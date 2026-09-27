@@ -1,4 +1,42 @@
 ; Generated from runtime/raven/src/System/Double.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Double.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
+ldarg value
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeUnion0(Double arg0) -> System.Result.Ok<Double>
+ldarg arg0
+newobj instance System.Result.Ok<Double>::.ctor(Double)
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeUnion1(System.Result.Ok<Double> arg0) -> System.Result<Double,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Double,System.NumberParseError>::.ctor(System.Result.Ok<Double>)
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
+ret
+.end
+.function neoCLR.Library.System.Double.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Double,System.NumberParseError>
+ldarg arg0
+newobj instance System.Result<Double,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
+ret
+.end
 .function neoCLR.Library.System.Double.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False

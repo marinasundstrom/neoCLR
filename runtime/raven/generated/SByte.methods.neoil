@@ -1,61 +1,255 @@
 ; Generated from runtime/raven/src/System/SByte.rvn. Regenerate with build_runtime_library.py.
 .type System.SByte
 .sealed
+.implements System.Number<SByte>
 .implements System.ComparableTo<SByte>
-.method instance readonly byref CompareTo(SByte other) -> Int32
+.property static Zero() -> SByte
+.get System.SByte::get_Zero()
+.end
+.property static One() -> SByte
+.get System.SByte::get_One()
+.end
+.method static get_Zero() -> SByte
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
-ldarg 0
+ldc.i4 0
 M00000001_IL_0003:
-ldobj SByte
-M00000001_IL_0008:
+conv.i1
+M00000001_IL_0004:
+ret
+.end
+.method static get_One() -> SByte
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i4 1
+M00000002_IL_0003:
+conv.i1
+M00000002_IL_0004:
+ret
+.end
+.method static op_Addition(SByte left,SByte right) -> SByte
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
 conv.i4
-M00000001_IL_0009:
+M00000003_IL_0004:
 ldarg 1
-M00000001_IL_000a:
+M00000003_IL_0005:
 conv.i4
-M00000001_IL_000b:
+M00000003_IL_0006:
+add
+M00000003_IL_0007:
+conv.i1
+M00000003_IL_0008:
+ret
+.end
+.method static op_Subtraction(SByte left,SByte right) -> SByte
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+conv.i4
+M00000004_IL_0004:
+ldarg 1
+M00000004_IL_0005:
+conv.i4
+M00000004_IL_0006:
+sub
+M00000004_IL_0007:
+conv.i1
+M00000004_IL_0008:
+ret
+.end
+.method static op_Multiply(SByte left,SByte right) -> SByte
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+conv.i4
+M00000005_IL_0004:
+ldarg 1
+M00000005_IL_0005:
+conv.i4
+M00000005_IL_0006:
+mul
+M00000005_IL_0007:
+conv.i1
+M00000005_IL_0008:
+ret
+.end
+.method static op_Division(SByte left,SByte right) -> SByte
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+conv.i4
+M00000006_IL_0004:
+ldarg 1
+M00000006_IL_0005:
+conv.i4
+M00000006_IL_0006:
+div
+M00000006_IL_0007:
+conv.i1
+M00000006_IL_0008:
+ret
+.end
+.method static Parse(String value) -> System.Result<SByte,System.NumberParseError>
+.local Value local0
+.local Int32 local1
+ldc.i4 0
+stloc local1
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call neoCLR.Runtime.ParseSByte(String)
+M00000007_IL_0008:
+stloc local0
+M00000007_IL_0009:
+M00000007_IL_000a:
+ldloc local0
+M00000007_IL_000b:
+value.is SByte
+call neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0010:
+brtrue M00000007_IL_001a
+M00000007_IL_0015:
+br M00000007_IL_002c
+M00000007_IL_001a:
+M00000007_IL_001b:
+ldloc local0
+M00000007_IL_001c:
+value.unpack SByte
+M00000007_IL_0021:
+call neoCLR.Library.System.SByte.RuntimeUnion0(SByte)
+M00000007_IL_0026:
+call neoCLR.Library.System.SByte.RuntimeUnion1(System.Result.Ok<SByte>)
+M00000007_IL_002b:
+ret
+M00000007_IL_002c:
+M00000007_IL_002d:
+M00000007_IL_002e:
+ldloc local0
+M00000007_IL_002f:
+value.unpack Int32
+M00000007_IL_0034:
+stloc local1
+M00000007_IL_0035:
+M00000007_IL_0036:
+ldloc local1
+M00000007_IL_0037:
+ldc.i4 1
+M00000007_IL_0038:
+ceq
+call neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003a:
+brtrue M00000007_IL_0044
+M00000007_IL_003f:
+br M00000007_IL_0059
+M00000007_IL_0044:
+call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorInvalidFormatNew()
+M00000007_IL_0049:
+call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat)
+M00000007_IL_004e:
+call neoCLR.Library.System.SByte.RuntimeUnion2(System.NumberParseError)
+M00000007_IL_0053:
+call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+M00000007_IL_0058:
+ret
+M00000007_IL_0059:
+M00000007_IL_005a:
+M00000007_IL_005b:
+ldloc local1
+M00000007_IL_005c:
+ldc.i4 2
+M00000007_IL_005d:
+ceq
+call neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_005f:
+brtrue M00000007_IL_0069
+M00000007_IL_0064:
+br M00000007_IL_007e
+M00000007_IL_0069:
+call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorOverflowNew()
+M00000007_IL_006e:
+call neoCLR.Library.System.SByte.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow)
+M00000007_IL_0073:
+call neoCLR.Library.System.SByte.RuntimeUnion2(System.NumberParseError)
+M00000007_IL_0078:
+call neoCLR.Library.System.SByte.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+M00000007_IL_007d:
+ret
+M00000007_IL_007e:
+M00000007_IL_007f:
+M00000007_IL_0080:
+ldstr "invalid native parse status"
+M00000007_IL_0085:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+.end
+.method instance readonly byref CompareTo(SByte other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldobj SByte
+M00000008_IL_0008:
+conv.i4
+M00000008_IL_0009:
+ldarg 1
+M00000008_IL_000a:
+conv.i4
+M00000008_IL_000b:
 clt
 call neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_000d:
-brtrue M00000001_IL_0017
-M00000001_IL_0012:
-br M00000001_IL_001a
-M00000001_IL_0017:
-M00000001_IL_0018:
+M00000008_IL_000d:
+brtrue M00000008_IL_0017
+M00000008_IL_0012:
+br M00000008_IL_001a
+M00000008_IL_0017:
+M00000008_IL_0018:
 ldc.i4 -1
-M00000001_IL_0019:
+M00000008_IL_0019:
 ret
-M00000001_IL_001a:
-M00000001_IL_001b:
-M00000001_IL_001c:
+M00000008_IL_001a:
+M00000008_IL_001b:
+M00000008_IL_001c:
 ldarg 0
-M00000001_IL_001d:
+M00000008_IL_001d:
 ldobj SByte
-M00000001_IL_0022:
+M00000008_IL_0022:
 conv.i4
-M00000001_IL_0023:
+M00000008_IL_0023:
 ldarg 1
-M00000001_IL_0024:
+M00000008_IL_0024:
 conv.i4
-M00000001_IL_0025:
+M00000008_IL_0025:
 cgt
 call neoCLR.Library.System.SByte.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0027:
-brtrue M00000001_IL_0031
-M00000001_IL_002c:
-br M00000001_IL_0034
-M00000001_IL_0031:
-M00000001_IL_0032:
+M00000008_IL_0027:
+brtrue M00000008_IL_0031
+M00000008_IL_002c:
+br M00000008_IL_0034
+M00000008_IL_0031:
+M00000008_IL_0032:
 ldc.i4 1
-M00000001_IL_0033:
+M00000008_IL_0033:
 ret
-M00000001_IL_0034:
-M00000001_IL_0035:
-M00000001_IL_0036:
+M00000008_IL_0034:
+M00000008_IL_0035:
+M00000008_IL_0036:
 ldc.i4 0
-M00000001_IL_0037:
+M00000008_IL_0037:
 ret
 .end
 .end

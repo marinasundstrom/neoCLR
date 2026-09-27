@@ -71,7 +71,7 @@ per the author’s 2026-09-27 clarification.
 
 The author accepted the assistant's two proposed slices on 2026-09-27. Both are
 implemented in development: String.ToUpperInvariant/ToLowerInvariant use Unicode 17
-full default casing; Int64.Parse returns a standard Int64ParseError union through
+full default casing; Int64.Parse returns the shared NumberParseError union through
 Result, ToString uses strict decimal formatting, and static read-only MinValue/
 MaxValue properties expose the range. The bounds are not compiler constant fields.
 [Design and .NET/Unicode/Rust comparisons](../design/text-casing-integer.md) and
@@ -253,3 +253,14 @@ DateTime(LocalDateTime | ZonedDateTime). Fixed-offset civil projection covers ye
 arithmetic across DST, and validate gaps, ordered overlaps and second-level offsets.
 Formatting uses the existing separate culture APIs. No unified localization resource
 implementation or scheduling API is added.
+
+## Number and concrete parsing — author-selected development
+
+The author selected Number for the eight fixed-width integers, Single and Double,
+with concrete Parse methods on those types and Boolean. Parsable is on hold; a
+numeric-specific parsing interface is a future candidate. The
+[numeric design](../design/numeric-contracts.md) owns grammar, arithmetic and
+current generic-import boundaries. The bounded development slice and focused consumer validation are complete;
+all numeric Parse methods use NumberParseError. See the [evidence](../experiments/numeric-contracts/README.md). General static/default/interface accessibility belongs to the
+[runtime tracker](runtime-language.md#interfaces-as-a-platform-capability), not a
+second library checklist. No broader milestone completion is implied.

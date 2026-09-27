@@ -1,53 +1,223 @@
 ; Generated from runtime/raven/src/System/UInt64.rvn. Regenerate with build_runtime_library.py.
 .type System.UInt64
 .sealed
+.implements System.Number<UInt64>
 .implements System.ComparableTo<UInt64>
-.method instance readonly byref CompareTo(UInt64 other) -> Int32
+.property static Zero() -> UInt64
+.get System.UInt64::get_Zero()
+.end
+.property static One() -> UInt64
+.get System.UInt64::get_One()
+.end
+.method static get_Zero() -> UInt64
 M00000001_IL_0000:
 M00000001_IL_0001:
 M00000001_IL_0002:
-ldarg 0
+ldc.i4 0
 M00000001_IL_0003:
-ldobj UInt64
-M00000001_IL_0008:
+conv.i8
+M00000001_IL_0004:
+ret
+.end
+.method static get_One() -> UInt64
+M00000002_IL_0000:
+M00000002_IL_0001:
+M00000002_IL_0002:
+ldc.i4 1
+M00000002_IL_0003:
+conv.i8
+M00000002_IL_0004:
+ret
+.end
+.method static op_Addition(UInt64 left,UInt64 right) -> UInt64
+M00000003_IL_0000:
+M00000003_IL_0001:
+M00000003_IL_0002:
+ldarg 0
+M00000003_IL_0003:
 ldarg 1
-M00000001_IL_0009:
+M00000003_IL_0004:
+add
+M00000003_IL_0005:
+ret
+.end
+.method static op_Subtraction(UInt64 left,UInt64 right) -> UInt64
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldarg 1
+M00000004_IL_0004:
+sub
+M00000004_IL_0005:
+ret
+.end
+.method static op_Multiply(UInt64 left,UInt64 right) -> UInt64
+M00000005_IL_0000:
+M00000005_IL_0001:
+M00000005_IL_0002:
+ldarg 0
+M00000005_IL_0003:
+ldarg 1
+M00000005_IL_0004:
+mul
+M00000005_IL_0005:
+ret
+.end
+.method static op_Division(UInt64 left,UInt64 right) -> UInt64
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldarg 1
+M00000006_IL_0004:
+div.un
+M00000006_IL_0005:
+ret
+.end
+.method static Parse(String value) -> System.Result<UInt64,System.NumberParseError>
+.local Value local0
+.local Int32 local1
+ldc.i4 0
+stloc local1
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
+call neoCLR.Runtime.ParseUInt64(String)
+M00000007_IL_0008:
+stloc local0
+M00000007_IL_0009:
+M00000007_IL_000a:
+ldloc local0
+M00000007_IL_000b:
+value.is UInt64
+call neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_0010:
+brtrue M00000007_IL_001a
+M00000007_IL_0015:
+br M00000007_IL_002c
+M00000007_IL_001a:
+M00000007_IL_001b:
+ldloc local0
+M00000007_IL_001c:
+value.unpack UInt64
+M00000007_IL_0021:
+call neoCLR.Library.System.UInt64.RuntimeUnion0(UInt64)
+M00000007_IL_0026:
+call neoCLR.Library.System.UInt64.RuntimeUnion1(System.Result.Ok<UInt64>)
+M00000007_IL_002b:
+ret
+M00000007_IL_002c:
+M00000007_IL_002d:
+M00000007_IL_002e:
+ldloc local0
+M00000007_IL_002f:
+value.unpack Int32
+M00000007_IL_0034:
+stloc local1
+M00000007_IL_0035:
+M00000007_IL_0036:
+ldloc local1
+M00000007_IL_0037:
+ldc.i4 1
+M00000007_IL_0038:
+ceq
+call neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_003a:
+brtrue M00000007_IL_0044
+M00000007_IL_003f:
+br M00000007_IL_0059
+M00000007_IL_0044:
+call neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorInvalidFormatNew()
+M00000007_IL_0049:
+call neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat)
+M00000007_IL_004e:
+call neoCLR.Library.System.UInt64.RuntimeUnion2(System.NumberParseError)
+M00000007_IL_0053:
+call neoCLR.Library.System.UInt64.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+M00000007_IL_0058:
+ret
+M00000007_IL_0059:
+M00000007_IL_005a:
+M00000007_IL_005b:
+ldloc local1
+M00000007_IL_005c:
+ldc.i4 2
+M00000007_IL_005d:
+ceq
+call neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_005f:
+brtrue M00000007_IL_0069
+M00000007_IL_0064:
+br M00000007_IL_007e
+M00000007_IL_0069:
+call neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorOverflowNew()
+M00000007_IL_006e:
+call neoCLR.Library.System.UInt64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow)
+M00000007_IL_0073:
+call neoCLR.Library.System.UInt64.RuntimeUnion2(System.NumberParseError)
+M00000007_IL_0078:
+call neoCLR.Library.System.UInt64.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
+M00000007_IL_007d:
+ret
+M00000007_IL_007e:
+M00000007_IL_007f:
+M00000007_IL_0080:
+ldstr "invalid native parse status"
+M00000007_IL_0085:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+.end
+.method instance readonly byref CompareTo(UInt64 other) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldobj UInt64
+M00000008_IL_0008:
+ldarg 1
+M00000008_IL_0009:
 clt.un
 call neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_000b:
-brtrue M00000001_IL_0015
-M00000001_IL_0010:
-br M00000001_IL_0018
-M00000001_IL_0015:
-M00000001_IL_0016:
+M00000008_IL_000b:
+brtrue M00000008_IL_0015
+M00000008_IL_0010:
+br M00000008_IL_0018
+M00000008_IL_0015:
+M00000008_IL_0016:
 ldc.i4 -1
-M00000001_IL_0017:
+M00000008_IL_0017:
 ret
-M00000001_IL_0018:
-M00000001_IL_0019:
-M00000001_IL_001a:
+M00000008_IL_0018:
+M00000008_IL_0019:
+M00000008_IL_001a:
 ldarg 0
-M00000001_IL_001b:
+M00000008_IL_001b:
 ldobj UInt64
-M00000001_IL_0020:
+M00000008_IL_0020:
 ldarg 1
-M00000001_IL_0021:
+M00000008_IL_0021:
 cgt.un
 call neoCLR.Library.System.UInt64.RuntimeBooleanToInt32(Boolean)
-M00000001_IL_0023:
-brtrue M00000001_IL_002d
-M00000001_IL_0028:
-br M00000001_IL_0030
-M00000001_IL_002d:
-M00000001_IL_002e:
+M00000008_IL_0023:
+brtrue M00000008_IL_002d
+M00000008_IL_0028:
+br M00000008_IL_0030
+M00000008_IL_002d:
+M00000008_IL_002e:
 ldc.i4 1
-M00000001_IL_002f:
+M00000008_IL_002f:
 ret
-M00000001_IL_0030:
-M00000001_IL_0031:
-M00000001_IL_0032:
+M00000008_IL_0030:
+M00000008_IL_0031:
+M00000008_IL_0032:
 ldc.i4 0
-M00000001_IL_0033:
+M00000008_IL_0033:
 ret
 .end
 .end

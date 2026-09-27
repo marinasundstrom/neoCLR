@@ -35,7 +35,8 @@ ambiguous and skipped local times; [TimeZoneError](xref:System.TimeZoneError) re
 lookup/range/discovery failures. See [DateTime and zones](/features/time/) and the [exact union declaration](date-time-union.md).
 
 [Casing and decimal reporting](text-numbers.md) covers development
-String.ToUpperInvariant/ToLowerInvariant and Int64 parsing, formatting and bounds.
+String.ToUpperInvariant/ToLowerInvariant, Number arithmetic, concrete primitive
+parsing, and Int64 formatting and bounds (development).
 
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)

@@ -1,9 +1,37 @@
 namespace System
 
-public struct UInt16 : ComparableTo<ushort> {
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
+public struct UInt16 : Number<ushort> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: ushort
+
+    static val Zero: ushort => (ushort)0
+    static val One: ushort => (ushort)1
+
+    static func +(left: ushort, right: ushort) -> ushort => (ushort)(left + right)
+    static func -(left: ushort, right: ushort) -> ushort => (ushort)(left - right)
+    static func *(left: ushort, right: ushort) -> ushort => (ushort)(left * right)
+    static func /(left: ushort, right: ushort) -> ushort => (ushort)(left / right)
+
+    /// Parses the complete text using the strict, culture-independent grammar.
+    static func Parse(value: string) -> Result<ushort, NumberParseError> {
+        let payload = RuntimeServices.ParseUInt16(value)
+        if RuntimeServices.IsValue<ushort>(payload) {
+            return Ok(RuntimeServices.UnpackValue<ushort>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<int>(payload)
+        if status == 1 {
+            return Error(NumberParseError.InvalidFormat())
+        }
+        if status == 2 {
+            return Error(NumberParseError.Overflow())
+        }
+        System.Fault("invalid native parse status")
+        return Error(NumberParseError.InvalidFormat())
+    }
 
     func CompareTo(other: ushort) -> int {
         if m_value < other {

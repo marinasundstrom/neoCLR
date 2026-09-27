@@ -109,7 +109,7 @@ identity and execution. It does not establish .NET Framework/NanoFramework execu
 
 Seven typed error carriers now own their cases, predicates, extraction and formatting
 in Raven: FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
-Int32ParseError, IntegerDivisionError and Linq.SingleError. Each retains exactly one
+NumberParseError, IntegerDivisionError and Linq.SingleError. Each retains exactly one
 erased Stored field and the existing empty nested cases. Bootstrap-only ValueStorage
 pack/test/unpack intrinsics admit those checked cases; arbitrary payloads are rejected.
 The importer checks constructor CIL before lowering the single field assignment to

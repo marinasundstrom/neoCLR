@@ -1,5 +1,10 @@
 # Int32.Parse: typed error contract
 
+The carrier spellings below describe the archived Neo/bootstrap profile. The current
+Raven development API uses `Result<int, NumberParseError>` (and the same error union
+for all numeric Parse methods); see [numeric contracts](design/numeric-contracts.md).
+
+
 `System.Int32.Parse(String) -> System.Result<Int32,System.Int32ParseError>` returns
 an ordinary Result with a successful Int32 or a specific parsing error. The non-generic
 System.Int32ParseError carrier contains one of its directly nested ordinary types:

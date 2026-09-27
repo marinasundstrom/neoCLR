@@ -1,9 +1,16 @@
 ; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
 .type System.Int32
 .sealed
+.implements System.Number<Int32>
 .implements System.ComparableTo<Int32>
 .implements System.EquatableTo<Int32>
-.method static Parse(String value) -> System.Result<Int32,System.Int32ParseError>
+.property static Zero() -> Int32
+.get System.Int32::get_Zero()
+.end
+.property static One() -> Int32
+.get System.Int32::get_One()
+.end
+.method static Parse(String value) -> System.Result<Int32,System.NumberParseError>
 .local Value local0
 .local Byte local1
 ldc.i4 0
@@ -60,13 +67,13 @@ brtrue M00000001_IL_0045
 M00000001_IL_0040:
 br M00000001_IL_005a
 M00000001_IL_0045:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorInvalidFormatNew()
+call neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorInvalidFormatNew()
 M00000001_IL_004a:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorInvalidFormat(System.Int32ParseError.InvalidFormat)
+call neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat)
 M00000001_IL_004f:
-call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
+call neoCLR.Library.System.Int32.RuntimeUnion2(System.NumberParseError)
 M00000001_IL_0054:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
 M00000001_IL_0059:
 ret
 M00000001_IL_005a:
@@ -85,13 +92,13 @@ brtrue M00000001_IL_006b
 M00000001_IL_0066:
 br M00000001_IL_0080
 M00000001_IL_006b:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorOverflowNew()
+call neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorOverflowNew()
 M00000001_IL_0070:
-call neoCLR.Library.System.Int32.RuntimeErrorSystemInt32ParseErrorNewSystemInt32ParseErrorOverflow(System.Int32ParseError.Overflow)
+call neoCLR.Library.System.Int32.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow)
 M00000001_IL_0075:
-call neoCLR.Library.System.Int32.RuntimeUnion2(System.Int32ParseError)
+call neoCLR.Library.System.Int32.RuntimeUnion2(System.NumberParseError)
 M00000001_IL_007a:
-call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.Int32ParseError>)
+call neoCLR.Library.System.Int32.RuntimeUnion3(System.Result.Error<System.NumberParseError>)
 M00000001_IL_007f:
 ret
 M00000001_IL_0080:
@@ -204,52 +211,116 @@ call neoCLR.Runtime.Int32ToString(Int32)
 M00000004_IL_000d:
 ret
 .end
-.method instance readonly byref CompareTo(Int32 other) -> Int32
+.method static get_Zero() -> Int32
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
-ldarg 0
+ldc.i4 0
 M00000005_IL_0003:
-ldobj Int32
-M00000005_IL_0008:
+ret
+.end
+.method static get_One() -> Int32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldc.i4 1
+M00000006_IL_0003:
+ret
+.end
+.method static op_Addition(Int32 left,Int32 right) -> Int32
+M00000007_IL_0000:
+M00000007_IL_0001:
+M00000007_IL_0002:
+ldarg 0
+M00000007_IL_0003:
 ldarg 1
-M00000005_IL_0009:
+M00000007_IL_0004:
+add
+M00000007_IL_0005:
+ret
+.end
+.method static op_Subtraction(Int32 left,Int32 right) -> Int32
+M00000008_IL_0000:
+M00000008_IL_0001:
+M00000008_IL_0002:
+ldarg 0
+M00000008_IL_0003:
+ldarg 1
+M00000008_IL_0004:
+sub
+M00000008_IL_0005:
+ret
+.end
+.method static op_Multiply(Int32 left,Int32 right) -> Int32
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldarg 1
+M00000009_IL_0004:
+mul
+M00000009_IL_0005:
+ret
+.end
+.method static op_Division(Int32 left,Int32 right) -> Int32
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldarg 1
+M0000000a_IL_0004:
+div
+M0000000a_IL_0005:
+ret
+.end
+.method instance readonly byref CompareTo(Int32 other) -> Int32
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldobj Int32
+M0000000b_IL_0008:
+ldarg 1
+M0000000b_IL_0009:
 clt
 call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_000b:
-brtrue M00000005_IL_0015
-M00000005_IL_0010:
-br M00000005_IL_0018
-M00000005_IL_0015:
-M00000005_IL_0016:
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0018
+M0000000b_IL_0015:
+M0000000b_IL_0016:
 ldc.i4 -1
-M00000005_IL_0017:
+M0000000b_IL_0017:
 ret
-M00000005_IL_0018:
-M00000005_IL_0019:
-M00000005_IL_001a:
+M0000000b_IL_0018:
+M0000000b_IL_0019:
+M0000000b_IL_001a:
 ldarg 0
-M00000005_IL_001b:
+M0000000b_IL_001b:
 ldobj Int32
-M00000005_IL_0020:
+M0000000b_IL_0020:
 ldarg 1
-M00000005_IL_0021:
+M0000000b_IL_0021:
 cgt
 call neoCLR.Library.System.Int32.RuntimeBooleanToInt32(Boolean)
-M00000005_IL_0023:
-brtrue M00000005_IL_002d
-M00000005_IL_0028:
-br M00000005_IL_0030
-M00000005_IL_002d:
-M00000005_IL_002e:
+M0000000b_IL_0023:
+brtrue M0000000b_IL_002d
+M0000000b_IL_0028:
+br M0000000b_IL_0030
+M0000000b_IL_002d:
+M0000000b_IL_002e:
 ldc.i4 1
-M00000005_IL_002f:
+M0000000b_IL_002f:
 ret
-M00000005_IL_0030:
-M00000005_IL_0031:
-M00000005_IL_0032:
+M0000000b_IL_0030:
+M0000000b_IL_0031:
+M0000000b_IL_0032:
 ldc.i4 0
-M00000005_IL_0033:
+M0000000b_IL_0033:
 ret
 .end
 .end

@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add development Number<T> for eight fixed-width integers, Single and Double:
+  inherited ordering, static Zero/One and binary arithmetic. Add strict concrete
+  Parse methods for the remaining numeric types and Boolean, using standard Raven
+  NumberParseError/BooleanParseError unions. All numeric parsers, including Int32/Int64,
+  share NumberParseError; migrate old numeric error patterns to the shared union.
+  Parsing interfaces remain on hold. Validate nominal static contracts and admit
+  bounded closed static application numeric specialization, with explicit limits
+  on custom types/additional constraints. Integrate independently tested general
+  Raven static-interface/constraint fixes; broader static/default/interface
+  accessibility is recorded as platform direction. Refresh matching API references,
+  generated primitive slices and focused native/consumer/metadata evidence.
+
 - Add provisional TimeOffset, named IANA TimeZone rules, immutable ZonedDateTime and
   explicit Unique/Ambiguous/Skipped local mapping. Introduce the author-directed
   nominal parenthesized DateTime(LocalDateTime | ZonedDateTime), with typed matching

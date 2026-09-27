@@ -250,12 +250,6 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'ConsoleReadError'">
     <Compile Include="src/System/ConsoleReadError.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int64ParseError'">
-    <Compile Include="src/System/Int64ParseError.rvn" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Int32ParseError'">
-    <Compile Include="src/System/Int32ParseError.rvn" />
-  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'SingleError'">
     <Compile Include="src/System/Linq/SingleError.rvn" />
   </ItemGroup>
@@ -462,5 +456,14 @@
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderState'">
     <Compile Include="src/System/Text/EncoderState.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Number'">
+    <Compile Include="src/System/Number.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'NumberParseError'">
+    <Compile Include="src/System/NumberParseError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BooleanParseError'">
+    <Compile Include="src/System/BooleanParseError.rvn" />
   </ItemGroup>
 </Project>

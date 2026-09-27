@@ -11,7 +11,7 @@ static class InterfaceBindings
         public interface Clonable<T> { T Clone(); }
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
-    static readonly HashSet<string> Contracts = new() { "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
+    static readonly HashSet<string> Contracts = new() { "System.Number", "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
     public static bool IsInterface(string type) => type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
@@ -67,11 +67,12 @@ static class InterfaceBindings
     }
     public static void Validate(ModuleDefinition module)
     {
+        NumberBindings.Validate(module);
         ComparerBindings.Validate(module);
         StreamBindings.ValidateCapabilities(module);
         StorageProviderBindings.Validate(module);
         StorageItemBindings.Validate(module);
-        foreach (var name in Contracts) {
+        foreach (var name in Contracts.Where(n => n != "System.Number")) {
             var type = module.GetType(name + "`1");
             if (type is null || !type.IsInterface || type.GenericParameters.Count != 1
                 || type.GenericParameters[0].Attributes != GenericParameterAttributes.NonVariant

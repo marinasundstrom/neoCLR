@@ -1,5 +1,15 @@
 # Raven targeting neoCLR
 
+## Number integration (2026-09-27)
+
+The current numeric slice requires Raven neoCLR commit `617efd444` or later,
+including independently integrated authored-static-interface, inherited-constraint
+and target-metadata emission fixes. No Runtime Contract setting changed. Number<T>
+and all concrete numeric parsers use matching development references; parsing
+returns the shared NumberParseError. See [numeric scope and evidence](../numeric-contracts/README.md)
+and [broader interface direction](../../tracking/runtime-language.md#interfaces-as-a-platform-capability).
+The historical probe revisions below describe their original experiments.
+
 ## Development compiler policy (2026-09-24)
 
 The shared neoCLR build props now require Raven's AllowNullableValueTypes option

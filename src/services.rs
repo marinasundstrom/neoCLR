@@ -12,6 +12,7 @@ pub enum RuntimeService {
     ManagedHeap,
     ParseInt32,
     ParseInt64,
+    ParseNumber,
     FormatInt32,
     ConsoleOutput,
     NativeInterop,
@@ -138,6 +139,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::ReadAllText => RuntimeService::FileInput,
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::ParseInt64 => RuntimeService::ParseInt64,
+            crate::native::Binding::ParseNumber(_) => RuntimeService::ParseNumber,
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::IntegerToString | crate::native::Binding::StringCasing(_) => {
                 RuntimeService::StringOperations

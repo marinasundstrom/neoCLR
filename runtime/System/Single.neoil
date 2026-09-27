@@ -1,2 +1,2 @@
-.include "../raven/generated/Single.methods.neoil"
-.include "../raven/generated/Single.helpers.neoil"
+.include "../raven/generated/Single.bootstrap.methods.neoil"
+.include "../raven/generated/Single.bootstrap.helpers.neoil"

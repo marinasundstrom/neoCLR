@@ -1,9 +1,26 @@
 namespace System
 
+import System.Result.*
+import System.Runtime.CompilerServices.RuntimeServices
+
 public struct Boolean : ComparableTo<bool> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: bool
+
+    /// Parses the complete text using the strict, culture-independent grammar.
+    static func Parse(value: string) -> Result<bool, BooleanParseError> {
+        let payload = RuntimeServices.ParseBoolean(value)
+        if RuntimeServices.IsValue<bool>(payload) {
+            return Ok(RuntimeServices.UnpackValue<bool>(payload))
+        }
+        let status = RuntimeServices.UnpackValue<int>(payload)
+        if status == 1 {
+            return Error(BooleanParseError.InvalidFormat())
+        }
+        System.Fault("invalid native parse status")
+        return Error(BooleanParseError.InvalidFormat())
+    }
 
     func CompareTo(other: bool) -> int {
         if m_value == other {

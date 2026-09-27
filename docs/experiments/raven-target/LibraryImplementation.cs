@@ -154,14 +154,15 @@ static class LibraryImplementation
         IPAddressBindings.Validate(contract);
         JsonBindings.Validate(contract);
         // Bounded invariant declaration authoring, not permission to replace a class with an
-        // interface or supply executable default/static interface members.
+        // interface or supply executable default bodies. Static abstract members must
+        // match the selected reference contract just as instance members do.
         foreach (var candidate in new[] { type, contract })
             if (!candidate.IsPublic || !candidate.IsInterface || !candidate.IsAbstract
                 || candidate.IsSealed || candidate.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant) || candidate.HasFields
                 || candidate.HasNestedTypes || candidate.HasEvents
                 || candidate.BaseType is not null || candidate.IsExplicitLayout
                 || candidate.Methods.Any(m => !m.IsPublic || !m.IsAbstract || !m.IsVirtual
-                    || !m.IsNewSlot || m.IsFinal || m.IsStatic || m.IsConstructor || m.HasBody
+                    || !m.IsNewSlot || m.IsFinal || m.IsConstructor || m.HasBody
                     || m.HasGenericParameters || m.ExplicitThis || m.HasOverrides
                     || m.CallingConvention != MethodCallingConvention.Default
                     || m.Parameters.Any(p => (p.IsOut || p.ParameterType.IsByReference) && !PropagationLibrary.IsOutput(m, p))))
@@ -170,7 +171,7 @@ static class LibraryImplementation
         // use this explicitly selected source/reference pair during validation.
         ApplicationTypes.BindLibrary(type, owner);
         bool Match(MethodDefinition left, MethodDefinition right) =>
-            left.Name == right.Name && SameType(left.ReturnType, right.ReturnType)
+            left.Name == right.Name && left.IsStatic == right.IsStatic && SameType(left.ReturnType, right.ReturnType)
             && left.Parameters.Count == right.Parameters.Count
             && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name && p.First.IsOut == p.Second.IsOut
                 && SameType(p.First.ParameterType, p.Second.ParameterType));

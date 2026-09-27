@@ -16,8 +16,8 @@ public func Parsed(text: string, expected: long) {
 
 public func Rejected(text: string, overflow: bool) {
     match Int64.Parse(text) {
-        Error(Int64ParseError.InvalidFormat) => Check(!overflow, "expected overflow")
-        Error(Int64ParseError.Overflow) => Check(overflow, "expected format")
+        Error(NumberParseError.InvalidFormat) => Check(!overflow, "expected overflow")
+        Error(NumberParseError.Overflow) => Check(overflow, "expected format")
         _ => System.Fault("expected parse error")
     }
 }

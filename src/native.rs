@@ -49,6 +49,7 @@ pub(crate) enum Binding {
     TypeArgument,
     ParseInt32,
     ParseInt64,
+    ParseNumber(crate::numeric_parse::Kind),
     StringCasing(bool),
     Int32ToString,
     IntegerToString,
@@ -170,10 +171,19 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::ReflectionConstruct,
             Type::from_name("System.Object"),
         ),
-        ("neoCLR.Runtime.TimeZoneExists", [Type::String]) => (Binding::TimeZoneExists, Type::Boolean),
-        ("neoCLR.Runtime.TimeZoneOffset", [Type::String, Type::Int64]) => (Binding::TimeZoneOffset, Type::Int32),
-        ("neoCLR.Runtime.TimeZoneMapLocal", [Type::String, Type::Int64]) => (Binding::TimeZoneMapLocal, Type::Array(Box::new(Type::Int64))),
-        ("neoCLR.Runtime.TimeZoneDatabaseVersion", []) => (Binding::TimeZoneDatabaseVersion, Type::String),
+        ("neoCLR.Runtime.TimeZoneExists", [Type::String]) => {
+            (Binding::TimeZoneExists, Type::Boolean)
+        }
+        ("neoCLR.Runtime.TimeZoneOffset", [Type::String, Type::Int64]) => {
+            (Binding::TimeZoneOffset, Type::Int32)
+        }
+        ("neoCLR.Runtime.TimeZoneMapLocal", [Type::String, Type::Int64]) => (
+            Binding::TimeZoneMapLocal,
+            Type::Array(Box::new(Type::Int64)),
+        ),
+        ("neoCLR.Runtime.TimeZoneDatabaseVersion", []) => {
+            (Binding::TimeZoneDatabaseVersion, Type::String)
+        }
         ("neoCLR.Runtime.SystemTimeZoneName", []) => (Binding::SystemTimeZoneName, Type::String),
         ("neoCLR.Runtime.SystemCultureName", []) => (Binding::SystemCultureName, Type::String),
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
@@ -203,6 +213,42 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::StringCasing(false), Type::String)
         }
         ("neoCLR.Runtime.ParseInt64", [Type::String]) => (Binding::ParseInt64, Type::Value),
+        ("neoCLR.Runtime.ParseSByte", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::SByte),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseByte", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::Byte),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseInt16", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::Int16),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseUInt16", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::UInt16),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseUInt32", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::UInt32),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseUInt64", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::UInt64),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseSingle", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::Single),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseDouble", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::Double),
+            Type::Value,
+        ),
+        ("neoCLR.Runtime.ParseBoolean", [Type::String]) => (
+            Binding::ParseNumber(crate::numeric_parse::Kind::Boolean),
+            Type::Value,
+        ),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Int64ToString", [Type::Int64])
@@ -670,11 +716,21 @@ impl Binding {
                     crate::type_identity::describe_loaded(module, &concrete)?,
                 )))
             }
-            (Self::TimeZoneExists, [Value::String(id)]) => Ok(Value::Boolean(crate::time_zones::exists(id))),
-            (Self::TimeZoneOffset, [Value::String(id), Value::Int64(ticks)]) => Ok(Value::Int32(crate::time_zones::offset(id, *ticks))),
-            (Self::TimeZoneMapLocal, [Value::String(id), Value::Int64(ticks)]) => Ok(crate::time_zones::map_local(id, *ticks)),
-            (Self::TimeZoneDatabaseVersion, []) => Ok(Value::String(chrono_tz::IANA_TZDB_VERSION.into())),
-            (Self::SystemTimeZoneName, []) => Ok(Value::String(iana_time_zone::get_timezone().unwrap_or_default().into())),
+            (Self::TimeZoneExists, [Value::String(id)]) => {
+                Ok(Value::Boolean(crate::time_zones::exists(id)))
+            }
+            (Self::TimeZoneOffset, [Value::String(id), Value::Int64(ticks)]) => {
+                Ok(Value::Int32(crate::time_zones::offset(id, *ticks)))
+            }
+            (Self::TimeZoneMapLocal, [Value::String(id), Value::Int64(ticks)]) => {
+                Ok(crate::time_zones::map_local(id, *ticks))
+            }
+            (Self::TimeZoneDatabaseVersion, []) => {
+                Ok(Value::String(chrono_tz::IANA_TZDB_VERSION.into()))
+            }
+            (Self::SystemTimeZoneName, []) => Ok(Value::String(
+                iana_time_zone::get_timezone().unwrap_or_default().into(),
+            )),
             (Self::SystemCultureName, []) => Ok(Value::String(
                 sys_locale::get_locale().unwrap_or_default().into(),
             )),
@@ -836,6 +892,9 @@ impl Binding {
                     }
                 };
                 Ok(Value::Erased(Box::new(payload)))
+            }
+            (Self::ParseNumber(kind), [Value::String(text)]) => {
+                Ok(crate::numeric_parse::parse(text, *kind))
             }
             (Self::ParseInt64, [Value::String(text)]) => {
                 // Validate the whole grammar first: malformed text wins over overflow.

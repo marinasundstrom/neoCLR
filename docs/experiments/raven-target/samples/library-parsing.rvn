@@ -2,19 +2,19 @@ import System.Result.*
 import System.*
 import System.Console.*
 
-func ParseInput(text: string) -> Result<int, Int32ParseError> {
+func ParseInput(text: string) -> Result<int, NumberParseError> {
     let value = Int32.Parse(text)?
     WriteLine("Parsed")
     return Ok(value)
 }
 
-func ShowParse(result: Result<int, Int32ParseError>) {
+func ShowParse(result: Result<int, NumberParseError>) {
     match result {
         .Ok(let ok) => WriteLine(ok)
         .Error(let error) => {
-            if (error is Int32ParseError.InvalidFormat) {
+            if (error is NumberParseError.InvalidFormat) {
                 WriteLine("Invalid format")
-            } else if (error is Int32ParseError.Overflow) {
+            } else if (error is NumberParseError.Overflow) {
                 WriteLine("Overflow")
             }
         }

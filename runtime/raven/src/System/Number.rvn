@@ -1,0 +1,14 @@
+namespace System
+
+/// Basic arithmetic and ordering for numeric values. Parsing is a separate capability.
+public interface Number<T> : ComparableTo<T> {
+    /// The additive identity.
+    static val Zero: T { get; }
+    /// The multiplicative identity.
+    static val One: T { get; }
+
+    static func +(left: T, right: T) -> T
+    static func -(left: T, right: T) -> T
+    static func *(left: T, right: T) -> T
+    static func /(left: T, right: T) -> T
+}

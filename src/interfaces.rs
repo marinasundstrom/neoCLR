@@ -28,7 +28,11 @@ pub(crate) fn is_bodyless(module: &Module, function: &Function) -> bool {
 
 pub(crate) fn validate_contract(function: &Function) -> Result<(), Fault> {
     let explicit = !function.interface_implementations.is_empty();
-    if !function.instance
+    if (!function.instance
+        && (!function.body.is_empty()
+            || function.receiver_byref
+            || function.receiver_readonly
+            || explicit))
         || function.visibility
             != if explicit {
                 Visibility::Private
@@ -200,7 +204,7 @@ fn member(
             definition: None,
             name: format!("{}.{name}", owner.definition_name().unwrap()),
             owner: Some(owner.clone()),
-            instance: true,
+            instance: contract.instance,
             generic_arguments: vec![],
             parameters: contract.parameters.clone(),
         };
@@ -232,7 +236,9 @@ fn check_signature(
             .owner
             .as_ref()
             .is_some_and(|owner| !module.is_reference_type(owner));
-    if implementation.parameters != contract.parameters {
+    if implementation.instance != contract.instance
+        || implementation.parameters != contract.parameters
+    {
         return Err(Fault::new(
             "interface implementation requires exact parameter types",
         ));

@@ -145,12 +145,14 @@ static class UnionImport
         }
         var delegateAdapters = new Dictionary<string, string>();
         var mappings = new List<(MethodDefinition Method, int MethodId, int Offset)>();
+        var numericSpecialization = new NumericSpecialization(library.MainModule, guestLibraries.Append(app.MainModule));
         var pending = new Queue<MethodDefinition>(entry is not null ? [entry] : exports);
         var seen = new HashSet<MethodDefinition>();
         var instanceBodies = new Dictionary<MethodDefinition, string>();
         while (pending.TryDequeue(out var method))
         {
             if (!seen.Add(method)) continue;
+            if (libraryOwner is null) numericSpecialization.Rewrite(method);
             var methodId = seen.Count;
             // Library slices include public overloads and private transport state machines.
             // Keep application admission at its existing bound.
@@ -974,10 +976,10 @@ static class UnionImport
             // Library metadata keeps author-supplied parameter names for introspection.
             var declaredParameters = args.Skip(method.HasThis ? 1 : 0).Select((t, i) =>
                 libraryOwner is not null ? (GenericUnionLibrary.IsConditionalOutput(method, method.Parameters[i]) || ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t + " " + OpaqueLibrary.ParameterName(method, i) : (ApplicationTypes.IsConditionalUnionOutput(method) ? "out(true) " : method.Parameters[i].IsOut ? "out " : "") + t);
-            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {Name(method)}({string.Join(',', args)}) -> {result}");
+            output.AppendLine(libraryOwner is not null && !emitInstance && !emitOwnedStatic ? $".function {(method.IsAssembly ? "internal " : "")}{Name(method)}({string.Join(',', args.Select((t, i) => t + " " + method.Parameters[i].Name))}) -> {(libraryOwner == "System.Console" && result == "noresult" ? "Void" : result)}" : emitOwnedStatic ? $".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}static {ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {result}" : emitInstance ? $".method {(libraryOwner is not null && method.IsPrivate ? "private " : (DescriptorLibrary.IsBaseConstructor(method) || libraryOwner is not null && method.IsAssembly) ? "internal " : "")}instance {ApplicationTypes.Modifiers(method)}{(LibraryImplementation.IsReadonlyReceiver(method) ? "readonly " : "")}{((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "byref " : "")}{ApplicationTypes.MethodName(method)}({string.Join(',', declaredParameters)}) -> {(method.DeclaringType.IsValueType && !asyncStateMember && result == "noresult" ? "Void" : result)}" : $".function {(numericSpecialization.IsSpecialized(method) ? "internal " : "")}{Name(method)}({string.Join(',', args)}) -> {result}");
             if (OpaqueLibrary.IsExplicitStringCount(method))
                 output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");
-            if (libraryOwner is null) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
+            if (libraryOwner is null && !numericSpecialization.IsSpecialized(method)) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             // Adapter temporaries are declared before code and assigned explicitly;
             // in particular, ref-protocol temporaries must never be default roots.
@@ -1037,15 +1039,15 @@ static class UnionImport
             IdentityEncoding = "assembly-signature-v1",
             AssemblyIdentity = app.Name.FullName, TypeIdentities = ApplicationTypes.IdentityMap(),
             MethodIdentities = seen
-                .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32(), MetadataName = m.FullName,
+                .Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = numericSpecialization.Origin(m).MetadataToken.ToUInt32(), MetadataName = m.FullName,
                     RuntimeName = (libraryOwner is not null && m.DeclaringType.IsValueType) || m.HasThis && (libraryOwner is not null || !(m.IsConstructor && m.DeclaringType.IsValueType))
                         ? ApplicationTypes.Type(m.DeclaringType) + "::" + ApplicationTypes.MethodName(m) : Name(m) }),
             Profile = libraryOwner is not null ? ((exports.Any(m => m.HasThis) || ApplicationTypes.IdentityMap().Length != 0) ? "instance-library-fragment-v1" : "namespace-library-fragment-v1") : collectionProfile ? "result-option-void-instance-libraries-v11" : "result-option-void-files-strings-arrays-v7",
             RequiredLibraryProfile = collectionProfile ? "raven-collections" : "bundled-system", ApplicationSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(application))),
             CoreSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(core))), DependencyImages = dependencies.Select(path => new { AssemblyIdentity = System.Reflection.AssemblyName.GetAssemblyName(path).FullName,
                 Sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))) }),
-            ReachableMethods = seen.Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = m.MetadataToken.ToUInt32() }),
-            Mappings = mappings.Select(m => new { AssemblyIdentity = m.Method.Module.Assembly.Name.FullName, MethodToken = m.Method.MetadataToken.ToUInt32(), m.Offset,
+            ReachableMethods = seen.Select(m => new { AssemblyIdentity = m.Module.Assembly.Name.FullName, MethodToken = numericSpecialization.Origin(m).MetadataToken.ToUInt32() }),
+            Mappings = mappings.Select(m => new { AssemblyIdentity = m.Method.Module.Assembly.Name.FullName, MethodToken = numericSpecialization.Origin(m.Method).MetadataToken.ToUInt32(), m.Offset,
                 OutputLabel = $"M{m.MethodId:x8}_IL_{m.Offset:x4}:", OutputLine = labelLines[$"M{m.MethodId:x8}_IL_{m.Offset:x4}:"] }),
             Scope = "Bounded application class/value fields, constructors and instance methods; Int32/String vectors, optional closed collection references, file UTF-8 APIs, String helpers and generic Result/Option bindings; CFG stack/definite-assignment checked; observable default carriers rejected; explicit nongeneric library types and bodies admitted; no reference-core declaration bodies executed."
         }, new JsonSerializerOptions { WriteIndented = true }));
@@ -1119,7 +1121,7 @@ static class UnionImport
             throw new InvalidDataException("Unsupported runtime signature.");
         // Reuse the declaration catalog for its bounded static Int32 APIs. Check
         // both sides before mapping a resolved CLI reference to the runtime library.
-        var file = FaultBindings.Bind(reference, definition) ?? BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? UnicodeScalarBindings.Bind(reference, definition) ?? Utf8Bindings.Bind(reference, definition) ?? IPAddressBindings.Bind(reference, definition) ?? UriBindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
+        var file = NumberBindings.Bind(reference, definition) ?? FaultBindings.Bind(reference, definition) ?? BooleanBindings.Bind(reference, definition) ?? ProcessBindings.Bind(reference, definition) ?? GenericUnionBindings.Bind(reference, definition) ?? ErrorBindings.Bind(reference, definition) ?? CalendarBindings.Bind(reference, definition) ?? PrimitiveBindings.Bind(reference, definition) ?? DoubleBindings.Bind(reference, definition) ?? Int32Bindings.Bind(reference, definition) ?? UnicodeScalarBindings.Bind(reference, definition) ?? Utf8Bindings.Bind(reference, definition) ?? IPAddressBindings.Bind(reference, definition) ?? UriBindings.Bind(reference, definition) ?? PathBindings.Bind(reference, definition) ?? FileBindings.Bind(reference, definition) ?? ResultBindings.Bind(reference, definition);
         if (file is not null)
         {
             if ((file.OutArgument >= 0 && file.Result == "Boolean" || reference.Name == "FromResidual")

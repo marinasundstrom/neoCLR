@@ -360,7 +360,7 @@ static class ApplicationTypes
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute") || ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));
             foreach (var method in type.Methods.Where(m => m.IsAbstract))
-                output.AppendLine($".method instance {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && p.IsOut ? "out " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
+                output.AppendLine($".method {(method.IsStatic ? "static" : "instance")} {(LibraryNames.ContainsKey(type) && PropagationLibrary.IsContract(type) ? "readonly byref " : "")}{(type.IsInterface ? "" : "abstract ")}{MethodName(method)}({string.Join(',', method.Parameters.Select(p => (LibraryNames.ContainsKey(type) && p.IsOut ? "out " : "") + map(p.ParameterType, false) + (LibraryNames.ContainsKey(type) ? " " + p.Name : "")))}) -> {map(method.ReturnType, true)}\n.end");
             // Defer storage initialization for the explicit async state-machine contract,
             // independent of generated names or union-case conventions.
             var deferredState = !IsLibrary(type) && !type.IsValueType && type.Interfaces.Any(i =>

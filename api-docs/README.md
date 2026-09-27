@@ -18,6 +18,11 @@ Encoder, EncoderProgress/EncoderState, CreateEncoder and StreamWriter.Finish are
 additional development APIs; custom Encoding implementations must add the factory. Keep generated signatures and authored guides
 aligned with the matching runtime and compiler reference artifacts.
 
+Number, NumberParseError/BooleanParseError and concrete primitive Parse are also
+development APIs. Number's static operators/identities and inherited ordering have
+matching type/member documentation. The numeric guide records the current closed
+primitive-only generic specialization limits; no Parsable interface is exposed.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not
@@ -201,7 +206,7 @@ so every family uses the same supplied IUnion identity.
 
 The same generated union documentation now covers StreamError, TextReadError,
 StorageLookupError, FileReadError, FileWriteError, ConsoleReadError, Utf8SliceError,
-Int32ParseError, IntegerDivisionError and SingleError. EntryKind is an enum instead:
+NumberParseError, IntegerDivisionError and SingleError. EntryKind is an enum instead:
 its named fields replace nested union cases and Is*/Get* accessors. Zero is unnamed.
 
 Development cancellation source/token/registration APIs now have generated type and
@@ -330,7 +335,7 @@ payload routes were confirmed absent and are supplied by manual-members.json.
 ## Casing and Int64 development slice
 
 String.ToUpperInvariant/ToLowerInvariant, Int64.Parse/ToString/MinValue/MaxValue
-and standard Int64ParseError now have generated type/member coverage and XML
+and standard NumberParseError now have generated type/member coverage and XML
 contracts. [Casing and decimal reporting](text-numbers.md) explains Unicode 17 full
 mappings, .NET differences, typed failures and static bounds properties. Matching
 native runtime, library and reference artifacts are required; no manual exclusions.

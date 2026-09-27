@@ -3,25 +3,25 @@ namespace System
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public struct Int32 : ComparableTo<int>, EquatableTo<int> {
+public struct Int32 : Number<int>, EquatableTo<int> {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: int
 
-    static func Parse(value: string) -> Result<int, Int32ParseError> {
+    static func Parse(value: string) -> Result<int, NumberParseError> {
         let payload = RuntimeServices.ParseInt32(value)
         if RuntimeServices.IsValue<int>(payload) {
             return Ok(RuntimeServices.UnpackValue<int>(payload))
         }
         let status = RuntimeServices.UnpackValue<byte>(payload)
         if status == 1 {
-            return Error(Int32ParseError.InvalidFormat())
+            return Error(NumberParseError.InvalidFormat())
         }
         if status == 2 {
-            return Error(Int32ParseError.Overflow())
+            return Error(NumberParseError.Overflow())
         }
         System.Fault("invalid native parse status")
-        return Error(Int32ParseError.InvalidFormat())
+        return Error(NumberParseError.InvalidFormat())
     }
 
     static func Divide(dividend: int, divisor: int) -> System.Result<int, IntegerDivisionError> {
@@ -41,6 +41,14 @@ public struct Int32 : ComparableTo<int>, EquatableTo<int> {
     func ToString() -> string {
         return RuntimeServices.Int32ToString(m_value)
     }
+
+    static val Zero: int => (int)0
+    static val One: int => (int)1
+
+    static func +(left: int, right: int) -> int => (int)(left + right)
+    static func -(left: int, right: int) -> int => (int)(left - right)
+    static func *(left: int, right: int) -> int => (int)(left * right)
+    static func /(left: int, right: int) -> int => (int)(left / right)
 
     func CompareTo(other: int) -> int {
         if m_value < other {

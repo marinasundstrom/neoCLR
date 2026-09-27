@@ -84,6 +84,16 @@ static class RuntimeServiceBindings
             ("StringToUpperInvariant", ["String"], "String"),
             ("StringToLowerInvariant", ["String"], "String"),
             ("ParseInt64", ["String"], "Value"),
+            ("ParseSByte", ["String"], "Value"),
+            ("ParseByte", ["String"], "Value"),
+            ("ParseInt16", ["String"], "Value"),
+            ("ParseUInt16", ["String"], "Value"),
+            ("ParseUInt32", ["String"], "Value"),
+            ("ParseUInt64", ["String"], "Value"),
+            ("ParseSingle", ["String"], "Value"),
+            ("ParseDouble", ["String"], "Value"),
+            ("ParseBoolean", ["String"], "Value"),
+
             ("ParseInt32", ["String"], "Value"),
             ("ConsoleWriteBytes", ["Boolean", "arrayref<Byte>", "Int32", "Int32"], "Value"),
             ("ConsoleFlush", ["Boolean"], "Value"),
@@ -213,7 +223,7 @@ static class RuntimeServiceBindings
                 : definition.ReturnType is not GenericParameter parameter || parameter.Owner != definition || parameter.Position != 0))
             throw new InvalidDataException("Unsupported erased native value intrinsic.");
         var element = RuntimeSignatures.Map(method.GenericArguments[0], GenericUnionBindings.Type);
-        if (element is not ("String" or "Char" or "UInt32" or "Byte" or "Int32" or "Int64" or "Void"))
+        if (element is not ("String" or "Char" or "SByte" or "Byte" or "Int16" or "UInt16" or "Int32" or "UInt32" or "Int64" or "UInt64" or "Single" or "Double" or "Boolean" or "Void"))
             throw new InvalidDataException("Unsupported erased native payload type.");
         var shape = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type);
         if (!shape.Args.SequenceEqual(new[] { "Value" })

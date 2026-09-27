@@ -1,20 +1,20 @@
 ; Generated from runtime/raven/src/System/Int64.rvn. Regenerate with build_runtime_library.py.
-.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorInvalidFormat(System.Int64ParseError.InvalidFormat value) -> System.Int64ParseError
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorInvalidFormat(System.NumberParseError.InvalidFormat value) -> System.NumberParseError
 ldarg value
-newobj instance System.Int64ParseError::.ctor(System.Int64ParseError.InvalidFormat)
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.InvalidFormat)
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorNewSystemInt64ParseErrorOverflow(System.Int64ParseError.Overflow value) -> System.Int64ParseError
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorNewSystemNumberParseErrorOverflow(System.NumberParseError.Overflow value) -> System.NumberParseError
 ldarg value
-newobj instance System.Int64ParseError::.ctor(System.Int64ParseError.Overflow)
+newobj instance System.NumberParseError::.ctor(System.NumberParseError.Overflow)
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorInvalidFormatNew() -> System.Int64ParseError.InvalidFormat
-newobj instance System.Int64ParseError.InvalidFormat::.ctor()
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorInvalidFormatNew() -> System.NumberParseError.InvalidFormat
+newobj instance System.NumberParseError.InvalidFormat::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeErrorSystemInt64ParseErrorOverflowNew() -> System.Int64ParseError.Overflow
-newobj instance System.Int64ParseError.Overflow::.ctor()
+.function neoCLR.Library.System.Int64.RuntimeErrorSystemNumberParseErrorOverflowNew() -> System.NumberParseError.Overflow
+newobj instance System.NumberParseError.Overflow::.ctor()
 ret
 .end
 .function neoCLR.Library.System.Int64.RuntimeUnion0(Int64 arg0) -> System.Result.Ok<Int64>
@@ -22,19 +22,19 @@ ldarg arg0
 newobj instance System.Result.Ok<Int64>::.ctor(Int64)
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeUnion1(System.Result.Ok<Int64> arg0) -> System.Result<Int64,System.Int64ParseError>
+.function neoCLR.Library.System.Int64.RuntimeUnion1(System.Result.Ok<Int64> arg0) -> System.Result<Int64,System.NumberParseError>
 ldarg arg0
-newobj instance System.Result<Int64,System.Int64ParseError>::.ctor(System.Result.Ok<Int64>)
+newobj instance System.Result<Int64,System.NumberParseError>::.ctor(System.Result.Ok<Int64>)
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeUnion2(System.Int64ParseError arg0) -> System.Result.Error<System.Int64ParseError>
+.function neoCLR.Library.System.Int64.RuntimeUnion2(System.NumberParseError arg0) -> System.Result.Error<System.NumberParseError>
 ldarg arg0
-newobj instance System.Result.Error<System.Int64ParseError>::.ctor(System.Int64ParseError)
+newobj instance System.Result.Error<System.NumberParseError>::.ctor(System.NumberParseError)
 ret
 .end
-.function neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.Int64ParseError> arg0) -> System.Result<Int64,System.Int64ParseError>
+.function neoCLR.Library.System.Int64.RuntimeUnion3(System.Result.Error<System.NumberParseError> arg0) -> System.Result<Int64,System.NumberParseError>
 ldarg arg0
-newobj instance System.Result<Int64,System.Int64ParseError>::.ctor(System.Result.Error<System.Int64ParseError>)
+newobj instance System.Result<Int64,System.NumberParseError>::.ctor(System.Result.Error<System.NumberParseError>)
 ret
 .end
 .function neoCLR.Library.System.Int64.RuntimeBooleanToInt32(Boolean value) -> Int32

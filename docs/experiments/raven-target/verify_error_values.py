@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-error-values-') as temporary:
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
-    let error = Int32ParseError.Overflow()
+    let error = NumberParseError.Overflow()
     error.GetInvalidFormat()
 }
 ''')
@@ -30,7 +30,7 @@ func Main() {
         raise AssertionError(result.stdout + result.stderr)
     (root / 'Main.rvn').write_text('''import System.*
 func Main() {
-    let error = default(Int32ParseError)
+    let error = default(NumberParseError)
     System.Console.WriteLine(error.ToString())
 }
 ''')

@@ -8,7 +8,7 @@ static class ResultBindings
     const string Int32Ok = "System.Result.Ok<Int32>";
     public const string RangeError = "System.InvalidRangeError";
     public const string DivisionError = "System.IntegerDivisionError";
-    public const string ParseError = "System.Int32ParseError";
+    public const string ParseError = "System.NumberParseError";
     const string VoidOk = "System.Result.Ok<Void>";
     public const string SliceError = "System.Text.Utf8SliceError";
     public const string Slice = "System.Result<String,System.Text.Utf8SliceError>";

@@ -43,3 +43,35 @@ the changed contract; retain .NET/CLR comparisons in the linked designs and
 [design research](../design-research.md). No tests or completion claims were added
 by consolidating this record. Historical planning detail remains in the
 [previous platform backlog](../history/planning-20260927/platform-backlog.md).
+
+## Interfaces as a platform capability
+
+**Author direction, 2026-09-27.** Support static interface members, default
+implementations and member accessibility (public/private and the applicable other
+levels). Number is a concrete first consumer; numeric-only importer admission is
+an interim boundary, not the final interface model. Do not infer that accepted
+Raven syntax establishes equivalent neoCLR runtime behavior.
+
+Compared with .NET's static abstract/virtual and default interface members, neoCLR
+should offer familiar contracts while preserving its explicit receiver/lifetime
+rules. The [existing native default implementation contract](../default-interface-implementations.md)
+already specifies most-specific selection, reabstraction and ambiguity; the
+[explicit mapping contract](../explicit-interfaces.md) separates dispatch from
+ordinary private access. These are working native foundations, not evidence of
+complete Raven-facing support. Public/private helper declarations inside an
+interface are distinct from a private explicit implementation of a public member.
+
+Next evidence, following the selected [Number slice](../design/numeric-contracts.md):
+
+1. Compile and execute one ordinary static interface helper and one default body
+   calling a private helper through the Raven import path; verify rejected external
+   access as well as successful internal access.
+2. Exercise derived defaults, conflicting diamonds and reabstraction through that
+   same path, reusing existing native evidence where unchanged.
+3. Add static virtual defaults and constrained selection, plus the applicable
+   protected/internal combinations. Define each level's assembly/inheritance scope
+   and reject unsupported combinations explicitly.
+
+Broader interface support is selected direction, not a completion claim or a
+reason to build the entire platform matrix. Avoid claiming an improvement over
+.NET without an observable benefit and its receiver, metadata and dispatch costs.

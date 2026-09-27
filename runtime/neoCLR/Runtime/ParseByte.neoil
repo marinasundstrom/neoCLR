@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.ParseByte(string value) -> System.Value
+    .methodimpl InternalCall
+.end

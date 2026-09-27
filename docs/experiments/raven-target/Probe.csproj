@@ -27,12 +27,12 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileWriteError.rvn" LogicalName="NeoCLR.FileWriteError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Int32ParseError.rvn" LogicalName="NeoCLR.Int32ParseError.rvn" />
-    <EmbeddedResource Include="../../../runtime/raven/src/System/Int64ParseError.rvn" LogicalName="NeoCLR.Int64ParseError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/NumberParseError.rvn" LogicalName="NeoCLR.NumberParseError.rvn" /></ItemGroup>
+  <ItemGroup><EmbeddedResource Include="../../../runtime/raven/src/System/BooleanParseError.rvn" LogicalName="NeoCLR.BooleanParseError.rvn" /></ItemGroup>
   <Target Name="RequireRaven" BeforeTargets="Restore;PrepareForBuild" Condition="'$(RavenRoot)' == ''">
     <Error Text="Pass -p:RavenRoot=/absolute/path/to/Raven at the documented revision." />
   </Target>

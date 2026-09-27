@@ -415,7 +415,7 @@ static class SignatureProbe
         var notFound = readError.NestedTypes.Single(t => t.Name == "NotFound");
         var notFoundConstructor = notFound.Methods.Single(m => m.IsConstructor);
         Check("Error case constructor mapping", ErrorBindings.Construct(Reference(notFoundConstructor, notFound), notFoundConstructor)?.Result == "System.Storage.FileReadError.NotFound");
-        Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.Int32ParseError"));
+        Check("Empty errors differ from union carriers", ErrorBindings.IsEmpty("System.InvalidDateError") && !ErrorBindings.IsEmpty("System.NumberParseError"));
         ErrorBindings.Reset(module);
         foreach (var httpOwner in new[] { "System.Web.Http.HttpClient", "System.Web.Http.HttpRequest" })
             foreach (var get in module.GetType(httpOwner).Methods.Where(m => m.Name == "Get"))

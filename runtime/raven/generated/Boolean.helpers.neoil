@@ -1,4 +1,48 @@
 ; Generated from runtime/raven/src/System/Boolean.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Boolean.RuntimeErrorSystemBooleanParseErrorNewSystemBooleanParseErrorInvalidFormat(System.BooleanParseError.InvalidFormat value) -> System.BooleanParseError
+ldarg value
+newobj instance System.BooleanParseError::.ctor(System.BooleanParseError.InvalidFormat)
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeErrorSystemBooleanParseErrorInvalidFormatNew() -> System.BooleanParseError.InvalidFormat
+newobj instance System.BooleanParseError.InvalidFormat::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeUnion0(Boolean arg0) -> System.Result.Ok<Boolean>
+ldarg arg0
+newobj instance System.Result.Ok<Boolean>::.ctor(Boolean)
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeUnion1(System.Result.Ok<Boolean> arg0) -> System.Result<Boolean,System.BooleanParseError>
+ldarg arg0
+newobj instance System.Result<Boolean,System.BooleanParseError>::.ctor(System.Result.Ok<Boolean>)
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeUnion2(System.BooleanParseError arg0) -> System.Result.Error<System.BooleanParseError>
+ldarg arg0
+newobj instance System.Result.Error<System.BooleanParseError>::.ctor(System.BooleanParseError)
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeUnion3(System.Result.Error<System.BooleanParseError> arg0) -> System.Result<Boolean,System.BooleanParseError>
+ldarg arg0
+newobj instance System.Result<Boolean,System.BooleanParseError>::.ctor(System.Result.Error<System.BooleanParseError>)
+ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeBooleanFromInt32(Int32 value) -> Boolean
+    ldarg value
+    ldc.i4 0
+    beq False
+    ldarg value
+    ldc.i4 1
+    beq True
+    fault "Non-canonical CLI Boolean"
+False:
+    ldc.bool false
+    ret
+True:
+    ldc.bool true
+    ret
+.end
 .function neoCLR.Library.System.Boolean.RuntimeBooleanToInt32(Boolean value) -> Int32
     ldarg value
     brfalse False
@@ -7,4 +51,10 @@
 False:
     ldc.i4 0
     ret
+.end
+.function neoCLR.Library.System.Boolean.RuntimeCliCall0(Int32 arg0) -> System.Result.Ok<Boolean>
+ldarg arg0
+call neoCLR.Library.System.Boolean.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Boolean.RuntimeUnion0(Boolean)
+ret
 .end

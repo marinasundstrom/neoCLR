@@ -8261,3 +8261,51 @@ configuration/content, not target-specific code added to Raven main.
   Unicode-version split, naming and costs. [Focused evidence](experiments/casing-integer/README.md)
   covers a runnable report and exact runtime/metadata contracts. No general culture,
   normalization, builder optimization or next milestone was inferred from this direction.
+
+## 2026-09-27 — Number and Parsable interfaces selected
+
+- **Author:** “Now add Number and Parsable interfaces and implement them for the
+  common set of types”.
+- **Assistant scope proposal:** Number<T> for basic arithmetic, ordering, Zero/One;
+  Parsable<T,TError> for static Parse returning Result; eight fixed-width integer
+  types plus Single/Double, and Boolean for parsing only.
+- **Author confirmation:** “Yes, that scope”.
+- **Investigation:** authored static abstract/operator interface contracts and
+  neoCLR generic-call import need support before the APIs can be genuinely useful.
+  General Raven work is isolated on a main-based feature branch. Implementation is
+  in progress; [numeric contract notes](design/numeric-contracts.md) distinguish
+  selected scope from completed behavior.
+
+- **Subsequent author correction:** “Put the parsable interface on hold. Focus on
+  Number interface and Parse per concrete type”. The author then suggested a
+  numeric-specific parsing interface rather than .NET-style broad Parsable. The
+  assistant keeps concrete parsing in scope and records ParsableNumber as a future
+  candidate, separate from arithmetic; no parsing interface is being implemented.
+
+- **Further author direction:** static interface members, default implementations
+  and accessibility within interfaces (including public/private) are important to
+  the intended platform. The author expects Raven to supply these language features
+  and wants neoCLR to make broader use of interfaces.
+- **Assistant response/action:** distinguish Raven semantics, emitted CLI metadata,
+  importer admission and runtime dispatch/access checks. General authored static
+  contract fixes were tested independently (13 focused cases) and integrated as
+  Raven main `d7d69fe69`, then neoCLR branch `82774c30d`. Number remains the first
+  selected consumer, not the intended ceiling on interface support. Existing native
+  default-body/explicit-mapping support does not establish complete Raven import or
+  arbitrary private interface helper support. Broader scope is recorded in the
+  [runtime/language tracker](tracking/runtime-language.md#interfaces-as-a-platform-capability).
+
+- **Numeric error correction:** the author directed use of NumberParseError for all
+  numbers unless separate errors are needed. The assistant is migrating Int32 and
+  Int64 and their current consumers to that shared union, retaining Boolean's
+  format-only error because Boolean is not numeric. Earlier plans to preserve the
+  separate numeric error types are superseded; archived Neo compatibility remains
+  isolated from the current Raven API.
+
+- **Implemented outcome:** Number/ordering/arithmetic for ten primitive numeric
+  types, concrete parsing and shared NumberParseError, with a bounded generic
+  application consumer. General Raven fixes were integrated independently; the
+  [numeric evidence](experiments/numeric-contracts/README.md) records focused
+  compiler/native/metadata/consumer checks. Parsable remains on hold. General
+  static defaults and arbitrary interface helpers/accessibility remain broader
+  follow-up work, not a claimed completion of the interface direction.
