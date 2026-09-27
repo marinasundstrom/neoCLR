@@ -155,7 +155,7 @@ completion, queue publication, wake notifications, shared host resources, aggreg
 instruction/frame budgets, guest safepoints and async unwrapping are not supplied
 by this component. Do not enable a public facade until these are connected and
 validated. The VM now pauses between instruction intervals and releases graph
-access during scheduler waits. Ordinary blocking guest calls still hold access. The runtime-side blocking probe is
+access during scheduler waits and prepared file/console I/O, worker joins and native imports. The runtime-side blocking probe is
 not proof that guest blocking calls have already been offloaded correctly.
 
 ```sh
@@ -240,10 +240,32 @@ completion boundary. Existing wake tests cover poll/park notification races.
 No public signature changed; the website's future Task.Run status remains accurate.
 No website build, API snapshot regeneration, full suite or new benchmark was needed.
 
+## Prepared blocking guest calls
+
+The interpreter now yields a prepared call to its native driver. File services,
+console reads/writes/flushes, isolated-worker joins and trusted native imports run
+outside graph access. The caller frame, arguments and pending read destination are
+published first. Native pointers remain owned by the executing context; this change
+does not yet share native allocations between contexts.
+
+Byte writes use a detached snapshot. ReadInto validates and roots its destination,
+performs the bounded read outside access, and commits only transferred elements
+after reacquiring access. This preserves aliases and changes to the untouched tail;
+it does not make conflicting application writes to the same range safe. Faults
+retain the caller location and host calls are not replayed. Cancellation remains
+cooperative: an in-progress host Console or native call cannot be forcibly interrupted.
+This supplies the blocking boundary needed for .NET-like Task.Run progress without
+adopting .NET's thread-pool implementation or exception-bearing Task contract.
+
+Seven suspension/guest-call probes, two buffer handoff probes, and 33 focused
+file-stream/native/debugger integration tests pass. The guest console probe admits
+collection and capture mutation by a different participant during the host call.
+A broader invocation was stopped when its console-stream fixture began whole-library
+preparation; it is not counted as completed coverage. No website build was run.
+
 ## Next prerequisite
 
-Move ordinary blocking guest calls outside managed graph access, and
-establish shared invocation services and aggregate budgets before general guest
+Establish shared invocation services and aggregate budgets before general guest
 work submission. Then establish atomic Promise/queue publication and expose the
 Run overloads, with async callback unwrapping validated at that API boundary.
 The per-execution instruction budget is preserved across pauses, but not yet shared

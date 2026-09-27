@@ -54,7 +54,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   comparison. Release graph access during scheduler completion waits, retaining the
   dispatch boundary and all roots without consuming guest instruction fuel; validate
   collection by another participant, exactly-once notification posting and cancellation.
-  Ordinary blocking guest boundaries, shared services and public Task.Run remain pending.
+  Add prepared blocking-call boundaries for file/console I/O, isolated-worker joins
+  and native imports. Preserve rooted callers/destinations, snapshot byte writes and
+  commit only transferred read bytes under graph access. Validate guest capture
+  mutation during a host call and buffer alias/tail preservation. Shared invocation
+  services, aggregate budgets and public Task.Run remain pending.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

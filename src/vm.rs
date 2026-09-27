@@ -1512,29 +1512,17 @@ fn interpret_frames(
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
     let mut state = InstructionState::new(options.limits);
-    let result = loop {
-        let mut heap = participant.enter();
-        match interpret_instructions(
-            module,
-            frames,
-            &options,
-            &mut native_libraries,
-            &mut heap,
-            &mut memory,
-            &mut output,
-            &mut console_bytes,
-            &mut state,
-            1024,
-        ) {
-            Ok(InstructionProgress::Suspended) => continue,
-            Ok(InstructionProgress::Waiting) => {
-                drop(heap);
-                state.scheduler.park();
-            }
-            Ok(InstructionProgress::Completed(value)) => break Ok(value),
-            Err(fault) => break Err(fault),
-        }
-    };
+    let result = drive_instructions(
+        module,
+        frames,
+        &options,
+        &mut native_libraries,
+        &mut participant,
+        &mut memory,
+        &mut output,
+        &mut console_bytes,
+        &mut state,
+    );
     // Source teardown may join host workers; never hold the managed graph gate.
     drop(state);
     let heap = participant.enter();
@@ -1557,6 +1545,70 @@ fn interpret_frames(
         memory,
         native_libraries,
     })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn drive_instructions(
+    module: &Module,
+    frames: &mut Vec<Frame>,
+    options: &ExecutionOptions,
+    native_libraries: &mut Option<crate::interop::NativeLibraries>,
+    participant: &mut crate::shared_heap::Participant,
+    memory: &mut crate::memory::PointerHeap,
+    output: &mut Vec<String>,
+    console_bytes: &mut [Vec<u8>; 2],
+    state: &mut InstructionState,
+) -> Result<Value, Fault> {
+    loop {
+        let mut heap = participant.enter();
+        match interpret_instructions(
+            module,
+            frames,
+            options,
+            native_libraries,
+            &mut heap,
+            memory,
+            output,
+            console_bytes,
+            state,
+            1024,
+        ) {
+            Ok(InstructionProgress::Suspended) => continue,
+            Ok(InstructionProgress::Waiting) => {
+                drop(heap);
+                state.scheduler.park();
+            }
+            Ok(InstructionProgress::HostCall(call)) => {
+                drop(heap);
+                let value = match call.run(
+                    module, state, native_libraries, memory, output, console_bytes, options,
+                ) {
+                    Ok(value) => value,
+                    Err(fault) => break Err(fault),
+                };
+                let mut heap = participant.enter();
+                if let Err(fault) = call.resume(value, frames) {
+                    break Err(fault);
+                }
+                if frames.iter().any(|frame| frame.stack.len() > options.limits.stack) {
+                    break Err(Fault::coded(
+                        crate::FaultCode::EvaluationStackOverflow,
+                        "evaluation stack limit exceeded",
+                    ));
+                }
+                if let Err(fault) = heap.publish(execution_roots(
+                    frames,
+                    &state.scheduler,
+                    state.default_task_queue.as_ref(),
+                    state.invocation_result.as_ref(),
+                )) {
+                    break Err(fault);
+                }
+            }
+            Ok(InstructionProgress::Completed(value)) => break Ok(value),
+            Err(fault) => break Err(fault),
+        }
+    }
 }
 
 fn completion_notification_frame(
@@ -1652,9 +1704,14 @@ impl InstructionState {
         }
     }
 }
+#[path = "vm_host_call.rs"]
+mod host_call;
+use host_call::HostCall;
+
 enum InstructionProgress {
     Suspended,
     Waiting,
+    HostCall(Box<HostCall>),
     Completed(Value),
 }
 
@@ -1663,7 +1720,7 @@ fn interpret_instructions(
     module: &Module,
     frames: &mut Vec<Frame>,
     options: &ExecutionOptions,
-    native_libraries: &mut Option<crate::interop::NativeLibraries>,
+    _native_libraries: &mut Option<crate::interop::NativeLibraries>,
     heap: &mut crate::shared_heap::Access<'_>,
     memory: &mut crate::memory::PointerHeap,
     output: &mut Vec<String>,
@@ -1679,7 +1736,7 @@ fn interpret_instructions(
         collection_threshold,
         arrays_used,
         scheduler,
-        files,
+        files: _,
         interned,
         default_task_queue,
         invocation_result,
@@ -1941,6 +1998,7 @@ fn interpret_instructions(
         };
 
         // Host Result propagates terminal faults; there is no guest exception machinery.
+        let mut host_call = None;
         let step = (|| -> Result<Option<Value>, Fault> {
             let frame = frames
                 .last_mut()
@@ -2891,16 +2949,18 @@ fn interpret_instructions(
                     }
                     restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
-                        let libraries = native_libraries.as_mut().ok_or_else(|| {
-                            Fault::new("native imports require trusted run_with_native execution")
-                        })?;
-                        // SAFETY: a native library session is only supplied by run_with_native,
-                        // whose caller accepts the native ABI and memory safety contract.
-                        let value = unsafe { libraries.invoke(&callee, args, memory)? };
-                        expect(&value, &callee.returns)?;
-                        frame.stack.push(value.on_stack());
+                        host_call = Some(HostCall::new(
+                            callee, args, executing_assembly.clone(), context.clone(), pc,
+                        )?);
+                        return Ok(None);
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind(&callee)?;
+                        if HostCall::supports(&binding) {
+                            host_call = Some(HostCall::new(
+                            callee, args, executing_assembly.clone(), context.clone(), pc,
+                        )?);
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::GcCollect) {
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(
@@ -2975,7 +3035,6 @@ fn interpret_instructions(
                             frames.push(Frame::new(adapter, args)?);
                             return Ok(None);
                         }
-                        let prior_output = output.len();
                         let value = if let crate::native::Binding::GcInfo(index) = binding {
                             let stats = heap.statistics();
                             let count = [
@@ -3057,8 +3116,6 @@ fn interpret_instructions(
                                 ));
                             }
                             scheduler.sockets.invoke(operation, &args, heap)?
-                        } else if let crate::native::Binding::FileResource(operation) = binding {
-                            files.invoke(operation, &args, &limits)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             scheduler.workers.start(module, args, options, pooled)?
                         } else if matches!(binding, crate::native::Binding::NotifyWorker) {
@@ -3073,12 +3130,6 @@ fn interpret_instructions(
                             crate::native::Binding::RequestWorkerCancellation
                         ) {
                             scheduler.workers.request_cancellation(args)?
-                        } else if matches!(binding, crate::native::Binding::JoinWorkerResult) {
-                            Value::Erased(Box::new(
-                                scheduler.workers.join_result(args, output, options, true)?,
-                            ))
-                        } else if matches!(binding, crate::native::Binding::JoinWorker) {
-                            scheduler.workers.join(args, output, options)?
                         } else {
                             binding.invoke(
                                 args,
@@ -3090,18 +3141,6 @@ fn interpret_instructions(
                                 options,
                             )?
                         };
-                        if options.console.is_none()
-                            && matches!(
-                                binding,
-                                crate::native::Binding::JoinWorker
-                                    | crate::native::Binding::JoinWorkerResult
-                            )
-                        {
-                            for line in &output[prior_output..] {
-                                console_bytes[0].extend_from_slice(line.as_bytes());
-                                console_bytes[0].push(b'\n');
-                            }
-                        }
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)
@@ -3749,6 +3788,17 @@ fn interpret_instructions(
             }
             Ok(None)
         })();
+        if let Some(call) = host_call {
+            let mut roots = execution_roots(
+                frames,
+                scheduler,
+                default_task_queue.as_ref(),
+                invocation_result.as_ref(),
+            );
+            call.trace_roots(&mut roots);
+            heap.publish(roots)?;
+            return Ok(InstructionProgress::HostCall(Box::new(call)));
+        }
         // Keep the suspended startup frame on the ordinary traced frame stack.
         // Queue/host completion frames run above it on the same instruction budget.
         let step = if matches!(step, Ok(None))

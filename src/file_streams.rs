@@ -188,6 +188,18 @@ impl Files {
         Ok(names)
     }
 
+    /// Detached read payload for a prepared ReadInto. Commit only after graph access
+    /// is reacquired; preserve the existing transfer bound and error precedence.
+    pub(crate) fn read_transfer(&mut self, id: i32, count: i32) -> Value {
+        Value::Erased(Box::new(match self.read(id, count) {
+            Ok(bytes) => Value::Array {
+                element: Type::Byte,
+                elements: bytes.into_iter().map(Value::Byte).collect(),
+            },
+            Err(error) => Value::Byte(error as u8),
+        }))
+    }
+
     pub(crate) fn invoke(
         &mut self,
         op: Operation,
@@ -255,7 +267,7 @@ impl Files {
                 Operation::Write,
                 [
                     Value::Int32(id),
-                    Value::ObjectReference(array),
+                    array,
                     Value::Int32(offset),
                     Value::Int32(count),
                 ],
@@ -263,7 +275,11 @@ impl Files {
                 let Value::Array {
                     element: Type::Byte,
                     elements,
-                } = array.reference.read()?
+                } = (match array {
+                    Value::ObjectReference(array) => array.reference.read()?,
+                    Value::Array { .. } => array.clone(),
+                    _ => return Err(Fault::new("write requires a byte array")),
+                })
                 else {
                     return Err(Fault::new("File write requires a byte array"));
                 };

@@ -853,7 +853,7 @@ impl Binding {
                 Self::ConsoleWriteBytes,
                 [
                     Value::Boolean(error),
-                    Value::ObjectReference(array),
+                    array,
                     Value::Int32(offset),
                     Value::Int32(count),
                 ],
@@ -861,7 +861,11 @@ impl Binding {
                 let Value::Array {
                     element: Type::Byte,
                     elements,
-                } = array.reference.read()?
+                } = (match array {
+                    Value::ObjectReference(array) => array.reference.read()?,
+                    Value::Array { .. } => array.clone(),
+                    _ => return Err(Fault::new("write requires a byte array")),
+                })
                 else {
                     return Err(Fault::new("Console write requires a byte array"));
                 };

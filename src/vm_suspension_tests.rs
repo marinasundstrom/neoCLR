@@ -79,6 +79,7 @@ ret
                     match progress {
                         InstructionProgress::Completed(value) => break value,
                         InstructionProgress::Waiting => panic!("unexpected host wait"),
+                        InstructionProgress::HostCall(_) => panic!("unexpected host call"),
                         InstructionProgress::Suspended => {
                             step_tx
                                 .send(())
@@ -299,6 +300,7 @@ ret
         match progress {
             InstructionProgress::Completed(value) => break value,
             InstructionProgress::Waiting => panic!("unexpected host wait"),
+            InstructionProgress::HostCall(_) => panic!("unexpected host call"),
             InstructionProgress::Suspended => {
                 pauses += 1;
                 collector
@@ -520,6 +522,7 @@ ret
     let value = loop {
         match run(&mut state, &mut frames).unwrap() {
             InstructionProgress::Waiting => state.scheduler.park(),
+            InstructionProgress::HostCall(_) => panic!("unexpected host call"),
             InstructionProgress::Suspended => panic!("unexpected instruction quantum"),
             InstructionProgress::Completed(value) => break value,
         }
@@ -534,4 +537,106 @@ ret
     };
     assert_eq!(queue.reference.read_field(0).unwrap(), Value::Int32(1));
     assert_eq!(queue.reference.read_field(1).unwrap(), Value::Int32(2));
+}
+
+#[test]
+fn blocking_guest_console_call_allows_shared_collection_and_mutation() {
+    struct CollectingConsole {
+        participant: std::sync::Mutex<crate::shared_heap::Participant>,
+        capture: crate::value::ObjectReference,
+    }
+    impl std::fmt::Debug for CollectingConsole {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            f.write_str("CollectingConsole")
+        }
+    }
+    impl crate::Console for CollectingConsole {
+        fn read_byte(&self) -> std::io::Result<Option<u8>> {
+            let start = std::time::Instant::now();
+            let mut participant = self.participant.lock().unwrap();
+            let mut heap = participant
+                .enter_cancellable(|| start.elapsed().as_secs() >= 2)
+                .map_err(|_| std::io::Error::other("host call retained graph access"))?;
+            heap.collect(vec![], CollectionReason::ExplicitRequest)
+                .unwrap();
+            self.capture
+                .reference
+                .field(0, Type::Int32)
+                .unwrap()
+                .write(Value::Int32(42))
+                .unwrap();
+            Ok(Some(65))
+        }
+        fn write_line(&self, _: &str) -> std::io::Result<()> {
+            unreachable!()
+        }
+    }
+    let module = crate::assemble(
+        r#"
+.module System
+.function neoCLR.Runtime.ConsoleReadByte() -> Value
+.methodimpl InternalCall
+.end
+.type class Capture
+.field Number Int32
+.end
+.function Main(Capture capture) -> Capture
+call neoCLR.Runtime.ConsoleReadByte()
+pop
+ldarg capture
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let owner = Owner::new(2);
+    let mut participant = owner.participant().unwrap();
+    let other = owner.participant().unwrap();
+    let capture = {
+        let mut heap = participant.enter();
+        let id = heap
+            .allocate(Value::Object {
+                ty: Type::from_name("Capture"),
+                fields: vec![Value::Int32(0)],
+            })
+            .unwrap();
+        crate::value::ObjectReference {
+            reference: heap.address(id).unwrap(),
+            view: None,
+        }
+    };
+    let options = ExecutionOptions {
+        console: Some(std::sync::Arc::new(CollectingConsole {
+            participant: std::sync::Mutex::new(other),
+            capture: capture.clone(),
+        })),
+        ..Default::default()
+    };
+    let mut state = InstructionState::new(options.limits);
+    let mut frames = vec![
+        Frame::new(
+            module
+                .functions
+                .iter()
+                .find(|f| f.name == "Main")
+                .unwrap()
+                .clone(),
+            vec![Value::ObjectReference(capture.clone())],
+        )
+        .unwrap(),
+    ];
+    let result = drive_instructions(
+        &module,
+        &mut frames,
+        &options,
+        &mut None,
+        &mut participant,
+        &mut Default::default(),
+        &mut Vec::new(),
+        &mut [Vec::new(), Vec::new()],
+        &mut state,
+    )
+    .unwrap();
+    assert_eq!(result, Value::ObjectReference(capture.clone()));
+    assert_eq!(capture.reference.read_field(0).unwrap(), Value::Int32(42));
 }
