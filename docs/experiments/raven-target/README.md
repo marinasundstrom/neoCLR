@@ -22,8 +22,12 @@ await now discards the configured inhabited unit result correctly with Raven
 `c08f343b1` on `neoclr`.
 Mutable-local storage in ordinary async methods is corrected by Raven
 main dc7b87eff, integrated individually as 08815ceaf on its neoclr branch. Seventeen
-independent .NET capture checks pass. Generic-method closure metadata remains a
-pre-existing general compiler follow-up; see the [capture checkpoint](../task-run/README.md#shared-mutable-local-capture-checkpoint).
+independent .NET capture checks pass. Generic-method capture metadata is corrected
+by main 586cc8d89, integrated as b32459beb on neoclr, with 11 focused CLR checks.
+The target consumer now reaches the numeric-only generic application import guard:
+this is missing neoCLR support for Raven's normal contract. See the
+[generic capture checkpoint](../task-run/README.md#generic-capture-contract-checkpoint)
+for the retained importer fixture and independent generic-containing-type Raven bug.
 The unit-result correction preserves importer stack checks. Existing uninitialized
 private-var constructor assignment also needs explicit-field compatibility in helpers.
 

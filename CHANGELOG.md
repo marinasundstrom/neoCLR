@@ -179,7 +179,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   sharing through the independently validated Raven closure fix (main dc7b87eff,
   experimental integration 08815ceaf), retaining one closure per invocation across
   suspension. Promote the original failing consumer to a required 42-result regression
-  and track pre-existing generic-method capture metadata separately. Integrate the
+  and repair generic-method capture metadata through Raven main 586cc8d89 (neoclr
+  b32459beb), with 11 focused CLR checks. Record the newly reached numeric-only
+  generic application importer restriction as missing neoCLR support for Raven's
+  normal contract; retain an explicit rejection fixture and a bounded import follow-up.
+  Keep the separately reproduced Raven generic-containing-type async arity failure
+  distinct. Record the author's compiler/runtime compatibility ownership direction.
+  Integrate the
   Task.Run work with main’s route, JSON-array and reflection-constructor additions,
   retaining native submission and refreshing the combined API reference. Include the
   completed RavenDoc publisher/navigation checkpoint in the integration. This is not

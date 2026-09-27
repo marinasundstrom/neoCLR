@@ -102,7 +102,11 @@ are corrected: short-name lookup and block-lambda returns use independently test
 Raven fixes integrated into both branches. Direct completion-only await
 now passes with the target compiler unit-result fix. Mutable-local
 sharing in ordinary async methods is corrected by the independently tested Raven
-closure fix; generic-method capture metadata remains a separate Raven limitation.
+closure fix. Generic-method capture metadata is also repaired in Raven; the
+[compatibility follow-up](experiments/task-run/compiler-gaps/README.md) is now neoCLR's
+numeric-only generic application importer. Extend bounded ordinary generic import
+against Raven's normal contract; do not encode that gap as compiler divergence.
+Async methods inside generic classes have a separately reproduced Raven arity bug.
 Thread's future public role is open.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.

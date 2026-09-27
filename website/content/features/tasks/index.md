@@ -44,8 +44,9 @@ Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an al
 Inline block callbacks infer their value result; an explicitly typed delegate local
 is optional. Direct completion-only await uses the ordinary Task protocol. Mutable locals in
 ordinary async methods share storage with their callbacks,
-including across suspension. Generic-method closure metadata remains a separate
-Raven limitation.
+including across suspension. Generic async capture metadata is corrected in the
+compiler, but neoCLR's application importer still restricts generic methods to its
+supported numeric algorithms. General generic callers remain outside this slice.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#task.run-development)

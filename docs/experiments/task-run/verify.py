@@ -65,3 +65,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-task-run-') as directory:
         assert result.returncode == code and result.stdout == output, (name, result.returncode, result.stdout, result.stderr)
         assert (error in result.stderr if error else result.stderr == ''), (name, result.stderr)
         print(name + ': passed', flush=True)
+
+    if not args.case or 'generic-capture-import-gap' in args.case:
+        (root / 'Main.rvn').write_text((here / 'compiler-gaps/GenericCapture.rvn').read_text())
+        compiled = run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', root / 'generic-capture'])
+        assert (root / 'generic-capture/App.raw.dll').stat().st_size > 0
+        expected = 'Numeric specialization requires Number<T> and a supported concrete numeric argument:'
+        assert compiled.returncode != 0 and expected in compiled.stderr, (compiled.stdout, compiled.stderr)
+        assert 'NamespaceMembers::Read<System.Int32>' in compiled.stderr, compiled.stderr
+        print('generic-capture-import-gap: confirmed current importer limitation', flush=True)

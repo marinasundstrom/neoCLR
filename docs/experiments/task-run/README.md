@@ -630,7 +630,8 @@ checks pass. Website source/downloads are updated without building the website.
 
 The [original source integration failures](compiler-gaps/README.md) are corrected.
 The passing consumer now uses unqualified Task.Run, inline value-returning blocks
-and direct completion-only await. Generic-method capture metadata remains separate.
+and direct completion-only await. Generic-method capture metadata is repaired by the later checkpoint below; ordinary
+generic application import remains limited.
 
 ## Shared mutable-local capture checkpoint
 
@@ -662,8 +663,8 @@ The library has no authored async functions, so this correction changes consumer
 emission without requiring library regeneration. The API snapshot refresh changes only the XML
 documentation fingerprint and reuses the unchanged reference assembly.
 
-A separate generic-method closure metadata failure reproduces before and after this
-fix on ordinary Raven/.NET. It is [retained as a compiler follow-up](compiler-gaps/README.md#separate-general-raven-follow-up-generic-method-closure-metadata),
+A separate generic-method closure metadata failure initially reproduced before and after
+this fix on ordinary Raven/.NET. It is [repaired in the subsequent checkpoint](compiler-gaps/README.md#separate-general-raven-follow-up-generic-method-closure-metadata),
 not hidden by lowering the required result or weakening the importer. This slice
 does not establish async-lambda-owned locals or iterator capture planning.
 
@@ -728,10 +729,31 @@ and run against the unchanged development reference/library and rebuilt bridge.
 API reference and feature pages describe the current behavior; the snapshot refresh
 is XML-only. No full suite or website build is part of this slice.
 
+## Generic capture contract checkpoint
+
+Raven main `586cc8d89`, individually integrated as `b32459beb` on neoclr, fixes
+method/type-parameter ownership in captured fields and async state-machine closure
+references. Eleven focused ordinary .NET checks pass, including scalar and array
+captures with value/reference substitutions and existing shared/generic closures.
+The original scalar case failed metadata normalization before the fix. This is a
+normal Raven/CLI contract repair, with no neoCLR policy or Runtime Contract option.
+
+The neoCLR [generic consumer](compiler-gaps/GenericCapture.rvn) now reaches import
+but fails the numeric-only generic application specialization guard. It cannot yet
+run on neoCLR. The explicit `generic-capture-import-gap` check records this unsupported
+contract separately from passing consumers. This is an importer capability gap;
+no native runtime failure has been established because import stops first.
+The existing shared-object/block-callback/unwrapping consumer compiles, passes
+typed-stack verification and runs with the expected output against the rebuilt
+bridge and unchanged combined runtime/library/reference.
+No public signatures or implementation APIs change, so the reference assembly is
+reused; the snapshot refresh updates XML only. No full suite or website build.
+
 ## Next bounded work
 
-Review the separate generic-method capture candidate against the bounded release
-scope. The reduced Task.Run lookup, block-return, ordinary mutable-capture and unit-await
-failures are now positive regressions. Broader async-lambda-owned/iterator capture
-coverage remains separate; these slices do not claim every generic capture shape
-or select a new scheduler/backend feature.
+Add bounded import of a closed ordinary generic application helper, using Raven's
+normal emitted contract. Start with a synchronous identity/read helper, then re-run
+the generic async capture fixture to identify subsequent closure/state-machine
+requirements. This is compatibility work in neoCLR, not a compiler workaround.
+The independent generic-containing-type async arity failure remains Raven-owned;
+async-lambda-owned/iterator captures also need their own bounded coverage.

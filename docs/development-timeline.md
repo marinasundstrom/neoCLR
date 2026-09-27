@@ -8733,3 +8733,20 @@ for scope and remaining lookup/inference work.
 - Review: light/dark desktop and narrow-screen checks preserved highlighting;
   a long inline expression exposed mobile overflow, addressed by wrapping inline
   code while keeping code-block scrolling.
+
+## 2026-09-27 — Raven contracts and platform compatibility
+
+**Author:** Reaffirmed that general fixes belong to Raven, with shared fixes on both
+main and neoclr and platform-specific differences isolated on neoclr. Asked that we
+also determine whether neoCLR lacks compatibility, then clarified that the baseline
+is “the contract that Raven normally follow”. Observed that porting to neoCLR has
+uncovered many bugs in Raven proper.
+
+**Assistant:** Distinguished invalid Raven output, missing neoCLR support for valid
+Raven contracts, and intentional platform differences. Proposed independently
+validating general fixes on ordinary .NET, then checking neoCLR consumers without
+weakening import or verification to conceal runtime gaps. The current generic
+capture reproduction fails on ordinary .NET before the fix; it is compiler-owned.
+A separate async generic-containing-type failure also reproduces without captures.
+See the [Task.Run checkpoint](experiments/task-run/README.md) for implementation
+and validation outcomes; broader .NET library parity is not inferred from this direction.

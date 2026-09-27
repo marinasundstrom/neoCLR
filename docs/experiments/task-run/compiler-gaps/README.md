@@ -18,17 +18,34 @@ live beside the consumer: [native submission](../MutableCapture.rvn) and
 See the [capture checkpoint](../README.md#shared-mutable-local-capture-checkpoint)
 for implementation scope and validation.
 
-## Separate general Raven follow-up: generic-method closure metadata
+<a id="separate-general-raven-follow-up-generic-method-closure-metadata"></a>
 
-A generic async method that captures a `T` local still fails during CLI metadata
-normalization. This reproduces on unchanged Raven main and with the capture-storage
-fix, using ordinary .NET references. The retained Raven repro is
-`docs/compiler/development/async-generic-capture.rvn`, recorded in its
-`docs/compiler/neoclr-fix-integration.md` at `dc7b87eff`. It needs an independent
-method/type-parameter ownership fix. This is not a new Runtime Contract setting or
-a reason to relax importer validation. Its neoCLR-specific impact has not yet been
-established. Async-lambda-owned locals and iterator capture planning also need their
-own bounded coverage; the source-method fix does not establish every capture shape.
+## Generic captures: compiler repaired, importer gap remains
+
+Raven main `586cc8d89` (integrated as `b32459beb` on neoclr) repairs generic
+async capture metadata. Closure fields and state-machine closure references now
+use type-owned generic parameters rather than source-method parameters. Both scalar
+and array captures execute on ordinary .NET with int and string substitutions;
+all 11 focused compiler checks pass. No Runtime Contract option changes.
+
+[GenericCapture.rvn](GenericCapture.rvn) now gets past compiler emission and reaches
+neoCLR's importer. It is rejected in `NumericSpecialization.cs`: application generic
+method calls currently require Number<T> and supported numeric arguments. That is
+missing neoCLR importer support for an ordinary Raven contract, not a reason to
+fork Raven's generic capture semantics. `verify.py --case generic-capture-import-gap`
+checks that exact rejection; it does **not** claim runtime execution succeeds.
+The intended result after import support is `42`, then `after`.
+
+The next bounded compatibility slice should admit a closed ordinary generic
+application helper, verify its signature/body substitution, then re-run this async
+capture consumer to identify any remaining state-machine/display-class import gaps.
+Keep unsupported shapes checked rather than weakening verification. There is no
+claim that removing the numeric guard alone is sufficient.
+
+Raven also retains `docs/compiler/development/async-generic-containing-type.rvn`:
+an async method inside a generic class fails on ordinary .NET with a state-machine
+generic-arity TypeLoadException **without any capture**. That independent Raven
+issue, async-lambda-owned locals and iterator capture planning remain separate.
 
 ## Corrected: direct completion-only await
 

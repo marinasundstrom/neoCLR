@@ -1,0 +1,15 @@
+import System.*
+import System.Tasks.*
+
+async func Read<T>(initial: T, replacement: T) -> Task<T> {
+    var value = initial
+    let read: Func<T> = () => value
+    await Task.Run(() => ())
+    value = replacement
+    return read()
+}
+
+async func Main() -> Task<()> {
+    Console.WriteLine(await Read<int>(1, 42))
+    Console.WriteLine(await Read<string>("before", "after"))
+}

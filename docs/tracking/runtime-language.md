@@ -9,7 +9,7 @@ or later author direction selects it.
 
 ## Author-selected Task.Run work — 2026-09-27
 
-**Active direction; development API implemented with compiler gaps.** Task.Run is the canonical submission
+**Active direction; development API implemented with bounded import limitations.** Task.Run is the canonical submission
 API for work with shared lexical captures, with execution chosen by the runtime. The subsequent .NET-behavior direction leads to
 a native-thread first implementation recommendation, including progress while
 submitted work blocks and async callback unwrapping.
@@ -57,6 +57,12 @@ case pass. Development Run overloads now submit completion-only/typed work and u
 inner tasks through the existing outcome-transfer helper. The compiled capture/identity/
 unwrapping consumer passes with direct callbacks and awaits. Ordinary async methods now
 share mutable locals with their callbacks through the integrated Raven closure fix.
+Generic async capture metadata is corrected in Raven main and neoclr. Its target
+consumer now exposes neoCLR's numeric-only generic application import restriction,
+which is a compatibility gap against Raven's normal contract. The next bounded
+slice starts with ordinary closed generic helper import; see the
+[ownership and evidence](../experiments/task-run/compiler-gaps/README.md).
+
 The [original compiler gaps](../experiments/task-run/compiler-gaps/README.md) are
 corrected. Short-name lookup selects the nongeneric owner independently of metadata
 order; block callbacks infer value returns without a typed delegate local. Direct
