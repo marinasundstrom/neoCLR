@@ -73,8 +73,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   debugger bytes while unrelated buffers remain usable. Validate shared guest
   buffers and native imports. Aggregate array budgets across active and parked guest
   contexts, retained results and prepared I/O buffers; count shared heap payload once
-  and release private charges on participant exit. Atomic guest Promise/queue mutations
-  and public Run with queued capture/result handoff still need integration.
+  and release private charges on participant exit. Keep selected System.Tasks
+  mutations and state snapshots atomic across instruction quanta, including Promise
+  completion/registration, queue bookkeeping and lazy Default creation. Yield outside
+  those regions for queue callbacks; preserve cancellation and instruction limits.
+  Test the generated library with forced interleaving. Public Run with queued
+  capture/result handoff still needs integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

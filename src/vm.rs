@@ -1248,6 +1248,7 @@ fn restrict_reference_arguments(
 }
 
 struct Frame {
+    queue_callback: bool,
     permit: Option<crate::invocation_budget::FramePermit>,
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
@@ -1321,6 +1322,7 @@ impl Frame {
                 .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
                 .collect(),
             permit: None,
+            queue_callback: false,
             constructing: false,
             construction_object: None,
             construction_receiver: None,
@@ -1723,6 +1725,9 @@ impl InstructionState {
         }
     }
 }
+#[path = "vm_task_atomic.rs"]
+mod task_atomic;
+
 #[path = "vm_host_call.rs"]
 mod host_call;
 use host_call::HostCall;
@@ -1989,7 +1994,7 @@ fn interpret_instructions_with_dispatch(
             *owner = std::sync::Weak::new();
             return Ok(InstructionProgress::Completed(value));
         }
-        if executed == quantum || budget.remaining() == 0 {
+        if (executed >= quantum && !task_atomic::active(frames)) || budget.remaining() == 0 {
             break;
         }
         executed += 1;
@@ -2456,7 +2461,13 @@ fn interpret_instructions_with_dispatch(
                             "frame limit exceeded",
                         ));
                     }
-                    frames.push(Frame::new(callee, args)?);
+                    let queue_callback = task_atomic::queue_pump(&function);
+                    if task_atomic::active(frames) && !queue_callback {
+                        return Err(Fault::new("Task mutation cannot invoke a user callback"));
+                    }
+                    let mut callback = Frame::new(callee, args)?;
+                    callback.queue_callback = queue_callback;
+                    frames.push(callback);
                 }
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
@@ -3932,6 +3943,9 @@ fn interpret_instructions_with_dispatch(
             Ok(None)
         })();
         if let Some(mut call) = host_call {
+            if task_atomic::active(frames) {
+                return Err(Fault::new("Task mutation cannot suspend for host I/O"));
+            }
             let mut roots = execution_roots(
                 frames,
                 scheduler,
@@ -4347,3 +4361,7 @@ fn validate_attribute(
 #[cfg(test)]
 #[path = "vm_suspension_tests.rs"]
 mod suspension_tests;
+
+#[cfg(test)]
+#[path = "vm_task_atomic_tests.rs"]
+mod task_atomic_tests;

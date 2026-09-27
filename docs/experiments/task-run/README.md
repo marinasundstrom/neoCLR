@@ -415,12 +415,56 @@ aggregation, shared aliases, collection, participant release, completed inline r
 and detached write payloads. No full suite or website build was needed. The public
 Task.Run feature page remains correctly marked as future work.
 
+## Atomic task-library scheduling regions
+
+The interpreter now retains graph access across instruction quanta inside the
+closed System.Tasks library's Promise Complete/Cancel/Register/Read and state tests,
+Task State/Outcome snapshots, TaskQueue Post/Run/Drain bookkeeping and lazy Default
+creation. Identification uses the System definition owner and selected member names;
+application methods with the same names receive no special policy. This is internal
+runtime/library coupling, not a public synchronized-method attribute or general lock.
+
+A callback frame entered by TaskQueue Run/Drain ends the enclosing atomic region.
+Callbacks can yield and perform prepared blocking I/O; subsequent queue bookkeeping
+regains the region when the callback returns. Nested task-library mutations inside
+callbacks establish their own region. Instruction fuel, cancellation checks, GC and
+resource limits remain active. Host-call suspension or invoking a user callback from
+another protected mutation faults rather than silently releasing the region. A
+terminal fault/cancellation does not roll back a partially performed mutation: it
+fails the invocation under the existing Fault contract.
+
+The generated library retains first-terminal-transition behavior, callback posting
+and its existing rejection of recursive/overlapping queue pumps. The runtime does
+not make arbitrary ArrayList operations or application read/modify/write sequences
+atomic. Shared captures still require appropriate application synchronization.
+
+.NET's [TaskCompletionSource<T>](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskcompletionsource-1?view=net-10.0)
+documents concurrent member use (reviewed 2026-09-27). That is the ergonomic baseline
+for Promise completion and observation. neoCLR reuses its graph gate for this first
+implementation; it does not claim to reproduce CLR internals. Per-object monitors
+would permit finer scheduling but require retained monitor ownership, waiters and
+unwind integration. Native replacements for Promise/queue storage would duplicate
+Raven library behavior. The selected approach keeps that behavior in Raven at the
+cost of longer graph-lock intervals and explicit coupling to these method bodies.
+There is no throughput or fairness improvement claim. A future compiler/backend or
+a library change that introduces new callback/I/O paths must revisit the policy.
+
+Focused validation passes: six new probes plus the sixteen existing VM suspension
+and prepared-I/O probes (22 tests). The new fixture executes checked-in generated
+Tasks, ArrayList and required contracts with one-instruction quanta; it does not
+recompile Raven or verify the whole library. Object formatting is an explicit
+faulting fixture stub because reflection/formatting is outside these scenarios.
+Checks cover completion versus cancellation, callback registration versus completion,
+posting during a yielding drain callback, one Default identity, application-name
+isolation, instruction exhaustion, cancellation and forbidden host suspension. The
+older queue suspension probe now expects bookkeeping to remain within one interval.
+No public signature, API snapshot or website build changed.
+
 ## Next prerequisite
 
-Establish atomic Promise/queue publication, then expose the Run overloads with
-async callback unwrapping. Wire queued captures and completion handoff into the same
-root and payload-publication protocol at that API boundary; native work ownership
-alone does not publish arbitrary inline payloads. Instruction/live-frame budgets,
-file handles, interning, scheduler services, native memory and guest array accounting
-now share invocation scope. Retaining every object until invocation exit is not a
-substitute for bounded live-object accounting.
+Wire queued captures and completion handoff into the same root and payload-publication
+protocol, then expose the Run overloads with async callback unwrapping. Native work
+ownership alone does not publish arbitrary inline payloads. Instruction/live-frame
+budgets, file handles, interning, scheduler services, native memory and guest array
+accounting now share invocation scope. Task-library mutation regions are implemented;
+public Task.Run and end-to-end shared-capture acceptance remain pending.
