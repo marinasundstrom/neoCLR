@@ -1,0 +1,33 @@
+import System.*
+import System.Data.Json.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+class ReportClient {
+    async func SubmitReport(client: HttpClient) -> Task<Result<string, AppError>> {
+        let report = await client.GetFromJson<ReportPayload>("stations/42/reports")?
+        let response = await client.PostAsJson("stations/42/reports", report)
+        return ReadReply(response)
+    }
+
+}
+
+func Main(arguments: string[]) {
+    if arguments.Length != 1 {
+        System.Fault("Supply the server base URL, for example http://localhost:8080/")
+        return
+    }
+    let client = HttpClient()
+    client.BaseUri = Some(arguments[0])
+    let submission = ReportClient().SubmitReport(client)
+    submission.OnCompleted(() => {
+        if let Ok(reply) = submission.GetResult() {
+            Console.WriteLine(reply)
+        } else if let Error(error) = submission.GetResult() {
+            System.Fault(error.ToString())
+        }
+    })
+}

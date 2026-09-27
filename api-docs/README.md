@@ -355,3 +355,9 @@ The GC/Reflection website build also exposed omitted LocalTimeMapping Unique and
 Ambiguous Deconstruct pages. Their out-parameter signatures now have explicit
 [manual member entries](time-zone-mappings.md), registered in manual-members.json;
 no public API is excluded.
+
+
+RoutePattern and RouteMatch (development 2026-09-27) add four public methods.
+All have XML contracts and automatic RavenDoc selection; the [routing guide](routes.md)
+covers direct matching, typed parameters, errors and optional application unions.
+There are no manual exclusions. Match their reference snapshot to the HTTP library.

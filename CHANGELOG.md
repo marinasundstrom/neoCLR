@@ -31,6 +31,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   WebApplication plan; enum/Uuid/Option mapping and optional SQLite remain planned.
   Preview 10 remains flat-model-only.
 
+- Add development RoutePattern.Parse/Match and RouteMatch.Get/GetInt32 for reusable
+  literal and named-segment parsing inside HttpServer handlers. Separate no-match
+  from malformed input and typed conversion failure; define bounded, case-sensitive
+  paths with query separation and strict once-only UTF-8 segment decoding. Add a
+  direct-use consumer and station client/server case with optional application union
+  dispatch, API reference and tested website excerpts/download. Keep dispatch and
+  lifecycle application-owned. Record the author's proposed
+  reusable attribute-driven route-to-union mapper as the next design investigation,
+  with startup validation and Result-based no-match/error handling; it is not an
+  implemented API.
+
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add
   synchronous full Collect and nullable KeepAlive; share automatic/explicit root

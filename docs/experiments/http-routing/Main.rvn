@@ -1,0 +1,90 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Web.Http.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Verify() -> Result<unit, string> {
+    let pattern = RoutePattern.Parse("/stations/{stationId}/reports")?
+    let Some(directId) = ReadStationId(pattern, "/stations/42/reports")? else {
+        return Error("direct match")
+    }
+    Check(directId == 42, "direct helper")
+    Check(ReadStationId(pattern, "/missing")? is None, "direct absence")
+    Check(ReadStationId(pattern, "/stations/no/reports") is Error(_), "direct invalid number")
+    let Some(parameters) = pattern.Match("/stations/42/reports?limit=2")? else {
+        return Error("Expected match")
+    }
+    Check(parameters.Get("stationId")? == "42", "raw capture")
+    Check(parameters.GetInt32("stationId")? == 42, "typed capture")
+    Check(parameters.Get("missing") is Error(_), "missing capture")
+    Check(pattern.Match("/stations/42/reports/")? is None, "trailing slash")
+    Check(pattern.Match("/Stations/42/reports")? is None, "case sensitivity")
+    Check(pattern.Match("/stations//reports")? is None, "empty parameter")
+    Check(pattern.Match("/stations/42")? is None, "missing segment")
+    Check(pattern.Match("/stations/42/reports/extra")? is None, "extra segment")
+    Check(pattern.Match("/elsewhere/%ZZ") is Error(_), "validate mismatched target")
+    for target in ["stations/42/reports", "/stations/%2f/reports", "/stations/%5C/reports", "/stations/%00/reports", "/stations/%ff/reports", "/stations/%/reports", "/stations/%GG/reports", "/stations/42/reports#fragment"] {
+        Check(pattern.Match(target) is Error(_), "invalid target")
+    }
+    for source in ["relative", "/{id}/{id}", "/{id", "/{}", "/{1id}", "/{id?}", "/{id:int}", "/x{id}", "/a?b", "/a#b", "/%ZZ"] {
+        Check(RoutePattern.Parse(source) is Error(_), "invalid pattern")
+    }
+    let root = RoutePattern.Parse("/")?
+    Check(root.Match("/?x=1")? is Some(_), "root query")
+    Check(root.Match("//")? is None, "repeated slash")
+    let text = RoutePattern.Parse("/names/{name}")?
+    let Some(unicode) = text.Match("/names/Caf%C3%A9")? else { return Error("unicode match") }
+    Check(unicode.Get("name")? == "Café", "decoded UTF-8")
+    let Some(plus) = text.Match("/names/a+b")? else { return Error("plus match") }
+    Check(plus.Get("name")? == "a+b", "plus unchanged")
+    let Some(once) = text.Match("/names/%252F")? else { return Error("escaped percent") }
+    Check(once.Get("name")? == "%2F", "decode once")
+    let literal = RoutePattern.Parse("/Caf%C3%A9")?
+    Check(literal.Match("/Café")? is Some(_), "decoded literal")
+    for value in ["-2147483648", "2147483647"] {
+        let Some(valid) = pattern.Match("/stations/" + value + "/reports")? else { return Error("numeric match") }
+        Check(valid.GetInt32("stationId") is Ok(_), "integer bounds")
+    }
+    for value in ["abc", "2147483648", "1.5"] {
+        let Some(invalid) = pattern.Match("/stations/" + value + "/reports")? else { return Error("invalid integer should match path") }
+        Check(invalid.GetInt32("stationId") is Error(_), "integer failure")
+    }
+    let route = ParseStationRoute(pattern, "GET", "/stations/%34%32/reports")?
+    let StationRoute.ReadReports(readId) = route else {
+        return Error("union mapping")
+    }
+    Check(readId == 42, "union payload")
+    let posted = ParseStationRoute(pattern, "POST", "/stations/42/reports")?
+    let StationRoute.SubmitReport(postId) = posted else {
+        return Error("post variant")
+    }
+    Check(postId == 42, "post payload")
+    Check(ParseStationRoute(pattern, "GET", "/stations/no/reports") is Error(_), "union conversion failure")
+    Check(ParseStationRoute(pattern, "GET", "/missing")? is StationRoute.Unmatched(_), "union absence")
+    var boundary = "/"
+    for index in 0..<1023 { boundary += "a" }
+    let longPattern = RoutePattern.Parse(boundary)?
+    Check(longPattern.Match(boundary)? is Some(_), "byte boundary")
+    Check(RoutePattern.Parse(boundary + "a") is Error(_), "pattern byte overflow")
+    Check(longPattern.Match(boundary + "a") is Error(_), "target byte overflow")
+    var segments = ""
+    for index in 0..<16 { segments += "/a" }
+    let maxSegments = RoutePattern.Parse(segments)?
+    Check(maxSegments.Match(segments)? is Some(_), "segment boundary")
+    Check(RoutePattern.Parse(segments + "/a") is Error(_), "pattern segment overflow")
+    Check(maxSegments.Match(segments + "/a") is Error(_), "target segment overflow")
+    return Ok(())
+}
+
+func Main() {
+    if let Error(reason) = Verify() {
+        System.Fault(reason)
+    }
+    Console.WriteLine("Route parsing checks passed")
+}

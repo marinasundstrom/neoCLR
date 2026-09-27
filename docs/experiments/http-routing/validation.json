@@ -1,0 +1,108 @@
+{
+  "date": "2026-09-27",
+  "host": "macOS arm64",
+  "scope": "Direct reusable RoutePattern/RouteMatch parsing, named and Int32 values, explicit optional application union dispatch",
+  "commands": [
+    "python3 docs/experiments/http-routing/verify.py --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+    "python3 docs/experiments/http-json/verify.py --routed --case all --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async"
+  ],
+  "checks": [
+    "Valid/invalid pattern grammar, duplicate parameters, case sensitivity, root/empty/trailing segments and no-match",
+    "Query separation, strict UTF-8 escapes, decoded separators/control rejection, plus unchanged, once-only decoding and validation before mismatch",
+    "Missing parameter and checked Int32 boundaries; direct use and application route-union construction/extraction",
+    "Exact 1024-byte and 16-segment boundaries, overflow for patterns and targets",
+    "29 independent HTTP server cases; managed pair; managed client against Python server"
+  ],
+  "runs": {
+    "direct": {
+      "assembly_ms": 3041,
+      "load_ms": 2148,
+      "verify_ms": 938,
+      "run_ms": 6644,
+      "allocated": 1296,
+      "live": 0,
+      "peak": 170,
+      "collections": 24,
+      "reclaimed": 1296
+    },
+    "http": [
+      {
+        "peer": "server",
+        "assembly_ms": 3131,
+        "load_ms": 2078,
+        "verify_ms": 929,
+        "run_ms": 58906,
+        "allocated": 12991,
+        "live": 0,
+        "peak": 305,
+        "collections": 156,
+        "reclaimed": 12991
+      },
+      {
+        "peer": "client",
+        "assembly_ms": 3743,
+        "load_ms": 2672,
+        "verify_ms": 1084,
+        "run_ms": 10677,
+        "allocated": 1394,
+        "live": 0,
+        "peak": 274,
+        "collections": 21,
+        "reclaimed": 1394
+      },
+      {
+        "peer": "server",
+        "assembly_ms": 3264,
+        "load_ms": 2369,
+        "verify_ms": 1015,
+        "run_ms": 16978,
+        "allocated": 1292,
+        "live": 0,
+        "peak": 303,
+        "collections": 16,
+        "reclaimed": 1292
+      },
+      {
+        "peer": "client",
+        "assembly_ms": 3409,
+        "load_ms": 1828,
+        "verify_ms": 945,
+        "run_ms": 6782,
+        "allocated": 1422,
+        "live": 0,
+        "peak": 302,
+        "collections": 19,
+        "reclaimed": 1422
+      }
+    ]
+  },
+  "notes": [
+    "The same compiled pattern is reused throughout the contract consumer and server lifetime. Captures are new per match.",
+    "No new native services, compiler source changes or Runtime Contract configuration. Existing mutable private-field admission retained.",
+    "Scalar-only explicit-layout unions and nested constant-payload Object.Equals patterns remain recorded bridge limitations; this case does not fix them.",
+    "Attribute-driven automatic mapping is a design direction, not implemented or validated by these tests.",
+    "Correctness and resource evidence only, not throughput/latency guarantees. Preview 10 remains unchanged."
+  ],
+  "sha256": {
+    "runtime/raven/src/System/Web/Http/Routes.rvn": "0121fa54f43fead03e945773a5402961a6afe3bd771e54b9cb629fdac5092e43",
+    "runtime/raven/generated/HttpClient.methods.neoil": "4aa33b499ea781b271830f9e1fc59c684ab31378cea2c09a8464e2602a501bc9",
+    "runtime/raven/generated/HttpClient.helpers.neoil": "f0d75557fa3c0523abc742a69b7fa7792235c67bf42dd1b1361d5674be27f465",
+    "docs/experiments/http-routing/Direct.rvn": "1ef206fff80a4534a196e05f08114cfc60ea12c94b1f81c643baf8ad656bfe12",
+    "docs/experiments/http-routing/Main.rvn": "2c6714c54fe08f019cd0cbe83a81a42ba0f0a28f8c7d8b4c98a10b0effb8962b",
+    "docs/experiments/http-routing/Routes.rvn": "1a2a4b9341d47a992e991a90a117eef0b2368fce2c3ffddffe22f81650a14cfe",
+    "docs/experiments/http-routing/Server.rvn": "539e06c0a2d1824ce4b605e6f5c231fe3a2bd1a7cffed7f02315182b624be743",
+    "docs/experiments/http-routing/Client.rvn": "36eeb50ddd1908d965c20196ae6bce38ae502e910bf9d759cb1e969cdf3ed7d5",
+    "docs/experiments/http-json/verify.py": "b02d771e257a7d50fb51b585eb1384d77031bd1a3ee804deebf542e57d869e79"
+  },
+  "validation": {
+    "websitePages": 1262,
+    "websiteTests": 18,
+    "downloadMatchesSources": true,
+    "runtimeSnapshot": "passed",
+    "apiSnapshot": "passed",
+    "publicApiTypesAdded": [
+      "System.Web.Http.RoutePattern",
+      "System.Web.Http.RouteMatch"
+    ]
+  }
+}

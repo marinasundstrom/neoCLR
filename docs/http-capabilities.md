@@ -34,8 +34,11 @@ covers independent peers and the managed pair. Development JSON now matches the
 1,024-byte HTTP body cap; [payload evidence](experiments/json-object-mapping/payload-validation.json)
 covers boundaries and the longer report case. Typed arrays are now implemented;
 [collection evidence](experiments/json-object-mapping/collection-validation.json) covers
-array payloads and invalid elements. Enum/Uuid/Option mapping and route parsing are
-next; WebApplication, configurable limits and SQL remain deferred.
+array payloads and invalid elements. Enum/Uuid/Option mapping remains
+pending. Direct route parsing and the explicit union-dispatch case are now
+implemented; see [route evidence](experiments/http-routing/validation.json).
+Attribute-driven union mapping is the next design investigation above the parser;
+WebApplication, configurable limits and SQL remain deferred.
 
 ## Capability matrix
 
@@ -50,7 +53,7 @@ next; WebApplication, configurable limits and SQL remain deferred.
 | Live response/request body streams | Deferred response reader | Deferred request reader and response writer | Separate body lifetime from connection lifetime; trailers and completion semantics |
 | JSON DOM and typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); nested reference objects are implemented in development with [evidence](experiments/json-object-mapping/nested-validation.json); current JSON size/shape limits remain |
 | Cancellation and cleanup | Implemented through lookup/connect/transfer; upload ownership and one-shot rules | Implemented accept/context/complete/shutdown lifetime | [Network cancellation](experiments/network-cancellation/README.md), [context](experiments/http-context/README.md); synchronous source reads cannot be interrupted mid-read |
-| Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting | No routing or application framework implied |
+| Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting; development RoutePattern matching and named/Int32 parameters | [Routing](route-parsing.md); optional application union dispatch; no hosting framework |
 | HTTPS/TLS | Deferred for this cleartext POC | Deferred for this cleartext POC | [TLS feasibility](http-client-design.md#https-feasibility-checkpoint--2026-09-25); wider release scope remains an explicit decision, never an implicit public-network readiness claim |
 | Pooling/persistent reuse | Deferred; currently one connection per exchange | Deferred; closes each exchange | Separate request and connection ownership |
 | HTTP/2 | Deferred | Deferred | Multiplexing, flow control, HPACK, negotiation and per-stream errors |

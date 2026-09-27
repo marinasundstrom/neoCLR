@@ -83,9 +83,35 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   path matching with explicit Int32/Uuid parsing after the JSON work. Updates the
   roadmap and plan to defer WebApplication infrastructure. Route parsing remains
   planned; this exchange does not claim an implemented parser.
-- **Open:** exact route-parser signatures and path normalization rules, enum/Uuid/
-  Option contracts, wider collection shapes and configurable budgets, and whether
-  to select SQLite after the in-memory consumer.
+- **Author layering refinement:** suggests returning an application union whose cases
+  carry route parameters, then clarifies that this is a convenience above basic
+  route parsing, useful for match-based application dispatch rather than the
+  fundamental result contract. The assistant agrees to retain independent parsing
+  and typed value access, with optional application-owned union construction.
+- **Author continuation:** asks to continue after that refinement. The assistant
+  implements RoutePattern/RouteMatch and a station case with direct matching and
+  explicit union mapping; JSON enum/Uuid/Option requests remain pending, rather than
+  being treated as cancelled by this bounded routing slice. See the
+  [route design](route-parsing.md) and [case evidence](experiments/http-routing/validation.json).
+- **Author next idea:** after these primitives, proposes attributes on union cases
+  that specify route patterns, with a dedicated route-to-union mapper. The assistant
+  records this as the next design investigation above the independent parser;
+  metadata retention, case construction, supported types and ambiguity rules remain
+  to be validated. No attribute API or automatic mapper is claimed as implemented.
+- **Author concrete syntax and reuse:** supplies AppRoutes with RoutePattern
+  attributes and an UnmatchedPattern-marked case, then suggests the clearer name
+  UnmatchedRoutePattern. Requests constructing a reusable parser object for the
+  server lifetime so patterns are not reparsed for each request.
+- **Author delegation:** permits Result-based unmatched handling and asks the
+  assistant to choose what fits. The assistant selects a planned
+  Result<AppRoutes, RouteMappingError> contract: NoMatch is distinct from invalid
+  parameter/malformed target errors, while configuration errors fail mapper creation.
+  This supersedes the proposed unmatched attribute for the initial mapper design;
+  the earlier suggestion is retained here. The current explicit sample's Unmatched
+  variant remains an application choice, not the future mapper contract.
+- **Open:** attribute-driven union mapping, enum/Uuid/Option contracts, wider
+  collection shapes and configurable budgets, and whether to select SQLite after
+  the in-memory consumer.
 
 ## 2026-09-26 — Streaming, modern HTTP and a finite POC
 

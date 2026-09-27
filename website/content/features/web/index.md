@@ -214,9 +214,11 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 ## Direction
 
 The active development direction is a small Web API. Nested objects and typed
-arrays are implemented in development. Next, a route parser should let an existing
-HttpServer handler match paths and extract typed parameters. This smaller scope
-defers WebApplication infrastructure and automatic endpoint registration.
+arrays are implemented in development. RoutePattern now lets an existing
+HttpServer handler match paths and extract named values or checked Int32 parameters.
+An application union is an optional convenience for dispatch with match. See the
+[routed station case](/cases/http-server/#development-case-routing-with-typed-parameters)
+and [API guide](/docs/routes.html). WebApplication infrastructure remains deferred.
 SQLite-backed persistence is an optional exploration.
 
 Possible later steps include asynchronous body contracts, response streaming, TLS

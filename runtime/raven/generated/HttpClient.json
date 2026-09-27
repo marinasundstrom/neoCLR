@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System.Web.Http.HttpClient",
   "inputs": {
+    "runtime/raven/src/System/Web/Http/Routes.rvn": "0121fa54f43fead03e945773a5402961a6afe3bd771e54b9cb629fdac5092e43",
     "runtime/raven/src/System/Runtime/GC.rvn": "1c672a79b8eb146f353d73ec5d075235976dbc68397843d2e1b7ce669dd915d0",
     "runtime/raven/src/System/DateTime.rvn": "8ba1677cd951cd8da8449ed57f76df8805756c5fa3dadbdcaafac9bbd7f6f870",
     "runtime/raven/src/System/ZonedDateTime.rvn": "69fb6cac5174b6e4b240996f66a09077e985bbd2531c41b49b6d0bd41b8924f9",
@@ -167,15 +168,15 @@
     "runtime/raven/src/System/Boolean.rvn": "72900f5ddfe7fdfd3f2b3d9b872fc033b10800cf2f9b515166e6385f1a3a0211",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "ecb5516f12161cea9458ff333454fb4cc012619e5f68501c034ccdde024ffab2",
+    "runtime/raven/System.Runtime.rvnproj": "d17e991c77a35cb30a97c90730458831fb6b6d04b921f6312814b39478340d1b",
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
-    "HttpClient.methods.neoil": "ed8603a7d1d1e8ff2cf56e73ef67cc73ab97998e94977b9d88d19098d2917c4d",
-    "HttpClient.helpers.neoil": "4d0413e163a40da1dad0fffaeaaddd819e8624acbabdfc72378ecdd92189f5d1"
+    "HttpClient.methods.neoil": "4aa33b499ea781b271830f9e1fc59c684ab31378cea2c09a8464e2602a501bc9",
+    "HttpClient.helpers.neoil": "f0d75557fa3c0523abc742a69b7fa7792235c67bf42dd1b1361d5674be27f465"
   },
-  "compilerSha256": "e93241cabea700f511fb141a677919fdd9ff8bd6b19fae571e90fc5f2475c8f3",
-  "coreSha256": "6388a48392633850a157b04fc5ef4cd37e0ddd451c980dbd01f658365c3f4c60",
+  "compilerSha256": "9378ae6a3de0bdbfdc3f6025950ea769c9f1599d6a1c23d0f4a6367d4967e792",
+  "coreSha256": "657b261170a45a1fb47e37ebbe3adce0183a38f979149e2989bf4749833a5709",
   "exports": [
     "get_DefaultRequestHeaders() -> System.Collections.Sequence<System.Web.Http.HttpHeader>",
     "set_DefaultRequestHeaders(System.Collections.Sequence<System.Web.Http.HttpHeader> value) -> noresult",

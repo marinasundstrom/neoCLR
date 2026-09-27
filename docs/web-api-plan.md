@@ -55,29 +55,43 @@ transport and runtime resource limits together; changing one constant is insuffi
 2. **Useful API payloads — byte budget implemented in development.** JSON now
    accepts 1,024 UTF-8 bytes, with below/at/above-boundary checks and a longer nested
    station report. See [budget evidence](experiments/json-object-mapping/payload-validation.json).
-   Four levels and 32 values remain unchanged. Next add a bounded
-   collection shape for list results. The author subsequently explicitly selects
+   Four levels and 32 values remain unchanged. Typed scalar/model arrays and jagged
+   arrays are implemented; broader generic collection shapes remain deferred. The author subsequently explicitly selects
    collection serialization/deserialization, enum mapping, a new Uuid type, and
-   Option mapping for JSON nullability. Complete those before the route-parser
-   consumer. The proposed Option rule is None/null and Some/contained value, with
+   Option mapping for JSON nullability. These remain pending; the subsequent route/union discussion selects a bounded
+   routing slice first without cancelling the JSON requests. The proposed Option rule is None/null and Some/contained value, with
    missing Option properties becoming None and required missing fields remaining
    errors. Broader numeric/date/converter support is selected only through a consumer.
-3. **Route parser inside the handler — author-selected smaller scope.** Match
+3. **Route parser inside the handler — implemented in development.** Match
    literal segments and named single-segment parameters, then expose explicit typed
    parsing (initial candidates: Int32 and Uuid). Keep method selection, JSON reads,
    domain behavior and response completion in the existing HttpServer handler.
    Distinguish pattern errors, a route that does not match, and a parameter that
-   cannot be parsed. Exact public signatures remain to be tested in Raven.
-4. **End-to-end routed case.** Extend the tested station-report case with a path
+   cannot be parsed. The [implemented contract](route-parsing.md) provides Parse,
+   Match, Get and GetInt32; Uuid awaits its own type and parser.
+4. **End-to-end routed case — implemented in development.** Extend the tested station-report case with a path
    such as /stations/{id}/reports and a connecting client. Specify case sensitivity,
    trailing slashes, query separation and percent decoding before implementation;
    avoid decoding an escaped slash into an additional path segment. Check literal
    mismatch, missing/extra segments, invalid patterns, typed parameter failure and
-   successful extraction. The handler explicitly chooses 400/404/405 and owns its
+   successful extraction. This case explicitly chooses 400/404 (including 404 for
+   unsupported methods); it does not add automatic 405 handling and owns its
    existing cleanup. No registration table, DI, middleware, automatic delegate binding
    or new application lifecycle is needed. New public APIs require matching reference
    artifacts and API documentation. WebApplication remains deferred.
-5. **Optional SQL/SQLite consumer.** If selected, reduce the
+5. **Optional route-to-union mapper — next design investigation.** The author
+   proposes attributes on union cases to declare route patterns. Preserve the direct
+   parser as the foundation; a dedicated mapper should construct application union
+   cases with parsed payloads and leave match-based dispatch to the caller. Validate
+   case-attribute placement/retention, constructor parameter names, supported parsers,
+   missing values and ambiguous patterns before settling public syntax. Compare
+   runtime metadata mapping with generated mapping; neither is implemented yet.
+   The author further requires a reusable mapper built once for the server lifetime,
+   and leaves unmatched handling to assistant judgment. The selected design is
+   Result<AppRoutes, RouteMappingError>, with NoMatch distinct from malformed target
+   and invalid parameter errors; an unmatched attribute is unnecessary initially.
+   See [the recorded design choices](route-parsing.md#next-layer-attributed-union-mapping).
+6. **Optional SQL/SQLite consumer.** If selected, reduce the
    [SQL proposal](proposals/sql-data-access.md) to opening/closing a connection,
    parameterized execution, a forward reader, explicit SQL NULL/value mapping,
    and transactions with commit/rollback. Separate contracts from the provider;

@@ -1444,3 +1444,23 @@ The heap-async Raven target preserves the source entry signature; neoCLR owns
 startup adaptation and pending completion. Use a matching updated compiler,
 bridge and runtime. Public System signatures and Runtime Contract settings are
 unchanged. Integer results now become `neoclr run` process exit statuses.
+
+
+## Route parsing and optional union dispatch — 2026-09-27
+
+RoutePattern and RouteMatch are ordinary Raven reference classes in the HTTP slice,
+with four exact public bridge bindings. Their private storage stays mutable because
+InstanceRoots currently requires mutable implementation fields; the public API
+exposes no mutation. Matching uses existing UTF-8, collection and integer APIs.
+No native services, Raven compiler source or Runtime Contract configuration changes.
+Rebuild the HTTP library and compiler reference together; Preview 10 lacks these APIs.
+
+The [routing experiment](../http-routing/README.md) also records two existing gaps:
+scalar-only payload unions may emit overlapping explicit CLI layouts rejected by
+ApplicationTypes, and nested constant payload patterns may emit unsupported static
+Object.Equals(Object,Object). They are not fixed or silently admitted here. The case
+uses a meaningful Unmatched(String) fallback (yielding sequential managed union
+storage), and extracts payloads before comparing values. Standalone contract checks
+exercise that exact source and HTTP tests exercise match-based dispatch. Before an
+attribute mapper promises arbitrary route unions, validate scalar-only union
+admission independently. Keep any generic Raven fix separate from neoCLR policy.

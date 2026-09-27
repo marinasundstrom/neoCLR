@@ -356,5 +356,7 @@
   "System.Web.Http.Json.HttpJsonError.Http",
   "System.Web.Http.Json.HttpJsonError.Json",
   "System.Web.Http.Json.JsonContent",
+  "System.Web.Http.RouteMatch",
+  "System.Web.Http.RoutePattern",
   "System.ZonedDateTime"
 ]

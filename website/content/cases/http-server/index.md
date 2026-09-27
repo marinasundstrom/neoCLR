@@ -153,3 +153,70 @@ limit. Nulls, generic lists and polymorphic property/element values
 remain unsupported. Shared child references are serialized as repeated objects;
 cycles fail at the depth limit. See [JSON mapping rules](/docs/json.html) for
 construction, error and stream ownership contracts.
+
+
+## Development case: routing with typed parameters
+
+**Requires a matching development build after Preview 10.** A station is now
+addressed by ID: GET `/stations/42/reports` reads its report and POST to the same
+path submits it. Station 42 is the small case's known sensor. The shared nested
+JSON models above are unchanged.
+
+Compile `RoutePattern.Parse("/stations/{stationId}/reports")` once. The fundamental
+API matches a target and exposes named values; no route union is required:
+
+```raven
+{{HTTP_ROUTE_DIRECT_SAMPLE}}
+```
+
+An application-defined union is an optional convenience for dispatch. These cases
+carry already parsed parameters; the fallback carries the original target:
+
+```raven
+{{HTTP_ROUTE_UNION_SAMPLE}}
+```
+
+Ordinary application code converts a match into its chosen route variant:
+
+```raven
+{{HTTP_ROUTE_PARSE_SAMPLE}}
+```
+
+### Server dispatch
+
+The handler uses `match` to choose its own logic. Invalid parameters become 400;
+unmatched paths, unknown stations and unsupported methods become 404 in this case.
+The existing HttpContext completion and cleanup remain in the surrounding server.
+
+```raven
+{{HTTP_ROUTE_SERVER_SAMPLE}}
+```
+
+### Connecting client
+
+The client reads the report and submits it back using the same station path:
+
+```raven
+{{HTTP_ROUTE_CLIENT_SAMPLE}}
+```
+
+Matching is case-sensitive; trailing slashes matter. Query text is ignored. Segment
+values are decoded once as UTF-8, while encoded separators and malformed escapes
+are rejected. Each target/pattern allows at most 1,024 UTF-8 bytes and 16 segments.
+`GetInt32` checks spelling and bounds; other types can use `Get` and their own parser.
+See the [route API guide](/docs/routes.html) for the complete contract.
+
+The [project download](/samples/http-json.zip) includes `http-routing`, the shared
+model source and verifier. With a matching development bundle, run from its root:
+
+```sh
+python3 http-routing/verify.py --toolchain-root /path/to/development-bundle \
+  --runner /path/to/measure_async
+python3 http-json/verify.py --routed --case all \
+  --toolchain-root /path/to/development-bundle --runner /path/to/measure_async
+```
+
+The checks cover direct parsing and union dispatch, 29 independent server requests,
+the neoCLR client/server pair and the client against an independent server. The
+client prints `{"accepted":true}`. The examples are development source, not APIs
+included in Preview 10 or a new hosting framework.

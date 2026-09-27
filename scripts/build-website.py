@@ -251,6 +251,11 @@ def main():
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
         'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ROUTE_DIRECT_SAMPLE': ('docs/experiments/http-routing/Direct.rvn', 'func ReadStationId(', '\n}', True),
+        'HTTP_ROUTE_UNION_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'union StationRoute {', '\n}', True),
+        'HTTP_ROUTE_PARSE_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'func ParseStationRoute(', '\n}', True),
+        'HTTP_ROUTE_SERVER_SAMPLE': ('docs/experiments/http-routing/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ROUTE_CLIENT_SAMPLE': ('docs/experiments/http-routing/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_NESTED_MODELS_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'public class Station {', 'public class Acknowledgement {', False),
         'HTTP_MAPPED_CLIENT_SAMPLE': ('docs/experiments/json-object-mapping/HttpClient.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_NESTED_READ_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'func Acknowledge(', '\n}', True),
@@ -341,6 +346,7 @@ def main():
     json_downloads = downloads / 'http-json'
     for directory, names in (
         ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('http-routing', ('Direct.rvn', 'Routes.rvn', 'Main.rvn', 'Routing.rvnproj', 'Server.rvn', 'Client.rvn', 'Server.rvnproj', 'Client.rvnproj', 'verify.py', 'README.md')),
         ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),
     ):
         destination = json_downloads / directory
