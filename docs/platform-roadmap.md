@@ -32,7 +32,8 @@ and conversion-progress contracts before dependent API expansion. The author cla
 that the immediate System.Text scope is encoding/decoding foundations and possibly
 a small builder, with Swift as the closer model for text API shape.
 The [library tracker](tracking/library-data.md#string-design-review-before-further-expansion)
-owns the boundary experiment and next bounded recommendation: UTF-8 conversion
+owns the boundary experiment, [paired text API sketch](design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies)
+and next bounded recommendation: UTF-8 conversion
 progress for a chunked reader, then evaluate minimal text construction. General
 scalar/range APIs and the broader portfolio are not prerequisites. Experimental
 types and proposed names are not adopted System APIs.

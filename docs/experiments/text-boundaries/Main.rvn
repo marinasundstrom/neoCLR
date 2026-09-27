@@ -191,6 +191,8 @@ public func Main(args: string[]) {
     if args.Length == 0 {
         CheckBoundaries()
         CheckDecodeEdges()
+    } else if args[0].Equals("consumer") {
+        CheckConsumer()
     } else if args[0].Equals("first") {
         CheckSplits(0, 6)
     } else {

@@ -84,3 +84,20 @@ once; execution covers only this fixture. Existing Sequence, equality/hash and C
 contracts need no migration. Scalar traversal, opaque positions, builder mutation,
 foreign UTF-16 policy and Unicode-version alignment remain separate work; this probe
 does not claim to settle those interfaces.
+
+## API sketch consumer — 2026-09-27
+
+`Consumer.rvn` adds an application-only accumulator and exact delimiter extraction.
+It checks immutable Build snapshots, Clear/reuse, grapheme resegmentation on append,
+missing versus empty suffixes, exact matching inside a grapheme, and incremental
+UTF-8 output composed into the same text. The paired String/Text vocabulary is in
+[the design sketch](../../design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies).
+Text is not introduced as an alias or wrapper. The accumulator uses concatenation
+and makes no efficiency claim.
+
+Use the command above with `--consumer-only` to compile/verify the combined fixture
+and execute only the new consumer. `consumer-results.json` records this focused run;
+the original `results.json` remains evidence for unchanged boundary checks. Without
+that option, the verifier also executes the three original runs. No website build,
+full suite, new public API snapshot or performance benchmark is needed for this
+application-only semantic sketch.

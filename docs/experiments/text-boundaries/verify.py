@@ -11,6 +11,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 for name in ('runtime', 'bridge', 'system', 'reference'):
     parser.add_argument('--' + name, required=True, type=Path)
 parser.add_argument('--evidence', type=Path)
+parser.add_argument('--consumer-only', action='store_true')
 args = parser.parse_args()
 root = Path(__file__).resolve().parent
 artifacts = {name: getattr(args, name).resolve() for name in
@@ -30,7 +31,7 @@ def run(command):
 
 with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
     work = Path(directory)
-    for name in ('Main.rvn', 'Boundaries.rvn', 'Decoder.rvn', 'Boundaries.rvnproj'):
+    for name in ('Main.rvn', 'Boundaries.rvn', 'Decoder.rvn', 'Consumer.rvn', 'Boundaries.rvnproj'):
         shutil.copyfile(root / name, work / name)
     shutil.copyfile(artifacts['reference'], work / 'NeoCLR.CoreProbe.dll')
     run(['dotnet', artifacts['bridge'], '--project', work / 'Boundaries.rvnproj', work / 'out'])
@@ -38,12 +39,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
     common = [app, '--system', artifacts['system']]
     run([artifacts['runtime'], 'verify', *common])
     results = {}
-    for label, guest_args in [('contracts', []), ('splits-0-6', ['first']),
-                              ('splits-7-13', ['last'])]:
+    runs = [('consumer', ['consumer'])]
+    if not args.consumer_only:
+        runs += [('contracts', []), ('splits-0-6', ['first']), ('splits-7-13', ['last'])]
+    for label, guest_args in runs:
         output = run([artifacts['runtime'], 'run', *common, '--', *guest_args])
         expected = ('Scalar and source-range contracts: passed',
                     'Decoding ownership, progress and errors: passed') if not guest_args else (
                     'Bounded UTF-8 split checks: passed',)
+        if label == 'consumer':
+            expected = ('Text API consumer: construction, extraction and split decoding passed',)
         if any(marker not in output for marker in expected):
             raise SystemExit(f'Missing success marker in {label}')
         results[label] = list(expected)

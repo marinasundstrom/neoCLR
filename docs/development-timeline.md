@@ -8025,3 +8025,23 @@ configuration/content, not target-specific code added to Raven main.
 - **Action/outcome:** records the [intent and scope guard](design/text-abstraction.md#high-level-text-api-intent--author-clarification)
   in the existing design and theme tracker. Exact names, any compatibility surface
   and migration remain open. Documentation only; no runtime/API changes.
+
+## 2026-09-27 — Correcting the comparison and testing a small text API sketch
+
+- **Author correction:** C# string and char are not simply handling fixed bytes.
+- **Assistant response:** acknowledges conflating bytes with encoding units. C# string
+  is variable-length UTF-16 text and char is a code unit; the design question is which
+  operations and units are prominent in everyday APIs, not whether .NET handles text.
+- **Author:** asks for the next safe step and then says “Continue”.
+- **Assistant proposal/action:** compares String and Text vocabulary under identical
+  contracts for split decoding, construction and extraction. Adds one executable
+  application-only consumer to the existing experiment, reusing unchanged boundary
+  evidence. A hypothetical Text alias is not compiled or presented as implemented.
+- **Outcome:** construction preserves snapshots through append/clear/reuse; joining
+  decoded chunks resegments graphemes; optional delimiter extraction hides position
+  arithmetic. Exact matching inside a grapheme remains a distinct search policy,
+  not a generic high-level default. The [sketch](design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies)
+  records the smallest foundation recommendation and open naming/codec questions.
+  Compilation, import verification and the focused consumer execution pass; unchanged
+  boundary evidence is reused. No production API or runtime change; no usability or
+  performance superiority claim. No full suite or website build.

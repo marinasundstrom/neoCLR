@@ -1,0 +1,14 @@
+{
+  "scope": "Application prototype; no System API change",
+  "runs": {
+    "consumer": [
+      "Text API consumer: construction, extraction and split decoding passed"
+    ]
+  },
+  "sha256": {
+    "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+    "bridge": "498dc391f263da5f0e832db88a9fe27a0d15b416b7a0e6b128eb0fbf44ff9356",
+    "system": "882da90eccd6ec65230d149c0f3c97a2053bac9fa4052befc138484de483fcc7",
+    "reference": "f2db99896264745259e60336dacc6db0cfb38395dae22a2573f3cb157d6b28e8"
+  }
+}

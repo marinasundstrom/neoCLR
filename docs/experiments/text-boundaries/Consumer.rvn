@@ -1,0 +1,81 @@
+import System.*
+import System.Result.*
+import System.Option.*
+import System.Console.*
+
+// Contract sketch only: concatenation models semantics, not builder performance.
+public class TextAccumulator {
+    private var value: string = ""
+
+    func Append(part: string) {
+        value = String.Concat(value, part)
+    }
+
+    func Build() -> string {
+        return value
+    }
+
+    func Clear() {
+        value = ""
+    }
+}
+
+// A delimiter consumer avoids exposing any position unit to its caller.
+public func AfterOrdinal(source: string, delimiter: string) -> Option<string> {
+    let owner = TextSource(source)
+    match owner.FindOrdinal(delimiter) {
+        None => return None
+        Some(let range) => {
+            let start = range.Utf8Start + range.Utf8Length
+            match owner.Slice(SourceRange(owner, start, source.GetUtf8ByteCount() - start)) {
+                Ok(let suffix) => return Some(suffix)
+                Error(_) => System.Fault("Invalid internally constructed suffix")
+            }
+        }
+    }
+    return None
+}
+
+public func CheckConsumer() {
+    let builder = TextAccumulator()
+    builder.Append("name=")
+    builder.Append("e")
+    let snapshot = builder.Build()
+    builder.Append("́")
+    let report = builder.Build()
+    Check(snapshot.Equals("name=e"), "Build preserves an earlier snapshot")
+    Check(report.Equals("name=é") && report.Length == 6, "Append resegments the boundary")
+    builder.Clear()
+    builder.Append("replacement")
+    Check(report.Equals("name=é"), "Clear/reuse preserves materialized output")
+    Check(builder.Build().Equals("replacement"), "Builder reuse")
+    match AfterOrdinal(report, "=") {
+        Some(let text) => Check(text.Equals("é") && text.Length == 1, "Extract without offset arithmetic")
+        None => System.Fault("Missing delimiter")
+    }
+    match AfterOrdinal(report, "missing") {
+        None => { }
+        Some(_) => System.Fault("Missing delimiter must remain distinct from empty text")
+    }
+    match AfterOrdinal("name=", "=") {
+        Some(let text) => Check(text.Length == 0, "Present delimiter with empty suffix")
+        None => System.Fault("Empty suffix is present")
+    }
+    match AfterOrdinal("é", "e") {
+        Some(let text) => Check(text.Equals("́"), "Ordinal matching may split a grapheme")
+        None => System.Fault("Ordinal scalar match")
+    }
+    let decoder = BoundedUtf8Decoder()
+    let first: byte[] = [(byte)101, (byte)204]
+    let second: byte[] = [(byte)129]
+    let initial = Step(decoder.Decode(first, 0, 2, false, 4))
+    Check(initial.Text.Equals("e") && initial.InputBytesConsumed == 2, "Decode emits text and owns incomplete bytes")
+    Check(StatusCode(initial) == 1, "Await split scalar")
+    let final = Step(decoder.Decode(second, 0, 1, true, 4))
+    Check(StatusCode(final) == 3 && final.InputBytesConsumed == 1, "Final decode progress")
+    builder.Clear()
+    builder.Append(initial.Text)
+    builder.Append(final.Text)
+    Check(builder.Build().Equals("é") && builder.Build().Length == 1, "Decoded chunks compose as text")
+    WriteLine("Text API consumer: construction, extraction and split decoding passed")
+}

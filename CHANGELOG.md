@@ -47,6 +47,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   as an open naming discussion, separating aliases, type identity, namespaces and
   sequence semantics. Clarify the high-level text API objective and small-surface
   constraint; no rename, new representation or namespace migration is implemented.
+  Add a paired String/Text API sketch and focused executable construction, extraction
+  and decoding consumer. Preserve snapshots and explicit ordinal search semantics;
+  naming remains provisional and the accumulator makes no performance claim.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

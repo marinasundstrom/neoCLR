@@ -31,6 +31,7 @@
     <Compile Include="Main.rvn" />
     <Compile Include="Boundaries.rvn" />
     <Compile Include="Decoder.rvn" />
+    <Compile Include="Consumer.rvn" />
     <Reference Include="NeoCLR.CoreProbe">
       <HintPath>NeoCLR.CoreProbe.dll</HintPath>
     </Reference>

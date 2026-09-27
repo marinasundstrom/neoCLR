@@ -424,6 +424,56 @@ separate high/low type families are options, not a required package. The earlier
 String/Char contract remains implemented behavior; the author has clarified the
 design objective, not approved an exact replacement surface.
 
+### Consumer API sketch: identical behavior, two vocabularies
+
+**Experimental, 2026-09-27.** The author asks for the next safe step, then directs
+continuation of a small sketch tested against decoding, construction and extraction.
+The [executable consumer](../experiments/text-boundaries/Consumer.rvn) uses existing
+String plus application-only helpers. The Text spelling below is a design sketch,
+not a compiled alias, new runtime type or claim of measured developer preference.
+Both columns intentionally describe the same behavior. Existing library String is
+real; the additional builders, decoder surface and extraction operation are proposals.
+
+| Operation | Familiar String vocabulary | Text-oriented vocabulary | Common contract |
+| --- | --- | --- | --- |
+| Incremental decode | UTF-8 decoder produces string chunks | UTF-8 decoder produces Text chunks | Accept byte input with final-input flag and named output budget. Return text, consumed bytes and status; failures retain progress and byte error location. |
+| Construction | StringBuilder: Append(string), Build → string, Clear | TextBuilder: Append(Text), Build → Text, Clear | Append valid text; Build preserves an immutable snapshot. Reuse cannot mutate prior results. Appends can combine into one grapheme. |
+| Delimiter extraction | AfterOrdinal(string, delimiter) → Option<string> | AfterOrdinal(Text, delimiter) → Option<Text> | First exact delimiter match; Some(empty) differs from None. No caller byte arithmetic. Prototype empty delimiter matches the start; a public API must document that choice. |
+| Explicit representation | UTF-8 encode(string) → bytes | UTF-8 encode(Text) → bytes | Encoding conversion is explicit. Renaming the input does not change validity, ownership or byte count. |
+
+These are signature descriptions, not Raven declarations. `TextAccumulator` in the
+fixture models builder semantics with existing concatenation. It does not claim
+amortized append performance or prescribe the eventual public implementation.
+
+The tested consumer assembles `name=` then `e`, saves a snapshot, appends a combining
+acute accent, and extracts the value after `=`. The saved snapshot stays `name=e`;
+the extracted value is one grapheme `é`. Clear/reuse leaves the built report intact.
+A second path decodes bytes for `e` plus an incomplete combining scalar, then the
+remaining byte. Joining the returned chunks yields the same text. Codecs need not
+buffer a whole grapheme to return useful valid text.
+
+The extraction fixture also searches `e` inside `é` and returns the remaining
+combining mark. That is intentional **ordinal** behavior, not a recommended implicit
+character-search policy. Swift-like character-boundary search would need different
+acceptance rules. Naming the value Text cannot settle that choice; retain an explicit
+ordinal name for this experiment and do not ship a generic Find/After default yet.
+
+**Assessment:** Text foregrounds application intent, while String preserves familiar
+vocabulary. The examples do not demonstrate that either spelling improves usability.
+They do demonstrate that application code can build and extract text without exposing
+byte indexes, and that lower-level decoding still needs byte progress. No public
+Rune/Bytes wrapper or opaque position type is required by these three consumers.
+One text representation is sufficient for this sketch.
+
+**Smallest foundation recommendation:** retain current whole-value UTF-8 conversion;
+add one stateful decoder role with explicit progress/finalization for a chunked reader.
+Keep output immutable and make strict errors visible. Decide its output-budget unit,
+retry behavior, bounds and allocation policy before promoting the experimental
+signature. Then implement minimal construction only if the report consumer warrants
+it. Keep search policy and the String/Text naming decision open; neither blocks the
+codec contract. Reuse the earlier .NET Decoder.Convert and Swift text comparisons;
+this consumer is behavioral evidence, not performance or usability evidence.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory

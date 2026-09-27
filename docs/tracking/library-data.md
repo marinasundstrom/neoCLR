@@ -137,6 +137,12 @@ use naming to challenge encoding/code-unit assumptions, allow explicit lower-lev
 operations where useful, and keep the surface small. This is an API design objective,
 not merely renaming; no duplicate text representation or compatibility layer is selected.
 
+**API sketch follow-up:** the [paired String/Text consumer sketch](../design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies)
+keeps behavior identical and tests split decoding, construction snapshots and direct
+delimiter extraction. It needs neither a new core type nor public position machinery.
+Text naming remains open; exact versus character-boundary search is a separate
+policy. The next recommendation remains the bounded decoder contract for one reader.
+
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
 are not System APIs. The next bounded implementation recommendation is the UTF-8
