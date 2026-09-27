@@ -117,6 +117,26 @@
       ]
     },
     {
+      "name": "chrono-tz",
+      "version": "0.10.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/chronotope/chrono-tz",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a6139a8597ed92cf816dfb33f5dd6cf0bb93a6adc938f11039f371bc5bcd26c3",
+      "notices": [
+        {
+          "path": "third-party/licenses/chrono-tz-0.10.4/LICENSE",
+          "sha256": "4789210f4df8abc03fce1cddd9c2ba517f184840687f2815d741de282c1aa93a",
+          "origin": "crate:LICENSE"
+        },
+        {
+          "path": "third-party/licenses/chrono-tz-0.10.4/tz/LICENSE",
+          "sha256": "0613408568889f5739e5ae252b722a2659c02002839ad970a63dc5e9174b27cf",
+          "origin": "crate:tz/LICENSE"
+        }
+      ]
+    },
+    {
       "name": "core-foundation-sys",
       "version": "0.8.7",
       "declared_license": "MIT OR Apache-2.0",
@@ -467,6 +487,36 @@
       ]
     },
     {
+      "name": "phf",
+      "version": "0.12.1",
+      "declared_license": "MIT",
+      "repository": "https://github.com/rust-phf/rust-phf",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "913273894cec178f401a31ec4b656318d95473527be05c0752cc41cdc32be8b7",
+      "notices": [
+        {
+          "path": "third-party/licenses/phf-0.12.1/LICENSE",
+          "sha256": "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38",
+          "origin": "crate:LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "phf_shared",
+      "version": "0.12.1",
+      "declared_license": "MIT",
+      "repository": "https://github.com/rust-phf/rust-phf",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "06005508882fb681fd97892ecff4b7fd0fee13ef1aa569f8695dae7ab9099981",
+      "notices": [
+        {
+          "path": "third-party/licenses/phf_shared-0.12.1/LICENSE",
+          "sha256": "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38",
+          "origin": "crate:LICENSE"
+        }
+      ]
+    },
+    {
       "name": "pin-project-lite",
       "version": "0.2.17",
       "declared_license": "Apache-2.0 OR MIT",
@@ -647,6 +697,31 @@
       ]
     },
     {
+      "name": "siphasher",
+      "version": "1.0.4",
+      "declared_license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/jedisct1/rust-siphash",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "33f4fe9184a62d842c9ef383018f3306d8ba224fd9d836f56d7288308847c256",
+      "notices": [
+        {
+          "path": "third-party/licenses/siphasher-1.0.4/COPYING",
+          "sha256": "c962ee4d1d05ddc138b202b2540219ebc57893fcf97b364852094a9a94ce1365",
+          "origin": "crate:COPYING"
+        },
+        {
+          "path": "third-party/licenses/siphasher-1.0.4/LICENSE-APACHE",
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+          "origin": "crate:LICENSE-APACHE"
+        },
+        {
+          "path": "third-party/licenses/siphasher-1.0.4/LICENSE-MIT",
+          "sha256": "f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d",
+          "origin": "crate:LICENSE-MIT"
+        }
+      ]
+    },
+    {
       "name": "slab",
       "version": "0.4.12",
       "declared_license": "MIT",
@@ -717,6 +792,26 @@
         {
           "path": "third-party/licenses/syn-3.0.5/LICENSE-MIT",
           "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+          "origin": "crate:LICENSE-MIT"
+        }
+      ]
+    },
+    {
+      "name": "sys-locale",
+      "version": "0.3.2",
+      "declared_license": "MIT OR Apache-2.0",
+      "repository": "https://github.com/1Password/sys-locale",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8eab9a99a024a169fe8a903cf9d4a3b3601109bcc13bd9e3c6fff259138626c4",
+      "notices": [
+        {
+          "path": "third-party/licenses/sys-locale-0.3.2/LICENSE-APACHE",
+          "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+          "origin": "crate:LICENSE-APACHE"
+        },
+        {
+          "path": "third-party/licenses/sys-locale-0.3.2/LICENSE-MIT",
+          "sha256": "5cc390ab5e5e6507f467368cbab1297552d64bfd863f4b496c7928508bcfefd8",
           "origin": "crate:LICENSE-MIT"
         }
       ]

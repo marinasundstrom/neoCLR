@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Complete the locked dependency notice inventory for chrono-tz, sys-locale,
+  phf/phf_shared and siphasher, including timezone-data licensing. Copy notices
+  only after verifying upstream crate archives against Cargo.lock checksums.
+
 - Prepare Preview 11 from the bounded current surface, with Windows x64 native
   runtime packaging and extracted-sample smoke checks alongside focused host CI.
   Windows Raven SDK/bridge distribution remains unqualified. Include generic async,

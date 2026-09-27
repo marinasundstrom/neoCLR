@@ -11,6 +11,11 @@ windows-link, even though it was not compiled in the local macOS validation.
 
 | Package | Locked version | Declared license expression | Preserved texts |
 | --- | --- | --- | --- |
+| chrono-tz | 0.10.4 | MIT OR Apache-2.0 | [LICENSE](third-party/licenses/chrono-tz-0.10.4/LICENSE), [LICENSE](third-party/licenses/chrono-tz-0.10.4/tz/LICENSE) |
+| phf | 0.12.1 | MIT | [LICENSE](third-party/licenses/phf-0.12.1/LICENSE) |
+| phf_shared | 0.12.1 | MIT | [LICENSE](third-party/licenses/phf_shared-0.12.1/LICENSE) |
+| siphasher | 1.0.4 | MIT OR Apache-2.0 | [COPYING](third-party/licenses/siphasher-1.0.4/COPYING), [LICENSE-APACHE](third-party/licenses/siphasher-1.0.4/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/siphasher-1.0.4/LICENSE-MIT) |
+| sys-locale | 0.3.2 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/sys-locale-0.3.2/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/sys-locale-0.3.2/LICENSE-MIT) |
 | socket2 | 0.6.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/socket2-0.6.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/socket2-0.6.1/LICENSE-MIT) |
 | windows-sys | 0.60.2 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-sys-0.60.2/license-apache-2.0), [license-mit](third-party/licenses/windows-sys-0.60.2/license-mit) |
 | windows-targets | 0.53.5 | MIT OR Apache-2.0 | [license-apache-2.0](third-party/licenses/windows-targets-0.53.5/license-apache-2.0), [license-mit](third-party/licenses/windows-targets-0.53.5/license-mit) |
