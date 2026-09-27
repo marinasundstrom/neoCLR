@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "scope": "Reusable development application sample; not installed SDK mapper",
+  "checks": {
+    "consumer": "Passed: repeated parsing, union values, malformed/overflow input, encoded values, capture snapshot independence and structural overlap boundaries; final live objects = 0",
+    "http": "Passed: nine independent Python requests and two-request neoCLR client/server pair; all processes finish with live objects = 0",
+    "mixed_payloads": "Passed: String/Int32 binding by parameter name with reversed URL order and UTF-8 capture; live objects = 0",
+    "startup_rejections": [
+      "repeated attribute",
+      "missing attribute",
+      "missing argument",
+      "ambiguous patterns",
+      "encoded overlap",
+      "invalid UTF8 literal",
+      "bad pattern"
+    ],
+    "import_rejections": "Unsupported Long-only union layout is rejected before mapper execution; recorded separately by verifier",
+    "visibility": "One native test passes: public/internal, source enclosing visibility, missing visibility, compound/generic argument visibility",
+    "reflection": "10 focused native reflection tests and 30 bridge signature checks pass",
+    "library": "HttpClient and Descriptors clean regeneration matches checked-in implementation; snapshot hashes pass. Other 147 manifests change only shared input fingerprints.",
+    "api": "Matching reference refreshed; API snapshot check passes",
+    "website_publisher": "18 tests pass"
+  },
+  "validation_notes": [
+    "HTTP, direct and mixed checks completed before invalid-schema fixture corrections; remaining schema checks rerun separately. Executable sample sources unchanged between those runs.",
+    "Initial website test during reference refresh failed with Invalid assembly public key; serial rerun passed all 18 tests."
+  ],
+  "sha256": {
+    "Client.rvn": "239eb29cf89aa4e775f9f525498ab8cfeb0a72f35932737c7ac63bf7cda85d6d",
+    "Client.rvnproj": "e30f361b161384bb56500296308a5252c313af86fd0b150f296c2e889daaa8c0",
+    "Main.rvn": "7f3b5f5015e798e271c6f6b43002113350e57b0b91947084fa4be415d3cd4cff",
+    "Mapper.rvn": "1d9192513384453e220069e64b983096a518238bbcc1a07141b8f9b3a8feb70a",
+    "Mapper.rvnproj": "d6eb9a64d0fdbd8ee401189283dc4575f2f38981edadb749d2edc2e0de74dff9",
+    "Routes.rvn": "06edd2204ae3013975a7422bd3059933178d535e201992ab163bfacd5d482ead",
+    "Server.rvn": "dd2402da6e5d5aac5e4f345db467ca8d390954c28787ff3c9efcb3eef8ac6772",
+    "Server.rvnproj": "0b14a294f3a0d5e754d6f72b420c94769ff96cc1713eeb9b60135e6724756324",
+    "verify.py": "3b5c3533761a21255344f1d18f1af3f089adaee805ab11010aecc04b5f0dfdb8"
+  }
+}

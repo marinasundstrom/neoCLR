@@ -4,7 +4,7 @@ using Mono.Cecil;
 static class HttpBindings
 {
     public const string Prefix = "System.Web.Http.";
-    public static readonly string[] Names = ["HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation", "HttpResponseAssociation"];
+    public static readonly string[] Names = ["RoutePattern", "RouteMatch", "HttpClient", "HttpHandler", "HttpRequest", "HttpResponse", "HttpContent", "HttpHeader", "HttpSocketHandler", "HttpResponseDecoder", "HttpExchange", "HttpServer", "HttpRequestDecoder", "HttpServerExchange", "HttpContext", "HttpServeOperation", "HttpResponseAssociation"];
     public static bool IsName(string name) => Names.Any(n => name == Prefix + n);
     public static bool IsContract(string name) => name == Prefix + "HttpHandler";
     public static bool IsProvider(TypeDefinition type) => type.FullName is Prefix + "HttpResponseDecoder" or Prefix + "HttpExchange" or Prefix + "HttpRequestDecoder" or Prefix + "HttpServerExchange" or Prefix + "HttpServeOperation" or Prefix + "HttpResponseAssociation";
@@ -17,6 +17,18 @@ static class HttpBindings
             public struct HttpError { public struct InvalidUri { } public struct NameResolution { } public struct Transport { } public struct Content { } public struct InvalidRequest { } public struct Protocol { } public struct Unsupported { } public struct LimitExceeded { } public struct TimedOut { } public struct Handler { } public struct UnsuccessfulStatus { } }
             public interface HttpHandler {
                 Tasks.Task<Result<HttpResponse, HttpError>> Send(HttpRequest request, Concurrency.CancellationToken cancellationToken);
+            }
+            public sealed class RoutePattern {
+                private RoutePattern() { }
+                public static Result<RoutePattern, string> Parse(string pattern) => default;
+                public Result<Option<RouteMatch>, string> Match(string target) => default;
+                public Collections.Sequence<string> GetParameterNames() => default;
+                public bool Overlaps(RoutePattern other) => default;
+            }
+            public sealed class RouteMatch {
+                public RouteMatch(Collections.Sequence<string> names, Collections.Sequence<string> values) { }
+                public Result<string, string> Get(string name) => default;
+                public Result<int, string> GetInt32(string name) => default;
             }
             public sealed class HttpClient {
                 public HttpClient() { }
@@ -180,7 +192,7 @@ static class HttpBindings
     public static void Project(ModuleDefinition module)
     {
         foreach (var type in module.Types.Where(t => IsName(t.FullName)))
-            foreach (var method in type.Methods.Where(m => type.Name == "HttpResponse" && m.Name == "Associate" || m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name is "Encode" or "WithDefaults" || type.Name == "HttpContent" && m.Name is "get_MediaType" or "BeginUpload" or "ReadUpload" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
+            foreach (var method in type.Methods.Where(m => type.Name == "RouteMatch" && m.IsConstructor || type.Name == "HttpResponse" && m.Name == "Associate" || m.Name == "FindValues" || m.Name == "FromIncoming" || m.Name == "EncodeResponse" || type.Name == "HttpRequest" && m.Name is "Encode" or "WithDefaults" || type.Name == "HttpContent" && m.Name is "get_MediaType" or "BeginUpload" or "ReadUpload" || type.Name == "HttpServer" && (m.IsConstructor || m.Name is "Release" or "get_StopToken") || type.Name == "HttpContext" && (m.IsConstructor || m.Name == "Send")))
                 method.Attributes = (method.Attributes & ~MethodAttributes.MemberAccessMask) | MethodAttributes.Assembly;
         foreach (var type in module.Types.Where(IsProvider))
         {
@@ -201,6 +213,12 @@ static class HttpBindings
         var outcome = $"System.Result<{response},System.Web.Http.HttpError>";
         var task = $"System.Tasks.Task<{outcome}>";
         var expected = (owner[Prefix.Length..], definition.Name) switch {
+            ("RoutePattern", "Parse") => ("String", "System.Result<System.Web.Http.RoutePattern,String>", true),
+            ("RoutePattern", "GetParameterNames") => ("", "System.Collections.Sequence<String>", false),
+            ("RoutePattern", "Overlaps") => ("System.Web.Http.RoutePattern", "Boolean", false),
+            ("RoutePattern", "Match") => ("String", "System.Result<System.Option<System.Web.Http.RouteMatch>,String>", false),
+            ("RouteMatch", "Get") => ("String", "System.Result<String,String>", false),
+            ("RouteMatch", "GetInt32") => ("String", "System.Result<Int32,String>", false),
             ("HttpServer", ".ctor") when library => ("System.Networking.Sockets.Socket", "noresult", false),
             ("HttpServer", "Listen") => ("String,Int32,Int32", $"System.Result<{Prefix}HttpServer,System.Web.Http.HttpError>", true),
             ("HttpServer", "GetLocalPort") => ("", "System.Result<Int32,System.Web.Http.HttpError>", false),

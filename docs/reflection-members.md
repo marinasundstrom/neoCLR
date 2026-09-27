@@ -130,3 +130,37 @@ uniqueness and extracted feature-page examples were checked. The subsequent comb
 GC integration also built and checked the complete website; no platform matrix was
 run. Raven integration documentation is commit `4dc15a17a`
 on the `neoclr` branch; no compiler source changes were required.
+
+
+## Retained constructors and union values (2026-09-27)
+
+The next bounded startup-mapping prerequisite adds `ConstructorInfo.Invoke` as an
+extension in System.Runtime.Reflection. It selects the descriptor's exact method
+identity and executes through ordinary newobj/boxing frames. No overload search
+occurs on invocation. Argument/access checks still run each time; this is not a
+compiled delegate or globally cached native plan. Nongeneric value records, including
+admitted union cases and carriers, now work through this descriptor path. Existing
+TypeInfo.CreateInstance and method/property/field contracts remain unchanged.
+
+The [.NET ConstructorInfo.Invoke contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.constructorinfo.invoke?view=net-10.0)
+(reviewed 2026-09-27) is the ergonomic baseline: select a constructor and invoke it
+with an argument array. neoCLR uses explicit Result validation errors and exact
+boxed types instead of the richer CLR binder/coercion and exception model. This
+keeps target UTF-8 strings on their normal boxed/reference path; it adds boxing,
+argument-array and adapter costs. No performance advantage is claimed.
+
+Application value constructors were previously imported only as CLI lowering
+helpers. The bridge now also emits checked instance constructor wrappers retaining
+the actual source identity and parameter metadata; the helper stays an implementation
+detail. Wrappers call the original body and do not synthesize union tags or bypass
+initialization. This is neoCLR bridge policy, not a Raven compiler change. Runtime
+Contract configuration is unchanged; matching bridge/library/reference artifacts
+are required. The VM now returns the initialized value from no-result by-reference
+newobj constructors, as it already does for reference constructors.
+
+[The executable case](experiments/union-construction/README.md) retains the case and
+carrier constructors discovered via route attributes, constructs independent values
+and recovers an ordinary Raven union. The [runtime mapper](experiments/runtime-route-mapper/README.md) now composes these
+constructors with cached patterns and capture conversions. Its dynamic argument
+collections use the Sequence<Object?> Invoke overload, which copies arguments before
+applying the existing exact-type checks. JSON enum/Uuid/Option work stays pending.

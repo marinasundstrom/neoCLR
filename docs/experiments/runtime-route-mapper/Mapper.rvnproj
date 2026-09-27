@@ -1,0 +1,10 @@
+<Project DefaultTargets="Build">
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.props" />
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Mapper.rvn" />
+    <Compile Include="Routes.rvn" />
+    <Compile Include="Main.rvn" />
+  </ItemGroup>
+  <Import Project="$(NeoCLRRoot)/build/NeoCLR.Raven.targets" />
+</Project>

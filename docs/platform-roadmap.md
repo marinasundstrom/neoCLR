@@ -5,6 +5,33 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
+serving a useful Web API, nested JSON serialization/deserialization, and a
+route parser used within an existing HttpServer handler, including named and typed
+parameters. This later author direction defers the earlier separate WebApplication
+project and Minimal API infrastructure.
+A rudimentary SQL interface with a SQLite provider is an optional follow-on based
+on the existing proposal, not a prerequisite or approval of its complete surface.
+The [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
+application acceptance; the [bounded plan](web-api-plan.md) proposes the sequence
+and records design choices still to validate. The first nested typed JSON slice is
+implemented in development with [consumer and HTTP evidence](experiments/json-object-mapping/nested-validation.json).
+JSON now matches the 1,024-byte HTTP body budget, with [boundary and case evidence](experiments/json-object-mapping/payload-validation.json).
+Typed arrays now support collection payloads; see [collection evidence](experiments/json-object-mapping/collection-validation.json).
+The author's route/union refinement selects the next bounded routing slice: direct
+RoutePattern/RouteMatch parsing and optional application union dispatch are now
+implemented in development; see [the case](experiments/http-routing/README.md).
+A [generated attribute-driven mapper experiment](experiments/route-union-mapper/README.md)
+validates schemas and reuses compiled patterns. The author subsequently selects
+runtime attribute reflection with cached startup mapping. Member/parameter
+[attribute data](attribute-introspection.md) is now implemented in development;
+the [runtime mapper case](experiments/runtime-route-mapper/README.md) now validates route schemas at startup and retains patterns, conversion bindings and case/carrier constructors for request handling. Source generation remains a future alternative; SDK packaging is not yet implemented.
+Enum, Uuid and Option JSON mapping remain requested and pending.
+This explicitly supersedes the previous general useful-library priority; M2–M6
+remain candidates. Preview 10's completed POC stays closed.
+
+### Completed POC and preceding library direction
+
 The bounded HTTP POC is [complete on macOS arm64](http-capabilities.md#finish-this-poc),
 including independent peers, known-length uploads and the extracted-package check.
 Feature scope is frozen; do not automatically start another HTTP feature.
@@ -18,10 +45,10 @@ the matching Option layout. See [release evidence](preview-10-validation.json).
 The [toolchain/release tracker](tracking/toolchain-release.md) owns residual compiler
 observations and delivery maintenance. Hosted CI passed all six split jobs at
 `1404454e` (slowest 8.88 minutes); later migration corrections passed the focused
-checks requested by the author and final extracted-package checks. HTTP feature
-scope remains frozen. Thematic consolidation is complete.
+checks requested by the author and final extracted-package checks. The released POC feature
+scope remains frozen; the new Web API direction is a separate increment. Thematic consolidation is complete.
 
-**Next direction: useful library APIs**, selected by the author after release.
+**Preceding direction: useful library APIs**, selected by the author after release.
 The author-selected comparer slice is implemented in development: equality/hash and
 ordering policies, callback adapters, StringComparer.Ordinal and a HashMap policy
 constructor. See the [library/data sequence and evidence](tracking/library-data.md#active-direction--useful-api-gaps).
@@ -108,12 +135,13 @@ tooling owns packaging procedure and general release checks.
 
 ## Milestones
 
-Retain the application-led milestone sequence. M2–M6 remain candidate products;
-reassess their ordering after M1 rather than treating the list as approved API scope.
+The author now selects the Web API increment after M1. M2–M6 remain candidate
+products; their earlier ordering is not approved API scope.
 
 | Milestone | Sample product | Status / scope owner |
 | --- | --- | --- |
 | M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | Released in Preview 10; done for now |
+| Web API increment | Nested/collection JSON + typed route-parser case | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); JSON and direct routing slices implemented; generated union mapper experiment validated |
 | M2 — Work with data | File Catalog | Candidate; library/data tracker |
 | M3 — Handle waiting and failure | Download Queue | Candidate; HTTP, library and runtime contracts must be selected together |
 | M4 — Human time and presentation | Activity Report | Candidate; library/data tracker |

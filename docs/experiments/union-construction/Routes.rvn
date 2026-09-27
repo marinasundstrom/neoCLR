@@ -1,0 +1,20 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+
+public class RoutePatternAttribute : Attribute {
+    init(pattern: string) { }
+}
+
+public union CatalogRoutes {
+    [RoutePattern("/items")]
+    case ListItems
+    [RoutePattern("/items/{id}")]
+    case GetItem(id: int)
+}
+
+
+public union TextRoutes {
+    case Empty
+    case Item(name: string, id: int)
+}

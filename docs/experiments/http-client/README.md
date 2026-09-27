@@ -159,3 +159,13 @@ Development update (2026-09-27): the client now uses async Main directly and awa
 ReadGreeting. It requires the matching [entry-results toolchain](../entry-results/README.md).
 The ready-work marker is still posted before awaiting, preserving the observable
 ordering checked by this experiment. HTTP framing and handler behavior are unchanged.
+
+
+## General HttpClient website example
+
+`Overview.rvn` shows base-address configuration, a default Accept header, token
+forwarding and GetString with typed HTTP errors. Run the verifier with `--overview`
+to select it; `--case "fragmented UTF-8"` is the focused successful-response case.
+The full program prints `HTTP 200` followed by `Café 🌍`. The verifier also checks
+the outgoing Accept header against its independent local server. Other client
+capabilities and the paired server application are explained on the Web page.

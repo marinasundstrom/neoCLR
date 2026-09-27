@@ -1,8 +1,11 @@
 namespace System.Introspection
 
 import System.*
+import System.Collections.*
+import System.Runtime.CompilerServices.*
 
 public sealed interface ParameterInfo {
+    func GetCustomAttributesData() -> Sequence<CustomAttributeData>
     val MetadataToken: int { get }
     val Module: ModuleInfo { get }
     val Name: string { get }
@@ -40,6 +43,10 @@ internal class RuntimeParameterInfo : ParameterInfo {
         StoredDeclaringType = declaringType
         StoredMemberKind = memberKind
         StoredMemberIndex = memberIndex
+    }
+
+    func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
+        return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, MetadataToken)
     }
 
     val MetadataToken: int => StoredMetadataToken

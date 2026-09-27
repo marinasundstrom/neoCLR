@@ -2,9 +2,30 @@
 
 **Consolidated 2026-09-27.** [Platform priorities](../platform-roadmap.md) govern work.
 This page owns general library scope. After Preview 10, the author selects filling
-useful API gaps, including earlier requests. HTTP POC scope remains closed for now.
+useful API gaps, including earlier requests. The completed HTTP POC remains closed; the author now prioritizes the separate
+[Web API increment](../web-api-plan.md) over further general library expansion.
 
-## Active direction — useful API gaps
+## Web API JSON dependency
+
+**Implemented in development, 2026-09-27.** The existing typed mapper now supports
+nested reference objects for the [Web API plan](../web-api-plan.md).
+See [focused and HTTP evidence](../experiments/json-object-mapping/nested-validation.json).
+This tracker owns mapping behavior and serializer limits; HTTP owns endpoint and
+application acceptance. The first slice preserves existing scalar/name/error contracts, validates the whole
+input tree before constructors/setters, and bounds recursion to four object levels.
+Cycles fail at the depth bound; shared children are independent subtrees. Nulls
+remain rejected. The fixed document budget now matches HTTP at 1,024 UTF-8 bytes; see
+[payload evidence](../experiments/json-object-mapping/payload-validation.json).
+Typed scalar/model arrays (including jagged arrays) and scalar roots are now
+supported; see [collection evidence](../experiments/json-object-mapping/collection-validation.json).
+Enum mapping, a new Uuid type and Option nullability are the next author-selected
+contracts. Generic lists, dictionaries and configurable limits remain deferred;
+the plan distinguishes the first nested-object slice from later API requirements.
+SQLite stays exploratory under the [SQL proposal](../proposals/sql-data-access.md).
+
+## Preceding direction — useful API gaps
+
+<a id="active-direction--useful-api-gaps"></a>
 
 Selected 2026-09-27. Earlier author requests include consistent System.Text APIs,
 general/string comparers, ToUpper/ToLower-style operations, String methods,

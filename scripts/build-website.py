@@ -245,13 +245,30 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'ATTRIBUTE_ROUTE_DECLARATION': ('docs/experiments/attribute-introspection/Routes.rvn', 'public union CatalogRoutes {', '\n}', True),
+        'ATTRIBUTE_ROUTE_READING': ('docs/experiments/attribute-introspection/Routes.rvn', 'func ReadRouteDeclarations()', '\n}', True),
         'COMPARER_MAP_SAMPLE': (raven + 'library-comparers.rvn', '    let files = HashMap<string, int>(StringComparer.Ordinal)', '\n    files.Set', False),
         'JSON_DOM_SAMPLE': ('docs/experiments/json-dom/Sample.rvn', 'func AddAcknowledgement(', '\n}', True),
         'HTTP_CONTEXT_SAMPLE': ('docs/experiments/http-context/Sample.rvn', 'async func ReplyToNext(', '\n}', True),
         'HTTP_VERB_SAMPLE': ('docs/experiments/http-verbs/Sample.rvn', 'async func ReplaceText(', '\n}', True),
         'HTTP_POST_SAMPLE': ('docs/experiments/http-post/Sample.rvn', 'async func PostText(', '\n}', True),
+        'HTTP_REPORT_SERVER_SAMPLE': ('docs/experiments/http-json/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ATTRIBUTED_ROUTES': ('docs/experiments/runtime-route-mapper/Routes.rvn', 'public union AppRoutes {', '\n}', True),
+        'HTTP_ATTRIBUTED_STARTUP': ('docs/experiments/runtime-route-mapper/Server.rvn', '    let Ok(routes) = AppRoutesParser.Create()', '\n    let Ok(count)', False),
+        'HTTP_ATTRIBUTED_HANDLER': ('docs/experiments/runtime-route-mapper/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ATTRIBUTED_CLIENT': ('docs/experiments/runtime-route-mapper/Client.rvn', 'async func Main(', '\n}', True),
+        'HTTP_ROUTE_DIRECT_SAMPLE': ('docs/experiments/http-routing/Direct.rvn', 'func ReadStationId(', '\n}', True),
+        'HTTP_ROUTE_UNION_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'union StationRoute {', '\n}', True),
+        'HTTP_ROUTE_PARSE_SAMPLE': ('docs/experiments/http-routing/Routes.rvn', 'func ParseStationRoute(', '\n}', True),
+        'HTTP_ROUTE_SERVER_SAMPLE': ('docs/experiments/http-routing/Server.rvn', '    func Configure(', '\n    }', True),
+        'HTTP_ROUTE_CLIENT_SAMPLE': ('docs/experiments/http-routing/Client.rvn', 'class ReportClient {', '\n}', True),
+        'HTTP_NESTED_MODELS_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'public class Station {', 'public class Acknowledgement {', False),
+        'HTTP_MAPPED_CLIENT_SAMPLE': ('docs/experiments/json-object-mapping/HttpClient.rvn', 'class ReportClient {', '\n}', True),
+        'HTTP_NESTED_READ_SAMPLE': ('docs/experiments/json-object-mapping/NestedHttpApplication.rvn', 'func Acknowledge(', '\n}', True),
+        'HTTP_REPORT_CONNECT_SAMPLE': ('docs/experiments/http-json/Client.rvn', '    let client = HttpClient()', '\n    submission.OnCompleted', False),
         'HTTP_JSON_SAMPLE': ('docs/experiments/http-json/Client.rvn', 'class ReportClient {', '\n}', True),
         'HTTP_SERVER_SAMPLE': ('docs/experiments/http-server/Server.rvn', 'func Respond(', '\n}', True),
+        'HTTP_CLIENT_OVERVIEW_SAMPLE': ('docs/experiments/http-client/Overview.rvn', 'class GreetingClient {', '\n}', True),
         'HTTP_CLIENT_SAMPLE': ('docs/experiments/http-client/Main.rvn', 'async func ReadGreeting(', '\n}', True),
         'SOCKET_SERVER_SAMPLE': ('docs/experiments/socket-echo/Server.rvn', 'async func Serve(', '\n}', True),
         'DNS_RESOLVE_SAMPLE': ('docs/experiments/socket-client/Main.rvn', 'async func ResolveHost()', '\n}', True),
@@ -293,6 +310,7 @@ def main():
     })
     samples.update({
         'GC_SAMPLE': ('docs/experiments/runtime-gc/Main.rvn', '    let retained =', '    Check(GC.PeakHeapObjectCount', False),
+        'UNION_CONSTRUCTION_SAMPLE': ('docs/experiments/union-construction/Main.rvn', '    func Create(id:', '\n    }', True),
         'REFLECTION_CONSTRUCTION_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let model =', '    let _ = Field', False),
         'REFLECTION_FIELD_SAMPLE': ('docs/experiments/reflection-members/Main.rvn', '    let _ = Field', '    Check(Field', False),
     })
@@ -323,7 +341,7 @@ def main():
     shutil.make_archive(str(downloads / 'http-post'), 'zip', post_downloads)
     http_downloads = downloads / 'http-client'
     http_downloads.mkdir()
-    for name in ('Main.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
+    for name in ('Main.rvn', 'Overview.rvn', 'Handlers.rvn', 'HttpClient.rvnproj', 'Reference.cs', 'README.md', 'verify.py'):
         shutil.copyfile(ROOT / 'docs/experiments/http-client' / name, http_downloads / name)
     shutil.make_archive(str(downloads / 'http-client'), 'zip', http_downloads)
     server_downloads = downloads / 'http-server'
@@ -335,7 +353,12 @@ def main():
     shutil.make_archive(str(downloads / 'http-server'), 'zip', server_downloads)
     json_downloads = downloads / 'http-json'
     for directory, names in (
-        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('json-object-mapping', ('Mapping.rvn', 'Main.rvn', 'Public.rvn', 'JsonObjectMapping.rvnproj', 'verify.py', 'HttpApplication.rvn', 'NestedHttpApplication.rvn', 'HttpClient.rvn', 'HttpServer.rvn', 'README.md', 'cost.md', 'cost-results.json')),
+        ('union-construction', ('Main.rvn', 'Routes.rvn', 'Construction.rvnproj', 'README.md', 'verify.py', 'validation.json')),
+        ('attribute-introspection', ('Main.rvn', 'Routes.rvn', 'Attributes.rvnproj', 'README.md', 'verify.py')),
+        ('runtime-route-mapper', ('Mapper.rvn', 'Routes.rvn', 'Main.rvn', 'Server.rvn', 'Client.rvn', 'Mapper.rvnproj', 'Server.rvnproj', 'Client.rvnproj', 'verify.py', 'README.md', 'validation.json')),
+        ('route-union-mapper', ('Attributes.rvn', 'Routes.rvn', 'Main.rvn', 'Server.rvn', 'Client.rvn', 'Generator.cs', 'Generator.csproj', 'verify.py', 'README.md')),
+        ('http-routing', ('Direct.rvn', 'Routes.rvn', 'Main.rvn', 'Routing.rvnproj', 'Server.rvn', 'Client.rvn', 'Server.rvnproj', 'Client.rvnproj', 'verify.py', 'README.md')),
         ('http-json', ('Client.rvn', 'Server.rvn', 'Application.rvn', 'Client.rvnproj', 'Server.rvnproj', 'README.md', 'limitations.md', 'verify.py')),
     ):
         destination = json_downloads / directory

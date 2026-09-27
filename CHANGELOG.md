@@ -8,6 +8,50 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Extend development JSON serialization/deserialization to nested nongeneric
+  reference properties, with full input-tree validation before model construction
+  or setters. Preserve scalar/name/null/error policies; expand the development JSON
+  document and number-token cap from 128 to 1,024 UTF-8 bytes across string, stream
+  and HTTP-content paths, matching buffered HTTP bodies. Count escaped output bytes,
+  validate before stream writes, and add boundary checks plus a longer station report;
+  support typed scalar/model arrays (including jagged arrays) and scalar roots,
+  validate every array element before constructing models, and use checked runtime
+  adapters for array access/construction. Integrate the independently tested Raven
+  target-metadata array fix. Bound container depth to four including the root,
+  reject polymorphic property values,
+  and serialize shared children as independent subtrees. Add focused mapping checks
+  and a nested station-report client/server case with on-site walkthrough and
+  downloadable tested sources. Introduce a tested general HttpClient example and
+  capability overview before “Case: Building a Http server app”, with the server
+  followed by its connecting client. Give the case its own page and navigation,
+  retain essential code on the feature page, and record contextual cases as a
+  general website convention. Record the author-selected minimal Web API priority
+  and roadmap acceptance scope. The latest author direction selects a route parser
+  inside HttpServer with typed parameter extraction, deferring the earlier separate
+  WebApplication plan; enum/Uuid/Option mapping and optional SQLite remain planned.
+  Preview 10 remains flat-model-only.
+
+- Add development RoutePattern.Parse/Match and RouteMatch.Get/GetInt32 for reusable
+  literal and named-segment parsing inside HttpServer handlers. Separate no-match
+  from malformed input and typed conversion failure; define bounded, case-sensitive
+  paths with query separation and strict once-only UTF-8 segment decoding. Add a
+  direct-use consumer and station client/server case with optional application union
+  dispatch, API reference and tested website excerpts/download. Keep dispatch and
+  lifecycle application-owned. Add an experimental emitted-metadata generator for
+  attributed application union cases, with String/Int32 payload binding, build-time
+  schema checks, startup-compiled reusable patterns and Result-based no-match/error
+  handling. Include an item server/client case. Integrate Raven's independently
+  tested case-attribute emission fix and admit bounded Int32-only standard union
+  carriers through logical fields, without general CLR explicit-layout aliasing.
+  Add a reusable runtime mapper sample that validates attributes once at startup,
+  caches patterns/conversions/constructors and returns typed union results to the
+  catalog HTTP handler. Reject repeated attributes, unsupported payloads and
+  structurally overlapping routes before listening. Add RoutePattern.GetParameterNames
+  snapshots and conservative Overlaps checks, TypeInfo.IsVisible (including source
+  enclosing types and generic arguments), and ConstructorInfo.Invoke with dynamic
+  Sequence<Object?> arguments. Update the server/client case, API reference and
+  downloadable projects. SDK mapper packaging and source generation remain future work.
+
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add
   synchronous full Collect and nullable KeepAlive; share automatic/explicit root
@@ -30,6 +74,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   exhaustive-match updates; ReflectionError also gains five cases. Refresh library/API
   contracts and add a dedicated Reflection
   feature page. Generic classes, static fields, coercion and byref/out remain unsupported.
+  Add metadata-only GetCustomAttributesData to MemberInfo and ParameterInfo, with
+  CustomAttributeData/CustomAttributeTypedArgument snapshots for retained application
+  attributes and String/Int32/Boolean constructor constants. Preserve scoped member
+  and parameter targets; reject malformed targets, unsupported constants and named
+  arguments. Inspection never executes constructors. Compiler-only/external framework
+  annotations remain outside this bounded surface; nullable-string attribute emission
+  has a recorded Raven limitation. Add ConstructorInfo.Invoke through reflection
+  extensions for exact retained public constructors, including nongeneric value
+  records and union case/carrier construction. Retain imported value-constructor
+  metadata through checked wrappers; preserve initialized no-result value newobj
+  results. Existing TypeInfo activation remains class-only. Add a startup union
+  construction case and match updated runtime/library/reference artifacts.
 
 - Record Task.Run as the author-selected canonical submission API with shared
   captures and runtime-selected execution. Document heap/scheduling prerequisites,
@@ -101,8 +157,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   sharing through the independently validated Raven closure fix (main dc7b87eff,
   experimental integration 08815ceaf), retaining one closure per invocation across
   suspension. Promote the original failing consumer to a required 42-result regression
-  and track pre-existing generic-method capture metadata separately. This is not a
-  published release.
+  and track pre-existing generic-method capture metadata separately. Integrate the
+  Task.Run work with main’s route, JSON-array and reflection-constructor additions,
+  retaining native submission and refreshing the combined API reference. This is not
+  a published release.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

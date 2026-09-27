@@ -33,6 +33,7 @@ pub(crate) enum Binding {
     ReflectionMember(u8),
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
+    ReflectionArray(u8),
     ReflectionPropertyCheck(bool),
     ReflectionProperty(bool),
     ObjectTypeHandle,
@@ -110,7 +111,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::AssemblyInfo(query));
     }
     if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
-        let expected = if integer {
+        let expected = if function.name == "neoCLR.Runtime.MemberCustomAttributes" {
+            vec![Type::from_name("System.Introspection.TypeInfo"), Type::Int32]
+        } else if integer {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
             vec![Type::RuntimeTypeHandle]
@@ -140,11 +143,25 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         return Ok(Binding::Reflection(query));
     }
+    for (kind, name) in ["Length", "Get", "Create"].iter().enumerate() {
+        if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") { continue; }
+        let object = Type::from_name("System.Object");
+        let expected = match kind {
+            0 => vec![object.clone()],
+            1 => vec![object.clone(), Type::Int32],
+            _ => vec![Type::from_name("System.Introspection.TypeInfo"), Type::ArrayRef(Box::new(object.clone()))],
+        };
+        let returns = if kind == 0 { Type::Int32 } else { object };
+        if function.parameters != expected || function.returns != returns || function.no_result {
+            return Err(Fault::new("reflection array signature mismatch"));
+        }
+        return Ok(Binding::ReflectionArray(kind as u8));
+    }
     if function.name == "neoCLR.Runtime.ReflectionAssignable" {
         if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || function.returns != Type::Boolean || function.no_result { return Err(Fault::new("reflection assignability signature mismatch")); }
         return Ok(Binding::ReflectionAssignable);
     }
-    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet"].iter().enumerate() {
+    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet", "ConstructorInvoke"].iter().enumerate() {
         let execution = format!("neoCLR.Runtime.Reflection{name}");
         let check = function.name == format!("{execution}Check");
         if function.name != execution && !check { continue; }

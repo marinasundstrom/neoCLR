@@ -9,12 +9,36 @@ client/server cancellation, explicit resource lifetime, independent interoperabi
 and the current known-length upload increment. The bounded POC is complete on macOS arm64 as of 2026-09-27; feature scope is frozen.
 [Preview 10](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.10)
 is published with the qualified runtime, SDK and editor packages.
-The author intends to release it after separate release qualification. Modern HTTP capabilities are tracked below without becoming automatic
-completion requirements. POC completion is distinct from release qualification.
+Modern HTTP capabilities are tracked below without becoming automatic
+completion requirements for the new Web API increment.
 
 Statuses: **Implemented** means development source with linked focused evidence;
 **Complete** records a satisfied POC gate; **Deferred** is outside this POC.
 It does not imply inclusion in published Preview 9 or production readiness.
+
+## Active direction — minimal Web API
+
+**Selected 2026-09-27; nested JSON implemented in development.** The author now focuses HTTP work
+on a minimal Web API: typed JSON and, in the latest direction, a route parser
+used inside the existing handler with named parameters and typed parsing. The earlier
+separate WebApplication proposal is deferred. See the [bounded plan](web-api-plan.md) for the proposed
+sequence, .NET comparison, acceptance cases and open contracts. This is a new
+increment; it does not reopen Preview 10's completed POC.
+
+Nested object serialization/deserialization is complete for the bounded first slice, owned by
+[library/data](tracking/library-data.md#web-api-json-dependency). Routing, endpoint
+handling and application lifecycle belong here. SQLite remains an optional later
+consumer of the [SQL proposal](proposals/sql-data-access.md), not a Web API gate.
+The [nested report evidence](experiments/json-object-mapping/nested-validation.json)
+covers independent peers and the managed pair. Development JSON now matches the
+1,024-byte HTTP body cap; [payload evidence](experiments/json-object-mapping/payload-validation.json)
+covers boundaries and the longer report case. Typed arrays are now implemented;
+[collection evidence](experiments/json-object-mapping/collection-validation.json) covers
+array payloads and invalid elements. Enum/Uuid/Option mapping remains
+pending. Direct route parsing and the explicit union-dispatch case are now
+implemented; see [route evidence](experiments/http-routing/validation.json).
+Attribute-driven union mapping is the next design investigation above the parser;
+WebApplication, configurable limits and SQL remain deferred.
 
 ## Capability matrix
 
@@ -27,9 +51,9 @@ It does not imply inclusion in published Preview 9 or production readiness.
 | Unknown-length/chunked request bodies | Deferred | Deferred; rejects request transfer coding | Define async producer and optional length before wire support |
 | Response framing | Implemented: fixed-length, bounded chunked and close-delimited reception | Implemented: fixed-length buffered emission | [Framing contract](http-client-design.md#bounded-response-framing-and-head--2026-09-25); incoming chunked responses still fully buffered |
 | Live response/request body streams | Deferred response reader | Deferred request reader and response writer | Separate body lifetime from connection lifetime; trailers and completion semantics |
-| JSON DOM and flat typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); current JSON size/shape limits remain |
+| JSON DOM and typed mapping | Implemented: shared conversion and generic client helpers | Implemented: shared conversion through handler/context | [Mapped application](experiments/json-object-mapping/README.md), [helpers](experiments/http-json-client/README.md); nested reference objects are implemented in development with [evidence](experiments/json-object-mapping/nested-validation.json); current JSON size/shape limits remain |
 | Cancellation and cleanup | Implemented through lookup/connect/transfer; upload ownership and one-shot rules | Implemented accept/context/complete/shutdown lifetime | [Network cancellation](experiments/network-cancellation/README.md), [context](experiments/http-context/README.md); synchronous source reads cannot be interrupted mid-read |
-| Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting | No routing or application framework implied |
+| Application pipeline | Implemented custom/forwarding HttpHandler | Implemented Accept/HttpContext and bounded callback hosting; development RoutePattern matching and named/Int32 parameters | [Routing](route-parsing.md); optional application union dispatch; no hosting framework |
 | HTTPS/TLS | Deferred for this cleartext POC | Deferred for this cleartext POC | [TLS feasibility](http-client-design.md#https-feasibility-checkpoint--2026-09-25); wider release scope remains an explicit decision, never an implicit public-network readiness claim |
 | Pooling/persistent reuse | Deferred; currently one connection per exchange | Deferred; closes each exchange | Separate request and connection ownership |
 | HTTP/2 | Deferred | Deferred | Multiplexing, flow control, HPACK, negotiation and per-stream errors |
@@ -66,9 +90,9 @@ Compiler status and the upload getter workaround are owned by the
 [toolchain tracker](tracking/toolchain-release.md#integration-and-correctness).
 
 A runtime release still needs its own supported-target/package checks, known-defect
-assessment and release notes. Publication is separate. HTTP feature work stops here until the author selects another capability. The
-author intends to release this POC; [toolchain/release](tracking/toolchain-release.md)
-owns efficient CI, selected-candidate packages and remaining release decisions.
+assessment and release notes. Publication is separate. Preview 10 completed this release; the author has now
+selected the Web API increment above. [Toolchain/release](tracking/toolchain-release.md)
+owns subsequent packaging and release qualification.
 
 ## Modern HTTP direction
 
@@ -167,3 +191,14 @@ Future text-body conversion should reuse this contract while HTTP retains its me
 type/charset policy, byte-body access, framing and header validation. No new HTTP
 milestone is opened by this dependency, and no automatic charset/BOM detection or
 additional protocol support is claimed.
+
+### Cached attributed route mapping (2026-09-27)
+
+The [runtime item case](experiments/runtime-route-mapper/README.md) validates route
+attributes at startup and retains patterns, parameter conversions and case/carrier
+constructors. Requests return ordinary application unions with Result errors for
+NoMatch, InvalidTarget, InvalidParameter and ConstructionFailed. The server owns
+method policy, dispatch and response status. String/Int32 payloads and up to 16
+public nongeneric cases are supported. This is reusable development sample source,
+not an installed SDK mapper. The earlier generator remains an exploratory alternative.
+Enum/Uuid/Option JSON support remains requested and pending.

@@ -8,6 +8,15 @@ Choose a topic after [building your first project](../try/). Each guide explains
 observable behavior, shows a tested example where useful, and records limits and
 relevant differences from .NET. Use the [API reference](../docs/) to look up exact members.
 
+## Cases: APIs in context
+
+Small, runnable examples show how APIs work together to solve a concrete problem.
+They need only enough application context to explain the choices and results.
+
+- [Case: Building a Http server app](/cases/http-server/) — accept a station report,
+  connect a client, and return a JSON acknowledgement. Start with the
+  [general HttpClient example](/features/web/) for the client API overview.
+
 ## Language and everyday code
 
 | Guide | What you’ll learn |

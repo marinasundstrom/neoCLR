@@ -25,6 +25,94 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-27 — Focus on a minimal Web API
+
+- **Author:** “We should focus on the Http story”, specifying the minimum features
+  to serve a Web API, JSON serialization/deserialization with nested objects, and
+  a WebApplication concept in a separate project with Minimal API endpoints.
+  Suggests “Perhaps” a rudimentary SQL interface with a SQLite provider, referring
+  to the existing proposal.
+- **Assistant proposal:** nested typed JSON first, then a separate application
+  layer and a small in-memory API consumer; SQLite remains an optional follow-on.
+  Reuse existing HTTP and JSON foundations, revisit the 128-byte JSON bound for
+  realistic payloads, and avoid treating modern protocols or the entire SQL
+  proposal as prerequisites. Detailed contracts and ordering are assistant proposals.
+- **Action/outcome:** updated the authoritative roadmap and theme trackers and
+  wrote the [Web API plan](web-api-plan.md), with primary-source comparisons and
+  focused acceptance cases. The prior POC remains complete. This exchange changes
+  work priority; it does not implement a mapper, framework or database provider.
+- **Author follow-up:** requests more presentable website samples organized around
+  client/server cases instead of random snippets, then asks to commit and continue
+  with the first slice.
+- **Assistant action:** makes the existing station-report case lead the Web page,
+  shows its tested server alongside the client, and records case-based website
+  acceptance and editorial guidance. Nested JSON implementation follows this
+  planning/presentation commit.
+- **Author presentation correction:** asks for a general HttpClient sample showing
+  its capabilities first, followed by a server sample and a client connecting to it.
+  The assistant adds a standalone tested client example/capability overview ahead
+  of the paired report case and orders that case server-first. The author then
+  selects the heading “Case: Building a Http server app” and explains that cases
+  should show small real-world or realistic uses in context, without needing large
+  samples. The assistant moves the paired case to its own documentation page,
+  links it from the client guide and cases navigation, and records the convention.
+  The author further clarifies that this applies generally to the website, especially
+  feature pages: the case and code should explain what a feature does and how it is
+  used. The assistant retains essential server/client code on the feature page, with
+  the dedicated case supplying the complete context.
+- **Implementation outcome:** the first nested JSON slice is implemented with
+  whole-input validation, bounded recursion and unchanged scalar/null policies.
+  The focused consumer and nested station-report client/server/independent peers
+  pass with zero final live objects; see [evidence](experiments/json-object-mapping/nested-validation.json).
+  Website code is extracted from the tested case. WebApplication and SQLite remain
+  future work; no release or deployment is implied.
+- **Subsequent author direction:** after the payload-budget slice, asks to continue
+  with collection serialization/deserialization, then adds enums and a Uuid type
+  (noting that the platform does not yet have one), and explicitly asks the JSON
+  serializer to recognize Option for JSON-nullable values.
+- **Assistant plan:** implement typed arrays first; then enum and Uuid mappings and
+  Option values. Proposes None as JSON null, Some as the contained mapping, missing
+  Option properties as None, and missing required properties as errors. These are
+  implementation choices in response to the author, not a quoted author specification.
+  The payload budget is committed as `32e63a1e`; subsequent implementation evidence
+  is recorded in the JSON design and changelog as each slice completes.
+- **Author scope correction:** “We don't have to go all the way to building a web
+  app infrastructure.” Proposes a route parser used within the handler to match
+  paths, extract parameters and return their parsed form.
+- **Assistant response:** keeps HttpServer as the host and proposes literal/named
+  path matching with explicit Int32/Uuid parsing after the JSON work. Updates the
+  roadmap and plan to defer WebApplication infrastructure. Route parsing remains
+  planned; this exchange does not claim an implemented parser.
+- **Author layering refinement:** suggests returning an application union whose cases
+  carry route parameters, then clarifies that this is a convenience above basic
+  route parsing, useful for match-based application dispatch rather than the
+  fundamental result contract. The assistant agrees to retain independent parsing
+  and typed value access, with optional application-owned union construction.
+- **Author continuation:** asks to continue after that refinement. The assistant
+  implements RoutePattern/RouteMatch and a station case with direct matching and
+  explicit union mapping; JSON enum/Uuid/Option requests remain pending, rather than
+  being treated as cancelled by this bounded routing slice. See the
+  [route design](route-parsing.md) and [case evidence](experiments/http-routing/validation.json).
+- **Author next idea:** after these primitives, proposes attributes on union cases
+  that specify route patterns, with a dedicated route-to-union mapper. The assistant
+  records this as the next design investigation above the independent parser;
+  metadata retention, case construction, supported types and ambiguity rules remain
+  to be validated. No attribute API or automatic mapper is claimed as implemented.
+- **Author concrete syntax and reuse:** supplies AppRoutes with RoutePattern
+  attributes and an UnmatchedPattern-marked case, then suggests the clearer name
+  UnmatchedRoutePattern. Requests constructing a reusable parser object for the
+  server lifetime so patterns are not reparsed for each request.
+- **Author delegation:** permits Result-based unmatched handling and asks the
+  assistant to choose what fits. The assistant selects a planned
+  Result<AppRoutes, RouteMappingError> contract: NoMatch is distinct from invalid
+  parameter/malformed target errors, while configuration errors fail mapper creation.
+  This supersedes the proposed unmatched attribute for the initial mapper design;
+  the earlier suggestion is retained here. The current explicit sample's Unmatched
+  variant remains an application choice, not the future mapper contract.
+- **Open:** attribute-driven union mapping, enum/Uuid/Option contracts, wider
+  collection shapes and configurable budgets, and whether to select SQLite after
+  the in-memory consumer.
+
 ## 2026-09-26 — Streaming, modern HTTP and a finite POC
 
 - **Author:** requests continuation, then asks how the work fits future streaming
@@ -8496,3 +8584,111 @@ configuration/content, not target-specific code added to Raven main.
   probe records about 4% overhead; results and limitations are retained with the
   [storage evidence](experiments/task-run/README.md). No full suite or website build
   was run for this prerequisite.
+
+## 2026-09-27 — Reusable attributed route union prototype
+
+- **Author direction:** proposed RoutePattern attributes on union cases, clarified
+  the possible unmatched marker as UnmatchedRoutePattern, and requested preparation
+  once for the server lifetime. The author then delegated whether Result should
+  signal unmatched routes and asked to continue.
+- **Assistant choice:** use Result<AppRoutes, RouteMappingError>, separating NoMatch,
+  malformed target and failed conversion; omit an unmatched attribute initially.
+  Select emitted-metadata generation above the existing primitives. Schema binding
+  is checked at build time and patterns compile once in Create; this adds a build
+  step while avoiding runtime attribute discovery. This is an experiment rather
+  than a claim of completed SDK integration.
+- **Actions:** a reduced probe exposed silently omitted Raven case attributes.
+  Fix and test this independently on Raven main (`3179cd21e`, 16 attribute tests,
+  189 union tests), then integrate only that fix onto neoclr (`2f62361ef`). Add
+  neoCLR's bounded Int32 carrier projection without arbitrary explicit-layout
+  aliasing. Implement the generator, typed Result errors and item HTTP case.
+- **Scope:** String/Int32 and empty cases, exact parameter names, rejected structural
+  overlap, reusable patterns and application-owned dispatch. Enum/Uuid/Option JSON,
+  automatic SDK integration and broader attribute reflection remain open.
+  [Executable recipe and evidence](experiments/route-union-mapper/README.md).
+
+- **Author correction:** “Perhaps we should add runtime attribute reflection,”
+  followed by the explicit preference to use reflection at application startup and
+  cache the mapped information. Source generation should be considered in future.
+  **Assistant response:** adopt startup reflection as the immediate next direction;
+  retain the generated prototype as evidence, not as the intended permanent workflow.
+
+## 2026-09-27 — Member and parameter attribute data
+
+- **Author:** asked to add attribute retrieval to the introspection model for members
+  and parameters, similar to .NET, then asked whether multiple attribute declarations
+  are handled. This refines the startup-reflection direction for route mapping.
+- **Assistant choice/action:** add GetCustomAttributesData on MemberInfo and
+  ParameterInfo, immutable type/constructor/typed-argument descriptions and source
+  token retention. Read data without executing attribute constructors; preserve
+  multiple declarations and repeated allowed attributes in metadata order. The
+  initial application attribute constants are String/Int32/Boolean, with unsupported
+  constants and named arguments rejected explicitly rather than silently omitted.
+- **Validation:** the public consumer checks every available member category,
+  parameters, union cases, separate/grouped/repeated attributes, repeated reads and
+  snapshot copies. Attribute constructors deliberately Fault. Native tests cover
+  serialization, malformed data and token ownership. A real catalog-route declaration
+  is inspected once at startup for the website example.
+- **Remaining:** cached dynamic union construction is the next mapper slice. Broad
+  framework/CLI attribute coverage and named/type/enum/array arguments are not claimed.
+  A nullable-string attribute constructor triggered Raven's CustomAttributeBuilder
+  emission exception and is recorded for independent investigation. Source generation
+  remains a future option; enum/Uuid/Option JSON requests remain pending.
+
+
+## 2026-09-27 — retained constructor invocation for startup route mapping
+
+- **Author:** asked to continue after the multiple-attribute introspection slice.
+  Earlier direction selects runtime reflection at startup and cached mapping, with
+  source generation reserved as a future alternative.
+- **Assistant:** identified class-only reflective construction and unavailable
+  application value-constructor descriptors as the next bounded prerequisites.
+  Added exact ConstructorInfo invocation, value-case/carrier boxing, and bridge
+  constructor wrappers retaining source identity. The sample prepares descriptors
+  from a route attribute once and reuses them to construct ordinary Raven unions.
+- **Scope:** descriptor selection is retained; arguments and access are checked per
+  call. There is no claim of a compiled native plan or completed general route
+  mapper. General schema validation/capture binding is next; enum/Uuid/Option JSON
+  requests remain open. Evidence and validation are recorded with the
+  [construction case](experiments/union-construction/README.md).
+
+
+## 2026-09-27 — reusable startup route mapping
+
+- **Author:** asked to continue the attributed route and introspection work. Earlier
+  direction selects startup reflection with cached mappings and leaves unmatched
+  handling to assistant judgment.
+- **Assistant action:** composed attribute data, route primitives and retained
+  constructors into a reusable application mapper, with a typed AppRoutes facade.
+  Added capture-name snapshots, conservative structural overlap checks, dynamic
+  constructor argument collections and effective type visibility for startup validation.
+  The catalog server prepares once, then matches ordinary union cases; its client
+  lists items and fetches item 42. No generation step or hosting framework is needed.
+- **Outcome:** focused consumer, schema-rejection and HTTP evidence is recorded with
+  the [runtime mapper case](experiments/runtime-route-mapper/README.md). Discovery is
+  cached; target decoding, allocations and checked construction still occur per request.
+- **Open:** SDK packaging and source generation are future options. Enum, Uuid and
+  Option JSON support remains requested; this slice does not implement those types.
+
+
+## 2026-09-27 — Integrating completed Task.Run work
+
+**Author:** Asked to integrate completed changes into main, then clarified that this
+means neoCLR main while keeping compiler work separate in Raven. Subsequently asked
+for applicable Raven work on both main and neoclr, qualifying that with “If it applies
+to both”.
+
+**Assistant:** Prepared the neoCLR merge in the Task.Run worktree while the website
+chat completed its changes in the main checkout. Preserved main's routing, typed JSON
+arrays and reflection-constructor work alongside shared-task submission. The direct
+unit-await compiler correction is target-specific: the ordinary CLR control using
+configured System.ValueTuple passes unchanged, so no general main-branch fix is
+claimed. The independently validated shared-capture fix is already on both Raven
+branches. The author’s conditional integration direction preserves independent
+validation of general compiler fixes; it does not request a wholesale target merge.
+
+**Validation:** The direct-await slice passes 24 Raven neighbors and three neoCLR
+compile/verify/run consumers. The combined neoCLR merge passes 15 VM suspension and
+nine reflection checks; its combined source/generated-library fingerprints and API
+snapshot are refreshed. See the [Task.Run checkpoint](experiments/task-run/README.md#direct-unit-await-checkpoint)
+for scope and remaining lookup/inference work.

@@ -17,6 +17,7 @@ parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--toolchain-root', type=Path, required=True)
 parser.add_argument('--runner', type=Path, required=True)
 parser.add_argument('--case', action='append', help='Select named Raven cases; the .NET baseline still runs')
+parser.add_argument('--overview', action='store_true', help='Verify the general HttpClient website example')
 args = parser.parse_args()
 here = Path(__file__).resolve().parent
 bundle = args.toolchain_root.resolve()
@@ -32,7 +33,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     port = listener.getsockname()[1]
     for name in ['Handlers.rvn', 'HttpClient.rvnproj']:
         shutil.copyfile(here / name, root / name)
-    (root / 'Main.rvn').write_text((here / 'Main.rvn').read_text().replace('19091', str(port)))
+    (root / 'Main.rvn').write_text((here / ('Overview.rvn' if args.overview else 'Main.rvn')).read_text().replace('19091', str(port)))
     build = subprocess.run(['dotnet', 'msbuild', str(root / 'HttpClient.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=150)
     assert build.returncode == 0, build.stdout + build.stderr
     reference = root / 'reference'
@@ -58,6 +59,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
                     assert lines[0] == b'GET /greeting HTTP/1.1', request
                     assert f'Host: localhost:{port}'.encode() in lines, request
                     assert b'Connection: close' in lines, request
+                    if args.overview and command[0] != 'dotnet':
+                        assert b'Accept: text/plain' in lines, request
                     for fragment in fragments:
                         if isinstance(fragment, tuple):
                             data, delay = fragment
@@ -95,7 +98,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-client-') as folder, socket
     assert baseline.stdout == 'HTTP 200\nCafé 🌍\n', baseline.stdout
     print('.NET: Content-Length completes before EOF; UTF-8 body matches', flush=True)
     command = [str(args.runner.resolve()), str(root / 'bin/neoclr/Debug/App.neoil'), str(bundle / 'lib/System.neoil'), '256', '10000000']
-    prefix = 'Handler checks passed\nOther work runs while HTTP is pending\n'
+    prefix = '' if args.overview else 'Handler checks passed\nOther work runs while HTTP is pending\n'
     cases = [
         ('trickling body', [head] + [(bytes([value]), 3) for value in body], False, 'HTTP error: Request deadline exceeded\n'),
         ('trickling headers', [(bytes([value]), 1) for value in head], False, 'HTTP error: Request deadline exceeded\n'),

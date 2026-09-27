@@ -4,7 +4,8 @@ title: JSON serialization
 # JSON serialization
 
 **Preview 10.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
-reads/writes the closed JsonValue DOM and now has provisional flat-object overloads.
+reads/writes the closed JsonValue DOM and has provisional flat-object overloads.
+**Development after Preview 10** also maps nested nongeneric reference objects, typed arrays and root String/Int32/Boolean values.
 Rebuild consumers with the matching Preview 10 reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
@@ -31,7 +32,7 @@ Serialize(output: OutputStream, value: Object) -> Result<unit, JsonError>
 Use `JsonSerializer.Deserialize<YourClass>(text)?` for a typed result, or pass
 `typeof(YourClass)` to the non-generic read overload. Both use the same mapper and
 return the same structured errors, including UnsupportedMapping for unsupported
-targets such as value types. Construction requires a
+targets such as unsupported value types and generic lists. Object construction requires a
 runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
@@ -42,23 +43,46 @@ rebuild with matching references and library artifacts.
 
 ## Provisional property rules
 
-- Map String, Int32 and Boolean public instance properties with exact, case-sensitive
+- Map String, Int32 and Boolean public instance properties, plus nested nongeneric
+  reference objects and typed arrays in development, with exact, case-sensitive
   names. No naming policy or attribute support; property order is not promised.
 - Serialize public getters, including read-only properties. Deserialize public
   setters; read-only/private setters and static properties are ignored. Fields are ignored.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject null, nested model objects, collections, Option, enums, unsupported scalars
+- Reject null, generic collections, Option, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 
-Validate input property shapes and values before invoking the constructor. Setter
+Development nested writes require each property value to have its declared runtime
+type; polymorphic properties are rejected. Reads use each declared class and its
+public parameterless constructor. Shared children serialize as repeated JSON objects;
+deserialization constructs independent instances rather than preserving identity.
+
+Validate the entire input tree before invoking any model constructor or setter. Setter
 failures and user Faults are not transactional; side effects are not rolled back.
 The Reflection error case retains ReflectionError. UnsupportedMapping identifies
 unsupported shapes through diagnostic text; ordinary syntax, missing-field,
 type-mismatch, number and stream causes retain their existing JsonError cases.
 Terminal Faults from user accessors/constructors are not wrapped.
+
+## Typed arrays — development
+
+Use `Deserialize<int[]>("[21,22]")` or `Deserialize<ReportPayload[]>(text)` for
+root arrays. Array-valued model properties use the same mapper; strings, Int32,
+Boolean, supported models and jagged arrays can be elements. String/Int32/Boolean
+also work as root values. The non-generic TypeInfo, borrowed stream, JsonContent
+and generic HTTP helper paths share this behavior.
+
+Order and empty arrays are preserved. Each array admits at most 31 elements;
+every object or array consumes a container level and contributes to the existing
+32-value document bound. Element types are exact, with no coercion or polymorphic
+substitution. Null arrays/elements are rejected; missing writable array properties
+remain errors. Generic lists, interfaces, dictionaries, rectangular arrays and
+unsupported scalar elements remain outside this slice. Shared model elements
+serialize repeatedly and deserialize independently. The complete input tree,
+including later elements, is validated before any model constructor/setter runs.
 
 ## Streams and limits
 
@@ -67,10 +91,16 @@ consume input before failure. Writes validate mapping and the entire encoded doc
 before touching output; a stream failure can still leave a written prefix. This is
 buffered synchronous conversion, not async stream parsing.
 
-Existing bounds apply: 128 UTF-8 bytes, four container levels, 32 value occurrences,
-31 children per container. Object mapping is flat even though DOM values can nest.
-Recursive models, configurable naming/null policy and
-HTTP verb extensions remain later work. Shared content conversion is described below.
+Development builds after Preview 10 allow 1,024 UTF-8 bytes per document (Preview 10: 128),
+including whitespace, property names and escaped output. String and buffered HTTP input
+return LimitExceeded above that cap; stream input reads at most 1,025 bytes and returns
+Read(TextReadError.LimitExceeded), leaving the stream open. JSON number tokens use the
+same byte cap; longer tokens return InvalidNumber. Existing shape bounds apply: four container levels, 32 value occurrences,
+31 children per container. Development mapping supports up to four object/array container
+levels including the root; deeper graphs and cycles return LimitExceeded. This
+bounded recursion does not preserve reference identity. Generic lists, dictionaries, configurable
+limits and naming/null policies remain later work. Shared content conversion is
+described below.
 
 ## HTTP content conversion
 
@@ -90,12 +120,13 @@ Creation sets `application/json; charset=utf-8`. Reads interpret buffered bytes 
 UTF-8 JSON; the caller selects header and status policy. All operations are
 synchronous, preserve the serializer's errors and limits, and leave content reusable.
 Invalid UTF-8 is `JsonError.Read(TextReadError.InvalidUtf8)`. Empty bytes fail JSON
-syntax validation; a `null` document is a JsonNull node, while flat model mapping
+syntax validation; a `null` document is a JsonNull node, while model mapping
 continues rejecting it. The byte limit is checked before decoding.
 
 These methods do not send a request, complete/close a context or add cancellation.
-The [mapped HTTP sample](/features/web/) uses the same helpers on both peers.
-HttpClient verb extensions and request/response conveniences remain later work.
+The [mapped HTTP sample](/cases/http-server/) uses the same helpers on both peers.
+Generic HttpClient verbs are described below; automatic endpoint binding remains
+future work.
 
 ## Error payload reference
 

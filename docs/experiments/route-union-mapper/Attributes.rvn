@@ -1,0 +1,6 @@
+import System.*
+
+// Metadata-only marker for this development generator; no runtime construction.
+public class RoutePatternAttribute : Attribute {
+    init(pattern: string) { }
+}

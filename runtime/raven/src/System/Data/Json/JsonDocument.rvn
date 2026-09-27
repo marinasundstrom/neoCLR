@@ -158,8 +158,8 @@ internal class DocumentWriter {
     }
 
     private func Append(text: string) -> Result<unit, JsonError> {
-        if text.GetUtf8ByteCount() > 128 - output.GetUtf8ByteCount() {
-            return Error(JsonError.LimitExceeded("Document exceeds 128 UTF-8 bytes"))
+        if text.GetUtf8ByteCount() > 1024 - output.GetUtf8ByteCount() {
+            return Error(JsonError.LimitExceeded("Document exceeds 1024 UTF-8 bytes"))
         }
         output = String.Concat(output, text)
         return Ok(())

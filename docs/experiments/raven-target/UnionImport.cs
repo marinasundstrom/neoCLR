@@ -69,7 +69,7 @@ static class UnionImport
                 ? JsonBindings.GenericImplementationName(method) + "<T0>"
             : exports.Contains(method) && method.DeclaringType.FullName == HttpJsonBindings.Operations && method.IsStatic
                 ? method.DeclaringType.FullName + "." + LibraryImplementation.GenericName(method)
-            : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
+            : exports.Contains(method) ? (method.DeclaringType.FullName is "System.Tasks.TaskOperators" or "System.Tasks.TaskResultOperators" or "System.Runtime.Reflection.TypeReflectionExtensions" or "System.Runtime.Reflection.PropertyReflectionExtensions" or "System.Runtime.Reflection.ConstructorReflectionExtensions" or "System.Runtime.Reflection.MethodReflectionExtensions" or "System.Runtime.Reflection.FieldReflectionExtensions" ? method.DeclaringType.FullName : libraryOwner) + "." + LibraryImplementation.GenericName(method)
             : throw new InvalidDataException("Unexported implementation dependency: " + method.FullName);
         var entryHasArguments = entry is not null && EntryPointBindings.HasArguments(entry, collectionProfile);
         var adaptEntry = entry is not null && (entryHasArguments || entry.ReturnType.MetadataType != MetadataType.Void);
@@ -865,10 +865,10 @@ static class UnionImport
                         }
                         else if (targetMethod.Module == library.MainModule)
                         {
-                            if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
+                            if (targetMethod.IsConstructor && targetMethod.DeclaringType.FullName is "System.Object" or "System.ValueType" or "System.Attribute" && targetMethod.Parameters.Count == 0 && method.IsConstructor && method.DeclaringType.BaseType?.FullName == targetMethod.DeclaringType.FullName && instruction.OpCode.Code == Code.Call)
                             {
                                 Expect(ApplicationTypes.Receiver(method));
-                                code.AppendLine((libraryOwner is null || method.DeclaringType.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName == "System.Object"
+                                code.AppendLine((libraryOwner is null || method.DeclaringType.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !method.DeclaringType.IsValueType && targetMethod.DeclaringType.FullName is "System.Object" or "System.Attribute"
                                     ? "call instance System.Object::.ctor()" : "pop");
                                 break;
                             }
@@ -990,7 +990,9 @@ static class UnionImport
                     output.AppendLine($".override instance {ProfileType(declaration.DeclaringType)}::{ApplicationTypes.MethodName(declaration.Resolve())}({string.Join(',', declaration.Parameters.Select(p => ProfileType(p.ParameterType)))})");
             if (OpaqueLibrary.IsExplicitStringCount(method))
                 output.AppendLine(".override instance System.Collections.Collection<Char>::get_Count()");
-            if (libraryOwner is null && !numericSpecialization.IsSpecialized(method)) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
+            if (libraryOwner is null && !valueConstructor && !numericSpecialization.IsSpecialized(method)) output.AppendLine(SourceMetadata.Method(method, explicitReceiver: method.HasThis && !emitInstance));
+            if (libraryOwner is null && !valueConstructor)
+                foreach (var attribute in AttributeMetadata.Method(method, (type, _) => ProfileType(type))) output.AppendLine(attribute);
             for (var n = 0; n < locals.Length; n++) output.AppendLine($".local {locals[n]} local{n}");
             // Adapter temporaries are declared before code and assigned explicitly;
             // in particular, ref-protocol temporaries must never be default roots.
@@ -1015,6 +1017,28 @@ static class UnionImport
             }
             output.AppendLine(".end");
             if (emitInstance || emitOwnedStatic) { instanceBodies[method] = output.ToString(methodStart, output.Length - methodStart); output.Length = methodStart; }
+            if (valueConstructor) {
+                // Keep ordinary CLI lowering through its checked helper, and expose
+                // the actual constructor identity for descriptor-based construction.
+                var constructorParameters = declaredParameters.Select((t, i) => t + " " + method.Parameters[i].Name);
+                var wrapper = new StringBuilder($".method {(method.IsPrivate ? "private " : method.IsAssembly ? "internal " : "")}instance byref .ctor({string.Join(',', constructorParameters)}) -> Void\n");
+                wrapper.AppendLine(SourceMetadata.Method(method));
+                foreach (var attribute in AttributeMetadata.Method(method, (type, _) => ProfileType(type))) wrapper.AppendLine(attribute);
+                var owner = ProfileType(method.DeclaringType);
+                wrapper.AppendLine($".local {owner} value\nldloca value\ninitobj {owner}\nldloca value");
+                for (var n = 1; n < args.Length; n++) wrapper.AppendLine($"ldarg {n}");
+                wrapper.AppendLine($"call {Name(method)}({string.Join(',', args)})");
+                // The lowering helper receives ordinary initialized storage, never
+                // the VM's restricted construction capability. Publish each field
+                // through normal checked constructor writes after the body returns.
+                foreach (var field in method.DeclaringType.Fields.Where(f => !f.IsStatic)) {
+                    var fieldName = ApplicationTypes.FieldName(field);
+                    wrapper.AppendLine($"ldarg 0\nldflda {owner}::{fieldName}\nldloc value\nldfld {owner}::{fieldName}\nstobj {ProfileType(field.FieldType)}");
+                }
+                wrapper.AppendLine("ldvoid\nret\n.end");
+                instanceBodies[method] = wrapper.ToString();
+            }
+
 
             ApplicationTypes.Expand(ProfileType, pending);
 

@@ -1,0 +1,108 @@
+{
+  "date": "2026-09-27",
+  "host": "macOS arm64",
+  "scope": "Development typed scalar/model arrays, jagged arrays, scalar roots and HTTP array payloads",
+  "commands": [
+    "cargo test --test reflection_arrays",
+    "python3 docs/experiments/json-object-mapping/verify.py --public --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+    "python3 docs/experiments/http-json/verify.py --nested --case all --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async"
+  ],
+  "checks": [
+    "Scalar, reference and jagged array round trips; empty and ordered arrays; model properties; streams and HTTP content",
+    "Whole-input validation rejects an invalid later model-array element without constructor/setter side effects",
+    "31 entries, 32 total values, four container levels and existing 1024-byte budget; null/type/overflow failures",
+    "19 independent server cases; managed pair; managed client against Python server",
+    "Three runtime adapter tests: checked boxing, invalid casts, bounds, exact native signatures and released roots"
+  ],
+  "runs": {
+    "mapping": {
+      "assembly_ms": 1909,
+      "load_ms": 1197,
+      "verify_ms": 611,
+      "run_ms": 19786,
+      "allocated": 11738,
+      "live": 0,
+      "peak": 252,
+      "collections": 192,
+      "reclaimed": 11738
+    },
+    "http": [
+      {
+        "peer": "server",
+        "assembly_ms": 1861,
+        "load_ms": 1348,
+        "verify_ms": 527,
+        "run_ms": 21609,
+        "allocated": 8866,
+        "live": 0,
+        "peak": 274,
+        "collections": 110,
+        "reclaimed": 8866
+      },
+      {
+        "peer": "client",
+        "assembly_ms": 1867,
+        "load_ms": 1126,
+        "verify_ms": 485,
+        "run_ms": 5278,
+        "allocated": 1390,
+        "live": 0,
+        "peak": 274,
+        "collections": 21,
+        "reclaimed": 1390
+      },
+      {
+        "peer": "server",
+        "assembly_ms": 1809,
+        "load_ms": 1140,
+        "verify_ms": 483,
+        "run_ms": 8240,
+        "allocated": 1188,
+        "live": 0,
+        "peak": 268,
+        "collections": 16,
+        "reclaimed": 1188
+      },
+      {
+        "peer": "client",
+        "assembly_ms": 1843,
+        "load_ms": 1106,
+        "verify_ms": 486,
+        "run_ms": 3693,
+        "allocated": 1418,
+        "live": 0,
+        "peak": 302,
+        "collections": 19,
+        "reclaimed": 1418
+      }
+    ]
+  },
+  "compiler": {
+    "generalFix": "f20a65b72",
+    "neoclrIntegration": "84d1b10e0",
+    "focusedTargetMetadataTests": 8,
+    "notes": "Independently validated and integrated on Raven main; only the specific general fix was cherry-picked into neoclr. Runtime Contract configuration unchanged."
+  },
+  "notes": [
+    "Correctness/resource observations, not load or latency guarantees.",
+    "No public API inventory additions. Matching development runtime, reference and library artifacts required for private array services.",
+    "Preview 10 unchanged; generic lists, dictionaries, enums, Uuid and Option mapping are not implemented by this slice.",
+    "Final regenerated library was byte-identical to the tested bundle. Existing DOM corpus evidence is reused because DOM parsing/writing did not change."
+  ],
+  "sha256": {
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "1c1781678ad49d5bc8ad5acb0d075351be10cceb41888eb7bbeb4e895b09ff4b",
+    "runtime/raven/generated/JsonValue.helpers.neoil": "a38cb4f6f39fdcab7923e0b149e778c3ad3478a3ebcaff9ac09d8e34a17d4807",
+    "src/reflection_arrays.rs": "7b750edfe6211ac7fd049358f0af4e4bc47bb1a06c05ba58755cd68d22703b8c",
+    "tests/reflection_arrays.rs": "51ca9ac656aaa1993458e3d7ea345b30070867e24cbbbcf157969699b2b8eb03",
+    "docs/experiments/json-object-mapping/Public.rvn": "b9af62fb5cbea743f409a204104a20b9af4b93ab30fd63803a7b4600f92904aa",
+    "docs/experiments/json-object-mapping/NestedHttpApplication.rvn": "610a98ae139867b7f4a868cae4c5179bd88dfbcf10f661c43644c4d707fa0218",
+    "docs/experiments/http-json/verify.py": "f749587675930edc1ea4b1f7cb1c94747ffab3f6fced0706f841968db55236c9"
+  },
+  "validation": {
+    "websitePages": 1255,
+    "websiteTests": 18,
+    "downloadMatchesSources": true,
+    "runtimeSnapshot": "passed",
+    "apiSnapshot": "passed"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "raven_main": "3179cd21e",
+  "raven_neoclr": "2f62361ef",
+  "compiler_tests": {
+    "attributes": 16,
+    "unions": 189
+  },
+  "command": "python3 docs/experiments/route-union-mapper/verify.py --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+  "checks": {
+    "scalar_admission": 7,
+    "rejected_schemas": 7,
+    "independent_http_requests": 9,
+    "paired_http_requests": 2,
+    "mixed_string_int_payloads": "passed",
+    "copy_boxing_reuse_errors": "passed",
+    "all_consumers_final_live_objects": 0
+  },
+  "log": "Generated AppRoutesParser from 2 attributed cases.\nScalar union admission: 7 checks passed.\nAttributed route mapper checks passed\nassembly_ms=2053 load_ms=1200 verify_ms=519 run_ms=311\nallocated=355 live=0 peak=64 collections=7 reclaimed=355\n\nHTTP server: assembly_ms=1843 load_ms=1170 verify_ms=543 run_ms=5032\nallocated=2545 live=0 peak=216 collections=33 reclaimed=2545\nHTTP client: assembly_ms=1774 load_ms=1156 verify_ms=554 run_ms=2170\nallocated=521 live=0 peak=142 collections=10 reclaimed=521\nHTTP server: assembly_ms=1872 load_ms=1129 verify_ms=545 run_ms=5319\nallocated=562 live=0 peak=180 collections=9 reclaimed=562\nHTTP checks: 9 independent requests and a 2-request neoCLR client/server pair passed.\nMixed route checks passed\nassembly_ms=1789 load_ms=1169 verify_ms=543 run_ms=157\nallocated=178 live=0 peak=64 collections=4 reclaimed=178\n\nRejected schema: missing attribute\nRejected schema: missing argument\nRejected schema: unsupported type\nRejected schema: ambiguous patterns\nRejected schema: encoded overlap\nRejected schema: invalid UTF8 literal\nRejected schema: bad pattern\n"
+}

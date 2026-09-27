@@ -38,6 +38,32 @@ directions are welcome, clearly distinguished from implementation. Setup/downloa
 pages retain accurate package availability. Preserve changelog, published release
 notes and development history outside the feature narrative.
 
+## Case-based samples — author direction, 2026-09-27
+
+This is a general website convention, especially for feature pages: explain a
+feature or API through a small realistic case and show its essential code directly
+on the feature page. A reader should be able to recognize what the feature does
+and how to use it from that example. Link to a dedicated case page for the complete
+project or additional context; a link alone does not replace the on-page example.
+Apply this when developing and reviewing feature pages, without inflating a simple
+sample into a large application.
+
+Present samples as coherent application cases, especially paired HTTP clients and
+servers. For Web, introduce a general HttpClient sample and its capabilities first;
+then show a server followed by the client that connects to it (author clarification
+on the same date). Lead with the use case and exchange, then show shared models/payloads,
+server behavior, client calls, expected responses and failure behavior. Include
+complete downloadable projects and on-site run instructions tied to the matching
+release or development toolchain. Extract displayed code from tested sources.
+Individual API snippets can support the walkthrough but should not substitute for
+it. Give a selected use case a dedicated `website/content/cases/<case>/index.md`
+page, a descriptive “Case:” title and navigation from its feature guide and the
+cases list. The author emphasizes that these can stay small: a real or realistic
+purpose and understandable context matter more than size or tutorial depth. Do not
+expand a sample into a large application merely to justify calling it a case.
+Evolve the report case into the selected Web API story as nested JSON and
+WebApplication become implemented; do not show planned endpoints as runnable code.
+
 ## Information structure
 
 | Location | Purpose | Required distinction |
@@ -45,6 +71,7 @@ notes and development history outside the feature narrative.
 | `website/content/about/index.md` | Project background, goals, relationship to .NET, current scope and participation | Intent versus implemented capability |
 | `website/content/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
 | `website/content/features/<name>/index.md` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
+| `website/content/cases/<case>/index.md` | Small realistic use cases, tested code, run instructions and observable results | Working case versus future extensions; link to the general feature/API guide |
 | `website/content/try/index.md` | Reader-facing installation, .rvnproj workflow, expected output and troubleshooting | Published bundle instructions versus development-only API availability |
 | `website/content/raven/index.md` | Introduce the Raven language, examples and the .NET/neoCLR target distinction | Language capabilities versus target-specific library support |
 | `api-docs/namespaces.md` → `/docs/namespaces.html` | Current namespace contents and links to reference pages and guides; extend as APIs land | Implemented namespaces versus proposals; overview versus member coverage |

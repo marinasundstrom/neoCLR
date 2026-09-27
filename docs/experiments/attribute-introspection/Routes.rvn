@@ -1,0 +1,36 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+
+public class RoutePatternAttribute : Attribute {
+    init(pattern: string) { }
+}
+
+public union CatalogRoutes {
+    [RoutePattern("/items")]
+    case ListItems
+    [RoutePattern("/items/{id}")]
+    case GetItem(id: int)
+}
+
+// Inspect declarations during startup, before the server accepts requests.
+func ReadRouteDeclarations() -> int {
+    let routes = typeof(CatalogRoutes)
+    var count = 0
+    for candidate in routes.Module.GetTypes() {
+        if let Some(parent) = candidate.DeclaringType {
+            if parent.Equals(routes) {
+                for attribute in candidate.GetCustomAttributesData() {
+                    if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
+                        let arguments = attribute.GetConstructorArguments()
+                        if arguments[0].Value is string pattern {
+                            Console.WriteLine(candidate.Name + " => " + pattern)
+                            count += 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return count
+}

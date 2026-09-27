@@ -58,3 +58,30 @@ contexts remain future work.
 [Type extensions](xref:System.Runtime.Reflection.TypeReflectionExtensions) ·
 [Method extensions](xref:System.Runtime.Reflection.MethodReflectionExtensions) ·
 [Field extensions](xref:System.Runtime.Reflection.FieldReflectionExtensions)
+
+Development attribute inspection belongs to [Introspection](../introspection/#development-case-inspecting-route-declarations-at-startup):
+MemberInfo and ParameterInfo expose constructor data without executing attribute
+constructors. Read it once during startup and cache the validated mapping.
+
+
+## Development case: preparing union constructors for routes
+
+Read route attributes and select constructors at startup, then keep those descriptors
+for the server lifetime. The tested `ItemRouteFactory` finds the `/items/{id}` case,
+checks its Int32 payload and retains both its case and union carrier constructors.
+Each request can construct an ordinary union and dispatch with `match`:
+
+```raven
+{{UNION_CONSTRUCTION_SAMPLE}}
+```
+
+`ConstructorInfo.Invoke` executes the exact retained constructor. Nongeneric value
+records, including admitted union cases and carriers, are supported through this
+extension. Access and argument checks run on every invocation; discovery and overload
+selection do not. TypeInfo activation keeps its reference-class-only contract.
+
+The [downloadable cases](../../samples/http-json.zip) include `union-construction`
+with preparation, repeated construction and rejection checks. The [attributed HTTP case](/cases/http-server/#case-attributed-item-routes)
+combines this execution support with startup schema validation and cached route bindings.
+See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
+for signatures and limitations.

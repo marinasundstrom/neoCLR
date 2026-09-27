@@ -197,3 +197,82 @@ A run overlapping library regeneration timed out. The isolated run passed withou
 changing any deadline. This remains a limitation under load, not evidence of
 production readiness or a reason to weaken the timeout checks. The DOM sample
 remains available separately; no full suite or website build was run.
+
+
+## Nested objects — development, 2026-09-27
+
+The public mapper now supports nested nongeneric reference properties, retaining
+exact names, required writable properties and String/Int32/Boolean leaves. Full
+input validation precedes all model constructors/setters. Nulls, polymorphic
+property values, collections and generic/value models remain unsupported. Four
+object levels including the root are allowed; cycles/deeper graphs return
+LimitExceeded. Shared children are repeated in JSON and restored independently.
+The first nested slice retained the 128-byte and 32-value document bounds; the
+byte-budget follow-up below expands documents to 1,024 bytes.
+
+Run the existing `--public` command for the expanded contract consumer. Constructor
+and setter markers prove successful execution; the verifier asserts that the
+invalid-input region emits no model side effects. Tests also cover shared children,
+four/five levels, cycles, nulls, unsupported collections, inaccessible nested
+constructors and stream output remaining untouched on mapping failure.
+
+The same station-report client/server case can now use
+[NestedHttpApplication.rvn](NestedHttpApplication.rvn): GET /report returns
+a station name and sensor description (the initial slice carried only the name),
+and POST /reports reads that nested model and
+returns `{"accepted":true}` with status 201. The original flat variant is unchanged.
+Run the nested case with a matching development bundle and measured runtime:
+
+```sh
+python3 docs/experiments/http-json/verify.py --nested --case all \
+  --toolchain-root /absolute/path/to/matching-development-bundle \
+  --runner target/release/examples/measure_async
+```
+
+The website extracts the models, client and server conversion directly from these
+sources and ships the complete project/verifier download. This is explicit HTTP
+composition, not WebApplication, automatic binding, persistence or a release.
+See the [nested mapping design](../../json-dom-design.md#nested-typed-objects--development-2026-09-27)
+and [validation evidence](nested-validation.json).
+
+
+Validation on macOS arm64: the public consumer passes with 6,295 allocations,
+96 collections, peak 239 and zero final live objects. All 15 nested HTTP server
+cases pass; the neoCLR pair uses 971 client / 799 server allocations, and the
+independent-peer client uses 999, all with zero final live objects. These are
+correctness results, not latency/load guarantees. The general HttpClient website
+example also passes its independent fragmented-UTF-8 peer, checking its Accept
+header and decoded output (570 allocations, zero final live objects).
+The bridge was rebuilt before final validation to retain the current GC and
+Reflection reference surface. No runtime/compiler behavior outside JSON changed.
+
+
+## API payload budget — development, 2026-09-27
+
+Documents and number tokens now allow 1,024 UTF-8 bytes, matching buffered HTTP
+bodies. The same `--public` consumer checks nested models at 1,023 and 1,024 bytes,
+HTTP-content reads, and rejection above the cap without stream writes. The DOM
+consumer checks UTF-8, escaping, number spelling and borrowed stream boundaries.
+The nested case adds a required `station.description` string to its wire model;
+its verifier checks 17 server cases, including 1,023/1,024-byte request bodies,
+the managed pair and an independent server. Preview 10 and the flat sample are
+unchanged. See [current validation](payload-validation.json) and the
+[budget design](../../json-dom-design.md#web-api-byte-budget--development-2026-09-27).
+
+
+## Typed collections — development, 2026-09-27
+
+The mapper now accepts one-dimensional typed arrays, including jagged arrays, of
+its supported scalars and nongeneric reference models. Scalars also work as roots.
+Arrays may appear on model properties and pass through streams and HTTP content.
+The complete supplied tree is validated before model construction, including later
+invalid elements. Nulls, element polymorphism, generic lists and dictionaries remain
+unsupported. Each array has at most 31 entries; the unchanged document-wide limits
+are 32 values, four container levels and 1,024 UTF-8 bytes.
+
+The nested station case adds required `readings: int[]` and checks 19 independent
+server cases, the managed pair and the managed client against an independent server.
+This changes the development sample's wire contract; Preview 10 remains unchanged.
+See [collection evidence](collection-validation.json), including runtime adapters and
+the independently extracted Raven target-metadata array fix. Enum, Uuid and Option
+mapping are the next author-requested slices.

@@ -22,7 +22,7 @@ static class DescriptorLibrary
         var contracts = Layouts.Keys.Append("TypeInfo").ToArray();
         // The closed family is authored together; bind the explicit source/core
         // pairs before checking its mutually referring signatures.
-        foreach (var name in contracts)
+        foreach (var name in contracts.Concat(new[] { "CustomAttributeData", "CustomAttributeTypedArgument" }))
             ApplicationTypes.BindLibrary(source.GetType("System.Introspection." + name), "System.Introspection." + name);
         foreach (var name in contracts)
             interfaces(source.GetType("System.Introspection." + name), core.GetType("System.Introspection." + name), "System.Introspection." + name);
@@ -41,10 +41,23 @@ static class DescriptorLibrary
                 throw new InvalidDataException("Descriptor storage or construction contract mismatch: " + name);
             result.AddRange(roots(type, contract, fullName));
         }
+        foreach (var name in new[] { "CustomAttributeData", "CustomAttributeTypedArgument" })
+        {
+            var type = source.GetType("System.Introspection." + name);
+            var layout = name == "CustomAttributeData"
+                ? new[] { ("storedType", "System.Introspection.TypeInfo"), ("storedConstructor", "System.Introspection.ConstructorInfo"), ("storedArguments", "System.Introspection.CustomAttributeTypedArgument[]") }
+                : new[] { ("storedType", "System.Introspection.TypeInfo"), ("storedValue", "System.Object") };
+            if (type is null || type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
+                p.First.Name != p.Second.Item1 || p.First.FieldType.FullName != p.Second.Item2 || !p.First.IsPrivate || p.First.IsStatic)
+                || type.Methods.Count(m => m.IsConstructor) != 1 || !type.Methods.Single(m => m.IsConstructor).IsPrivate)
+                throw new InvalidDataException("Attribute snapshot layout mismatch: " + name);
+            result.AddRange(roots(type, core.GetType("System.Introspection." + name), "System.Introspection." + name));
+        }
         result.AddRange(roots(source.GetType("System.Introspection.RuntimeTypeInfo"),
             core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.TypeReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.PropertyReflectionExtensions"));
+        result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.ConstructorReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.MethodReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.FieldReflectionExtensions"));
         return result.ToArray();
@@ -60,6 +73,6 @@ static class DescriptorLibrary
     public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"
         && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeParameterInfo" or "RuntimeAssemblyInfo" or "RuntimeModuleInfo");
     public static bool SameType(TypeReference left, TypeReference right) => (IsProvider(left)
-        || left.Namespace == "System.Introspection" && left.Name is "MemberInfo" or "FieldInfo" or "MethodInfo" or "ConstructorInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
+        || left.Namespace == "System.Introspection" && left.Name is "CustomAttributeData" or "CustomAttributeTypedArgument" or "MemberInfo" or "FieldInfo" or "MethodInfo" or "ConstructorInfo" or "PropertyInfo" or "TypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
         && left.FullName == right.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 }

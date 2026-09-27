@@ -23,6 +23,14 @@ development APIs. Number's static operators/identities and inherited ordering ha
 matching type/member documentation. The numeric guide records the current closed
 primitive-only generic specialization limits; no Parsable interface is exposed.
 
+The cached route-mapper slice adds documented RoutePattern.GetParameterNames/Overlaps,
+TypeInfo.IsVisible and the ConstructorInfo.Invoke Sequence<Object?> overload. All
+use existing selected types; the matching reference and snapshot include their members.
+RavenDoc currently labels the Invoke group `self(...)` and spells the emitted
+extension signature `static func self`; both overloads and their XML descriptions
+remain present. The [manual reflection guide](reflection.md)
+provides the intended Invoke spelling. This renderer naming limitation adds no exclusion.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not
@@ -368,3 +376,19 @@ Ordinary async mutable-local sharing is corrected by the integrated Raven closur
 Direct completion-only await is corrected by the target compiler unit-result fix.
 The XML-only API snapshot refresh preserves the unchanged reference assembly; the
 existing library snapshot is reused. No full suite or website build is part of this slice.
+
+
+RoutePattern and RouteMatch (development 2026-09-27) add four public methods.
+All have XML contracts and automatic RavenDoc selection; the [routing guide](routes.md)
+covers direct matching, typed parameters, errors and optional application unions.
+There are no manual exclusions. Match their reference snapshot to the HTTP library.
+
+Attribute data (development 2026-09-27) adds MemberInfo/ParameterInfo retrieval,
+CustomAttributeData and CustomAttributeTypedArgument. All public signatures have
+XML coverage and automatic type selection; the introspection guide documents exact
+retention, constants, non-execution and source limitations. No manual exclusions.
+
+
+The 2026-09-27 constructor execution increment includes ConstructorReflectionExtensions
+and Invoke in generated type/member coverage, with exact boxing/access limitations
+in [the reflection reference](reflection.md). TypeInfo activation is unchanged.

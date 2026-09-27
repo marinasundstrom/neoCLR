@@ -121,3 +121,16 @@ Its server request count is two, while the default DOM pair still uses one.
 The [slot-summary follow-up](slot-budget-summary.md) reduces remaining quota-scan
 cost while retaining instruction-boundary enforcement; it records focused mutation
 and GC checks plus a new comparison against the allocation-light walker.
+
+
+## Nested station case — development, 2026-09-27
+
+Use `--nested` (implies `--mapped`) with a matching post-Preview-10 development
+bundle to exchange a nested station name and a sensor description. This longer
+report uses the development 1,024-byte JSON budget. It reuses the typed client and
+server with NestedHttpApplication.rvn. The verifier checks 17 independent server
+cases (including 1,023/1,024-byte bodies), the two-request neoCLR pair, and the client
+against Python. See [payload evidence](../json-object-mapping/payload-validation.json). Invalid nested
+name values, missing names and null names return 400. See the
+[nested mapper evidence](../json-object-mapping/README.md#nested-objects--development-2026-09-27).
+The default DOM and `--mapped` flat variants keep their wire formats.

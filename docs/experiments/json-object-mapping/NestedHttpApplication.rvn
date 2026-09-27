@@ -1,0 +1,88 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+import System.Web.Http.*
+import System.Web.Http.Json.*
+
+union AppError {
+    case Http(reason: HttpError)
+    case Json(reason: JsonError)
+    case Body(message: string)
+
+    override func ToString() -> string {
+        return match self {
+            Http(let reason) => reason.ToString()
+            Json(let reason) => reason.ToString()
+            Body(let message) => message
+        }
+    }
+}
+
+// Conversions belong to this application; the library retains the original errors.
+extension HttpErrorConversion for HttpError {
+    static func implicit(error: HttpError) -> AppError => AppError.Http(error)
+}
+
+extension JsonErrorConversion for JsonError {
+    static func implicit(error: JsonError) -> AppError => AppError.Json(error)
+}
+
+extension HttpJsonErrorConversion for HttpJsonError {
+    static func implicit(error: HttpJsonError) -> AppError {
+        return match error {
+            HttpJsonError.Http(let reason) => AppError.Http(reason)
+            HttpJsonError.Json(let reason) => AppError.Json(reason)
+        }
+    }
+}
+
+// Development nested station case. Property names are the wire contract.
+public class Station {
+    init() { }
+    var name: string { get; set; } = ""
+    var description: string { get; set; } = ""
+}
+
+public class ReportPayload {
+    init() { }
+    var station: Station { get; set; } = Station()
+    var readings: int[] { get; set; } = [21, 22]
+}
+
+public class Acknowledgement {
+    init() { }
+    var accepted: bool { get; set; } = false
+}
+
+func CreateReport() -> Result<ReportPayload, JsonError> {
+    let report = ReportPayload()
+    report.station.name = "Café"
+    report.station.description = "Indoor air-quality sensor near the café entrance. Reports are collected during opening hours to help staff check ventilation and keep the seating area comfortable."
+    return Ok(report)
+}
+
+func Acknowledge(content: HttpContent) -> Result<Acknowledgement, JsonError> {
+    _ = JsonContent.Read<ReportPayload>(content)?
+    let reply = Acknowledgement()
+    reply.accepted = true
+    return Ok(reply)
+}
+
+func PrepareReport() -> Result<HttpContent, AppError> {
+    let report = CreateReport()?
+    let content = JsonContent.Create(report)?
+    return Ok(content)
+}
+
+func ReadReply(result: Result<HttpResponse, HttpJsonError>) -> Result<string, AppError> {
+    let response = result?
+    if response.StatusCode != HttpStatusCode.Created {
+        return Error(AppError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))
+    }
+    let reply = JsonContent.Read<Acknowledgement>(response.Content)?
+    if reply.accepted {
+        let output = JsonSerializer.Serialize(reply)?
+        return Ok(output)
+    }
+    return Error(AppError.Body("Unexpected acknowledgement"))
+}

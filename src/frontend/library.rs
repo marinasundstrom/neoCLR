@@ -142,8 +142,9 @@ pub(super) fn cases(ty: &Ty) -> Result<Vec<Case>, Fault> {
         .type_definition(&metadata)
         .ok_or_else(|| Fault::new("match requires a bundled System union"))?;
     if !definition.custom_attributes.iter().any(|a| {
-        a.constructor.owner.as_ref().and_then(Type::definition_name)
-            == Some("System.Runtime.CompilerServices.UnionAttribute")
+        a.target_token.is_none()
+            && a.constructor.owner.as_ref().and_then(Type::definition_name)
+                == Some("System.Runtime.CompilerServices.UnionAttribute")
     }) {
         return Err(Fault::new("match requires a bundled System union marker"));
     }
@@ -450,12 +451,13 @@ pub(super) fn case_conversion(actual: &Ty, expected: &Ty) -> Result<Option<Strin
         return Ok(None);
     };
     if !definition.custom_attributes.iter().any(|attribute| {
-        attribute
-            .constructor
-            .owner
-            .as_ref()
-            .and_then(Type::definition_name)
-            == Some("System.Runtime.CompilerServices.UnionAttribute")
+        attribute.target_token.is_none()
+            && attribute
+                .constructor
+                .owner
+                .as_ref()
+                .and_then(Type::definition_name)
+                == Some("System.Runtime.CompilerServices.UnionAttribute")
     }) {
         return Ok(None);
     }
@@ -495,12 +497,13 @@ pub(super) fn imported_cases(name: &str) -> Result<Option<Vec<String>>, Fault> {
         definition.name == name
             && definition.visibility == Visibility::Public
             && definition.custom_attributes.iter().any(|attribute| {
-                attribute
-                    .constructor
-                    .owner
-                    .as_ref()
-                    .and_then(Type::definition_name)
-                    == Some("System.Runtime.CompilerServices.UnionAttribute")
+                attribute.target_token.is_none()
+                    && attribute
+                        .constructor
+                        .owner
+                        .as_ref()
+                        .and_then(Type::definition_name)
+                        == Some("System.Runtime.CompilerServices.UnionAttribute")
             })
     }) {
         found = true;

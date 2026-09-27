@@ -1,0 +1,26 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Web.Http.*
+
+// Optional application convenience. The library knows nothing about these routes.
+union StationRoute {
+    case ReadReports(stationId: int)
+    case SubmitReport(stationId: int)
+    case Unmatched(target: string)
+}
+
+func ParseStationRoute(pattern: RoutePattern, method: string, target: string) -> Result<StationRoute, string> {
+    let matched = pattern.Match(target)?
+    let Some(parameters) = matched else {
+        return Ok(StationRoute.Unmatched(target))
+    }
+    let id = parameters.GetInt32("stationId")?
+    if method == "GET" {
+        return Ok(StationRoute.ReadReports(id))
+    }
+    if method == "POST" {
+        return Ok(StationRoute.SubmitReport(id))
+    }
+    return Ok(StationRoute.Unmatched(target))
+}

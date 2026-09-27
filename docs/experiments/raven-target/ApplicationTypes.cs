@@ -109,8 +109,8 @@ static class ApplicationTypes
         var type = reference.Resolve();
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
-            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
-            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !IsModule(type.BaseType?.Resolve()?.Module))
+            || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false)
+            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !(type.BaseType?.FullName == "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope)) && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
@@ -157,6 +157,7 @@ static class ApplicationTypes
             if (DelegateLibrary.IsMatched(type) || FlagsLibrary.IsMatched(type) || MarkerLibrary.IsMatched(type)) continue;
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
+            AttributeMetadata.Discover(type, pending);
             foreach (var field in type.Fields) map(field.FieldType, false);
             foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface || !IsLibrary(type) && m.IsPublic && !m.IsConstructor && !m.HasGenericParameters && m.HasBody) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
@@ -249,6 +250,31 @@ static class ApplicationTypes
                 && field.Offset > 0 && field.FieldType.Resolve() == caseType) == 1);
     }
 
+    // A bounded logical tagged-union projection, not general explicit-layout support.
+    // Scalar case payloads have no managed references or raw byte-addressable storage;
+    // neoCLR represents the private tag and case slots as ordinary value fields.
+    public static bool IsInt32CaseUnion(TypeDefinition type)
+    {
+        if (!type.IsValueType || !type.IsSealed || !type.IsExplicitLayout || type.HasGenericParameters
+            || type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.HasMarshalInfo)
+            || !StandardUnionLibrary.IsCandidate(type)) return false;
+        var cases = RavenUnionMetadata.Cases(type);
+        if (cases.Length == 0 || cases.Length != type.NestedTypes.Count || type.Fields.Count != cases.Length + 1
+            || cases.Where((c, i) => c.Ordinal != i).Any()) return false;
+        var tag = type.Fields.SingleOrDefault(f => f.Name == "<Tag>");
+        if (tag is null || tag.FieldType.MetadataType != MetadataType.Byte || tag.Offset != 0) return false;
+        return cases.All(c =>
+        {
+            var payload = type.NestedTypes.SingleOrDefault(t => t.Name == c.Name
+                && t.FullName.Replace('/', '+') == c.MetadataName);
+            return payload is { IsNestedPublic: true, IsValueType: true, IsSequentialLayout: true,
+                    HasGenericParameters: false, HasNestedTypes: false }
+                && payload.Fields.All(f => f.IsPrivate && !f.IsStatic && !f.HasMarshalInfo
+                    && f.FieldType.MetadataType == MetadataType.Int32)
+                && type.Fields.Count(f => f != tag && f.Offset > 0 && f.FieldType.Resolve() == payload) == 1;
+        });
+    }
+
     // Bounded source-library projection. Managed payload unions use
     // separate sequential fields; overlapping payload layouts remain unsupported.
     // This is Raven's current bridge shape, not a platform-wide case convention.
@@ -298,7 +324,7 @@ static class ApplicationTypes
         if (method.HasThis && Type(method.DeclaringType) is null) throw new InvalidDataException("Unsupported application receiver.");
     }
     public static string Receiver(MethodReference method) => Type(method.DeclaringType)! + ((method.DeclaringType.IsValueType && !LibraryImplementation.IsByValueReceiver(method) || OpaqueLibrary.IsByRefString(method)) ? "&" : "");
-    static string FieldName(FieldDefinition field) => FlagsLibrary.IsMatched(field.DeclaringType) ? "Bits" : LibraryNames.ContainsKey(field.DeclaringType)
+    public static string FieldName(FieldDefinition field) => FlagsLibrary.IsMatched(field.DeclaringType) ? "Bits" : LibraryNames.ContainsKey(field.DeclaringType)
         && DescriptorLibrary.IsDescriptor(field.DeclaringType) ? field.Name[6..]
         : LibraryNames.ContainsKey(field.DeclaringType) && GenericUnionLibrary.IsCase(field.DeclaringType)
             ? "Value" : MetadataIdentity.MemberName(field.Name);
@@ -383,10 +409,13 @@ static class ApplicationTypes
             if (type.IsSealed) output.AppendLine(".sealed");
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.ClosedHierarchyAttribute"))
                 output.AppendLine(".closedhierarchy");
-            if (!IsLibrary(type)) output.AppendLine(SourceMetadata.Type(type));
+            if (!IsLibrary(type)) {
+                output.AppendLine(SourceMetadata.Type(type));
+                foreach (var attribute in AttributeMetadata.Type(type, map)) output.AppendLine(attribute);
+            }
             if (IsModule(type.BaseType?.Resolve()?.Module)) output.AppendLine(".extends " + map(type.BaseType, false));
             else if ((!IsLibrary(type) || type.Methods.Any(m => m.IsVirtual && !m.IsNewSlot)) && !type.IsValueType && !type.IsInterface
-                && type.BaseType?.FullName == "System.Object" && RuntimeSignatures.IsCore(type.BaseType.Scope))
+                && type.BaseType?.FullName is "System.Object" or "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope))
                 output.AppendLine(".extends System.Object");
             if (type.CustomAttributes.Any(a => a.AttributeType.FullName == "System.Runtime.CompilerServices.UnionAttribute") || ErrorCarrierLibrary.IsMatched(type) || GenericUnionLibrary.IsMatched(type) && GenericUnionLibrary.IsCarrier(type)) output.AppendLine(".custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()");
             foreach (var contract in type.Interfaces) output.AppendLine(".implements " + map(contract.InterfaceType, false));

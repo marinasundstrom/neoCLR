@@ -65,7 +65,7 @@ public sealed class JsonSerializer {
 }
 internal sealed class ObjectMapper {
     public ObjectMapper() { }
-    public static Result<JsonObject, JsonError> Write(object value) => default;
+    public static Result<JsonValue, JsonError> Write(object value) => default;
     public static Result<object, JsonError> Read(JsonValue value, Introspection.TypeInfo type) => default;
 }
 internal sealed class DocumentReader { public DocumentReader(string text) { } public Result<JsonValue, JsonError> Read() => default; }
@@ -180,7 +180,7 @@ internal sealed class JsonClientRead {
         ["JsonSerializer::Serialize(System.Object)"] = ("System.Result<String,System.Data.Json.JsonError>", true, false),
         ["JsonSerializer::Serialize(System.IO.OutputStream,System.Object)"] = ("System.Result<Void,System.Data.Json.JsonError>", true, false),
         ["ObjectMapper::.ctor()"] = ("noresult", false, true),
-        ["ObjectMapper::Write(System.Object)"] = ("System.Result<System.Data.Json.JsonObject,System.Data.Json.JsonError>", true, false),
+        ["ObjectMapper::Write(System.Object)"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", true, false),
         ["ObjectMapper::Read(System.Data.Json.JsonValue,System.Introspection.TypeInfo)"] = ("System.Result<System.Object,System.Data.Json.JsonError>", true, false),
         ["DocumentReader::.ctor(String)"] = ("noresult", false, true),
         ["DocumentReader::Read()"] = ("System.Result<System.Data.Json.JsonValue,System.Data.Json.JsonError>", false, false),

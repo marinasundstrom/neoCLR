@@ -130,6 +130,8 @@
   "System.Introspection.AssemblyInfo",
   "System.Introspection.BindingFlags",
   "System.Introspection.ConstructorInfo",
+  "System.Introspection.CustomAttributeData",
+  "System.Introspection.CustomAttributeTypedArgument",
   "System.Introspection.FieldInfo",
   "System.Introspection.MemberInfo",
   "System.Introspection.MethodInfo",
@@ -215,6 +217,7 @@
   "System.Runtime.CompilerServices.UnionAttribute",
   "System.Runtime.GC",
   "System.Runtime.InteropServices.NativeMemory",
+  "System.Runtime.Reflection.ConstructorReflectionExtensions",
   "System.Runtime.Reflection.FieldReflectionExtensions",
   "System.Runtime.Reflection.MethodReflectionExtensions",
   "System.Runtime.Reflection.PropertyReflectionExtensions",
@@ -357,5 +360,7 @@
   "System.Web.Http.Json.HttpJsonError.Http",
   "System.Web.Http.Json.HttpJsonError.Json",
   "System.Web.Http.Json.JsonContent",
+  "System.Web.Http.RouteMatch",
+  "System.Web.Http.RoutePattern",
   "System.ZonedDateTime"
 ]

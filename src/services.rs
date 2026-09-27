@@ -103,6 +103,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
+            crate::native::Binding::ReflectionArray(_) => RuntimeService::ManagedArrays,
             crate::native::Binding::ReflectionConstruct
             | crate::native::Binding::ReflectionMember(_)
             | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,

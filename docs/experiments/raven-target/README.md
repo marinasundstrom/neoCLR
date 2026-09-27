@@ -23,6 +23,26 @@ pre-existing general compiler follow-up; see the [capture checkpoint](../task-ru
 The unit-result correction preserves importer stack checks. Existing uninitialized
 private-var constructor assignment also needs explicit-field compatibility in helpers.
 
+## Typed JSON array integration (2026-09-27)
+
+The JSON mapper uses three private checked array services for length, boxed element
+access and typed construction. Public serializer signatures stay unchanged; the
+private ObjectMapper.Write reference contract now returns JsonValue for array and
+scalar roots. Array operations execute through ordinary interpreter frames and
+retain type/bounds, allocation and GC checks. Runtime Contract settings are unchanged.
+
+Generic array results exposed a general Raven metadata-context bug. The independent
+main-based fix `f20a65b72` is integrated on the neoCLR branch as `84d1b10e0`; its
+eight focused tests pass (three new cases failed before), using ordinary reference-only
+CLI contracts and .NET 11 metadata. It does not add neoCLR policies to Raven main or
+claim execution validation on .NET Framework/NanoFramework. Consumers require the
+matching rebuilt compiler/bridge/reference.
+
+A separate general candidate remains: propagation directly inside an indexed
+assignment can leave the array/index on an early-return IL stack. The mapper uses
+a named mapped value before assignment; the isolated compiler regression is not
+yet validated or integrated. This is distinct from array type projection.
+
 ## Explicit application interface integration (2026-09-27)
 
 The development bridge imports ordinary explicit instance implementations on
@@ -1447,3 +1467,104 @@ The heap-async Raven target preserves the source entry signature; neoCLR owns
 startup adaptation and pending completion. Use a matching updated compiler,
 bridge and runtime. Public System signatures and Runtime Contract settings are
 unchanged. Integer results now become `neoclr run` process exit statuses.
+
+
+## Route parsing and optional union dispatch — 2026-09-27
+
+RoutePattern and RouteMatch are ordinary Raven reference classes in the HTTP slice,
+with four exact public bridge bindings. Their private storage stays mutable because
+InstanceRoots currently requires mutable implementation fields; the public API
+exposes no mutation. Matching uses existing UTF-8, collection and integer APIs.
+No native services, Raven compiler source or Runtime Contract configuration changes.
+Rebuild the HTTP library and compiler reference together; Preview 10 lacks these APIs.
+
+The [routing experiment](../http-routing/README.md) also records two existing gaps:
+scalar-only payload unions may emit overlapping explicit CLI layouts rejected by
+ApplicationTypes, and nested constant payload patterns may emit unsupported static
+Object.Equals(Object,Object). They are not fixed or silently admitted here. The case
+uses a meaningful Unmatched(String) fallback (yielding sequential managed union
+storage), and extracts payloads before comparing values. Standalone contract checks
+exercise that exact source and HTTP tests exercise match-based dispatch. Before an
+attribute mapper promises arbitrary route unions, validate scalar-only union
+admission independently. Keep any generic Raven fix separate from neoCLR policy.
+
+### Attributed route unions (development 2026-09-27)
+
+The [route mapper experiment](../route-union-mapper/README.md) consumes attributes
+on nested case types and constructor parameter names from CLI metadata. Raven's
+main fix `3179cd21e`, integrated on neoclr as `2f62361ef`, preserves and validates
+case attributes; constructors do not receive duplicates. The fix is independent
+of neoCLR and passed 16 attribute tests and 189 union tests on .NET 11. No claims
+are made for .NET Framework/NanoFramework execution. Runtime Contract settings and
+the existing semantic meaning of attributes are unchanged; previously omitted
+case attributes now appear in metadata and invalid usage produces diagnostics.
+
+ApplicationTypes now admits the bounded standard nongeneric union carrier with
+private Byte tag at offset zero, positive case slots and private Int32-only case
+fields. Empty cases may coexist. Imported execution uses logical fields, not raw
+CLR offset aliasing; references, other scalar types and arbitrary explicit-layout
+structs remain rejected. This target-specific admission policy stays in neoCLR.
+The focused metadata mutation checks and compiled copy/boxing/dispatch consumer
+are in the experiment. Nested constant patterns/static Object.Equals remain a
+separate limitation; samples extract payloads and compare normally.
+
+### Member and parameter attribute data (development 2026-09-27)
+
+[Attribute introspection](../../attribute-introspection.md) preserves directly
+applied user attributes from imported application modules on type/case, field,
+property, method/constructor and parameter metadata. Retained attributes identify
+an admitted constructor and exact String/Int32/Boolean constants. Unsupported
+constants and named arguments fail import. Nullable and Raven union-case/companion
+compiler annotations remain governed by their existing contracts; external framework
+attributes without runtime definitions are not silently advertised as available.
+
+Type/member/parameter discovery returns snapshots through MemberInfo and ParameterInfo.
+No constructor executes. Attribute classes use the existing Object foundation in the
+executable projection; this does not introduce System.Attribute instance APIs.
+The case-attribute compiler fix described above is reused; Runtime Contract settings
+are unchanged. No further Raven compiler modification is part of this slice.
+A reduced nullable-string attribute constructor currently throws in Raven emission's
+CustomAttributeBuilder, so null constants are validated at the native metadata level.
+
+Descriptors and ParameterInfo fragments are regenerated and checked. Other slices
+compile separate source groups; their output artifacts/provenance are reused while
+the shared source inventory hashes advance. The native runtime, source-library
+fragments, reference assembly and importer must be updated together.
+
+
+### Retained constructor execution (2026-09-27)
+
+The ConstructorReflectionExtensions.Invoke development API exposes exact public
+constructor execution for concrete nongeneric classes and value records. Descriptor
+indices resolve against their declaring owner after module linking. Reflection
+checks do not perform overload selection; argument and access checks still execute
+per call. Runtime Contract configuration is unchanged and no Raven compiler change
+is required. The matching bridge, library fragments and reference assembly must be
+used together.
+
+Application value constructors gain instance wrappers with original source member
+and parameter identity. Their existing helper executes against ordinary initialized
+local storage; wrappers copy completed fields through checked construction writes.
+This preserves ordinary application lowering and avoids passing construction
+capabilities to free-standing helpers. The wrapper retains constructor attributes;
+implementation helpers do not duplicate the source constructor metadata. Constructor
+faults propagate before publication. This entails a temporary value/copy and is not
+a performance claim. See [the executable consumer](../union-construction/README.md)
+and the [.NET comparison](../../reflection-members.md#retained-constructors-and-union-values-2026-09-27).
+
+Only the Descriptors implementation slice changes. Other snapshot manifests advance
+the shared ReflectionExtensions source hash while retaining their unaffected output
+hashes and compiler provenance. Constructor reflection does not add generic-owner,
+enum or private execution support, or widen TypeInfo.CreateInstance.
+
+
+### Cached runtime route mapper (2026-09-27)
+
+The [runtime mapper case](../runtime-route-mapper/README.md) composes retained
+attributes and constructors without a generation step. The matching reference
+adds RoutePattern.GetParameterNames/Overlaps, ConstructorInfo.Invoke accepting
+Sequence<Object?> and TypeInfo.IsVisible. Type-shape query 11 reports effective
+visibility, including imported enclosing-type visibility and compound type arguments.
+Runtime Contract configuration and Raven compiler emission are unchanged. Use matching
+bridge, reference, library and runner artifacts. HttpClient and Descriptors library
+slices were regenerated; other manifests only refresh their shared source hashes.

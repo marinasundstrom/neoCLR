@@ -1,0 +1,136 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+import System.Result.*
+import System.Runtime.Reflection.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+// Resolve the case and its carrier constructor once, then retain both descriptors.
+public class ItemRouteFactory {
+    private val caseConstructor: ConstructorInfo
+    private val unionConstructor: ConstructorInfo
+
+    private init(caseConstructor: ConstructorInfo, unionConstructor: ConstructorInfo) {
+        self.caseConstructor = caseConstructor
+        self.unionConstructor = unionConstructor
+    }
+
+    static func Prepare() -> Result<ItemRouteFactory, string> {
+        let routes = typeof(CatalogRoutes)
+        for candidate in routes.Module.GetTypes() {
+            if let Some(parent) = candidate.DeclaringType {
+                if parent.Equals(routes) {
+                    for attribute in candidate.GetCustomAttributesData() {
+                        if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
+                            let values = attribute.GetConstructorArguments()
+                            if values[0].Value is string pattern {
+                                if pattern == "/items/{id}" {
+                                    let constructors = candidate.GetConstructors()
+                                    if constructors.Count != 1 {
+                                        return Error("Expected one case constructor")
+                                    }
+                                    let parameters = constructors[0].GetParameters()
+                                    if parameters.Count != 1 || parameters[0].Name != "id" || !parameters[0].ParameterType.Equals(typeof(int)) {
+                                        return Error("Expected one Int32 payload")
+                                    }
+                                    for carrier in routes.GetConstructors() {
+                                        let payloads = carrier.GetParameters()
+                                        if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
+                                            return Ok(ItemRouteFactory(constructors[0], carrier))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return Error("Item route constructors missing")
+    }
+
+    func Create(id: int) -> Result<CatalogRoutes, ReflectionError> {
+        let payload = caseConstructor.Invoke(id)?
+        let route = unionConstructor.Invoke(payload)?
+        if route is CatalogRoutes value {
+            return Ok(value)
+        }
+        return Error(ReflectionError.InvalidResultType)
+    }
+}
+
+public class Product {
+    val Id: int
+    init(id: int) {
+        Id = id
+    }
+}
+
+public class Locked {
+    private init() { }
+}
+
+func Main() {
+    let factory = match ItemRouteFactory.Prepare() {
+        Ok(let value) => value
+        Error(let reason) => {
+            System.Fault(reason)
+        }
+    }
+    let Ok(CatalogRoutes.GetItem(first)) = factory.Create(42) else {
+        System.Fault("Could not construct item route")
+        return
+    }
+    let Ok(CatalogRoutes.GetItem(second)) = factory.Create(-7) else {
+        System.Fault("Could not reuse retained constructors")
+        return
+    }
+    Check(first == 42 && second == -7, "Independent union values")
+    let constructor = typeof(Product).GetConstructors()[0]
+    let Ok(value) = constructor.Invoke(19) else {
+        System.Fault("Reference constructor failed")
+        return
+    }
+    Check(((Product)value).Id == 19, "Reference construction")
+    Check(constructor.Invoke("19") is Error(ReflectionError.InvalidArguments), "Exact argument type")
+    Check(constructor.Invoke() is Error(ReflectionError.InvalidArguments), "Exact arity")
+    Check(constructor.Invoke(null) is Error(ReflectionError.InvalidArguments), "Null value rejected")
+    let denied = typeof(Locked).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0]
+    Check(denied.Invoke() is Error(ReflectionError.AccessDenied), "Private constructor rejected")
+    let caseConstructor = typeof(TextRoutes.Item).GetConstructors()[0]
+    let Ok(payload) = caseConstructor.Invoke("catalog", 23) else {
+        System.Fault("Mixed case constructor failed")
+        return
+    }
+    var found = false
+    for carrier in typeof(TextRoutes).GetConstructors() {
+        let parameters = carrier.GetParameters()
+        if parameters.Count == 1 && parameters[0].ParameterType.Equals(typeof(TextRoutes.Item)) {
+            let Ok(boxed) = carrier.Invoke(payload) else {
+                System.Fault("Mixed carrier constructor failed")
+                return
+            }
+            if boxed is TextRoutes route {
+                let TextRoutes.Item(name, id) = route else {
+                    System.Fault("Wrong mixed case")
+                    return
+                }
+                Check(name == "catalog" && id == 23, "Mixed payload retained")
+                found = true
+            }
+        }
+    }
+    Check(found, "Mixed carrier found")
+    let emptyConstructor = typeof(TextRoutes.Empty).GetConstructors()[0]
+    let Ok(empty) = emptyConstructor.Invoke() else {
+        System.Fault("Empty case construction failed")
+        return
+    }
+    Check(empty is TextRoutes.Empty, "Empty case boxed")
+    Console.WriteLine("Retained union constructor checks passed")
+}

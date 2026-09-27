@@ -407,3 +407,111 @@ The independent compiler reduction and general fix are recorded in the
 [prototype investigation](experiments/http-json-client-prototype/README.md).
 Reference-instantiated generic boxing now preserves Object identity; values retain
 copied boxing. See [runtime semantics](boxed-interface-values.md#generic-reference-boxing--2026-09-26).
+
+
+## Nested typed objects — development, 2026-09-27
+
+The author-selected Web API direction now extends the existing mapper with nested
+nongeneric reference properties. Reuse the System.Text.Json comparison in the
+[Web API plan](web-api-plan.md#comparison-alternatives-and-costs): typed recursion
+closes a neoCLR implementation gap while retaining its existing UTF-8 byte bounds,
+Result causes and explicit reflection behavior. This is a library change with no
+new public signatures, runtime mechanisms or compiler configuration.
+
+Reads use declared property types and public parameterless construction. A first
+pass validates the complete input tree before any model constructor or setter; a
+second pass constructs children and parents and assigns properties. Exact names,
+required writable properties, ignored unknown fields, String/Int32/Boolean leaves
+and null rejection remain unchanged. Construction/accessor side effects are not
+transactional; reflection failures retain their structured causes and user Faults
+remain terminal. The two passes add traversal and temporary-list allocation; no
+performance improvement is claimed. A retained mapping plan could avoid repeated
+work but would introduce additional lifetime/storage machinery before it is needed.
+
+Writes require a nested property's runtime type to equal its declared type. This
+avoids silently serializing a derived shape that the declared read type cannot
+reconstruct; it also excludes polymorphic DTO properties. Shared children are
+serialized repeatedly and read back as independent instances. Four object levels,
+including the root, are allowed; deeper graphs and cycles return LimitExceeded.
+Depth bounding reuses the existing DOM contract and avoids a reference-tracking
+protocol, but does not distinguish a cycle from an ordinary overly deep graph.
+Nulls, collections, Option, generic/value models, naming policies and configurable
+limits remain deferred. The existing 128-byte/32-value document limits still apply.
+Mapping and encoded-document validation finish before stream writes.
+
+The private traversal uses integer pass selection (0 validate, 1 construct) because
+the current bridge rejects Boolean argument conversion on multi-argument private
+calls. This local workaround does not weaken access or change Raven; a general
+bridge conversion improvement remains outside this serializer slice.
+
+The [focused consumer](experiments/json-object-mapping/Public.rvn) covers string,
+stream and HTTP-content round trips, nested invalid values without constructor or
+setter output, shared siblings, four/five levels, cycles, nulls, inaccessible nested
+constructors and unsupported shapes. The station-report case has an opt-in nested
+variant on the [HTTP case page](../website/content/cases/http-server/index.md); its independent
+peers and complete exchange are recorded with the implementation evidence.
+
+
+## Web API byte budget — development, 2026-09-27
+
+The next bounded increment raises complete JSON documents and number tokens from
+128 to 1,024 UTF-8 bytes, matching the existing buffered HTTP body limit. A station
+report with a nested sensor name and installation description now fits through
+string, borrowed stream and HTTP-content conversion. Preview 10 remains unchanged.
+The limit includes input whitespace, names, punctuation and escaped output; it is
+not a character count. Four container/object levels, 32 value occurrences and 31
+children per container remain unchanged. Typed collections and optional/null mapping
+are separate next decisions, not implicitly enabled by a larger document budget.
+
+The cap remains fixed to keep this increment within an already supported transport
+budget. Configurable larger budgets would require transport and runtime resource
+policy together. In .NET, [JsonSerializerOptions.DefaultBufferSize](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.defaultbuffersize)
+is a temporary-buffer setting (16,384 bytes by default), not a document-size cap;
+[MaxDepth](https://learn.microsoft.com/en-us/dotnet/api/system.text.json.jsonserializeroptions.maxdepth)
+defaults to an effective 64 levels. Sources reviewed 2026-09-27. neoCLR's fixed 1 KiB
+and four-level contract is deliberately narrower. The benefit is room for this
+concrete API report without conflicting JSON/HTTP byte caps; the cost is more
+whole-buffer storage and synchronous traversal. No performance advantage is claimed.
+
+String and buffered HTTP input reject more than 1,024 bytes with LimitExceeded.
+Borrowed stream input reads one extra byte to detect overflow and retains the
+existing Read(TextReadError.LimitExceeded) cause without rewinding or closing.
+Writers validate escaped output and the complete document before writing to a
+stream; I/O failures after that may still leave a prefix. Number tokens longer
+than 1,024 bytes retain InvalidNumber. HTTP transport overflow remains its existing
+error contract; this change does not introduce automatic HTTP 413 responses.
+
+[Payload validation](experiments/json-object-mapping/payload-validation.json) records
+focused DOM/stream and nested-model consumers plus independent HTTP peers. Tests
+exercise UTF-8 and escape expansion, long number spelling, the exact byte boundary,
+one byte over, borrowed ownership and untouched output on validation failure.
+
+
+## Typed arrays — development, 2026-09-27
+
+The collection slice maps vectors at the root and as properties, with String,
+Int32, Boolean, model or vector elements. Root scalar values use the same value
+mapper. Empty arrays and ordering are preserved; jagged arrays reuse recursive
+mapping. Objects and arrays both count toward four container levels. The existing
+1,024-byte, 32-value and 31-item bounds apply. Null, polymorphic elements, generic
+lists/interfaces, dictionaries and rectangular arrays remain unsupported here.
+Whole-input validation still precedes model constructors/setters, including when
+an invalid value occurs in a later array element.
+
+[System.Text.Json collection support](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/supported-types)
+(reviewed 2026-09-27) covers arrays and many generic/custom enumerable collections;
+its byte arrays have a special base64 mapping. neoCLR starts with exact typed
+vectors because it already has checked array storage and type descriptors, while
+general generic-class activation is outside its current reflection contract.
+This closes the concrete report-array use case at the cost of a narrower surface;
+byte arrays and arbitrary enumeration are not silently treated as supported JSON.
+
+Three private array services build small execution adapters using ordinary array,
+boxing and cast instructions. They do not write managed memory through a native
+shortcut; bounds/type checks, allocation limits, instruction budgets and GC roots
+remain interpreter-owned. JSON policy stays in the Raven mapper. The private
+ObjectMapper.Write bridge contract now returns JsonValue so the root can be an
+array or scalar; public JsonSerializer signatures are unchanged.
+
+See [focused collection validation](experiments/json-object-mapping/collection-validation.json)
+for runtime adapter, typed mapper and independent HTTP peer results.

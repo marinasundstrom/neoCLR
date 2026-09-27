@@ -6,6 +6,7 @@ import System.Option.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface MemberInfo {
+    func GetCustomAttributesData() -> Sequence<CustomAttributeData>
     val MetadataToken: int { get }
     val Module: ModuleInfo { get }
     val Name: string { get }
@@ -67,6 +68,10 @@ internal sealed class RuntimeMemberInfo {
         StoredName = name
         StoredDeclaringType = declaringType
         StoredMetadataToken = metadataToken
+    }
+
+    func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
+        return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, MetadataToken)
     }
 
     val MetadataToken: int => StoredMetadataToken
@@ -401,6 +406,7 @@ public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
     val IsUnion: bool { get }
     val IsEnum: bool { get }
     val IsValueType: bool { get }
+    val IsVisible: bool { get }
     func GetGenericArguments() -> Sequence<TypeInfo>
     func GetElementType() -> Option<TypeInfo>
 
@@ -420,6 +426,10 @@ public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
 }
 
 internal class RuntimeTypeInfo : TypeInfo {
+    func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
+        return RuntimeServices.MemberCustomAttributes(self, MetadataToken)
+    }
+
     private field Handle: RuntimeTypeHandle
 
     internal val ExecutionHandle: RuntimeTypeHandle => Handle
@@ -524,6 +534,7 @@ internal class RuntimeTypeInfo : TypeInfo {
     val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
+    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {
@@ -532,5 +543,43 @@ internal class RuntimeTypeInfo : TypeInfo {
 
     func GetElementType() -> Option<TypeInfo> {
         return RuntimeServices.TypeElementType(Handle)
+    }
+}
+
+public class CustomAttributeTypedArgument {
+    private var storedType: TypeInfo
+    private var storedValue: Object?
+
+    private init(type: TypeInfo, value: Object?) {
+        storedType = type
+        storedValue = value
+    }
+
+    val ArgumentType: TypeInfo => storedType
+    val Value: Object? => storedValue
+}
+
+public class CustomAttributeData {
+    private var storedType: TypeInfo
+    private var storedConstructor: ConstructorInfo
+    private var storedArguments: CustomAttributeTypedArgument[]
+
+    private init(type: TypeInfo, constructor: ConstructorInfo, arguments: CustomAttributeTypedArgument[]) {
+        storedType = type
+        storedConstructor = constructor
+        storedArguments = arguments
+    }
+
+    val AttributeType: TypeInfo => storedType
+    val Constructor: ConstructorInfo => storedConstructor
+
+    func GetConstructorArguments() -> Sequence<CustomAttributeTypedArgument> {
+        let result = CheckedStorage.Reserve<CustomAttributeTypedArgument>(storedArguments.Length)
+        var index = 0
+        while index < storedArguments.Length {
+            result[index] = storedArguments[index]
+            index += 1
+        }
+        return result
     }
 }

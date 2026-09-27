@@ -20,7 +20,13 @@ parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defa
 parser.add_argument('--case', choices=['all', 'server', 'pair', 'client'], default='all')
 parser.add_argument('--repeat', type=int, default=1, help='Repeat the selected peer checks serially after building once')
 parser.add_argument('--mapped', action='store_true', help='Use the provisional reflection-backed report variant')
+parser.add_argument('--nested', action='store_true', help='Use development nested station models (implies --mapped)')
+parser.add_argument('--routed', action='store_true', help='Use route matching and application-union dispatch (implies --nested)')
 args = parser.parse_args()
+if args.routed:
+    args.nested = True
+if args.nested:
+    args.mapped = True
 if args.repeat < 1:
     parser.error('--repeat must be at least 1')
 here = Path(__file__).resolve().parent
@@ -28,6 +34,13 @@ bundle = args.toolchain_root.resolve()
 runner = args.runner.resolve()
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
 report = {'station': 'Café'}
+if args.nested:
+    report = {'station': {
+        'name': 'Café',
+        'description': ('Indoor air-quality sensor near the café entrance. Reports are collected '
+                        'during opening hours to help staff check ventilation and keep the '
+                        'seating area comfortable.'),
+    }, 'readings': [21, 22]}
 reply = {'accepted': True}
 
 
@@ -58,8 +71,12 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             shutil.copyfile(here / filename, target / filename)
         if args.mapped:
             mapping = here.parent / 'json-object-mapping'
-            shutil.copyfile(mapping / 'HttpApplication.rvn', target / 'Application.rvn')
+            shutil.copyfile(mapping / ('NestedHttpApplication.rvn' if args.nested else 'HttpApplication.rvn'), target / 'Application.rvn')
             shutil.copyfile(mapping / ('Http' + name + '.rvn'), target / (name + '.rvn'))
+        if args.routed:
+            routing = here.parent / 'http-routing'
+            for filename in (name + '.rvn', name + '.rvnproj', 'Routes.rvn'):
+                shutil.copyfile(routing / filename, target / filename)
         apps[name] = build(target / (name + '.rvnproj'))
 
     def client(port):
@@ -110,6 +127,38 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             ('POST', '/reports', b'{"station":"Caf\\u00e9","extra":true}', 201, reply),
             ('GET', '/missing', None, 404, {'error': 'Not found'}),
         ]
+        if args.nested:
+            cases[9] = ('POST', '/reports', b'{"station":{"name":"","description":""},"readings":[]}', 201, reply)
+            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true,"description":""},"readings":[]}', 201, reply)
+            cases += [
+                ('POST', '/reports', b'{"station":{}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":12}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":null}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":"x","description":""},"readings":[1,"2"]}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":"x","description":""},"readings":null}', 400, {'error': 'Invalid report'}),
+            ]
+            for size in (1023, 1024):
+                boundary = {'station': {'name': 'Café', 'description': ''}, 'readings': []}
+                base = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
+                boundary['station']['description'] = 'a' * (size - len(base))
+                payload = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
+                assert len(payload) == size
+                cases.append(('POST', '/reports', payload, 201, reply))
+        if args.routed:
+            cases = [(m, '/stations/42/reports' if p in ('/report', '/reports') else p, b, status, expected)
+                     for m, p, b, status, expected in cases]
+            cases += [
+                ('GET', '/stations/42/reports?limit=2', None, 200, report),
+                ('GET', '/stations/%34%32/reports', None, 200, report),
+                ('GET', '/stations/no/reports', None, 400, {'error': 'Invalid route parameter'}),
+                ('GET', '/stations/2147483648/reports', None, 400, {'error': 'Invalid route parameter'}),
+                ('GET', '/stations/%2F/reports', None, 400, {'error': 'Invalid route parameter'}),
+                ('GET', '/stations/7/reports', None, 404, {'error': 'Unknown station'}),
+                ('GET', '/stations/42/reports/', None, 404, {'error': 'Not found'}),
+                ('GET', '/Stations/42/reports', None, 404, {'error': 'Not found'}),
+                ('GET', '/stations//reports', None, 404, {'error': 'Not found'}),
+                ('PUT', '/stations/42/reports', None, 404, {'error': 'Not found'}),
+            ]
         for method, path, payload, status, expected in cases:
             print(f'Peer case: {method} {path} -> {status}', flush=True)
             request = Request(f'http://127.0.0.1:{port}{path}', data=payload, method=method, headers={'Content-Type': 'application/json; charset=utf-8'})
@@ -127,7 +176,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     class Peer(BaseHTTPRequestHandler):
         protocol_version = 'HTTP/1.1'
         def do_GET(self):
-            assert self.path == '/report', self.path
+            assert self.path == ('/stations/42/reports' if args.routed else '/report'), self.path
             payload = json.dumps(report, ensure_ascii=False).encode()
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -135,7 +184,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             self.end_headers()
             self.wfile.write(payload)
         def do_POST(self):
-            assert self.path == '/reports', self.path
+            assert self.path == ('/stations/42/reports' if args.routed else '/reports'), self.path
             assert self.headers['Content-Type'] == 'application/json; charset=utf-8'
             assert json.loads(self.rfile.read(int(self.headers['Content-Length']))) == report
             payload = json.dumps(reply, ensure_ascii=False).encode()
@@ -150,7 +199,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     for iteration in range(1, args.repeat + 1):
         print(f'Iteration {iteration}/{args.repeat}: {args.case}', flush=True)
         if args.case in ('all', 'server'):
-            serve(independent, 12)
+            serve(independent, 29 if args.routed else 19 if args.nested else 12)
         if args.case in ('all', 'pair'):
             serve(client, 2 if args.mapped else 1)
         if args.case in ('all', 'client'):

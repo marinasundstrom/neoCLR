@@ -45,6 +45,7 @@ mod reachability;
 mod references;
 mod reflection;
 mod reflection_execution;
+mod reflection_arrays;
 mod reflection_properties;
 mod reflection_members;
 mod string_case_folding;

@@ -171,6 +171,7 @@ SLICES = {
     'Boolean': 'System.Boolean',
 }
 SOURCES = {
+    "Routes": "runtime/raven/src/System/Web/Http/Routes.rvn",
     'GC': 'runtime/raven/src/System/Runtime/GC.rvn',
     'DateTime': 'runtime/raven/src/System/DateTime.rvn',
     'ZonedDateTime': 'runtime/raven/src/System/ZonedDateTime.rvn',
@@ -391,7 +392,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         assert match, lines[0]
         end = lines.index('.end\n')
         body = ''.join(lines[:end + 1])
-        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or ('<' not in match[1] and name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.', 'System.Runtime.Reflection.MethodReflectionExtensions.', 'System.Runtime.Reflection.FieldReflectionExtensions.'))):
+        if (name == 'Tasks' and match[1].startswith(('System.Tasks.TaskOperators.', 'System.Tasks.TaskResultOperators.'))) or ('<' not in match[1] and name == 'Descriptors' and match[1].startswith(('System.Runtime.Reflection.TypeReflectionExtensions.', 'System.Runtime.Reflection.PropertyReflectionExtensions.', 'System.Runtime.Reflection.ConstructorReflectionExtensions.', 'System.Runtime.Reflection.MethodReflectionExtensions.', 'System.Runtime.Reflection.FieldReflectionExtensions.'))):
             operator_owner = match[1].rsplit('.', 1)[0]
             extension_owners.setdefault(operator_owner, []).append(body.replace('.function ' + operator_owner + '.', '.method static ', 1))
         elif match[1].startswith(owner + '.'):

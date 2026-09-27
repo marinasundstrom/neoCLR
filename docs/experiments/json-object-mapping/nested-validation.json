@@ -1,0 +1,108 @@
+{
+  "date": "2026-09-27",
+  "scope": "Bounded nested reference-object JSON mapping; station-report client/server case",
+  "host": "macOS arm64",
+  "commands": [
+    "python3 docs/experiments/json-object-mapping/verify.py --public --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+    "python3 docs/experiments/http-json/verify.py --nested --case all --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async",
+    "python3 docs/experiments/http-client/verify.py --overview --case 'fragmented UTF-8' --toolchain-root target/experiments/nested-json/bundle --runner target/release/examples/measure_async"
+  ],
+  "publicConsumer": {
+    "allocated": 6295,
+    "live": 0,
+    "peak": 239,
+    "collections": 96,
+    "reclaimed": 6295
+  },
+  "httpServerCases": 15,
+  "httpRunsInOrder": [
+    {
+      "peer": "server",
+      "assembly_ms": 3307,
+      "load_ms": 2457,
+      "verify_ms": 815,
+      "run_ms": 13084,
+      "allocated": 5339,
+      "live": 0,
+      "peak": 210,
+      "collections": 72,
+      "reclaimed": 5339
+    },
+    {
+      "peer": "client",
+      "assembly_ms": 2035,
+      "load_ms": 1122,
+      "verify_ms": 506,
+      "run_ms": 3059,
+      "allocated": 971,
+      "live": 0,
+      "peak": 170,
+      "collections": 16,
+      "reclaimed": 971
+    },
+    {
+      "peer": "server",
+      "assembly_ms": 1953,
+      "load_ms": 1281,
+      "verify_ms": 524,
+      "run_ms": 6222,
+      "allocated": 799,
+      "live": 0,
+      "peak": 207,
+      "collections": 13,
+      "reclaimed": 799
+    },
+    {
+      "peer": "client",
+      "assembly_ms": 1837,
+      "load_ms": 1136,
+      "verify_ms": 544,
+      "run_ms": 2079,
+      "allocated": 999,
+      "live": 0,
+      "peak": 224,
+      "collections": 16,
+      "reclaimed": 999
+    }
+  ],
+  "limits": [
+    "128 UTF-8 bytes",
+    "four object levels including root",
+    "32 JSON values",
+    "nulls, collections and polymorphic property values rejected"
+  ],
+  "sha256": {
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "6ac651bfe446794adedfb05daa67764e57fbfee1a7385278733dedad69929f7f",
+    "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "ebaccb04cf34b97375b8884cfffad08a16f3d035834437e8de6515cd1bb5a828",
+    "docs/experiments/json-object-mapping/Public.rvn": "634120bedadd3fc9049465b89586b014eb6ed6c387aae15731d5a204f9b8c5bd",
+    "docs/experiments/json-object-mapping/NestedHttpApplication.rvn": "1d100dc2a210daa0cb56ff7ee8b4aacde11705d048f47264f61b07ed99d86464",
+    "docs/experiments/http-json/verify.py": "76eab377ccc57152bc465664f5134f7f3d3ba245ada295ce0bb0c0551639a3bb",
+    "target/release/examples/measure_async": "3f471dd0bef4a1898da1e17161ace3ff1c397b37d218a68f78274027fd3e8953",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "be6444e929cf4c724a247a58c8ac33fa1f2c9f2854055c98571fa975ddb1dc12",
+    "target/experiments/nested-json/bundle/demo/NeoCLR.CoreProbe.dll": "d06667f31384a1355a70a81a5887462af061461f25e05af2127154d8d2e48dde",
+    "target/experiments/nested-json/bundle/lib/System.neoil": "4113889a2c24a501b590bea422f947463f4debfb8ec226d20068bd71641b5a6c",
+    "docs/experiments/http-client/Overview.rvn": "a554bf8eb567a93d8c4e9b6da494fe01091e855e22af074c7e8acc472f78ef32",
+    "docs/experiments/http-client/verify.py": "8b250d2fd233b8710d8fe4d4172783931792bdb4c464bdc5463e2a370712b907"
+  },
+  "generalClientOverview": {
+    "case": "fragmented UTF-8",
+    "assembly_ms": 3646,
+    "load_ms": 2221,
+    "verify_ms": 1080,
+    "run_ms": 1390,
+    "allocated": 380,
+    "live": 0,
+    "peak": 142,
+    "collections": 7,
+    "reclaimed": 380
+  },
+  "tooling": "Bridge rebuilt from current repository sources; reference inventory retains existing GC and Reflection APIs. No Raven source changes.",
+  "documentation": {
+    "websitePagesChecked": 1255,
+    "websiteTestsPassed": 18,
+    "apiSnapshot": "passed; existing public type inventory preserved",
+    "librarySnapshot": "passed",
+    "downloads": "rendered sample order and source identity checked",
+    "visualReview": "HTTP guide and dedicated case inspected in the local browser"
+  }
+}

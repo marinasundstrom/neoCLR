@@ -1,0 +1,37 @@
+import System.*
+import System.Collections.*
+import System.Concurrency.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+class GreetingClient {
+    async func Read(
+        baseUri: string,
+        cancellationToken: CancellationToken
+    ) -> Task<Result<string, HttpError>> {
+        let client = HttpClient()
+        client.BaseUri = Some(baseUri)
+
+        let headers = ArrayList<HttpHeader>()
+        headers.Add(HttpHeader("Accept", "text/plain"))
+        client.DefaultRequestHeaders = headers
+
+        // GetString requires a successful status and decodes the body as UTF-8.
+        return await client.GetString("greeting", cancellationToken)
+    }
+}
+
+func Main() {
+    // The verifier substitutes the local peer's port.
+    let fetching = GreetingClient().Read("http://localhost:19091/", CancellationToken.None)
+    fetching.OnCompleted(() => {
+        if let Ok(text) = fetching.GetResult() {
+            Console.WriteLine("HTTP 200")
+            Console.WriteLine(text)
+        } else if let Error(error) = fetching.GetResult() {
+            Console.WriteLine("HTTP error: " + error.ToString())
+        }
+    })
+}
