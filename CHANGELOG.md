@@ -50,18 +50,17 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a paired String/Text API sketch and focused executable construction, extraction
   and decoding consumer. Preserve snapshots and explicit ordinal search semantics;
   naming remains provisional and the accumulator makes no performance claim.
-- Decode StreamReader.ReadToEnd incrementally with a private bounded UTF-8 helper.
-  Preserve byte limits, BOM, repeated EOF and input ownership; ReadLine is unchanged.
-  Malformed input can now fail before EOF, changing error ordering and cursor
-  advancement from Preview 10; failures still return no partial text or rollback.
-  Refresh reader implementation/API evidence and document a later text-oriented
-  Encoder abstraction without adopting .NET's UTF-16 char-buffer surface. Record
-  author-required reader/writer encoding selection with UTF-8 as default as the next
-  foundation contract; selectable encodings are not implemented by this slice.
-  Add a passing application-only shared encoding selection probe with author-selected
-  UTF-8 and strict ASCII, isolated decoder state and reader/writer consumers. Track
-  public integration gaps and future HTTP reuse; production constructors remain
-  UTF-8-only and no fixed encoding enum is introduced.
+- Add development Encoding/Decoder contracts, Encodings.Utf8/Ascii and a standard
+  Raven EncodingError union. StreamReader and StreamWriter accept selected encodings
+  with UTF-8 defaults and leaveOpen overloads. Decode incrementally with owned carry;
+  delimit lines after decoding and reject unrepresentable ASCII before output.
+  Preserve partial transfers and typed stream errors; add InvalidEncoding cases.
+  Malformed UTF-8 can fail before EOF, changing error ordering/cursor advancement
+  from Preview 10. Limits distinguish source bytes, text UTF-8 bytes and encoded
+  output; errors do not roll back streams. Refresh public metadata, library/API
+  snapshots, feature pages and focused consumer evidence, including custom codecs,
+  split input and the maximum reader bound. Stateful Encoder and future HTTP
+  integration remain planned; no text rename, replacement fallback or new HTTP scope.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

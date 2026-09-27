@@ -8105,3 +8105,22 @@ configuration/content, not target-specific code added to Raven main.
   and HTTP dependency in existing trackers without reopening HTTP POC scope.
 - **Evidence:** [selection source and results](experiments/text-boundaries/README.md#shared-encoding-selection-application-contract-probe).
   No full suite, website build, runtime/compiler changes or performance claims.
+
+### 2026-09-27 — Shared encoding contract reaches the library
+
+- **Author:** directed continuation after choosing UTF-8 and strict ASCII, and
+  emphasized that encoding is foundational infrastructure for HTTP and other APIs.
+- **Assistant action:** promoted the tested roles to Encoding, Decoder, Encodings
+  and a standard Raven EncodingError union. Added selected reader/writer constructors
+  alongside UTF-8 defaults, independent decoder ownership, decoded line boundaries,
+  strict ASCII rejection before output and preserved leaveOpen/partial transfers.
+- **Outcome:** focused library consumers pass for the built-ins and a deliberately
+  expanding application codec; reader regression checks include split scalars and
+  the 65536-byte bound. Public reference and implementation snapshots are refreshed.
+  This is development work after Preview 10, not a newly published release.
+- **Tradeoffs/open work:** owned text results and whole-value byte snapshots keep
+  lifetimes clear but allocate. Source quotas and UTF-8 text quotas remain distinct;
+  broader codecs need further quota design. Stateful Encoder, minimal construction
+  and HTTP charset policy remain separate follow-ups. No String/Text rename or
+  widening of the HTTP POC. See [contract](design/text-abstraction.md#shared-encoding-apis-development)
+  and [focused evidence](experiments/text-boundaries/encoding-validation.json).

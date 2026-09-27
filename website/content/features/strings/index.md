@@ -53,14 +53,15 @@ The downloadable source and expected output are the same files used by the saved
 
 ## Planned work and open questions
 
-This is an evolving preview API. We are considering more efficient iteration, text positions for slicing, normalization and language-sensitive comparison. A dedicated scalar value type may replace uint in the explicit scalar view. Other encodings would be conversions at the boundary, leaving the meaning of String and Char unchanged. Possible future Utf8String and AsciiString types could offer encoding-specific operations and guarantees alongside the default text container. Those types and an Encoding hierarchy remain deferred.
+This is an evolving preview API. We are considering more efficient iteration, text positions for slicing, normalization and language-sensitive comparison. A dedicated scalar value type may replace uint in the explicit scalar view. Encoding conversion happens at boundaries, leaving the meaning of String and Char unchanged. Possible future Utf8String and AsciiString types could offer encoding-specific operations and guarantees alongside the default text container. Those additional string types remain deferred; the development conversion interfaces are described below.
 
 Unlike .NET’s UTF-16 Char, neoCLR’s Char can contain multiple Unicode scalars. Numeric character casts and fixed-size character memory assumptions must change. Compiler literal diagnostics currently follow the host Unicode rules; the runtime validates the pinned target rules. CLI constant fields are outside the tested character surface.
 
 .NET offers configurable UTF-8 decoding, including a strict mode. This implementation starts with a strict Result and Sequence-based byte access. Whether those are the right long-term contracts is open for feedback.
 
-Text readers handle strict UTF-8 at stream boundaries; the [HTTP and JSON guide](../web/)
-describes bounded document conversion. A general public incremental Encoding API remains open.
+Text readers default to strict UTF-8 and support selected encodings in development;
+the [HTTP and JSON guide](../web/) describes the existing bounded document conversion.
+Future HTTP charset handling can reuse the encoding foundation.
 
 [Implementation details, tests and design comparisons →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/raven-string-api.md)
 
@@ -226,4 +227,14 @@ The [text foundation review](https://github.com/marinasundstrom/neoCLR/blob/main
 uses Swift as the closer model for character-facing text APIs, with explicit scalar
 and encoding views. The immediate direction is encoding/decoding foundations and
 possibly a small builder for later APIs, not System.Text parity. Boundary types
-remain experimental; these plans do not change current equality, indexing or APIs.
+remain experimental; these plans do not change current equality or indexing.
+
+## Encoding foundations (development)
+
+[Encoding](xref:System.Text.Encoding) converts valid text into bytes and creates
+independent [Decoder](xref:System.Text.Decoder) instances. [Encodings](xref:System.Text.Encodings)
+provides UTF-8 and strict ASCII. ASCII rejects unrepresentable text and bytes above
+127; it never silently substitutes characters. StreamReader/StreamWriter accept
+these policies while keeping UTF-8 defaults. See [encoding contracts](../../docs/streams.html#selected-encodings-development)
+for ownership, bounds and errors. Stateful encoding and a small builder remain
+possible next steps; these additions are not part of Preview 10.

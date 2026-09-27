@@ -11,6 +11,7 @@ public union StreamError {
     case LimitExceeded
     case WrongAccess
     case IoFailure
+    case InvalidEncoding
 
     override func ToString() -> string {
         return match self {
@@ -23,6 +24,7 @@ public union StreamError {
             InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
             WrongAccess => "WrongAccess"
+            InvalidEncoding => "InvalidEncoding"
             IoFailure => "IoFailure"
             _ => "Empty"
         }

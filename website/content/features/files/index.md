@@ -56,6 +56,14 @@ helpers. Console exposes the same text and byte interfaces through standard stre
 
 <a id="limits"></a>
 
+## Selected text encodings (development)
+
+StreamReader and StreamWriter accept an [Encoding](xref:System.Text.Encoding), with
+UTF-8 as the default. `Encodings.Ascii` selects strict ASCII. Both adapters retain
+the leaveOpen option. Lines are recognized after decoding; unsupported ASCII output
+fails before writing. See [selected encoding contracts](../../docs/streams.html#selected-encodings-development).
+Use matching development artifacts; Preview 10 does not include these overloads.
+
 ## Behavior and limits
 
 Compared with .NET Stream capability flags, separate interfaces express readable,

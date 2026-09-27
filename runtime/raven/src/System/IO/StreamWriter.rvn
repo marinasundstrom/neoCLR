@@ -6,17 +6,32 @@ import System.Text.*
 import System.Runtime.CompilerServices.*
 
 public class StreamWriter : TextWriter {
-    private field output: OutputStream
-    private field leaveOpen: bool
-    private field closed: bool = false
+    private var output: OutputStream
+    private var leaveOpen: bool
+    private var encoding: Encoding
+    private var closed: bool = false
 
     init(output: OutputStream) {
         self.output = output
+        encoding = Encodings.Utf8
         leaveOpen = false
     }
 
     init(output: OutputStream, leaveOpen: bool) {
         self.output = output
+        encoding = Encodings.Utf8
+        self.leaveOpen = leaveOpen
+    }
+
+    init(output: OutputStream, encoding: Encoding) {
+        self.output = output
+        self.encoding = encoding
+        leaveOpen = false
+    }
+
+    init(output: OutputStream, encoding: Encoding, leaveOpen: bool) {
+        self.output = output
+        self.encoding = encoding
         self.leaveOpen = leaveOpen
     }
 
@@ -27,7 +42,14 @@ public class StreamWriter : TextWriter {
         if text.GetUtf8ByteCount() > 65536 {
             return Error(StreamError.LimitExceeded())
         }
-        let bytes = Utf8.Encode(text)
+        let bytes = match encoding.Encode(text) {
+            Ok(let value) => value
+            Error(EncodingError.LimitExceeded) => return Error(StreamError.LimitExceeded)
+            Error(_) => return Error(StreamError.InvalidEncoding)
+        }
+        if bytes.Count > 65536 {
+            return Error(StreamError.LimitExceeded)
+        }
         let buffer = CheckedStorage.Reserve<byte>(bytes.Count)
         var index = 0
         while index < bytes.Count {

@@ -122,13 +122,14 @@ disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
 [StreamReader](xref:System.IO.StreamReader) reads strict UTF-8 from an InputStream.
 It works with host files and the sample's partial-read memory input. The POC exposes
 ReadToEnd(maxUtf8Bytes), ReadLine(maxUtf8Bytes) and Close. The [Console guide](console.md)
-describes line reading. Current constructors use UTF-8 only. Selectable reader/writer
-encodings with UTF-8 as default are the intended next foundation contract, not yet
-implemented. Async work remains separate. A BOM is preserved as text, rather than
+describes line reading. Development constructors also accept [Encoding](xref:System.Text.Encoding):
+`StreamReader(input, Encodings.Ascii)` and `StreamWriter(output, Encodings.Ascii)`,
+optionally followed by `leaveOpen`. Existing constructors select UTF-8. Async work
+remains separate. A BOM is preserved as text, rather than
 detecting other encodings.
 
-Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading; zero accepts
-only EOF. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
+Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading. A zero bound
+accepts only EOF for ReadToEnd; ReadLine also accepts an empty terminated line. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
 distinct TextReadError; input error distinctions are preserved as named cases.
 Errors do not roll back the cursor. Repeated reads at EOF produce an empty string.
 In development after Preview 10, ReadToEnd decodes bounded UTF-8 chunks, retaining
@@ -142,7 +143,8 @@ partial text is returned. A size-limit failure takes precedence over decoding th
 read that exceeded the limit; stream errors encountered earlier remain stream errors.
 This changes how far failing reads can advance and which error is observed first
 compared with Preview 10's decode-at-EOF implementation. A final incomplete sequence
-returns InvalidUtf8. There is no new public Encoder or Decoder type in this slice.
+returns InvalidUtf8. The development [Decoder](xref:System.Text.Decoder) interface exposes incremental
+conversion. A stateful Encoder remains future work.
 
 StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
 closed. Close is idempotent, and reads after closing return Closed. Construction
@@ -176,5 +178,51 @@ It exercises real await and GC, but does not introduce asynchronous stream metho
 ## Console and text output
 
 TextReader/StreamReader now also support bounded ReadLine. TextWriter/StreamWriter
-provide UTF-8 output over any OutputStream. See the [Console guide](console.md) for
+provide UTF-8 output by default, or the explicitly selected encoding, over any OutputStream. See the [Console guide](console.md) for
 the standard channels, line endings, byte bounds and manual Flush reference.
+
+## Selected encodings (development)
+
+`System.Text.Encoding` is the reusable conversion policy: `Encode(string)` returns
+`Result<Sequence<byte>, EncodingError>` and `CreateDecoder()` creates independent
+state. `Encodings.Utf8` and `Encodings.Ascii` supply the first implementations.
+`Decoder.Decode(byte[], offset, count, final)` returns valid text. Success accepts
+all offered bytes; an incomplete UTF-8 scalar is copied into decoder-owned carry
+and may produce empty text. The caller may immediately reuse its array. Invalid
+ranges and counts above 65536 fail before mutation and can be retried. Malformed
+input or finalization ends the decoder; later calls return Finished. Built-ins
+never replace invalid/unrepresentable content. UTF-8 preserves U+FEFF; no codec
+sniffing, BOM insertion or automatic BOM removal occurs.
+
+`StreamReader(input, encoding[, leaveOpen])` and
+`StreamWriter(output, encoding[, leaveOpen])` select this shared interface. Existing
+constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding itself
+can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
+suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
+WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
+conversion and byte snapshotting finish before output callbacks. Partial writes
+are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
+retain InvalidUtf8. Stream failures retain their existing cases.
+
+`maxUtf8Bytes` remains the returned text's UTF-8 size, with a separate source-read
+ceiling of the same number (plus one overflow byte for ReadToEnd, or up to two line
+terminator bytes for ReadLine). These measures coincide for valid built-in input;
+custom codecs must respect both. Future expanding/stateful codecs need explicit
+source/output quota design. Errors return no partial text and may advance input.
+Writer input and encoded output are each limited to 65536 bytes; WriteLine includes
+LF in both limits. Runtime allocation/instruction budgets still apply, so the API
+ceiling is not an allocation guarantee. Conversion does not add async behavior.
+
+Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but the
+conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
+This avoids exposing storage units through character APIs, at the cost of owned
+result allocations and no destination-capacity/progress API. Strict ASCII avoids
+silent replacement at the cost of handling conversion failures. This is whole-value
+encoding plus incremental decoding; a stateful **Encoder** remains future work.
+Flush forwards stream flushing; it does not finalize an encoder. HTTP can reuse the
+conversion policy later, but charset selection, protocol validation and framing
+remain HTTP concerns. This work does not reopen the completed HTTP POC.
+
+Focused consumers: [EncodingMain.rvn](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/EncodingMain.rvn)
+and [verification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/verify_encoding.py), plus the
+existing reader regression fixtures. No website build or full suite is required.

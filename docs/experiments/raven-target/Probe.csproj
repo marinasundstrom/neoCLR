@@ -19,6 +19,7 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/Networking/DnsError.rvn" LogicalName="NeoCLR.DnsError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/UriError.rvn" LogicalName="NeoCLR.UriError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/StorageLookupError.rvn" LogicalName="NeoCLR.StorageLookupError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Text/EncodingError.rvn" LogicalName="NeoCLR.EncodingError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/IO/TextReadError.rvn" LogicalName="NeoCLR.TextReadError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/IO/StreamError.rvn" LogicalName="NeoCLR.StreamError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Storage/FileReadError.rvn" LogicalName="NeoCLR.FileReadError.rvn" />

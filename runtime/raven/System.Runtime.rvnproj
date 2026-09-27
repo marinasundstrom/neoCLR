@@ -394,4 +394,16 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparer'">
     <Compile Include="src/System/StringComparer.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoding'">
+    <Compile Include="src/System/Text/Encoding.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Decoder'">
+    <Compile Include="src/System/Text/Decoder.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncodingError'">
+    <Compile Include="src/System/Text/EncodingError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encodings'">
+    <Compile Include="src/System/Text/Encodings.rvn" />
+  </ItemGroup>
 </Project>

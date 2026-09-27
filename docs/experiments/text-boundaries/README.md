@@ -165,3 +165,12 @@ write occurs for unrepresentable text. The prototype owns its stream and has no
 ReadLine or leaveOpen overload yet. A stateful Encoder, public reference projection
 and actual production stream constructor integration remain outstanding. Tests do
 not claim to establish performance or arbitrary expanding-codec quota semantics.
+
+## Public encoding integration
+
+`EncodingMain.rvn` exercises the actual System.Text encoding interfaces and selected
+stream constructors. Run `verify_encoding.py` with matching `--runtime`, `--bridge`,
+`--system` and `--reference` paths. It covers independent carry ownership, strict
+UTF-8/ASCII, lifecycle, line reading, partial writes, byte counts and leaveOpen.
+`verify.py --reader-only` retains the existing chunk/boundary/maximum reader checks.
+The Selection prototype remains application-only; the public test does not compile it.

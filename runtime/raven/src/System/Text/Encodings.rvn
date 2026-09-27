@@ -1,0 +1,137 @@
+namespace System.Text
+
+import System.*
+import System.Collections.*
+import System.Result.*
+
+public static class Encodings {
+    static val Utf8: Encoding => Utf8Encoding()
+    static val Ascii: Encoding => AsciiEncoding()
+}
+
+internal class Utf8Encoding : Encoding {
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        if text.GetUtf8ByteCount() > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        return Ok(Utf8.Encode(text))
+    }
+    func CreateDecoder() -> Decoder {
+        return Utf8Decoder()
+    }
+}
+
+internal class AsciiEncoding : Encoding {
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        if text.GetUtf8ByteCount() > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        let bytes = Utf8.Encode(text)
+        for value in bytes {
+            if value > 127 {
+                return Error(EncodingError.UnrepresentableText)
+            }
+        }
+        return Ok(bytes)
+    }
+    func CreateDecoder() -> Decoder {
+        return AsciiDecoder()
+    }
+}
+
+internal class Utf8Decoder : Decoder {
+    private var carry: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+    private var pending: int = 0
+    private var width: int = 0
+    private var stopped: bool = false
+
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+        if stopped {
+            return Error(EncodingError.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
+            return Error(EncodingError.InvalidRange)
+        }
+        if count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        let output = ArrayList<byte>(count + 3)
+        var index = 0
+        while index < count {
+            let value = source[offset + index]
+            if pending == 0 {
+                if value <= 127 {
+                    width = 1
+                } else if value >= 194 && value <= 223 {
+                    width = 2
+                } else if value >= 224 && value <= 239 {
+                    width = 3
+                } else if value >= 240 && value <= 244 {
+                    width = 4
+                } else {
+                    stopped = true
+                    return Error(EncodingError.InvalidUtf8)
+                }
+            } else if !(value >= 128 && value <= 191) {
+                stopped = true
+                return Error(EncodingError.InvalidUtf8)
+            }
+            carry[pending] = value
+            pending += 1
+            index += 1
+            if pending == width {
+                for slot in 0..<width {
+                    output.Add(carry[slot])
+                }
+                pending = 0
+            }
+        }
+        if final {
+            stopped = true
+            if pending != 0 {
+                return Error(EncodingError.InvalidUtf8)
+            }
+        }
+        return match Utf8.Decode(output) {
+            Ok(let text) => Ok(text)
+            Error(_) => {
+                stopped = true
+                Error(EncodingError.InvalidUtf8)
+            }
+        }
+    }
+}
+
+internal class AsciiDecoder : Decoder {
+    private var stopped: bool = false
+
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+        if stopped {
+            return Error(EncodingError.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset {
+            return Error(EncodingError.InvalidRange)
+        }
+        if count > 65536 {
+            return Error(EncodingError.LimitExceeded)
+        }
+        let bytes = ArrayList<byte>(count)
+        var index = 0
+        while index < count {
+            let value = source[offset + index]
+            if value > 127 {
+                stopped = true
+                return Error(EncodingError.InvalidData)
+            }
+            bytes.Add(value)
+            index += 1
+        }
+        if final {
+            stopped = true
+        }
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => Ok(text)
+            Error(_) => Error(EncodingError.InvalidData)
+        }
+    }
+}

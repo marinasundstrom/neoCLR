@@ -16,6 +16,7 @@ parser.add_argument('--baseline-system', type=Path, help='Optional prior library
 selection = parser.add_mutually_exclusive_group()
 selection.add_argument('--consumer-only', action='store_true')
 selection.add_argument('--reader-only', action='store_true')
+selection.add_argument('--selection-only', action='store_true')
 args = parser.parse_args()
 if args.reader_only and not args.runner:
     parser.error("--reader-only requires a matching --runner for the larger fixtures")
@@ -42,7 +43,7 @@ def run(command, allowed_fault=None):
 
 with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
     work = Path(directory)
-    for name in ('Main.rvn', 'Boundaries.rvn', 'Decoder.rvn', 'Consumer.rvn', 'Reader.rvn', 'ReaderMain.rvn', 'Boundaries.rvnproj'):
+    for name in ('Main.rvn', 'Boundaries.rvn', 'Decoder.rvn', 'Consumer.rvn', 'Reader.rvn', 'ReaderMain.rvn', 'Selection.rvn', 'SelectionMain.rvn', 'Boundaries.rvnproj'):
         shutil.copyfile(root / name, work / name)
     if args.reader_only:
         project = work / 'Boundaries.rvnproj'
@@ -51,6 +52,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
             text = text.replace(f'    <Compile Include="{name}" />\n', '')
         text = text.replace('<ItemGroup>', '<ItemGroup>\n    <Compile Include="ReaderMain.rvn" />\n    <Compile Include="Reader.rvn" />', 1)
         project.write_text(text)
+    if args.selection_only:
+        project = work / 'Boundaries.rvnproj'
+        text = project.read_text()
+        for name in ('Main.rvn', 'Boundaries.rvn', 'Decoder.rvn', 'Consumer.rvn'):
+            text = text.replace(f'    <Compile Include="{name}" />\n', '')
+        text = text.replace('<ItemGroup>', '<ItemGroup>\n    <Compile Include="SelectionMain.rvn" />\n    <Compile Include="Selection.rvn" />', 1)
+        project.write_text(text)
     shutil.copyfile(artifacts['reference'], work / 'NeoCLR.CoreProbe.dll')
     run(['dotnet', artifacts['bridge'], '--project', work / 'Boundaries.rvnproj', work / 'out'])
     app = work / 'out' / 'App.neoil'
@@ -58,7 +66,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
     run([artifacts['runtime'], 'verify', *common])
     results = {}
     runs = [('consumer', ['consumer'])]
-    if args.reader_only:
+    if args.selection_only:
+        runs = [('selection-read', ['selection-read']), ('selection-write', ['selection-write'])]
+    elif args.reader_only:
         runs = [('reader', ['reader']), ('reader-boundary', ['reader-boundary']), ('reader-limit', ['reader-limit'])]
     elif not args.consumer_only:
         runs += [('contracts', []), ('splits-0-6', ['first']), ('splits-7-13', ['last'])]
@@ -83,6 +93,10 @@ with tempfile.TemporaryDirectory(prefix='neoclr-text-boundaries-') as directory:
             expected = ('Incremental StreamReader carry/output boundary passed',)
         if label == 'reader-limit':
             expected = ('Incremental StreamReader maximum bound passed',)
+        if label == 'selection-read':
+            expected = ('Encoding selection reader and independent decoder checks passed',)
+        if label == 'selection-write':
+            expected = ('Encoding selection writer and strict rejection checks passed',)
         if any(marker not in output for marker in expected):
             raise SystemExit(f'Missing success marker in {label}')
         results[label] = list(expected)

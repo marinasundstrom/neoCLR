@@ -86,6 +86,10 @@ SLICES = {
     'Void': 'System.Void',
 
     'String': 'System.String',
+    'Encoding': 'System.Text.Encoding',
+    'Decoder': 'System.Text.Decoder',
+    'EncodingError': 'System.Text.EncodingError',
+    'Encodings': 'System.Text.Encodings',
     'Utf8': 'System.Text.Utf8',
     'UnicodeScalar': 'System.Text.UnicodeScalar',
     'InvalidUtf8Error': 'System.Text.InvalidUtf8Error',
@@ -231,6 +235,10 @@ SOURCES = {
     'Void': 'runtime/raven/src/System/Void.rvn',
 
     'String': 'runtime/raven/src/System/String.rvn',
+    'Encoding': 'runtime/raven/src/System/Text/Encoding.rvn',
+    'Decoder': 'runtime/raven/src/System/Text/Decoder.rvn',
+    'EncodingError': 'runtime/raven/src/System/Text/EncodingError.rvn',
+    'Encodings': 'runtime/raven/src/System/Text/Encodings.rvn',
     'Utf8': 'runtime/raven/src/System/Text/Utf8.rvn',
     'UnicodeScalar': 'runtime/raven/src/System/Text/UnicodeScalar.rvn',
     'InvalidUtf8Error': 'runtime/raven/src/System/Text/InvalidUtf8Error.rvn',

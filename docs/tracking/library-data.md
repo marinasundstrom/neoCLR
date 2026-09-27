@@ -152,18 +152,17 @@ this does not expand the current internal UTF-8 reader slice into a public hiera
 
 **Author-required stream selection:** [StreamReader and StreamWriter must accept a
 specific encoding with UTF-8 as default](../design/text-abstraction.md#selected-stream-encoding-with-utf-8-default--author-requirement).
-Current constructors are still UTF-8-only. The internal reader helper does not
-complete this requirement. The author selects UTF-8 plus strict ASCII first and
-emphasizes reuse by HTTP and other APIs. The [shared-interface selection probe](../design/text-abstraction.md#shared-encoding-selection-probe-utf-8-and-strict-ascii)
-passes two focused reader/writer runs, including independent decoder state and strict
-rejection before output. Next promote the contract with matching public metadata,
-ReadLine/leaveOpen compatibility and typed error/limit semantics. The probe's names
-and bounds are not shipped APIs; do not silently reinterpret maxUtf8Bytes.
+Development now provides Encoding, Decoder, Encodings.Utf8/Ascii and EncodingError,
+with selected constructors on both stream adapters. The author chose strict ASCII
+and emphasizes reuse by HTTP and other APIs. See the [implemented contract](../design/text-abstraction.md#shared-encoding-apis-development)
+for lifecycle, independent decoder state, ReadLine/leaveOpen compatibility, strict
+rejection before output and separate source/text quota semantics. The earlier probe
+remains experimental evidence; its names and bounds are not the public contract.
 
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
-are not System APIs. The internal UTF-8 reader slice is complete; encoding selection
-for both stream adapters is next, followed by evaluating minimal text construction
+are not System APIs. Shared encoding selection for both stream adapters is implemented in development;
+next evaluate minimal text construction
 for a report consumer. Public scalar/range APIs, Unicode alignment,
 fold naming, full casing and normalization are not blanket prerequisites. A separate
 builder must justify its role alongside immutable String and Swift-style construction.

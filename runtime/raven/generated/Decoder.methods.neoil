@@ -1,0 +1,5 @@
+; Generated from runtime/raven/src/System/Text/Decoder.rvn. Regenerate with build_runtime_library.py.
+.interface System.Text.Decoder
+.method instance Decode(arrayref<Byte> source,Int32 offset,Int32 count,Boolean final) -> System.Result<String,System.Text.EncodingError>
+.end
+.end

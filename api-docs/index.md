@@ -55,7 +55,7 @@ walks through the compiled hostname/echo POC.
 | Outcomes and callbacks | [Outcomes](/features/outcomes/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Func](xref:System.Func`2) |
 | Queries | [Collections and queries](/features/collections/) | [System.Linq](xref:System.Linq) |
 | Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Date) · [Time](xref:System.Time) · [Instant](xref:System.Instant) · [Clock](xref:System.Clock) |
-| Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) |
+| Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) · [Encoding](xref:System.Text.Encoding) · [Decoder](xref:System.Text.Decoder) |
 | Mathematics and environment | [Expected outcomes](/features/outcomes/) | [System.Math](xref:System.Math) · [Environment](xref:System.Environment) |
 | Tasks and completion | [Tasks and async](/features/tasks/) · [Callbacks](callbacks.md) | [System.Tasks](xref:System.Tasks) |
 | Isolated workers | [Thread and worker behavior](/features/tasks/) | [System.Concurrency](xref:System.Concurrency) |

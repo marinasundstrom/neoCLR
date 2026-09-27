@@ -523,11 +523,57 @@ limits. Introduce the abstraction with one actual writer/encoding consumer after
 the corresponding contracts are settled; no new character representation or
 namespace reorganization is implied.
 
+### Shared encoding APIs (development)
+
+`System.Text.Encoding` is the reusable conversion policy: `Encode(string)` returns
+`Result<Sequence<byte>, EncodingError>` and `CreateDecoder()` creates independent
+state. `Encodings.Utf8` and `Encodings.Ascii` supply the first implementations.
+`Decoder.Decode(byte[], offset, count, final)` returns valid text. Success accepts
+all offered bytes; an incomplete UTF-8 scalar is copied into decoder-owned carry
+and may produce empty text. The caller may immediately reuse its array. Invalid
+ranges and counts above 65536 fail before mutation and can be retried. Malformed
+input or finalization ends the decoder; later calls return Finished. Built-ins
+never replace invalid/unrepresentable content. UTF-8 preserves U+FEFF; no codec
+sniffing, BOM insertion or automatic BOM removal occurs.
+
+`StreamReader(input, encoding[, leaveOpen])` and
+`StreamWriter(output, encoding[, leaveOpen])` select this shared interface. Existing
+constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding itself
+can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
+suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
+WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
+conversion and byte snapshotting finish before output callbacks. Partial writes
+are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
+retain InvalidUtf8. Stream failures retain their existing cases.
+
+`maxUtf8Bytes` remains the returned text's UTF-8 size, with a separate source-read
+ceiling of the same number (plus one overflow byte for ReadToEnd, or up to two line
+terminator bytes for ReadLine). These measures coincide for valid built-in input;
+custom codecs must respect both. Future expanding/stateful codecs need explicit
+source/output quota design. Errors return no partial text and may advance input.
+Writer input and encoded output are each limited to 65536 bytes; WriteLine includes
+LF in both limits. Runtime allocation/instruction budgets still apply, so the API
+ceiling is not an allocation guarantee. Conversion does not add async behavior.
+
+Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but the
+conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
+This avoids exposing storage units through character APIs, at the cost of owned
+result allocations and no destination-capacity/progress API. Strict ASCII avoids
+silent replacement at the cost of handling conversion failures. This is whole-value
+encoding plus incremental decoding; a stateful **Encoder** remains future work.
+Flush forwards stream flushing; it does not finalize an encoder. HTTP can reuse the
+conversion policy later, but charset selection, protocol validation and framing
+remain HTTP concerns. This work does not reopen the completed HTTP POC.
+
+Focused consumers: [EncodingMain.rvn](../experiments/text-boundaries/EncodingMain.rvn)
+and [verification](../experiments/text-boundaries/verify_encoding.py), plus the
+existing reader regression fixtures. No website build or full suite is required.
+
 ### Selected stream encoding with UTF-8 default — author requirement
 
 The author clarifies that **StreamReader and StreamWriter must accept a selected
 encoding, with UTF-8 as the default**. This is an intended capability, not just a
-possible extra codec. Current production constructors remain UTF-8-only; the private
+possible extra codec. At the time of this requirement, production constructors were UTF-8-only; the private
 reader integration implements part of the default path and does not complete this
 requirement. The next foundation step must establish that selection contract before
 presenting either stream adapter as complete.
@@ -613,7 +659,8 @@ invalid ranges, byte limits, empty EOF, partial writes, encoded-byte counts, new
 encoding and ownership close. It omits ReadLine, leaveOpen overloads, destination
 fault injection and stateful encoders. These are explicit integration tasks before
 promoting the contract into production StreamReader/StreamWriter; existing constructors
-remain UTF-8-only. No .NET/Raven reference or runtime API changed in this probe.
+were UTF-8-only at the probe stage. Public integration is now recorded above.
+The probe itself did not change .NET/Raven references or runtime APIs.
 
 **HTTP dependency:** keep conversion in the shared text foundation. A future HTTP
 text-body adapter selects an encoding according to media type/charset policy and
@@ -624,7 +671,7 @@ framing, compression, header validation and content-length accounting stay in th
 own HTTP layers. ASCII includes control bytes, so choosing ASCII cannot establish
 safe field syntax. This records a dependency, not new HTTP implementation scope.
 
-**Next bounded step:** promote the shared encoding/decoder roles with matching
+**Probe follow-up (now implemented above):** promote the shared encoding/decoder roles with matching
 reference metadata and both stream adapters, retaining UTF-8 defaults and adding
 strict ASCII. Cover line reads and ownership compatibility, choose typed conversion
 errors without silently changing existing cases, and make quotas explicit. Add a
@@ -645,7 +692,7 @@ part of the tested .NET 10 baseline merely because it appears on that page.
 | **Bring over, adapted** | Rune | A validated scalar value and its classification/conversion operations, building on the existing UnicodeScalar helper. Needed by codecs and scanners independently of grapheme Char. [.NET Rune](https://learn.microsoft.com/en-us/dotnet/api/system.text.rune?view=net-10.0) is the semantic baseline; type name and migration remain to be decided. |
 | **Bring over, bounded** | StringBuilder | Append text/Char/scalars, materialize String, clear/reuse and explicit limits for a report consumer. Defer arbitrary insertion, replacement, formatting overload families and mutable character indexing. A minimal append-only builder need not wait for every search-position decision. |
 | **Bring over the role** | Encoder/Decoder | Stateful incremental conversion with explicit byte/scalar progress, final input, invalid data and destination exhaustion. Start with UTF-8; implement only the state needed by that codec, not an inheritance hierarchy first. |
-| **Adapt when a second codec is needed** | Encoding | A small selectable codec contract for a real interop consumer. UTF-16 is the first candidate for .NET/native interchange, with endianness/BOM/surrogate-error policy. Strict ASCII validation/conversion is useful for machine protocols; it need not imply a full Encoding subclass family. [.NET Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-10.0) is a role comparison, not a class-shape mandate. |
+| **Implemented in development** | Encoding | A small selectable codec contract now supports UTF-8 and author-selected strict ASCII. UTF-16 remains a possible later .NET/native interchange codec, needing endianness/BOM/surrogate-error policy. Strict ASCII validation/conversion is useful for machine protocols; it need not imply a full Encoding subclass family. [.NET Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-10.0) is a role comparison, not a class-shape mandate. |
 | **Bring over selectively after foundations** | Ascii helpers; normalization and casing capabilities | Explicit ASCII operations for protocol code; whole-String normalization/casing for an identified input/display scenario. Keep normalization opt-in and distinguish it from key folding. Do not wait for complete globalization to provide ASCII operations. |
 | **Defer until repeated-format use exists** | CompositeFormat and specialized formatting integration | Begin with existing formatting/interpolation capabilities and the builder’s concrete report. Parsed format caching, providers and compiler-specific handlers need separate evidence; no automatic C# handler port to Raven. |
 | **Leave out of the initial portfolio** | EncodingProvider, EncodingInfo registries and code-page packages; UTF-7 and broad UTF-32 support | No current consumer justifies discovery/registration or that coverage. Add a codec when a file/protocol requires it, not to complete an inventory. |
@@ -715,8 +762,8 @@ The prototype should demonstrate that:
    Raven projection agree on any new value/range type, including invalid defaults.
 
 **Next bounded implementation recommendation:** the internal UTF-8 reader integration
-is complete and the shared selection probe passes. Promote the selected encoding
-contract into both stream adapters with UTF-8 defaults and strict ASCII, covering
+is complete and shared Encoding/Decoder selection is integrated in both stream
+adapters with UTF-8 defaults and strict ASCII. Focused integration covers
 line reads, ownership and error/limit semantics. A builder remains a companion
 candidate; no complete search API, new scalar public type or String/Text rename is
 required first. Unicode-version alignment and comparison naming remain separate.

@@ -1263,3 +1263,23 @@ Generic policies are invariant and explicit; no inferred default/culture policy 
 introduced. The focused verifier is `verify_comparers.py`, and
 `Probe --comparer-signatures OUTPUT` checks metadata admission. Editor checks use
 `verify_editor.py PROJECT --comparers`. The package builder includes the verifier.
+
+## Shared encoding reference surface — 2026-09-27
+
+The neoCLR development reference adds System.Text.Encoding, Decoder, Encodings and
+EncodingError plus selected StreamReader/StreamWriter constructors. EncodingError
+uses standard Raven union metadata; InvalidEncoding cases are appended to stream
+error unions without renumbering existing cases. The bridge admits exact interface
+and constructor signatures and exports the matching authored Raven library bodies.
+Application codecs implement the same interfaces as built-ins. No Runtime Contract
+configuration, compiler semantic rule, opcode, metadata convention or native VM
+service changes. Match reference and System library artifacts; Preview 10 does not
+contain this surface. Stateful Encoder and UTF-16 buffer-style conversion are not
+part of this contract.
+
+Validation: focused production consumers pass for UTF-8 defaults, strict ASCII,
+owned split-input carry, decoder lifecycle, decoded line boundaries, independent
+custom providers, limits, partial-write failures, flushing and leaveOpen. Existing
+reader checks pass, including 65536 input bytes. Only necessary snapshot/contract
+checks run; no full compiler/runtime suite, website build or platform matrix. See
+neoCLR's docs/experiments/text-boundaries/encoding-validation.json for evidence.

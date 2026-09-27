@@ -1,0 +1,7 @@
+namespace System.Text
+
+import System.*
+
+public interface Decoder {
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError>
+}

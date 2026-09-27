@@ -8,69 +8,96 @@ import System.Text.*
 import System.Runtime.CompilerServices.*
 
 public class StreamReader : TextReader {
-    private field input: InputStream
-    private field leaveOpen: bool
-    private field closed: bool = false
+    private var input: InputStream
+    private var decoder: Decoder
+    private var leaveOpen: bool
+    private var closed: bool = false
+    private var eof: bool = false
+    private var pendingText: string = ""
+    private var lastRead: int = 0
 
     init(input: InputStream) {
         self.input = input
+        decoder = Encodings.Utf8.CreateDecoder()
         leaveOpen = false
     }
 
     init(input: InputStream, leaveOpen: bool) {
         self.input = input
+        decoder = Encodings.Utf8.CreateDecoder()
         self.leaveOpen = leaveOpen
     }
 
-    // LF and CRLF delimit lines; a lone CR is data. No read-ahead across lines.
+    init(input: InputStream, encoding: Encoding) {
+        self.input = input
+        decoder = encoding.CreateDecoder()
+        leaveOpen = false
+    }
+
+    init(input: InputStream, encoding: Encoding, leaveOpen: bool) {
+        self.input = input
+        decoder = encoding.CreateDecoder()
+        self.leaveOpen = leaveOpen
+    }
+
+    // Delimit decoded text. Built-in codecs do not read ahead across lines.
     func ReadLine(maxUtf8Bytes: int) -> Result<Option<string>, TextReadError> {
         if closed {
-            return Error(TextReadError.Closed())
+            return Error(TextReadError.Closed)
         }
         if maxUtf8Bytes < 0 {
-            return Error(TextReadError.InvalidRange())
+            return Error(TextReadError.InvalidRange)
         }
         if maxUtf8Bytes > 65536 {
-            return Error(TextReadError.LimitExceeded())
+            return Error(TextReadError.LimitExceeded)
         }
-        let bytes: List<byte> = ArrayList<byte>()
         let buffer: byte[] = [(byte)0]
+        let line = ArrayList<byte>()
+        var accepted = 0
         while true {
-            match input.Read(buffer, 0, 1) {
-                Ok(let count) => {
-                    if count < 0 {
-                        System.Fault("Invalid input read count")
+            let part = pendingText
+            pendingText = ""
+            let bytes = Utf8.Encode(part)
+            var index = 0
+            while index < bytes.Count {
+                let value = bytes[index]
+                if value == 10 {
+                    match part.SliceUtf8(index + 1, bytes.Count - index - 1) {
+                        Ok(let suffix) => pendingText = suffix
+                        Error(_) => System.Fault("Invalid decoded line suffix")
                     }
-                    if count > 1 {
-                        System.Fault("Invalid input read count")
+                    var lineLength = line.Count
+                    if lineLength > 0 && line[lineLength - 1] == 13 {
+                        lineLength -= 1
                     }
-                    if count == 0 {
-                        if bytes.Count == 0 {
-                            let absent: Option<string> = None()
-                            return Ok(absent)
-                        }
-                        if bytes.Count > maxUtf8Bytes {
-                            return Error(TextReadError.LimitExceeded())
-                        }
-                        return DecodeLine(bytes, bytes.Count)
-                    }
-                    let value = buffer[0]
-                    if value == 10 {
-                        var length = bytes.Count
-                        if length > 0 && bytes[length - 1] == 13 {
-                            length -= 1
-                        }
-                        return DecodeLine(bytes, length)
-                    }
-                    if bytes.Count >= maxUtf8Bytes && (bytes.Count > maxUtf8Bytes || value != 13) {
-                        return Error(TextReadError.LimitExceeded())
-                    }
-                    bytes.Add(value)
+                    return DecodeLine(line, lineLength)
                 }
-                Error(let error) => return Error(FromStream(error))
+                if line.Count >= maxUtf8Bytes && (line.Count > maxUtf8Bytes || value != 13) {
+                    return Error(TextReadError.LimitExceeded)
+                }
+                line.Add(value)
+                index += 1
             }
+            if eof {
+                if line.Count > maxUtf8Bytes {
+                    return Error(TextReadError.LimitExceeded)
+                }
+                if line.Count == 0 {
+                    let absent: Option<string> = None()
+                    return Ok(absent)
+                }
+                return DecodeLine(line, line.Count)
+            }
+            if accepted > maxUtf8Bytes + 1 {
+                return Error(TextReadError.LimitExceeded)
+            }
+            match ReadPart(buffer, 1, 1) {
+                Ok(let decoded) => pendingText = decoded
+                Error(let error) => return Error(error)
+            }
+            accepted += lastRead
         }
-        return Error(TextReadError.IoFailure())
+        return Error(TextReadError.IoFailure)
     }
 
     private static func DecodeLine(bytes: Sequence<byte>, length: int) -> Result<Option<string>, TextReadError> {
@@ -85,65 +112,72 @@ public class StreamReader : TextReader {
                 let present: Option<string> = Some(text)
                 Ok(present)
             }
-            Error(_) => Error(TextReadError.InvalidUtf8())
+            Error(_) => Error(TextReadError.InvalidEncoding)
         }
     }
 
     func ReadToEnd(maxUtf8Bytes: int) -> Result<string, TextReadError> {
         if closed {
-            return Error(TextReadError.Closed())
+            return Error(TextReadError.Closed)
         }
         if maxUtf8Bytes < 0 {
-            return Error(TextReadError.InvalidRange())
+            return Error(TextReadError.InvalidRange)
         }
         if maxUtf8Bytes > 65536 {
-            return Error(TextReadError.LimitExceeded())
+            return Error(TextReadError.LimitExceeded)
         }
-        let decoder = ReadUtf8Decoder()
         let buffer = CheckedStorage.Reserve<byte>(256)
+        var text = pendingText
+        pendingText = ""
         var accepted = 0
-        var text = ""
         while true {
+            if text.GetUtf8ByteCount() > maxUtf8Bytes {
+                return Error(TextReadError.LimitExceeded)
+            }
+            if eof {
+                return Ok(text)
+            }
             var request = maxUtf8Bytes - accepted + 1
             if request > buffer.Length {
                 request = buffer.Length
             }
-            match input.Read(buffer, 0, request) {
-                Ok(let count) => {
-                    if count < 0 {
-                        System.Fault("Invalid input read count")
-                    }
-                    if count > request {
-                        System.Fault("Invalid input read count")
-                    }
-                    if count > maxUtf8Bytes - accepted {
-                        return Error(TextReadError.LimitExceeded())
-                    }
-                    accepted += count
-                    var offset = 0
-                    var complete = false
-                    while !complete {
-                        match decoder.Decode(buffer, offset, count - offset, count == 0, 256) {
-                            Ok(let part) => {
-                                text = String.Concat(text, part)
-                                offset += decoder.InputBytesConsumed
-                                if decoder.OutputFull {
-                                    // Retry the unconsumed suffix before reading again.
-                                } else {
-                                    complete = true
-                                }
-                            }
-                            Error(_) => return Error(TextReadError.InvalidUtf8())
-                        }
-                    }
-                    if count == 0 {
-                        return Ok(text)
-                    }
-                }
-                Error(let error) => return Error(FromStream(error))
+            match ReadPart(buffer, request, maxUtf8Bytes - accepted) {
+                Ok(let part) => text = String.Concat(text, part)
+                Error(let error) => return Error(error)
+            }
+            accepted += lastRead
+            if accepted > maxUtf8Bytes {
+                return Error(TextReadError.LimitExceeded)
             }
         }
-        return Error(TextReadError.IoFailure())
+        return Error(TextReadError.IoFailure)
+    }
+
+    private func ReadPart(buffer: byte[], request: int, remaining: int) -> Result<string, TextReadError> {
+        let count = match input.Read(buffer, 0, request) {
+            Ok(let value) => value
+            Error(let error) => return Error(FromStream(error))
+        }
+        if !(count >= 0) || count > request {
+            System.Fault("Invalid input read count")
+        }
+        lastRead = count
+        if count > remaining {
+            return Error(TextReadError.LimitExceeded)
+        }
+        if count == 0 {
+            eof = true
+        }
+        let decoded = match decoder.Decode(buffer, 0, count, eof) {
+            Ok(let text) => text
+            Error(EncodingError.InvalidUtf8) => return Error(TextReadError.InvalidUtf8)
+            Error(EncodingError.LimitExceeded) => return Error(TextReadError.LimitExceeded)
+            Error(_) => return Error(TextReadError.InvalidEncoding)
+        }
+        if decoded.GetUtf8ByteCount() > 65536 {
+            return Error(TextReadError.LimitExceeded)
+        }
+        return Ok(decoded)
     }
 
     func Close() {
@@ -156,111 +190,18 @@ public class StreamReader : TextReader {
     }
 
     private static func FromStream(error: StreamError) -> TextReadError {
-        if error is StreamError.InvalidPath {
-            return TextReadError.InvalidPath()
+        return match error {
+            StreamError.InvalidPath => TextReadError.InvalidPath
+            StreamError.NotFound => TextReadError.NotFound
+            StreamError.AccessDenied => TextReadError.AccessDenied
+            StreamError.WrongKind => TextReadError.WrongKind
+            StreamError.AlreadyExists => TextReadError.AlreadyExists
+            StreamError.Closed => TextReadError.Closed
+            StreamError.InvalidRange => TextReadError.InvalidRange
+            StreamError.LimitExceeded => TextReadError.LimitExceeded
+            StreamError.WrongAccess => TextReadError.WrongAccess
+            StreamError.InvalidEncoding => TextReadError.InvalidEncoding
+            _ => TextReadError.IoFailure
         }
-        if error is StreamError.NotFound {
-            return TextReadError.NotFound()
-        }
-        if error is StreamError.AccessDenied {
-            return TextReadError.AccessDenied()
-        }
-        if error is StreamError.WrongKind {
-            return TextReadError.WrongKind()
-        }
-        if error is StreamError.AlreadyExists {
-            return TextReadError.AlreadyExists()
-        }
-        if error is StreamError.Closed {
-            return TextReadError.Closed()
-        }
-        if error is StreamError.InvalidRange {
-            return TextReadError.InvalidRange()
-        }
-        if error is StreamError.LimitExceeded {
-            return TextReadError.LimitExceeded()
-        }
-        if error is StreamError.WrongAccess {
-            return TextReadError.WrongAccess()
-        }
-        if error is StreamError.IoFailure {
-            return TextReadError.IoFailure()
-        }
-        System.Fault("Invalid stream error")
-        return TextReadError.IoFailure()
-    }
-}
-
-// Internal, single-consumer codec. Progress belongs to the most recent call.
-// No callback/reentry or public decoder API is exposed by this reader slice.
-internal class ReadUtf8Decoder {
-    private var pending: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
-    private var pendingCount: int = 0
-    private var expected: int = 0
-    private var stopped: bool = false
-    private var consumed: int = 0
-    private var full: bool = false
-
-    val InputBytesConsumed: int => consumed
-    val OutputFull: bool => full
-
-    func Decode(source: byte[], offset: int, count: int, final: bool,
-                maxOutputUtf8Bytes: int) -> Result<string, InvalidUtf8Error> {
-        // Caller owns range/total-limit validation; these are internal invariants.
-        if stopped {
-            System.Fault("UTF-8 reader decoder already finalized")
-        }
-        consumed = 0
-        full = false
-        let output = ArrayList<byte>(maxOutputUtf8Bytes)
-        var produced = 0
-        while consumed < count {
-            let value = source[offset + consumed]
-            var width = expected
-            if pendingCount == 0 {
-                if value <= 127 {
-                    width = 1
-                } else if value >= 194 && value <= 223 {
-                    width = 2
-                } else if value >= 224 && value <= 239 {
-                    width = 3
-                } else if value >= 240 && value <= 244 {
-                    width = 4
-                } else {
-                    stopped = true
-                    return Error(InvalidUtf8Error())
-                }
-            }
-            if width > maxOutputUtf8Bytes - produced {
-                full = true
-                return Utf8.Decode(output)
-            }
-            if pendingCount == 0 {
-                expected = width
-            } else if !(value >= 128 && value <= 191) {
-                stopped = true
-                return Error(InvalidUtf8Error())
-            }
-            pending[pendingCount] = value
-            pendingCount += 1
-            consumed += 1
-            if pendingCount == expected {
-                var index = 0
-                while index < expected {
-                    output.Add(pending[index])
-                    index += 1
-                }
-                produced += expected
-                pendingCount = 0
-                expected = 0
-            }
-        }
-        if final {
-            stopped = true
-            if pendingCount != 0 {
-                return Error(InvalidUtf8Error())
-            }
-        }
-        return Utf8.Decode(output)
     }
 }
