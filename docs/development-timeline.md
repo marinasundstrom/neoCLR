@@ -8826,3 +8826,10 @@ private-var explicit assignment diagnostic is recorded in Raven.
 SDK and VS Code extension, then launch an HTTP client/server application. The
 assistant will use fresh versioned local artifacts and validate the installed pair.
 This requests local installation; it does not certify or publish a release.
+
+**Packaging finding:** The first fresh SDK build failed compiling Raven.Core
+WithContext. The new enclosing-argument logic included a semantic extension owner
+that emits as a nongeneric CLI container. The assistant reproduced this in two
+existing ordinary .NET tests, corrected the owner boundary and passed 29 focused
+checks. General `768fdcd7a` is integrated into Raven main and individually as
+`b7bc6838d` on neoclr. The first failed artifact attempt is not installed.

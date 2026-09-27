@@ -803,3 +803,11 @@ explicit/implicit field receivers. This repairs normal CLI contract compatibilit
 no Runtime Contract options or public signatures change. The separate explicit
 `self.value` assignment diagnostic for generic `private var` storage is recorded
 in Raven's compiler docs; the consumer uses ordinary unqualified field access.
+
+SDK bootstrap follow-up: Raven `768fdcd7a` (neoclr `b7bc6838d`) excludes semantic
+generic extension-container parameters from nested closure runtime identities.
+Those containers emit as nongeneric static CLI types; closures already carry
+method-owned aliases. Raven.Core WithContext exposed the regression. Two existing
+ordinary .NET ResultWithMessage consumers fail before and pass after the repair;
+all 29 selected extension/async-owner/capture/union checks pass. Runtime Contract
+configuration and neoCLR policies are unchanged.

@@ -21,7 +21,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Support ordinary instance async methods inside bounded generic classes;
   integrate Raven owner-arity and implicit-field-receiver fixes with 35 focused
   CLR checks and a pending-await int/string receiver consumer. The reported
-  interpolation defect remains a release follow-up; no public signatures or Runtime Contract options change.
+  interpolation defect remains a release follow-up; no public signatures or Runtime
+  Contract options change. Integrate the SDK-bootstrap follow-up preserving
+  nongeneric CLI ownership for generic extension closures, with 29 focused CLR checks.
 
 - Record the author-selected pre-release assessment on main: feature finish lines,
   confirmed format/Clippy and stale union-probe gate failures, current async
