@@ -58,7 +58,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and native imports. Preserve rooted callers/destinations, snapshot byte writes and
   commit only transferred read bytes under graph access. Validate guest capture
   mutation during a host call and buffer alias/tail preservation. Shared invocation
-  services, aggregate budgets and public Task.Run remain pending.
+  services and public Task.Run remain pending. Share instruction fuel and live-frame
+  permits across VM contexts; paused frames retain capacity and returns/unwinding
+  release it. Validate aggregate exhaustion/admission and record a focused cost probe.
+  Array/native-memory and host-resource accounting still need shared integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

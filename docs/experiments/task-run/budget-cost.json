@@ -1,0 +1,66 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "baseline_commit": "891bf8d4",
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "probe_sha256": "1b5211a48593ffaeb03b66a01ce8f8aa4ba482807db5acb034b5b0e7c31611a1",
+  "candidate_source_sha256": {
+    "src/slots.rs": "893f1c013e266764c0c87a5df91d6fc55e731c6636cf2e386e87dda46077365c",
+    "src/vm.rs": "57c74bfca27ea7f73138f0575862e689070086b6e0fefd6667864b07c2e44416",
+    "src/invocation_budget.rs": "9a5895c298d26f7d248ec5e6c698d8531ea1aae40fe9e76a8f6b958ac8d37167"
+  },
+  "runs": [
+    {
+      "kind": "baseline",
+      "sha256": "ee23c93c7b40461542ac3e893fe49fc9286a61332d69c343b97d0bad335c10f2",
+      "seconds": [
+        1.295381833,
+        1.9290096669999999,
+        0.929638417,
+        0.771106959,
+        1.049899375,
+        0.880091916
+      ]
+    },
+    {
+      "kind": "candidate",
+      "sha256": "2b0600e1f59720ccf8d84af2e4eb709bf8fa92658374d49769d902052c7ec227",
+      "seconds": [
+        0.568525833,
+        0.559657334,
+        0.487561959,
+        0.488745958,
+        0.497777292,
+        0.5159275
+      ]
+    },
+    {
+      "kind": "candidate",
+      "sha256": "2b0600e1f59720ccf8d84af2e4eb709bf8fa92658374d49769d902052c7ec227",
+      "seconds": [
+        0.558248625,
+        0.520137458,
+        0.490116041,
+        0.485832708,
+        0.48781275,
+        0.514468833
+      ]
+    },
+    {
+      "kind": "baseline",
+      "sha256": "ee23c93c7b40461542ac3e893fe49fc9286a61332d69c343b97d0bad335c10f2",
+      "seconds": [
+        0.552025083,
+        0.556495375,
+        0.493852958,
+        0.486090708,
+        0.461616666,
+        0.501925959
+      ]
+    }
+  ],
+  "median_seconds": {
+    "baseline": 0.663801167,
+    "candidate": 0.49394666649999996
+  },
+  "ratio": 0.7441184063178966
+}

@@ -62,6 +62,7 @@ pub use stack_trace::{CodeLocation, StackFrame, StackTrace};
 pub use string_value::StringValue;
 mod type_identity;
 pub mod value;
+mod invocation_budget;
 mod vm;
 mod workers;
 

@@ -1248,6 +1248,7 @@ fn restrict_reference_arguments(
 }
 
 struct Frame {
+    permit: Option<crate::invocation_budget::FramePermit>,
     function: std::rc::Rc<crate::metadata::Function>,
     pc: usize,
     trace_pc: usize,
@@ -1319,6 +1320,7 @@ impl Frame {
                 .into_iter()
                 .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
                 .collect(),
+            permit: None,
             constructing: false,
             construction_object: None,
             construction_receiver: None,
@@ -1681,11 +1683,15 @@ struct InstructionState {
     invocation_result: Option<Value>,
     entry_drain_depth: Option<usize>,
     drain_required: bool,
-    remaining_instructions: usize,
+    budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
 }
 impl InstructionState {
     fn new(limits: Limits) -> Self {
+        Self::with_budget(limits, crate::invocation_budget::Budget::new(limits))
+    }
+
+    fn with_budget(limits: Limits, budget: std::sync::Arc<crate::invocation_budget::Budget>) -> Self {
         Self {
             collection_threshold: limits.heap_objects.min(64),
             arrays_used: false,
@@ -1699,7 +1705,7 @@ impl InstructionState {
             invocation_result: None,
             entry_drain_depth: None,
             drain_required: true,
-            remaining_instructions: limits.instructions,
+            budget,
             completion_boundary: None,
         }
     }
@@ -1742,11 +1748,23 @@ fn interpret_instructions(
         invocation_result,
         entry_drain_depth,
         drain_required,
-        remaining_instructions,
+        budget,
         completion_boundary,
     } = state;
     let mut executed = 0;
     loop {
+        // Admit new frames before they execute or become a parked continuation.
+        // Existing permits remain charged across host waits and instruction pauses.
+        for frame in frames.iter_mut().rev() {
+            if let Some(permit) = &frame.permit {
+                if !permit.belongs_to(budget) {
+                    return Err(Fault::new("frame belongs to another invocation budget"));
+                }
+                break;
+            } else {
+                frame.permit = Some(budget.frame()?);
+            }
+        }
         if let Some(value) = completion_boundary.take() {
             // Run ready default-queue work before waiting for registered host
             // results. A notification is transferred directly into a traced
@@ -1833,11 +1851,11 @@ fn interpret_instructions(
             heap.collect(roots, crate::CollectionReason::ExecutionCompleted)?;
             return Ok(InstructionProgress::Completed(value));
         }
-        if executed == quantum || *remaining_instructions == 0 {
+        if executed == quantum || budget.remaining() == 0 {
             break;
         }
         executed += 1;
-        *remaining_instructions -= 1;
+        budget.charge()?;
         if let (Some(debugger), Some(frame)) = (&options.debugger, frames.last()) {
             let before_host_call = matches!(frame.function.body.get(frame.pc), Some(Op::Call(target))
                 if resolve(module, target).is_ok_and(|f| f.pinvoke.is_some() || f.is_internal_call()));
@@ -3869,7 +3887,7 @@ fn interpret_instructions(
             ));
         }
     }
-    if *remaining_instructions == 0 {
+    if budget.remaining() == 0 {
         if let Some(frame) = frames.last_mut() {
             frame.trace_pc = frame.pc;
         }

@@ -185,7 +185,7 @@ fn suspension_does_not_reset_instruction_budget() {
             ));
         }
     }
-    assert_eq!(state.remaining_instructions, 0);
+    assert_eq!(state.budget.remaining(), 0);
 }
 
 #[test]
@@ -211,7 +211,7 @@ fn zero_quantum_is_rejected_without_consuming_budget() {
         0,
     );
     assert!(matches!(result, Err(_)));
-    assert_eq!(state.remaining_instructions, options.limits.instructions);
+    assert_eq!(state.budget.remaining(), options.limits.instructions);
 }
 
 #[test]
@@ -482,14 +482,14 @@ ret
         Ok(InstructionProgress::Waiting)
     ));
     assert!(frames.is_empty());
-    let fuel = state.remaining_instructions;
+    let fuel = state.budget.remaining();
     for _ in 0..3 {
         state.scheduler.park();
         assert!(matches!(
             run(&mut state, &mut frames),
             Ok(InstructionProgress::Waiting)
         ));
-        assert_eq!(state.remaining_instructions, fuel);
+        assert_eq!(state.budget.remaining(), fuel);
     }
     // Exercise access from another native participant while no guest frame exists.
     let observed = queue.clone();
@@ -515,7 +515,7 @@ ret
                 ..
             })
         ));
-        assert_eq!(state.remaining_instructions, fuel);
+        assert_eq!(state.budget.remaining(), fuel);
         return;
     }
     let _peer = std::net::TcpStream::connect(("127.0.0.1", port as u16)).unwrap();
@@ -639,4 +639,73 @@ ret
     .unwrap();
     assert_eq!(result, Value::ObjectReference(capture.clone()));
     assert_eq!(capture.reference.read_field(0).unwrap(), Value::Int32(42));
+}
+
+#[test]
+fn guest_contexts_share_instruction_fuel_and_live_frame_admission() {
+    let module =
+        crate::assemble(".module SharedFuel\n.function Spin() -> Void\nloop:\nbr loop\n.end")
+            .unwrap();
+    let options = ExecutionOptions {
+        limits: Limits {
+            instructions: 5,
+            frames: 1,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let budget = crate::invocation_budget::Budget::new(options.limits);
+    let mut first = InstructionState::with_budget(options.limits, budget.clone());
+    let mut second = InstructionState::with_budget(options.limits, budget.clone());
+    let owner = Owner::new(1);
+    let mut participant = owner.participant().unwrap();
+    let mut first_frames = vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()];
+    let mut second_frames = vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()];
+    let mut run = |frames: &mut Vec<Frame>, state: &mut InstructionState| {
+        interpret_instructions(
+            &module,
+            frames,
+            &options,
+            &mut None,
+            &mut participant.enter(),
+            &mut Default::default(),
+            &mut Vec::new(),
+            &mut [Vec::new(), Vec::new()],
+            state,
+            1,
+        )
+    };
+    assert!(matches!(
+        run(&mut first_frames, &mut first),
+        Ok(InstructionProgress::Suspended)
+    ));
+    assert_eq!(budget.remaining(), 4);
+    assert!(matches!(
+        run(&mut second_frames, &mut second),
+        Err(Fault {
+            code: crate::FaultCode::StackOverflow,
+            ..
+        })
+    ));
+    assert_eq!(
+        budget.remaining(),
+        4,
+        "failed frame admission consumes no instructions"
+    );
+    drop(first_frames);
+    for _ in 0..3 {
+        assert!(matches!(
+            run(&mut second_frames, &mut second),
+            Ok(InstructionProgress::Suspended)
+        ));
+    }
+    assert!(matches!(
+        run(&mut second_frames, &mut second),
+        Err(Fault {
+            code: crate::FaultCode::InstructionLimitExceeded,
+            ..
+        })
+    ));
+    assert_eq!(first.budget.remaining(), 0);
+    assert_eq!(second.budget.remaining(), 0);
 }

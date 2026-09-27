@@ -263,12 +263,33 @@ collection and capture mutation by a different participant during the host call.
 A broader invocation was stopped when its console-stream fixture began whole-library
 preparation; it is not counted as completed coverage. No website build was run.
 
+## Shared instruction and live-frame budgets
+
+An invocation budget now supplies atomic, non-resetting instruction fuel and
+live-frame permits. VM contexts can share this owner; a paused or blocked frame
+keeps its permit, while return/teardown releases frame capacity. New frames are
+admitted before executing or parking, including initial callback frames. Waiting
+consumes no fuel, and exhausted fuel never wraps or refunds on task completion.
+This retains neoCLR's bounded-host contract; .NET Task.Run does not supply equivalent
+per-invocation instruction or frame quotas by default.
+
+Two budget tests cover concurrent native consumers and unwind cleanup. Eight VM
+suspension tests include two guest contexts sharing one budget, rejecting excess
+live frames, reusing released capacity and exhausting the same fuel. Nineteen
+focused cancellation/startup/GC integration tests also pass.
+
+[Budget cost observations](budget-cost.json) reuse the existing release class-field
+probe and a fingerprint-verified runner from `891bf8d4`. Median times were 0.6638s
+and 0.4939s (0.7441×). No slowdown was observed, but the noisy comparison spans the
+intervening wait/host-call changes and does not establish a speedup or isolate the
+cost of atomic accounting. No broad suite or website build was run.
+
 ## Next prerequisite
 
 Establish shared invocation services and aggregate budgets before general guest
 work submission. Then establish atomic Promise/queue publication and expose the
 Run overloads, with async callback unwrapping validated at that API boundary.
-The per-execution instruction budget is preserved across pauses, but not yet shared
-across multiple guest contexts. Keep frame, heap and host-resource budgets
-invocation-owned; a new task must not reset them. Retaining every object until
+Instruction and live-frame budgets now have a shared owner. Connect shared service,
+array/native-memory and host-resource accounting before general submission; a new
+task must not reset those limits. Retaining every object until
 invocation exit is not a substitute for bounded live-object accounting.
