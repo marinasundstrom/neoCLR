@@ -121,14 +121,20 @@ Char's meaning. The [layering contract](../design/text-abstraction.md#separate-t
 qualifies the review's low-level buffer recommendations. This does not change the
 currently selected grapheme unit or any artifact format.
 
-**Next bounded recommendation:** a String/System.Text boundary prototype using a
-small delimiter-extraction consumer and split UTF-8 input. Resolve validated scalar
-identity, traversal, source-range ownership and progress/error units before dependent
-APIs. Unicode-version alignment and explicit simple-fold naming are recommended
-changes, not performed migrations. Keep the existing Sequence<char> surface for now;
-do not require grapheme buffers underneath every text API. Broader designs remain
-provisional and HTTP remains closed. After the boundary decisions, a small append-only
-builder need not wait for unrelated search, regex, collation or zero-copy work.
+**Latest author direction:** deliver the basics of System.Text: encoding/decoding
+and possibly StringBuilder as foundations for later APIs. Swift is the closer text
+API model: grapheme characters with explicit lower-level views. Preserve .NET
+familiarity where useful; neither platform's whole surface is required. This refines
+the earlier portfolio, not authorization to implement it all.
+
+**Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
+examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
+are not System APIs. The next bounded implementation recommendation is the UTF-8
+progress/error contract for a chunked reader, followed by evaluating minimal text
+construction for a report consumer. Public scalar/range APIs, Unicode alignment,
+fold naming, full casing and normalization are not blanket prerequisites. A separate
+builder must justify its role alongside immutable String and Swift-style construction.
+Keep existing Sequence<char> and equality/hash contracts; HTTP remains closed.
 
 **Review validation:** the corrected Raven observation sample and independent .NET,
 Swift, Rust and Go probes pass/run as recorded in

@@ -38,6 +38,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   boundary work before dependent expansion; no proposed API changes are implemented.
   Clarify the separate metadata, logical text, storage and API-boundary encoding
   contracts: String/Char APIs need not expose UTF-8 simply because storage/defaults use it.
+- Narrow the text foundation direction to encoding/decoding and possibly a small
+  builder, using Swift as the closer text API comparison and retaining grapheme Char.
+  Record the supplied alternative design as a proposal, not an approved migration.
+  Add an application-only scalar/range/bounded-decoder experiment and focused
+  passing evidence; no proposed types are added to System. Track bridge limitations
+  and distinguish byte progress from grapheme semantics.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

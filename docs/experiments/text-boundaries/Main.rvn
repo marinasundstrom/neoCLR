@@ -1,0 +1,199 @@
+import System.*
+import System.Console.*
+import System.Result.*
+import System.Option.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Step(result: Result<DecodeStep, DecodeFailure>) -> DecodeStep {
+    return match result {
+        Ok(let value) => value
+        Error(_) => {
+            System.Fault("Unexpected decode failure")
+            DecodeStep("", 0, 0, DecodeStatus.Finished)
+        }
+    }
+}
+
+public func Failure(result: Result<DecodeStep, DecodeFailure>) -> DecodeFailure {
+    return match result {
+        Error(let value) => value
+        Ok(_) => {
+            System.Fault("Expected decode failure")
+            DecodeFailure("", 0, 0, DecodeError.Stopped)
+        }
+    }
+}
+
+public func StatusCode(step: DecodeStep) -> int {
+    return match step.Status {
+        DecodeStatus.InputAccepted => 0
+        DecodeStatus.NeedMoreInput => 1
+        DecodeStatus.OutputFull => 2
+        DecodeStatus.Finished => 3
+        _ => -1
+    }
+}
+
+public func CheckBoundaries() {
+    for value in [(uint)0, (uint)55295, (uint)57344, (uint)1114111, (uint)128512, (uint)769] {
+        match ScalarValue.FromValue(value) {
+            Ok(let scalar) => {
+                Check(scalar.Value == value, "Scalar value")
+                Check(scalar.ToText().GetUtf8ByteCount() > 0, "Scalar encoding")
+            }
+            Error(_) => System.Fault("Valid scalar rejected")
+        }
+    }
+    for value in [(uint)55296, (uint)57343, (uint)1114112] {
+        match ScalarValue.FromValue(value) {
+            Error(BoundaryError.InvalidScalar) => { }
+            _ => System.Fault("Invalid scalar accepted")
+        }
+    }
+    Check(default(ScalarValue).ToText().Equals("\u0000"), "Default scalar is NUL")
+    let source = TextSource("name=é")
+    match source.FindOrdinal("́") {
+        Some(let range) => {
+            Check(range.Utf8Start == 6 && range.Utf8Length == 2, "Scalar range inside grapheme")
+            match source.Slice(range) {
+                Ok(let text) => Check(text.Equals("́"), "Slice match")
+                _ => System.Fault("Slice rejected")
+            }
+            match TextSource("name=é").Slice(range) {
+                Error(BoundaryError.WrongSource) => { }
+                _ => System.Fault("Wrong source accepted")
+            }
+        }
+        _ => System.Fault("Missing combining mark")
+    }
+    match source.FindOrdinal("=") {
+        Some(let delimiter) => {
+            let start = delimiter.Utf8Start + delimiter.Utf8Length
+            match source.RangeFromUtf8(start, source.Text.GetUtf8ByteCount() - start) {
+                Ok(let range) => {
+                    match source.Slice(range) {
+                        Ok(let value) => Check(value.Equals("é") && value.Length == 1, "Delimiter extraction")
+                        _ => System.Fault("Delimiter slice")
+                    }
+                }
+                _ => System.Fault("Delimiter range")
+            }
+        }
+        _ => System.Fault("Missing delimiter")
+    }
+    match source.Slice(SourceRange(source, 7, 1)) {
+        Error(BoundaryError.InvalidBoundary) => { }
+        _ => System.Fault("Forged boundary")
+    }
+    match source.Slice(SourceRange(source, 0, 99)) {
+        Error(BoundaryError.OutOfRange) => { }
+        _ => System.Fault("Forged range")
+    }
+    match source.Slice(default(SourceRange)) {
+        Error(BoundaryError.UninitializedRange) => { }
+        _ => System.Fault("Null range")
+    }
+    match source.FindOrdinal("") {
+        Some(let range) => Check(range.Utf8Start == 0 && range.Utf8Length == 0, "Empty match")
+        _ => System.Fault("Empty search")
+    }
+    match source.FindOrdinal("absent") {
+        None => { }
+        _ => System.Fault("Absent match")
+    }
+    WriteLine("Scalar and source-range contracts: passed")
+
+}
+
+public func CheckSplits(first: int, last: int) {
+    let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128, (byte)101, (byte)204, (byte)129]
+    for split in first..last {
+        let decoder = BoundedUtf8Decoder()
+        var text = ""
+        var scalars = 0
+        var offset = 0
+        for end in [split, bytes.Length] {
+            var finished = false
+            var attempts = 0
+            while !finished {
+                attempts += 1
+                Check(attempts <= 16, "Decoder must make progress")
+                let step = Step(decoder.Decode(bytes, offset, end - offset, end == bytes.Length, 4))
+                text = String.Concat(text, step.Text)
+                scalars += step.ScalarsProduced
+                offset += step.InputBytesConsumed
+                Check(step.Utf8BytesProduced <= 4, "Output bound")
+                match step.Status {
+                    DecodeStatus.OutputFull => { }
+                    _ => finished = true
+                }
+            }
+            if end == bytes.Length {
+                break
+            }
+        }
+        Check(text.Equals("Aé€😀é") && scalars == 6 && text.Length == 5, "Split decode")
+    }
+    WriteLine("Bounded UTF-8 split checks: passed")
+}
+
+public func CheckDecodeEdges() {
+    let bytes: byte[] = [(byte)65, (byte)195, (byte)169, (byte)226, (byte)130, (byte)172, (byte)240, (byte)159, (byte)152, (byte)128, (byte)101, (byte)204, (byte)129]
+    let empty: byte[] = []
+    let prefix: byte[] = [(byte)195]
+    let tail: byte[] = [(byte)169]
+    let owned = BoundedUtf8Decoder()
+    Check(StatusCode(Step(owned.Decode(prefix, 0, 1, false, 2))) == 1, "Carry status")
+    prefix[0] = (byte)65
+    _ = Failure(owned.Decode(tail, 2147483647, 1, false, 2))
+    _ = Failure(owned.Decode(tail, 0, 1, false, 257))
+    Check(StatusCode(Step(owned.Decode(empty, 0, 0, false, 0))) == 1, "Empty is not EOF")
+    let full = Step(owned.Decode(tail, 0, 1, true, 1))
+    Check(StatusCode(full) == 2 && full.InputBytesConsumed == 0, "Carry output exhaustion")
+    let done = Step(owned.Decode(tail, 0, 1, true, 2))
+    Check(done.Text.Equals("é") && StatusCode(done) == 3, "Owned carry retry")
+    _ = Failure(owned.Decode(empty, 0, 0, false, 2))
+    let bounded = BoundedUtf8Decoder()
+    let first = Step(bounded.Decode(bytes, 0, 3, true, 1))
+    Check(first.Text.Equals("A") && first.InputBytesConsumed == 1 && StatusCode(first) == 2, "Prefix progress")
+    Check(Step(bounded.Decode(bytes, 1, 2, true, 2)).Text.Equals("é"), "Final retry")
+    let zero = BoundedUtf8Decoder()
+    Check(Step(zero.Decode(bytes, 0, 1, true, 0)).InputBytesConsumed == 0, "Zero capacity")
+    Check(Step(zero.Decode(bytes, 0, 1, true, 1)).Text.Equals("A"), "Zero capacity retry")
+    let malformed: byte[] = [(byte)65, (byte)255]
+    let failure = Failure(BoundedUtf8Decoder().Decode(malformed, 0, 2, true, 4))
+    Check(failure.Text.Equals("A") && failure.InputBytesConsumed == 1 && failure.ScalarsProduced == 1, "Failure preserves prefix")
+    match failure.Reason {
+        DecodeError.InvalidUtf8(let position) => Check(position.Value == 1, "Error offset")
+        _ => System.Fault("Wrong error")
+    }
+    let truncated = BoundedUtf8Decoder()
+    _ = Step(truncated.Decode(bytes, 0, 2, false, 4))
+    match Failure(truncated.Decode(empty, 0, 0, true, 4)).Reason {
+        DecodeError.IncompleteUtf8(let position) => Check(position.Value == 1, "Truncated offset")
+        _ => System.Fault("Wrong truncation error")
+    }
+    for invalid in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128]] {
+        match Failure(BoundedUtf8Decoder().Decode(invalid, 0, invalid.Length, true, 4)).Reason {
+            DecodeError.InvalidUtf8(let position) => Check(position.Value == 0, "Strict error position")
+            _ => System.Fault("Strict validation")
+        }
+    }
+    WriteLine("Decoding ownership, progress and errors: passed")
+}
+
+public func Main(args: string[]) {
+    if args.Length == 0 {
+        CheckBoundaries()
+        CheckDecodeEdges()
+    } else if args[0].Equals("first") {
+        CheckSplits(0, 6)
+    } else {
+        CheckSplits(7, 13)
+    }
+}

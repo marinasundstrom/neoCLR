@@ -29,10 +29,13 @@ The author-selected explicit String comparison modes and matching ignore-case po
 are implemented in development. The [String/System.Text foundation review](design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
 is complete: keep the UTF-8/grapheme model, but establish scalar, position, ownership
 and conversion-progress contracts before dependent API expansion. The author clarifies
-that System.Text is a source of useful capabilities, not a namespace to copy wholesale.
+that the immediate System.Text scope is encoding/decoding foundations and possibly
+a small builder, with Swift as the closer model for text API shape.
 The [library tracker](tracking/library-data.md#string-design-review-before-further-expansion)
-owns the proposed portfolio and next bounded step: a text-boundary prototype before
-larger implementation. Recommendations and proposed names are not yet adopted APIs.
+owns the boundary experiment and next bounded recommendation: UTF-8 conversion
+progress for a chunked reader, then evaluate minimal text construction. General
+scalar/range APIs and the broader portfolio are not prerequisites. Experimental
+types and proposed names are not adopted System APIs.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

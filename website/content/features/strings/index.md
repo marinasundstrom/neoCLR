@@ -223,7 +223,7 @@ See [StringComparison](xref:System.StringComparison) and [StringComparer](xref:S
 Use matching development runtime and SDK artifacts; Preview 10 lacks these additions.
 
 The [text foundation review](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
-recommends explicit scalar and range contracts before broader text APIs. A small
-builder and improved UTF-8 conversion are proposed directions; System.Text parity
-is not the goal. These recommendations do not change the current API. .NET remains
-the ergonomic target, informed by UTF-8 and lessons from other frameworks.
+uses Swift as the closer model for character-facing text APIs, with explicit scalar
+and encoding views. The immediate direction is encoding/decoding foundations and
+possibly a small builder for later APIs, not System.Text parity. Boundary types
+remain experimental; these plans do not change current equality, indexing or APIs.

@@ -1,0 +1,141 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Text.*
+
+public union DecodeStatus {
+    case InputAccepted
+    case NeedMoreInput
+    case OutputFull
+    case Finished
+}
+
+// Reference payload avoids unsupported explicit-layout integer-only app unions.
+public class StreamBytePosition {
+    val Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+public union DecodeError {
+    case InvalidRange
+    case LimitExceeded
+    case Stopped
+    case InvalidUtf8(byteOffset: StreamBytePosition)
+    case IncompleteUtf8(byteOffset: StreamBytePosition)
+}
+
+public class DecodeStep {
+    val Text: string
+    val InputBytesConsumed: int
+    val ScalarsProduced: int
+    val Status: DecodeStatus
+    val Utf8BytesProduced: int => Text.GetUtf8ByteCount()
+
+    init(text: string, consumed: int, scalars: int, status: DecodeStatus) {
+        Text = text
+        InputBytesConsumed = consumed
+        ScalarsProduced = scalars
+        Status = status
+    }
+}
+
+public class DecodeFailure {
+    val Text: string
+    val InputBytesConsumed: int
+    val ScalarsProduced: int
+    val Reason: DecodeError
+    val Utf8BytesProduced: int => Text.GetUtf8ByteCount()
+
+    init(text: string, consumed: int, scalars: int, reason: DecodeError) {
+        Text = text
+        InputBytesConsumed = consumed
+        ScalarsProduced = scalars
+        Reason = reason
+    }
+}
+
+// Extends the earlier utf8-chunks experiment's owned carry and strict validation.
+public class BoundedUtf8Decoder {
+    private var pending: ArrayList<byte> = ArrayList<byte>(4)
+    private var expected: int = 0
+    private var stopped: bool = false
+    private var accepted: int = 0
+    private var scalarStart: int = 0
+
+    func Decode(source: byte[], offset: int, count: int, final: bool,
+                maxOutputUtf8Bytes: int) -> Result<DecodeStep, DecodeFailure> {
+        if stopped {
+            return Error(DecodeFailure("", 0, 0, DecodeError.Stopped))
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > source.Length || count > source.Length - offset || !(maxOutputUtf8Bytes >= 0) {
+            return Error(DecodeFailure("", 0, 0, DecodeError.InvalidRange))
+        }
+        if count > 256 || maxOutputUtf8Bytes > 256 || count > 4096 - accepted {
+            return Error(DecodeFailure("", 0, 0, DecodeError.LimitExceeded))
+        }
+        var text = ""
+        var consumed = 0
+        var produced = 0
+        var scalars = 0
+        while consumed < count {
+            let value = source[offset + consumed]
+            var width = expected
+            if pending.Count == 0 {
+                if value <= 127 {
+                    width = 1
+                } else if value >= 194 && value <= 223 {
+                    width = 2
+                } else if value >= 224 && value <= 239 {
+                    width = 3
+                } else if value >= 240 && value <= 244 {
+                    width = 4
+                } else {
+                    stopped = true
+                    return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(accepted))))
+                }
+            }
+            // Never emit a partial scalar. Carry from earlier calls also needs room.
+            if width > maxOutputUtf8Bytes - produced {
+                return Ok(DecodeStep(text, consumed, scalars, DecodeStatus.OutputFull))
+            }
+            if pending.Count == 0 {
+                scalarStart = accepted
+                expected = width
+            } else if !(value >= 128 && value <= 191) {
+                stopped = true
+                return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
+            }
+            pending.Add(value)
+            consumed += 1
+            accepted += 1
+            if pending.Count == expected {
+                match Utf8.Decode(pending) {
+                    Ok(let scalar) => {
+                        text = String.Concat(text, scalar)
+                        produced += expected
+                        scalars += 1
+                    }
+                    Error(_) => {
+                        stopped = true
+                        return Error(DecodeFailure(text, consumed, scalars, DecodeError.InvalidUtf8(StreamBytePosition(scalarStart))))
+                    }
+                }
+                pending = ArrayList<byte>(4)
+                expected = 0
+            }
+        }
+        if final {
+            stopped = true
+            if pending.Count != 0 {
+                return Error(DecodeFailure(text, consumed, scalars, DecodeError.IncompleteUtf8(StreamBytePosition(scalarStart))))
+            }
+            return Ok(DecodeStep(text, consumed, scalars, DecodeStatus.Finished))
+        }
+        if pending.Count != 0 {
+            return Ok(DecodeStep(text, consumed, scalars, DecodeStatus.NeedMoreInput))
+        }
+        return Ok(DecodeStep(text, consumed, scalars, DecodeStatus.InputAccepted))
+    }
+}

@@ -291,6 +291,46 @@ remains valid; this review revisits how to present that relation, not its tested
 implementation. A future ASCII-only policy belongs to protocol consumers, not a
 silent shortcut for all Unicode comparisons.
 
+### Foundation scope and Swift direction — author clarification
+
+The author confirms that Char should hold a user-perceived character, not an
+encoding unit, and identifies Swift as the closer direction for the text API.
+Use Swift as the primary comparison for character/scalar/encoding views and text
+navigation; retain .NET as an ergonomic and capability comparison, not a required
+surface shape. This refines the earlier .NET-first framing for this theme.
+A grapheme approximates a perceived character; it is not necessarily one rendered
+glyph or one display cell.
+
+The immediate goal is **encoding/decoding foundations and possibly a small
+StringBuilder**, sufficient to build later APIs. It is not the full System.Text
+API. Public scalar values, general range machinery, casing, normalization and
+formatting families must not become prerequisites without a concrete dependency.
+Existing Utf8 conversion and the chunk experiment already work without a new
+public scalar type. Keep such types experimental until a consumer needs them.
+
+[Swift's String/Character guide](https://raw.githubusercontent.com/swiftlang/swift-book/main/TSPL.docc/LanguageGuide/StringsAndCharacters.md)
+provides the reference for character collections, separate Unicode representations,
+append operations and value semantics. A neoCLR builder would supply controlled
+mutable accumulation beside the existing immutable String. Compare that with
+Swift-style string construction before adding a separate public type; Swift's
+copy-on-write implementation is not automatically a neoCLR requirement.
+
+Swift inspiration does not silently adopt canonical-equivalence equality, mutable
+String value semantics or every indexing rule. Existing exact equality/hashing and
+String/Sequence consumers remain unchanged. Those divergences need explicit
+review before any future migration. The detailed inventory below is a menu of
+later capabilities, not the scope of this foundation milestone.
+
+The author's supplied ChatGPT proposal is a useful comparison, not an adopted
+specification. Encoding-neutral text, explicit views, source-bound positions and
+strict decoding fit this direction. Removing Char, removing Length and demoting
+graphemes are alternative design choices, not Unicode necessities. Keep them open
+for reasoned review rather than inferring a migration from the pasted text. Canonical
+equality does not require storage normalization: Swift's canonical comparisons do
+not by themselves imply rewriting encoded data. A source-bound position also needs
+a declared boundary view (grapheme versus scalar), source validation and retention
+rules; making its offset opaque does not settle those questions.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory
@@ -351,12 +391,11 @@ an entire large source is an ownership cost even in a GC-managed runtime.
 
 ### Recommended next bounded step and acceptance
 
-**First:** a String/System.Text boundary prototype and contract decision, rather
-than StringBuilder or the entire Encoding hierarchy. Resolve scalar type identity,
-traversal/construction, positions versus grapheme ordinals, progress/error units and
-ownership using two tiny consumers: delimiter extraction with search-to-slice
-round trips, and UTF-8 conversion split inside a multibyte scalar. This is a proposed
-next task; this review contains no implementation of those interfaces.
+**Current experiment:** [text boundaries](../experiments/text-boundaries/README.md)
+uses delimiter extraction and split UTF-8 input to examine units, ownership and
+conversion progress. These are application types, not public System APIs. Scalar
+and range experiments inform future views; they do not mandate introducing them
+before basic encoding or text construction.
 
 The prototype should demonstrate that:
 
@@ -375,13 +414,14 @@ The prototype should demonstrate that:
    equality and hash coherence remain intact. Runtime enforcement, metadata and
    Raven projection agree on any new value/range type, including invalid defaults.
 
-**Then:** qualify the chosen Unicode baseline and settle comparison naming before
-expanding dependent APIs. Do not make unfinished regex, collation, general codec
-registration or zero-copy work prerequisites for the selected portfolio. Next implement a minimal builder against those contracts,
-followed by incremental conversion and reader/writer integration. StringBuilder's
-familiar construction role is useful; [.NET's implementation and full surface](https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-10.0)
-are not prerequisites. Each family needs its own bounded consumer, not one giant
-System.Text implementation commit.
+**Next bounded implementation recommendation:** improve the existing UTF-8 codec
+with the progress, final-input and error contract needed by one chunked reader.
+Keep text output encoding-independent and encoded input explicit. Evaluate minimal
+append/materialization against an actual report consumer next, comparing a separate
+builder with Swift-style construction. A builder must preserve immutable snapshots
+and allow concatenation to resegment graphemes; no complete search API, new scalar
+public type, normalization or comparison-policy migration is required first.
+Unicode-version alignment and comparison naming remain tracked separately.
 
 The proposed improvements over .NET are clearer unit boundaries, fewer accidental
 culture defaults, valid-text invariants and coherent typed failures. The present

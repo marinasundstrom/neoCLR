@@ -1,0 +1,123 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+import System.Option.*
+import System.Text.*
+
+// Experimental application types, not additions to System or its reference assembly.
+public union BoundaryError {
+    case InvalidScalar
+    case WrongSource
+    case OutOfRange
+    case InvalidBoundary
+    case UninitializedRange
+}
+
+public struct ScalarValue {
+    private var code: uint = (uint)0
+
+    private init(value: uint) {
+        code = value
+    }
+
+    val Value: uint => code
+
+    static func FromValue(value: uint) -> Result<ScalarValue, BoundaryError> {
+        if value > 1114111 || (value >= 55296 && value <= 57343) {
+            return Error(BoundaryError.InvalidScalar)
+        }
+        return Ok(ScalarValue(value))
+    }
+
+    func ToText() -> string {
+        let bytes = ArrayList<byte>(4)
+        if code <= 127 {
+            bytes.Add((byte)code)
+        } else if code <= 2047 {
+            bytes.Add((byte)(192 + code / 64))
+            bytes.Add((byte)(128 + code % 64))
+        } else if code <= 65535 {
+            bytes.Add((byte)(224 + code / 4096))
+            bytes.Add((byte)(128 + code / 64 % 64))
+            bytes.Add((byte)(128 + code % 64))
+        } else {
+            bytes.Add((byte)(240 + code / 262144))
+            bytes.Add((byte)(128 + code / 4096 % 64))
+            bytes.Add((byte)(128 + code / 64 % 64))
+            bytes.Add((byte)(128 + code % 64))
+        }
+        return match Utf8.Decode(bytes) {
+            Ok(let text) => text
+            Error(_) => {
+                System.Fault("Invalid scalar encoding in prototype")
+                ""
+            }
+        }
+    }
+}
+
+public class SourceRange {
+    val Source: TextSource
+    val Utf8Start: int
+    val Utf8Length: int
+
+    // Public for adversarial construction in the prototype. Every use validates it.
+    init(source: TextSource, utf8Start: int, utf8Length: int) {
+        Source = source
+        Utf8Start = utf8Start
+        Utf8Length = utf8Length
+    }
+}
+
+public class TextSource {
+    val Text: string
+
+    init(text: string) {
+        Text = text
+    }
+
+    func RangeFromUtf8(start: int, length: int) -> Result<SourceRange, BoundaryError> {
+        return match Text.SliceUtf8(start, length) {
+            Ok(_) => Ok(SourceRange(self, start, length))
+            Error(Utf8SliceError.OutOfRange) => Error(BoundaryError.OutOfRange)
+            Error(_) => Error(BoundaryError.InvalidBoundary)
+        }
+    }
+
+    func Slice(range: SourceRange?) -> Result<string, BoundaryError> {
+        if range is not SourceRange actual {
+            return Error(BoundaryError.UninitializedRange)
+        }
+        if !Object.ReferenceEquals(self, actual.Source) {
+            return Error(BoundaryError.WrongSource)
+        }
+        return match Text.SliceUtf8(actual.Utf8Start, actual.Utf8Length) {
+            Ok(let text) => Ok(text)
+            Error(Utf8SliceError.OutOfRange) => Error(BoundaryError.OutOfRange)
+            Error(_) => Error(BoundaryError.InvalidBoundary)
+        }
+    }
+
+    func FindOrdinal(pattern: string) -> Option<SourceRange> {
+        let source = Utf8.Encode(Text)
+        let needle = Utf8.Encode(pattern)
+        if needle.Count > source.Count {
+            return None
+        }
+        var start = 0
+        while start <= source.Count - needle.Count {
+            var index = 0
+            var matches = true
+            while index < needle.Count && matches {
+                matches = source[start + index] == needle[index]
+                index += 1
+            }
+            if matches {
+                // Both strings are valid UTF-8: an exact match has scalar endpoints.
+                return Some(SourceRange(self, start, needle.Count))
+            }
+            start += 1
+        }
+        return None
+    }
+}

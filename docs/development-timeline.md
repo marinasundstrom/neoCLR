@@ -7969,3 +7969,30 @@ configuration/content, not target-specific code added to Raven main.
   grapheme Char, noting that “Unicode character” does not by itself choose between
   scalars and graphemes. No metadata format, runtime representation or public API is
   changed. Byte-oriented projections remain explicitly encoding-specific contracts.
+
+## 2026-09-27 — Swift-like text and a bounded System.Text foundation
+
+- **Author:** clarifies that Char should hold a visible/user-perceived character,
+  not an encoding unit. Subsequently says the intent is the basics of System.Text,
+  supporting encoding and perhaps StringBuilder so later APIs can be built on them.
+  “We will be more like Swift, I believe, so our API should reflect that.”
+- **Assistant response:** retains grapheme Char, distinguishing graphemes from glyphs
+  and display width. Makes Swift the primary text-surface comparison, preserving
+  .NET familiarity where useful. Narrows implementation recommendations to UTF-8
+  conversion progress and evaluating minimal text construction. Public scalar/range
+  machinery and the broader capability inventory are not blanket prerequisites.
+- **Author input:** provides a ChatGPT proposal for encoding-neutral String, scalar
+  and encoding views, opaque positions, strict decoding and explicit normalization;
+  that proposal also removes Char and Length and places graphemes in System.Text.
+- **Assistant assessment:** treats the pasted proposal as input, not a user decision.
+  Supports separating text and encoding, but identifies removing Char as conflicting
+  with the author's current Swift-like direction. Canonical-equivalence comparison
+  and storage normalization are separate choices. No approval to remove Length,
+  indexing or exact equality is inferred.
+- **Actions/outcome:** updates existing design/roadmap/theme tracking and website
+  future-direction prose. Adds an [application-only boundary experiment](experiments/text-boundaries/README.md)
+  with scalar/range and bounded decoder checks. Compilation, import verification and
+  three focused executions pass, including all 14 byte splits of the teaching text.
+  Records application bridge/fixture limitations; no compiler or System API changes.
+  No full suite or website build. Public view names, position semantics and builder
+  shape remain open; the supplied proposal is not implemented wholesale.
