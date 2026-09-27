@@ -114,6 +114,13 @@ is scalar support, a small builder, improved UTF-8 conversion and incremental
 encoder/decoder roles. General codec registries, fallback class hierarchies, every
 encoding and adjacent subnamespaces are not automatic scope.
 
+**Further author clarification:** separate metadata serialization, logical text,
+runtime storage and API boundary encodings. String/Char-facing APIs should remain
+encoding-independent; UTF-8 is a documented boundary default where selected, not
+Char's meaning. The [layering contract](../design/text-abstraction.md#separate-the-text-and-encoding-contracts)
+qualifies the review's low-level buffer recommendations. This does not change the
+currently selected grapheme unit or any artifact format.
+
 **Next bounded recommendation:** a String/System.Text boundary prototype using a
 small delimiter-extraction consumer and split UTF-8 input. Resolve validated scalar
 identity, traversal, source-range ownership and progress/error units before dependent

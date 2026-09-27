@@ -36,6 +36,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   a proposed System.Text capability portfolio.
   Correct stale String indexing/union documentation. Recommend scalar/range/codec
   boundary work before dependent expansion; no proposed API changes are implemented.
+  Clarify the separate metadata, logical text, storage and API-boundary encoding
+  contracts: String/Char APIs need not expose UTF-8 simply because storage/defaults use it.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

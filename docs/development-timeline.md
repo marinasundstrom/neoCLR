@@ -7952,3 +7952,20 @@ configuration/content, not target-specific code added to Raven main.
   [probe sources/results](experiments/text-review/README.md). Recommendations are not
   implemented public APIs or author approval of exact signatures. No runtime or
   compiler change, full suite, website build or publication occurs.
+
+
+## 2026-09-27 — Separate logical text from serialization and API encoding defaults
+
+- **Author:** distinguishes strings encoded in metadata from class-library preferences
+  for UTF-8, and says a character should represent a Unicode character in the system
+  without bearing the actual encoding. Users select encoding unless an API supplies
+  a default such as UTF-8.
+- **Assistant response:** separates artifact serialization, logical text, runtime
+  storage, API boundary encoding, foreign representation and interpretation policies.
+  Corrects the review's overly broad wording about building System.Text around Char:
+  high-level String/Char input is appropriate; low-level buffer progress must name
+  its units. UTF-8 storage does not force UTF-8 into every public text signature.
+- **Action:** updates the existing text design and owning tracker. Retains the current
+  grapheme Char, noting that “Unicode character” does not by itself choose between
+  scalars and graphemes. No metadata format, runtime representation or public API is
+  changed. Byte-oriented projections remain explicitly encoding-specific contracts.

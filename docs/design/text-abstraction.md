@@ -36,6 +36,46 @@ The scalar view uses uint for this small preview surface, not a new scalar value
 type. This is provisional and may become a dedicated type with construction-time
 validation. Char's scalar values are available through `character.ToString().GetScalars()`.
 
+## Separate the text and encoding contracts
+
+**Author clarification, 2026-09-27:** metadata encoding, runtime representation and
+class-library encoding defaults are different concerns. A character is a logical
+value in the system; it need not carry or expose an encoding. Callers choose an
+encoding when crossing a byte boundary, or use the encoding specified by that API.
+UTF-8 is the preferred default where appropriate, not the meaning of every text API.
+
+| Concern | Contract owner | Consequence for the public API |
+| --- | --- | --- |
+| Source/artifact and metadata serialization | The source or artifact format and its reader/writer | Names and literals need a defined serialized representation. Its encoded units do not define guest Char, String.Length or a codec's public buffer units. Do not infer a metadata-format change from a library default. |
+| Logical String and Char values | The language/platform text contract | String denotes Unicode text; today's Char denotes one extended grapheme cluster. A scalar denotes one Unicode scalar value. Neither logical unit is a UTF-8 byte or UTF-16 code unit. |
+| Runtime storage | The runtime implementation | Current storage uses UTF-8. Layout, sharing and caching can evolve while preserving public text behavior. Storage does not require callers to encode/decode ordinary String values. |
+| Text-to-byte and byte-to-text boundaries | The specific library API, protocol or caller's explicit choice | An API may accept an encoding, document a UTF-8 default, or mandate an encoding. These are different policies. String-to-String operations do not need an encoding parameter. |
+| Foreign ABI / opaque data | The interop or resource boundary | Convert explicitly to required bytes/code units and define invalid-input handling. Preserve data outside Unicode text in a suitable boundary representation rather than silently replacing it. |
+| Interpretation of text | The selected comparison, segmentation, normalization or casing policy | These operate on logical text and Unicode rules. UTF-8 storage or output defaults do not choose culture, case equivalence, normalization or user-visible character boundaries. |
+
+Encoding-specific operations remain useful **explicit projections**. GetUtf8ByteCount,
+SliceUtf8 and Utf8.Encode/Decode have UTF-8 in their contract, regardless of how a
+future runtime stores the String. Likewise, the currently selected scalar ordinal
+ordering is an observable comparison contract to preserve, not permission for an
+internal-storage change to change sorting.
+
+A high-level writer can accept String or Char and perform its documented default
+encoding internally; users need not manually create bytes for every write. An
+explicit codec can select another boundary encoding without changing the input
+text's identity. Metadata readers independently decode the representation required
+by their artifact format. None of these operations means that Char itself is
+“a UTF-8 character”.
+
+This refines the review below: **encoding-independent text input is appropriate for
+builders and codecs**. The warning concerns confusing grapheme counts with byte or
+scalar progress in low-level conversion buffers. It does not mean every text API
+must expose scalar arrays, UTF-8 storage or encoding choices. A scalar-oriented core
+can support a simpler String/Char-facing API.
+
+The word “Unicode character” alone does not resolve the scalar-versus-grapheme
+choice. This clarification preserves the currently selected grapheme Char; it does
+not silently change it to a scalar, code point or encoded unit.
+
 ## Representation, safety and costs
 
 The runtime stores Char as owned, immutable, validated UTF-8 text. Copying a Char
@@ -114,10 +154,11 @@ valid/invalid literals, prohibited numeric operations and unchanged .NET default
 
 ## System.Text foundation review — 2026-09-27
 
-**Review conclusion:** keep immutable valid UTF-8 text, grapheme Char and familiar
-String operations, but do not build the selected System.Text capabilities around
-`Sequence<char>`. A grapheme is suitable for character-facing operations; it is
-not the fixed-size processing unit needed by encoders, buffers or parser positions.
+**Review conclusion:** keep immutable Unicode text, grapheme Char and familiar
+String operations, with UTF-8 as the current storage choice. Text-facing System.Text
+APIs may consume String/Char; their lower-level conversion contracts must distinguish
+byte/scalar progress from grapheme counts. Sequence<char> is not a universal encoded
+buffer contract. Metadata encoding and boundary defaults remain independent.
 The user identifies future System.Text work as dependent on getting these crucial
 String interfaces right first, then clarifies that the goal is to select useful
 capabilities to bring over, not copy the entire namespace.
@@ -169,7 +210,7 @@ Three alternatives were considered:
   surrogate/code-unit concerns. Choose only if .NET binary/ABI compatibility becomes
   a primary product requirement; familiarity alone is insufficient reason.
 
-The major problem would be **hiding these differences**, for example calling an
+The major problem would be **conflating these layers or hiding their differences**, for example calling an
 encoder output count “chars written” when it actually counts bytes, or using a
 String sequence as if it were a fixed-width buffer. The model itself supports the
 selected modern API portfolio provided these boundaries are made explicit.
