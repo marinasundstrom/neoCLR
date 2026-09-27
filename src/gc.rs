@@ -76,6 +76,13 @@ impl ManagedHeap {
     /// Inspect a heap-backed reference, including an interior field, only within
     /// the execution that owns it. This does not create a guest invocation handle.
     pub fn read_reference(&self, reference: &crate::SlotReference) -> Result<Value, Fault> {
+        self.check_reference_owner(reference)?;
+        reference.read()
+    }
+    pub(crate) fn check_reference_owner(
+        &self,
+        reference: &crate::SlotReference,
+    ) -> Result<(), Fault> {
         let cell = reference
             .allocation_id()
             .and_then(|id| self.objects.get(&id))
@@ -83,7 +90,7 @@ impl ManagedHeap {
         if !reference.belongs_to_heap_cell(cell) {
             return Err(Fault::new("reference does not belong to this managed heap"));
         }
-        reference.read()
+        Ok(())
     }
     pub(crate) fn address(&self, identity: usize) -> Result<crate::SlotReference, Fault> {
         let cell = self

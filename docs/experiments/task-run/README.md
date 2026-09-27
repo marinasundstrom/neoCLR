@@ -123,11 +123,58 @@ participants and export ordering. Existing VM collection/entry-dispatch behavior
 passes. No new per-instruction scheduling or slot operations were introduced; the
 previous storage cost check is retained, not rerun as a scheduler benchmark.
 
+## First native work-submission slice
+
+`src/task_work.rs` implements an internal, bounded native work owner. It is tested
+with runtime-side callbacks and is **not yet connected to guest delegate execution
+or public Task.Run**. One dedicated native thread per admitted job is the initial
+backend primitive; pooling remains runtime policy. Handles are single-use and never
+reused. The bound is total submissions per owner, not a public Task.Run option.
+
+Submission registers capture roots under heap access before starting the thread.
+A worker can release access while blocked and publish temporary execution roots
+between access intervals. Producing a result and publishing its roots happen in
+one interval; completion retains that registration until the receiving owner
+publishes the result. Invocation identities reject foreign submissions/completions,
+and reference-result provenance checks reject handles from another heap even if
+allocation IDs coincide. Existing frame-escape checks also apply. Root IDs passed
+by the internal driver remain trusted invocation-local root-walker output.
+
+The owner provides nonblocking readiness inspection and explicit join. Teardown
+requests a private stop token and joins all owned jobs, including after a fault;
+it does not cancel the host's token merely because this owner is disposed. Workers
+observe both host cancellation and local stop. Waiting for heap access is cancellable,
+so a stopped worker need not acquire the gate to exit. Blocking host operations
+still require their own cooperation; this does not forcibly interrupt arbitrary
+native code. Normal teardown must inspect faults; Drop joins as an unwinding
+fallback. Faults remain invocation failures, not new TaskOutcome cases.
+
+The driver must normally join/teardown outside heap access. The cancellation test
+also covers cleanup of a worker already waiting for that access. Public Promise
+completion, queue publication, wake notifications, shared host resources, aggregate
+instruction/frame budgets, guest safepoints and async unwrapping are not supplied
+by this component. Do not enable a public facade until these are connected and
+validated. In particular, the current full-invocation VM guard would serialize
+entire callbacks and block progress; the runtime-side blocking probe is not proof
+that guest blocking calls have already been offloaded correctly.
+
+```sh
+cargo test --lib task_work::tests
+cargo test --lib shared_heap::tests
+cargo test --test heap_references host_can_inspect_returned_fields_only_in_the_owning_execution
+```
+
+Nine native work tests, six coordinator tests and the host provenance regression
+pass. The work tests cover caller progress during a blocked callback, shared
+mutation, parked temporary roots, fresh reference results, bounded admission,
+single-use handles, cancellation/join, fault cleanup and foreign-heap rejection.
+These are contract checks, not throughput benchmarks or Raven API examples.
+
 ## Next prerequisite
 
-Establish bounded native submission, rooted completion ownership, cancellation and
-join-before-disposal. Then connect guest execution safepoints and shared services,
-and establish concurrent Promise/queue publication before exposing Run overloads.
-Native blocking-work progress and async callback unwrapping need executable
-acceptance at that later API boundary. Retaining every object until invocation exit
-is not a substitute for bounded live-object accounting.
+Connect guest execution safepoints and shared services to native work ownership,
+then establish concurrent Promise/queue publication before exposing Run overloads.
+Validate blocking guest callbacks and async callback unwrapping at that API boundary.
+Keep instruction, frame, heap and host-resource budgets invocation-owned; a new task
+must not reset them. Retaining every object until invocation exit is not a
+substitute for bounded live-object accounting.

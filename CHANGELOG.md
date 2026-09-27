@@ -43,6 +43,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   collection across parked participants and export after participant release.
   Route existing VM collection through one participant; concurrent guest execution
   and public Task.Run remain pending. Add focused coordinator/GC/startup checks.
+  Implement the internal bounded native work owner with rooted capture/result
+  handoff, invocation provenance, cancellable heap-gate waits and cancellation/join
+  cleanup that preserves the host token. Validate blocking runtime-side callbacks;
+  guest execution, shared services, Promise publication and Run overloads remain
+  unconnected. This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

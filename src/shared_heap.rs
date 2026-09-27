@@ -21,6 +21,13 @@ struct Shared {
 }
 
 pub(crate) struct Owner(Arc<Shared>);
+#[derive(Clone)]
+pub(crate) struct Identity(Weak<Shared>);
+impl Identity {
+    pub(crate) fn matches(&self, access: &Access<'_>) -> bool {
+        Weak::ptr_eq(&self.0, &Arc::downgrade(access.shared))
+    }
+}
 pub(crate) struct Participant {
     shared: Arc<Shared>,
     registration: Arc<Registration>,
@@ -61,6 +68,34 @@ impl Owner {
 }
 
 impl Participant {
+    /// Native work must not wait indefinitely for the graph gate after teardown
+    /// requests cancellation. No guest work runs while waiting for this lock.
+    pub(crate) fn enter_cancellable(
+        &mut self,
+        cancelled: impl Fn() -> bool,
+    ) -> Result<Access<'_>, Fault> {
+        loop {
+            if cancelled() {
+                return Err(Fault::coded(
+                    crate::FaultCode::ExecutionCancelled,
+                    "heap access cancelled",
+                ));
+            }
+            match self.shared.state.try_lock() {
+                Ok(state) => {
+                    return Ok(Access {
+                        shared: &self.shared,
+                        registration: &self.registration,
+                        state,
+                    });
+                }
+                Err(std::sync::TryLockError::WouldBlock) => {
+                    std::thread::park_timeout(std::time::Duration::from_millis(1))
+                }
+                Err(std::sync::TryLockError::Poisoned(_)) => panic!("shared heap lock poisoned"),
+            }
+        }
+    }
     pub(crate) fn enter(&mut self) -> Access<'_> {
         Access {
             shared: &self.shared,
@@ -100,9 +135,52 @@ fn register(
 }
 
 impl Access<'_> {
+    pub(crate) fn identity(&self) -> Identity {
+        Identity(Arc::downgrade(self.shared))
+    }
+
+    /// Validate native result provenance, including nested values and delegates.
+    /// Allocation IDs alone cannot distinguish two invocations with the same ID.
+    pub(crate) fn publish_value(&mut self, value: &crate::Value) -> Result<(), Fault> {
+        use crate::Value;
+        value.ensure_heap_references()?;
+        let mut pending = vec![value];
+        let mut roots = Vec::new();
+        while let Some(value) = pending.pop() {
+            let reference = match value {
+                Value::ObjectReference(object) => Some(&object.reference),
+                Value::SlotReference(reference)
+                | Value::SlotInterface {
+                    receiver: reference,
+                    ..
+                } => Some(reference),
+                Value::Delegate(delegate) => {
+                    pending.extend(delegate.receiver.as_deref());
+                    None
+                }
+                Value::Object { fields, .. }
+                | Value::Array {
+                    elements: fields, ..
+                } => {
+                    pending.extend(fields);
+                    None
+                }
+                Value::Erased(value) => {
+                    pending.push(value);
+                    None
+                }
+                _ => None,
+            };
+            if let Some(reference) = reference {
+                self.state.heap.check_reference_owner(reference)?;
+                roots.push(reference.allocation_id().expect("checked heap reference"));
+            }
+        }
+        self.publish(roots)
+    }
+
     /// Publish queued captures before the submitting participant can release them.
     /// Dropping a rejected/unsubmitted participant never reacquires the heap lock.
-    #[allow(dead_code)] // Submission is connected when native Task.Run is added.
     pub(crate) fn fork(&mut self, roots: Vec<usize>) -> Result<Participant, Fault> {
         register(self.shared, &mut self.state, roots)
     }

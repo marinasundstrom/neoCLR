@@ -21,9 +21,10 @@ worker contract is not a substitute. Thread's future public role remains open.
 The [first storage prerequisite](../experiments/task-run/README.md) implements
 synchronized managed slots and tests native alias sharing. The subsequent heap coordinator registers participant roots and serializes graph
 access/collection; the current VM uses one participant and has not yet gained
-concurrent guest execution. The next bounded prerequisite is native work ownership,
-then guest safepoints/shared services and concurrent Promise/queue publication
-before the Task.Run facade. Green threads are recorded as a possible future backend.
+concurrent guest execution. The first native work owner now covers bounded submission, rooted completion,
+cooperative cancellation and join-before-disposal with runtime-side callbacks.
+Guest safepoints/shared services and concurrent Promise/queue publication remain
+before the Task.Run facade; the internal blocking probe is not a guest API result. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.
 
