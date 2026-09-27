@@ -69,8 +69,8 @@ per the author’s 2026-09-27 clarification.
 
 ## String design review before further expansion
 
-**Author-directed next step (2026-09-27):** finish explicit comparison modes, then
-stop implementation and reassess strings as a whole. .NET is the ergonomic target;
+**Review completed (2026-09-27); implementation pause retained.** The author directed
+finishing explicit comparison modes and then reassessing strings as a whole. .NET is the ergonomic target;
 exact API spelling, behavior and implementation are not mandatory. Learn from other
 frameworks and evaluate benefits and costs specific to valid UTF-8 text.
 
@@ -101,6 +101,33 @@ from hypotheses; benchmark only performance claims that matter. Do not start a
 redesign, StringBuilder, generalized casing or additional comparison overloads
 while producing that recommendation. This review supersedes the earlier proposed
 text-construction-first ordering; it does not reopen the released HTTP POC.
+
+**Outcome:** the [completed review](../design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
+contains the keep/change/defer matrix, framework comparisons, actual five-language
+observations, a model-impact assessment and crucial-interface checklist. The model
+is viable; its main risks are hidden units/costs, grapheme buffering assumptions and
+foreign-text round trips, not UTF-8 itself. These are explicit acceptance concerns
+for a modern API, not permission to copy .NET signatures mechanically. The author stresses the System.Text
+dependency, then clarifies that we should select what to bring over rather than
+copy everything. The [proposed portfolio](../design/text-abstraction.md#what-to-bring-over-from-systemtext)
+is scalar support, a small builder, improved UTF-8 conversion and incremental
+encoder/decoder roles. General codec registries, fallback class hierarchies, every
+encoding and adjacent subnamespaces are not automatic scope.
+
+**Next bounded recommendation:** a String/System.Text boundary prototype using a
+small delimiter-extraction consumer and split UTF-8 input. Resolve validated scalar
+identity, traversal, source-range ownership and progress/error units before dependent
+APIs. Unicode-version alignment and explicit simple-fold naming are recommended
+changes, not performed migrations. Keep the existing Sequence<char> surface for now;
+do not require grapheme buffers underneath every text API. Broader designs remain
+provisional and HTTP remains closed. After the boundary decisions, a small append-only
+builder need not wait for unrelated search, regex, collation or zero-copy work.
+
+**Review validation:** the corrected Raven observation sample and independent .NET,
+Swift, Rust and Go probes pass/run as recorded in
+[the evidence](../experiments/text-review/README.md). Source inspection supplies
+complexity and ownership observations; these are not performance measurements.
+No runtime/compiler/API changes, full-suite run or website build are part of the review.
 
 ## Recorded checkpoints and remaining scope
 

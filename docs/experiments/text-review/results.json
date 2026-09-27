@@ -1,0 +1,61 @@
+{
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "corpus": "Aé👨‍👩‍👧‍👦🇸🇪",
+  "neoCLR": {
+    "revision": "730bcdc2",
+    "ravenRevision": "a108df82a",
+    "result": "Text foundation observations passed",
+    "graphemes": 4,
+    "scalars": 12,
+    "utf8Bytes": 37,
+    "integerIndex1": "é",
+    "ordinalCanonicalEquality": false,
+    "prefixInsideGrapheme": true,
+    "byteSliceInsideGrapheme": "́",
+    "joinedGraphemes": 1,
+    "simpleFoldKelvin": true,
+    "simpleFoldSharpSExpansion": false,
+    "malformedUtf8Rejected": true
+  },
+  "dotnet": {
+    "runtime": ".NET 10.0.0",
+    "graphemes": 4,
+    "scalars": 12,
+    "utf8Bytes": 37,
+    "utf16Units": 18,
+    "ordinalCanonicalEquality": false,
+    "ordinalPrefixInsideGrapheme": true,
+    "ordinalIgnoreCaseKelvin": false
+  },
+  "swift": {
+    "version": "Apple Swift 6.2.3",
+    "graphemes": 4,
+    "scalars": 12,
+    "utf8Bytes": 37,
+    "utf16Units": 18,
+    "canonicalEquality": true,
+    "prefixInsideGrapheme": false,
+    "joinedGraphemes": 1
+  },
+  "rust": {
+    "version": "1.95.0 (59807616e 2026-04-14)",
+    "scalars": 12,
+    "utf8Bytes": 37,
+    "utf16Units": 18,
+    "canonicalEquality": false,
+    "prefixInsideGrapheme": true,
+    "interiorByteRangeRejected": true,
+    "asciiIgnoreCaseKelvin": false
+  },
+  "go": {
+    "version": "go1.26.3 darwin/arm64",
+    "scalars": 12,
+    "utf8Bytes": 37,
+    "canonicalEquality": false,
+    "prefixInsideGrapheme": true,
+    "simpleFoldKelvin": true,
+    "simpleFoldSharpSExpansion": false
+  },
+  "limits": "Behavioral examples, not benchmarks; no proposed APIs implemented; no full suite or website build."
+}

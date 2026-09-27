@@ -26,12 +26,13 @@ The author-selected comparer slice is implemented in development: equality/hash 
 ordering policies, callback adapters, StringComparer.Ordinal and a HashMap policy
 constructor. See the [library/data sequence and evidence](tracking/library-data.md#active-direction--useful-api-gaps).
 The author-selected explicit String comparison modes and matching ignore-case policy
-are implemented in development. **Stop string feature expansion here for a design
-review**: reassess the complete String/Char surface, using .NET ergonomics as the
-target while learning from other frameworks and accounting for native UTF-8.
+are implemented in development. The [String/System.Text foundation review](design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
+is complete: keep the UTF-8/grapheme model, but establish scalar, position, ownership
+and conversion-progress contracts before dependent API expansion. The author clarifies
+that System.Text is a source of useful capabilities, not a namespace to copy wholesale.
 The [library tracker](tracking/library-data.md#string-design-review-before-further-expansion)
-owns the review and its completion boundary. StringBuilder and casing additions
-remain candidates after that review, not automatic next implementation tasks.
+owns the proposed portfolio and next bounded step: a text-boundary prototype before
+larger implementation. Recommendations and proposed names are not yet adopted APIs.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

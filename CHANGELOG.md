@@ -31,6 +31,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record .NET as the ergonomic target rather than an exact API template, learning
   from other frameworks and UTF-8 constraints. Finish the comparison slice, then
   stop further string expansion for an author-directed whole-surface design review.
+  Complete that review with .NET/Swift/Rust/Go and alternative-.NET comparisons,
+  focused behavioral probes, an assessment of String-model costs/limitations and
+  a proposed System.Text capability portfolio.
+  Correct stale String indexing/union documentation. Recommend scalar/range/codec
+  boundary work before dependent expansion; no proposed API changes are implemented.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

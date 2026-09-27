@@ -222,6 +222,8 @@ and folded ordering can differ from .NET's OrdinalIgnoreCase. An unknown mode fa
 See [StringComparison](xref:System.StringComparison) and [StringComparer](xref:System.StringComparer).
 Use matching development runtime and SDK artifacts; Preview 10 lacks these additions.
 
-Further String expansion is paused for a review of the complete text API. .NET is
-the ergonomic target, with UTF-8 and lessons from other frameworks shaping the
-choices. Casing, normalization, indexing and text construction remain open directions.
+The [text foundation review](https://github.com/marinasundstrom/neoCLR/blob/main/docs/design/text-abstraction.md#systemtext-foundation-review--2026-09-27)
+recommends explicit scalar and range contracts before broader text APIs. A small
+builder and improved UTF-8 conversion are proposed directions; System.Text parity
+is not the goal. These recommendations do not change the current API. .NET remains
+the ergonomic target, informed by UTF-8 and lessons from other frameworks.

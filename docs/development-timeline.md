@@ -7916,3 +7916,39 @@ configuration/content, not target-specific code added to Raven main.
   [focused evidence](experiments/raven-target/string-comparison-validation.json).
   Website/full-suite runs are skipped. No complete redesign, new release or website
   publication is claimed.
+
+
+## 2026-09-27 — Reviewing String as the foundation for selected System.Text work
+
+- **Author:** “Continue with review”. Subsequently stresses that upcoming System.Text
+  work depends on getting String's crucial interfaces right.
+- **Assistant:** broadens the review from convenience methods to byte/scalar/grapheme
+  units, range ownership, conversion progress and errors, Unicode versions and the
+  dependencies of builders, codecs and readers/writers.
+- **Author clarification:** “We shouldn't copy everything from System.Text, but we
+  should at least know what we want to bring over to NeoCLR.” This refines the earlier
+  “entire System.Text API” wording; the recorded goal is capability selection, not
+  complete .NET namespace or overload parity.
+- **Author emphasis:** “We are building a modern api”, and asks to know the impact
+  of the current String model, including whether choosing it is a problem.
+- **Assistant assessment:** separates UTF-8 storage from grapheme semantics and
+  implementation costs. Recommends retaining the model with explicit lower-level
+  contracts, records real interop/streaming/indexing limitations and conditions for
+  reconsidering scalar Char or UTF-16 compatibility. This is an assessment, not
+  evidence of performance superiority or author approval of a redesign.
+- **Assistant findings:** current String already has integer grapheme indexing;
+  earlier design prose was stale. Exact prefix/search and byte slicing can operate
+  inside a grapheme. Joining Chars can change grapheme count, so codec buffer lengths
+  cannot inherit Char's unit. Five small language probes make these differences
+  concrete; Swift canonical equality is deliberately not neoCLR's exact equality.
+- **Assistant recommendations:** retain the native text model; prototype the scalar,
+  traversal/range and incremental-conversion boundaries; align Unicode versions;
+  reconsider the simple-fold policy's name before dependent expansion. Select a
+  small builder, scalar support, improved UTF-8 conversion and incremental codec roles.
+  Defer general encoding registries and broad legacy coverage; do not copy fallback
+  hierarchies or automatically include regex/JSON work.
+- **Actions/outcome:** updates the [existing text design](design/text-abstraction.md#systemtext-foundation-review--2026-09-27),
+  current String guide, authoritative roadmap and owning library tracker. Keeps
+  [probe sources/results](experiments/text-review/README.md). Recommendations are not
+  implemented public APIs or author approval of exact signatures. No runtime or
+  compiler change, full suite, website build or publication occurs.

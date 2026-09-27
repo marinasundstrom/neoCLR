@@ -6,8 +6,12 @@ The Raven target projects these runtime APIs:
 
 | Call | Result |
 | --- | --- |
+| `String(characters)` | String copied from Sequence<Char> |
+| `String.Intern(text)` | Execution-scoped canonical String |
 | `String.Concat(left, right)` | String |
 | `String.CompareOrdinal(left, right)` | Int32 comparison sign |
+| `String.Compare(left, right, comparison)` | Explicit development comparison mode |
+| `String.CompareOrdinalIgnoreCase(left, right)` | Development simple-fold comparison sign |
 | `text.Equals(other)` | Boolean |
 | `text.ContainsOrdinal(value)` | Boolean |
 | `text.StartsWithOrdinal(value)` | Boolean |
@@ -15,6 +19,7 @@ The Raven target projects these runtime APIs:
 | `text.GetUtf8ByteCount()` | Int32 byte count |
 | `text.IsEmpty` | Boolean |
 | `text.Length` | Int32 grapheme count |
+| `text[index]` | Char at the grapheme ordinal; scans from the start |
 | `text.GetIterator()` / `for character in text` | Iterator<Char> / grapheme iteration |
 | `text.GetScalars()` | Sequence<UInt32> Unicode scalars |
 | `text.SliceUtf8(byteStart, byteLength)` | Result<String, Utf8SliceError> |
@@ -31,11 +36,11 @@ uses `?` and typed Result matches to handle successful byte-range copies, OutOfR
 and InvalidBoundary. Empty ranges are accepted only at code-point boundaries,
 including the end of the string. Range validation precedes boundary validation.
 
-The declared String members above are projected; integer string indexing is deferred. The error carrier
-exposes IsOutOfRange and IsInvalidBoundary; [case constructors, checked accessors
-and ToString](raven-error-api.md) are also projected. Broader inherited/interface API coverage
-is still tracked separately. Inherited metadata such as Object.ToString can appear in
-completion but is not admitted by this catalog. Unqualified Contains, Substring,
+String also implements Sequence<char>, with Count available through Collection/Sequence
+rather than as a public String property. Use standard union patterns for
+Utf8SliceError.OutOfRange and InvalidBoundary; older Is*/Get* carrier helpers have
+been removed. String's Object equality, hash and ToString behavior are supported;
+see the [Object reference](../api-docs/objects.md#string-through-object-development). Unqualified Contains, Substring,
 Join, Format and IsNullOrEmpty are not imported from the host .NET library.
 
 ## Semantics and implementation layers

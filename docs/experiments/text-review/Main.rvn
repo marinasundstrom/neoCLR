@@ -1,0 +1,38 @@
+import System.*
+import System.Collections.*
+import System.Text.*
+import System.Result.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Main() {
+    let text = "Aé👨‍👩‍👧‍👦🇸🇪"
+    Check(text.Length == 4, "grapheme count")
+    Check(text.GetScalars().Count == 12, "scalar count")
+    Check(text.GetUtf8ByteCount() == 37, "byte count")
+    Check(text[1].ToString() == "é", "integer indexing uses graphemes")
+    let sequence: Sequence<char> = text
+    Check(sequence.Count == 4, "sequence count uses graphemes")
+    Check(!"é".Equals("é"), "exact default equality")
+    Check("é".ContainsOrdinal("́"), "ordinal search can match within a grapheme")
+    Check("é".StartsWithOrdinal("e"), "ordinal prefix can end within a grapheme")
+    match "é".SliceUtf8(1, 2) {
+        Ok(let mark) => Check(mark == "́", "byte slice allows scalar boundary inside grapheme")
+        Error(_) => System.Fault("unexpected slice failure")
+    }
+    let parts: char[] = ['e', Char.FromString("́")]
+    Check(String(parts).Length == 1, "construction does not preserve input grapheme count")
+    Check(String.Concat("e", "́").Length == 1, "concatenation can merge graphemes")
+    Check(String.CompareOrdinalIgnoreCase("K", "k") == 0, "Unicode simple folding")
+    Check(String.CompareOrdinalIgnoreCase("ß", "ss") != 0, "no full folding")
+    let invalid: byte[] = [(byte)255]
+    match Utf8.Decode(invalid) {
+        Ok(_) => System.Fault("malformed UTF-8 accepted")
+        Error(_) => { }
+    }
+    Console.WriteLine("Text foundation observations passed")
+}
