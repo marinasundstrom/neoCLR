@@ -7,13 +7,17 @@ Task<T>. The bridge admits the three exact Run signatures (unit, typed and task-
 callbacks); bootstrap RuntimeServices alone exposes ScheduleTask. Source export preserves
 both nominal owners and private helper types. Managed wrappers complete a default-queue
 Promise or register the existing inner-outcome transfer; the native runtime supplies
-shared-capture execution. Runtime Contract options and Raven compiler source are unchanged.
+shared-capture execution. Runtime Contract options are unchanged. The subsequent
+Raven capture fix below corrects compiler storage planning without importer relaxations.
 
 Eleven focused `--task-run-signatures` checks cover admission and malformed metadata.
 The [compiled consumer](../task-run/README.md#public-overloads-and-async-unwrapping) and
 [reduced compiler gaps](../task-run/compiler-gaps/README.md) distinguish passing runtime
-behavior from mutable-local capture sharing, short-name lookup, block-lambda inference
-and direct unit-await limitations.
+behavior from short-name lookup, block-lambda inference and direct unit-await
+limitations. Mutable-local storage in ordinary async methods is corrected by Raven
+main dc7b87eff, integrated individually as 08815ceaf on its neoclr branch. Seventeen
+independent .NET capture checks pass. Generic-method closure metadata remains a
+pre-existing general compiler follow-up; see the [capture checkpoint](../task-run/README.md#shared-mutable-local-capture-checkpoint).
 No importer relaxation is made for the invalid unit stack. Existing uninitialized
 private-var constructor assignment also needs explicit-field compatibility in helpers.
 

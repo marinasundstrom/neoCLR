@@ -25,20 +25,24 @@ The focused public consumer script also checks the reduced failures. Unit-await
 lowering/metadata should be resolved before advertising friction-free completion-only
 await. Keep negative observations distinct from passing implementation evidence.
 
-## Mutable captured locals: semantic release blocker
+## Corrected: ordinary async mutable-local sharing
 
-`MutableCapture.rvn` should return 42 under Raven's documented shared-variable
-capture semantics, but currently returns 0 with no fault. The callback assignment
-is not reflected in the caller's captured scalar local. This is a failing contract,
-not another successful Task.Run consumer. The runtime's shared object identity/mutation
-probes and the shared-state object consumer pass; using an explicit shared object is
-an interim workaround, not a replacement for the required lexical-variable contract.
+The former 0-instead-of-42 failure is corrected by Raven main `dc7b87eff`, integrated
+individually as `08815ceaf` on Raven's `neoclr` branch. The positive regressions now
+live beside the consumer: [native submission](../MutableCapture.rvn) and
+[inline callback](../MutableCaptureInline.rvn). Their required result is 42;
+`verify.py --case mutable-capture --case mutable-capture-inline` checks the contract.
+See the [capture checkpoint](../README.md#shared-mutable-local-capture-checkpoint)
+for implementation scope and validation.
 
-`MutableCaptureInline.rvn` removes Task.Run and await, invoking an int-returning
-callback inline from async Main. Its imported MoveNext copies local0 into the closure
-field, invokes the callback, then passes unchanged local0 to SetResult. The callback
-writes 42 into the closure field. This independently narrows the suspect boundary to
-closure/async lowering or import, rather than native task result transfer. The inline
-reduction's runtime outcome has not been checked; do not claim that it passed or failed.
-The first fix should establish one shared storage location for the captured local,
-with independent Raven CLI coverage before target integration.
+## Separate general Raven follow-up: generic-method closure metadata
+
+A generic async method that captures a `T` local still fails during CLI metadata
+normalization. This reproduces on unchanged Raven main and with the capture-storage
+fix, using ordinary .NET references. The retained Raven repro is
+`docs/compiler/development/async-generic-capture.rvn`, recorded in its
+`docs/compiler/neoclr-fix-integration.md` at `dc7b87eff`. It needs an independent
+method/type-parameter ownership fix. This is not a new Runtime Contract setting or
+a reason to relax importer validation. Its neoCLR-specific impact has not yet been
+established. Async-lambda-owned locals and iterator capture planning also need their
+own bounded coverage; the source-method fix does not establish every capture shape.

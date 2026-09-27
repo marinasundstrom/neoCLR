@@ -94,9 +94,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   typed and task-producing callbacks, with shared capture/result identity and async
   outcome transfer on the default dispatcher. Refresh matching library/reference
   artifacts and API documentation. Record required Raven workarounds for short-name
-  lookup, block-lambda typing and direct unit await. Record incorrect mutable-scalar
-  capture sharing as a semantic release blocker; explicit shared-object mutations
-  pass. This is not a published release.
+  lookup, block-lambda typing and direct unit await. Correct ordinary async mutable-local
+  sharing through the independently validated Raven closure fix (main dc7b87eff,
+  experimental integration 08815ceaf), retaining one closure per invocation across
+  suspension. Promote the original failing consumer to a required 42-result regression
+  and track pre-existing generic-method capture metadata separately. This is not a
+  published release.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

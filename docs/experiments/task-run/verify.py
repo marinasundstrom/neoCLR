@@ -14,6 +14,8 @@ tools = {name: getattr(args, name).resolve() for name in ('runtime', 'bridge', '
 here = Path(__file__).resolve().parent
 prefix = 'import System.*\nimport System.Tasks.*\nalias Task = System.Tasks.Task\n'
 cases = [
+    ('mutable-capture', (here / 'MutableCapture.rvn').read_text(), 42, '', None),
+    ('mutable-capture-inline', (here / 'MutableCaptureInline.rvn').read_text(), 42, '', None),
     ('capture-and-unwrap', (here / 'Main.rvn').read_text(), 0, '42\nTrue\n41\n21\n7\n', None),
     ('unobserved-work', prefix + 'func Main() { _ = Task.Run(() => Console.WriteLine("finished")) }', 0, 'finished\n', None),
     ('unwrap-unit', prefix + '''func Main() -> Task<int> {
@@ -69,12 +71,3 @@ with tempfile.TemporaryDirectory(prefix='neoclr-task-run-') as directory:
         result = run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', root / name])
         assert result.returncode != 0 and diagnostic in result.stderr, (name, result.stdout, result.stderr)
         print(name + ': recorded compiler limitation reproduced', flush=True)
-
-    if not args.case or 'mutable-capture-gap' in args.case:
-        (root / 'Main.rvn').write_text((here / 'compiler-gaps/MutableCapture.rvn').read_text())
-        build = root / 'mutable-capture-gap'
-        compiled = run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', build])
-        assert compiled.returncode == 0, (compiled.stdout, compiled.stderr)
-        observed = run([tools['runtime'], 'run', build / 'App.neoil', '--system', tools['system']])
-        assert observed.returncode == 0 and observed.stdout == '' and observed.stderr == '', observed
-        print('mutable-capture-gap: reproduced incorrect 0 (required result: 42)', flush=True)

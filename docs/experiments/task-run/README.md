@@ -611,7 +611,8 @@ made. Shared arbitrary read/modify/write sequences still require coordination.
 
 The bridge admits exact public overload signatures and keeps ScheduleTask confined
 to bootstrap RuntimeServices. Source export keeps Task and Task<T> as distinct nominal
-owners. No Raven Runtime Contract setting or compiler source changed. Constructor-
+owners. The public-overload slice changed no Raven Runtime Contract setting or compiler
+source; the subsequent capture correction is recorded below. Constructor-
 assigned helper storage uses explicit fields for the already-recorded private-var
 compiler limitation. Only the Tasks implementation was regenerated; other generated
 manifests refresh their shared source fingerprint while reusing unaffected artifacts.
@@ -620,22 +621,57 @@ manifests refresh their shared source fingerprint while reusing unaffected artif
 nested submission and an async callback that itself awaits native work. Its expected
 output is 42, True, 41, 21 and 7 on separate lines. Five compiled consumer cases
 pass: that sample, unobserved-work entry draining, unit-result async unwrapping,
-cancellation from an inner task and a terminal callback fault. The separate mutable-
-local case fails its required result and is retained as negative evidence below. Run it with matching --runtime, --bridge, --system and --reference artifacts;
+cancellation from an inner task and a terminal callback fault. Mutable-local sharing
+now has separate positive regressions below. Run with matching --runtime, --bridge,
+--system and --reference artifacts;
 --case selects one check. Eleven bridge signature checks and 29 VM tests pass. The API
 reference includes the static owner and all overloads; matching API/library snapshot
 checks pass. Website source/downloads are updated without building the website.
 
-Four [compiler integration gaps](compiler-gaps/README.md) are reproduced and retained
-as negative evidence: short-name Task lookup, block-lambda result inference, direct
-unit await and incorrect mutable-scalar capture sharing. The latter returns 0 instead
-of 42 and is a semantic release blocker, not a passing feature check. The passing consumer uses an explicit alias, a typed callback local, and
-Map before unit await. These workarounds do not redefine the API contract.
+Three [compiler integration gaps](compiler-gaps/README.md) remain: short-name Task
+lookup, block-lambda result inference and direct unit await. The passing consumer
+uses an explicit alias, a typed callback local and Map before unit await. These
+workarounds do not redefine the API contract.
+
+## Shared mutable-local capture checkpoint
+
+Raven main `dc7b87eff` was developed on `codex/async-mutable-captures` independently
+of neoCLR and integrated individually as `08815ceaf` on the experimental branch.
+The original compiler copied a mutable scalar into callback storage while its async
+caller read a separate local or state-machine field. The fix retains one shared
+closure per invocation through suspension and completion, and redirects captured
+local reads/writes/addresses to it. Local-function calls resolve the host closure.
+This restores the expected .NET-style shared-variable semantics; it adds private
+state-machine closure storage, not atomicity for concurrent read-modify-write work.
+Runtime Contract configuration, reference signatures and native runtime code are
+unchanged. No importer checks were relaxed.
+
+Seventeen focused ordinary .NET runtime checks pass, covering direct and Task.Run
+callbacks, forced suspension, caller writes, sibling reads, per-invocation lifetime,
+receiver/parameter capture and local functions. The original two suspension cases
+failed before the fix; ordinary synchronous capture neighbors already passed.
+The rebuilt neoCLR bridge uses the same fix. [MutableCapture.rvn](MutableCapture.rvn)
+and [MutableCaptureInline.rvn](MutableCaptureInline.rvn) are positive regressions,
+requiring 42 rather than accepting the old incorrect 0. The former exercises native
+submission; the latter removes Task.Run and invokes the callback directly in async
+Main. Both compile, pass typed-stack verification and exit with 42 using the unchanged
+development System library/reference. The existing shared-object/async-unwrapping
+consumer was also recompiled, verified and run, preserving its expected output
+(42, True, 41, 21, 7). These three cases are the neoCLR checks rerun for this correction;
+unaffected fault/cancellation and native-runtime checks reuse their earlier evidence.
+The library has no authored async functions, so this correction changes consumer
+emission without requiring library regeneration. The API snapshot refresh changes only the XML
+documentation fingerprint and reuses the unchanged reference assembly.
+
+A separate generic-method closure metadata failure reproduces before and after this
+fix on ordinary Raven/.NET. It is [retained as a compiler follow-up](compiler-gaps/README.md#separate-general-raven-follow-up-generic-method-closure-metadata),
+not hidden by lowering the required result or weakening the importer. This slice
+does not establish async-lambda-owned locals or iterator capture planning.
 
 ## Next bounded work
 
-Resolve mutable-local closure storage and direct unit-await lowering/metadata, then
-short-name lookup and block-lambda
-inference in isolated Raven work with independent CLI tests. Keep the negative fixtures
-until corrected; do not weaken the importer or run broader platform matrices merely
-to compensate. Public release readiness requires reviewing these integration gaps.
+Resolve direct unit-await lowering/metadata next, then short-name lookup and
+block-lambda inference in isolated Raven work with independent CLI tests. Keep the
+remaining negative fixtures until corrected. Public release readiness still requires
+reviewing these integration gaps and the separate generic-method capture candidate;
+no broader platform matrix or website build is required for this correction.

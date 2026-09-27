@@ -71,7 +71,10 @@ The author next selected [Task.Run with shared captured objects](tracking/runtim
 as the canonical work-submission API, with runtime-selected execution. Development
 now has native shared captures, typed/completion-only overloads and task unwrapping.
 [Compiler integration gaps](experiments/task-run/compiler-gaps/README.md) remain,
-including incorrect mutable-local capture sharing, short-name lookup and direct unit await; Thread's future public role is open.
+including short-name lookup, block-lambda inference and direct unit await. Mutable-local
+sharing in ordinary async methods is corrected by the independently tested Raven
+closure fix; generic-method capture metadata remains a separate Raven limitation.
+Thread's future public role is open.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

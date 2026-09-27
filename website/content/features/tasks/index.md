@@ -43,9 +43,9 @@ values; a callback Fault fails the invocation and requests sibling shutdown.
 Current Raven limitations require an explicit `alias Task = System.Tasks.Task` for
 short Run calls and typed delegate locals for some block lambdas. Direct unit await
 has an importer limitation; the tested consumer maps completion to an integer before
-awaiting. Captured mutable scalar locals also have a semantic gap: writes can fail to reach the
-caller. Use an explicit shared object for now. These are compiler integration gaps
-and release blockers, not intended API design.
+awaiting. Mutable locals in ordinary async methods share storage with their callbacks,
+including across suspension. Generic-method closure metadata remains a separate
+Raven limitation. The lookup, inference and unit-await gaps remain release work.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#taskrun-development)
