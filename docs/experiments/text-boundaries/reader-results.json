@@ -1,0 +1,47 @@
+{
+  "scope": "Production StreamReader behavior; unchanged public signatures",
+  "runs": {
+    "reader": [
+      "Incremental StreamReader contracts passed"
+    ],
+    "reader-boundary-comparison": {
+      "current": [
+        "assembly_ms=1604 load_ms=833 verify_ms=508 run_ms=494",
+        "Incremental StreamReader carry/output boundary passed",
+        "allocated=40 live=0 peak=40 collections=1 reclaimed=40"
+      ],
+      "baseline": [
+        "assembly_ms=1390 load_ms=841 verify_ms=425 run_ms=286",
+        "Incremental StreamReader carry/output boundary passed",
+        "allocated=32 live=0 peak=32 collections=1 reclaimed=32"
+      ],
+      "note": "Single bounded diagnostic run; not a throughput benchmark"
+    },
+    "reader-boundary": [
+      "Incremental StreamReader carry/output boundary passed"
+    ],
+    "reader-limit-comparison": {
+      "current": [
+        "assembly_ms=1335 load_ms=840 verify_ms=406 run_ms=20322",
+        "Incremental StreamReader maximum bound passed",
+        "allocated=778 live=0 peak=64 collections=14 reclaimed=778"
+      ],
+      "baseline": [
+        "assembly_ms=1445 load_ms=816 verify_ms=351 run_ms=3267",
+        "Error: \"Fault: array payload budget exceeded [code=ArrayLimitExceeded] at System.Collections.ArrayList.Add:51\\n  at System.Collections.ArrayList.Add(Byte) owner=Constructed { definition: \\\"System.Collections.ArrayList\\\", arguments: [Byte] } [System:513] IL instruction 51\\n  at System.IO.StreamReader.ReadToEnd(Int32) owner=Named(\\\"System.IO.StreamReader\\\") [System:1976] IL instruction 205\\n  at Application_V1_M_363A6D6574686F6439353A343A7479706536353A426F756E6461726965732C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C303A31363A4E616D6573706163654D656D6265727331363A436865636B5265616465724C696D6974353A46616C7365353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F6964303A() [ImportedUnion:3] IL instruction 53\\n  at Application_V1_M_363A6D6574686F6439353A343A7479706536353A426F756E6461726965732C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C303A31363A4E616D6573706163654D656D62657273343A4D61696E353A46616C7365353A46616C7365313A30313A3039383A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D343A566F69643131363A3131323A363A766563746F723130303A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D363A537472696E67(ArrayRef(String)) [ImportedUnion:0] IL instruction 20\\n  at RuntimeMainArguments() [ImportedUnion:6] IL instruction 35\""
+      ],
+      "note": "Single bounded diagnostic run; not a throughput benchmark"
+    },
+    "reader-limit": [
+      "Incremental StreamReader maximum bound passed"
+    ]
+  },
+  "sha256": {
+    "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+    "bridge": "498dc391f263da5f0e832db88a9fe27a0d15b416b7a0e6b128eb0fbf44ff9356",
+    "system": "14b5c2dcda48e65d7b31b51d7a4299fa748ef42bc22e29b3b8fb33bfaca15196",
+    "reference": "f2db99896264745259e60336dacc6db0cfb38395dae22a2573f3cb157d6b28e8",
+    "runner": "b16f3146c22e13ae447e8eff87b9c81120c8ec4b8f8c94f5c12a00bdc8024e19",
+    "baseline_system": "882da90eccd6ec65230d149c0f3c97a2053bac9fa4052befc138484de483fcc7"
+  }
+}

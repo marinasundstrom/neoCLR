@@ -1,0 +1,163 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Option.*
+import System.Text.*
+import System.Console.*
+
+public class ChunkInput : InputStream {
+    private var data: Sequence<byte> = ArrayList<byte>()
+    private var width: int = 1
+    private var position: int = 0
+    private var calls: int = 0
+    private var closed: bool = false
+
+    val Position: int => position
+    val Calls: int => calls
+    val Closed: bool => closed
+
+    init(data: Sequence<byte>, width: int) {
+        self.data = data
+        self.width = width
+    }
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        calls += 1
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        var copied = 0
+        while copied < count && copied < width && position < data.Count {
+            buffer[offset + copied] = data[position]
+            copied += 1
+            position += 1
+        }
+        return Ok(copied)
+    }
+
+    func Close() {
+        closed = true
+    }
+}
+
+public class FailedInput : InputStream {
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        return Error(StreamError.AccessDenied)
+    }
+    func Close() { }
+}
+
+public func ExpectText(result: Result<string, TextReadError>, expected: string) {
+    match result {
+        Ok(let text) => Check(text.Equals(expected), "Reader text mismatch")
+        Error(_) => System.Fault("Unexpected reader error")
+    }
+}
+
+public func CheckReader() {
+    let source = "Aé€😀é"
+    let bytes = Utf8.Encode(source)
+    for width in 1..4 {
+        let input = ChunkInput(bytes, width)
+        let reader = StreamReader(input, true)
+        ExpectText(reader.ReadToEnd(bytes.Count), source)
+        ExpectText(reader.ReadToEnd(0), "")
+        reader.Close()
+        Check(!(input.Closed), "Leave-open ownership")
+        match reader.ReadToEnd(-1) {
+            Error(TextReadError.Closed) => { }
+            _ => System.Fault("Closed precedes bounds")
+        }
+    }
+    let invalid = ChunkInput([(byte)255, (byte)65], 1)
+    match StreamReader(invalid).ReadToEnd(20) {
+        Error(TextReadError.InvalidUtf8) => Check(invalid.Position == 1, "Reject malformed input before another read")
+        _ => System.Fault("Invalid input accepted")
+    }
+    for bad in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128], [(byte)226], [(byte)195, (byte)65]] {
+        match StreamReader(ChunkInput(bad, 1)).ReadToEnd(8) {
+            Error(TextReadError.InvalidUtf8) => { }
+            _ => System.Fault("Strict malformed/truncated input")
+        }
+    }
+    let bounded = ChunkInput(Utf8.Encode("abc"), 3)
+    let boundedReader = StreamReader(bounded)
+    match boundedReader.ReadToEnd(-1) {
+        Error(TextReadError.InvalidRange) => { }
+        _ => System.Fault("Negative bound")
+    }
+    match boundedReader.ReadToEnd(65537) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fault("Unsupported bound")
+    }
+    Check(bounded.Calls == 0, "Invalid bounds must not read")
+    match boundedReader.ReadToEnd(2) {
+        Error(TextReadError.LimitExceeded) => Check(bounded.Position == 3, "Single excess byte")
+        _ => System.Fault("Exceeded bound accepted")
+    }
+    boundedReader.Close()
+    boundedReader.Close()
+    Check(bounded.Closed, "Owned close")
+    match StreamReader(FailedInput()).ReadToEnd(10) {
+        Error(TextReadError.AccessDenied) => { }
+        _ => System.Fault("Stream error lost")
+    }
+    ExpectText(StreamReader(ChunkInput(Utf8.Encode("\uFEFFx"), 1)).ReadToEnd(4), "\uFEFFx")
+    let lines = StreamReader(ChunkInput(Utf8.Encode("a\r\né"), 1))
+    match lines.ReadLine(1) {
+        Ok(Some(let line)) => Check(line.Equals("a"), "Existing line contract")
+        _ => System.Fault("Line read regression")
+    }
+    ExpectText(lines.ReadToEnd(3), "é")
+    WriteLine("Incremental StreamReader contracts passed")
+}
+
+public func CheckReaderBoundary() {
+    let bytes = ArrayList<byte>()
+    for index in 0..<255 {
+        bytes.Add((byte)65)
+    }
+    for value in [(byte)240, (byte)159, (byte)152, (byte)128] {
+        bytes.Add(value)
+    }
+    for index in 0..<255 {
+        bytes.Add((byte)66)
+    }
+    // Check the full value independently, preserving the actual emoji position.
+    let decoded = match Utf8.Decode(bytes) {
+        Ok(let text) => text
+        Error(_) => "invalid fixture"
+    }
+    ExpectText(StreamReader(ChunkInput(bytes, 256)).ReadToEnd(bytes.Count), decoded)
+    WriteLine("Incremental StreamReader carry/output boundary passed")
+}
+
+public func CheckReaderLimit() {
+    var text = "A"
+    for index in 0..<16 {
+        text = String.Concat(text, text)
+    }
+    let input = RepeatingInput()
+    ExpectText(StreamReader(input).ReadToEnd(65536), text)
+    Check(input.Position == 65536, "Maximum accepted byte count")
+    WriteLine("Incremental StreamReader maximum bound passed")
+}
+
+
+// Generate the maximum-sized input without allocating one large guest byte array.
+public class RepeatingInput : InputStream {
+    private var position: int = 0
+    val Position: int => position
+
+    func Read(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        var written = 0
+        while written < count && position < 65536 {
+            buffer[offset + written] = (byte)65
+            written += 1
+            position += 1
+        }
+        return Ok(written)
+    }
+    func Close() { }
+}

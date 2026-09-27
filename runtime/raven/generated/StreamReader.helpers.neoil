@@ -54,6 +54,10 @@ ldarg value
 newobj instance System.IO.TextReadError::.ctor(System.IO.TextReadError.InvalidUtf8)
 ret
 .end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemTextInvalidUtf8ErrorNew() -> System.Text.InvalidUtf8Error
+newobj instance System.Text.InvalidUtf8Error::.ctor()
+ret
+.end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemIOTextReadErrorInvalidPathNew() -> System.IO.TextReadError.InvalidPath
 newobj instance System.IO.TextReadError.InvalidPath::.ctor()
 ret
@@ -196,6 +200,16 @@ ldarg arg0
 newobj instance System.Result<String,System.IO.TextReadError>::.ctor(System.Result.Ok<String>)
 ret
 .end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion19(System.Text.InvalidUtf8Error arg0) -> System.Result.Error<System.Text.InvalidUtf8Error>
+ldarg arg0
+newobj instance System.Result.Error<System.Text.InvalidUtf8Error>::.ctor(System.Text.InvalidUtf8Error)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeUnion20(System.Result.Error<System.Text.InvalidUtf8Error> arg0) -> System.Result<String,System.Text.InvalidUtf8Error>
+ldarg arg0
+newobj instance System.Result<String,System.Text.InvalidUtf8Error>::.ctor(System.Result.Error<System.Text.InvalidUtf8Error>)
+ret
+.end
 .function neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32 value) -> Boolean
     ldarg value
     ldc.i4 0
@@ -219,4 +233,743 @@ True:
 False:
     ldc.i4 0
     ret
+.end
+.function neoCLR.Library.System.IO.StreamReader.RuntimeCliCall0(neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572 arg0,arrayref<Byte> arg1,Int32 arg2,Int32 arg3,Int32 arg4,Int32 arg5) -> System.Result<String,System.Text.InvalidUtf8Error>
+ldarg arg0
+ldarg arg1
+ldarg arg2
+ldarg arg3
+ldarg arg4
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+ldarg arg5
+callvirt instance neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::Decode(arrayref<Byte>,Int32,Int32,Boolean,Int32)
+ret
+.end
+.type internal class neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572
+.sealed
+.field private pending arrayref<Byte>
+.field private pendingCount Int32
+.field private expected Int32
+.field private stopped Boolean
+.field private consumed Int32
+.field private full Boolean
+.property instance InputBytesConsumed() -> Int32
+.get instance neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::get_InputBytesConsumed()
+.end
+.property instance OutputFull() -> Boolean
+.get instance neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::get_OutputFull()
+.end
+.method instance .ctor() -> noresult
+M00000008_IL_0000:
+M00000008_IL_0001:
+ldarg 0
+M00000008_IL_0002:
+pop
+M00000008_IL_0007:
+M00000008_IL_0008:
+ldarg 0
+M00000008_IL_0009:
+ldc.i4 4
+M00000008_IL_000a:
+newarr Byte
+M00000008_IL_000f:
+dup
+M00000008_IL_0010:
+ldc.i4 0
+M00000008_IL_0011:
+ldc.i4 0
+M00000008_IL_0012:
+conv.u1
+M00000008_IL_0013:
+stelem Byte
+M00000008_IL_0014:
+dup
+M00000008_IL_0015:
+ldc.i4 1
+M00000008_IL_0016:
+ldc.i4 0
+M00000008_IL_0017:
+conv.u1
+M00000008_IL_0018:
+stelem Byte
+M00000008_IL_0019:
+dup
+M00000008_IL_001a:
+ldc.i4 2
+M00000008_IL_001b:
+ldc.i4 0
+M00000008_IL_001c:
+conv.u1
+M00000008_IL_001d:
+stelem Byte
+M00000008_IL_001e:
+dup
+M00000008_IL_001f:
+ldc.i4 3
+M00000008_IL_0020:
+ldc.i4 0
+M00000008_IL_0021:
+conv.u1
+M00000008_IL_0022:
+stelem Byte
+M00000008_IL_0023:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pending
+M00000008_IL_0028:
+M00000008_IL_0029:
+ldarg 0
+M00000008_IL_002a:
+ldc.i4 0
+M00000008_IL_002b:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000008_IL_0030:
+M00000008_IL_0031:
+ldarg 0
+M00000008_IL_0032:
+ldc.i4 0
+M00000008_IL_0033:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000008_IL_0038:
+M00000008_IL_0039:
+ldarg 0
+M00000008_IL_003a:
+ldc.i4 0
+M00000008_IL_003b:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::stopped
+M00000008_IL_0040:
+M00000008_IL_0041:
+ldarg 0
+M00000008_IL_0042:
+ldc.i4 0
+M00000008_IL_0043:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000008_IL_0048:
+M00000008_IL_0049:
+ldarg 0
+M00000008_IL_004a:
+ldc.i4 0
+M00000008_IL_004b:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::full
+M00000008_IL_0050:
+ret
+.end
+.method instance Decode(arrayref<Byte> source,Int32 offset,Int32 count,Boolean final,Int32 maxOutputUtf8Bytes) -> System.Result<String,System.Text.InvalidUtf8Error>
+.local System.Collections.ArrayList<Byte> local0
+.local Int32 local1
+.local Byte local2
+.local Int32 local3
+.local Int32 local4
+ldloca local0
+initobj System.Collections.ArrayList<Byte>
+ldc.i4 0
+stloc local1
+ldc.i4 0
+stloc local2
+ldc.i4 0
+stloc local3
+ldc.i4 0
+stloc local4
+M00000009_IL_0000:
+M00000009_IL_0001:
+M00000009_IL_0002:
+ldarg 0
+M00000009_IL_0003:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::stopped
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0008:
+brtrue M00000009_IL_0012
+M00000009_IL_000d:
+br M00000009_IL_001d
+M00000009_IL_0012:
+M00000009_IL_0013:
+ldstr "UTF-8 reader decoder already finalized"
+M00000009_IL_0018:
+call System.Fault(String)
+fault "System.Fault returned unexpectedly"
+M00000009_IL_001d:
+M00000009_IL_001e:
+M00000009_IL_001f:
+ldarg 0
+M00000009_IL_0020:
+ldc.i4 0
+M00000009_IL_0021:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000009_IL_0026:
+M00000009_IL_0027:
+ldarg 0
+M00000009_IL_0028:
+ldc.i4 0
+M00000009_IL_0029:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::full
+M00000009_IL_002e:
+M00000009_IL_002f:
+ldarg 5
+M00000009_IL_0031:
+newobj instance System.Collections.ArrayList<Byte>::.ctor(Int32)
+M00000009_IL_0036:
+stloc local0
+M00000009_IL_0037:
+M00000009_IL_0038:
+ldc.i4 0
+M00000009_IL_0039:
+stloc local1
+M00000009_IL_003a:
+M00000009_IL_003b:
+M00000009_IL_003c:
+ldarg 0
+M00000009_IL_003d:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000009_IL_0042:
+ldarg 3
+M00000009_IL_0043:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0045:
+brtrue M00000009_IL_004f
+M00000009_IL_004a:
+br M00000009_IL_0283
+M00000009_IL_004f:
+M00000009_IL_0050:
+ldarg 1
+M00000009_IL_0051:
+ldarg 2
+M00000009_IL_0052:
+ldarg 0
+M00000009_IL_0053:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000009_IL_0058:
+add
+M00000009_IL_0059:
+ldelem Byte
+M00000009_IL_005a:
+stloc local2
+M00000009_IL_005b:
+M00000009_IL_005c:
+ldarg 0
+M00000009_IL_005d:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_0062:
+stloc local3
+M00000009_IL_0063:
+M00000009_IL_0064:
+ldarg 0
+M00000009_IL_0065:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_006a:
+ldc.i4 0
+M00000009_IL_006b:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_006d:
+brtrue M00000009_IL_0077
+M00000009_IL_0072:
+br M00000009_IL_0155
+M00000009_IL_0077:
+M00000009_IL_0078:
+ldloc local2
+M00000009_IL_0079:
+conv.i4
+M00000009_IL_007a:
+ldc.i4 127
+M00000009_IL_007c:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_007e:
+ldc.i4 0
+M00000009_IL_007f:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0081:
+brtrue M00000009_IL_008b
+M00000009_IL_0086:
+br M00000009_IL_0094
+M00000009_IL_008b:
+M00000009_IL_008c:
+ldc.i4 1
+M00000009_IL_008d:
+stloc local3
+M00000009_IL_008e:
+br M00000009_IL_0154
+M00000009_IL_0094:
+M00000009_IL_0095:
+ldloc local2
+M00000009_IL_0096:
+conv.i4
+M00000009_IL_0097:
+ldc.i4 194
+M00000009_IL_009c:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_009e:
+ldc.i4 0
+M00000009_IL_009f:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00a1:
+brfalse M00000009_IL_00b7
+M00000009_IL_00a6:
+ldloc local2
+M00000009_IL_00a7:
+conv.i4
+M00000009_IL_00a8:
+ldc.i4 223
+M00000009_IL_00ad:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00af:
+ldc.i4 0
+M00000009_IL_00b0:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00b2:
+br M00000009_IL_00b8
+M00000009_IL_00b7:
+ldc.i4 0
+M00000009_IL_00b8:
+brtrue M00000009_IL_00c2
+M00000009_IL_00bd:
+br M00000009_IL_00cb
+M00000009_IL_00c2:
+M00000009_IL_00c3:
+ldc.i4 2
+M00000009_IL_00c4:
+stloc local3
+M00000009_IL_00c5:
+br M00000009_IL_0153
+M00000009_IL_00cb:
+M00000009_IL_00cc:
+ldloc local2
+M00000009_IL_00cd:
+conv.i4
+M00000009_IL_00ce:
+ldc.i4 224
+M00000009_IL_00d3:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00d5:
+ldc.i4 0
+M00000009_IL_00d6:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00d8:
+brfalse M00000009_IL_00ee
+M00000009_IL_00dd:
+ldloc local2
+M00000009_IL_00de:
+conv.i4
+M00000009_IL_00df:
+ldc.i4 239
+M00000009_IL_00e4:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00e6:
+ldc.i4 0
+M00000009_IL_00e7:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_00e9:
+br M00000009_IL_00ef
+M00000009_IL_00ee:
+ldc.i4 0
+M00000009_IL_00ef:
+brtrue M00000009_IL_00f9
+M00000009_IL_00f4:
+br M00000009_IL_0102
+M00000009_IL_00f9:
+M00000009_IL_00fa:
+ldc.i4 3
+M00000009_IL_00fb:
+stloc local3
+M00000009_IL_00fc:
+br M00000009_IL_0152
+M00000009_IL_0102:
+M00000009_IL_0103:
+ldloc local2
+M00000009_IL_0104:
+conv.i4
+M00000009_IL_0105:
+ldc.i4 240
+M00000009_IL_010a:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_010c:
+ldc.i4 0
+M00000009_IL_010d:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_010f:
+brfalse M00000009_IL_0125
+M00000009_IL_0114:
+ldloc local2
+M00000009_IL_0115:
+conv.i4
+M00000009_IL_0116:
+ldc.i4 244
+M00000009_IL_011b:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_011d:
+ldc.i4 0
+M00000009_IL_011e:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0120:
+br M00000009_IL_0126
+M00000009_IL_0125:
+ldc.i4 0
+M00000009_IL_0126:
+brtrue M00000009_IL_0130
+M00000009_IL_012b:
+br M00000009_IL_0139
+M00000009_IL_0130:
+M00000009_IL_0131:
+ldc.i4 4
+M00000009_IL_0132:
+stloc local3
+M00000009_IL_0133:
+br M00000009_IL_0151
+M00000009_IL_0139:
+M00000009_IL_013a:
+ldarg 0
+M00000009_IL_013b:
+ldc.i4 1
+M00000009_IL_013c:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::stopped
+M00000009_IL_0141:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemTextInvalidUtf8ErrorNew()
+M00000009_IL_0146:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion19(System.Text.InvalidUtf8Error)
+M00000009_IL_014b:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion20(System.Result.Error<System.Text.InvalidUtf8Error>)
+M00000009_IL_0150:
+ret
+M00000009_IL_0151:
+M00000009_IL_0152:
+M00000009_IL_0153:
+M00000009_IL_0154:
+M00000009_IL_0155:
+M00000009_IL_0156:
+M00000009_IL_0157:
+ldloc local3
+M00000009_IL_0158:
+ldarg 5
+M00000009_IL_015a:
+ldloc local1
+M00000009_IL_015b:
+sub
+M00000009_IL_015c:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_015e:
+brtrue M00000009_IL_0168
+M00000009_IL_0163:
+br M00000009_IL_0178
+M00000009_IL_0168:
+M00000009_IL_0169:
+ldarg 0
+M00000009_IL_016a:
+ldc.i4 1
+M00000009_IL_016b:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::full
+M00000009_IL_0170:
+M00000009_IL_0171:
+ldloc local0
+M00000009_IL_0172:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M00000009_IL_0177:
+ret
+M00000009_IL_0178:
+M00000009_IL_0179:
+M00000009_IL_017a:
+ldarg 0
+M00000009_IL_017b:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_0180:
+ldc.i4 0
+M00000009_IL_0181:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0183:
+brtrue M00000009_IL_018d
+M00000009_IL_0188:
+br M00000009_IL_019b
+M00000009_IL_018d:
+M00000009_IL_018e:
+ldarg 0
+M00000009_IL_018f:
+ldloc local3
+M00000009_IL_0190:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_0195:
+br M00000009_IL_01e5
+M00000009_IL_019b:
+M00000009_IL_019c:
+ldloc local2
+M00000009_IL_019d:
+conv.i4
+M00000009_IL_019e:
+ldc.i4 128
+M00000009_IL_01a3:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_01a5:
+ldc.i4 0
+M00000009_IL_01a6:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_01a8:
+brfalse M00000009_IL_01be
+M00000009_IL_01ad:
+ldloc local2
+M00000009_IL_01ae:
+conv.i4
+M00000009_IL_01af:
+ldc.i4 191
+M00000009_IL_01b4:
+cgt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_01b6:
+ldc.i4 0
+M00000009_IL_01b7:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_01b9:
+br M00000009_IL_01bf
+M00000009_IL_01be:
+ldc.i4 0
+M00000009_IL_01bf:
+ldc.i4 0
+M00000009_IL_01c0:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_01c2:
+brtrue M00000009_IL_01cc
+M00000009_IL_01c7:
+br M00000009_IL_01e4
+M00000009_IL_01cc:
+M00000009_IL_01cd:
+ldarg 0
+M00000009_IL_01ce:
+ldc.i4 1
+M00000009_IL_01cf:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::stopped
+M00000009_IL_01d4:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemTextInvalidUtf8ErrorNew()
+M00000009_IL_01d9:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion19(System.Text.InvalidUtf8Error)
+M00000009_IL_01de:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion20(System.Result.Error<System.Text.InvalidUtf8Error>)
+M00000009_IL_01e3:
+ret
+M00000009_IL_01e4:
+M00000009_IL_01e5:
+M00000009_IL_01e6:
+M00000009_IL_01e7:
+ldarg 0
+M00000009_IL_01e8:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pending
+M00000009_IL_01ed:
+ldarg 0
+M00000009_IL_01ee:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_01f3:
+ldloc local2
+M00000009_IL_01f4:
+stelem Byte
+M00000009_IL_01f5:
+M00000009_IL_01f6:
+ldarg 0
+M00000009_IL_01f7:
+ldarg 0
+M00000009_IL_01f8:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_01fd:
+ldc.i4 1
+M00000009_IL_01fe:
+add
+M00000009_IL_01ff:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_0204:
+M00000009_IL_0205:
+ldarg 0
+M00000009_IL_0206:
+ldarg 0
+M00000009_IL_0207:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000009_IL_020c:
+ldc.i4 1
+M00000009_IL_020d:
+add
+M00000009_IL_020e:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M00000009_IL_0213:
+M00000009_IL_0214:
+ldarg 0
+M00000009_IL_0215:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_021a:
+ldarg 0
+M00000009_IL_021b:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_0220:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0222:
+brtrue M00000009_IL_022c
+M00000009_IL_0227:
+br M00000009_IL_027d
+M00000009_IL_022c:
+M00000009_IL_022d:
+ldc.i4 0
+M00000009_IL_022e:
+stloc local4
+M00000009_IL_0230:
+M00000009_IL_0231:
+M00000009_IL_0232:
+ldloc local4
+M00000009_IL_0234:
+ldarg 0
+M00000009_IL_0235:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_023a:
+clt
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_023c:
+brtrue M00000009_IL_0246
+M00000009_IL_0241:
+br M00000009_IL_0262
+M00000009_IL_0246:
+M00000009_IL_0247:
+ldloc local0
+M00000009_IL_0248:
+ldarg 0
+M00000009_IL_0249:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pending
+M00000009_IL_024e:
+ldloc local4
+M00000009_IL_0250:
+ldelem Byte
+M00000009_IL_0251:
+callvirt instance System.Collections.ArrayList<Byte>::Add(Byte)
+M00000009_IL_0256:
+M00000009_IL_0257:
+ldloc local4
+M00000009_IL_0259:
+ldc.i4 1
+M00000009_IL_025a:
+add
+M00000009_IL_025b:
+stloc local4
+M00000009_IL_025d:
+br M00000009_IL_0231
+M00000009_IL_0262:
+M00000009_IL_0263:
+M00000009_IL_0264:
+ldloc local1
+M00000009_IL_0265:
+ldarg 0
+M00000009_IL_0266:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_026b:
+add
+M00000009_IL_026c:
+stloc local1
+M00000009_IL_026d:
+M00000009_IL_026e:
+ldarg 0
+M00000009_IL_026f:
+ldc.i4 0
+M00000009_IL_0270:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_0275:
+M00000009_IL_0276:
+ldarg 0
+M00000009_IL_0277:
+ldc.i4 0
+M00000009_IL_0278:
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::expected
+M00000009_IL_027d:
+M00000009_IL_027e:
+br M00000009_IL_003b
+M00000009_IL_0283:
+M00000009_IL_0284:
+M00000009_IL_0285:
+ldarg 4
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_0287:
+brtrue M00000009_IL_0291
+M00000009_IL_028c:
+br M00000009_IL_02c1
+M00000009_IL_0291:
+M00000009_IL_0292:
+ldarg 0
+M00000009_IL_0293:
+ldc.i4 1
+M00000009_IL_0294:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+stfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::stopped
+M00000009_IL_0299:
+M00000009_IL_029a:
+ldarg 0
+M00000009_IL_029b:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::pendingCount
+M00000009_IL_02a0:
+ldc.i4 0
+M00000009_IL_02a1:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_02a3:
+ldc.i4 0
+M00000009_IL_02a4:
+ceq
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_02a6:
+brtrue M00000009_IL_02b0
+M00000009_IL_02ab:
+br M00000009_IL_02c0
+M00000009_IL_02b0:
+call neoCLR.Library.System.IO.StreamReader.RuntimeErrorSystemTextInvalidUtf8ErrorNew()
+M00000009_IL_02b5:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion19(System.Text.InvalidUtf8Error)
+M00000009_IL_02ba:
+call neoCLR.Library.System.IO.StreamReader.RuntimeUnion20(System.Result.Error<System.Text.InvalidUtf8Error>)
+M00000009_IL_02bf:
+ret
+M00000009_IL_02c0:
+M00000009_IL_02c1:
+M00000009_IL_02c2:
+M00000009_IL_02c3:
+ldloc local0
+M00000009_IL_02c4:
+call System.Text.Utf8::Decode(System.Collections.Sequence<Byte>)
+M00000009_IL_02c9:
+ret
+.end
+.method instance get_InputBytesConsumed() -> Int32
+M0000000a_IL_0000:
+M0000000a_IL_0001:
+M0000000a_IL_0002:
+ldarg 0
+M0000000a_IL_0003:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::consumed
+M0000000a_IL_0008:
+ret
+.end
+.method instance get_OutputFull() -> Boolean
+M0000000b_IL_0000:
+M0000000b_IL_0001:
+M0000000b_IL_0002:
+ldarg 0
+M0000000b_IL_0003:
+ldfld neoCLR.Library.System.IO.StreamReader.Type_53797374656D2E494F2E52656164557466384465636F646572::full
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_0008:
+call neoCLR.Library.System.IO.StreamReader.RuntimeBooleanFromInt32(Int32)
+ret
+.end
 .end

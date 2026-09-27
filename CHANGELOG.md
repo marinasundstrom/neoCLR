@@ -50,6 +50,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a paired String/Text API sketch and focused executable construction, extraction
   and decoding consumer. Preserve snapshots and explicit ordinal search semantics;
   naming remains provisional and the accumulator makes no performance claim.
+- Decode StreamReader.ReadToEnd incrementally with a private bounded UTF-8 helper.
+  Preserve byte limits, BOM, repeated EOF and input ownership; ReadLine is unchanged.
+  Malformed input can now fail before EOF, changing error ordering and cursor
+  advancement from Preview 10; failures still return no partial text or rollback.
+  Refresh reader implementation/API evidence and document a later text-oriented
+  Encoder abstraction without adopting .NET's UTF-16 char-buffer surface. Record
+  author-required reader/writer encoding selection with UTF-8 as default as the next
+  foundation contract; selectable encodings are not implemented by this slice.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

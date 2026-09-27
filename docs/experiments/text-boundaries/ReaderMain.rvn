@@ -1,0 +1,17 @@
+import System.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Main(args: string[]) {
+    if args[0].Equals("reader") {
+        CheckReader()
+    } else if args[0].Equals("reader-boundary") {
+        CheckReaderBoundary()
+    } else {
+        CheckReaderLimit()
+    }
+}

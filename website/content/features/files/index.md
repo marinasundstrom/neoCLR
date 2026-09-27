@@ -46,6 +46,9 @@ capabilities; optional seekability is separate. MemoryStream provides in-memory
 byte storage. Callers own buffers and must handle partial transfers.
 
 StreamReader decodes strict UTF-8; StreamWriter retries partial UTF-8 writes.
+In development after Preview 10, ReadToEnd decodes chunks incrementally and reports
+malformed input before EOF when detected. It still returns one accumulated String;
+errors return no partial text. See the [reader contract](../../docs/streams.html#text-readers).
 Callers flush and close explicitly. FileText supplies bounded whole-file text
 helpers. Console exposes the same text and byte interfaces through standard streams.
 

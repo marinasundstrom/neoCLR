@@ -141,7 +141,21 @@ not merely renaming; no duplicate text representation or compatibility layer is 
 keeps behavior identical and tests split decoding, construction snapshots and direct
 delimiter extraction. It needs neither a new core type nor public position machinery.
 Text naming remains open; exact versus character-boundary search is a separate
-policy. The next recommendation remains the bounded decoder contract for one reader.
+policy. The bounded decoder role is now integrated privately into StreamReader.ReadToEnd;
+see the [implementation scope](../design/text-abstraction.md#internal-reader-integration-development).
+Public progress/error types remain provisional.
+
+**Later encoder:** the author explicitly wants an [Encoder abstraction](../design/text-abstraction.md#later-encoder-abstraction--author-direction)
+adapted to neoCLR text, not .NET's UTF-16 char-buffer surface. Track text input,
+encoded-byte output and unambiguous incremental progress for a writer consumer;
+this does not expand the current internal UTF-8 reader slice into a public hierarchy.
+
+**Author-required stream selection:** [StreamReader and StreamWriter must accept a
+specific encoding with UTF-8 as default](../design/text-abstraction.md#selected-stream-encoding-with-utf-8-default--author-requirement).
+Current constructors are still UTF-8-only. The internal reader helper does not
+complete this requirement. Next establish selection and independent per-stream
+conversion state, with explicit byte-limit/count semantics, and prove it through
+both reader and writer consumers. Do not silently reinterpret maxUtf8Bytes.
 
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These

@@ -8045,3 +8045,43 @@ configuration/content, not target-specific code added to Raven main.
   Compilation, import verification and the focused consumer execution pass; unchanged
   boundary evidence is reused. No production API or runtime change; no usability or
   performance superiority claim. No full suite or website build.
+
+## 2026-09-27 — Incremental reader integration and a future text-oriented Encoder
+
+- **Author:** directs continuation after the consumer sketch. During implementation,
+  explicitly says an Encoder abstraction will be needed later and must fit neoCLR's
+  string/text direction rather than mirror .NET.
+- **Assistant decision:** chooses existing StreamReader.ReadToEnd as the first
+  library consumer, with a private UTF-8 decoder. Keeps public codec signatures
+  provisional; this does not implement the entire experimental carrier surface.
+- **Action:** implements bounded conversion and carry, retries unconsumed input
+  before reading again, and retains the existing byte bound, BOM and ownership
+  contracts. ReadLine is unchanged. Malformed input can fail before EOF, so docs
+  record changed failure ordering/cursor behavior and no partial text return.
+- **Integration finding:** the rich prototype's readonly carrier and private union
+  dependencies exceed current private-library admission. Uses an internal helper
+  with existing Result and progress properties; no compiler/bridge change or public
+  workaround types. Explicit branch control also avoids the previously observed
+  negated-property assignment problem. These remain integration limitations, not
+  a selected public API shape.
+- **Future direction:** records [Encoder requirements](design/text-abstraction.md#later-encoder-abstraction--author-direction)
+  around valid text input, explicit encoded bytes and precise progress. UTF-16 code
+  units are not imposed as the input model. Exact type names, error policy and
+  resumable input boundaries remain open.
+- **Validation scope:** focused reader contracts and buffer/maximum-bound consumers,
+  generated implementation and API snapshot checks; unchanged tests are reused.
+  A bounded old/new host-cost comparison checks for material regression. No full
+  suite, website build, publication or public Encoder/Decoder API is included.
+
+- **Subsequent author correction:** StreamReader and StreamWriter are supposed to
+  use specific encoders, with UTF-8 as default.
+- **Assistant response/action:** distinguishes the intended selectable-encoding
+  contract from today's UTF-8-only constructors. Corrects the next bounded direction
+  to establish selection for both adapters, independent conversion state and explicit
+  limits/counts. The internal decoder is default-path work, not completion of the
+  stream abstraction. No selected-encoding constructor is claimed as implemented.
+- **Observed outcomes:** three current reader runs pass, including the maximum
+  bound under an expanded instruction allowance. Snapshot checks pass. The small
+  diagnostic is slower than the previous implementation; the old maximum fixture
+  faults on its whole-input array budget. Records these tradeoffs rather than claiming
+  a speedup. See [reader evidence](experiments/text-boundaries/reader-results.json).

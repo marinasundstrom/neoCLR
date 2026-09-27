@@ -9,7 +9,10 @@ The site documents Preview 10 plus explicitly labeled development additions.
 Comparer policies, the HashMap policy constructor and explicit String comparison
 modes are post-Preview-10 APIs. StringComparison, both comparison methods and
 StringComparer.OrdinalIgnoreCase have type/member coverage; the reference describes
-simple-fold/.NET differences and invalid modes. Keep generated signatures and authored guides
+simple-fold/.NET differences and invalid modes. Development StreamReader.ReadToEnd
+now decodes incrementally with earlier malformed-input failure; its signatures are
+unchanged and the reader guide records cursor/error-ordering implications. Encoding
+selection for reader/writer is intended but not implemented. Keep generated signatures and authored guides
 aligned with the matching runtime and compiler reference artifacts.
 
 ## Build and refresh

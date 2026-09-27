@@ -37,7 +37,7 @@
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
     "runtime/raven/src/System/IO/StreamWriter.rvn": "f108f21e5a1ff1c639a97e114af0989adf370bedfb734a1e9d5d247715c85fd4",
     "runtime/raven/src/System/IO/MemoryStream.rvn": "bd81a43f0f196d2acd8b85aa97876bd472588b0c2d5e2c81c3fc5606a631ea7c",
-    "runtime/raven/src/System/IO/StreamReader.rvn": "c33391676f4b55295ae2ae14fa8b27a07f6eba77d6b97e222a11a590f07ee61a",
+    "runtime/raven/src/System/IO/StreamReader.rvn": "8a1e94113a8b202315378b0f82d2abbf0cdfde87748e98849fd79a78aa33e21e",
     "runtime/raven/src/System/IO/SeekableStream.rvn": "b330b07c1e8ea6d2411c4cd78fb74c1a094e6bfcebafe81b815cfb98e230ecf3",
     "runtime/raven/src/System/Storage/FileSystem.rvn": "317025c6492b1494e415c098f121ce90c48c7ad8047b078bc588d03e5565d84b",
     "runtime/raven/src/System/Storage/StorageItems.rvn": "15aeb42f992e6108999cc21807d3f3f579fe2852eb7e17cb3f7122e4b2b7f3df",

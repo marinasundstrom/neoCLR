@@ -99,10 +99,12 @@ public class StreamReader : TextReader {
         if maxUtf8Bytes > 65536 {
             return Error(TextReadError.LimitExceeded())
         }
-        let bytes: List<byte> = ArrayList<byte>()
+        let decoder = ReadUtf8Decoder()
         let buffer = CheckedStorage.Reserve<byte>(256)
+        var accepted = 0
+        var text = ""
         while true {
-            var request = maxUtf8Bytes - bytes.Count + 1
+            var request = maxUtf8Bytes - accepted + 1
             if request > buffer.Length {
                 request = buffer.Length
             }
@@ -114,19 +116,28 @@ public class StreamReader : TextReader {
                     if count > request {
                         System.Fault("Invalid input read count")
                     }
-                    if count > maxUtf8Bytes - bytes.Count {
+                    if count > maxUtf8Bytes - accepted {
                         return Error(TextReadError.LimitExceeded())
                     }
-                    if count == 0 {
-                        return match Utf8.Decode(bytes) {
-                            Ok(let text) => Ok(text)
-                            Error(_) => Error(TextReadError.InvalidUtf8())
+                    accepted += count
+                    var offset = 0
+                    var complete = false
+                    while !complete {
+                        match decoder.Decode(buffer, offset, count - offset, count == 0, 256) {
+                            Ok(let part) => {
+                                text = String.Concat(text, part)
+                                offset += decoder.InputBytesConsumed
+                                if decoder.OutputFull {
+                                    // Retry the unconsumed suffix before reading again.
+                                } else {
+                                    complete = true
+                                }
+                            }
+                            Error(_) => return Error(TextReadError.InvalidUtf8())
                         }
                     }
-                    var index = 0
-                    while index < count {
-                        bytes.Add(buffer[index])
-                        index += 1
+                    if count == 0 {
+                        return Ok(text)
                     }
                 }
                 Error(let error) => return Error(FromStream(error))
@@ -177,5 +188,79 @@ public class StreamReader : TextReader {
         }
         System.Fault("Invalid stream error")
         return TextReadError.IoFailure()
+    }
+}
+
+// Internal, single-consumer codec. Progress belongs to the most recent call.
+// No callback/reentry or public decoder API is exposed by this reader slice.
+internal class ReadUtf8Decoder {
+    private var pending: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+    private var pendingCount: int = 0
+    private var expected: int = 0
+    private var stopped: bool = false
+    private var consumed: int = 0
+    private var full: bool = false
+
+    val InputBytesConsumed: int => consumed
+    val OutputFull: bool => full
+
+    func Decode(source: byte[], offset: int, count: int, final: bool,
+                maxOutputUtf8Bytes: int) -> Result<string, InvalidUtf8Error> {
+        // Caller owns range/total-limit validation; these are internal invariants.
+        if stopped {
+            System.Fault("UTF-8 reader decoder already finalized")
+        }
+        consumed = 0
+        full = false
+        let output = ArrayList<byte>(maxOutputUtf8Bytes)
+        var produced = 0
+        while consumed < count {
+            let value = source[offset + consumed]
+            var width = expected
+            if pendingCount == 0 {
+                if value <= 127 {
+                    width = 1
+                } else if value >= 194 && value <= 223 {
+                    width = 2
+                } else if value >= 224 && value <= 239 {
+                    width = 3
+                } else if value >= 240 && value <= 244 {
+                    width = 4
+                } else {
+                    stopped = true
+                    return Error(InvalidUtf8Error())
+                }
+            }
+            if width > maxOutputUtf8Bytes - produced {
+                full = true
+                return Utf8.Decode(output)
+            }
+            if pendingCount == 0 {
+                expected = width
+            } else if !(value >= 128 && value <= 191) {
+                stopped = true
+                return Error(InvalidUtf8Error())
+            }
+            pending[pendingCount] = value
+            pendingCount += 1
+            consumed += 1
+            if pendingCount == expected {
+                var index = 0
+                while index < expected {
+                    output.Add(pending[index])
+                    index += 1
+                }
+                produced += expected
+                pendingCount = 0
+                expected = 0
+            }
+        }
+        if final {
+            stopped = true
+            if pendingCount != 0 {
+                return Error(InvalidUtf8Error())
+            }
+        }
+        return Utf8.Decode(output)
     }
 }

@@ -101,3 +101,49 @@ the original `results.json` remains evidence for unchanged boundary checks. With
 that option, the verifier also executes the three original runs. No website build,
 full suite, new public API snapshot or performance benchmark is needed for this
 application-only semantic sketch.
+
+## Internal StreamReader integration — development
+
+`Reader.rvn` exercises the actual library StreamReader.ReadToEnd, not the sample's
+BoundedUtf8Decoder. `--reader-only --runner /path/to/measure_async` runs reader
+contracts plus the 256-byte carry/output boundary and 65536-byte maximum. Build the
+matching host with `cargo build --release --example measure_async`; its larger
+instruction budget accommodates these managed fixtures. The contract run still
+uses the normal CLI limits. `--baseline-system /path/to/prior/System.neoil` optionally
+runs the identical boundary and maximum fixtures against the prior implementation.
+Use matching core/bridge artifacts and the regenerated current System library.
+
+The library decoder is private, with one synchronous consumer and caller-validated
+ranges. It carries incomplete bytes, reports current-call consumption and output
+exhaustion, and validates complete groups through existing Utf8.Decode. Unlike the
+rich experimental decoder, it does not expose public statuses, prefix recovery or
+error offsets. These are not silently claimed as production capabilities. Returning
+an existing Result and private progress properties avoids widening bridge support
+or publishing provisional types merely to satisfy private dependency restrictions.
+
+Contract coverage includes one-to-four-byte partial reads, supplementary and combining
+text, BOM preservation, strict malformed/truncated data, early rejection without a
+subsequent read, exact/invalid/overflow limits, repeated EOF, stream error propagation,
+close ownership and ReadLine followed by ReadToEnd. A 514-byte fixture puts a four-byte
+scalar across a 256-byte read boundary and forces an output-budget retry. The maximum
+fixture checks the existing 65536-byte accepted limit with 256-byte input chunks.
+
+`reader-results.json` records artifacts and focused outcomes. Host timing and object
+counts are a bounded regression diagnostic, not a throughput benchmark or a claim
+of lower total memory. The reader still concatenates accumulated output; short reads
+can cause repeated copying, and a future construction primitive should address that
+when justified. UTF-8 carry is bounded, but output memory is proportional to returned
+text. No malformed-prefix recovery or async/Encoder abstraction is added.
+
+Recorded reader results (macOS arm64, single diagnostic run): the 514-byte case took
+494 ms in the current host versus 286 ms with the prior library, with 40 versus 32
+managed objects allocated. This is an observed cost of the new path, not evidence
+of a speedup or a stable benchmark ratio. The 65536-byte synthetic stream completed
+in 20322 ms; the prior implementation faulted while growing ArrayList under the same
+array budget and therefore has no comparable completion time. The current run
+reclaimed all 778 allocated objects (peak live 64). Host instruction allowance was
+500000000 for these two larger fixtures; heap allowance was 100000, and other limits
+were unchanged. Guest fixture work is included in timings. Faster construction and
+codec traversal remain concrete follow-up questions, not reasons to claim that this
+slice reduces total allocations. The old-library maximum fault is explicitly allowed
+and recorded by the diagnostic runner; it is not reported as a successful old read.

@@ -37,7 +37,7 @@
     "runtime/raven/src/System/IO/TextWriter.rvn": "ee053d0893f533207e580eba37509aca9284dd0c37d13dff1941a2485b506fec",
     "runtime/raven/src/System/IO/StreamWriter.rvn": "f108f21e5a1ff1c639a97e114af0989adf370bedfb734a1e9d5d247715c85fd4",
     "runtime/raven/src/System/IO/MemoryStream.rvn": "bd81a43f0f196d2acd8b85aa97876bd472588b0c2d5e2c81c3fc5606a631ea7c",
-    "runtime/raven/src/System/IO/StreamReader.rvn": "c33391676f4b55295ae2ae14fa8b27a07f6eba77d6b97e222a11a590f07ee61a",
+    "runtime/raven/src/System/IO/StreamReader.rvn": "8a1e94113a8b202315378b0f82d2abbf0cdfde87748e98849fd79a78aa33e21e",
     "runtime/raven/src/System/IO/SeekableStream.rvn": "b330b07c1e8ea6d2411c4cd78fb74c1a094e6bfcebafe81b815cfb98e230ecf3",
     "runtime/raven/src/System/Storage/FileSystem.rvn": "317025c6492b1494e415c098f121ce90c48c7ad8047b078bc588d03e5565d84b",
     "runtime/raven/src/System/Storage/StorageItems.rvn": "15aeb42f992e6108999cc21807d3f3f579fe2852eb7e17cb3f7122e4b2b7f3df",
@@ -142,8 +142,8 @@
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
-    "StreamReader.methods.neoil": "f547fcfd1d95b753e99ba19f1ff7a149eb86ee1e8ea00b943e995598da80e2d5",
-    "StreamReader.helpers.neoil": "a6fef796855ac7cb0140c076ef7830be2b3e13dc2ab0d75a0c8ebf4404f59edb"
+    "StreamReader.methods.neoil": "5eddc402b2e38d1ea31ffb1b493e357d7d91d4489b1b3fdbdc4d55cb2fde8377",
+    "StreamReader.helpers.neoil": "2faa0d9e0ef12474d19e3a59e253fea328f71dd68dc9dbfe3302f5cb2f4e67e5"
   },
   "compilerSha256": "9e540c5c3f3d2ea673e6e60e4bfc621180d8d7b6158a4a22e085e8439a9a7e1c",
   "coreSha256": "285b0fa0c07ac0e1f30bba1929577cfe2caf341bb1f261d70b2e5d52e9e60be0",

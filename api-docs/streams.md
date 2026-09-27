@@ -122,14 +122,27 @@ disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
 [StreamReader](xref:System.IO.StreamReader) reads strict UTF-8 from an InputStream.
 It works with host files and the sample's partial-read memory input. The POC exposes
 ReadToEnd(maxUtf8Bytes), ReadLine(maxUtf8Bytes) and Close. The [Console guide](console.md)
-describes line reading; other encodings and async work remain future extensions. A BOM is preserved as text, rather than detecting other encodings.
+describes line reading. Current constructors use UTF-8 only. Selectable reader/writer
+encodings with UTF-8 as default are the intended next foundation contract, not yet
+implemented. Async work remains separate. A BOM is preserved as text, rather than
+detecting other encodings.
 
 Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading; zero accepts
 only EOF. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
 distinct TextReadError; input error distinctions are preserved as named cases.
 Errors do not roll back the cursor. Repeated reads at EOF produce an empty string.
-This implementation buffers remaining bytes and the decoded string, so memory is
-bounded by the operation but is not constant. Host resource budgets also apply.
+In development after Preview 10, ReadToEnd decodes bounded UTF-8 chunks, retaining
+at most three incomplete sequence bytes between conversions. It still accumulates
+the returned String, so total memory is not constant. ReadLine retains its line
+buffer. Host resource budgets also apply.
+
+Malformed completed input is now rejected during chunk processing instead of waiting
+for EOF. An underlying read may already have consumed bytes after the error; no
+partial text is returned. A size-limit failure takes precedence over decoding the
+read that exceeded the limit; stream errors encountered earlier remain stream errors.
+This changes how far failing reads can advance and which error is observed first
+compared with Preview 10's decode-at-EOF implementation. A final incomplete sequence
+returns InvalidUtf8. There is no new public Encoder or Decoder type in this slice.
 
 StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
 closed. Close is idempotent, and reads after closing return Closed. Construction

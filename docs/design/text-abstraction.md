@@ -474,6 +474,92 @@ it. Keep search policy and the String/Text naming decision open; neither blocks 
 codec contract. Reuse the earlier .NET Decoder.Convert and Swift text comparisons;
 this consumer is behavioral evidence, not performance or usability evidence.
 
+### Internal reader integration — development
+
+StreamReader.ReadToEnd now consumes the bounded UTF-8 conversion role internally.
+It reads at most 256 bytes, retries conversion of an unconsumed suffix before reading
+again, and carries at most three incomplete bytes between conversions. A complete
+scalar is never split across decoder output chunks, but graphemes may be. Complete
+output is validated by the existing strict Utf8 codec in bounded groups, not decoded
+one scalar at a time. The reader still accumulates one String and returns no prefix
+on failure. Its existing 65536-byte limit, BOM preservation and input ownership stay
+in place. ReadLine is unchanged.
+
+Malformed input can fail before EOF now, changing failure ordering and cursor
+advancement relative to Preview 10; [the public reader contract](../../api-docs/streams.md#text-readers)
+records those details. No public decoder types or new representation are introduced.
+The internal helper exposes consumed bytes and output exhaustion to its one caller;
+its Result uses the existing InvalidUtf8Error. Rich error offsets and prefix recovery
+from the prototype remain candidates for a later public decoder, not shipped behavior.
+
+The application prototype's rich result carrier is not directly admitted as a private
+library dependency by the current bridge (readonly storage/private union restrictions).
+Keep the private helper minimal rather than changing compiler admission or making
+experimental carrier types public to bypass that restriction. This limits reuse;
+it does not select the eventual public contract. The helper is synchronous and
+single-consumer, has no callbacks, and relies on its caller's checked ranges.
+
+### Later Encoder abstraction — author direction
+
+The author explicitly requests an Encoder abstraction later, adapted to neoCLR's
+string/text direction rather than copied from .NET. This is a future capability,
+not authorization to implement the full Encoding/Encoder/Decoder class hierarchy.
+.NET's encoder role is the comparison baseline; its UTF-16 char-buffer inputs are
+not neoCLR's public text unit.
+
+A candidate Encoder consumes valid text (currently String) and produces explicitly
+encoded bytes. Public spelling may later be Text without changing that role.
+Incremental calls need final-input, output-exhaustion, ownership and progress rules.
+Do not report consumed graphemes if conversion may stop inside a multi-scalar Char:
+choose whole-input acceptance with bounded owned carry, or a resumable position with
+a precisely named boundary. The choice remains open. Encoding selection, BOM policy
+and unmappable text for restricted encodings must be explicit; UTF-8's valid-text
+path does not need a UTF-16 surrogate-repair policy.
+
+The first internal reader decoder is evidence for bounded conversion, not a base
+class or a public Encoder signature. Its fixed UTF-8 buffers and progress properties
+are implementation details. Avoid shaping future public APIs around their incidental
+limits. Introduce the abstraction with one actual writer/encoding consumer after
+the corresponding contracts are settled; no new character representation or
+namespace reorganization is implied.
+
+### Selected stream encoding with UTF-8 default — author requirement
+
+The author clarifies that **StreamReader and StreamWriter must accept a selected
+encoding, with UTF-8 as the default**. This is an intended capability, not just a
+possible extra codec. Current production constructors remain UTF-8-only; the private
+reader integration implements part of the default path and does not complete this
+requirement. The next foundation step must establish that selection contract before
+presenting either stream adapter as complete.
+
+.NET's reader/writer encoding selection is the ergonomic baseline. Adapt the role:
+one reusable encoding choice can create separate per-reader decoding and per-writer
+encoding state. Do not share mutable conversion state across streams. “Encoder” in
+this discussion denotes the requested encoding abstraction; exact Encoding/Encoder/
+Decoder type names and whether a combined contract is preferable remain open.
+A read adapter needs byte-to-text conversion; a write adapter needs text-to-byte
+conversion. The author has not requested one specific class hierarchy.
+
+The default constructors should continue to select UTF-8. Explicit selection must
+flow into conversion rather than be accepted and ignored; validate the design with
+a second codec or a distinct test implementation. Reader/writer ownership and close
+behavior must remain clear. Finalizing conversion at EOF/close and ordinary Flush
+are separate concerns for stateful codecs; specify those semantics before exposing
+custom implementations. Keep BOM handling explicit rather than inferring detection
+from encoding selection.
+
+Existing `ReadToEnd(maxUtf8Bytes)` and writer byte-count results need deliberate
+unit review. For another encoding, source-byte quotas, UTF-8 size of internal text
+and encoded bytes written are different quantities. Preserve or explicitly migrate
+the existing contract; never reinterpret a parameter silently. Valid text remains
+the public input/output value, so choosing UTF-16 must not redefine Char as a code
+unit. Strict invalid/unrepresentable-data behavior also belongs in the selected
+encoding contract.
+
+Keep this bounded: selection, independent conversion state, precise progress/limits,
+and one reader plus one writer consumer. General code-page registries, provider
+hierarchies, automatic detection and a full System.Text clone are not implied.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory
