@@ -98,7 +98,8 @@ The author next selected [Task.Run with shared captured objects](tracking/runtim
 as the canonical work-submission API, with runtime-selected execution. Development
 now has native shared captures, typed/completion-only overloads and task unwrapping.
 [Compiler integration gaps](experiments/task-run/compiler-gaps/README.md) remain,
-including short-name lookup and block-lambda inference. Direct completion-only await
+with block-lambda inference still open. Short-name Task.Run lookup is corrected by
+the independently tested Raven type-family lookup fix. Direct completion-only await
 now passes with the target compiler unit-result fix. Mutable-local
 sharing in ordinary async methods is corrected by the independently tested Raven
 closure fix; generic-method capture metadata remains a separate Raven limitation.

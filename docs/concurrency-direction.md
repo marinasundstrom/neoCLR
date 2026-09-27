@@ -30,7 +30,7 @@ flow or caller-thread affinity. Those are separate contracts. Keep Task/Promise 
 System.Tasks. Keep completion-only work compatible with Task<unit>, alongside
 value-producing work returning Task<T>. The subsequent author direction is to align with .NET Task.Run behavior. Include
 async callback flattening in the overload family. The [compiled consumer](experiments/task-run/Main.rvn)
-validates it with direct completion-only await and recorded short-name/lambda workarounds.
+validates it with direct completion-only await and the remaining block-lambda workaround.
 
 The author considers Thread a possible implementation primitive and leaves its
 public future open. Do not remove or repurpose its existing isolated string-worker

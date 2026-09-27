@@ -6,9 +6,6 @@ selected API semantics or evidence of a runtime failure. No Raven source was cha
 in the submission slice. General fixes need isolated Raven branches, independent CLI
 contract tests and extraction to main before target integration.
 
-- `Unqualified.rvn`: wildcard-imported `Task.Run` reports RAV0117 (no Run member).
-  Fully qualified `System.Tasks.Task.Run` or `alias Task = System.Tasks.Task` works;
-  the alias also permits Task<T> result annotations in the compiled consumer.
 - `BlockLambda.rvn`: block callbacks can report RAV1503 (int to void), including an
   explicit Run<int> call. An independently target-typed `Func<int>` local works.
 
@@ -49,3 +46,14 @@ regression replaces the former negative fixture. Main and MutableCapture now awa
 completion directly, without mapping to an integer. Importer stack checks remain
 unchanged. See the [unit-await checkpoint](../README.md#direct-unit-await-checkpoint)
 for the exact validation scope.
+
+## Corrected: unqualified Task.Run lookup
+
+Raven main `f1a3792b8`, integrated as `09f584523` on neoclr, fixes selection of a
+simple imported type receiver when generic and nongeneric types share a name.
+The generic-first metadata order reproduced the same missing-Run diagnostic using
+an ordinary C# reference assembly; all 28 focused CLR checks pass after the fix.
+[Unqualified.rvn](../Unqualified.rvn) is now a positive 42-result consumer, and the
+shared-capture example no longer uses an explicit alias. The change preserves
+local/parameter/alias precedence and explicit generic annotations. No target policy
+or importer relaxation is introduced.

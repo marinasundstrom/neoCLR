@@ -628,10 +628,9 @@ now has separate positive regressions below. Run with matching --runtime, --brid
 reference includes the static owner and all overloads; matching API/library snapshot
 checks pass. Website source/downloads are updated without building the website.
 
-Two [compiler integration gaps](compiler-gaps/README.md) remain: short-name Task
-lookup and block-lambda result inference. The passing consumer
-uses an explicit alias and a typed callback local. These
-workarounds do not redefine the API contract.
+The [block-lambda inference gap](compiler-gaps/README.md) remains. The passing
+consumer uses a typed callback local; Task.Run no longer needs an explicit alias.
+The workaround does not redefine the API contract.
 
 ## Shared mutable-local capture checkpoint
 
@@ -698,10 +697,24 @@ identity/unwrapping consumer compiles, typed-verifies and executes with the comb
 runtime, reference and library. Source/generated-library fingerprints match. No full
 suite or website build is used for this integration.
 
+## Short-name Task.Run lookup checkpoint
+
+Raven main `f1a3792b8` fixes simple type-family lookup, integrated independently as
+`09f584523` on its neoclr branch. The ordinary CLR regression declares Task<T> before
+static Task in metadata and reproduces the missing-Run diagnostic; reversed order
+already passed. Lookup now chooses the nongeneric type in the same declaring scope,
+preserving local/parameter/alias precedence and explicit generic annotations. This
+matches the familiar .NET type-family model without changing Runtime Contract options.
+
+All 28 focused compiler checks pass. The original [Unqualified.rvn](Unqualified.rvn)
+is a positive consumer requiring exit 42. Main also drops its explicit Task alias.
+Both compile, pass typed-stack verification and run with the existing development
+reference/library and rebuilt bridge. No public signatures or library implementations
+change; the API snapshot refresh updates XML only. No website or full-suite build.
+
 ## Next bounded work
 
-Resolve short-name lookup and block-lambda inference in isolated Raven work with
-independent CLI tests. Keep the
-remaining negative fixtures until corrected. Public release readiness still requires
-reviewing these integration gaps and the separate generic-method capture candidate;
+Resolve block-lambda inference in isolated Raven work with independent CLI tests.
+Keep the remaining negative fixture until corrected. Public release readiness still
+requires reviewing these integration gaps and the separate generic-method capture candidate;
 no broader platform matrix or website build is required for this correction.

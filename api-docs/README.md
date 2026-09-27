@@ -371,7 +371,7 @@ and XML coverage. The matching bridge/reference/library implement shared capture
 completion-only and typed work, and async unwrapping. ScheduleTask and helper carriers
 remain private implementation details. [The callback guide](callbacks.md#taskrun-development)
 records native execution, invocation limits, default-queue behavior and current Raven
-lookup/lambda limitations and the separate generic-method capture follow-up.
+block-lambda inference limitations and the separate generic-method capture follow-up.
 Ordinary async mutable-local sharing is corrected by the integrated Raven closure fix.
 Direct completion-only await is corrected by the target compiler unit-result fix.
 The XML-only API snapshot refresh preserves the unchanged reference assembly; the

@@ -159,8 +159,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   terminal guest faults. Add development Task.Run overloads for completion-only,
   typed and task-producing callbacks, with shared capture/result identity and async
   outcome transfer on the default dispatcher. Refresh matching library/reference
-  artifacts and API documentation. Record required Raven workarounds for short-name
-  lookup and block-lambda typing. Correct direct completion-only await in the target
+  artifacts and API documentation. Record the remaining Raven workaround for
+  block-lambda typing. Correct short-name
+  Task.Run lookup through Raven main f1a3792b8 (neoclr 09f584523); metadata order no
+  longer selects Task<T> in place of its nongeneric owner. Promote the reduced
+  lookup failure to a passing consumer and remove the example’s explicit alias.
+  Correct direct completion-only await in the target
   compiler by recognizing the configured inhabited unit result; remove the integer-map
   workaround and promote the failing fixture to a positive consumer. Correct ordinary
   async mutable-local

@@ -1,6 +1,5 @@
 import System.*
 import System.Tasks.*
-alias Task = System.Tasks.Task
 
 class SharedState {
     var Value: int = 0

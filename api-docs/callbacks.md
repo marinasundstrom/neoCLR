@@ -68,8 +68,8 @@ per-job `worker_result_bytes` cap. These host quota choices are provisional. Thi
 runtime-owned, invocation-scoped backend differs from .NET's process-wide thread pool.
 See the [task feature page](/features/tasks/#task-run) for the compiled example.
 
-Current Raven integration limitations: use `alias Task = System.Tasks.Task` (or the
-fully qualified owner) for Run lookup. Give multi-statement value callbacks a
+Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
+For the remaining Raven inference limitation, give multi-statement value callbacks a
 `Func<T>` local type when overload inference reports a void conversion. These are
 tracked limitations, not intended API semantics. Direct `Task<unit>` awaits, typed awaits and async unwrapping use
 the ordinary Task protocol with the matching development compiler.
