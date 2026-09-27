@@ -1,4 +1,5 @@
-//! Single-threaded, non-moving tracing heap. Object identities are never reused.
+//! Non-moving tracing heap. Object identities are never reused. The caller must
+//! exclude graph mutation during collection; the VM uses shared_heap::Access.
 use crate::{Fault, Value};
 use std::collections::{BTreeMap, HashSet, VecDeque};
 

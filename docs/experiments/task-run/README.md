@@ -22,7 +22,8 @@ same object through interior aliases on two threads; no serialization or object
 copy is used to substitute for sharing.
 
 This is a storage prerequisite only. The interpreter still runs one execution per
-invocation. Its collector does not coordinate with other running VMs. The new
+invocation. The coordination prerequisite below now protects its heap access, but
+it does not yet interleave multiple guest VMs. The new
 native tests keep the heap alive while accessing it, and only collect after the
 threads join. They **do not** establish safe concurrent collection. Promise,
 TaskQueue, general collections and host-resource ownership still need their own
@@ -81,12 +82,52 @@ candidate (1.0383×, about 4% slower). This observed cost does not justify a sep
 optimization project; repeat only if subsequent shared-execution changes or a
 supported workload raise a material regression question.
 
+## Shared heap/root coordination
+
+The runtime now creates an invocation-owned heap coordinator. A participant has a
+registered root snapshot and acquires exclusive graph access. Root publication,
+new participant registration and collection happen under that same gate. Collection
+combines the current participant's roots with every retained participant snapshot;
+transitive references are still traced by the existing collector. Registered roots
+are invocation-local VM allocation IDs, not guest handles or a cross-heap import API.
+
+Registration precedes transfer of queued captures. A completion can retain its
+participant until the receiving owner publishes the result. Registrations are weak
+in the coordinator, so dropping an abandoned submission never reacquires the gate
+and cannot deadlock a submitter holding it. Expired entries are pruned on admission
+and collection. Admission has an explicit participant bound; exporting the final
+heap requires all participants to have been released. Invalid root publication
+preserves the previous snapshot and does not partially sweep.
+
+The VM's automatic, explicit and final collections now use this coordinator. The
+current VM holds one access guard for its execution, with a one-participant budget;
+this is deliberately **not** concurrent guest execution yet. Before native guest
+callbacks can run, the interpreter must publish complete roots and release the
+guard at appropriate safepoints and blocking boundaries. No GC can make progress
+while a participant holds access, so holding that guard during a blocking host call
+is not a viable final Task.Run scheduling policy. Slot locks alone remain insufficient.
+All VM graph access must obey the gate; the internal ManagedHeap helper interface
+must not be used to bypass registered-root collection.
+
+Focused checks for this slice:
+
+```sh
+cargo test --lib shared_heap::tests
+cargo test --test runtime_gc --test gc_diagnostics --test heap_references --test entry_results
+```
+
+Six coordinator tests and 25 integration tests pass. They cover queued capture
+retention, native mutation/result handoff, exclusion of collection during mutation,
+transitive graph retention, abandoned admission, invalid publication, bounded
+participants and export ordering. Existing VM collection/entry-dispatch behavior
+passes. No new per-instruction scheduling or slot operations were introduced; the
+previous storage cost check is retained, not rerun as a scheduler benchmark.
+
 ## Next prerequisite
 
-Define a shared execution owner and collector safepoint/root protocol for queued
-captures, running frames, suspended continuations and completed results. Collection
-must not race graph mutation or reclaim a callback between submission and rooting.
-Then establish concurrent Promise/queue publication and cancellation/teardown before
-exposing Run overloads. Retaining every object until invocation exit is not a
-substitute for bounded live-object accounting. Native blocking-work progress and
-async callback unwrapping need executable acceptance at that later API boundary.
+Establish bounded native submission, rooted completion ownership, cancellation and
+join-before-disposal. Then connect guest execution safepoints and shared services,
+and establish concurrent Promise/queue publication before exposing Run overloads.
+Native blocking-work progress and async callback unwrapping need executable
+acceptance at that later API boundary. Retaining every object until invocation exit
+is not a substitute for bounded live-object accounting.

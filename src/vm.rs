@@ -1506,7 +1506,11 @@ fn interpret_frames(
     options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    let mut heap = crate::ManagedHeap::default();
+    // One participant today. Native Task.Run will release/reacquire this access
+    // at explicit VM safepoints after publishing all execution roots.
+    let owner = crate::shared_heap::Owner::new(1);
+    let mut participant = owner.participant()?;
+    let mut heap = participant.enter();
     let mut memory = crate::memory::PointerHeap::default();
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
@@ -1527,6 +1531,9 @@ fn interpret_frames(
         }
         debugger.finish(snapshot, result.as_ref().err());
     }
+    drop(heap);
+    drop(participant);
+    let heap = owner.into_heap()?;
     result.map(|value| Execution {
         value,
         output,
@@ -1602,7 +1609,7 @@ fn interpret_instructions(
     frames: &mut Vec<Frame>,
     options: &ExecutionOptions,
     native_libraries: &mut Option<crate::interop::NativeLibraries>,
-    heap: &mut crate::ManagedHeap,
+    heap: &mut crate::shared_heap::Access<'_>,
     memory: &mut crate::memory::PointerHeap,
     output: &mut Vec<String>,
     console_bytes: &mut [Vec<u8>; 2],

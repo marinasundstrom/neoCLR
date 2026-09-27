@@ -19,10 +19,11 @@ owns the contract, backend alternatives and focused acceptance cases. Settle the
 execution/heap ownership boundary before exposing the facade; the isolated Thread
 worker contract is not a substitute. Thread's future public role remains open.
 The [first storage prerequisite](../experiments/task-run/README.md) implements
-synchronized managed slots and tests native alias sharing. It does not yet supply
-shared collector roots, concurrent Promise/queue publication or a Task.Run facade.
-The next bounded prerequisite is coordinated heap/root ownership for queued,
-running and completed work. Green threads are recorded as a possible future backend.
+synchronized managed slots and tests native alias sharing. The subsequent heap coordinator registers participant roots and serializes graph
+access/collection; the current VM uses one participant and has not yet gained
+concurrent guest execution. The next bounded prerequisite is native work ownership,
+then guest safepoints/shared services and concurrent Promise/queue publication
+before the Task.Run facade. Green threads are recorded as a possible future backend.
 This explicit task does not reopen the finished HTTP POC or select a general
 scheduler/backend rewrite independently of the capability's requirements.
 

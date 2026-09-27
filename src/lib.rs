@@ -16,6 +16,7 @@ pub use console::{Console, StdioConsole};
 mod delegates;
 pub mod frontend;
 mod gc;
+mod shared_heap;
 pub use delegates::Delegate;
 mod inheritance;
 mod initialization;

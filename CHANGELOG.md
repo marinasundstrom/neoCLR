@@ -38,7 +38,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   synchronized managed slots, weak heap handles and debugger snapshots that release
   storage locks before following references. Cover native-thread alias mutation,
   coherent slot reads and payload-cache invalidation. Record green threads as a
-  possible later backend; Task.Run and concurrent GC are not exposed by this slice.
+  possible later backend. Add invocation-owned heap coordination with registered
+  participant roots, atomic admission/publication under exclusive graph access,
+  collection across parked participants and export after participant release.
+  Route existing VM collection through one participant; concurrent guest execution
+  and public Task.Run remain pending. Add focused coordinator/GC/startup checks.
 
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and

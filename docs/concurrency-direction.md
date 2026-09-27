@@ -43,7 +43,8 @@ The runtime has an invocation-owned tracing heap. The first implementation
 prerequisite replaces `Rc<RefCell<Slot>>` with identity-preserving `Arc` storage and
 per-slot mutexes. Heap handles still use weak references, and the root walk covers
 the active invocation. [Storage evidence](experiments/task-run/README.md) covers
-native sharing at this boundary; concurrent VM execution and GC are not implemented.
+native sharing and the following shared-root coordinator. Existing VM collection
+uses one registered participant; concurrent guest execution is not implemented.
 The existing native workers start separate invocations. Merely
 sending a delegate or substituting Arc for Rc is insufficient: slot access, GC,
 Promise completion, task queues, cancellation and host resources also need a
