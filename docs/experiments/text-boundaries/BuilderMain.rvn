@@ -1,0 +1,116 @@
+import System.*
+import System.Result.*
+import System.Text.*
+import System.Console.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Added(result: Result<unit, BuildError>) {
+    match result {
+        Ok(_) => { }
+        Error(_) => System.Fault("Unexpected build limit")
+    }
+}
+
+public func Rejected(result: Result<unit, BuildError>) {
+    match result {
+        Error(BuildError.LimitExceeded) => { }
+        _ => System.Fault("Missing build limit")
+    }
+}
+
+public func Contracts() {
+    let report = ReportTextBuilder(80)
+    Check(report.Build().Equals("") && report.Utf8ByteCount == 0, "Initial empty state")
+    Added(report.Append("name="))
+    Added(report.Append("e"))
+    let first = report.Build()
+    Added(report.Append("́"))
+    Added(report.AppendLine(""))
+    Added(report.AppendLine("status=ready"))
+    let text = report.Build()
+    Check(first.Equals("name=e"), "Snapshot before combining mark")
+    Check(text.Equals("name=é\nstatus=ready\n"), "Report order and LF")
+    Check(text.Length == 20 && report.Utf8ByteCount == 22, "Grapheme and byte units differ")
+    Check(report.Build().Equals(text), "Repeat build")
+    report.Clear()
+    Check(report.Utf8ByteCount == 0 && report.MaxUtf8Bytes == 80, "Clear preserves limit")
+    Added(report.Append("replacement"))
+    Check(report.Build().Equals("replacement") && text.Equals("name=é\nstatus=ready\n"), "Reuse preserves snapshot")
+
+    let zero = ReportTextBuilder(0)
+    Added(zero.Append(""))
+    Rejected(zero.AppendLine(""))
+    Rejected(zero.Append("x"))
+    Check(zero.Build().Equals("") && zero.Utf8ByteCount == 0, "Zero quota atomicity")
+    let bounded = ReportTextBuilder(4)
+    Added(bounded.Append("é"))
+    Rejected(bounded.AppendLine("é"))
+    Check(bounded.Utf8ByteCount == 2 && bounded.Build().Equals("é"), "AppendLine rejects without partial change")
+    Added(bounded.Append("é"))
+    Added(bounded.Append(""))
+    Rejected(bounded.Append("x"))
+    Check(bounded.Build().Equals("éé"), "Exact byte bound")
+    bounded.Clear()
+    Added(bounded.Append("😀"))
+    Check(bounded.Build().Length == 1 && bounded.Utf8ByteCount == 4, "Supplementary text")
+
+    let split = Encodings.Utf8.CreateDecoder()
+    let chunks = ReportTextBuilder(3)
+    let firstBytes: byte[] = [(byte)101, (byte)204]
+    let finalBytes: byte[] = [(byte)129]
+    match split.Decode(firstBytes, 0, 2, false) {
+        Ok(let part) => Added(chunks.Append(part))
+        Error(_) => System.Fault("First decoded part")
+    }
+    match split.Decode(finalBytes, 0, 1, true) {
+        Ok(let part) => Added(chunks.Append(part))
+        Error(_) => System.Fault("Final decoded part")
+    }
+    Check(chunks.Build().Equals("é") && chunks.Build().Length == 1, "Decoded parts resegment")
+    let odd = ReportTextBuilder(8)
+    for part in ["A", "", "é", "B", "C", "D"] {
+        Added(odd.Append(part))
+    }
+    Check(odd.Build().Equals("AéBCD"), "Odd reduction preserves order")
+    WriteLine("Bounded report construction contracts passed")
+}
+
+public func Diagnostic(mode: string, count: int) {
+    let part = "0123456789abcdef"
+    var text = ""
+    if mode.Equals("builder") {
+        let builder = ReportTextBuilder(65536)
+        for index in 0..<count {
+            Added(builder.Append(part))
+        }
+        text = builder.Build()
+    } else {
+        for index in 0..<count {
+            if part.GetUtf8ByteCount() > 65536 - text.GetUtf8ByteCount() {
+                System.Fault("Concat limit")
+            }
+            text = String.Concat(text, part)
+        }
+    }
+    Check(text.GetUtf8ByteCount() == count * 16, "Diagnostic result size")
+    WriteLine(text)
+}
+
+public func Main(args: string[]) {
+    if args[0].Equals("contracts") {
+        Contracts()
+    } else if args[0].Equals("invalid-limit") {
+        _ = ReportTextBuilder(-1)
+    } else {
+        var count = 8
+        if args[1].Equals("large") {
+            count = 1024
+        }
+        Diagnostic(args[0], count)
+    }
+}

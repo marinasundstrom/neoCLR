@@ -61,6 +61,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   snapshots, feature pages and focused consumer evidence, including custom codecs,
   split input and the maximum reader bound. Stateful Encoder and future HTTP
   integration remain planned; no text rename, replacement fallback or new HTTP scope.
+- Evaluate bounded report construction with an application-only builder: explicit
+  UTF-8 quotas, atomic expected-limit failures, immutable snapshots, clear/reuse and
+  decoded combining sequences. Focused contracts and a .NET semantic comparison
+  pass. Identical-output diagnostics favor ordinary concatenation over this managed
+  implementation; defer public builder promotion and record Encoder progress as the
+  next bounded candidate. No runtime/API changes or builder optimization work.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

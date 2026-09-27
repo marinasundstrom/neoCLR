@@ -776,3 +776,73 @@ that hypothesis. Full culture collation, normalization, Unicode security profile
 regex design and broad encoding coverage remain open work, not hidden blockers for
 every small API. No benchmark is necessary until a relevant performance claim or
 regression is part of the selected task.
+
+### Bounded report construction evaluation — 2026-09-27
+
+**Scenario and hypothesis.** A report consumer appends a name, decoded text and
+status lines, then retains the result while reusing the accumulator. Test whether
+a minimal managed builder provides useful explicit quotas and snapshot semantics,
+and whether deferred balanced concatenation is worth promoting over existing
+String.Concat. This is an evaluation of the next roadmap candidate, not a new
+public type or an author decision on naming.
+
+**Comparison (primary sources retrieved 2026-09-27).** .NET's
+[StringBuilder](https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-10.0)
+provides mutable construction and immutable ToString snapshots. Its length/capacity
+units follow .NET char, and documented MaxCapacity behavior is not a general hard
+input quota. Its guidance also recommends measuring whether a builder helps.
+Swift's [String](https://developer.apple.com/documentation/swift/string) offers
+value-semantic mutation backed by copy-on-write storage and amortized append growth.
+Neither API spelling grants those implementation properties to neoCLR. The
+[.NET semantic fixture](../experiments/text-boundaries/BuilderBaseline.cs) confirms
+snapshot/reuse behavior and distinct UTF-16, UTF-8 and grapheme counts on the same
+report; there is no cross-runtime timing comparison.
+
+**Prototype contract.** [ReportTextBuilder](../experiments/text-boundaries/Builder.rvn)
+is an ordinary application reference type with Append(string), AppendLine(string),
+Build(), Clear(), Utf8ByteCount and MaxUtf8Bytes. The caller explicitly selects a
+0–65536 UTF-8 byte quota. Unsupported construction limits fault; append overflow is
+a typed LimitExceeded and leaves existing content unchanged. AppendLine preflights
+text plus LF as one operation. Host resource faults are not transactional guarantees.
+No mutable character indexing, capacity property, formatting overload family or
+implicit encoding conversion is introduced. Scalar and Char helpers can be added
+only with a consumer; the fixture accepts valid strings from the existing Decoder.
+
+Build returns immutable text, caches repeated materialization and compacts retained
+fragments. Appending a combining mark can merge with an earlier grapheme; byte counts
+are additive while character counts are not. Clear releases fragments and cached
+text while preserving the quota. Empty appends add no retained fragment. The managed
+implementation keeps immutable parts and combines adjacent pairs in balanced rounds.
+For n equal-sized pieces, this changes concatenation's summed copied length from
+quadratic growth to O(total bytes × log n), but adds guest collection operations,
+reference objects and intermediate strings. That is algorithm analysis, not measured
+native allocation evidence. Runtime source at `0a14989b`,
+[src/native.rs](../../src/native.rs), shows StringConcat allocating a fresh payload
+and copying both inputs; immutable payload sharing alone does not make append cheap.
+
+**Evidence and decision.** The focused contracts pass for empty/zero/exact bounds,
+atomic line rejection, odd fragment counts/order, repeated Build, retained snapshots,
+clear/reuse, supplementary text and split decoded combining sequences. The diagnostic
+checks identical final bytes for both strategies at 8 and 1024 pieces, with three
+fresh invocations each and alternating order. At 1024 × 16 bytes, ordinary bounded
+concatenation took **51–58 ms**, versus **561–574 ms** for the managed builder on
+macOS arm64. At eight pieces the ranges were 0–2 and 5–6 ms. Millisecond resolution
+limits interpretation of the small case. Measurements include guest construction,
+checks and captured output, but exclude load/verification; they are not a warmed
+throughput study. Managed GC counts do not measure native String payload bytes.
+See [raw evidence](../experiments/text-boundaries/builder-validation.json).
+
+The explicit quota and snapshot contract is useful, but this implementation is not
+justified as the public builder. Keep ordinary concatenation for the tested report;
+retain the bounded construction contract as a candidate. Do not optimize this probe
+or add a new native buffer/ownership facility solely to obtain a favorable result.
+A future consumer that needs bulk construction can justify evaluating a one-pass
+join or native append buffer, including snapshot lifetimes and resource enforcement.
+That would be separate runtime work. A thin bounded concatenation wrapper is also
+an option if callers need quotas without claiming faster assembly.
+
+**Next bounded candidate.** Return to the author-requested incremental Encoder role:
+first settle text-input progress, output-byte capacity and completion semantics with
+a writer consumer. This remains a follow-up, not authorization for a .NET fallback
+hierarchy or new HTTP feature. The shared Encoding/Decoder APIs remain implemented;
+public builder promotion and String/Text naming remain deferred.

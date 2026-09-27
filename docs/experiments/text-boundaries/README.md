@@ -174,3 +174,33 @@ stream constructors. Run `verify_encoding.py` with matching `--runtime`, `--brid
 UTF-8/ASCII, lifecycle, line reading, partial writes, byte counts and leaveOpen.
 `verify.py --reader-only` retains the existing chunk/boundary/maximum reader checks.
 The Selection prototype remains application-only; the public test does not compile it.
+
+## Bounded report construction evaluation
+
+`Builder.rvn` and `BuilderMain.rvn` evaluate an application-only append accumulator
+against ordinary concatenation. They do not add a public StringBuilder/TextBuilder.
+The fixture exercises a small report, a hard UTF-8 byte quota, atomic expected
+limit failures, immutable snapshots, clear/reuse, combining boundaries and output
+from the public Decoder. An empty append consumes neither bytes nor a fragment.
+Build combines adjacent fragments in balanced rounds and compacts retained state.
+
+Run `verify_builder.py` with the same four artifact arguments as `verify_encoding.py`,
+plus `--runner target/release/examples/measure_async` and `--evidence OUTPUT.json`.
+It runs the focused contract and invalid-limit checks, then three fresh invocations
+of each construction strategy at 8 and 1024 pieces of 16 bytes. Order alternates;
+every final byte is checked. Timings include guest construction, checks and captured
+output, but exclude assembly/loading/verification. GC counters omit native String
+payload allocations; zero surviving managed objects is not a native-byte measurement.
+
+[Recorded evidence](builder-validation.json): at 1024 pieces (16 KiB), concatenation
+runs in 51–58 ms and the balanced managed accumulator in 561–574 ms. Eight-piece
+runs are 0–2 ms versus 5–6 ms; the timer resolution limits small-case interpretation.
+The explicit quota/snapshot contract works, but these measurements do not support
+promoting this implementation as the public builder. Do not turn this result into
+an optimization project without a concrete consumer requiring bulk construction.
+See the [design decision](../../design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27).
+
+`BuilderBaseline.cs` is a semantic .NET comparison, run in a temporary net11.0 console
+project. It confirms immutable snapshots and reuse while distinguishing 21 UTF-16
+units, 22 UTF-8 bytes and 20 graphemes for the same report. It is not a cross-runtime
+performance comparison; its exact tested version is in the evidence.

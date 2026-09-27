@@ -1,0 +1,80 @@
+import System.*
+import System.Collections.*
+import System.Result.*
+
+// Evaluation only. This does not add System.Text.StringBuilder or settle its name.
+public union BuildError {
+    case LimitExceeded
+}
+
+public class ReportTextBuilder {
+    private var pieces: ArrayList<string> = ArrayList<string>()
+    private var size: int = 0
+    private var limit: int = 0
+    private var snapshot: string = ""
+    private var dirty: bool = false
+
+    init(maxUtf8Bytes: int) {
+        if !(maxUtf8Bytes >= 0) || maxUtf8Bytes > 65536 {
+            System.Fault("Builder limit must be between 0 and 65536 UTF-8 bytes")
+        }
+        limit = maxUtf8Bytes
+    }
+
+    val Utf8ByteCount: int => size
+    val MaxUtf8Bytes: int => limit
+
+    func Append(text: string) -> Result<unit, BuildError> {
+        let count = text.GetUtf8ByteCount()
+        if count > limit - size {
+            return Error(BuildError.LimitExceeded)
+        }
+        if count != 0 {
+            pieces.Add(text)
+            size += count
+            dirty = true
+        }
+        return Ok(())
+    }
+
+    func AppendLine(text: string) -> Result<unit, BuildError> {
+        // Preflight the complete operation: failure must not leave half a line.
+        if text.GetUtf8ByteCount() >= limit - size {
+            return Error(BuildError.LimitExceeded)
+        }
+        return Append(String.Concat(text, "\n"))
+    }
+
+    func Build() -> string {
+        if !dirty {
+            return snapshot
+        }
+        var level = pieces
+        while level.Count > 1 {
+            let next = ArrayList<string>((level.Count + 1) / 2)
+            var index = 0
+            while index < level.Count {
+                if index + 1 < level.Count {
+                    next.Add(String.Concat(level[index], level[index + 1]))
+                } else {
+                    next.Add(level[index])
+                }
+                index += 2
+            }
+            level = next
+        }
+        snapshot = level[0]
+        // Release fragment references; later appends cannot mutate this snapshot.
+        pieces = ArrayList<string>(1)
+        pieces.Add(snapshot)
+        dirty = false
+        return snapshot
+    }
+
+    func Clear() {
+        pieces = ArrayList<string>()
+        size = 0
+        snapshot = ""
+        dirty = false
+    }
+}

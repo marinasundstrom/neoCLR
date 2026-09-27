@@ -8124,3 +8124,23 @@ configuration/content, not target-specific code added to Raven main.
   and HTTP charset policy remain separate follow-ups. No String/Text rename or
   widening of the HTTP POC. See [contract](design/text-abstraction.md#shared-encoding-apis-development)
   and [focused evidence](experiments/text-boundaries/encoding-validation.json).
+
+### 2026-09-27 — Report construction candidate evaluated
+
+- **Author context:** asked to continue after the shared encoding integration.
+  Earlier direction requested text foundations and possibly a builder, with useful
+  features ahead of optimization work. No new builder design was explicitly approved.
+- **Assistant action:** selected the roadmap's bounded report-construction evaluation.
+  Added an application-only accumulator and a concrete report consumer, checked hard
+  UTF-8 quotas and retained snapshots, and compared balanced deferred construction
+  with ordinary concatenation. A .NET semantic fixture separates UTF-16 units,
+  UTF-8 bytes and grapheme counts for the same report.
+- **Observed outcome:** semantic checks pass; the managed prototype is slower at
+  both measured sizes. At 1024 pieces/16 KiB, concatenation took 51–58 ms and the
+  prototype 561–574 ms. These are local diagnostics, not cross-runtime benchmarks
+  or native allocation measurements. [Evidence](experiments/text-boundaries/builder-validation.json).
+- **Assistant decision/recommendation:** retain the useful quota/snapshot contract
+  as a candidate and defer public builder promotion; do not start optimizing the
+  probe. Recommend the already requested Encoder progress contract with a writer
+  consumer as the next bounded task. This is not a new author naming decision or
+  a permanent priority change. No runtime/public API, website or release change.

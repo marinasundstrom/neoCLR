@@ -35,8 +35,12 @@ The [library tracker](tracking/library-data.md#string-design-review-before-furth
 owns the boundary experiment, [paired text API sketch](design/text-abstraction.md#consumer-api-sketch-identical-behavior-two-vocabularies)
 and the shared Encoding/Decoder integration in both stream adapters. Development
 constructors accept encoding selection with UTF-8 defaults and strict ASCII, backed
-by focused consumer checks. Minimal text construction is the next bounded candidate;
-a stateful Encoder and broader codecs remain separate follow-ups. General
+by focused consumer checks. The [bounded report construction evaluation](design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27)
+passes its contracts but does not justify promoting the managed builder: ordinary
+concatenation is faster for the tested report sizes. Keep public builder promotion
+deferred; do not start a builder optimization project. The next bounded candidate
+is the author-requested Encoder progress contract with a writer consumer. Broader
+codecs remain separate follow-ups. General
 scalar/range APIs and the broader portfolio are not prerequisites. Experimental
 types and proposed names are not adopted System APIs.
 M2–M6 remain candidate applications; no complete File Catalog
