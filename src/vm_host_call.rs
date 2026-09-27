@@ -148,11 +148,19 @@ impl HostCall {
                         let [Value::Int32(id), Value::Int32(count)] = self.args.as_slice() else {
                             return Err(Fault::new("Invalid prepared file read"));
                         };
-                        state.files.read_transfer(*id, *count)
+                        state
+                            .invocation
+                            .files
+                            .lock()
+                            .expect("file table lock poisoned")
+                            .read_transfer(*id, *count)
                     }
-                    crate::native::Binding::FileResource(operation) => {
-                        state.files.invoke(operation, &self.args, &options.limits)?
-                    }
+                    crate::native::Binding::FileResource(operation) => state
+                        .invocation
+                        .files
+                        .lock()
+                        .expect("file table lock poisoned")
+                        .invoke(operation, &self.args, &state.invocation.limits)?,
                     crate::native::Binding::JoinWorkerResult => {
                         Value::Erased(Box::new(state.scheduler.workers.join_result(
                             self.args.clone(),

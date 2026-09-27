@@ -654,9 +654,10 @@ fn guest_contexts_share_instruction_fuel_and_live_frame_admission() {
         },
         ..Default::default()
     };
-    let budget = crate::invocation_budget::Budget::new(options.limits);
-    let mut first = InstructionState::with_budget(options.limits, budget.clone());
-    let mut second = InstructionState::with_budget(options.limits, budget.clone());
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let budget = invocation.budget.clone();
+    let mut first = InstructionState::with_invocation(invocation.clone());
+    let mut second = InstructionState::with_invocation(invocation);
     let owner = Owner::new(1);
     let mut participant = owner.participant().unwrap();
     let mut first_frames = vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()];
@@ -708,4 +709,70 @@ fn guest_contexts_share_instruction_fuel_and_live_frame_admission() {
     ));
     assert_eq!(first.budget.remaining(), 0);
     assert_eq!(second.budget.remaining(), 0);
+}
+
+#[test]
+fn guest_contexts_share_intern_owner_and_cannot_reset_its_limit() {
+    let module = crate::assemble(
+        r#"
+.module System
+.function neoCLR.Runtime.StringIntern(String value) -> String
+.methodimpl InternalCall
+.end
+.function Canon(String input) -> String
+ldarg input
+call neoCLR.Runtime.StringIntern(String)
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let options = ExecutionOptions {
+        limits: Limits {
+            intern_entries: 1,
+            intern_bytes: 4,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let owner = Owner::new(1);
+    let run = |text: &str| {
+        let mut participant = owner.participant().unwrap();
+        let mut state = InstructionState::with_invocation(invocation.clone());
+        let mut frames = vec![
+            Frame::new(
+                module
+                    .functions
+                    .iter()
+                    .find(|f| f.name == "Canon")
+                    .unwrap()
+                    .clone(),
+                vec![Value::String(text.into())],
+            )
+            .unwrap(),
+        ];
+        drive_instructions(
+            &module,
+            &mut frames,
+            &options,
+            &mut None,
+            &mut participant,
+            &mut Default::default(),
+            &mut Vec::new(),
+            &mut [Vec::new(), Vec::new()],
+            &mut state,
+        )
+    };
+    let Value::String(first) = run("same").unwrap() else {
+        panic!()
+    };
+    let Value::String(second) = run("same").unwrap() else {
+        panic!()
+    };
+    assert!(first.same_owner(&second));
+    assert_eq!(
+        run("next").unwrap_err().code,
+        crate::FaultCode::InternPoolLimitExceeded
+    );
 }

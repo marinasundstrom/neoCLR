@@ -284,12 +284,35 @@ and 0.4939s (0.7441×). No slowdown was observed, but the noisy comparison spans
 intervening wait/host-call changes and does not establish a speedup or isolate the
 cost of atomic accounting. No broad suite or website build was run.
 
+## Shared file and interning services
+
+VM contexts now take one invocation owner containing immutable limits, the shared
+budget, file table and intern pool. Passing that owner preserves open-handle identity,
+file position, close state and the existing 64-file cap, as well as canonical string
+owners and intern quotas. These services outlive an individual context and are disposed
+when the invocation owner is released. Isolated Thread workers still create their own
+invocation owner and retain their existing isolation contract.
+
+File operations take the file-table mutex only outside graph access; file operations
+never reacquire the graph gate. The initial lock serializes even unrelated file
+operations. This is a correctness baseline with a concurrency cost compared with
+independent .NET FileStream instances, not a claim of better I/O scheduling. Interning
+holds only its own short-lived lock and performs no host I/O.
+
+Two native-context service probes and nine VM suspension/ownership probes pass,
+including shared file position/close state and guest interning identity/quota checks.
+The twelve file-stream integration tests pass. An older interning fixture was stopped
+when its whole-library preparation became apparent; its partial run is not evidence
+for this slice. The small System fixture validates the actual guest String.Intern
+binding across two contexts without rebuilding or verifying the entire library.
+
 ## Next prerequisite
 
-Establish shared invocation services and aggregate budgets before general guest
-work submission. Then establish atomic Promise/queue publication and expose the
+Integrate the scheduler/completion owner, shared default queue, native allocation
+ownership and aggregate array/native-memory accounting before general guest work
+submission. Then establish atomic Promise/queue publication and expose the
 Run overloads, with async callback unwrapping validated at that API boundary.
-Instruction and live-frame budgets now have a shared owner. Connect shared service,
-array/native-memory and host-resource accounting before general submission; a new
-task must not reset those limits. Retaining every object until
+Instruction/live-frame budgets, file handles and interning now share an invocation
+owner. Array/native-memory and remaining host-resource accounting still require
+integration; a new task must not reset those limits. Retaining every object until
 invocation exit is not a substitute for bounded live-object accounting.

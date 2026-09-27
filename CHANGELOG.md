@@ -61,7 +61,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   services and public Task.Run remain pending. Share instruction fuel and live-frame
   permits across VM contexts; paused frames retain capacity and returns/unwinding
   release it. Validate aggregate exhaustion/admission and record a focused cost probe.
-  Array/native-memory and host-resource accounting still need shared integration.
+  Share the invocation file table and intern pool across VM contexts, preserving
+  handle position/close state, string identity and quotas. File-table locking stays
+  outside graph access; file operations are initially serialized. Scheduler/queue,
+  array/native-memory ownership and public Run still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

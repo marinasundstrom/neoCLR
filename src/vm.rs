@@ -1671,14 +1671,13 @@ fn execution_roots(
     roots
 }
 
-/// State that must survive an instruction-boundary suspension. Host services are
-/// still local to this execution; sharing them is a separate integration step.
+/// State that survives an instruction-boundary suspension. File handles, interning
+/// and budgets share invocation ownership; scheduler/native memory integration remains.
 struct InstructionState {
     collection_threshold: usize,
     arrays_used: bool,
     scheduler: crate::scheduler::Scheduler,
-    files: crate::file_streams::Files,
-    interned: crate::string_interning::Pool,
+    invocation: std::sync::Arc<crate::invocation::Invocation>,
     default_task_queue: Option<Value>,
     invocation_result: Option<Value>,
     entry_drain_depth: Option<usize>,
@@ -1688,19 +1687,17 @@ struct InstructionState {
 }
 impl InstructionState {
     fn new(limits: Limits) -> Self {
-        Self::with_budget(limits, crate::invocation_budget::Budget::new(limits))
+        Self::with_invocation(crate::invocation::Invocation::new(limits))
     }
 
-    fn with_budget(limits: Limits, budget: std::sync::Arc<crate::invocation_budget::Budget>) -> Self {
+    fn with_invocation(invocation: std::sync::Arc<crate::invocation::Invocation>) -> Self {
+        let limits = invocation.limits;
+        let budget = invocation.budget.clone();
         Self {
             collection_threshold: limits.heap_objects.min(64),
             arrays_used: false,
             scheduler: Default::default(),
-            files: Default::default(),
-            interned: crate::string_interning::Pool::new(
-                limits.intern_entries,
-                limits.intern_bytes,
-            ),
+            invocation,
             default_task_queue: None,
             invocation_result: None,
             entry_drain_depth: None,
@@ -1742,8 +1739,7 @@ fn interpret_instructions(
         collection_threshold,
         arrays_used,
         scheduler,
-        files: _,
-        interned,
+        invocation,
         default_task_queue,
         invocation_result,
         entry_drain_depth,
@@ -3103,7 +3099,10 @@ fn interpret_instructions(
                                 }
                                 _ => return Err(Fault::new("String.Intern requires text")),
                             };
-                            Value::String(interned.intern(text.clone()).map_err(|e| e.fault())?)
+                            Value::String(
+                                invocation.interned.lock().expect("intern pool lock poisoned")
+                                    .intern(text.clone()).map_err(|e| e.fault())?,
+                            )
                         } else if let crate::native::Binding::Resolve(operation) = binding {
                             if matches!(
                                 operation,
