@@ -19,6 +19,35 @@ This case acknowledges a report; it does not save it. The downloadable project
 contains the client, server, shared JSON/error code and an interoperability verifier.
 Use the [setup guide](/try/) for the matching runtime and compiler.
 
+<a id="accept-loop"></a>
+
+## Server: accept requests in a loop
+
+The listener and the application model are separate. This sample calls
+`HttpServer.Listen("127.0.0.1", 0, 4)` once, then repeatedly awaits `Accept()`.
+Each successful accept gives the application one `HttpContext`. `Configure`
+chooses the response; `Complete` sends it and ends the exchange.
+
+The loop below is extracted from the downloadable server:
+
+```raven
+{{HTTP_REPORT_ACCEPT_LOOP}}
+```
+
+This example handles exchanges sequentially and stops after a configured number
+of attempts so the verifier can finish. Rejected protocol, limit and unsupported
+requests count toward that limit and leave the server listening. Other failures
+end the sample. Accept cleans up rejected exchanges; configuration failures close
+the acquired context explicitly, and Complete closes it after sending or failure.
+The program's completion callback closes the listener.
+
+`Configure` is where this application chooses its model. The later routing and
+attribute-mapper examples change dispatch inside the handler; they do not require
+a different listening model. A long-running application also needs an explicit
+shutdown policy. `Accept(token)` supports cancellation, while `server.Close()`
+stops the listener and closes its owned exchanges; it does not drain handlers.
+See [exchange ownership and limits](/features/web/#own-an-http-exchange).
+
 ## Server: validate and acknowledge
 
 ```raven

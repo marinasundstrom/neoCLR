@@ -8929,3 +8929,14 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   SDK/bridge qualification remains open. See the [release evidence](preview-11-validation.json).
   Assets are staged in an unpublished GitHub draft pending this final documentation
   commit and publication; this entry does not claim publication already happened.
+
+## 2026-09-27 — HttpServer as an application-owned accept loop
+
+- **Author:** illustrated listening once and repeatedly awaiting Accept, leaving
+  the application model inside the loop, then asked to incorporate this framing.
+- **Assistant:** clarified that Accept yields an HTTP request context rather than
+  a raw socket, and that sequential or concurrent handling needs an explicit
+  application policy. The current implementation closes each exchange connection.
+- **Action:** added the model to the Web guide and extracted the existing bounded
+  report-server accept loop into its case page. The explanation covers rejection,
+  completion, cleanup and shutdown without proposing a new HttpServer API.

@@ -6,7 +6,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No unreleased changes.
+### 2026-09-27
+
+- Explain HttpServer through an application-owned accept loop, separating request
+  handling models from the listener. Show the existing report-server loop directly
+  from its source, including rejection policy, completion and cleanup.
 
 ## 0.1.0-preview.11 — 2026-09-27
 

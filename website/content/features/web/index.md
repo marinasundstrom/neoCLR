@@ -135,6 +135,36 @@ also runs a .NET comparison client. The peer stays open until the client finishe
 checking that completion follows Content-Length rather than waiting for EOF.
 Malformed/truncated responses and collection during pending work are exercised too.
 
+## HttpServer: an application-owned accept loop
+
+The basic server model is to listen, accept a request context, and let the
+application decide what to do with it. In schematic form:
+
+```text
+listen
+repeat:
+    await the next HTTP request context
+    apply the application's handling model
+    complete the response, or close the context
+```
+
+`HttpServer.Listen(...)` returns a Result containing the listener. Each
+`await server.Accept()` returns a Result containing an `HttpContext`, with the
+buffered request and an outgoing response. This accepts an HTTP exchange, rather
+than exposing a raw socket. The current implementation uses one connection per
+exchange and closes it afterwards; it does not provide keep-alive request reuse.
+
+The application owns the loop. Inside it, handling can be direct code, route
+matching, union dispatch or an attribute-based mapper. Those models sit above
+HttpServer; none is required by the listener. See the [report server's actual
+accept loop](/cases/http-server/#accept-loop), including its error policy and
+resource cleanup.
+
+Awaiting response completion before accepting again gives sequential handling.
+Concurrent handling requires an explicit dispatch and lifetime policy, within the
+server's outstanding-context limits. `ServeOne` is a convenience for one
+callback-driven exchange; calling it is another way to build an application loop.
+
 ## Receive a request and return a response
 
 ```raven
