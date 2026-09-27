@@ -45,8 +45,8 @@ Inline block callbacks infer their value result; an explicitly typed delegate lo
 is optional. Direct completion-only await uses the ordinary Task protocol. Mutable locals in
 ordinary async methods share storage with their callbacks,
 including across suspension. Generic async capture metadata is corrected in the
-compiler, but neoCLR's application importer still restricts generic methods to its
-supported numeric algorithms. General generic callers remain outside this slice.
+compiler. Closed ordinary static generic helpers now import, but generated generic
+async state-machine and closure types remain outside the application's import scope.
 
 [Download the compiled shared-capture example](../../samples/task-run.rvn) ·
 [Overload and lifetime reference](../../docs/callbacks.html#task.run-development)

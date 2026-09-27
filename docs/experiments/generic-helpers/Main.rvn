@@ -1,0 +1,35 @@
+import System.*
+import System.Collections.*
+
+class State {
+    var Value: int = 0
+}
+
+func Identity<T>(value: T) -> T => value
+func Forward<T>(value: T) -> T => Identity<T>(value)
+func Second<T, U>(first: T, second: U) -> U => Forward<U>(second)
+
+func First<T>(values: ArrayList<T>) -> T => values[0]
+func Increment<T>(value: T) -> T where T: Number<T> => value + T.One
+
+func Main() -> int {
+    if Forward<int>(42) != 42 { return 1 }
+    if Forward<string>("hello") != "hello" { return 2 }
+    if !Forward<bool>(true) { return 3 }
+    let state = State()
+    let same = Forward<State>(state)
+    same.Value = 42
+    if state.Value != 42 { return 4 }
+    let values: int[] = [1, 2]
+    let array = Forward<int[]>(values)
+    array[0] = 42
+    if values[0] != 42 { return 5 }
+    if Second<int, string>(7, "after") != "after" { return 6 }
+    let list = ArrayList<string>()
+    list.Add("first")
+    if First<string>(list) != "first" { return 7 }
+    if Increment<int>(41) != 42 { return 8 }
+    if Increment<double>(1.5) != 2.5 { return 9 }
+    Console.WriteLine("Generic helpers passed")
+    return 0
+}

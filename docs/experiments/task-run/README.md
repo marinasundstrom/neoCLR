@@ -631,7 +631,7 @@ checks pass. Website source/downloads are updated without building the website.
 The [original source integration failures](compiler-gaps/README.md) are corrected.
 The passing consumer now uses unqualified Task.Run, inline value-returning blocks
 and direct completion-only await. Generic-method capture metadata is repaired by the later checkpoint below; ordinary
-generic application import remains limited.
+generic application-type import remains limited.
 
 ## Shared mutable-local capture checkpoint
 
@@ -738,11 +738,13 @@ captures with value/reference substitutions and existing shared/generic closures
 The original scalar case failed metadata normalization before the fix. This is a
 normal Raven/CLI contract repair, with no neoCLR policy or Runtime Contract option.
 
-The neoCLR [generic consumer](compiler-gaps/GenericCapture.rvn) now reaches import
-but fails the numeric-only generic application specialization guard. It cannot yet
-run on neoCLR. The explicit `generic-capture-import-gap` check records this unsupported
-contract separately from passing consumers. This is an importer capability gap;
-no native runtime failure has been established because import stops first.
+The neoCLR [generic consumer](compiler-gaps/GenericCapture.rvn) initially exposed
+the numeric-only generic application specialization guard. The subsequent
+[ordinary helper slice](../generic-helpers/README.md) removes that restriction for
+bounded unconstrained static methods. The consumer now reaches an unsupported
+constructed application async state-machine type and still cannot run. The explicit
+`generic-capture-import-gap` check tracks that next limitation. No native runtime
+failure has been established because import stops first.
 The existing shared-object/block-callback/unwrapping consumer compiles, passes
 typed-stack verification and runs with the expected output against the rebuilt
 bridge and unchanged combined runtime/library/reference.
@@ -751,9 +753,9 @@ reused; the snapshot refresh updates XML only. No full suite or website build.
 
 ## Next bounded work
 
-Add bounded import of a closed ordinary generic application helper, using Raven's
-normal emitted contract. Start with a synchronous identity/read helper, then re-run
-the generic async capture fixture to identify subsequent closure/state-machine
-requirements. This is compatibility work in neoCLR, not a compiler workaround.
-The independent generic-containing-type async arity failure remains Raven-owned;
-async-lambda-owned/iterator captures also need their own bounded coverage.
+Ordinary closed generic helpers now import; see the [focused consumer](../generic-helpers/README.md).
+Add bounded generic application-type import, starting with a holder and its fields
+before revisiting the async state-machine/display-class fixture. This follows Raven's
+normal contract in neoCLR, without a compiler workaround. The independent generic-
+containing-type async arity failure remains Raven-owned; async-lambda-owned/iterator
+captures also need their own bounded coverage.

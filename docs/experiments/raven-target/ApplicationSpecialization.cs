@@ -1,9 +1,9 @@
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
-// The target currently imports only closed static application numeric algorithms.
-// Specialization removes CLI constrained prefixes before the ordinary checked importer.
-sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefinition> applications)
+// Close bounded static application helpers before the ordinary checked importer.
+// Number<T> algorithms additionally resolve their supported constrained calls.
+sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<ModuleDefinition> applications)
 {
     readonly HashSet<ModuleDefinition> modules = applications.ToHashSet();
     readonly Dictionary<string, MethodDefinition> copies = new();
@@ -22,17 +22,27 @@ sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefi
     MethodDefinition Specialize(GenericInstanceMethod call)
     {
         var source = call.Resolve();
-        var key = source.Module.Mvid + ":" + call.FullName;
+        var key = source.Module.Mvid + ":" + call.FullName + ":" +
+            string.Join(";", call.GenericArguments.Select(MetadataIdentity.TypeKey));
         if (copies.TryGetValue(key, out var previous)) return previous;
         if (copies.Count >= 128 || !source.IsStatic || source.DeclaringType.HasGenericParameters || source.ExplicitThis
             || !source.HasBody || source.Body.HasExceptionHandlers || source.IsPInvokeImpl || source.IsInternalCall
             || source.GenericParameters.Count == 0 || source.GenericParameters.Count > 4
             || call.GenericArguments.Count != source.GenericParameters.Count)
-            throw new InvalidDataException("Unsupported numeric application specialization: " + call.FullName);
+            throw new InvalidDataException("Unsupported application specialization: " + call.FullName);
         for (var index = 0; index < source.GenericParameters.Count; index++)
         {
             var parameter = source.GenericParameters[index];
             var actual = call.GenericArguments[index];
+            if (parameter.Attributes == GenericParameterAttributes.NonVariant && parameter.Constraints.Count == 0)
+            {
+                // Validate that the argument is closed; normal import still owns its
+                // supported representation and access checks, including reference types.
+                if (actual is ByReferenceType || actual.MetadataType is MetadataType.Void or MetadataType.TypedByReference)
+                    throw new InvalidDataException("Unsupported application specialization argument: " + actual.FullName);
+                _ = RuntimeSignatures.Close(actual, source.DeclaringType);
+                continue;
+            }
             if (parameter.Attributes != GenericParameterAttributes.NonVariant || parameter.Constraints.Count != 1
                 || parameter.Constraints[0].ConstraintType is not GenericInstanceType requirement
                 || requirement.ElementType.FullName != NumberBindings.Contract || !RuntimeSignatures.IsCore(requirement.Scope)
@@ -44,13 +54,14 @@ sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefi
             // Cecil may synthesize mscorlib for that code; bind it to supplied core storage.
             call.GenericArguments[index] = core.GetType(actual.FullName).Methods.Single(m => m.Name == "CompareTo").Parameters[0].ParameterType;
         }
-        TypeReference Close(TypeReference type) => type switch {
+        TypeReference Close(TypeReference type, bool memberSignature = false) => type switch {
             GenericParameter p when p.Type == GenericParameterType.Method && p.Owner == source => call.GenericArguments[p.Position],
-            GenericParameter => throw new InvalidDataException("Unclosed numeric specialization parameter."),
-            ByReferenceType b => new ByReferenceType(Close(b.ElementType)),
-            ArrayType a when a.IsVector => new ArrayType(Close(a.ElementType)),
-            GenericInstanceType g => Construct(g.ElementType, g.GenericArguments.Select(Close)),
-            TypeSpecification => throw new InvalidDataException("Unsupported numeric specialization type."),
+            GenericParameter p when memberSignature && p.Type == GenericParameterType.Type => p,
+            GenericParameter => throw new InvalidDataException("Unclosed application specialization parameter."),
+            ByReferenceType b => new ByReferenceType(Close(b.ElementType, memberSignature)),
+            ArrayType a when a.IsVector => new ArrayType(Close(a.ElementType, memberSignature)),
+            GenericInstanceType g => Construct(g.ElementType, g.GenericArguments.Select(argument => Close(argument, memberSignature))),
+            TypeSpecification => throw new InvalidDataException("Unsupported application specialization type."),
             _ => type
         };
         MethodReference CloseMethod(MethodReference method)
@@ -63,7 +74,7 @@ sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefi
             }
             // Generic type signatures retain their type parameters; the constructed
             // owner carries substitution for the ordinary signature checker.
-            TypeReference SignatureType(TypeReference type) => type is GenericParameter { Type: GenericParameterType.Type } ? type : Close(type);
+            TypeReference SignatureType(TypeReference type) => Close(type, memberSignature: true);
             var closed = new MethodReference(method.Name, SignatureType(method.ReturnType), Close(method.DeclaringType)) {
                 HasThis = method.HasThis, ExplicitThis = method.ExplicitThis, CallingConvention = method.CallingConvention
             };
@@ -71,7 +82,7 @@ sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefi
                 closed.Parameters.Add(new ParameterDefinition(parameter.Name, parameter.Attributes, SignatureType(parameter.ParameterType)));
             return closed;
         }
-        var copy = new MethodDefinition("__Numeric" + copies.Count + "_" + source.Name,
+        var copy = new MethodDefinition("__Specialized" + copies.Count + "_" + source.Name,
             source.Attributes, Close(source.ReturnType));
         // Register before recursion, preserving the source's visibility and owner.
         copies.Add(key, copy);
@@ -94,7 +105,7 @@ sealed class NumericSpecialization(ModuleDefinition core, IEnumerable<ModuleDefi
                 ParameterDefinition p => copy.Parameters[p.Index],
                 VariableDefinition v => copy.Body.Variables[v.Index],
                 MethodReference m => CloseMethod(m),
-                FieldReference f => new FieldReference(f.Name, Close(f.FieldType), Close(f.DeclaringType)),
+                FieldReference f => new FieldReference(f.Name, Close(f.FieldType, memberSignature: true), Close(f.DeclaringType)),
                 TypeReference t => Close(t),
                 _ => instruction.Operand
             };

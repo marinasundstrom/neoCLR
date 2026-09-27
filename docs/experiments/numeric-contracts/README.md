@@ -8,8 +8,10 @@ is checked as a dependent consumer. Native `numeric_parse::tests` cover every in
 full-input grammar precedence, floating special values/rounding/underflow and Boolean
 spellings. `static_number_contracts` checks runtime static conformance and rejection.
 
-The importer currently specializes only closed static application functions with
-Number<T> constraints and the ten supported primitive arguments. It retains the
+The numeric importer specializes closed static application functions with Number<T>
+constraints and the ten supported primitive arguments. The subsequent
+[ordinary helper slice](../generic-helpers/README.md) also admits unconstrained
+closed static application methods. It retains the
 normal checked import of each resulting body; generated internal helpers carry no
 invented source metadata token. Debug mappings refer back to the original method.
 User-defined numeric types, generic classes, other constraints and static interface

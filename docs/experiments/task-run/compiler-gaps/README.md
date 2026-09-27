@@ -28,19 +28,19 @@ use type-owned generic parameters rather than source-method parameters. Both sca
 and array captures execute on ordinary .NET with int and string substitutions;
 all 11 focused compiler checks pass. No Runtime Contract option changes.
 
-[GenericCapture.rvn](GenericCapture.rvn) now gets past compiler emission and reaches
-neoCLR's importer. It is rejected in `NumericSpecialization.cs`: application generic
-method calls currently require Number<T> and supported numeric arguments. That is
-missing neoCLR importer support for an ordinary Raven contract, not a reason to
-fork Raven's generic capture semantics. `verify.py --case generic-capture-import-gap`
-checks that exact rejection; it does **not** claim runtime execution succeeds.
-The intended result after import support is `42`, then `after`.
+[GenericCapture.rvn](GenericCapture.rvn) now gets past compiler emission and closed
+method specialization. The [ordinary generic helper slice](../../generic-helpers/README.md)
+removes the former numeric-only method restriction. Import now rejects the constructed
+application async state-machine type (``NamespaceMembers/<>c__AsyncStateMachine0`1<System.Int32>``).
+That is missing neoCLR generic application-type import, not a reason to fork Raven's
+capture semantics. `verify.py --case generic-capture-import-gap` checks the specific
+rejection after a raw assembly is emitted; it does **not** claim execution succeeds.
+The intended result after type import support is `42`, then `after`.
 
-The next bounded compatibility slice should admit a closed ordinary generic
-application helper, verify its signature/body substitution, then re-run this async
-capture consumer to identify any remaining state-machine/display-class import gaps.
-Keep unsupported shapes checked rather than weakening verification. There is no
-claim that removing the numeric guard alone is sufficient.
+The next bounded compatibility slice should start with a closed generic application
+holder, preserve field/member signatures and type identity, then revisit the generated
+state machine and display class. Keep unsupported shapes checked; admitting ordinary
+generic helpers alone does not establish support for generated generic types.
 
 Raven also retains `docs/compiler/development/async-generic-containing-type.rvn`:
 an async method inside a generic class fails on ordinary .NET with a state-machine

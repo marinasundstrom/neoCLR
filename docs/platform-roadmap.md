@@ -104,8 +104,9 @@ now passes with the target compiler unit-result fix. Mutable-local
 sharing in ordinary async methods is corrected by the independently tested Raven
 closure fix. Generic-method capture metadata is also repaired in Raven; the
 [compatibility follow-up](experiments/task-run/compiler-gaps/README.md) is now neoCLR's
-numeric-only generic application importer. Extend bounded ordinary generic import
-against Raven's normal contract; do not encode that gap as compiler divergence.
+generic application-type importer. [Closed ordinary static helpers](experiments/generic-helpers/README.md)
+now import with unchanged Raven output. Next establish a bounded generic holder
+before generated state-machine/closure types; do not encode that gap as compiler divergence.
 Async methods inside generic classes have a separately reproduced Raven arity bug.
 Thread's future public role is open.
 M2–M6 remain candidate applications; no complete File Catalog

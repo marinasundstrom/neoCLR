@@ -199,6 +199,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   b32459beb), with 11 focused CLR checks. Record the newly reached numeric-only
   generic application importer restriction as missing neoCLR support for Raven's
   normal contract; retain an explicit rejection fixture and a bounded import follow-up.
+  Extend checked import to closed unconstrained static generic helpers, preserving
+  nested substitutions, object/vector identity, generic library member signatures,
+  exact Number constraints, visibility and source debug origins. Separate cache
+  entries by assembly-qualified type arguments. Add executable and metadata checks.
+  The async fixture now reaches unsupported constructed application state-machine
+  import; retain that next compatibility gap explicitly.
   Keep the separately reproduced Raven generic-containing-type async arity failure
   distinct. Record the author's compiler/runtime compatibility ownership direction.
   Integrate the

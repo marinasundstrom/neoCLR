@@ -125,7 +125,7 @@
     </member>
     <member name="T:System.Tasks.Task">
       <summary>Submits work with shared captures and runtime-selected execution (development).</summary>
-      <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Importing System.Tasks.* supports Task.Run alongside Task&lt;T&gt; without an alias. Inline block callbacks infer value results, and direct unit await is supported; generic application callers remain restricted by the numeric-only importer (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
+      <remarks>Run currently starts bounded native-thread work in the calling invocation. Captured objects retain identity. Importing System.Tasks.* supports Task.Run alongside Task&lt;T&gt; without an alias. Inline block callbacks infer value results, and direct unit await is supported; generic async callers still require unsupported constructed application state-machine import (see the callback guide). Work uses the default dispatcher; arbitrary shared read-modify-write operations are not atomic. Invocation limits and cancellation apply. A callback Fault terminates the invocation, not a task error case.</remarks>
     </member>
     <member name="M:System.Tasks.Task.Run(System.Func{System.Void})">
       <summary>Submits completion-only work with shared captures (development).</summary>

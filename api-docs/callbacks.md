@@ -78,6 +78,7 @@ Mutable scalar locals in ordinary async callers share storage with their callbac
 across suspension; awaiting the writer exposes its updated value to the caller.
 Captured objects retain identity and mutations. This does not make concurrent
 read-modify-write operations atomic. Generic-method capture metadata is corrected in
-Raven, but neoCLR still rejects ordinary generic application callers outside its
-numeric specialization contract. General generic callers, nested async-lambda-owned
-locals and iterator capture shapes are not established by this slice.
+Raven. neoCLR admits bounded ordinary closed static generic helpers, but the generic
+async caller fixture still stops at constructed application state-machine import.
+Generic async callers, nested async-lambda-owned locals and iterator capture shapes
+are not established by this slice.

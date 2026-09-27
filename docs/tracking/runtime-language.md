@@ -58,9 +58,11 @@ inner tasks through the existing outcome-transfer helper. The compiled capture/i
 unwrapping consumer passes with direct callbacks and awaits. Ordinary async methods now
 share mutable locals with their callbacks through the integrated Raven closure fix.
 Generic async capture metadata is corrected in Raven main and neoclr. Its target
-consumer now exposes neoCLR's numeric-only generic application import restriction,
-which is a compatibility gap against Raven's normal contract. The next bounded
-slice starts with ordinary closed generic helper import; see the
+consumer now reaches neoCLR's unsupported constructed application state-machine type.
+[Ordinary closed generic static helpers](../experiments/generic-helpers/README.md)
+import, including shared object/array identity and nested calls. The next bounded
+slice starts with generic application-type import, a compatibility gap against
+Raven's normal contract; see the
 [ownership and evidence](../experiments/task-run/compiler-gaps/README.md).
 
 The [original compiler gaps](../experiments/task-run/compiler-gaps/README.md) are

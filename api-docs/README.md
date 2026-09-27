@@ -374,8 +374,8 @@ records native execution, invocation limits, default-queue behavior and the sepa
 generic application import limitation. Inline block callbacks now infer their value result.
 Ordinary async mutable-local sharing is corrected by the integrated Raven closure fix.
 Direct completion-only await is corrected by the target compiler unit-result fix.
-Generic capture metadata is corrected in Raven; neoCLR still requires its numeric
-specialization contract for generic application methods. The XML-only API snapshot
+Generic capture metadata is corrected in Raven; neoCLR admits bounded ordinary closed
+static generic helpers, while constructed application async state machines remain unsupported. The XML-only API snapshot
 refresh preserves the unchanged reference assembly; the
 existing library snapshot is reused. No full suite or website build is part of this slice.
 

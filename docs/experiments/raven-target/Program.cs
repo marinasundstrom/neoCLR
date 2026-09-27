@@ -6,6 +6,12 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--generic-helper-checks")
+{
+    ApplicationSpecializationChecks.Verify();
+    return;
+}
+
 if (args.Length == 3 && args[0] == "--scalar-union-checks")
 {
     ScalarUnionChecks.Verify(args[1], args[2]);

@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-27",
+  "scope": "Bounded closed static generic application helpers",
+  "baseline": "Ordinary Forward<int> rejected by numeric-only generic specialization",
+  "checks": {
+    "metadata": "passed: signatures, caching, assembly-qualified identity, visibility, source origin, open/byref/constraint/instance rejection",
+    "consumer": "compiled, typed-stack verified and executed; generic collection reader, shared object/vector identity, Number<int> and Number<double> included",
+    "constraints": "additional Number constraint and class constraint rejected",
+    "genericAsync": "still rejected at constructed application state-machine type; not executed",
+    "apiSnapshot": "passed; unchanged reference assembly, import-input/XML fingerprints refreshed"
+  },
+  "sha256": {
+    "docs/experiments/raven-target/ApplicationSpecialization.cs": "40f02e5e744e14e079c16dba3fcc0334b28b4127da65dd642071f231cffb6660",
+    "docs/experiments/raven-target/ApplicationSpecializationChecks.cs": "f980a6a8dc0fede5116d5bab43fbc484e91fc3faf5a0a96f352a224a5798ab0c",
+    "docs/experiments/generic-helpers/Main.rvn": "36d2e23c837b15a12c6687ecf3485c566930ede33d0709cf4190075949c471f3",
+    "docs/experiments/generic-helpers/verify.py": "41227d0996ab01157396cc4ab49e106338b5badfd798afbd1b860773852f7925",
+    "docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "6cd929623fe0415e418bfabcbfa26aa902fbddda1c9356583f31334c1aed6022",
+    "target/debug/neoclr": "24f1104bf7b13af34c1ac38066c173b32bbd782a9fe6ed445e66fad1bbdfd202",
+    "target/task-run/Merged.System.neoil": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1",
+    "target/task-run/Merged.CoreProbe.dll": "01327a5beeb2c366246cf7c031962e9b051821612c26f561c756997b4b966429"
+  }
+}
