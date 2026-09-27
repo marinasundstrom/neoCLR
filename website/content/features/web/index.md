@@ -452,12 +452,22 @@ nodes from buffered content on either peer. They preserve Result errors and leav
 status handling and exchange completion to the application. Reads are synchronous
 and do not consume the content; creation sets the JSON UTF-8 media type.
 
-An earlier development experiment maps `[RoutePattern]` attributes on union cases
-into a generated reusable parser, with String/Int32 payloads and Result-based
-no-match/errors. See the [attributed item API case](/cases/http-server/#development-experiment-attributed-item-routes)
-for the server and connecting client. It requires an explicit generation step;
-automatic SDK integration remains future work.
+## Case: attributed catalog routes
 
-The immediate direction is runtime attribute inspection during startup, with a
-cached mapping for requests. [Attribute data is now available](/features/introspection/#development-case-inspecting-route-declarations-at-startup);
-[retained constructor invocation](/features/reflection/#development-case-preparing-union-constructors-for-routes) now supplies checked union construction. General cached schema/capture binding is next.
+Declare the catalog paths on an application union, then dispatch with `match`:
+
+```raven
+{{HTTP_ATTRIBUTED_ROUTES}}
+```
+
+Create `AppRoutesParser` once before listening. Startup reflection validates the
+attributes and caches patterns, capture conversions and constructors; each request
+returns `Result<AppRoutes, RouteMappingError>`. NoMatch is distinct from malformed
+input, invalid parameters and construction failure. HTTP methods and response policy
+stay in the handler. See the [complete server and connecting client](/cases/http-server/#case-attributed-item-routes)
+for the runnable project and expected responses.
+
+This is development sample source with String/Int32 payloads and up to 16 public
+nongeneric cases, not an installed SDK mapper. It rejects structural overlap at
+startup. Requests still decode input and invoke checked constructors; no performance
+advantage is claimed. Source generation remains a future alternative.

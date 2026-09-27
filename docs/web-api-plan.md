@@ -94,8 +94,9 @@ transport and runtime resource limits together; changing one constant is insuffi
    and invalid parameter errors; an unmatched attribute is unnecessary initially.
    Subsequent author direction selects startup reflection with a cached mapping.
    Member/parameter attribute data and retained constructor invocation are implemented;
-   [checked union construction](experiments/union-construction/README.md) supplies the
-   construction prerequisite. General cached schema/capture binding is next. Source generation remains a future alternative.
+   [runtime route mapping](experiments/runtime-route-mapper/README.md) now validates schemas
+   and caches patterns, capture conversions and constructors for the server lifetime.
+   This reusable application sample is not an installed SDK mapper. Source generation remains a future alternative.
    See [the recorded design choices](route-parsing.md#attributed-union-mapping-experiment).
 6. **Optional SQL/SQLite consumer.** If selected, reduce the
    [SQL proposal](proposals/sql-data-access.md) to opening/closing a connection,

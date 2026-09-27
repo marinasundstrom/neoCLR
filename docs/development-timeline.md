@@ -8610,3 +8610,21 @@ configuration/content, not target-specific code added to Raven main.
   mapper. General schema validation/capture binding is next; enum/Uuid/Option JSON
   requests remain open. Evidence and validation are recorded with the
   [construction case](experiments/union-construction/README.md).
+
+
+## 2026-09-27 — reusable startup route mapping
+
+- **Author:** asked to continue the attributed route and introspection work. Earlier
+  direction selects startup reflection with cached mappings and leaves unmatched
+  handling to assistant judgment.
+- **Assistant action:** composed attribute data, route primitives and retained
+  constructors into a reusable application mapper, with a typed AppRoutes facade.
+  Added capture-name snapshots, conservative structural overlap checks, dynamic
+  constructor argument collections and effective type visibility for startup validation.
+  The catalog server prepares once, then matches ordinary union cases; its client
+  lists items and fetches item 42. No generation step or hosting framework is needed.
+- **Outcome:** focused consumer, schema-rejection and HTTP evidence is recorded with
+  the [runtime mapper case](experiments/runtime-route-mapper/README.md). Discovery is
+  cached; target decoding, allocations and checked construction still occur per request.
+- **Open:** SDK packaging and source generation are future options. Enum, Uuid and
+  Option JSON support remains requested; this slice does not implement those types.

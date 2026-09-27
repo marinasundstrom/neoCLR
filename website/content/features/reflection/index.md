@@ -81,7 +81,7 @@ extension. Access and argument checks run on every invocation; discovery and ove
 selection do not. TypeInfo activation keeps its reference-class-only contract.
 
 The [downloadable cases](../../samples/http-json.zip) include `union-construction`
-with preparation, repeated construction and rejection checks. This supplies the
-construction prerequisite; general route-schema binding remains under development.
+with preparation, repeated construction and rejection checks. The [attributed HTTP case](/cases/http-server/#case-attributed-item-routes)
+combines this execution support with startup schema validation and cached route bindings.
 See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
 for signatures and limitations.

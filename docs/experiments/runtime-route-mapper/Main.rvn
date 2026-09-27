@@ -1,0 +1,82 @@
+import System.*
+import System.Result.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+func Main() {
+    CheckPatterns()
+    let Ok(parser) = AppRoutesParser.Create() else {
+        System.Fault("Mapper creation failed")
+        return
+    }
+    Check(parser.Parse("/items") is Ok(AppRoutes.ListItems), "empty case")
+    let Ok(AppRoutes.GetItem(first)) = parser.Parse("/items/42?details=true") else {
+        System.Fault("Typed case missing")
+        return
+    }
+    Check(first == 42, "typed parameter")
+    let Ok(AppRoutes.GetItem(second)) = parser.Parse("/items/-7") else {
+        System.Fault("Reused mapper failed")
+        return
+    }
+    Check(second == -7 && first == 42, "independent captures")
+    Check(parser.Parse("/missing") is Error(RouteMappingError.NoMatch), "no match")
+    Check(parser.Parse("/items/no") is Error(RouteMappingError.InvalidParameter(_, _)), "invalid parameter")
+    Check(parser.Parse("/items/2147483648") is Error(RouteMappingError.InvalidParameter(_, _)), "overflow")
+    Check(parser.Parse("/items/%2F") is Error(RouteMappingError.InvalidTarget(_)), "invalid target")
+    let Ok(AppRoutes.GetItem(encoded)) = parser.Parse("/items/%34%32") else {
+        System.Fault("Encoded integer failed")
+        return
+    }
+    Check(encoded == 42, "decoded parameter")
+    let original: AppRoutes = AppRoutes.GetItem(9)
+    var copy = original
+    copy = AppRoutes.ListItems()
+    let AppRoutes.GetItem(preserved) = original else {
+        System.Fault("Union copy changed original")
+        return
+    }
+    Check(preserved == 9 && copy is AppRoutes.ListItems, "union copy")
+    let boxed: Object = original
+    if boxed is AppRoutes restored {
+        let AppRoutes.GetItem(value) = restored else {
+            System.Fault("Boxed case changed")
+            return
+        }
+        Check(value == 9, "union boxing")
+    } else {
+        System.Fault("Union box missing")
+    }
+    Console.WriteLine("Runtime route mapper checks passed")
+}
+
+public func Pattern(text: string) -> System.Web.Http.RoutePattern {
+    let Ok(pattern) = System.Web.Http.RoutePattern.Parse(text) else {
+        System.Fault("Bad test pattern")
+        return Pattern("/")
+    }
+    return pattern
+}
+
+public func CheckPatterns() {
+    let parameter = Pattern("/items/{id}")
+    let literal = Pattern("/items/%34%32")
+    Check(parameter.Overlaps(literal) && literal.Overlaps(parameter), "Decoded overlap is symmetric")
+    Check(!parameter.Overlaps(Pattern("/items/")), "Parameters exclude empty segments")
+    Check(!Pattern("/items/").Overlaps(parameter), "Empty overlap is symmetric")
+    Check(!Pattern("/items").Overlaps(parameter), "Segment counts differ")
+    Check(Pattern("/").Overlaps(Pattern("/")), "Root overlaps itself")
+    Check(!Pattern("/").Overlaps(Pattern("//")), "Root and empty segments differ")
+    Check(Pattern("/{left}/fixed").Overlaps(Pattern("/literal/{right}")), "Crossed parameters overlap")
+    Check(!Pattern("/left/{id}").Overlaps(Pattern("/right/{id}")), "Distinct literals")
+    let names = (System.Collections.ArrayList<string>)parameter.GetParameterNames()
+    Check(names.Count == 1 && names[0] == "id", "Capture names")
+    names[0] = "changed"
+    Check(parameter.GetParameterNames()[0] == "id", "Capture names are snapshots")
+    Check(RouteUnionMapper.Create(typeof(string)) is Error(_), "Non-union rejected")
+    Check(RouteUnionMapper.Create(typeof(System.Option<int>)) is Error(_), "Generic union rejected")
+}

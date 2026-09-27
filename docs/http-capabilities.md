@@ -192,18 +192,13 @@ type/charset policy, byte-body access, framing and header validation. No new HTT
 milestone is opened by this dependency, and no automatic charset/BOM detection or
 additional protocol support is claimed.
 
-### Attributed route mapper experiment (2026-09-27)
+### Cached attributed route mapping (2026-09-27)
 
-The [item case](experiments/route-union-mapper/README.md) now generates a reusable
-parser from emitted RoutePattern attributes on union cases. It supports empty,
-Int32 and String payloads; rejects invalid/overlapping schemas during generation;
-compiles patterns once at startup; and separates NoMatch, InvalidTarget and
-InvalidParameter through Result. HTTP method policy and dispatch remain in the
-handler. This is a development experiment requiring an explicit generation step,
-not an installed SDK feature. Enum/Uuid/Option JSON support remains requested.
-
-The subsequent author direction chooses runtime introspection at startup and a
-cached mapping. [Member/parameter attribute data](attribute-introspection.md) now
-supports that preparation without executing attribute constructors.
-[Retained constructor invocation](experiments/union-construction/README.md) now
-supplies checked union construction; general cached schema/capture binding is next. The generator remains a future alternative.
+The [runtime item case](experiments/runtime-route-mapper/README.md) validates route
+attributes at startup and retains patterns, parameter conversions and case/carrier
+constructors. Requests return ordinary application unions with Result errors for
+NoMatch, InvalidTarget, InvalidParameter and ConstructionFailed. The server owns
+method policy, dispatch and response status. String/Int32 payloads and up to 16
+public nongeneric cases are supported. This is reusable development sample source,
+not an installed SDK mapper. The earlier generator remains an exploratory alternative.
+Enum/Uuid/Option JSON support remains requested and pending.

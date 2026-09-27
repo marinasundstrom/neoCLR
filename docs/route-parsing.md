@@ -136,4 +136,44 @@ reflection for the immediate implementation: discover and validate metadata once
 at startup, then cache the binding and construction information. Source generation
 remains a future alternative. The completed generator is retained as experimental
 contract evidence, not the chosen application workflow. Bounded [member and parameter metadata reading](attribute-introspection.md) is
-implemented without attribute-constructor execution. Retained constructor invocation now supports [checked union construction](experiments/union-construction/README.md). Next prepare the general reusable mapping, with schema validation and capture binding.
+implemented without attribute-constructor execution. Retained constructor invocation now supports [checked union construction](experiments/union-construction/README.md). The reusable mapping is now implemented below, including schema validation and capture binding.
+
+
+## Runtime attributed union mapper
+
+Implemented as a reusable application sample in
+[runtime-route-mapper](experiments/runtime-route-mapper/README.md), following the
+author's startup-reflection direction. It accepts a public nongeneric standard union,
+reads exactly one RoutePattern attribute per case, validates String/Int32 payloads
+against capture names, rejects structural overlaps, and retains compiled patterns
+and case/carrier constructors. A thin application facade returns a typed union.
+No generator is needed; source generation remains an alternative for later work.
+
+RoutePattern now exposes independent GetParameterNames snapshots and a symmetric
+Overlaps query. Overlap is conservative at the segment level: it ignores combined
+target byte limits and conversion domains. This intentionally rejects a literal
+route alongside a parameter route when their paths overlap. ASP.NET Core's
+[route-template precedence](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/routing?view=aspnetcore-10.0#route-template-precedence-and-endpoint-selection-order)
+instead ranks templates; rejecting overlap avoids hidden ordering in this small
+mapper, at the cost of rejecting useful prioritized route sets.
+
+The mapper uses retained constructor descriptors as in
+[.NET ConstructorInfo.Invoke](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.constructorinfo.invoke?view=net-10.0),
+but argument collections follow neoCLR Sequence contracts and exact boxed types.
+[Type.IsVisible](https://learn.microsoft.com/en-us/dotnet/api/system.type.isvisible?view=net-10.0)
+is the baseline for the new TypeInfo.IsVisible: source enclosing visibility,
+elements and generic arguments are considered. Missing source visibility fails
+closed. These primary-source comparisons were reviewed 2026-09-27.
+
+Requests do not rediscover attributes/parameter metadata or compile patterns.
+They still decode targets per attempted pattern, allocate fresh captures/arguments
+and perform checked reflection execution. No native execution-plan caching or
+performance advantage is claimed. Preparation errors are strings; Parse separates
+NoMatch, InvalidTarget, InvalidParameter and ConstructionFailed. The server owns
+HTTP policy and uses 404/400/500. Attribute constructors never run, while faults
+inside executed constructors remain terminal.
+
+This completes the bounded runtime mapping experiment, not SDK packaging or
+WebApplication hosting. JSON enum/Uuid/Option support remains pending. No Raven
+compiler change or Runtime Contract configuration change is required; use matching
+bridge/reference/library/runtime artifacts for IsVisible and the new overloads.

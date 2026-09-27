@@ -221,24 +221,28 @@ the neoCLR client/server pair and the client against an independent server. The
 client prints `{"accepted":true}`. The examples are development source, not APIs
 included in Preview 10 or a new hosting framework.
 
-## Development experiment: attributed item routes
+<a id="development-experiment-attributed-item-routes"></a>
 
-This generator prototype is retained as a future alternative. The current direction
-is [startup introspection with cached mappings](/features/introspection/#development-case-inspecting-route-declarations-at-startup);
-attribute reading is implemented, while dynamic union construction is the next slice.
+## Case: attributed item routes
 
-For a small catalog API, the route declaration can describe the case you want
-back. The generator reads these attributes from the compiled union:
+A small catalog API can declare its routes on the union returned to the handler:
 
 ```raven
 {{HTTP_ATTRIBUTED_ROUTES}}
 ```
 
-Create the generated `AppRoutesParser` once before accepting requests and retain
-it in the server. `Parse(target)` returns `Result<AppRoutes, RouteMappingError>`:
-NoMatch is separate from InvalidTarget and InvalidParameter. No fallback union
-case or unmatched attribute is required. The handler owns method selection,
-item lookup and response policy:
+`AppRoutesParser.Create()` inspects these attributes once before the server starts.
+It validates the schema and retains compiled patterns, capture conversions and
+constructors:
+
+```raven
+{{HTTP_ATTRIBUTED_STARTUP}}
+```
+
+`Parse(target)` returns `Result<AppRoutes, RouteMappingError>`.
+NoMatch is separate from InvalidTarget, InvalidParameter and ConstructionFailed;
+no fallback union case or unmatched attribute is needed. The handler owns method
+selection, item lookup and response policy:
 
 ```raven
 {{HTTP_ATTRIBUTED_HANDLER}}
@@ -250,18 +254,24 @@ The connecting client lists the catalog and reads item 42:
 {{HTTP_ATTRIBUTED_CLIENT}}
 ```
 
-This deliberately small in-memory case uses fixed JSON responses; the station
-case above demonstrates typed JSON. The [source download](/samples/http-json.zip)
-includes `route-union-mapper`, its metadata generator and build/run verifier:
+The server returns 404 for unmatched routes or missing items, 400 for invalid route
+input and 500 for construction errors. This small in-memory case uses fixed JSON
+responses; the station case above demonstrates typed JSON.
+
+The [source download](/samples/http-json.zip) includes `runtime-route-mapper`, its
+three projects, reusable mapper, typed application facade and verifier. With a
+matching development bundle, run:
 
 ```sh
-python3 route-union-mapper/verify.py --toolchain-root /path/to/development-bundle \
+python3 runtime-route-mapper/verify.py --toolchain-root /path/to/development-bundle \
   --runner /path/to/measure_async
 ```
 
-**Experimental generation step, not included in Preview 10 or integrated into the
-SDK yet.** One public nongeneric union, up to 16 cases and String/Int32 payloads
-are supported. Generation rejects invalid schemas and overlapping patterns;
-`Create()` compiles patterns once. Requests reuse those patterns, convert captures
-and construct cases. Route changes require regeneration. The ordinary
-[route primitives](/docs/routes.html) remain independently usable.
+**Development sample source, not included in Preview 10 or installed as an SDK mapper.**
+One public nongeneric union, up to 16 cases and String/Int32 payloads are supported.
+Startup rejects invalid schemas and structurally overlapping patterns. Overlap
+checks conservatively ignore typed conversion domains and the total target byte
+limit. Requests still decode targets, allocate arguments and perform checked
+constructor invocation. Attribute constructors never execute. Source generation
+remains a possible future alternative. The ordinary [route primitives](/docs/routes.html)
+remain independently usable.

@@ -255,8 +255,9 @@ attributes, merge inherited attributes or expose all framework annotations. See
 [attribute data and limits](/docs/introspection.html#attribute-data-development-after-preview-10).
 
 Use these descriptions to prepare and cache a mapping before request handling.
-Retained constructor invocation now supplies checked union construction; general
-cached schema/capture binding is next. Source generation remains a future alternative.
+The [attributed HTTP case](/cases/http-server/#case-attributed-item-routes) combines
+these descriptions with retained constructors, compiled patterns and capture
+conversions. Source generation remains a future alternative.
 
 
 The [retained constructor case](../reflection/#development-case-preparing-union-constructors-for-routes)

@@ -160,5 +160,7 @@ newobj constructors, as it already does for reference constructors.
 
 [The executable case](experiments/union-construction/README.md) retains the case and
 carrier constructors discovered via route attributes, constructs independent values
-and recovers an ordinary Raven union. General cached route-schema parsing remains
-next; JSON enum/Uuid/Option work stays pending.
+and recovers an ordinary Raven union. The [runtime mapper](experiments/runtime-route-mapper/README.md) now composes these
+constructors with cached patterns and capture conversions. Its dynamic argument
+collections use the Sequence<Object?> Invoke overload, which copies arguments before
+applying the existing exact-type checks. JSON enum/Uuid/Option work stays pending.

@@ -43,7 +43,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   handling. Include an item server/client case. Integrate Raven's independently
   tested case-attribute emission fix and admit bounded Int32-only standard union
   carriers through logical fields, without general CLR explicit-layout aliasing.
-  SDK generator integration and runtime custom-attribute discovery remain open.
+  Add a reusable runtime mapper sample that validates attributes once at startup,
+  caches patterns/conversions/constructors and returns typed union results to the
+  catalog HTTP handler. Reject repeated attributes, unsupported payloads and
+  structurally overlapping routes before listening. Add RoutePattern.GetParameterNames
+  snapshots and conservative Overlaps checks, TypeInfo.IsVisible (including source
+  enclosing types and generic arguments), and ConstructorInfo.Invoke with dynamic
+  Sequence<Object?> arguments. Update the server/client case, API reference and
+  downloadable projects. SDK mapper packaging and source generation remain future work.
 
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add

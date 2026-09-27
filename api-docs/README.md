@@ -23,6 +23,14 @@ development APIs. Number's static operators/identities and inherited ordering ha
 matching type/member documentation. The numeric guide records the current closed
 primitive-only generic specialization limits; no Parsable interface is exposed.
 
+The cached route-mapper slice adds documented RoutePattern.GetParameterNames/Overlaps,
+TypeInfo.IsVisible and the ConstructorInfo.Invoke Sequence<Object?> overload. All
+use existing selected types; the matching reference and snapshot include their members.
+RavenDoc currently labels the Invoke group `self(...)` and spells the emitted
+extension signature `static func self`; both overloads and their XML descriptions
+remain present. The [manual reflection guide](reflection.md)
+provides the intended Invoke spelling. This renderer naming limitation adds no exclusion.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not

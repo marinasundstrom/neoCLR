@@ -1533,3 +1533,15 @@ Only the Descriptors implementation slice changes. Other snapshot manifests adva
 the shared ReflectionExtensions source hash while retaining their unaffected output
 hashes and compiler provenance. Constructor reflection does not add generic-owner,
 enum or private execution support, or widen TypeInfo.CreateInstance.
+
+
+### Cached runtime route mapper (2026-09-27)
+
+The [runtime mapper case](../runtime-route-mapper/README.md) composes retained
+attributes and constructors without a generation step. The matching reference
+adds RoutePattern.GetParameterNames/Overlaps, ConstructorInfo.Invoke accepting
+Sequence<Object?> and TypeInfo.IsVisible. Type-shape query 11 reports effective
+visibility, including imported enclosing-type visibility and compound type arguments.
+Runtime Contract configuration and Raven compiler emission are unchanged. Use matching
+bridge, reference, library and runner artifacts. HttpClient and Descriptors library
+slices were regenerated; other manifests only refresh their shared source hashes.

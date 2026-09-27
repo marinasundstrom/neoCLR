@@ -1,0 +1,13 @@
+import System.*
+import System.Option.*
+import System.Result.*
+import System.Tasks.*
+import System.Web.Http.*
+
+async func Main(arguments: string[]) -> Task<Result<unit, HttpError>> {
+    let client = HttpClient()
+    client.BaseUri = Some(arguments[0])
+    Console.WriteLine(await client.GetString("items")?)
+    Console.WriteLine(await client.GetString("items/42")?)
+    return Ok(())
+}

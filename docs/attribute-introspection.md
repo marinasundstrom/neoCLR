@@ -23,7 +23,7 @@ This is development behavior after Preview 10, requiring matching runtime/librar
 and compiler bridge artifacts. It is not included in the published preview.
 The route mapper will resolve case metadata, pattern compilation, capture positions,
 parsers and case construction at preparation, retain the result, and avoid repeating
-metadata discovery on requests. The [retained constructor slice](experiments/union-construction/README.md) now supports checked dynamic case/carrier construction. General cached route-schema binding remains next.
+metadata discovery on requests. The [retained constructor slice](experiments/union-construction/README.md) now supports checked dynamic case/carrier construction. The [runtime mapper](experiments/runtime-route-mapper/README.md) now composes these capabilities into startup schema validation and cached request parsing.
 
 ## Comparison and tradeoffs (primary sources reviewed 2026-09-27)
 

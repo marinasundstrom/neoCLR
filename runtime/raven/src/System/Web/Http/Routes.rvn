@@ -165,6 +165,38 @@ public class RoutePattern {
         return Ok(RoutePattern(parts, names))
     }
 
+    /// Returns an independent snapshot of capture names in path order.
+    func GetParameterNames() -> Sequence<string> {
+        let result = ArrayList<string>()
+        for name in storedNames {
+            if name != "" {
+                result.Add(name)
+            }
+        }
+        return result
+    }
+
+    /// Checks structural overlap, before target byte limits or typed conversion.
+    func Overlaps(other: RoutePattern) -> bool {
+        if storedParts.Count != other.storedParts.Count {
+            return false
+        }
+        for index in 0..<storedParts.Count {
+            let leftParameter = storedNames[index] != ""
+            let rightParameter = other.storedNames[index] != ""
+            if !leftParameter && !rightParameter && storedParts[index] != other.storedParts[index] {
+                return false
+            }
+            if leftParameter && !rightParameter && other.storedParts[index] == "" {
+                return false
+            }
+            if !leftParameter && rightParameter && storedParts[index] == "" {
+                return false
+            }
+        }
+        return true
+    }
+
     /// Matches an origin-form request target, ignoring its query component.
     func Match(target: string) -> Result<Option<RouteMatch>, string> {
         if target.GetUtf8ByteCount() > 1024 {

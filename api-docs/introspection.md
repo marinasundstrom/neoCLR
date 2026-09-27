@@ -200,3 +200,11 @@ There is no `GetCustomAttributes` instantiation API or inheritance option yet.
 Cache validated descriptions during startup for repeated mappings. Dynamic union
 case construction is a separate next step; this API alone does not install a route
 mapper. Rebuild the runtime, library, bridge and reference together.
+
+
+`TypeInfo.IsVisible: bool` reports public visibility including containing types,
+element types and generic arguments. Missing imported visibility fails closed.
+Native definitions use declared visibility; primitives and generic parameter
+descriptors are visible. This is descriptive information, not invocation permission:
+open types and private members remain subject to their execution restrictions.
+The route-mapper case uses it to reject nonpublic schemas during preparation.

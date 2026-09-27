@@ -110,3 +110,10 @@ execution; constructor faults remain terminal. Descriptor identity resolves with
 the current loaded program; access and arguments are rechecked per invocation.
 This retains constructor selection, not a compiled execution plan.
 See the [tested union construction case](/features/reflection/#development-case-preparing-union-constructors-for-routes).
+
+
+`ConstructorInfo.Invoke(arguments: Sequence<Object?>)` copies a dynamic argument
+collection before using the same retained-constructor invocation contract. This
+supports cached route bindings without exposing private array-allocation services.
+The caller controls collection mutation while it is copied. It adds no overload
+selection or coercion, and provider/constructor Faults remain terminal.

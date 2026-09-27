@@ -24,9 +24,9 @@ python3 docs/experiments/union-construction/verify.py \
   --runner target/release/examples/measure_async
 ```
 
-General schema validation, overlap detection, capture binding and reusable route
-parsing remain the next layer. The earlier generator experiment retains evidence
-for those contracts; source generation remains a future alternative.
+The [runtime mapper case](../runtime-route-mapper/README.md) now supplies schema
+validation, overlap detection, capture binding and reusable parsing on top of this
+construction slice. Source generation remains a future alternative.
 
 
 Validation on macOS arm64: the [saved evidence](validation.json) records the public

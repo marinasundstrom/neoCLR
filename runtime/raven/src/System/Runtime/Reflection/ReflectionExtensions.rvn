@@ -263,6 +263,14 @@ public extension FieldReflectionExtensions for FieldInfo {
 }
 
 public extension ConstructorReflectionExtensions for ConstructorInfo {
+    func Invoke(arguments: System.Collections.Sequence<Object?>) -> Result<Object, ReflectionError> {
+        let snapshot = CheckedStorage.Reserve<Object?>(arguments.Count)
+        for index in 0..<arguments.Count {
+            snapshot[index] = arguments[index]
+        }
+        return self.Invoke(snapshot)
+    }
+
     func Invoke(params arguments: Object?[]) -> Result<Object, ReflectionError> {
         if self is RuntimeConstructorInfo implementation {
             if let Some(owner) = implementation.DeclaringType {

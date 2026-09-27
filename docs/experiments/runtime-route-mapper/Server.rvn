@@ -1,0 +1,86 @@
+import System.*
+import System.Result.*
+import System.Tasks.*
+import System.Text.*
+import System.Web.Http.*
+
+class ItemServer {
+    private var routes: AppRoutesParser
+
+    init(routes: AppRoutesParser) {
+        self.routes = routes
+    }
+
+    func Configure(context: HttpContext) {
+        var status = HttpStatusCode.NotFound
+        var body = "{\"error\":\"Not found\"}"
+        // Method policy and item lookup belong to the application.
+        if context.Request.Method == "GET" {
+            let parsed = routes.Parse(context.Request.Target)
+            if let Ok(route) = parsed {
+                match route {
+                    AppRoutes.ListItems => {
+                        status = HttpStatusCode.OK
+                        body = "[{\"id\":42,\"name\":\"Desk lamp\"}]"
+                    }
+                    AppRoutes.GetItem(let id) => {
+                        if id == 42 {
+                            status = HttpStatusCode.OK
+                            body = "{\"id\":42,\"name\":\"Desk lamp\"}"
+                        }
+                    }
+                }
+            } else if parsed is Error(RouteMappingError.ConstructionFailed(_)) {
+                status = HttpStatusCode.InternalServerError
+                body = "{\"error\":\"Route construction failed\"}"
+            } else if !(parsed is Error(RouteMappingError.NoMatch)) {
+                status = HttpStatusCode.BadRequest
+                body = "{\"error\":\"Invalid route\"}"
+            }
+        }
+        context.Respond(status, HttpContent(Utf8.Encode(body), "application/json; charset=utf-8"))
+    }
+
+    async func Serve(server: HttpServer, count: int) -> Task<Result<unit, HttpError>> {
+        var index = 0
+        while index < count {
+            let context = await server.Accept()?
+            Configure(context)
+            let sent = await context.Complete()
+            if let Error(error) = sent {
+                return Error(error)
+            }
+            index += 1
+        }
+        return Ok(())
+    }
+}
+
+func Main(arguments: string[]) {
+    let Ok(routes) = AppRoutesParser.Create() else {
+        System.Fault("Invalid route configuration")
+        return
+    }
+    let Ok(count) = Int32.Parse(arguments[0]) else {
+        System.Fault("Supply the number of requests")
+        return
+    }
+    let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
+        System.Fault("Listen failed")
+        return
+    }
+    let Ok(port) = server.GetLocalPort() else {
+        server.Close()
+        System.Fault("Local port unavailable")
+        return
+    }
+    Console.WriteLine(port)
+    let serving = ItemServer(routes).Serve(server, count)
+    serving.OnCompleted(() => {
+        server.Close()
+        if let Error(error) = serving.GetResult() {
+            System.Fault(error.ToString())
+        }
+        Console.WriteLine("Items served")
+    })
+}

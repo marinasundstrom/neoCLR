@@ -263,6 +263,7 @@ impl Query {
                     | Type::TypeParameter(_)
                     | Type::MethodTypeParameter(_) => false,
                 },
+                11 => publicly_visible(module, &ty),
                 0 => matches!(ty, Type::Array(_) | Type::ArrayRef(_)),
                 1 => matches!(ty, Type::ByRef(_) | Type::ReadOnlyByRef(_)),
                 2 => matches!(ty, Type::Ptr(_)),
@@ -1094,4 +1095,63 @@ pub(crate) fn materialize(
         }
     }
     build(module, heap, limits, value, 0)
+}
+
+// Source visibility already includes every enclosing type. Compound types must
+// also expose only visible element/argument types; visibility grants no execution.
+fn publicly_visible(module: &Module, ty: &Type) -> bool {
+    match ty {
+        Type::Array(t)
+        | Type::ArrayRef(t)
+        | Type::ByRef(t)
+        | Type::ReadOnlyByRef(t)
+        | Type::Ptr(t)
+        | Type::InterfaceRef(t) => publicly_visible(module, t),
+        Type::TypeParameter(_) | Type::MethodTypeParameter(_) => true,
+        _ => {
+            module.type_definition(ty).is_none_or(|d| {
+                d.visibility == crate::metadata::Visibility::Public
+                    && d.origin
+                        .as_ref()
+                        .is_none_or(|o| o.publicly_visible == Some(true))
+            }) && ty
+                .generic_arguments()
+                .iter()
+                .all(|t| publicly_visible(module, t))
+        }
+    }
+}
+
+#[cfg(test)]
+mod visibility_tests {
+    use super::*;
+
+    #[test]
+    fn visibility_respects_source_nesting_and_compound_types() {
+        let mut module = crate::assemble(".module Visibility\n.type Public\n.end\n.type internal Hidden\n.end\n.type Box<T>\n.end\n").unwrap();
+        for (name, expected) in [
+            ("Public", true),
+            ("Hidden", false),
+            ("Int32", true),
+            ("arrayref<Public>", true),
+            ("arrayref<Hidden>", false),
+            ("Box<Public>", true),
+            ("Box<Hidden>", false),
+            ("Hidden&", false),
+            ("Public*", true),
+        ] {
+            assert_eq!(
+                publicly_visible(&module, &crate::assembler::parse_type(name).unwrap()),
+                expected,
+                "{name}"
+            );
+        }
+        let public = &mut module.types[0];
+        public.origin = Some(serde_json::from_str(r#"{"assembly":"Source","module":"Source.dll","name":"Outer/Nested","token":33554433,"publicly_visible":false}"#).unwrap());
+        assert!(!publicly_visible(&module, &Type::from_name("Public")));
+        module.types[0].origin.as_mut().unwrap().publicly_visible = None;
+        assert!(!publicly_visible(&module, &Type::from_name("Public")));
+        module.types[0].origin.as_mut().unwrap().publicly_visible = Some(true);
+        assert!(publicly_visible(&module, &Type::from_name("Public")));
+    }
 }

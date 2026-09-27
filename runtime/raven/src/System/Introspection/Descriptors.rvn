@@ -406,6 +406,7 @@ public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
     val IsUnion: bool { get }
     val IsEnum: bool { get }
     val IsValueType: bool { get }
+    val IsVisible: bool { get }
     func GetGenericArguments() -> Sequence<TypeInfo>
     func GetElementType() -> Option<TypeInfo>
 
@@ -533,6 +534,7 @@ internal class RuntimeTypeInfo : TypeInfo {
     val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
     val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
     val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
+    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
 
 
     func GetGenericArguments() -> Sequence<TypeInfo> {

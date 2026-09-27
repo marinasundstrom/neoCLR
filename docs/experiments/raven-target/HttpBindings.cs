@@ -22,6 +22,8 @@ static class HttpBindings
                 private RoutePattern() { }
                 public static Result<RoutePattern, string> Parse(string pattern) => default;
                 public Result<Option<RouteMatch>, string> Match(string target) => default;
+                public Collections.Sequence<string> GetParameterNames() => default;
+                public bool Overlaps(RoutePattern other) => default;
             }
             public sealed class RouteMatch {
                 public RouteMatch(Collections.Sequence<string> names, Collections.Sequence<string> values) { }
@@ -212,6 +214,8 @@ static class HttpBindings
         var task = $"System.Tasks.Task<{outcome}>";
         var expected = (owner[Prefix.Length..], definition.Name) switch {
             ("RoutePattern", "Parse") => ("String", "System.Result<System.Web.Http.RoutePattern,String>", true),
+            ("RoutePattern", "GetParameterNames") => ("", "System.Collections.Sequence<String>", false),
+            ("RoutePattern", "Overlaps") => ("System.Web.Http.RoutePattern", "Boolean", false),
             ("RoutePattern", "Match") => ("String", "System.Result<System.Option<System.Web.Http.RouteMatch>,String>", false),
             ("RouteMatch", "Get") => ("String", "System.Result<String,String>", false),
             ("RouteMatch", "GetInt32") => ("String", "System.Result<Int32,String>", false),

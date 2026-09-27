@@ -1,0 +1,39 @@
+import System.*
+import System.Result.*
+
+[AttributeUsage(AttributeTargets.All, AllowMultiple: true)]
+public class RoutePatternAttribute : Attribute {
+    init(pattern: string) {
+        System.Fault("Route attributes must be read without executing constructors")
+    }
+}
+
+public union AppRoutes {
+    [RoutePattern("/items")]
+    case ListItems
+
+    [RoutePattern("/items/{id}")]
+    case GetItem(id: int)
+}
+
+// Typed application facade; the reusable mapper does not hard-code route cases.
+public class AppRoutesParser {
+    private val mapper: RouteUnionMapper
+
+    private init(mapper: RouteUnionMapper) {
+        self.mapper = mapper
+    }
+
+    static func Create() -> Result<AppRoutesParser, string> {
+        let mapper = RouteUnionMapper.Create(typeof(AppRoutes))?
+        return Ok(AppRoutesParser(mapper))
+    }
+
+    func Parse(target: string) -> Result<AppRoutes, RouteMappingError> {
+        let boxed = mapper.Parse(target)?
+        if boxed is AppRoutes route {
+            return Ok(route)
+        }
+        return Error(RouteMappingError.ConstructionFailed("Unexpected union type"))
+    }
+}
