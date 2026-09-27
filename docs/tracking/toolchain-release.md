@@ -123,14 +123,16 @@ artifact provenance. Issue numbers above retain the 2026-09-26 inventory; no iss
 status was refreshed or closed. Status changes belong here; implementation details
 and commands remain in the linked procedures and evidence.
 
-## Local async toolchain — 2026-09-27
+## Local development toolchain — 2026-09-27
 
 The author requested a matching SDK/extension installation and HTTP launch after
-the async work. [The installed snapshot](../local-sdk-snapshot.md) records neoCLR
-03947b07 and Raven b7bc6838d, three packaged generic async consumers, LSP completion,
-independent HTTP requests and the Raven pair. The server remains available in a
-Terminal window; the client returned accepted:true. This is local development
-evidence, not a published release or a waiver of the open gates above.
+the async work. [The installed snapshot](../local-sdk-snapshot.md) now uses SDK/VSIX
+0.1.12-neoclr.20260927.cpu1 and neoCLR 46b40f80, including recovery and metadata
+indexing. It records exact per-component Raven revisions, LSP completion, independent
+HTTP requests and the Raven pair. The fresh server was left running in Terminal on
+port 63796; the visible client returned accepted:true with zero live objects. Earlier
+async bundle/evidence remain available. This is local development evidence, not a
+published release or a waiver of the open gates above.
 
 ## HTTP CPU investigation — 2026-09-27
 

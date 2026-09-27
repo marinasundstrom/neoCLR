@@ -8894,3 +8894,11 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   considering incremental quota aggregation next, but not weakening quotas or
   removing locks. Startup and the remaining old editor memory/input issue are separate.
   See [implementation, measurements and boundaries](experiments/http-json/lookup-comparison-20260927.md).
+
+- **Installation outcome:** SDK/VSIX cpu1 and the fresh indexed-runtime bundle were
+  installed alongside prior bundles. Editor completion, four independent HTTP cases
+  and the Raven client/server pair pass. The updated workspace was opened and the
+  visible pair launched on port 63796; the client returned accepted:true and the
+  server remained running. [Exact provenance](experiments/http-json/local-cpu-toolchain-validation.json)
+  distinguishes the SDK revision from a concurrent editor-only completion-order
+  change included in VSIX packaging. This is not a published release.

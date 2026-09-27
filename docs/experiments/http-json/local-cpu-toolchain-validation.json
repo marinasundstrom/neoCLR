@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-27",
+  "distribution": "local development; not published",
+  "bundle": "/Users/robert/.neoclr/experiments/development-20260927-cpu",
+  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.20260927.cpu1",
+  "version": "0.1.12-neoclr.20260927.cpu1",
+  "neoCLRRevision": "46b40f807a5fdc2a02d5c6ddb3a4673f75afe2b5",
+  "bundleBridgeRavenRevision": "66c33f7a0d1522b018e34e31b16c70669f7b612a",
+  "sdkRavenRevision": "2a3fbb346",
+  "vsixRavenRevision": "66c33f7a0",
+  "source_note": "Another chat integrated alphabetic completion ordering after SDK publication and before VSIX compilation. Compiler/metadata files are unchanged between these Raven revisions. Workspace pins the SDK language server (2a3fbb346); bundled VSIX server additionally contains completion ordering. No claim of byte-identical server builds.",
+  "installed_sdk_files_verified": 440,
+  "extensions": [
+    "default profile: raven.raven-vscode@0.1.12-neoclr.20260927.cpu1",
+    "isolated raven-port-20260919: same version"
+  ],
+  "checks": {
+    "lookup_unit_tests": 3,
+    "native_contract_tests": 42,
+    "Task_Run_consumers": 13,
+    "Raven_discovery_watch_tests": 11,
+    "candidate_header_recovery": "pass; rejected 2049 bytes then valid GET; zero live objects",
+    "installed_editor_completion": "pass",
+    "installed_http": [
+      "GET /report 200",
+      "POST /reports 201",
+      "POST /reports malformed 400",
+      "GET /missing 404",
+      "Raven typed client GET+POST accepted:true"
+    ],
+    "api_snapshot": "pass",
+    "website_build": "not run",
+    "full_suite": "not run"
+  },
+  "hashes": {
+    "/Users/robert/.neoclr/experiments/development-20260927-cpu/bin/neoclr": "b3e9ee29f98d1e14dd1db73f1844bd0ba1a71a61db4691fc0722d4b209ccebbe",
+    "/Users/robert/.neoclr/experiments/development-20260927-cpu/tools/http-runner": "01331f45f92483039f1f86370f1a0fad82d9fee663a7e8bf4423e93020818585",
+    "/Users/robert/.neoclr/experiments/development-20260927-cpu/tools/bridge/Probe.dll": "6cc794e5a6677dab9d8b9586c8355c7962392417166dc740d4674e5598b170a1",
+    "/Users/robert/.neoclr/experiments/development-20260927-cpu/lib/System.neoil": "b944ad08760589ffa1409403e1d6c0e1cf3c3af49312bca5e28ade6b7aba4cc1",
+    "/Users/robert/.neoclr/experiments/development-20260927-cpu/demo/NeoCLR.CoreProbe.dll": "01327a5beeb2c366246cf7c031962e9b051821612c26f561c756997b4b966429",
+    "/Users/robert/.raven/sdk/0.1.12-neoclr.20260927.cpu1/tools/language-server/Raven.LanguageServer.dll": "9c03ebfeee107a6c776998a9c3ff49e7b028cd0b3d64ddc862e5035304d51d80",
+    "/Users/robert/.neoclr/builds/http-cpu-20260927/raven-vscode.vsix": "c1810b5c77be464376bb42c567fea8c6c5ea6600934ef043710415862d1ee8c4"
+  },
+  "live_launch": {
+    "server_pid": 73809,
+    "port": 63796,
+    "url": "http://127.0.0.1:63796/report",
+    "client_output": "{\"accepted\":true}",
+    "client_heap": "allocated=909 live=0 peak=170 collections=16 reclaimed=909",
+    "server_state": "running after typed client completed; bounded to 100 connection attempts",
+    "workspace": "editable-samples/http-json/HttpJson.code-workspace opened in isolated VS Code profile"
+  }
+}

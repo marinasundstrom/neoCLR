@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Install local SDK/VSIX `0.1.12-neoclr.20260927.cpu1` and the indexed-runtime
+  HTTP bundle; verify editor completion, independent HTTP cases and the Raven pair.
+  Preserve prior installations and record per-component source revisions/hashes.
+  This is a local development installation, not a published release.
+
 - Index immutable execution metadata candidates while preserving type, signature,
   access and duplicate-resolution checks. Focused native and Task.Run consumers
   pass; local HTTP median CPU falls about 24%. Record remaining quota aggregation
