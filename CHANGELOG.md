@@ -31,6 +31,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contracts and add a dedicated Reflection
   feature page. Generic classes, static fields, coercion and byref/out remain unsupported.
 
+- Record Task.Run as the author-selected canonical submission API with shared
+  captures and runtime-selected execution. Document heap/scheduling prerequisites,
+  backend alternatives and focused acceptance; implementation and Thread's future
+  public role remain open.
+
 - Support Raven Main returning integer, Result and target Task combinations through
   target-owned startup adaptation, including optional string-array arguments and
   pending default-queue/host completion. Result errors print to stderr and return

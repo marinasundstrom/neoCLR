@@ -8455,3 +8455,30 @@ configuration/content, not target-specific code added to Raven main.
   Focused native, source-consumer, API/library snapshot and website checks pass.
   The website was built locally, not published. Main integration and task worktree
   cleanup are performed after these checks.
+
+## 2026-09-27 — Task.Run as canonical shared-context work submission
+
+- **Author:** asks to add the documented Task.Run API, leaving execution policy to
+  the runtime and suggesting a thread as a possible initial mechanism.
+- **Assistant:** asks whether to start with noncapturing transferable values or
+  include shared captured objects, explaining that the latter requires wider
+  heap/thread-safety work.
+- **Author:** selects “Include shared captured objects now”, then clarifies:
+  “Task.Run will be our canonical API for creating tasks that can capture context.”
+  Leaves Thread's public future uncertain and suggests it as a backend primitive.
+- **Assistant:** distinguishes lexical capture/shared identity from ambient context
+  flow, identifies the existing single-owner heap and isolated worker mismatch,
+  and asks whether native threads are required now or cooperative execution is
+  acceptable.
+- **Author:** asks for the assistant's recommendation and adds, “We should align
+  with the behavior of Task.Run in .NET I thin”.
+- **Assistant recommendation:** use native-thread execution initially so blocking
+  work permits caller progress, preserve shared object identity, and include async
+  callback unwrapping. Keep pooling/dedicated-thread policy internal and retain
+  neoCLR's Result/cancellation/terminal-Fault model. Exact implementation and
+  overload evidence remain pending.
+- **Action:** records the direction, alternatives, costs and focused acceptance in
+  the [concurrency design](concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27)
+  and [runtime tracker](tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27).
+  Runtime implementation and validation remain pending; no Task.Run API is claimed
+  complete by this design record.

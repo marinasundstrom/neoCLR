@@ -1,6 +1,6 @@
 # Concurrency and tracked threads — post-release direction
 
-**Updated 2026-09-23. Explicit Thread implementation in development; Task.Run planned.** The author directs renaming
+**Updated 2026-09-27. Explicit Thread implemented; shared-context Task.Run selected, implementation pending.** The author directs renaming
 `System.Threading` to `System.Concurrency` after the async/Tasks release to express
 a broader area. `System.Concurrency` is the namespace for concurrency, including
 threading. Thread remains an explicit thread API and may be unavailable on some
@@ -15,7 +15,93 @@ could be named `System.Concurrency.Threads`; that is a packaging possibility, no
 selected namespace. Package boundaries, capability detection and unsupported-target
 behavior remain open.
 
-## Clarification: Task.Run overloads — 2026-09-23
+## Task.Run with shared captures — author direction, 2026-09-27
+
+`Task.Run` is selected as the canonical API for submitting new work with lexical
+captures, including shared managed objects. The runtime selects how to execute
+that work. This direction supersedes a noncapturing/transferable-values-only first
+slice. It is **not implemented yet**. Tasks returned by I/O and Promise remain valid
+ways to represent completion; they do not need an extra Task.Run wrapper.
+
+“Context” here includes captured variables and managed object identity. It does not
+yet select .NET ExecutionContext/AsyncLocal flow, thread-local inheritance, culture
+flow or caller-thread affinity. Those are separate contracts. Keep Task/Promise in
+System.Tasks. Keep completion-only work compatible with Task<unit>, alongside
+value-producing work returning Task<T>. The subsequent author direction is to align with .NET Task.Run behavior. Include
+async callback flattening in the intended overload family; exact Raven overload
+resolution and completion-only representation still require executable evidence.
+
+The author considers Thread a possible implementation primitive and leaves its
+public future open. Do not remove or repurpose its existing isolated string-worker
+API as part of that uncertainty. It cannot implement shared captures unchanged:
+copying/serializing a captured object into an isolated worker loses shared identity.
+A different backend must preserve the Task.Run sharing contract.
+
+### Runtime prerequisites and implementation alternatives
+
+The current runtime has an invocation-owned tracing heap. Managed slots use
+`Rc<RefCell<Slot>>`, heap handles use weak references, and the root walk covers the
+active invocation. The existing native workers start separate invocations. Merely
+sending a delegate or substituting Arc for Rc is insufficient: slot access, GC,
+Promise completion, task queues, cancellation and host resources also need a
+consistent ownership/synchronization model. Do not add unsafe Send/Sync assertions
+to conceal these constraints.
+
+| Candidate backend | Benefit | Required work and cost |
+| --- | --- | --- |
+| Shared-heap native execution | Blocking work need not stop all runnable guest work; supports the proposed Thread implementation primitive | Coordinate root publication/collection across running and suspended executions, synchronize managed storage and task completion, define resource ownership and shutdown. Library collections do not automatically become safe for concurrent mutation. |
+| Runtime-managed cooperative execution | Can retain the existing single-owner heap and preserve capture identity without cross-thread guest access | Add independently resumable executions, fair progress, GC roots and aggregate limits. Blocking host calls stall other tasks unless separately offloaded; simply posting arbitrary callbacks onto TaskQueue is insufficient. |
+
+The author subsequently asked for a recommendation and said to align with .NET
+Task.Run behavior. The assistant recommends native-thread execution for the first
+implementation: blocking or CPU-bound submitted work must allow caller progress.
+A single-thread cooperative backend that stalls all tasks on blocking host calls
+would not meet that baseline. Dedicated threads versus a bounded pool remain
+runtime policy; a task has no promised thread identity, start order or guaranteed
+simultaneous execution. Preserve the ability to use another backend only when it
+can meet the documented progress and sharing contract.
+
+Implement the shared execution substrate before adding the public facade. Establish
+synchronized storage and a shared heap/root registry, then concurrent Promise/queue
+publication and bounded task ownership/teardown. Test those boundaries with native
+contracts before exposing Raven Run overloads and refreshing the matching API
+artifacts. This is a feature prerequisite, not an optimization project. Existing
+Result/cancellation/Fault semantics remain neoCLR's; .NET-like scheduling does not
+select exception-bearing Task outcomes.
+
+### Focused acceptance before exposing the API
+
+- Typed and completion-only callbacks, including instance-method delegates and
+  captured locals that outlive their creating frame.
+- Shared object/array identity and mutation visible after completion, including a
+  reference returned from the callback; no serialization or deep-copy substitute.
+- Pending/running/completed captures survive forced GC; references become
+  collectible when no task, callback, continuation or result retains them.
+- Submission makes work runnable without awaiting it. Exercise nested submissions,
+  competing runnable work and the chosen backend's documented blocking behavior.
+- Promise first-terminal-transition behavior, multiple observers and continuation
+  publication remain correct under that backend. Specify cancellation and async
+  callback behavior before claiming those overloads.
+- Fault remains an invocation failure under the current TaskOutcome model, not an
+  invented task error case. Invocation cancellation/fault/exit must stop and join
+  owned execution before disposing its shared heap and host resources.
+- Bound queued/running work and account for all live frames, captures, heap objects
+  and instruction consumption. A task must not reset invocation resource budgets.
+
+### Comparison and sources
+
+.NET Task.Run uses the thread pool and provides completion-only, typed and
+async-unwrapping overloads. neoCLR keeps the familiar submission/result role while
+making backend choice a runtime policy; the cost is defining portable progress and
+sharing explicitly. See [Task.Run](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task.run?view=net-10.0).
+.NET's ambient [ExecutionContext](https://learn.microsoft.com/en-us/dotnet/api/system.threading.executioncontext?view=net-10.0)
+is separate from lexical closure capture; adopting the latter does not implement
+the former. Rust documents [Rc](https://doc.rust-lang.org/std/rc/index.html) as
+single-threaded; safe native sharing needs more than moving today's heap handles.
+Primary sources reviewed 2026-09-27; the alternatives above are neoCLR design
+analysis, not claims of shipped behavior.
+
+## Earlier clarification: Task.Run overloads — 2026-09-23
 
 The author clarified that Task.Run should have overloads and return values, as in
 .NET. The intended shape includes completion-only callbacks and value-producing

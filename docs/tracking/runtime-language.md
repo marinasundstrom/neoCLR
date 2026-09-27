@@ -7,6 +7,20 @@ foundation sweep. Useful API coverage is now selected in the
 expansion below remains deferred unless that work exposes a concrete dependency
 or later author direction selects it.
 
+## Author-selected Task.Run work — 2026-09-27
+
+**Active direction; implementation pending.** Task.Run is the canonical submission
+API for work with shared lexical captures, with execution chosen by the runtime. The subsequent .NET-behavior direction leads to
+a native-thread first implementation recommendation, including progress while
+submitted work blocks and async callback unwrapping.
+The author selected shared objects for the first slice rather than limiting it to
+noncapturing transferable values. [The concurrency design](../concurrency-direction.md#taskrun-with-shared-captures--author-direction-2026-09-27)
+owns the contract, backend alternatives and focused acceptance cases. Settle the
+execution/heap ownership boundary before exposing the facade; the isolated Thread
+worker contract is not a substitute. Thread's future public role remains open.
+This explicit task does not reopen the finished HTTP POC or select a general
+scheduler/backend rewrite independently of the capability's requirements.
+
 ## Recorded checkpoints and open scope
 
 | Area | Recorded evidence | Remaining scope / next evidence when selected |

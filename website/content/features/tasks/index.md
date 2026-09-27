@@ -162,8 +162,10 @@ completion through TaskQueue. Callbacks must return for other work to progress.
 A pending await currently resumes through the producer queue; custom queue and UI
 affinity are not settled contracts. Ordinary worker joins can still block the queue.
 
-Runtime-owned suspension, broader cleanup support and general Task.Run submission
-are future directions. Their scheduling, isolation and lifetime rules need design;
+Task.Run is the selected direction for submitting work with captured variables
+and shared objects, with the runtime choosing execution. It is not implemented yet.
+Thread may become a backend primitive; its public future remains open.
+Runtime-owned suspension and broader cleanup support remain future directions. Their scheduling, isolation and lifetime rules need design;
 no public Scheduler API is selected. See the [builder contracts](../../docs/async-builders.html)
 for the supported compiler integration.
 

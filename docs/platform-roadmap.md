@@ -67,6 +67,9 @@ import, private instance helpers and broader static/default/accessibility cases 
 The author also selected [Result/Task Main integration](experiments/entry-results/README.md),
 with direct async Main adoption in relevant samples after focused validation.
 This is a bounded startup integration, not a new broader milestone.
+The author next selected [Task.Run with shared captured objects](tracking/runtime-language.md#author-selected-taskrun-work--2026-09-27)
+as the canonical work-submission API, with runtime-selected execution. Implementation
+is pending the shared-heap/scheduling boundary; Thread's future public role is open.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 
