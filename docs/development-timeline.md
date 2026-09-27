@@ -8750,3 +8750,20 @@ capture reproduction fails on ordinary .NET before the fix; it is compiler-owned
 A separate async generic-containing-type failure also reproduces without captures.
 See the [Task.Run checkpoint](experiments/task-run/README.md) for implementation
 and validation outcomes; broader .NET library parity is not inferred from this direction.
+
+### 2026-09-27 — Reverse type relationships and extension visibility
+
+- Author requested links to types inheriting or implementing the current type,
+  clarifying that interfaces inherit interfaces whereas classes implement them.
+- Assistant implemented separate Derived interfaces and Implementing types
+  sections, plus Derived types for classes, scoped to the documented surface.
+  Generic and indirect relationships are included; indirect entries are marked.
+- Author then requested a Show extension members toggle. The assistant added
+  a persisted, initially enabled filter independent of inherited-member visibility.
+  Browser checks on ArrayList confirmed both grouping modes, counts, persistence
+  and independence; source/imported documentation tests cover type relationships.
+
+- Follow-up: the author asked for the toggles to sit next to one another when
+  space permits, and for the grouping and both toggle values to be shareable in
+  the URL. The assistant implemented wrapping controls and URL precedence over
+  saved preferences, preserving unrelated query parameters and page anchors.
