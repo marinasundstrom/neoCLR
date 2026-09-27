@@ -1107,3 +1107,42 @@ fn completed_inline_array_remains_charged_until_participant_release() {
     drop(first);
     assert!(matches!(run(&mut second).unwrap(), Value::Array { .. }));
 }
+
+#[test]
+fn native_work_failure_is_observed_before_more_guest_instructions() {
+    let module =
+        crate::assemble(".module System\n.function Main() -> Int32\nldc.i4 42\nret\n.end").unwrap();
+    let options = ExecutionOptions::default();
+    let invocation = crate::invocation::Invocation::new(options.limits);
+    let scope = crate::invocation_work::Scope(invocation.clone());
+    let owner = Owner::new(2);
+    let mut parent = owner.participant().unwrap();
+    invocation
+        .work
+        .submit(&mut parent.enter(), vec![], |_, _, _| {
+            Err(Fault::coded(
+                crate::FaultCode::UserFault,
+                "native callback failed",
+            ))
+        })
+        .unwrap();
+    assert!(invocation.wake.park(std::time::Duration::from_secs(2)));
+    let mut state = InstructionState::with_invocation(invocation.clone());
+    let before = state.budget.remaining();
+    let error = drive_instructions(
+        &module,
+        &mut vec![Frame::new(module.functions[0].clone(), vec![]).unwrap()],
+        &options,
+        &mut None,
+        &mut parent,
+        &mut invocation.memory.clone(),
+        &mut vec![],
+        &mut [vec![], vec![]],
+        &mut state,
+    )
+    .unwrap_err();
+    assert_eq!(error.code, crate::FaultCode::UserFault);
+    assert_eq!(error.message, "native callback failed");
+    assert_eq!(state.budget.remaining(), before);
+    drop(scope);
+}

@@ -81,8 +81,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with provenance, roots and payload admission before native execution. Retain completed
   results and transfer their private charge without double-counting; release rejected
   work capacity. Include inline arrays in owned delegate receivers in array budgets,
-  closing previously omitted payload accounting. Invocation scheduling and public Run
-  still need integration.
+  closing previously omitted payload accounting. Own native work at invocation scope,
+  wake the scheduler on completion, retain worker faults/panics and cancel siblings.
+  Close admission and join outside graph/service locks on root exit or unwinding,
+  before releasing shared resources. Guest delegate scheduling and public Run still
+  need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

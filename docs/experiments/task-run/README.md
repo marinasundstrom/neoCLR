@@ -498,11 +498,49 @@ transfer, rejected admission rollback, foreign captures, oversized-result cleanu
 inline delegate-receiver payloads. No whole-library rebuild, full suite or website
 build was needed; public API signatures and snapshots are unchanged.
 
+## Invocation-owned work lifecycle and wakeup
+
+The invocation now lazily owns its bounded native work service. Submission uses its
+limits and host cancellation token. Completion, cancellation and callback failure
+signal the existing scheduler wake latch; ready outcomes remain rooted until taken.
+The latch is a hint, so polling retains the existing bounded timeout when a signal
+arrives just before the native thread finishes. Handles remain single-use.
+
+Non-cancellation callback faults and panics leaving the native callback are recorded
+as invocation failures and request sibling cancellation. The VM checks the retained
+failure before executing another instruction interval. Consuming a failed job cannot
+hide the invocation failure. This uses the existing Fault model rather than adding
+a TaskOutcome error case. Host operations remain cooperatively cancellable; a
+noninterruptible native call can still delay shutdown.
+
+The root driver explicitly closes admission, removes the work owner from its service
+mutex, and joins outside graph/service locks before releasing shared services or
+exporting either heap. A root-driver scope repeats that cleanup during unwinding,
+breaking the job-to-invocation lifetime dependency. An existing guest failure keeps
+precedence; an otherwise successful driver reports a retained worker failure.
+Normal invocation exit stops outstanding work; this does not yet define the public
+Task.Run awaiting/entry-drain adapter. Only the root driver owns this shutdown scope.
+
+The initial internal service reuses Limits.frames as its total native-submission cap,
+while the existing shared frame budget independently bounds live guest frames. This
+is a bounded prerequisite, not a newly published task-limit contract. The .NET
+comparison remains runtime-owned scheduling with shared lexical captures; neoCLR's
+invocation lifetime and host quotas are deliberate boundaries, not a reproduction
+of .NET's process-wide pool. Detaching the owner before joining avoids a lock-cycle;
+no scheduling-throughput improvement is claimed.
+
+Validation passes: thirteen native-work tests, five invocation-lifecycle tests,
+fifteen guest suspension tests and fourteen GC/cancellation integration tests
+(47 focused tests). New coverage includes completion wakeup and single consumption,
+closed admission, retained faults/panics, sibling cancellation, shared host cancellation,
+root unwinding while a worker retains the invocation, service-lock availability during
+join, and fault observation before any further guest instruction. Existing final-GC
+behavior still passes. No full suite, website build or API snapshot change was needed.
+
 ## Next integration slice
 
-Connect the shared work owner to invocation scheduling and guest callback execution,
-then expose the Run overloads with async callback unwrapping. Root/payload handoff,
-aggregate services and atomic task-library mutation regions are implemented. The
-public driver must still own task shutdown, connect terminal faults/cancellation and
-validate end-to-end typed/completion-only shared captures. Public Task.Run remains
-unimplemented.
+Connect guest delegate execution and task completion to this invocation service, then
+expose the Run overloads with async callback unwrapping. The guest adapter must join
+entry draining with pending native work, share output/control state, allocate bounded
+heap participants and preserve root/payload publication at every handoff. Validate
+typed/completion-only shared captures end to end. Public Task.Run remains unimplemented.

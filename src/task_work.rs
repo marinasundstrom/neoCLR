@@ -91,6 +91,10 @@ pub(crate) struct Work {
     jobs: Vec<Option<JoinHandle<Outcome>>>,
     limit: usize,
     limits: crate::Limits,
+    observer: Option<(
+        std::sync::Arc<crate::scheduler::Wake>,
+        std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
+    )>,
 }
 impl Work {
     pub(crate) fn new(
@@ -108,7 +112,16 @@ impl Work {
             jobs: Vec::new(),
             limit,
             limits,
+            observer: None,
         }
+    }
+
+    pub(crate) fn observe(
+        &mut self,
+        wake: std::sync::Arc<crate::scheduler::Wake>,
+        failure: std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
+    ) {
+        self.observer = Some((wake, failure));
     }
 
     // Bound total submissions; consumed handles are never reused.
@@ -160,21 +173,38 @@ impl Work {
         let limits = self.limits;
         let cancellation = self.cancellation.clone();
         let identity = self.identity.clone();
+        let observer = self.observer.clone();
         let worker = thread::Builder::new()
             .name("neoclr-task".into())
             .spawn(move || {
-                cancelled(&cancellation)?;
-                let completion = callback(
-                    Context {
-                        participant,
-                        identity,
-                        limits,
-                        control: cancellation.clone(),
-                    },
-                    &cancellation,
-                )?;
-                cancelled(&cancellation)?;
-                Ok(completion)
+                let outcome = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    cancelled(&cancellation)?;
+                    let completion = callback(
+                        Context {
+                            participant,
+                            identity,
+                            limits,
+                            control: cancellation.clone(),
+                        },
+                        &cancellation,
+                    )?;
+                    cancelled(&cancellation)?;
+                    Ok(completion)
+                }))
+                .unwrap_or_else(|_| Err(Fault::new("native task panicked")));
+                if let Some((wake, failure)) = observer {
+                    if let Err(error) = &outcome {
+                        if error.code != FaultCode::ExecutionCancelled {
+                            let mut first = failure.lock().expect("task failure lock poisoned");
+                            if first.is_none() {
+                                *first = Some(error.clone());
+                            }
+                            cancellation.stop.cancel();
+                        }
+                    }
+                    wake.signal();
+                }
+                outcome
             })
             .map_err(|error| Fault::new(format!("cannot start native task: {error}")))?;
         let id = self.jobs.len();

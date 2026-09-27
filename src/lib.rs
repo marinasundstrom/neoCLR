@@ -63,6 +63,7 @@ pub use string_value::StringValue;
 mod type_identity;
 pub mod value;
 mod invocation;
+mod invocation_work;
 mod invocation_budget;
 mod vm;
 mod workers;

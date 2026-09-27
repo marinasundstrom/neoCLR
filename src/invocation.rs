@@ -6,6 +6,7 @@ use crate::{Limits, invocation_budget::Budget};
 use std::sync::{Arc, Mutex};
 
 pub(crate) struct Invocation {
+    pub(crate) work: super::invocation_work::Service,
     pub(crate) dispatch: Mutex<Dispatch>,
     pub(crate) wake: Arc<crate::scheduler::Wake>,
     pub(crate) memory: crate::memory::SharedMemory,
@@ -61,10 +62,19 @@ impl Invocation {
         self.wake.park(std::time::Duration::from_millis(10));
     }
 
+    #[cfg(test)]
     pub(crate) fn new(limits: Limits) -> Arc<Self> {
+        Self::with_cancellation(limits, crate::CancellationToken::new())
+    }
+
+    pub(crate) fn with_cancellation(
+        limits: Limits,
+        cancellation: crate::CancellationToken,
+    ) -> Arc<Self> {
         let scheduler = crate::scheduler::Scheduler::default();
         let wake = scheduler.wake();
         Arc::new(Self {
+            work: super::invocation_work::Service::new(limits, cancellation, wake.clone()),
             dispatch: Mutex::new(Dispatch {
                 scheduler,
                 default_task_queue: None,

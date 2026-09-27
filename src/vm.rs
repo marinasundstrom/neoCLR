@@ -1514,7 +1514,12 @@ fn interpret_frames(
     let mut participant = owner.participant()?;
     let mut output = vec![];
     let mut console_bytes = [Vec::new(), Vec::new()];
-    let mut state = InstructionState::new(options.limits);
+    let invocation = crate::invocation::Invocation::with_cancellation(
+        options.limits,
+        options.cancellation.clone().unwrap_or_default(),
+    );
+    let mut state = InstructionState::with_invocation(invocation);
+    let work_scope = crate::invocation_work::Scope(state.invocation.clone());
     let mut memory = state.invocation.memory.clone();
     let libraries = state.invocation.native_libraries.clone();
     *libraries.lock().expect("native library lock poisoned") = native_libraries.take();
@@ -1529,6 +1534,10 @@ fn interpret_frames(
         &mut console_bytes,
         &mut state,
     );
+    // Stop/join shared jobs before releasing services or exporting either heap.
+    let stopped = state.invocation.work.shutdown();
+    let result = result.and_then(|value| stopped.map(|_| value));
+    drop(work_scope);
     // Source teardown may join host workers; never hold the managed graph gate.
     drop(state);
     let mut heap = participant.enter();
@@ -1705,6 +1714,7 @@ struct InstructionState {
     dispatch_identity: std::sync::Arc<()>,
 }
 impl InstructionState {
+    #[cfg(test)]
     fn new(limits: Limits) -> Self {
         Self::with_invocation(crate::invocation::Invocation::new(limits))
     }
@@ -1778,6 +1788,7 @@ fn interpret_instructions(
     quantum: usize,
 ) -> Result<InstructionProgress, Fault> {
     let invocation = state.invocation.clone();
+    invocation.work.check()?;
     // Lock order is graph -> dispatch. Parking, joining and host I/O hold neither.
     let mut dispatch = invocation.dispatch.lock().expect("dispatch lock poisoned");
     dispatch.bind(heap)?;
