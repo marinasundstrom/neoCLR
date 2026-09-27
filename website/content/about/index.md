@@ -34,15 +34,8 @@ Proposals are inputs to this process. They can conflict, and their API shapes ar
 
 neoCLR retains the distinction between copied values and shared class or array references, managed garbage collection, generics and ordinary method dispatch. CLI metadata provides a compiler boundary. The runtime and System library are independent implementations; arbitrary unchanged .NET assemblies are not supported.
 
-| Area | Current neoCLR difference | Consequence |
-| --- | --- | --- |
-| [Errors and absence](../features/outcomes/) | Option and Result represent optional values and expected failures. | Callers match or propagate outcomes. APIs using exceptions or null in .NET need adaptation. |
-| Generic Void | Void can be a type argument, including in Func and Result. | One generic family covers results with or without a payload; the compiler must support this target contract. |
-| [Arrays](../features/arrays/) | Mutable arrays are invariant and expose a generic API shape. | Reference-array covariance is unavailable; code relying on those .NET conversions must change. |
-| [Text](../features/strings/) | String uses UTF-8 storage; Char represents a grapheme, with explicit scalar and byte operations. | Indexing and conversion differ from .NET’s UTF-16 code-unit contracts. |
-| [Tasks](../features/tasks/) | Development Task outcomes are completed or cancelled. Expected errors are Result values; terminal Fault is separate. | There is no .NET-style faulted Task state. Error handling and producer completion use different contracts. |
-
-These are selected differences, not a claim of full feature coverage or superiority. Feature pages describe availability, examples and limitations.
+Read [neoCLR and .NET](../comparison/) for the maintained comparison of contracts,
+implementation, compatibility and current limitations.
 
 <a id="implementation"></a>
 
@@ -59,8 +52,8 @@ Major limits include the bounded importer, bounded IPv4 networking and cleartext
 ## Roadmap
 
 The current HTTP POC exchanges typed JSON between neoCLR client and server and
-supports known-length source uploads. The bounded POC has passed matching-package checks on macOS arm64; release preparation
-is in progress with feature scope frozen. Current capabilities and
+supports known-length source uploads. The bounded POC was published in Preview 10. Development now extends the Web API
+cases and assesses toolchain readiness for a future release. Current capabilities and
 possible extensions are summarized on the [direction page](../proposals/#http-poc).
 No date is promised for the next release.
 

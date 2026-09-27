@@ -8,6 +8,9 @@ Choose a topic after [building your first project](../try/). Each guide explains
 observable behavior, shows a tested example where useful, and records limits and
 relevant differences from .NET. Use the [API reference](../docs/) to look up exact members.
 
+Coming from .NET? Start with the [platform comparison](../comparison/) for familiar
+concepts, different contracts and compatibility limits.
+
 ## Cases: APIs in context
 
 Small, runnable examples show how APIs work together to solve a concrete problem.

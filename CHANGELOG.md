@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Add a maintained neoCLR/.NET comparison covering contracts, practical tradeoffs,
+  implementation and compatibility limits, with primary .NET references. Link it
+  from About, Guides and section navigation; correct stale Preview 10 status and
+  document when to review the comparison.
+
 - Keep the DOM and typed JSON sample servers alive after protocol, limit and
   unsupported-request rejection. Count failed attempts toward the bounded sample
   lifetime and retain other error propagation. Verify an oversized connection is

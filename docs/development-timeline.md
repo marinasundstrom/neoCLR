@@ -8861,3 +8861,18 @@ loaded metadata lookup caching/indexing; retain quota, identity and access contr
 Reassess synchronization after measuring that bounded change. This is an investigation
 and recommendation, not an implemented optimization or approval of a broad redesign.
 See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.md).
+
+## 2026-09-27 — A maintained neoCLR and .NET comparison
+
+- **Author direction:** asked for a comparison page, or to keep an existing one
+  current; clarified that a short summary and feature table should highlight both
+  similarities and differences and link to articles explaining changed features.
+- **Assistant action:** expanded the former About-page summary into
+  [neoCLR and .NET](../website/content/comparison/index.md), separating shared
+  foundations, deliberate contract differences, and implementation/coverage gaps.
+  Added links to feature articles and primary .NET documentation, with a review
+  date and development-versus-release labels. About and Guides point to the page.
+- **Maintenance:** the [website workflow](design/feature-pages.md) now requires
+  reviewing this comparison when a relevant contract, limit or release changes.
+  This is documentation maintenance, not a change to platform priorities or a
+  claim of full .NET compatibility or superior performance.

@@ -68,6 +68,7 @@ WebApplication become implemented; do not show planned endpoints as runnable cod
 
 | Location | Purpose | Required distinction |
 | --- | --- | --- |
+| `website/content/comparison/index.md` | Maintained neoCLR/.NET comparison with primary sources and practical tradeoffs | Runtime versus language/library policy; development versus published availability |
 | `website/content/about/index.md` | Project background, goals, relationship to .NET, current scope and participation | Intent versus implemented capability |
 | `website/content/index.html` | Product overview, release/download status and entry points | Published capabilities versus development-only examples |
 | `website/content/features/<name>/index.md` | What currently works, a useful example where appropriate, limits and feedback | Implemented behavior versus “Where we’re heading” |
@@ -196,3 +197,12 @@ Author direction, 2026-09-24: Networking and Web each deserve their own feature
 page and homepage box once the corresponding POC is working. Networking starts
 with the hostname/TCP echo client; Web remains gated on an executable HTTP POC.
 Keep protocol-level Web information separate from transport and hostname contracts.
+
+## Maintaining the .NET comparison
+
+Review `website/content/comparison/index.md` when a change affects a compared
+contract, compatibility boundary, implementation limit or release availability.
+Update the relevant row and review date after checking evidence. Link to the
+feature page that owns details; avoid duplicating a full capability inventory.
+Keep primary .NET references, costs and benefits, and development labels current.
+About and Guides link to this canonical comparison instead of maintaining copies.

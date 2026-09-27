@@ -2,6 +2,8 @@
   href: docs/index.md
 - name: Guides
   items:
+    - name: neoCLR and .NET
+      href: comparison/index.md
     - name: Namespaces
       href: docs/namespaces.md
     - name: Collections and queries
