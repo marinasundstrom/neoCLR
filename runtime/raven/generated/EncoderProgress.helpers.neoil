@@ -1,0 +1,37 @@
+; Generated from runtime/raven/src/System/Text/EncoderProgress.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateNeedsOutput(System.Text.EncoderState.NeedsOutput value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.NeedsOutput)
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateReady(System.Text.EncoderState.Ready value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.Ready)
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateNewSystemTextEncoderStateFinished(System.Text.EncoderState.Finished value) -> System.Text.EncoderState
+ldarg value
+newobj instance System.Text.EncoderState::.ctor(System.Text.EncoderState.Finished)
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateNeedsOutputNew() -> System.Text.EncoderState.NeedsOutput
+newobj instance System.Text.EncoderState.NeedsOutput::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateReadyNew() -> System.Text.EncoderState.Ready
+newobj instance System.Text.EncoderState.Ready::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeErrorSystemTextEncoderStateFinishedNew() -> System.Text.EncoderState.Finished
+newobj instance System.Text.EncoderState.Finished::.ctor()
+ret
+.end
+.function neoCLR.Library.System.Text.EncoderProgress.RuntimeBooleanToInt32(Boolean value) -> Int32
+    ldarg value
+    brfalse False
+    ldc.i4 1
+    ret
+False:
+    ldc.i4 0
+    ret
+.end

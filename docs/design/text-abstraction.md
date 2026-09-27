@@ -523,11 +523,58 @@ limits. Introduce the abstraction with one actual writer/encoding consumer after
 the corresponding contracts are settled; no new character representation or
 namespace reorganization is implied.
 
+### Shared encoding APIs (development)
+
+`System.Text.Encoding` is the reusable conversion policy: `Encode(string)` returns
+`Result<Sequence<byte>, EncodingError>` and `CreateDecoder()` creates independent
+state. `Encodings.Utf8` and `Encodings.Ascii` supply the first implementations.
+`Decoder.Decode(byte[], offset, count, final)` returns valid text. Success accepts
+all offered bytes; an incomplete UTF-8 scalar is copied into decoder-owned carry
+and may produce empty text. The caller may immediately reuse its array. Invalid
+ranges and counts above 65536 fail before mutation and can be retried. Malformed
+input or finalization ends the decoder; later calls return Finished. Built-ins
+never replace invalid/unrepresentable content. UTF-8 preserves U+FEFF; no codec
+sniffing, BOM insertion or automatic BOM removal occurs.
+
+`StreamReader(input, encoding[, leaveOpen])` and
+`StreamWriter(output, encoding[, leaveOpen])` select this shared interface. Existing
+constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding itself
+can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
+suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
+WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
+strict built-in preflight finishes before output callbacks; the writer now drains
+a bounded byte buffer before requesting further encoded bytes. Partial writes
+are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
+retain InvalidUtf8. Stream failures retain their existing cases.
+
+`maxUtf8Bytes` remains the returned text's UTF-8 size, with a separate source-read
+ceiling of the same number (plus one overflow byte for ReadToEnd, or up to two line
+terminator bytes for ReadLine). These measures coincide for valid built-in input;
+custom codecs must respect both. Future expanding/stateful codecs need explicit
+source/output quota design. Errors return no partial text and may advance input.
+Writer input and encoded output are each limited to 65536 bytes; WriteLine includes
+LF in both limits. Runtime allocation/instruction budgets still apply, so the API
+ceiling is not an allocation guarantee. Conversion does not add async behavior.
+
+Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but the
+conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
+This avoids exposing storage units through character APIs, at the cost of owned
+result allocations and no destination-capacity/progress API. Strict ASCII avoids
+silent replacement at the cost of handling conversion failures. Whole-value Encode remains available alongside the development incremental
+Encoder described below. Flush forwards stream flushing; explicit Finish finalizes
+a StreamWriter encoder. HTTP can reuse the
+conversion policy later, but charset selection, protocol validation and framing
+remain HTTP concerns. This work does not reopen the completed HTTP POC.
+
+Focused consumers: [EncodingMain.rvn](../experiments/text-boundaries/EncodingMain.rvn)
+and [verification](../experiments/text-boundaries/verify_encoding.py), plus the
+existing reader regression fixtures. No website build or full suite is required.
+
 ### Selected stream encoding with UTF-8 default — author requirement
 
 The author clarifies that **StreamReader and StreamWriter must accept a selected
 encoding, with UTF-8 as the default**. This is an intended capability, not just a
-possible extra codec. Current production constructors remain UTF-8-only; the private
+possible extra codec. At the time of this requirement, production constructors were UTF-8-only; the private
 reader integration implements part of the default path and does not complete this
 requirement. The next foundation step must establish that selection contract before
 presenting either stream adapter as complete.
@@ -560,6 +607,78 @@ Keep this bounded: selection, independent conversion state, precise progress/lim
 and one reader plus one writer consumer. General code-page registries, provider
 hierarchies, automatic detection and a full System.Text clone are not implied.
 
+### Shared encoding selection probe — UTF-8 and strict ASCII
+
+**Author choice, 2026-09-27:** start with UTF-8 and strict ASCII, rather than the
+assistant's suggested UTF-16 little-endian. The author stresses that this is shared
+infrastructure for many APIs, including HTTP. The assistant initially considered
+built-in modes, then chose to test an interface rather than prescribe a closed enum
+that consumers would switch over. No enum or public selection API was implemented.
+
+[Selection.rvn](../experiments/text-boundaries/Selection.rvn) is an executable,
+application-only contract probe. It provides one encoding interface for whole-text
+Encode and CreateDecoder; each factory call returns independent mutable decoding
+state. The same selected-reader and selected-writer implementations use either codec,
+with UTF-8 default constructors. They do not inspect codec names or contain encoding
+switches. Text is still the existing valid String; no UTF-16 char array is introduced.
+Exact public names and compiler reference projection remain unselected.
+
+The decoder variant accepts the complete offered byte range on success and owns any
+incomplete UTF-8 carry. That is an explicit alternative to exposing low-level output
+buffer exhaustion: this high-level operation returns an owned String, including empty
+text when more input is needed. Final input succeeds once or returns a typed error;
+subsequent use returns Finished. Range/limit errors are retryable, malformed input is
+terminal. Failure does not expose prefix recovery or a consumed count. These simpler
+semantics do not replace the separate bounded-buffer experiment's contract.
+
+ASCII decoding rejects bytes above 127; encoding rejects unrepresentable text before
+any output call. NUL and DEL are valid ASCII values; ASCII conversion is not a
+printability or protocol-grammar validator. In contrast, default
+[.NET ASCIIEncoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.asciiencoding?view=net-10.0)
+uses replacement for unrepresentable characters, with configurable fallback available.
+Strict typed failure avoids silent data loss at the cost of explicit error handling;
+we do not need to copy that fallback class hierarchy. Source reviewed 2026-09-27.
+
+Writer results count actual encoded bytes, and short writes are retried. Encoded data
+is snapshotted before invoking output callbacks. WriteLine encodes text plus LF through
+the selected codec; Flush forwards to the stream and does not finalize a codec. The
+prototype uses stateless whole-value encoding, so it does **not** prove future stateful
+Encoder flush/close behavior. One selected encoding value can be reused; decoder
+state is never shared between readers.
+
+The fixture uses 256 offered bytes per decoder call and 4096 total/source/text bytes,
+plus a four-byte reader/writer scratch buffer. These are experiment limits, not public
+platform recommendations. For valid UTF-8 and ASCII, encoded bytes and UTF-8 text
+bytes have equal lengths, so preserving maxUtf8Bytes is demonstrable. This equality
+must not become a generic encoding-interface assumption: other encodings need
+separate source-byte and decoded-text quotas. The probe checks both counts but uses
+the same numeric limit for each; it does not establish a policy for expanding codecs.
+
+Two focused runs prove default/explicit selection, strict ASCII rejection in both
+directions, independent UTF-8 carry after caller mutation, finalization, retryable
+invalid ranges, byte limits, empty EOF, partial writes, encoded-byte counts, newline
+encoding and ownership close. It omits ReadLine, leaveOpen overloads, destination
+fault injection and stateful encoders. These are explicit integration tasks before
+promoting the contract into production StreamReader/StreamWriter; existing constructors
+were UTF-8-only at the probe stage. Public integration is now recorded above.
+The probe itself did not change .NET/Raven references or runtime APIs.
+
+**HTTP dependency:** keep conversion in the shared text foundation. A future HTTP
+text-body adapter selects an encoding according to media type/charset policy and
+keeps byte-body access available; codec defaults do not silently become protocol
+rules. [RFC 9110, Content-Type](https://www.rfc-editor.org/rfc/rfc9110.html#name-content-type)
+is the primary basis for representation metadata (reviewed 2026-09-27). Transfer
+framing, compression, header validation and content-length accounting stay in their
+own HTTP layers. ASCII includes control bytes, so choosing ASCII cannot establish
+safe field syntax. This records a dependency, not new HTTP implementation scope.
+
+**Probe follow-up (now implemented above):** promote the shared encoding/decoder roles with matching
+reference metadata and both stream adapters, retaining UTF-8 defaults and adding
+strict ASCII. Cover line reads and ownership compatibility, choose typed conversion
+errors without silently changing existing cases, and make quotas explicit. Add a
+stateful Encoder when its writer consumer requires it; avoid a registry or general
+inheritance hierarchy solely for .NET surface parity.
+
 ### What to bring over from System.Text
 
 This is the recommended portfolio, **not an implementation commitment**. Inventory
@@ -574,7 +693,7 @@ part of the tested .NET 10 baseline merely because it appears on that page.
 | **Bring over, adapted** | Rune | A validated scalar value and its classification/conversion operations, building on the existing UnicodeScalar helper. Needed by codecs and scanners independently of grapheme Char. [.NET Rune](https://learn.microsoft.com/en-us/dotnet/api/system.text.rune?view=net-10.0) is the semantic baseline; type name and migration remain to be decided. |
 | **Bring over, bounded** | StringBuilder | Append text/Char/scalars, materialize String, clear/reuse and explicit limits for a report consumer. Defer arbitrary insertion, replacement, formatting overload families and mutable character indexing. A minimal append-only builder need not wait for every search-position decision. |
 | **Bring over the role** | Encoder/Decoder | Stateful incremental conversion with explicit byte/scalar progress, final input, invalid data and destination exhaustion. Start with UTF-8; implement only the state needed by that codec, not an inheritance hierarchy first. |
-| **Adapt when a second codec is needed** | Encoding | A small selectable codec contract for a real interop consumer. UTF-16 is the first candidate for .NET/native interchange, with endianness/BOM/surrogate-error policy. Strict ASCII validation/conversion is useful for machine protocols; it need not imply a full Encoding subclass family. [.NET Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-10.0) is a role comparison, not a class-shape mandate. |
+| **Implemented in development** | Encoding | A small selectable codec contract now supports UTF-8 and author-selected strict ASCII. UTF-16 remains a possible later .NET/native interchange codec, needing endianness/BOM/surrogate-error policy. Strict ASCII validation/conversion is useful for machine protocols; it need not imply a full Encoding subclass family. [.NET Encoding](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoding?view=net-10.0) is a role comparison, not a class-shape mandate. |
 | **Bring over selectively after foundations** | Ascii helpers; normalization and casing capabilities | Explicit ASCII operations for protocol code; whole-String normalization/casing for an identified input/display scenario. Keep normalization opt-in and distinguish it from key folding. Do not wait for complete globalization to provide ASCII operations. |
 | **Defer until repeated-format use exists** | CompositeFormat and specialized formatting integration | Begin with existing formatting/interpolation capabilities and the builder’s concrete report. Parsed format caching, providers and compiler-specific handlers need separate evidence; no automatic C# handler port to Raven. |
 | **Leave out of the initial portfolio** | EncodingProvider, EncodingInfo registries and code-page packages; UTF-7 and broad UTF-32 support | No current consumer justifies discovery/registration or that coverage. Add a codec when a file/protocol requires it, not to complete an inventory. |
@@ -643,14 +762,12 @@ The prototype should demonstrate that:
    equality and hash coherence remain intact. Runtime enforcement, metadata and
    Raven projection agree on any new value/range type, including invalid defaults.
 
-**Next bounded implementation recommendation:** improve the existing UTF-8 codec
-with the progress, final-input and error contract needed by one chunked reader.
-Keep text output encoding-independent and encoded input explicit. Evaluate minimal
-append/materialization against an actual report consumer next, comparing a separate
-builder with Swift-style construction. A builder must preserve immutable snapshots
-and allow concatenation to resegment graphemes; no complete search API, new scalar
-public type, normalization or comparison-policy migration is required first.
-Unicode-version alignment and comparison naming remain tracked separately.
+**Next bounded implementation recommendation:** the internal UTF-8 reader integration
+is complete and shared Encoding/Decoder selection is integrated in both stream
+adapters with UTF-8 defaults and strict ASCII. Focused integration covers
+line reads, ownership and error/limit semantics. A builder remains a companion
+candidate; no complete search API, new scalar public type or String/Text rename is
+required first. Unicode-version alignment and comparison naming remain separate.
 
 The proposed improvements over .NET are clearer unit boundaries, fewer accidental
 culture defaults, valid-text invariants and coherent typed failures. The present
@@ -660,3 +777,212 @@ that hypothesis. Full culture collation, normalization, Unicode security profile
 regex design and broad encoding coverage remain open work, not hidden blockers for
 every small API. No benchmark is necessary until a relevant performance claim or
 regression is part of the selected task.
+
+### Bounded report construction evaluation — 2026-09-27
+
+**Scenario and hypothesis.** A report consumer appends a name, decoded text and
+status lines, then retains the result while reusing the accumulator. Test whether
+a minimal managed builder provides useful explicit quotas and snapshot semantics,
+and whether deferred balanced concatenation is worth promoting over existing
+String.Concat. This is an evaluation of the next roadmap candidate, not a new
+public type or an author decision on naming.
+
+**Comparison (primary sources retrieved 2026-09-27).** .NET's
+[StringBuilder](https://learn.microsoft.com/en-us/dotnet/api/system.text.stringbuilder?view=net-10.0)
+provides mutable construction and immutable ToString snapshots. Its length/capacity
+units follow .NET char, and documented MaxCapacity behavior is not a general hard
+input quota. Its guidance also recommends measuring whether a builder helps.
+Swift's [String](https://developer.apple.com/documentation/swift/string) offers
+value-semantic mutation backed by copy-on-write storage and amortized append growth.
+Neither API spelling grants those implementation properties to neoCLR. The
+[.NET semantic fixture](../experiments/text-boundaries/BuilderBaseline.cs) confirms
+snapshot/reuse behavior and distinct UTF-16, UTF-8 and grapheme counts on the same
+report; there is no cross-runtime timing comparison.
+
+**Prototype contract.** [ReportTextBuilder](../experiments/text-boundaries/Builder.rvn)
+is an ordinary application reference type with Append(string), AppendLine(string),
+Build(), Clear(), Utf8ByteCount and MaxUtf8Bytes. The caller explicitly selects a
+0–65536 UTF-8 byte quota. Unsupported construction limits fault; append overflow is
+a typed LimitExceeded and leaves existing content unchanged. AppendLine preflights
+text plus LF as one operation. Host resource faults are not transactional guarantees.
+No mutable character indexing, capacity property, formatting overload family or
+implicit encoding conversion is introduced. Scalar and Char helpers can be added
+only with a consumer; the fixture accepts valid strings from the existing Decoder.
+
+Build returns immutable text, caches repeated materialization and compacts retained
+fragments. Appending a combining mark can merge with an earlier grapheme; byte counts
+are additive while character counts are not. Clear releases fragments and cached
+text while preserving the quota. Empty appends add no retained fragment. The managed
+implementation keeps immutable parts and combines adjacent pairs in balanced rounds.
+For n equal-sized pieces, this changes concatenation's summed copied length from
+quadratic growth to O(total bytes × log n), but adds guest collection operations,
+reference objects and intermediate strings. That is algorithm analysis, not measured
+native allocation evidence. Runtime source at `0a14989b`,
+[src/native.rs](../../src/native.rs), shows StringConcat allocating a fresh payload
+and copying both inputs; immutable payload sharing alone does not make append cheap.
+
+**Evidence and decision.** The focused contracts pass for empty/zero/exact bounds,
+atomic line rejection, odd fragment counts/order, repeated Build, retained snapshots,
+clear/reuse, supplementary text and split decoded combining sequences. The diagnostic
+checks identical final bytes for both strategies at 8 and 1024 pieces, with three
+fresh invocations each and alternating order. At 1024 × 16 bytes, ordinary bounded
+concatenation took **51–58 ms**, versus **561–574 ms** for the managed builder on
+macOS arm64. At eight pieces the ranges were 0–2 and 5–6 ms. Millisecond resolution
+limits interpretation of the small case. Measurements include guest construction,
+checks and captured output, but exclude load/verification; they are not a warmed
+throughput study. Managed GC counts do not measure native String payload bytes.
+See [raw evidence](../experiments/text-boundaries/builder-validation.json).
+
+The explicit quota and snapshot contract is useful, but this implementation is not
+justified as the public builder. Keep ordinary concatenation for the tested report;
+retain the bounded construction contract as a candidate. Do not optimize this probe
+or add a new native buffer/ownership facility solely to obtain a favorable result.
+A future consumer that needs bulk construction can justify evaluating a one-pass
+join or native append buffer, including snapshot lifetimes and resource enforcement.
+That would be separate runtime work. A thin bounded concatenation wrapper is also
+an option if callers need quotas without claiming faster assembly.
+
+**Next bounded candidate.** Return to the author-requested incremental Encoder role:
+first settle text-input progress, output-byte capacity and completion semantics with
+a writer consumer. This remains a follow-up, not authorization for a .NET fallback
+hierarchy or new HTTP feature. The shared Encoding/Decoder APIs remain implemented;
+public builder promotion and String/Text naming remain deferred.
+
+### Encoder progress and writer evaluation — 2026-09-27
+
+**Problem.** The current Encoding.Encode returns all encoded bytes at once. A
+writer-facing Encoder needs bounded output, observable finalization and a clear
+answer to what input it has accepted. String/Char must not acquire UTF-16 buffer
+semantics to provide this. The [application probe](../experiments/text-boundaries/Encoder.rvn)
+now exercises a candidate with a real OutputStream consumer; it is not yet a public
+System.Text API or a production StreamWriter change.
+
+**.NET baseline.** [Encoder.Convert](https://learn.microsoft.com/en-us/dotnet/api/system.text.encoder.convert?view=net-10.0)
+(primary documentation retrieved 2026-09-27) separates input consumed, output written
+and completion, with final-input signaling and retained state. Its source is a char
+buffer; those units cannot be relabeled as neoCLR graphemes. The
+[.NET semantic fixture](../experiments/text-boundaries/EncoderBaseline.cs) consumes
+five UTF-16 units to produce nine UTF-8 bytes for `é😀é`. A one-byte destination
+cannot hold the first encoded scalar and is rejected by the tested .NET 11 encoder.
+This is a behavioral comparison, not a performance comparison or a criticism of
+.NET's different contract.
+
+**Candidate: whole-text acceptance followed by byte draining.**
+
+- `Accept(text, final)` accepts the complete immutable String on success. It retains
+  that value until drained; the caller may reassign its variable. There is no
+  character-consumption count or caller-managed source offset. Only one accepted
+  chunk can be pending. A nonfinal pending chunk rejects another Accept with Busy.
+- `Drain(output, offset, count)` returns one immutable step containing BytesWritten
+  and a standard union state: NeedsOutput, Ready or Finished. Writes affect only
+  that many bytes in the offered range. A positive capacity makes progress for
+  pending built-in output; zero capacity can return NeedsOutput with zero bytes.
+- Ready means the accepted chunk is fully drained and another may be accepted.
+  Finished means final input **and every final byte** have drained. An accepted
+  final chunk rejects further input even while its bytes remain pending. Empty
+  final input is meaningful; draining it may finish immediately or produce bytes.
+- Byte fragments need not be independently valid text: even a one-byte destination
+  works by splitting encoded scalars across drains. This simplifies byte sinks but
+  requires downstream text consumers to decode incrementally rather than treat
+  every output fragment as a complete UTF-8 string.
+
+The prototype uses a 4096-byte input quota and a 4096-byte maximum drain request;
+these are experimental bounds, not a new platform limit. Invalid ranges/capacities
+fail before state or destination mutation. Unsupported text and oversized input
+fail before acceptance and are retryable. UTF-8 accepts valid String directly;
+strict ASCII preflights the entire text before accepting it, including non-ASCII
+content beyond the first internal chunk. No replacement fallback is added.
+
+Internally the provider retains the immutable source and a pending encoded chunk
+of at most 32 bytes, using scalar-safe String slices for conversion. It does not allocate an encoded
+copy of the entire input. This is bounded encoded buffering, **not constant total
+memory**: the source and destination remain owned values, conversions allocate,
+and normal host budgets still apply. ASCII performs a validation pass followed by
+conversion. No throughput or allocation reduction has been benchmarked or claimed.
+The provider deliberately supports only UTF-8/ASCII. Arbitrary Encoding.Encode
+implementations must not be assumed composable across chunks or stateful sessions.
+
+**Writer/lifetime evidence.** The consumer pumps into a four-byte buffer, retries
+one-byte short writes, and drains again only after all returned bytes have been
+written. Counts represent actual bytes sent. An output error can follow partial
+output; the writer then rejects further Write/Finish operations because it cannot
+safely replay the accepted text. Expected ASCII preflight failure leaves it reusable.
+
+Finish explicitly accepts final empty input and drains it; repeated successful
+Finish calls emit nothing. Flush only invokes OutputStream.Flush. Close retains
+its existing ownership role and does not silently finalize conversion. A synthetic
+trailer provider proves that final output may need several drains and may fail;
+it is a protocol test double, not a new supported character encoding. Callers must
+Finish, then Flush if required, and observe both results before Close. Close/failed
+writers do not promise immediate collection of retained encoder state.
+
+**Validation.** Three focused executable runs pass for owned input, Busy/Finished,
+zero and one-byte capacities, untouched destination sentinels, invalid range retry,
+strict rejection after a valid prefix, source limits, scalar boundaries at the
+internal chunk edge, cross-input grapheme composition, short writes, leaveOpen,
+final bytes, idempotent Finish, Flush/Close separation and final-output errors.
+The .NET semantic comparison passes separately. See [evidence](../experiments/text-boundaries/encoder-validation.json).
+No benchmark, full suite, website build, compiler change or public API addition.
+
+**Recommendation and integration boundary.** Prefer this acceptance/drain role to
+exposing grapheme progress or raw UTF-8 source offsets. Its costs are retained input,
+two-stage usage and byte fragments that can split a scalar. The alternative is a
+resumable source-bound position with stricter lifetime/identity machinery; that is
+unnecessary for this bounded writer. Keep names and prototype bounds provisional.
+
+The next bounded implementation should add the public Encoder factory alongside
+Encoding.CreateDecoder, promote a coherent progress/error result, and connect it
+to StreamWriter with explicit Finish. Adding Encoding.CreateEncoder requires a
+migration for custom development Encoding implementations; do not silently wrap any
+arbitrary whole-value codec as an incremental one. Initially Finish can live on
+StreamWriter; extending the general TextWriter interface is separate work for a
+consumer needing that capability. Preserve UTF-8 defaults, strict ASCII preflight,
+WriteLine atomic preflight, encoded-byte counts and ownership, refresh matching
+reference/API artifacts, and reuse these focused consumers. HTTP charset policy,
+other encodings and public builder promotion remain outside this slice.
+
+### Public Encoder integration (development) — 2026-09-27
+
+The acceptance/drain contract is now implemented in System.Text. Encoding adds
+CreateEncoder; Encoder exposes Accept/Drain; EncoderProgress has read-only
+BytesWritten/State properties; EncoderState is a standard Raven union. EncodingError
+adds Busy without reordering its existing cases. Factories return independent state.
+The built-ins accept up to 65536 UTF-8 input bytes per chunk and drain requests up
+to 65536 bytes, retaining the source and at most 256 pending encoded bytes. The
+prototype's 4096/32-byte bounds are not the public contract. No String/Char semantic
+change, fallback replacement, native opcode or compiler option is introduced.
+
+StreamWriter now drives an encoder with a 256-byte output buffer, completes short
+writes before draining again, and exposes Finish on the concrete writer. Finish
+emits final bytes and returns their count; repeat success returns zero. Flush stays
+stream-only and Close stays ownership-only. Existing UTF-8 defaults and leaveOpen
+constructors remain. WriteLine preflights text plus LF as one input. Strict ASCII
+rejects unsupported input before output; positive-capacity built-in drains make
+progress even when a scalar spans several byte fragments.
+
+Material development migration: custom Encoding implementations must add
+CreateEncoder, returning independent sessions. Do not wrap arbitrary Encode calls
+as a chunk-wise codec. After an encoder-drain or output error, subsequent writes
+and Finish return InvalidEncoding; there is no replay of partly consumed input.
+Source-limit and ASCII preflight errors remain retryable. Custom output exceeding
+65536 bytes can be detected after partial output, but the writer never sends beyond
+the per-call ceiling. This differs from the previous whole-value snapshot check.
+Observe Finish and Flush before Close when final conversion output matters.
+
+EncoderProgress rejects negative counts and inactive EncoderState values. Its public
+surface is immutable; private storage follows the bridge's mutable-field profile.
+Internal encoder helper methods follow its existing public-instance dependency
+profile, without exposing the provider class. No importer admission broadening is
+needed for these implementation details. An explicit union-case match on the state
+getter establishes an active return for Raven's union-flow checks.
+
+Validation: four public Encoder/writer runs and three existing encoding/line runs
+pass against matching rebuilt reference/library artifacts. They include an
+independent factory session, one-byte drains, the 256-byte scalar boundary, custom
+final output, strict line rejection, partial-write failure, and a 65536-byte write
+with oversized input/line rejection before output. Larger boundary fixtures use
+the existing measure_async host limits; runtime defaults are unchanged. See
+[public evidence](../experiments/text-boundaries/public-encoder-validation.json).
+No full suite, website build or performance claim. This completes the bounded
+UTF-8/strict-ASCII encoding foundation; broader codecs, general TextWriter completion,
+HTTP charset policy and public builder promotion remain separately scoped work.

@@ -1,0 +1,147 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import System.Console.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Input(bytes: byte[]) -> MemoryStream {
+    let stream = MemoryStream()
+    match stream.Write(bytes, 0, bytes.Length) {
+        Ok(let count) => Check(count == bytes.Length, "Fixture write")
+        Error(_) => System.Fault("Fixture write error")
+    }
+    _ = stream.Seek((long)0)
+    return stream
+}
+
+public class ShortSink : OutputStream {
+    private var bytes: ArrayList<byte> = ArrayList<byte>()
+    private var closed: bool = false
+    private var flushes: int = 0
+    val Bytes: Sequence<byte> => bytes
+    val Closed: bool => closed
+    val Flushes: int => flushes
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+    func Close() {
+        closed = true
+    }
+}
+
+public func ExpectRead(result: Result<string, SelectionFailure>, expected: string) {
+    match result {
+        Ok(let text) => Check(text.Equals(expected), "Selected read content")
+        Error(_) => System.Fault("Selected read failed")
+    }
+}
+
+public func ExpectDecode(result: Result<string, CodecFailure>, expected: string) {
+    match result {
+        Ok(let text) => Check(text.Equals(expected), "Decoded content")
+        Error(_) => System.Fault("Decode failed")
+    }
+}
+
+public func ReaderSelectionChecks() {
+    let utf8: SelectedEncoding = Utf8Selection()
+    let ascii: SelectedEncoding = AsciiSelection()
+    let bytes: byte[] = [(byte)195, (byte)169]
+    ExpectRead(SelectedReader(Input(bytes)).ReadToEnd(2), "é")
+    ExpectRead(SelectedReader(Input(bytes), utf8).ReadToEnd(2), "é")
+    match SelectedReader(Input(bytes), ascii).ReadToEnd(2) {
+        Error(SelectionFailure.Codec(CodecFailure.InvalidData(_))) => { }
+        _ => System.Fault("ASCII decoding must be strict")
+    }
+    let plain: byte[] = [(byte)0, (byte)65, (byte)127]
+    let reader = SelectedReader(Input(plain), ascii)
+    ExpectRead(reader.ReadToEnd(3), "\u0000A\u007f")
+    ExpectRead(reader.ReadToEnd(0), "")
+    reader.Close()
+    match reader.ReadToEnd(3) {
+        Error(SelectionFailure.Closed) => { }
+        _ => System.Fault("Closed reader")
+    }
+    let first = utf8.CreateDecoder()
+    let second = utf8.CreateDecoder()
+    let head: byte[] = [(byte)195]
+    let tail: byte[] = [(byte)169]
+    ExpectDecode(first.Decode(head, 0, 1, false), "")
+    head[0] = (byte)65
+    ExpectDecode(second.Decode(head, 0, 1, true), "A")
+    ExpectDecode(first.Decode(tail, 0, 1, true), "é")
+    match first.Decode(tail, 0, 1, true) {
+        Error(CodecFailure.Finished) => { }
+        _ => System.Fault("Decoder finalization")
+    }
+    let strict = ascii.CreateDecoder()
+    match strict.Decode(plain, 0, 4, false) {
+        Error(CodecFailure.InvalidRange) => { }
+        _ => System.Fault("Invalid range")
+    }
+    ExpectDecode(strict.Decode(plain, 0, 3, true), "\u0000A\u007f")
+    let limited = SelectedReader(Input(plain), ascii)
+    match limited.ReadToEnd(2) {
+        Error(SelectionFailure.LimitExceeded) => { }
+        _ => System.Fault("Read quota")
+    }
+    WriteLine("Encoding selection reader and independent decoder checks passed")
+}
+
+public func WriterSelectionChecks() {
+    let sink = ShortSink()
+    let writer = SelectedWriter(sink)
+    match writer.Write("é😀") {
+        Ok(let count) => Check(count == 6 && sink.Bytes.Count == 6, "Actual encoded byte count")
+        _ => System.Fault("Default UTF-8 write")
+    }
+    match Utf8.Decode(sink.Bytes) {
+        Ok(let text) => Check(text.Equals("é😀"), "Partial write retry")
+        _ => System.Fault("Written UTF-8")
+    }
+    let asciiSink = ShortSink()
+    let asciiWriter = SelectedWriter(asciiSink, AsciiSelection())
+    match asciiWriter.Write("valid then é") {
+        Error(SelectionFailure.Codec(CodecFailure.UnrepresentableText)) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
+        _ => System.Fault("ASCII encoding must be strict")
+    }
+    match asciiWriter.WriteLine("A") {
+        Ok(let count) => Check(count == 2 && asciiSink.Bytes[1] == 10, "Encode newline through selected codec")
+        _ => System.Fault("ASCII line")
+    }
+    _ = asciiWriter.Flush()
+    Check(asciiSink.Flushes == 1, "Forward flush")
+    asciiWriter.Close()
+    Check(asciiSink.Closed, "Close ownership")
+    match asciiWriter.Write("A") {
+        Error(SelectionFailure.Closed) => { }
+        _ => System.Fault("Closed writer")
+    }
+    WriteLine("Encoding selection writer and strict rejection checks passed")
+}
+
+public func Main(args: string[]) {
+    if args[0].Equals("selection-read") {
+        ReaderSelectionChecks()
+    } else {
+        WriterSelectionChecks()
+    }
+}

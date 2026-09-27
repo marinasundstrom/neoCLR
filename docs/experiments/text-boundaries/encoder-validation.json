@@ -1,0 +1,40 @@
+{
+  "scope": "Application-only Accept/Drain encoder evaluation; no public Encoder API",
+  "runs": {
+    "progress": [
+      "Encoder acceptance, ownership and bounded progress passed"
+    ],
+    "boundaries": [
+      "Encoder scalar boundaries, limits and final output passed"
+    ],
+    "writer": [
+      "Encoder writer partial transfers and finalization passed"
+    ]
+  },
+  "sourceSha256": {
+    "Encoder.rvn": "50230addf0f73af866bc020525049e7c61369aad6ea575c82a0d0d3462f7a440",
+    "EncoderMain.rvn": "ea836a7912f4bfacb72d5c313a0f2321a1efbc130ef5155691114279aba2d2d8",
+    "EncoderBaseline.cs": "929da61fcb685a219052ef081052f1e08a0de52b092220fe5cac2cb79a3377be"
+  },
+  "sha256": {
+    "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+    "bridge": "98092dd9e82494515a990cae58db69adb9a4f6eca263fb751b6b9b82738d006f",
+    "system": "5b7121f65c9b533e3aed1afdfb7d405634849f83e9efa6e7be72c4d3f7efb524",
+    "reference": "5b95232390271a9d7ff9d3124566bf2db91fe7e0313c1442e7a3727afd5a1ff7"
+  },
+  "date": "2026-09-27",
+  "platform": "macOS arm64",
+  "dotnetSemanticComparison": ".NET 11.0.0: Convert consumed 5 UTF-16 units and produced 9 UTF-8 bytes; one-byte \u00e9 destination rejected",
+  "limits": {
+    "maxAcceptedUtf8Bytes": 4096,
+    "maxDrainRequestBytes": 4096,
+    "encodedChunkBytes": 32,
+    "writerBufferBytes": 4
+  },
+  "notes": [
+    "Application-only contract evaluation; no public Encoder or StreamWriter.Finish added.",
+    "Retains immutable accepted text; bounded encoded scratch is not constant total memory.",
+    "Synthetic trailer provider is not a supported character encoding.",
+    "No performance claims, full suite or website build."
+  ]
+}

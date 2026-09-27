@@ -141,27 +141,39 @@ not merely renaming; no duplicate text representation or compatibility layer is 
 keeps behavior identical and tests split decoding, construction snapshots and direct
 delimiter extraction. It needs neither a new core type nor public position machinery.
 Text naming remains open; exact versus character-boundary search is a separate
-policy. The bounded decoder role is now integrated privately into StreamReader.ReadToEnd;
-see the [implementation scope](../design/text-abstraction.md#internal-reader-integration-development).
-Public progress/error types remain provisional.
+policy. The decoder role is now exposed through the shared Encoding/Decoder interfaces;
+see the [implemented scope](../design/text-abstraction.md#shared-encoding-apis-development).
+A richer destination-capacity/progress contract remains future work.
 
 **Later encoder:** the author explicitly wants an [Encoder abstraction](../design/text-abstraction.md#later-encoder-abstraction--author-direction)
 adapted to neoCLR text, not .NET's UTF-16 char-buffer surface. Track text input,
 encoded-byte output and unambiguous incremental progress for a writer consumer;
-this does not expand the current internal UTF-8 reader slice into a public hierarchy.
+the shipped development Encoding/Decoder roles do not imply a full .NET conversion hierarchy.
 
 **Author-required stream selection:** [StreamReader and StreamWriter must accept a
 specific encoding with UTF-8 as default](../design/text-abstraction.md#selected-stream-encoding-with-utf-8-default--author-requirement).
-Current constructors are still UTF-8-only. The internal reader helper does not
-complete this requirement. Next establish selection and independent per-stream
-conversion state, with explicit byte-limit/count semantics, and prove it through
-both reader and writer consumers. Do not silently reinterpret maxUtf8Bytes.
+Development now provides Encoding, Decoder, Encodings.Utf8/Ascii and EncodingError,
+with selected constructors on both stream adapters. The author chose strict ASCII
+and emphasizes reuse by HTTP and other APIs. See the [implemented contract](../design/text-abstraction.md#shared-encoding-apis-development)
+for lifecycle, independent decoder state, ReadLine/leaveOpen compatibility, strict
+rejection before output and separate source/text quota semantics. The earlier probe
+remains experimental evidence; its names and bounds are not the public contract.
 
 **Boundary experiment:** [application-only prototype](../experiments/text-boundaries/README.md)
 examines scalar validation, source-bound ranges and bounded UTF-8 decoding. These
-are not System APIs. The next bounded implementation recommendation is the UTF-8
-progress/error contract for a chunked reader, followed by evaluating minimal text
-construction for a report consumer. Public scalar/range APIs, Unicode alignment,
+are not System APIs. Shared encoding selection for both stream adapters is implemented in development;
+the [bounded report construction evaluation](../design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27)
+now passes its quota/snapshot/Unicode contracts, but the balanced managed builder is
+slower than ordinary concatenation in both measured workloads. Keep public builder
+promotion deferred and use concatenation for this report; do not optimize the probe.
+The [Encoder acceptance/drain evaluation](../design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
+has been [promoted to the library](../design/text-abstraction.md#public-encoder-integration-development--2026-09-27).
+Encoding.CreateEncoder, Encoder, EncoderProgress/EncoderState and StreamWriter.Finish
+are implemented in development. Four public encoder/writer runs and three selection/line
+regressions pass, including the 65536-byte writer bound. Custom encodings must add
+the factory; output failures now stop subsequent writes. This completes the bounded
+UTF-8/ASCII foundation; additional codecs and general TextWriter completion remain
+separate consumer-driven work. Public scalar/range APIs, Unicode alignment,
 fold naming, full casing and normalization are not blanket prerequisites. A separate
 builder must justify its role alongside immutable String and Swift-style construction.
 Keep existing Sequence<char> and equality/hash contracts; HTTP remains closed.

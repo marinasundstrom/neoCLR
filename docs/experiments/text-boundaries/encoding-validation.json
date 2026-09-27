@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-27",
+  "scope": "Development shared encoding and stream adapter contracts; macOS arm64",
+  "encoding": {
+    "scope": "Public Encoding/Decoder and StreamReader/StreamWriter contracts",
+    "runs": {
+      "selection-read": [
+        "Encoding selection reader and independent decoder checks passed"
+      ],
+      "selection-write": [
+        "Encoding selection writer and strict rejection checks passed"
+      ],
+      "encoding-lines": [
+        "Encoding line and source range checks passed"
+      ]
+    },
+    "sha256": {
+      "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+      "bridge": "98092dd9e82494515a990cae58db69adb9a4f6eca263fb751b6b9b82738d006f",
+      "system": "5b7121f65c9b533e3aed1afdfb7d405634849f83e9efa6e7be72c4d3f7efb524",
+      "reference": "5b95232390271a9d7ff9d3124566bf2db91fe7e0313c1442e7a3727afd5a1ff7"
+    }
+  },
+  "reader": {
+    "scope": "Existing UTF-8 StreamReader behavior, chunk boundary and maximum-bound regressions",
+    "runs": {
+      "reader": [
+        "Incremental StreamReader contracts passed"
+      ],
+      "reader-boundary": [
+        "Incremental StreamReader carry/output boundary passed"
+      ],
+      "reader-limit": [
+        "Incremental StreamReader maximum bound passed"
+      ]
+    },
+    "sha256": {
+      "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+      "bridge": "98092dd9e82494515a990cae58db69adb9a4f6eca263fb751b6b9b82738d006f",
+      "system": "5b7121f65c9b533e3aed1afdfb7d405634849f83e9efa6e7be72c4d3f7efb524",
+      "reference": "5b95232390271a9d7ff9d3124566bf2db91fe7e0313c1442e7a3727afd5a1ff7",
+      "runner": "b16f3146c22e13ae447e8eff87b9c81120c8ec4b8f8c94f5c12a00bdc8024e19"
+    }
+  },
+  "notes": [
+    "Fresh matching bridge/reference and selected Raven library slices; no native runtime change.",
+    "Custom application codec verifies decoded line splitting, retained suffix and encoded-byte counts.",
+    "Partial output failure, zero progress and flush errors are preserved.",
+    "Reader maximum fixture uses the measure_async host resource budgets documented in verify.py.",
+    "No full suite, website build or cross-platform matrix; no performance improvement claim."
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-27",
+  "scope": "Public Encoder and StreamWriter.Finish integration; macOS arm64",
+  "encoder": {
+    "scope": "Public Encoder factory/progress and StreamWriter.Finish integration",
+    "runs": {
+      "progress": [
+        "Encoder acceptance, ownership and bounded progress passed"
+      ],
+      "boundaries": [
+        "Encoder scalar boundaries, limits and final output passed"
+      ],
+      "writer": [
+        "Encoder writer partial transfers and finalization passed"
+      ],
+      "maximum": [
+        "Encoder maximum writer bound passed"
+      ]
+    },
+    "sourceSha256": {
+      "PublicEncoderMain.rvn": "4c9eadc1503edd54cdaf46d994e5c8ef784601f58fd534ed2db87ebbd822ffa6"
+    },
+    "sha256": {
+      "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+      "bridge": "80dc602e1d96ce1762a1f1498622f217c18735c7a9a972f81ca1470b0308d01b",
+      "system": "ede3dcf8cb4cfa61a33e0eccb12f67f2d64803f66908f553ad3dc89f70f2bf79",
+      "reference": "77fa9c1ae678776ca7d9540c4ec667eb863a77ad360c25bbbbd5cc8c978b2ef7",
+      "runner": "b16f3146c22e13ae447e8eff87b9c81120c8ec4b8f8c94f5c12a00bdc8024e19"
+    }
+  },
+  "encodingRegression": {
+    "scope": "Public Encoding/Decoder and StreamReader/StreamWriter contracts",
+    "runs": {
+      "selection-read": [
+        "Encoding selection reader and independent decoder checks passed"
+      ],
+      "selection-write": [
+        "Encoding selection writer and strict rejection checks passed"
+      ],
+      "encoding-lines": [
+        "Encoding line and source range checks passed"
+      ]
+    },
+    "sha256": {
+      "runtime": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d",
+      "bridge": "80dc602e1d96ce1762a1f1498622f217c18735c7a9a972f81ca1470b0308d01b",
+      "system": "ede3dcf8cb4cfa61a33e0eccb12f67f2d64803f66908f553ad3dc89f70f2bf79",
+      "reference": "77fa9c1ae678776ca7d9540c4ec667eb863a77ad360c25bbbbd5cc8c978b2ef7"
+    }
+  },
+  "notes": [
+    "Seven focused runs; no full suite, website build or performance claim.",
+    "Boundary and maximum fixtures use measure_async with 100000 heap objects and 500000000 instructions; runtime defaults unchanged.",
+    "Custom trailer is a synthetic finalization fixture, not a supported character encoding.",
+    "Other reader/native behavior reuses existing evidence; only affected library slices regenerated."
+  ]
+}

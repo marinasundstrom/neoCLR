@@ -8,6 +8,8 @@ static class SourceUnionReferences
 {
     static readonly string[] Owners = ["System.TimeZoneError", "System.DateTime", "System.LocalTimeMapping", "System.Networking.IPAddressError", "System.Networking.Sockets.SocketError", "System.Networking.DnsError", "System.UriError",
         "System.Storage.StorageLookupError",
+        "System.Text.EncodingError",
+        "System.Text.EncoderState",
         "System.IO.TextReadError",
         "System.IO.StreamError",
         "System.Storage.FileReadError",

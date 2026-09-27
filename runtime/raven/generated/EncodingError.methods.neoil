@@ -1,0 +1,1506 @@
+; Generated from runtime/raven/src/System/Text/EncodingError.rvn. Regenerate with build_runtime_library.py.
+.type System.Text.EncodingError
+.sealed
+.custom instance System.Runtime.CompilerServices.UnionAttribute::.ctor()
+.implements System.Runtime.CompilerServices.IUnion
+.field private Metadata_V1_3C5461673E Byte
+.field private Metadata_V1_3C496E76616C696452616E67655061796C6F61643E System.Text.EncodingError.InvalidRange
+.field private Metadata_V1_3C4C696D697445786365656465645061796C6F61643E System.Text.EncodingError.LimitExceeded
+.field private Metadata_V1_3C46696E69736865645061796C6F61643E System.Text.EncodingError.Finished
+.field private Metadata_V1_3C496E76616C6964557466385061796C6F61643E System.Text.EncodingError.InvalidUtf8
+.field private Metadata_V1_3C496E76616C6964446174615061796C6F61643E System.Text.EncodingError.InvalidData
+.field private Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E System.Text.EncodingError.UnrepresentableText
+.field private Metadata_V1_3C427573795061796C6F61643E System.Text.EncodingError.Busy
+.property instance Value() -> System.Object
+.get instance System.Text.EncodingError::get_Value()
+.end
+.property instance HasValue() -> Boolean
+.get instance System.Text.EncodingError::get_HasValue()
+.end
+.method private static Metadata_V1_3C526176656E466F726D6174556E696F6E56616C75653E(System.Object value) -> String
+M00000001_IL_0000:
+ldarg 0
+M00000001_IL_0001:
+M00000001_IL_0002:
+ref.isnull
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_0004:
+brtrue M00000001_IL_000e
+M00000001_IL_0009:
+br M00000001_IL_0014
+M00000001_IL_000e:
+ldstr "null"
+M00000001_IL_0013:
+ret
+M00000001_IL_0014:
+M00000001_IL_0015:
+ldarg 0
+M00000001_IL_0016:
+isinst String
+M00000001_IL_001b:
+M00000001_IL_001c:
+ref.isnull
+ldc.bool false
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_001e:
+brtrue M00000001_IL_0028
+M00000001_IL_0023:
+br M00000001_IL_0043
+M00000001_IL_0028:
+ldstr "\u0022"
+M00000001_IL_002d:
+ldarg 0
+M00000001_IL_002e:
+castclass String
+M00000001_IL_0033:
+call System.String::Concat(String,String)
+M00000001_IL_0038:
+ldstr "\u0022"
+M00000001_IL_003d:
+call System.String::Concat(String,String)
+M00000001_IL_0042:
+ret
+M00000001_IL_0043:
+M00000001_IL_0044:
+ldarg 0
+M00000001_IL_0045:
+isinst Char
+M00000001_IL_004a:
+dup
+M00000001_IL_004b:
+ref.isnull
+brfalse M00000001_IL_0057
+M00000001_IL_0050:
+pop
+M00000001_IL_0051:
+ldc.i4 0
+M00000001_IL_0052:
+br M00000001_IL_005e
+M00000001_IL_0057:
+unbox.any Char
+M00000001_IL_005c:
+pop
+M00000001_IL_005d:
+ldc.i4 1
+M00000001_IL_005e:
+brtrue M00000001_IL_0068
+M00000001_IL_0063:
+br M00000001_IL_0083
+M00000001_IL_0068:
+ldstr "\u0027"
+M00000001_IL_006d:
+ldarg 0
+M00000001_IL_006e:
+call neoCLR.Library.System.Text.EncodingError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_0073:
+call System.String::Concat(String,String)
+M00000001_IL_0078:
+ldstr "\u0027"
+M00000001_IL_007d:
+call System.String::Concat(String,String)
+M00000001_IL_0082:
+ret
+M00000001_IL_0083:
+M00000001_IL_0084:
+ldarg 0
+M00000001_IL_0085:
+call neoCLR.Library.System.Text.EncodingError.RuntimeReflection936F30A1978F475D(System.Object)
+M00000001_IL_008a:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.InvalidRange value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.InvalidRange local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.InvalidRange
+M00000002_IL_0000:
+ldarg 0
+M00000002_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M00000002_IL_0007:
+ldc.i4 1
+M00000002_IL_0008:
+stloc local0
+M00000002_IL_0009:
+ldarg 0
+M00000002_IL_000a:
+ldloc local0
+M00000002_IL_000b:
+conv.u1
+M00000002_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M00000002_IL_0011:
+ldarg 1
+M00000002_IL_0012:
+stloc local1
+M00000002_IL_0013:
+ldarg 0
+M00000002_IL_0014:
+ldloc local1
+M00000002_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+M00000002_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.InvalidRange& value) -> Boolean
+M00000003_IL_0000:
+ldarg 0
+M00000003_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000003_IL_0006:
+conv.i4
+M00000003_IL_0007:
+ldc.i4 1
+M00000003_IL_0008:
+conv.i4
+M00000003_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000003_IL_000b:
+brtrue M00000003_IL_0015
+M00000003_IL_0010:
+br M00000003_IL_0023
+M00000003_IL_0015:
+ldarg 1
+M00000003_IL_0016:
+ldarg 0
+M00000003_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M00000003_IL_001c:
+stobj System.Text.EncodingError.InvalidRange
+M00000003_IL_0021:
+ldc.bool true
+M00000003_IL_0022:
+ret
+M00000003_IL_0023:
+M00000003_IL_0024:
+ldc.bool false
+M00000003_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.LimitExceeded value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.LimitExceeded local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.LimitExceeded
+M00000004_IL_0000:
+ldarg 0
+M00000004_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M00000004_IL_0007:
+ldc.i4 2
+M00000004_IL_0008:
+stloc local0
+M00000004_IL_0009:
+ldarg 0
+M00000004_IL_000a:
+ldloc local0
+M00000004_IL_000b:
+conv.u1
+M00000004_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M00000004_IL_0011:
+ldarg 1
+M00000004_IL_0012:
+stloc local1
+M00000004_IL_0013:
+ldarg 0
+M00000004_IL_0014:
+ldloc local1
+M00000004_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+M00000004_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.LimitExceeded& value) -> Boolean
+M00000005_IL_0000:
+ldarg 0
+M00000005_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000005_IL_0006:
+conv.i4
+M00000005_IL_0007:
+ldc.i4 2
+M00000005_IL_0008:
+conv.i4
+M00000005_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_000b:
+brtrue M00000005_IL_0015
+M00000005_IL_0010:
+br M00000005_IL_0023
+M00000005_IL_0015:
+ldarg 1
+M00000005_IL_0016:
+ldarg 0
+M00000005_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000005_IL_001c:
+stobj System.Text.EncodingError.LimitExceeded
+M00000005_IL_0021:
+ldc.bool true
+M00000005_IL_0022:
+ret
+M00000005_IL_0023:
+M00000005_IL_0024:
+ldc.bool false
+M00000005_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.Finished value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.Finished local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.Finished
+M00000006_IL_0000:
+ldarg 0
+M00000006_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M00000006_IL_0007:
+ldc.i4 3
+M00000006_IL_0008:
+stloc local0
+M00000006_IL_0009:
+ldarg 0
+M00000006_IL_000a:
+ldloc local0
+M00000006_IL_000b:
+conv.u1
+M00000006_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M00000006_IL_0011:
+ldarg 1
+M00000006_IL_0012:
+stloc local1
+M00000006_IL_0013:
+ldarg 0
+M00000006_IL_0014:
+ldloc local1
+M00000006_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+M00000006_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.Finished& value) -> Boolean
+M00000007_IL_0000:
+ldarg 0
+M00000007_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000007_IL_0006:
+conv.i4
+M00000007_IL_0007:
+ldc.i4 3
+M00000007_IL_0008:
+conv.i4
+M00000007_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000007_IL_000b:
+brtrue M00000007_IL_0015
+M00000007_IL_0010:
+br M00000007_IL_0023
+M00000007_IL_0015:
+ldarg 1
+M00000007_IL_0016:
+ldarg 0
+M00000007_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+M00000007_IL_001c:
+stobj System.Text.EncodingError.Finished
+M00000007_IL_0021:
+ldc.bool true
+M00000007_IL_0022:
+ret
+M00000007_IL_0023:
+M00000007_IL_0024:
+ldc.bool false
+M00000007_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.InvalidUtf8 value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.InvalidUtf8 local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.InvalidUtf8
+M00000008_IL_0000:
+ldarg 0
+M00000008_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M00000008_IL_0007:
+ldc.i4 4
+M00000008_IL_0008:
+stloc local0
+M00000008_IL_0009:
+ldarg 0
+M00000008_IL_000a:
+ldloc local0
+M00000008_IL_000b:
+conv.u1
+M00000008_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M00000008_IL_0011:
+ldarg 1
+M00000008_IL_0012:
+stloc local1
+M00000008_IL_0013:
+ldarg 0
+M00000008_IL_0014:
+ldloc local1
+M00000008_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+M00000008_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.InvalidUtf8& value) -> Boolean
+M00000009_IL_0000:
+ldarg 0
+M00000009_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000009_IL_0006:
+conv.i4
+M00000009_IL_0007:
+ldc.i4 4
+M00000009_IL_0008:
+conv.i4
+M00000009_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000009_IL_000b:
+brtrue M00000009_IL_0015
+M00000009_IL_0010:
+br M00000009_IL_0023
+M00000009_IL_0015:
+ldarg 1
+M00000009_IL_0016:
+ldarg 0
+M00000009_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+M00000009_IL_001c:
+stobj System.Text.EncodingError.InvalidUtf8
+M00000009_IL_0021:
+ldc.bool true
+M00000009_IL_0022:
+ret
+M00000009_IL_0023:
+M00000009_IL_0024:
+ldc.bool false
+M00000009_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.InvalidData value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.InvalidData local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.InvalidData
+M0000000a_IL_0000:
+ldarg 0
+M0000000a_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M0000000a_IL_0007:
+ldc.i4 5
+M0000000a_IL_0008:
+stloc local0
+M0000000a_IL_0009:
+ldarg 0
+M0000000a_IL_000a:
+ldloc local0
+M0000000a_IL_000b:
+conv.u1
+M0000000a_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M0000000a_IL_0011:
+ldarg 1
+M0000000a_IL_0012:
+stloc local1
+M0000000a_IL_0013:
+ldarg 0
+M0000000a_IL_0014:
+ldloc local1
+M0000000a_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+M0000000a_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.InvalidData& value) -> Boolean
+M0000000b_IL_0000:
+ldarg 0
+M0000000b_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M0000000b_IL_0006:
+conv.i4
+M0000000b_IL_0007:
+ldc.i4 5
+M0000000b_IL_0008:
+conv.i4
+M0000000b_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M0000000b_IL_000b:
+brtrue M0000000b_IL_0015
+M0000000b_IL_0010:
+br M0000000b_IL_0023
+M0000000b_IL_0015:
+ldarg 1
+M0000000b_IL_0016:
+ldarg 0
+M0000000b_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+M0000000b_IL_001c:
+stobj System.Text.EncodingError.InvalidData
+M0000000b_IL_0021:
+ldc.bool true
+M0000000b_IL_0022:
+ret
+M0000000b_IL_0023:
+M0000000b_IL_0024:
+ldc.bool false
+M0000000b_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.UnrepresentableText value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.UnrepresentableText local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.UnrepresentableText
+M0000000c_IL_0000:
+ldarg 0
+M0000000c_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M0000000c_IL_0007:
+ldc.i4 6
+M0000000c_IL_0008:
+stloc local0
+M0000000c_IL_0009:
+ldarg 0
+M0000000c_IL_000a:
+ldloc local0
+M0000000c_IL_000b:
+conv.u1
+M0000000c_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M0000000c_IL_0011:
+ldarg 1
+M0000000c_IL_0012:
+stloc local1
+M0000000c_IL_0013:
+ldarg 0
+M0000000c_IL_0014:
+ldloc local1
+M0000000c_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+M0000000c_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.UnrepresentableText& value) -> Boolean
+M0000000d_IL_0000:
+ldarg 0
+M0000000d_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M0000000d_IL_0006:
+conv.i4
+M0000000d_IL_0007:
+ldc.i4 6
+M0000000d_IL_0008:
+conv.i4
+M0000000d_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M0000000d_IL_000b:
+brtrue M0000000d_IL_0015
+M0000000d_IL_0010:
+br M0000000d_IL_0023
+M0000000d_IL_0015:
+ldarg 1
+M0000000d_IL_0016:
+ldarg 0
+M0000000d_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+M0000000d_IL_001c:
+stobj System.Text.EncodingError.UnrepresentableText
+M0000000d_IL_0021:
+ldc.bool true
+M0000000d_IL_0022:
+ret
+M0000000d_IL_0023:
+M0000000d_IL_0024:
+ldc.bool false
+M0000000d_IL_0025:
+ret
+.end
+.method instance byref .ctor(System.Text.EncodingError.Busy value) -> Void
+.local Byte local0
+.local System.Text.EncodingError.Busy local1
+.local Byte unionDefault1_0
+.local System.Text.EncodingError.InvalidRange unionDefault1_1
+.local System.Text.EncodingError.LimitExceeded unionDefault1_2
+.local System.Text.EncodingError.Finished unionDefault1_3
+.local System.Text.EncodingError.InvalidUtf8 unionDefault1_4
+.local System.Text.EncodingError.InvalidData unionDefault1_5
+.local System.Text.EncodingError.UnrepresentableText unionDefault1_6
+.local System.Text.EncodingError.Busy unionDefault1_7
+ldc.i4 0
+stloc local0
+ldloca local1
+initobj System.Text.EncodingError.Busy
+M0000000e_IL_0000:
+ldarg 0
+M0000000e_IL_0001:
+pop
+ldloca unionDefault1_0
+initobj Byte
+ldarg 0
+ldloc unionDefault1_0
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+ldloca unionDefault1_1
+initobj System.Text.EncodingError.InvalidRange
+ldarg 0
+ldloc unionDefault1_1
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+pop
+ldloca unionDefault1_2
+initobj System.Text.EncodingError.LimitExceeded
+ldarg 0
+ldloc unionDefault1_2
+stfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+pop
+ldloca unionDefault1_3
+initobj System.Text.EncodingError.Finished
+ldarg 0
+ldloc unionDefault1_3
+stfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+pop
+ldloca unionDefault1_4
+initobj System.Text.EncodingError.InvalidUtf8
+ldarg 0
+ldloc unionDefault1_4
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+pop
+ldloca unionDefault1_5
+initobj System.Text.EncodingError.InvalidData
+ldarg 0
+ldloc unionDefault1_5
+stfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+pop
+ldloca unionDefault1_6
+initobj System.Text.EncodingError.UnrepresentableText
+ldarg 0
+ldloc unionDefault1_6
+stfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+pop
+ldloca unionDefault1_7
+initobj System.Text.EncodingError.Busy
+ldarg 0
+ldloc unionDefault1_7
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M0000000e_IL_0007:
+ldc.i4 7
+M0000000e_IL_0008:
+stloc local0
+M0000000e_IL_0009:
+ldarg 0
+M0000000e_IL_000a:
+ldloc local0
+M0000000e_IL_000b:
+conv.u1
+M0000000e_IL_000c:
+stfld System.Text.EncodingError::Metadata_V1_3C5461673E
+pop
+M0000000e_IL_0011:
+ldarg 1
+M0000000e_IL_0012:
+stloc local1
+M0000000e_IL_0013:
+ldarg 0
+M0000000e_IL_0014:
+ldloc local1
+M0000000e_IL_0015:
+stfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+pop
+M0000000e_IL_001a:
+ldvoid
+ret
+.end
+.method instance byref TryGetValue(out(true) System.Text.EncodingError.Busy& value) -> Boolean
+M0000000f_IL_0000:
+ldarg 0
+M0000000f_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M0000000f_IL_0006:
+conv.i4
+M0000000f_IL_0007:
+ldc.i4 7
+M0000000f_IL_0008:
+conv.i4
+M0000000f_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M0000000f_IL_000b:
+brtrue M0000000f_IL_0015
+M0000000f_IL_0010:
+br M0000000f_IL_0023
+M0000000f_IL_0015:
+ldarg 1
+M0000000f_IL_0016:
+ldarg 0
+M0000000f_IL_0017:
+ldfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+M0000000f_IL_001c:
+stobj System.Text.EncodingError.Busy
+M0000000f_IL_0021:
+ldc.bool true
+M0000000f_IL_0022:
+ret
+M0000000f_IL_0023:
+M0000000f_IL_0024:
+ldc.bool false
+M0000000f_IL_0025:
+ret
+.end
+.method instance override byref ToString() -> String
+.local System.Text.EncodingError local0
+.local String local1
+.local System.Text.EncodingError local2
+.local System.Text.EncodingError.InvalidRange local3
+.local System.Text.EncodingError local4
+.local System.Text.EncodingError.LimitExceeded local5
+.local System.Text.EncodingError local6
+.local System.Text.EncodingError.Finished local7
+.local System.Text.EncodingError local8
+.local System.Text.EncodingError.InvalidUtf8 local9
+.local System.Text.EncodingError local10
+.local System.Text.EncodingError.InvalidData local11
+.local System.Text.EncodingError local12
+.local System.Text.EncodingError.UnrepresentableText local13
+.local System.Text.EncodingError local14
+.local System.Text.EncodingError.Busy local15
+ldloca local0
+initobj System.Text.EncodingError
+ldloca local2
+initobj System.Text.EncodingError
+ldloca local3
+initobj System.Text.EncodingError.InvalidRange
+ldloca local4
+initobj System.Text.EncodingError
+ldloca local5
+initobj System.Text.EncodingError.LimitExceeded
+ldloca local6
+initobj System.Text.EncodingError
+ldloca local7
+initobj System.Text.EncodingError.Finished
+ldloca local8
+initobj System.Text.EncodingError
+ldloca local9
+initobj System.Text.EncodingError.InvalidUtf8
+ldloca local10
+initobj System.Text.EncodingError
+ldloca local11
+initobj System.Text.EncodingError.InvalidData
+ldloca local12
+initobj System.Text.EncodingError
+ldloca local13
+initobj System.Text.EncodingError.UnrepresentableText
+ldloca local14
+initobj System.Text.EncodingError
+ldloca local15
+initobj System.Text.EncodingError.Busy
+M00000010_IL_0000:
+M00000010_IL_0001:
+M00000010_IL_0002:
+M00000010_IL_0003:
+ldarg 0
+M00000010_IL_0004:
+ldobj System.Text.EncodingError
+M00000010_IL_0009:
+stloc local0
+M00000010_IL_000a:
+M00000010_IL_000b:
+ldloc local0
+M00000010_IL_000c:
+stloc local2
+M00000010_IL_000d:
+ldloca local2
+M00000010_IL_000f:
+ldloca local3
+M00000010_IL_0011:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.InvalidRange&)
+M00000010_IL_0016:
+brfalse M00000010_IL_0034
+M00000010_IL_001b:
+ldloc local3
+M00000010_IL_001c:
+pop
+M00000010_IL_001d:
+M00000010_IL_001e:
+br M00000010_IL_0029
+M00000010_IL_0029:
+ldstr "InvalidRange"
+M00000010_IL_002e:
+stloc local1
+M00000010_IL_002f:
+br M00000010_IL_015b
+M00000010_IL_0034:
+M00000010_IL_0035:
+M00000010_IL_0036:
+ldloc local0
+M00000010_IL_0037:
+stloc local4
+M00000010_IL_0039:
+ldloca local4
+M00000010_IL_003b:
+ldloca local5
+M00000010_IL_003d:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.LimitExceeded&)
+M00000010_IL_0042:
+brfalse M00000010_IL_0061
+M00000010_IL_0047:
+ldloc local5
+M00000010_IL_0049:
+pop
+M00000010_IL_004a:
+M00000010_IL_004b:
+br M00000010_IL_0056
+M00000010_IL_0056:
+ldstr "LimitExceeded"
+M00000010_IL_005b:
+stloc local1
+M00000010_IL_005c:
+br M00000010_IL_015b
+M00000010_IL_0061:
+M00000010_IL_0062:
+M00000010_IL_0063:
+ldloc local0
+M00000010_IL_0064:
+stloc local6
+M00000010_IL_0066:
+ldloca local6
+M00000010_IL_0068:
+ldloca local7
+M00000010_IL_006a:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.Finished&)
+M00000010_IL_006f:
+brfalse M00000010_IL_008e
+M00000010_IL_0074:
+ldloc local7
+M00000010_IL_0076:
+pop
+M00000010_IL_0077:
+M00000010_IL_0078:
+br M00000010_IL_0083
+M00000010_IL_0083:
+ldstr "Finished"
+M00000010_IL_0088:
+stloc local1
+M00000010_IL_0089:
+br M00000010_IL_015b
+M00000010_IL_008e:
+M00000010_IL_008f:
+M00000010_IL_0090:
+ldloc local0
+M00000010_IL_0091:
+stloc local8
+M00000010_IL_0093:
+ldloca local8
+M00000010_IL_0095:
+ldloca local9
+M00000010_IL_0097:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.InvalidUtf8&)
+M00000010_IL_009c:
+brfalse M00000010_IL_00bb
+M00000010_IL_00a1:
+ldloc local9
+M00000010_IL_00a3:
+pop
+M00000010_IL_00a4:
+M00000010_IL_00a5:
+br M00000010_IL_00b0
+M00000010_IL_00b0:
+ldstr "InvalidUtf8"
+M00000010_IL_00b5:
+stloc local1
+M00000010_IL_00b6:
+br M00000010_IL_015b
+M00000010_IL_00bb:
+M00000010_IL_00bc:
+M00000010_IL_00bd:
+ldloc local0
+M00000010_IL_00be:
+stloc local10
+M00000010_IL_00c0:
+ldloca local10
+M00000010_IL_00c2:
+ldloca local11
+M00000010_IL_00c4:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.InvalidData&)
+M00000010_IL_00c9:
+brfalse M00000010_IL_00e8
+M00000010_IL_00ce:
+ldloc local11
+M00000010_IL_00d0:
+pop
+M00000010_IL_00d1:
+M00000010_IL_00d2:
+br M00000010_IL_00dd
+M00000010_IL_00dd:
+ldstr "InvalidData"
+M00000010_IL_00e2:
+stloc local1
+M00000010_IL_00e3:
+br M00000010_IL_015b
+M00000010_IL_00e8:
+M00000010_IL_00e9:
+ldloc local0
+M00000010_IL_00ea:
+stloc local12
+M00000010_IL_00ec:
+ldloca local12
+M00000010_IL_00ee:
+ldloca local13
+M00000010_IL_00f0:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.UnrepresentableText&)
+M00000010_IL_00f5:
+brfalse M00000010_IL_0114
+M00000010_IL_00fa:
+ldloc local13
+M00000010_IL_00fc:
+pop
+M00000010_IL_00fd:
+M00000010_IL_00fe:
+br M00000010_IL_0109
+M00000010_IL_0109:
+ldstr "UnrepresentableText"
+M00000010_IL_010e:
+stloc local1
+M00000010_IL_010f:
+br M00000010_IL_015b
+M00000010_IL_0114:
+M00000010_IL_0115:
+M00000010_IL_0116:
+ldloc local0
+M00000010_IL_0117:
+stloc local14
+M00000010_IL_0119:
+ldloca local14
+M00000010_IL_011b:
+ldloca local15
+M00000010_IL_011d:
+call instance System.Text.EncodingError::TryGetValue(System.Text.EncodingError.Busy&)
+M00000010_IL_0122:
+brfalse M00000010_IL_0141
+M00000010_IL_0127:
+ldloc local15
+M00000010_IL_0129:
+pop
+M00000010_IL_012a:
+M00000010_IL_012b:
+br M00000010_IL_0136
+M00000010_IL_0136:
+ldstr "Busy"
+M00000010_IL_013b:
+stloc local1
+M00000010_IL_013c:
+br M00000010_IL_015b
+M00000010_IL_0141:
+M00000010_IL_0142:
+ldloc local0
+M00000010_IL_0143:
+pop
+M00000010_IL_0144:
+ldc.i4 1
+M00000010_IL_0145:
+brfalse M00000010_IL_0156
+M00000010_IL_014a:
+M00000010_IL_014b:
+ldstr "Empty"
+M00000010_IL_0150:
+stloc local1
+M00000010_IL_0151:
+br M00000010_IL_015b
+M00000010_IL_0156:
+M00000010_IL_0157:
+M00000010_IL_0158:
+M00000010_IL_0159:
+M00000010_IL_015a:
+fault "Guest program reached a terminal failure"
+M00000010_IL_015b:
+M00000010_IL_015c:
+ldloc local1
+M00000010_IL_015d:
+ret
+.end
+.method instance byref get_Value() -> System.Object
+M00000011_IL_0000:
+ldarg 0
+M00000011_IL_0001:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_0006:
+conv.i4
+M00000011_IL_0007:
+ldc.i4 1
+M00000011_IL_0008:
+conv.i4
+M00000011_IL_0009:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_000b:
+brtrue M00000011_IL_0015
+M00000011_IL_0010:
+br M00000011_IL_0021
+M00000011_IL_0015:
+ldarg 0
+M00000011_IL_0016:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C696452616E67655061796C6F61643E
+M00000011_IL_001b:
+box System.Text.EncodingError.InvalidRange
+M00000011_IL_0020:
+ret
+M00000011_IL_0021:
+M00000011_IL_0022:
+ldarg 0
+M00000011_IL_0023:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_0028:
+conv.i4
+M00000011_IL_0029:
+ldc.i4 2
+M00000011_IL_002a:
+conv.i4
+M00000011_IL_002b:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_002d:
+brtrue M00000011_IL_0037
+M00000011_IL_0032:
+br M00000011_IL_0043
+M00000011_IL_0037:
+ldarg 0
+M00000011_IL_0038:
+ldfld System.Text.EncodingError::Metadata_V1_3C4C696D697445786365656465645061796C6F61643E
+M00000011_IL_003d:
+box System.Text.EncodingError.LimitExceeded
+M00000011_IL_0042:
+ret
+M00000011_IL_0043:
+M00000011_IL_0044:
+ldarg 0
+M00000011_IL_0045:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_004a:
+conv.i4
+M00000011_IL_004b:
+ldc.i4 3
+M00000011_IL_004c:
+conv.i4
+M00000011_IL_004d:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_004f:
+brtrue M00000011_IL_0059
+M00000011_IL_0054:
+br M00000011_IL_0065
+M00000011_IL_0059:
+ldarg 0
+M00000011_IL_005a:
+ldfld System.Text.EncodingError::Metadata_V1_3C46696E69736865645061796C6F61643E
+M00000011_IL_005f:
+box System.Text.EncodingError.Finished
+M00000011_IL_0064:
+ret
+M00000011_IL_0065:
+M00000011_IL_0066:
+ldarg 0
+M00000011_IL_0067:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_006c:
+conv.i4
+M00000011_IL_006d:
+ldc.i4 4
+M00000011_IL_006e:
+conv.i4
+M00000011_IL_006f:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0071:
+brtrue M00000011_IL_007b
+M00000011_IL_0076:
+br M00000011_IL_0087
+M00000011_IL_007b:
+ldarg 0
+M00000011_IL_007c:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964557466385061796C6F61643E
+M00000011_IL_0081:
+box System.Text.EncodingError.InvalidUtf8
+M00000011_IL_0086:
+ret
+M00000011_IL_0087:
+M00000011_IL_0088:
+ldarg 0
+M00000011_IL_0089:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_008e:
+conv.i4
+M00000011_IL_008f:
+ldc.i4 5
+M00000011_IL_0090:
+conv.i4
+M00000011_IL_0091:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_0093:
+brtrue M00000011_IL_009d
+M00000011_IL_0098:
+br M00000011_IL_00a9
+M00000011_IL_009d:
+ldarg 0
+M00000011_IL_009e:
+ldfld System.Text.EncodingError::Metadata_V1_3C496E76616C6964446174615061796C6F61643E
+M00000011_IL_00a3:
+box System.Text.EncodingError.InvalidData
+M00000011_IL_00a8:
+ret
+M00000011_IL_00a9:
+M00000011_IL_00aa:
+ldarg 0
+M00000011_IL_00ab:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_00b0:
+conv.i4
+M00000011_IL_00b1:
+ldc.i4 6
+M00000011_IL_00b2:
+conv.i4
+M00000011_IL_00b3:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_00b5:
+brtrue M00000011_IL_00bf
+M00000011_IL_00ba:
+br M00000011_IL_00cb
+M00000011_IL_00bf:
+ldarg 0
+M00000011_IL_00c0:
+ldfld System.Text.EncodingError::Metadata_V1_3C556E726570726573656E7461626C65546578745061796C6F61643E
+M00000011_IL_00c5:
+box System.Text.EncodingError.UnrepresentableText
+M00000011_IL_00ca:
+ret
+M00000011_IL_00cb:
+M00000011_IL_00cc:
+ldarg 0
+M00000011_IL_00cd:
+ldfld System.Text.EncodingError::Metadata_V1_3C5461673E
+M00000011_IL_00d2:
+conv.i4
+M00000011_IL_00d3:
+ldc.i4 7
+M00000011_IL_00d4:
+conv.i4
+M00000011_IL_00d5:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000011_IL_00d7:
+brtrue M00000011_IL_00e1
+M00000011_IL_00dc:
+br M00000011_IL_00ed
+M00000011_IL_00e1:
+ldarg 0
+M00000011_IL_00e2:
+ldfld System.Text.EncodingError::Metadata_V1_3C427573795061796C6F61643E
+M00000011_IL_00e7:
+box System.Text.EncodingError.Busy
+M00000011_IL_00ec:
+ret
+M00000011_IL_00ed:
+M00000011_IL_00ee:
+M00000011_IL_00ef:
+call neoCLR.Library.System.Text.EncodingError.DefaultReference53797374656D2E4F626A656374()
+ret
+.end
+.method instance byref get_HasValue() -> Boolean
+M00000012_IL_0000:
+ldarg 0
+M00000012_IL_0001:
+call instance System.Text.EncodingError::get_Value()
+M00000012_IL_0006:
+M00000012_IL_0007:
+ref.isnull
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_0009:
+ldc.i4 0
+M00000012_IL_000a:
+ceq
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanToInt32(Boolean)
+M00000012_IL_000c:
+call neoCLR.Library.System.Text.EncodingError.RuntimeBooleanFromInt32(Int32)
+ret
+.end
+.end

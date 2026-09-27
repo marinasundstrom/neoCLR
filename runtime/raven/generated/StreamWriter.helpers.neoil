@@ -19,6 +19,11 @@ ldarg value
 newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.IoFailure)
 ret
 .end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorNewSystemIOStreamErrorInvalidEncoding(System.IO.StreamError.InvalidEncoding value) -> System.IO.StreamError
+ldarg value
+newobj instance System.IO.StreamError::.ctor(System.IO.StreamError.InvalidEncoding)
+ret
+.end
 .function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorClosedNew() -> System.IO.StreamError.Closed
 newobj instance System.IO.StreamError.Closed::.ctor()
 ret
@@ -31,6 +36,10 @@ ret
 newobj instance System.IO.StreamError.IoFailure::.ctor()
 ret
 .end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeErrorSystemIOStreamErrorInvalidEncodingNew() -> System.IO.StreamError.InvalidEncoding
+newobj instance System.IO.StreamError.InvalidEncoding::.ctor()
+ret
+.end
 .function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion0(System.IO.StreamError arg0) -> System.Result.Error<System.IO.StreamError>
 ldarg arg0
 newobj instance System.Result.Error<System.IO.StreamError>::.ctor(System.IO.StreamError)
@@ -41,39 +50,78 @@ ldarg arg0
 newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion2(Int32 arg0) -> System.Result.Ok<Int32>
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion2(System.Result<Void,System.Text.EncodingError>& arg0,out(true) System.Result.Ok<Void>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Void,System.Text.EncodingError>::TryGetValue(System.Result.Ok<Void>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion3(System.Result.Ok<Void>& arg0) -> Void
+ldarg arg0
+call instance System.Result.Ok<Void>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Void,System.Text.EncodingError>& arg0,out(true) System.Result.Error<System.Text.EncodingError>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<Void,System.Text.EncodingError>::TryGetValue(System.Result.Error<System.Text.EncodingError>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Error<System.Text.EncodingError>& arg0) -> System.Text.EncodingError
+ldarg arg0
+call instance System.Result.Error<System.Text.EncodingError>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion6(Int32 arg0) -> System.Result.Ok<Int32>
 ldarg arg0
 newobj instance System.Result.Ok<Int32>::.ctor(Int32)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion3(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IO.StreamError>
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Ok<Int32> arg0) -> System.Result<Int32,System.IO.StreamError>
 ldarg arg0
 newobj instance System.Result<Int32,System.IO.StreamError>::.ctor(System.Result.Ok<Int32>)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion4(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion8(System.Result<System.Text.EncoderProgress,System.Text.EncodingError>& arg0,out(true) System.Result.Ok<System.Text.EncoderProgress>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::TryGetValue(System.Result.Ok<System.Text.EncoderProgress>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion9(System.Result.Ok<System.Text.EncoderProgress>& arg0) -> System.Text.EncoderProgress
+ldarg arg0
+call instance System.Result.Ok<System.Text.EncoderProgress>::get_Value()
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion10(System.Result<System.Text.EncoderProgress,System.Text.EncodingError>& arg0,out(true) System.Result.Error<System.Text.EncodingError>& arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call instance System.Result<System.Text.EncoderProgress,System.Text.EncodingError>::TryGetValue(System.Result.Error<System.Text.EncodingError>&)
+ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion11(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Ok<Int32>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Ok<Int32>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion5(System.Result.Ok<Int32>& arg0) -> Int32
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion12(System.Result.Ok<Int32>& arg0) -> Int32
 ldarg arg0
 call instance System.Result.Ok<Int32>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion6(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion13(System.Result<Int32,System.IO.StreamError>& arg0,out(true) System.Result.Error<System.IO.StreamError>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
 call instance System.Result<Int32,System.IO.StreamError>::TryGetValue(System.Result.Error<System.IO.StreamError>&)
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion7(System.Result.Error<System.IO.StreamError>& arg0) -> System.IO.StreamError
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion14(System.Result.Error<System.IO.StreamError>& arg0) -> System.IO.StreamError
 ldarg arg0
 call instance System.Result.Error<System.IO.StreamError>::get_Value()
 ret
 .end
-.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion8(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeUnion15(System.Result.Error<System.IO.StreamError> arg0) -> System.Result<Void,System.IO.StreamError>
 ldarg arg0
 newobj instance System.Result<Void,System.IO.StreamError>::.ctor(System.Result.Error<System.IO.StreamError>)
 ret
@@ -101,4 +149,12 @@ True:
 False:
     ldc.i4 0
     ret
+.end
+.function neoCLR.Library.System.IO.StreamWriter.RuntimeCliCall0(System.Text.Encoder arg0,String arg1,Int32 arg2) -> System.Result<Void,System.Text.EncodingError>
+ldarg arg0
+ldarg arg1
+ldarg arg2
+call neoCLR.Library.System.IO.StreamWriter.RuntimeBooleanFromInt32(Int32)
+callvirt instance System.Text.Encoder::Accept(String,Boolean)
+ret
 .end

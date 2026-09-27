@@ -1,0 +1,24 @@
+namespace System.Text
+
+public union EncodingError {
+    case InvalidRange
+    case LimitExceeded
+    case Finished
+    case InvalidUtf8
+    case InvalidData
+    case UnrepresentableText
+    case Busy
+
+    override func ToString() -> string {
+        return match self {
+            InvalidRange => "InvalidRange"
+            LimitExceeded => "LimitExceeded"
+            Finished => "Finished"
+            InvalidUtf8 => "InvalidUtf8"
+            InvalidData => "InvalidData"
+            UnrepresentableText => "UnrepresentableText"
+            Busy => "Busy"
+            _ => "Empty"
+        }
+    }
+}

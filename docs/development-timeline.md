@@ -8149,3 +8149,101 @@ configuration/content, not target-specific code added to Raven main.
   cannot mutate TimeOffset storage or construct a private TimeZone. Focused reference
   rendering confirms the pages and records the parenthesized-heading/payload-page
   limitations explicitly. Integration and cleanup occur after these feature checks.
+## 2026-09-27 — UTF-8 and strict ASCII as a shared encoding foundation
+
+- **Author:** directs continuation of reader/writer encoding selection. In response
+  to an optional choice between UTF-16 interchange and ASCII, selects “UTF-8 + strict
+  ASCII”. Stresses that the foundation will affect many APIs, including HTTP.
+- **Assistant response:** moves from considering built-in modes toward a shared
+  codec interface; avoids prescribing an enum that every consumer must switch on.
+  Distinguishes text conversion from HTTP charset policy, framing and field validation.
+- **Action:** adds an application-only selected encoding/decoder contract and both
+  reader/writer consumers. Default and explicit UTF-8, strict ASCII, decoder isolation,
+  owned carry, byte limits/counts, finalization, partial writes and pre-write rejection
+  pass in two focused executions. Public System APIs are not modified.
+- **Findings and remaining work:** whole-input acceptance with returned String is a
+  viable high-level alternative to output-buffer progress. ReadLine, leaveOpen, public
+  metadata and typed-error migration remain necessary before production integration;
+  future stateful Encoder finalization remains open. Records the shared foundation
+  and HTTP dependency in existing trackers without reopening HTTP POC scope.
+- **Evidence:** [selection source and results](experiments/text-boundaries/README.md#shared-encoding-selection-application-contract-probe).
+  No full suite, website build, runtime/compiler changes or performance claims.
+
+### 2026-09-27 — Shared encoding contract reaches the library
+
+- **Author:** directed continuation after choosing UTF-8 and strict ASCII, and
+  emphasized that encoding is foundational infrastructure for HTTP and other APIs.
+- **Assistant action:** promoted the tested roles to Encoding, Decoder, Encodings
+  and a standard Raven EncodingError union. Added selected reader/writer constructors
+  alongside UTF-8 defaults, independent decoder ownership, decoded line boundaries,
+  strict ASCII rejection before output and preserved leaveOpen/partial transfers.
+- **Outcome:** focused library consumers pass for the built-ins and a deliberately
+  expanding application codec; reader regression checks include split scalars and
+  the 65536-byte bound. Public reference and implementation snapshots are refreshed.
+  This is development work after Preview 10, not a newly published release.
+- **Tradeoffs/open work:** owned text results and whole-value byte snapshots keep
+  lifetimes clear but allocate. Source quotas and UTF-8 text quotas remain distinct;
+  broader codecs need further quota design. Stateful Encoder, minimal construction
+  and HTTP charset policy remain separate follow-ups. No String/Text rename or
+  widening of the HTTP POC. See [contract](design/text-abstraction.md#shared-encoding-apis-development)
+  and [focused evidence](experiments/text-boundaries/encoding-validation.json).
+
+### 2026-09-27 — Report construction candidate evaluated
+
+- **Author context:** asked to continue after the shared encoding integration.
+  Earlier direction requested text foundations and possibly a builder, with useful
+  features ahead of optimization work. No new builder design was explicitly approved.
+- **Assistant action:** selected the roadmap's bounded report-construction evaluation.
+  Added an application-only accumulator and a concrete report consumer, checked hard
+  UTF-8 quotas and retained snapshots, and compared balanced deferred construction
+  with ordinary concatenation. A .NET semantic fixture separates UTF-16 units,
+  UTF-8 bytes and grapheme counts for the same report.
+- **Observed outcome:** semantic checks pass; the managed prototype is slower at
+  both measured sizes. At 1024 pieces/16 KiB, concatenation took 51–58 ms and the
+  prototype 561–574 ms. These are local diagnostics, not cross-runtime benchmarks
+  or native allocation measurements. [Evidence](experiments/text-boundaries/builder-validation.json).
+- **Assistant decision/recommendation:** retain the useful quota/snapshot contract
+  as a candidate and defer public builder promotion; do not start optimizing the
+  probe. Recommend the already requested Encoder progress contract with a writer
+  consumer as the next bounded task. This is not a new author naming decision or
+  a permanent priority change. No runtime/public API, website or release change.
+
+### 2026-09-27 — Encoder progress tested with a writer
+
+- **Author context:** continued the foundation work after the builder evaluation;
+  the earlier request for an Encoder adapted to neoCLR text remains the direction.
+  No new public API spelling or lifecycle policy was explicitly selected by the author.
+- **Assistant proposal/action:** test whole-text Accept followed by bounded Drain,
+  returning bytes written and a Ready/NeedsOutput/Finished state. The application
+  provider retains valid immutable input and converts scalar-safe chunks for UTF-8
+  or strict ASCII. A real short-write OutputStream consumer tests explicit Finish,
+  stream-only Flush and ownership-only Close.
+- **Outcome:** three focused runs and a .NET semantic comparison pass. Checks cover
+  one-byte buffers, source ownership, retryable preflight errors, chunk boundaries,
+  partial writes and final-output failure. A synthetic trailer proves completion
+  must wait for final bytes; it is not a new supported encoding. No runtime/public
+  API or compiler change, benchmark, full suite or website build.
+- **Assistant recommendation/open work:** promote the factory/progress roles next,
+  integrate explicit StreamWriter Finish and document migration for custom Encoding
+  implementations. Keep general TextWriter completion, names and exact bounds under
+  review. HTTP policy and public builder promotion remain separate. See the
+  [contract](design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27)
+  and [evidence](experiments/text-boundaries/encoder-validation.json).
+
+### 2026-09-27 — Encoder contract promoted into the library
+
+- **Author:** asked to continue after the Encoder acceptance/drain evaluation.
+- **Assistant action:** implemented Encoding.CreateEncoder, Encoder and immutable
+  public progress properties with a standard Raven EncoderState union. Connected
+  both built-ins to StreamWriter and added explicit Finish; Flush and Close retain
+  their separate stream/ownership roles. Updated the compiler bridge reference and
+  API documentation alongside the implementation.
+- **Outcome:** four focused public Encoder/writer runs and three selection/line
+  runs pass, including independent sessions, strict line rejection, custom final
+  output and the maximum writer bound. Evidence is [recorded](experiments/text-boundaries/public-encoder-validation.json).
+  No full suite, website build, runtime-default change or performance claim.
+- **Compatibility/costs:** custom development Encoding implementations need the new
+  factory. Output/drain failures make subsequent writes unusable; custom output
+  overflow may follow partial output. Accepted text remains retained until drained.
+  Bounded UTF-8/ASCII foundations are complete; broader codecs, general TextWriter
+  completion, HTTP policy and public builder promotion remain separately scoped.

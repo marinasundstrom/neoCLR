@@ -1,0 +1,15 @@
+; Generated from runtime/raven/src/System/Text/Encodings.rvn. Regenerate with build_runtime_library.py.
+.method static get_Utf8() -> System.Text.Encoding
+M00000001_IL_0000:
+M00000001_IL_0001:
+newobj instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E55746638456E636F64696E67::.ctor()
+M00000001_IL_0006:
+ret
+.end
+.method static get_Ascii() -> System.Text.Encoding
+M00000002_IL_0000:
+M00000002_IL_0001:
+newobj instance neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E4173636969456E636F64696E67::.ctor()
+M00000002_IL_0006:
+ret
+.end

@@ -1,0 +1,287 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+
+// Application contract evaluation, not a public System.Text.Encoder.
+public union EncodeState {
+    case NeedsOutput
+    case Ready
+    case Finished
+}
+
+public union EncoderFailure {
+    case Busy
+    case Finished
+    case InvalidRange
+    case LimitExceeded
+    case UnrepresentableText
+}
+
+public class EncodeStep {
+    val BytesWritten: int
+    val State: EncodeState
+    init(bytesWritten: int, state: EncodeState) {
+        BytesWritten = bytesWritten
+        State = state
+    }
+}
+
+public interface EncoderSession {
+    func Accept(text: string, final: bool) -> Result<unit, EncoderFailure>
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncodeStep, EncoderFailure>
+}
+
+public func ScalarChunk(text: string, start: int) -> string {
+    var count = text.GetUtf8ByteCount() - start
+    if count > 32 {
+        count = 32
+    }
+    while count > 0 {
+        match text.SliceUtf8(start, count) {
+            Ok(let part) => return part
+            Error(_) => count -= 1
+        }
+    }
+    System.Fault("Invalid internal scalar boundary")
+    return ""
+}
+
+// Only the two stateless built-ins are supported by this provider. A general
+// Encoding.Encode implementation must not be assumed composable across chunks.
+public class BoundedTextEncoder : EncoderSession {
+    private var policy: Encoding = Encodings.Utf8
+    private var ascii: bool = false
+    private var text: string = ""
+    private var sourceOffset: int = 0
+    private var bytes: Sequence<byte> = ArrayList<byte>()
+    private var byteOffset: int = 0
+    private var pending: bool = false
+    private var ending: bool = false
+    private var finished: bool = false
+
+    init(strictAscii: bool) {
+        ascii = strictAscii
+        if strictAscii {
+            policy = Encodings.Ascii
+        }
+    }
+
+    func Accept(value: string, final: bool) -> Result<unit, EncoderFailure> {
+        if finished || ending {
+            return Error(EncoderFailure.Finished)
+        }
+        if pending {
+            return Error(EncoderFailure.Busy)
+        }
+        if value.GetUtf8ByteCount() > 4096 {
+            return Error(EncoderFailure.LimitExceeded)
+        }
+        // Validate restricted encodings before acceptance or any destination write.
+        if ascii {
+            var position = 0
+            while position < value.GetUtf8ByteCount() {
+                let part = ScalarChunk(value, position)
+                match policy.Encode(part) {
+                    Ok(_) => { }
+                    Error(_) => return Error(EncoderFailure.UnrepresentableText)
+                }
+                position += part.GetUtf8ByteCount()
+            }
+        }
+        text = value
+        sourceOffset = 0
+        bytes = ArrayList<byte>()
+        byteOffset = 0
+        pending = true
+        ending = final
+        return Ok(())
+    }
+
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncodeStep, EncoderFailure> {
+        if finished {
+            return Error(EncoderFailure.Finished)
+        }
+        if !(offset >= 0) || !(count >= 0) || offset > output.Length || count > output.Length - offset {
+            return Error(EncoderFailure.InvalidRange)
+        }
+        if count > 4096 {
+            return Error(EncoderFailure.LimitExceeded)
+        }
+        if !pending {
+            return Ok(EncodeStep(0, EncodeState.Ready))
+        }
+        var written = 0
+        while written < count {
+            if byteOffset == bytes.Count {
+                if sourceOffset == text.GetUtf8ByteCount() {
+                    break
+                }
+                let part = ScalarChunk(text, sourceOffset)
+                bytes = match policy.Encode(part) {
+                    Ok(let encoded) => encoded
+                    Error(_) => {
+                        System.Fault("Validated text encoding failed")
+                        ArrayList<byte>()
+                    }
+                }
+                sourceOffset += part.GetUtf8ByteCount()
+                byteOffset = 0
+            }
+            output[offset + written] = bytes[byteOffset]
+            byteOffset += 1
+            written += 1
+        }
+        if sourceOffset == text.GetUtf8ByteCount() && byteOffset == bytes.Count {
+            text = ""
+            bytes = ArrayList<byte>()
+            pending = false
+            if ending {
+                finished = true
+                return Ok(EncodeStep(written, EncodeState.Finished))
+            }
+            return Ok(EncodeStep(written, EncodeState.Ready))
+        }
+        return Ok(EncodeStep(written, EncodeState.NeedsOutput))
+    }
+}
+
+// Synthetic final-output provider. This is not a proposed character encoding.
+public class TrailerEncoder : EncoderSession {
+    private var inner: EncoderSession = BoundedTextEncoder(false)
+    func Accept(text: string, final: bool) -> Result<unit, EncoderFailure> {
+        if final {
+            return inner.Accept(text + "<end>", true)
+        }
+        return inner.Accept(text, false)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncodeStep, EncoderFailure> {
+        return inner.Drain(output, offset, count)
+    }
+}
+
+public class EncodingWriterProbe {
+    private var output: OutputStream
+    private var encoder: EncoderSession
+    private var leaveOpen: bool
+    private var closed: bool = false
+    private var finished: bool = false
+    private var failed: bool = false
+    private var finishing: bool = false
+
+    init(output: OutputStream, encoder: EncoderSession, leaveOpen: bool) {
+        self.output = output
+        self.encoder = encoder
+        self.leaveOpen = leaveOpen
+    }
+
+    func Write(text: string) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if finished || failed {
+            return Error(StreamError.InvalidEncoding)
+        }
+        match encoder.Accept(text, false) {
+            Ok(_) => { }
+            Error(EncoderFailure.LimitExceeded) => return Error(StreamError.LimitExceeded)
+            Error(_) => return Error(StreamError.InvalidEncoding)
+        }
+        return Pump()
+    }
+
+    // Finalize conversion explicitly; Flush remains an output-stream operation.
+    func Finish() -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if failed {
+            return Error(StreamError.InvalidEncoding)
+        }
+        if finished {
+            return Ok(0)
+        }
+        match encoder.Accept("", true) {
+            Ok(_) => { }
+            Error(_) => return Error(StreamError.InvalidEncoding)
+        }
+        finishing = true
+        return Pump()
+    }
+
+    private func Pump() -> Result<int, StreamError> {
+        let buffer: byte[] = [(byte)0, (byte)0, (byte)0, (byte)0]
+        var total = 0
+        while true {
+            let step = match encoder.Drain(buffer, 0, buffer.Length) {
+                Ok(let value) => value
+                Error(_) => {
+                    failed = true
+                    return Error(StreamError.InvalidEncoding)
+                }
+            }
+            if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
+                System.Fault("Invalid encoder byte count")
+            }
+            var sent = 0
+            while sent < step.BytesWritten {
+                match output.Write(buffer, sent, step.BytesWritten - sent) {
+                    Ok(let count) => {
+                        if !(count >= 0) || count > step.BytesWritten - sent {
+                            System.Fault("Invalid output count")
+                        }
+                        if count == 0 {
+                            failed = true
+                            return Error(StreamError.IoFailure)
+                        }
+                        sent += count
+                        total += count
+                    }
+                    Error(let error) => {
+                        failed = true
+                        return Error(error)
+                    }
+                }
+            }
+            match step.State {
+                EncodeState.NeedsOutput => {
+                    if step.BytesWritten == 0 {
+                        System.Fault("Encoder made no progress with positive capacity")
+                    }
+                }
+                EncodeState.Ready => {
+                    if finishing {
+                        System.Fault("Final input did not finalize encoder")
+                    }
+                    return Ok(total)
+                }
+                EncodeState.Finished => {
+                    if !finishing {
+                        System.Fault("Encoder finalized nonfinal input")
+                    }
+                    finished = true
+                    return Ok(total)
+                }
+                _ => System.Fault("Invalid encoder state")
+            }
+        }
+        return Error(StreamError.IoFailure)
+    }
+
+    func Flush() -> Result<unit, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        return output.Flush()
+    }
+
+    func Close() {
+        if !closed {
+            closed = true
+            if !leaveOpen {
+                output.Close()
+            }
+        }
+    }
+}

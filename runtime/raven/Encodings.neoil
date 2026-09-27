@@ -1,0 +1,4 @@
+.type System.Text.Encodings
+.include "generated/Encodings.methods.neoil"
+.end
+.include "generated/Encodings.helpers.neoil"

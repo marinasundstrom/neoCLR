@@ -12,6 +12,7 @@ public union TextReadError {
     case WrongAccess
     case IoFailure
     case InvalidUtf8
+    case InvalidEncoding
 
     override func ToString() -> string {
         return match self {
@@ -24,6 +25,7 @@ public union TextReadError {
             InvalidRange => "InvalidRange"
             LimitExceeded => "LimitExceeded"
             WrongAccess => "WrongAccess"
+            InvalidEncoding => "InvalidEncoding"
             IoFailure => "IoFailure"
             InvalidUtf8 => "InvalidUtf8"
             _ => "Empty"

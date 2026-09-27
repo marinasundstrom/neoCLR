@@ -1,0 +1,2 @@
+.include "generated/EncodingError.methods.neoil"
+.include "generated/EncodingError.helpers.neoil"

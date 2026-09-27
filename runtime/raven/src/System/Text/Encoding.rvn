@@ -1,0 +1,10 @@
+namespace System.Text
+
+import System.*
+import System.Collections.*
+
+public interface Encoding {
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError>
+    func CreateEncoder() -> Encoder
+    func CreateDecoder() -> Decoder
+}

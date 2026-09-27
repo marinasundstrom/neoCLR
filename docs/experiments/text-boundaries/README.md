@@ -147,3 +147,98 @@ were unchanged. Guest fixture work is included in timings. Faster construction a
 codec traversal remain concrete follow-up questions, not reasons to claim that this
 slice reduces total allocations. The old-library maximum fault is explicitly allowed
 and recorded by the diagnostic runner; it is not reported as a successful old read.
+
+## Shared encoding selection — application contract probe
+
+`Selection.rvn` and `SelectionMain.rvn` test a codec interface, separate decoder
+instances and reader/writer selection. UTF-8 is the default; strict ASCII is the
+second implementation selected by the author. This is not an enum switch, a second
+text representation or a public System API. Two runs pass in `selection-results.json`.
+Use `verify_selection.py` with the same runtime/bridge/system/reference arguments;
+it compiles only these two sources to stay within the application's method budget.
+
+The [design discussion](../../design/text-abstraction.md#shared-encoding-selection-probe-utf-8-and-strict-ascii)
+records all-input acceptance on successful decoding, owned carry, strict errors,
+byte counts, fixture bounds, comparison with .NET, integration gaps and future HTTP
+reuse. The writer prevalidates ASCII and snapshots bytes before output; no partial
+write occurs for unrepresentable text. The prototype owns its stream and has no
+ReadLine or leaveOpen overload yet. A stateful Encoder, public reference projection
+and actual production stream constructor integration remain outstanding. Tests do
+not claim to establish performance or arbitrary expanding-codec quota semantics.
+
+## Public encoding integration
+
+`EncodingMain.rvn` exercises the actual System.Text encoding interfaces and selected
+stream constructors. Run `verify_encoding.py` with matching `--runtime`, `--bridge`,
+`--system` and `--reference` paths. It covers independent carry ownership, strict
+UTF-8/ASCII, lifecycle, line reading, partial writes, byte counts and leaveOpen.
+`verify.py --reader-only` retains the existing chunk/boundary/maximum reader checks.
+The Selection prototype remains application-only; the public test does not compile it.
+
+## Bounded report construction evaluation
+
+`Builder.rvn` and `BuilderMain.rvn` evaluate an application-only append accumulator
+against ordinary concatenation. They do not add a public StringBuilder/TextBuilder.
+The fixture exercises a small report, a hard UTF-8 byte quota, atomic expected
+limit failures, immutable snapshots, clear/reuse, combining boundaries and output
+from the public Decoder. An empty append consumes neither bytes nor a fragment.
+Build combines adjacent fragments in balanced rounds and compacts retained state.
+
+Run `verify_builder.py` with the same four artifact arguments as `verify_encoding.py`,
+plus `--runner target/release/examples/measure_async` and `--evidence OUTPUT.json`.
+It runs the focused contract and invalid-limit checks, then three fresh invocations
+of each construction strategy at 8 and 1024 pieces of 16 bytes. Order alternates;
+every final byte is checked. Timings include guest construction, checks and captured
+output, but exclude assembly/loading/verification. GC counters omit native String
+payload allocations; zero surviving managed objects is not a native-byte measurement.
+
+[Recorded evidence](builder-validation.json): at 1024 pieces (16 KiB), concatenation
+runs in 51–58 ms and the balanced managed accumulator in 561–574 ms. Eight-piece
+runs are 0–2 ms versus 5–6 ms; the timer resolution limits small-case interpretation.
+The explicit quota/snapshot contract works, but these measurements do not support
+promoting this implementation as the public builder. Do not turn this result into
+an optimization project without a concrete consumer requiring bulk construction.
+See the [design decision](../../design/text-abstraction.md#bounded-report-construction-evaluation--2026-09-27).
+
+`BuilderBaseline.cs` is a semantic .NET comparison, run in a temporary net11.0 console
+project. It confirms immutable snapshots and reuse while distinguishing 21 UTF-16
+units, 22 UTF-8 bytes and 20 graphemes for the same report. It is not a cross-runtime
+performance comparison; its exact tested version is in the evidence.
+
+## Encoder acceptance/drain evaluation
+
+`Encoder.rvn` and `EncoderMain.rvn` test whole-text acceptance followed by bounded
+byte draining. UTF-8/strict ASCII keep at most 32 pending encoded bytes while retaining the
+accepted String; the experimental source/request ceiling is 4096 bytes. This is not
+a public Encoder API and does not make arbitrary Encoding.Encode implementations
+incrementally composable. A synthetic trailer provider tests final output only.
+
+Run `verify_encoder.py` with `--runtime`, `--bridge`, `--system`, `--reference` and
+optional `--evidence`. Three separate focused invocations cover acceptance/progress,
+scalar boundaries/limits/final output, and a short-write OutputStream consumer.
+[Evidence](encoder-validation.json) records matching artifact and source hashes.
+
+The writer distinguishes Finish (conversion completion), Flush (stream flush) and
+Close (ownership). Failed output is not automatically retried by a later Write;
+caller input may already be accepted and output partial. Finish and Flush errors
+must be observed before Close. One-byte drain fragments may split a UTF-8 scalar.
+See the [contract and integration recommendation](../../design/text-abstraction.md#encoder-progress-and-writer-evaluation--2026-09-27).
+
+`EncoderBaseline.cs`, run as a temporary net11.0 console project, compares .NET
+Convert's UTF-16 input counts and scalar-sized output capacity with the candidate's
+whole-text acceptance and byte drains. Its tested runtime is recorded in the evidence.
+No performance comparison or public String/Char contract change is implied.
+
+## Public Encoder integration
+
+`PublicEncoderMain.rvn` uses the production Encoding.CreateEncoder, Encoder,
+EncoderProgress/EncoderState and StreamWriter.Finish APIs. Its custom trailer codec
+is a synthetic contract test, not a supported encoding. `verify_public_encoder.py`
+uses the four artifact paths plus `--runner target/release/examples/measure_async`.
+It runs progress, boundary, writer and maximum-bound checks; the boundary/65536-byte
+fixtures use the established host limits of 100000 heap objects and 500000000
+instructions. Runtime defaults are unchanged. `verify_encoding.py` covers existing
+selection/line behavior and a migrated custom Encoding implementation.
+
+[Public integration evidence](public-encoder-validation.json) is separate from the
+earlier application-only Encoder probe. No full suite or website build is needed.

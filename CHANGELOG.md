@@ -18,6 +18,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   discovery without silent UTC fallback. Fixed offsets retain seconds and ±18h bounds.
   Refresh matching artifacts/API docs and the separate DateTime feature page.
   Windows/Linux discovery, broader ranges, rule updates and scheduling remain open.
+  Integrate concurrent encoding/encoder work from main and regenerate the combined
+  library and API artifacts; verify calendar, zone and encoder consumers together.
 
 - Add provisional Gregorian/Hebrew calendar policies, checked Date arithmetic,
   Date display and LocalDateTime construction. Add invariant, Swedish and Israeli
@@ -74,14 +76,33 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a paired String/Text API sketch and focused executable construction, extraction
   and decoding consumer. Preserve snapshots and explicit ordinal search semantics;
   naming remains provisional and the accumulator makes no performance claim.
-- Decode StreamReader.ReadToEnd incrementally with a private bounded UTF-8 helper.
-  Preserve byte limits, BOM, repeated EOF and input ownership; ReadLine is unchanged.
-  Malformed input can now fail before EOF, changing error ordering and cursor
-  advancement from Preview 10; failures still return no partial text or rollback.
-  Refresh reader implementation/API evidence and document a later text-oriented
-  Encoder abstraction without adopting .NET's UTF-16 char-buffer surface. Record
-  author-required reader/writer encoding selection with UTF-8 as default as the next
-  foundation contract; selectable encodings are not implemented by this slice.
+- Add development Encoding/Decoder contracts, Encodings.Utf8/Ascii and a standard
+  Raven EncodingError union. StreamReader and StreamWriter accept selected encodings
+  with UTF-8 defaults and leaveOpen overloads. Decode incrementally with owned carry;
+  delimit lines after decoding and reject unrepresentable ASCII before output.
+  Preserve partial transfers and typed stream errors; add InvalidEncoding cases.
+  Malformed UTF-8 can fail before EOF, changing error ordering/cursor advancement
+  from Preview 10. Limits distinguish source bytes, text UTF-8 bytes and encoded
+  output; errors do not roll back streams. Refresh public metadata, library/API
+  snapshots, feature pages and focused consumer evidence, including custom codecs,
+  split input and the maximum reader bound. Stateful Encoder and future HTTP
+  integration remain planned; no text rename, replacement fallback or new HTTP scope.
+- Evaluate bounded report construction with an application-only builder: explicit
+  UTF-8 quotas, atomic expected-limit failures, immutable snapshots, clear/reuse and
+  decoded combining sequences. Focused contracts and a .NET semantic comparison
+  pass. Identical-output diagnostics favor ordinary concatenation over this managed
+  implementation; defer public builder promotion and record Encoder progress as the
+  next bounded candidate. No runtime/API changes or builder optimization work.
+- Add development Encoding.CreateEncoder, Encoder, EncoderProgress/EncoderState
+  and StreamWriter.Finish after focused acceptance/drain evaluation. Standard Raven
+  state/error unions express progress and Busy. Built-ins retain valid text and
+  bounded encoded chunks; UTF-8 defaults and strict ASCII preflight remain. Finish
+  drains final bytes separately from Flush/Close. Custom Encoding implementations
+  must add the factory; drain/output failures stop later writes and Finish, while
+  input preflight failures remain retryable. Custom output-limit failure may follow
+  partial output. Refresh public metadata, API/library snapshots and feature docs;
+  focused factory/progress, short-write/finalization, maximum writer and selection
+  consumers pass. No new charset, native primitive or performance claim.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

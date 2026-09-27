@@ -156,3 +156,14 @@ Task/scheduler and ownership foundations belong to [runtime/language](tracking/r
 Compiler debt, packaging procedures and release qualification belong to
 [tooling/release](tracking/toolchain-release.md). The HTTP package acceptance result
 and POC completion decision are recorded here so they have one owner.
+
+## Text encoding foundation dependency — 2026-09-27
+
+The author identifies encoding as shared infrastructure affecting future HTTP APIs.
+The [library/data tracker](tracking/library-data.md#string-design-review-before-further-expansion)
+owns this work: selected stream encodings with UTF-8 default and strict ASCII first.
+The shared-interface probe is experimental; it does not change current HTTP behavior.
+Future text-body conversion should reuse this contract while HTTP retains its media
+type/charset policy, byte-body access, framing and header validation. No new HTTP
+milestone is opened by this dependency, and no automatic charset/BOM detection or
+additional protocol support is claimed.

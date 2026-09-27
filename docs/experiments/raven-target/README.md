@@ -1290,3 +1290,42 @@ Run `--globalization-signatures` for the expanded time signatures and malformed 
 checks, and `verify_time_zones.py --bridge ... --runtime ... --runner ...` for both
 executed examples and negative source access checks. Regenerate all library/reference
 snapshots with the same bridge. Installed SDK artifacts are not republished here.
+## Shared encoding reference surface — 2026-09-27
+
+The neoCLR development reference adds System.Text.Encoding, Decoder, Encodings and
+EncodingError plus selected StreamReader/StreamWriter constructors. EncodingError
+uses standard Raven union metadata; InvalidEncoding cases are appended to stream
+error unions without renumbering existing cases. The bridge admits exact interface
+and constructor signatures and exports the matching authored Raven library bodies.
+Application codecs implement the same interfaces as built-ins. No Runtime Contract
+configuration, compiler semantic rule, opcode, metadata convention or native VM
+service changes. Match reference and System library artifacts; Preview 10 does not
+contain this surface. Stateful Encoder and UTF-16 buffer-style conversion are not
+part of this contract.
+
+Validation: focused production consumers pass for UTF-8 defaults, strict ASCII,
+owned split-input carry, decoder lifecycle, decoded line boundaries, independent
+custom providers, limits, partial-write failures, flushing and leaveOpen. Existing
+reader checks pass, including 65536 input bytes. Only necessary snapshot/contract
+checks run; no full compiler/runtime suite, website build or platform matrix. See
+neoCLR's docs/experiments/text-boundaries/encoding-validation.json for evidence.
+
+## Encoder reference and writer completion — 2026-09-27
+
+The development neoCLR reference adds Encoding.CreateEncoder, Encoder.Accept/Drain,
+EncoderProgress read-only properties, a standard EncoderState union and
+StreamWriter.Finish. EncodingError appends Busy without changing existing case order.
+Custom Encoding implementations must add the factory. Exact interface, constructor
+and getter signatures are admitted by the bridge; progress uses private mutable
+storage with an immutable public surface to fit the existing library profile.
+Internal provider helpers remain instance methods under that profile. No new
+Runtime Contract setting, compiler semantic rule, native opcode or general importer
+admission is introduced. Rebuild references and System together; this is not Preview
+10 compatibility. TextWriter itself does not gain Finish.
+
+Validation in neoCLR: four focused public Encoder/writer runs and three existing
+encoding/line runs pass, including independent state, scalar/output boundaries,
+custom final bytes, failure handling and a 65536-byte write. Larger fixtures use the
+established measure_async host budget; runtime defaults stay unchanged. API/library
+snapshot checks accompany the implementation. No full suite or website build. See
+neoCLR docs/experiments/text-boundaries/public-encoder-validation.json.

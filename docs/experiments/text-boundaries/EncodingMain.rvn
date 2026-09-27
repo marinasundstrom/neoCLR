@@ -1,0 +1,306 @@
+import System.*
+import System.Collections.*
+import System.IO.*
+import System.Result.*
+import System.Text.*
+import System.Console.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public func Input(bytes: byte[]) -> MemoryStream {
+    let stream = MemoryStream()
+    match stream.Write(bytes, 0, bytes.Length) {
+        Ok(let count) => Check(count == bytes.Length, "Fixture write")
+        Error(_) => System.Fault("Fixture write error")
+    }
+    _ = stream.Seek((long)0)
+    return stream
+}
+
+public class ShortSink : OutputStream {
+    private var bytes: ArrayList<byte> = ArrayList<byte>()
+    private var closed: bool = false
+    private var flushes: int = 0
+    val Bytes: Sequence<byte> => bytes
+    val Closed: bool => closed
+    val Flushes: int => flushes
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        if closed {
+            return Error(StreamError.Closed)
+        }
+        if count == 0 {
+            return Ok(0)
+        }
+        bytes.Add(buffer[offset])
+        return Ok(1)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        flushes += 1
+        return Ok(())
+    }
+    func Close() {
+        closed = true
+    }
+}
+
+// A deliberately expanding test codec proves that adapters consume decoded text.
+public class ExpandedEncoding : Encoding {
+    func CreateEncoder() -> Encoder {
+        return ExpandedEncoder()
+    }
+    func Encode(text: string) -> Result<Sequence<byte>, EncodingError> {
+        let bytes: Sequence<byte> = [(byte)90]
+        return Ok(bytes)
+    }
+    func CreateDecoder() -> Decoder {
+        return ExpandedDecoder()
+    }
+}
+
+public class ExpandedEncoder : Encoder {
+    private var inner: Encoder = Encodings.Ascii.CreateEncoder()
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError> {
+        if final && text.IsEmpty {
+            return inner.Accept("", true)
+        }
+        return inner.Accept("Z", final)
+    }
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError> {
+        return inner.Drain(output, offset, count)
+    }
+}
+
+public class ExpandedDecoder : Decoder {
+    func Decode(source: byte[], offset: int, count: int, final: bool) -> Result<string, EncodingError> {
+        if count == 0 {
+            return Ok("")
+        }
+        return Ok("A\nB")
+    }
+}
+
+public class FailedSink : OutputStream {
+    private var zero: bool = false
+    private var calls: int = 0
+    init(zero: bool) {
+        self.zero = zero
+    }
+    val Calls: int => calls
+    func Write(buffer: byte[], offset: int, count: int) -> Result<int, StreamError> {
+        calls += 1
+        if zero {
+            return Ok(0)
+        }
+        if calls == 1 {
+            return Ok(1)
+        }
+        return Error(StreamError.AccessDenied)
+    }
+    func Flush() -> Result<unit, StreamError> {
+        return Error(StreamError.IoFailure)
+    }
+    func Close() { }
+}
+
+public func ExpectRead(result: Result<string, TextReadError>, expected: string) {
+    match result {
+        Ok(let text) => Check(text.Equals(expected), "Selected read content")
+        Error(_) => System.Fault("Selected read failed")
+    }
+}
+
+public func ExpectDecode(result: Result<string, EncodingError>, expected: string) {
+    match result {
+        Ok(let text) => Check(text.Equals(expected), "Decoded content")
+        Error(_) => System.Fault("Decode failed")
+    }
+}
+
+public func ReaderSelectionChecks() {
+    let utf8: Encoding = Encodings.Utf8
+    let ascii: Encoding = Encodings.Ascii
+    let bytes: byte[] = [(byte)195, (byte)169]
+    ExpectRead(StreamReader(Input(bytes)).ReadToEnd(2), "é")
+    ExpectRead(StreamReader(Input(bytes), utf8).ReadToEnd(2), "é")
+    match StreamReader(Input(bytes), ascii).ReadToEnd(2) {
+        Error(TextReadError.InvalidEncoding) => { }
+        _ => System.Fault("ASCII decoding must be strict")
+    }
+    let plain: byte[] = [(byte)0, (byte)65, (byte)127]
+    let reader = StreamReader(Input(plain), ascii)
+    ExpectRead(reader.ReadToEnd(3), "\u0000A\u007f")
+    ExpectRead(reader.ReadToEnd(0), "")
+    reader.Close()
+    match reader.ReadToEnd(3) {
+        Error(TextReadError.Closed) => { }
+        _ => System.Fault("Closed reader")
+    }
+    let first = utf8.CreateDecoder()
+    let second = utf8.CreateDecoder()
+    let head: byte[] = [(byte)195]
+    let tail: byte[] = [(byte)169]
+    ExpectDecode(first.Decode(head, 0, 1, false), "")
+    head[0] = (byte)65
+    ExpectDecode(second.Decode(head, 0, 1, true), "A")
+    ExpectDecode(first.Decode(tail, 0, 1, true), "é")
+    match first.Decode(tail, 0, 1, true) {
+        Error(EncodingError.Finished) => { }
+        _ => System.Fault("Decoder finalization")
+    }
+    let strict = ascii.CreateDecoder()
+    match strict.Decode(plain, 0, 4, false) {
+        Error(EncodingError.InvalidRange) => { }
+        _ => System.Fault("Invalid range")
+    }
+    ExpectDecode(strict.Decode(plain, 0, 3, true), "\u0000A\u007f")
+    let limited = StreamReader(Input(plain), ascii)
+    match limited.ReadToEnd(2) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fault("Read quota")
+    }
+    let lineSource = Input([(byte)65, (byte)13, (byte)10, (byte)66])
+    let lines = StreamReader(lineSource, ascii, true)
+    match lines.ReadLine(1) {
+        Ok(Option<string>.Some(let line)) => Check(line.Equals("A"), "ASCII CRLF")
+        _ => System.Fault("ASCII line")
+    }
+    ExpectRead(lines.ReadToEnd(1), "B")
+    lines.Close()
+    match lineSource.Seek((long)0) {
+        Ok(_) => { }
+        _ => System.Fault("Selected reader leaveOpen")
+    }
+    match StreamReader(Input(bytes), ascii).ReadLine(2) {
+        Error(TextReadError.InvalidEncoding) => { }
+        _ => System.Fault("ASCII line must decode strictly")
+    }
+    for bad in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128], [(byte)226]] {
+        let invalid = utf8.CreateDecoder()
+        match invalid.Decode(bad, 0, bad.Length, true) {
+            Error(EncodingError.InvalidUtf8) => { }
+            _ => System.Fault("Strict UTF-8 decoder")
+        }
+        match invalid.Decode(bad, 0, 0, false) {
+            Error(EncodingError.Finished) => { }
+            _ => System.Fault("Malformed decoder terminal")
+        }
+    }
+    let expanded = StreamReader(Input([(byte)1]), ExpandedEncoding())
+    match expanded.ReadLine(1) {
+        Ok(Option<string>.Some(let line)) => Check(line.Equals("A"), "Delimit decoded text")
+        _ => System.Fault("Custom codec line")
+    }
+    ExpectRead(expanded.ReadToEnd(1), "B")
+    match StreamReader(Input([(byte)1]), ExpandedEncoding()).ReadToEnd(1) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fault("Decoded text quota independent of source bytes")
+    }
+    WriteLine("Encoding selection reader and independent decoder checks passed")
+}
+
+public func LineAndRangeChecks() {
+    let utf8 = Encodings.Utf8
+    let ascii = Encodings.Ascii
+    for content in ["", "a", "é", "😀", "é", "a\rb"] {
+        let encoded = Utf8.Encode(content + "\r\n")
+        let lineInput = MemoryStream()
+        let storage: byte[] = [(byte)0]
+        for value in encoded {
+            storage[0] = value
+            _ = lineInput.Write(storage, 0, 1)
+        }
+        _ = lineInput.Seek((long)0)
+        let lineReader = StreamReader(lineInput)
+        match lineReader.ReadLine(content.GetUtf8ByteCount()) {
+            Ok(Option<string>.Some(let line)) => Check(line.Equals(content), "Unicode/empty/lone CR line")
+            _ => System.Fault("UTF-8 line")
+        }
+        match lineReader.ReadLine(0) {
+            Ok(Option<string>.None) => { }
+            _ => System.Fault("Line EOF")
+        }
+    }
+    let onlyCr = StreamReader(Input([(byte)13]), ascii)
+    match onlyCr.ReadLine(0) {
+        Error(TextReadError.LimitExceeded) => { }
+        _ => System.Fault("Lone CR is data at EOF")
+    }
+    let sliced = utf8.CreateDecoder()
+    let framed: byte[] = [(byte)65, (byte)195, (byte)169, (byte)66]
+    ExpectDecode(sliced.Decode(framed, 1, 2, false), "é")
+    ExpectDecode(sliced.Decode(framed, framed.Length, 0, true), "")
+    WriteLine("Encoding line and source range checks passed")
+}
+
+public func WriterSelectionChecks() {
+    let sink = ShortSink()
+    let writer = StreamWriter(sink)
+    match writer.Write("é😀") {
+        Ok(let count) => Check(count == 6 && sink.Bytes.Count == 6, "Actual encoded byte count")
+        _ => System.Fault("Default UTF-8 write")
+    }
+    match Utf8.Decode(sink.Bytes) {
+        Ok(let text) => Check(text.Equals("é😀"), "Partial write retry")
+        _ => System.Fault("Written UTF-8")
+    }
+    let asciiSink = ShortSink()
+    let asciiWriter = StreamWriter(asciiSink, Encodings.Ascii)
+    match asciiWriter.Write("valid then é") {
+        Error(StreamError.InvalidEncoding) => Check(asciiSink.Bytes.Count == 0, "Reject before output")
+        _ => System.Fault("ASCII encoding must be strict")
+    }
+    match asciiWriter.WriteLine("A") {
+        Ok(let count) => Check(count == 2 && asciiSink.Bytes[1] == 10, "Encode newline through selected codec")
+        _ => System.Fault("ASCII line")
+    }
+    _ = asciiWriter.Flush()
+    Check(asciiSink.Flushes == 1, "Forward flush")
+    asciiWriter.Close()
+    Check(asciiSink.Closed, "Close ownership")
+    match asciiWriter.Write("A") {
+        Error(StreamError.Closed) => { }
+        _ => System.Fault("Closed writer")
+    }
+    let borrowed = ShortSink()
+    let borrowedWriter = StreamWriter(borrowed, Encodings.Ascii, true)
+    borrowedWriter.Close()
+    Check(!(borrowed.Closed), "Selected writer leaveOpen")
+    match Encodings.Ascii.Encode("é") {
+        Error(EncodingError.UnrepresentableText) => { }
+        _ => System.Fault("Shared encoding rejects unsupported text")
+    }
+    let transformed = ShortSink()
+    match StreamWriter(transformed, ExpandedEncoding()).Write("hello") {
+        Ok(let count) => Check(count == 1 && transformed.Bytes[0] == 90, "Selected encoded byte count")
+        _ => System.Fault("Custom encoding writer")
+    }
+    match StreamWriter(FailedSink(true), Encodings.Ascii).Write("ok") {
+        Error(StreamError.IoFailure) => { }
+        _ => System.Fault("Zero progress output")
+    }
+    let failure = FailedSink(false)
+    let failingWriter = StreamWriter(failure, Encodings.Ascii)
+    match failingWriter.Write("ok") {
+        Error(StreamError.AccessDenied) => Check(failure.Calls == 2, "Error after partial output")
+        _ => System.Fault("Preserve output errors")
+    }
+    match failingWriter.Flush() {
+        Error(StreamError.IoFailure) => { }
+        _ => System.Fault("Preserve flush errors")
+    }
+    WriteLine("Encoding selection writer and strict rejection checks passed")
+}
+
+public func Main(args: string[]) {
+    if args[0].Equals("selection-read") {
+        ReaderSelectionChecks()
+    } else if args[0].Equals("encoding-lines") {
+        LineAndRangeChecks()
+    } else {
+        WriterSelectionChecks()
+    }
+}

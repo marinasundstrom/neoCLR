@@ -120,6 +120,13 @@ def build(path: Path) -> str:
         result += build(ROOT / 'runtime/raven/DateTimeFormat.neoil')
 
         result += build(ROOT / 'runtime/raven/Map.neoil')
+        result += build(ROOT / 'runtime/raven/Encoder.neoil')
+        result += build(ROOT / 'runtime/raven/EncoderProgress.neoil')
+        result += build(ROOT / 'runtime/raven/EncoderState.neoil')
+        result += build(ROOT / 'runtime/raven/Encoding.neoil')
+        result += build(ROOT / 'runtime/raven/Decoder.neoil')
+        result += build(ROOT / 'runtime/raven/EncodingError.neoil')
+        result += build(ROOT / 'runtime/raven/Encodings.neoil')
         result += build(ROOT / 'runtime/raven/Utf8.neoil')
         result += build(ROOT / 'runtime/raven/EntryKind.neoil')
         result += build(ROOT / 'runtime/raven/StorageLookupError.neoil')

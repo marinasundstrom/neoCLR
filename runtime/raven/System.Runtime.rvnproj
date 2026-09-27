@@ -439,4 +439,25 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DateTime'">
     <Compile Include="src/System/DateTime.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoding'">
+    <Compile Include="src/System/Text/Encoding.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Decoder'">
+    <Compile Include="src/System/Text/Decoder.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncodingError'">
+    <Compile Include="src/System/Text/EncodingError.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encodings'">
+    <Compile Include="src/System/Text/Encodings.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Encoder'">
+    <Compile Include="src/System/Text/Encoder.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderProgress'">
+    <Compile Include="src/System/Text/EncoderProgress.rvn" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'EncoderState'">
+    <Compile Include="src/System/Text/EncoderState.rvn" />
+  </ItemGroup>
 </Project>

@@ -1,0 +1,8 @@
+namespace System.Text
+
+import System.*
+
+public interface Encoder {
+    func Accept(text: string, final: bool) -> Result<unit, EncodingError>
+    func Drain(output: byte[], offset: int, count: int) -> Result<EncoderProgress, EncodingError>
+}

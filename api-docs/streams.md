@@ -122,13 +122,14 @@ disposal, asynchronous I/O and suspension-aware buffer ownership remain open.
 [StreamReader](xref:System.IO.StreamReader) reads strict UTF-8 from an InputStream.
 It works with host files and the sample's partial-read memory input. The POC exposes
 ReadToEnd(maxUtf8Bytes), ReadLine(maxUtf8Bytes) and Close. The [Console guide](console.md)
-describes line reading. Current constructors use UTF-8 only. Selectable reader/writer
-encodings with UTF-8 as default are the intended next foundation contract, not yet
-implemented. Async work remains separate. A BOM is preserved as text, rather than
+describes line reading. Development constructors also accept [Encoding](xref:System.Text.Encoding):
+`StreamReader(input, Encodings.Ascii)` and `StreamWriter(output, Encodings.Ascii)`,
+optionally followed by `leaveOpen`. Existing constructors select UTF-8. Async work
+remains separate. A BOM is preserved as text, rather than
 detecting other encodings.
 
-Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading; zero accepts
-only EOF. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
+Bounds are 0–65536 UTF-8 bytes. Negative bounds fail before reading. A zero bound
+accepts only EOF for ReadToEnd; ReadLine also accepts an empty terminated line. One excess byte may be consumed to detect overflow. Invalid UTF-8 has a
 distinct TextReadError; input error distinctions are preserved as named cases.
 Errors do not roll back the cursor. Repeated reads at EOF produce an empty string.
 In development after Preview 10, ReadToEnd decodes bounded UTF-8 chunks, retaining
@@ -142,7 +143,8 @@ partial text is returned. A size-limit failure takes precedence over decoding th
 read that exceeded the limit; stream errors encountered earlier remain stream errors.
 This changes how far failing reads can advance and which error is observed first
 compared with Preview 10's decode-at-EOF implementation. A final incomplete sequence
-returns InvalidUtf8. There is no new public Encoder or Decoder type in this slice.
+returns InvalidUtf8. The development [Decoder](xref:System.Text.Decoder) interface exposes incremental
+conversion. The development Encoder and StreamWriter.Finish contracts are described below.
 
 StreamReader(input) owns the input; StreamReader(input, true) leaves it open when
 closed. Close is idempotent, and reads after closing return Closed. Construction
@@ -176,5 +178,109 @@ It exercises real await and GC, but does not introduce asynchronous stream metho
 ## Console and text output
 
 TextReader/StreamReader now also support bounded ReadLine. TextWriter/StreamWriter
-provide UTF-8 output over any OutputStream. See the [Console guide](console.md) for
+provide UTF-8 output by default, or the explicitly selected encoding, over any OutputStream. See the [Console guide](console.md) for
 the standard channels, line endings, byte bounds and manual Flush reference.
+
+## Selected encodings (development)
+
+`System.Text.Encoding` is the reusable conversion policy: `Encode(string)` returns
+`Result<Sequence<byte>, EncodingError>` and `CreateDecoder()` creates independent
+state. `Encodings.Utf8` and `Encodings.Ascii` supply the first implementations.
+`Decoder.Decode(byte[], offset, count, final)` returns valid text. Success accepts
+all offered bytes; an incomplete UTF-8 scalar is copied into decoder-owned carry
+and may produce empty text. The caller may immediately reuse its array. Invalid
+ranges and counts above 65536 fail before mutation and can be retried. Malformed
+input or finalization ends the decoder; later calls return Finished. Built-ins
+never replace invalid/unrepresentable content. UTF-8 preserves U+FEFF; no codec
+sniffing, BOM insertion or automatic BOM removal occurs.
+
+`StreamReader(input, encoding[, leaveOpen])` and
+`StreamWriter(output, encoding[, leaveOpen])` select this shared interface. Existing
+constructors keep UTF-8 defaults. Each reader owns its decoder; the encoding itself
+can be reused. ReadLine recognizes LF and CRLF in decoded text and retains decoded
+suffixes supplied by a codec. Built-in codecs do not read ahead across lines.
+WriteLine encodes text plus LF together. Writer results count actual encoded bytes;
+strict built-in preflight finishes before output callbacks; the writer now drains
+a bounded byte buffer before requesting further encoded bytes. Partial writes
+are retried. Conversion errors return InvalidEncoding, while malformed UTF-8 reads
+retain InvalidUtf8. Stream failures retain their existing cases.
+
+`maxUtf8Bytes` remains the returned text's UTF-8 size, with a separate source-read
+ceiling of the same number (plus one overflow byte for ReadToEnd, or up to two line
+terminator bytes for ReadLine). These measures coincide for valid built-in input;
+custom codecs must respect both. Future expanding/stateful codecs need explicit
+source/output quota design. Errors return no partial text and may advance input.
+Writer input and encoded output are each limited to 65536 bytes; WriteLine includes
+LF in both limits. Runtime allocation/instruction budgets still apply, so the API
+ceiling is not an allocation guarantee. Conversion does not add async behavior.
+
+Compared with .NET Encoding/Decoder, the policy/factory roles are familiar but the
+conversion boundary returns valid Unicode text instead of a UTF-16 char buffer.
+This avoids exposing storage units through character APIs, at the cost of owned
+result allocations and no destination-capacity/progress API. Strict ASCII avoids
+silent replacement at the cost of handling conversion failures. Whole-value Encode remains available alongside the development incremental
+Encoder described below. Flush forwards stream flushing; explicit Finish finalizes
+a StreamWriter encoder. HTTP can reuse the
+conversion policy later, but charset selection, protocol validation and framing
+remain HTTP concerns. This work does not reopen the completed HTTP POC.
+
+Focused consumers: [EncodingMain.rvn](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/EncodingMain.rvn)
+and [verification](https://github.com/marinasundstrom/neoCLR/blob/main/docs/experiments/text-boundaries/verify_encoding.py), plus the
+existing reader regression fixtures. No website build or full suite is required.
+
+## Incremental encoding (development)
+
+[Encoding.CreateEncoder](xref:System.Text.Encoding) creates an independent
+[Encoder](xref:System.Text.Encoder). Accept a complete valid text chunk with
+`Accept(text, final)`, then call `Drain(buffer, offset, count)` until
+[EncoderProgress](xref:System.Text.EncoderProgress).State is Ready or Finished.
+[EncoderState](xref:System.Text.EncoderState).NeedsOutput means more bytes remain.
+The state and BytesWritten describe the same successful drain operation.
+
+Accept retains the immutable text, so callers need no character offset or mutable
+source-buffer lifetime rule. Nonfinal pending input rejects another Accept with
+EncodingError.Busy. Final accepted input rejects further input with Finished; its
+bytes must still drain before the returned progress says Finished. Empty final
+input is meaningful. Strict ASCII preflights all text before acceptance; rejected
+input can be corrected and retried. Built-in input and drain requests are bounded
+at 65536 UTF-8 source bytes and 65536 destination bytes respectively.
+
+Drain writes only BytesWritten bytes in the supplied range, does not retain the
+array and supports one-byte destinations. Fragments can split UTF-8 scalars; do not
+individually decode them as complete strings. Zero capacity may return NeedsOutput
+without progress. Invalid ranges and excessive requests leave output and state
+unchanged. Use one session per consumer; concurrent/reentrant calls are unsupported.
+Built-ins keep a pending encoded chunk of at most 256 bytes plus the accepted text;
+conversion still allocates and normal host resource limits apply.
+
+StreamWriter now drains through an independent encoder with a 256-byte buffer.
+It retries partial writes before asking for more encoded output. WriteLine preflights
+text plus LF together. Existing constructors keep UTF-8 defaults and leaveOpen
+behavior. Write/WriteLine results still count encoded bytes actually written.
+
+Call **StreamWriter.Finish()** to complete conversion and observe final output/errors,
+then **Flush()** if stream flushing is required, and **Close()** to release ownership.
+Finish returns additional bytes written; repeated successful Finish calls return zero.
+It does not flush or close. Write/WriteLine after Finish return InvalidEncoding.
+Close does not implicitly Finish or Flush. Finish is on StreamWriter; the general
+TextWriter interface has not gained a completion requirement.
+
+A drain/output failure can follow partial output and leaves the writer unusable for
+further Write/WriteLine/Finish; these return InvalidEncoding. Earlier source-limit
+and built-in ASCII preflight failures remain retryable and write no bytes. The writer
+never sends over 65536 bytes per call. For a custom encoder that expands beyond that
+output bound, detection can occur after partial output; there is no rollback or
+implicit replay. Closed is checked first. Flush remains available until Close.
+
+**Development migration:** custom Encoding implementations must now implement
+CreateEncoder and return fresh conversion state. Do not assume an arbitrary
+whole-value Encode implementation can safely be called separately for text fragments.
+Built-ins and the application custom-codec examples use the same public interface.
+EncoderProgress rejects negative byte counts and inactive states; providers must
+also respect the capacity offered to Drain. These APIs are not included in Preview 10.
+
+Compared with .NET Encoder.Convert, this design retains valid text rather than
+reporting UTF-16 char consumption. It permits arbitrarily small byte destinations,
+at the cost of retained input, two-stage usage and fragments that may split a scalar.
+The synthetic final-output test is a contract fixture, not an additional supported
+encoding. HTTP charset policy and additional codecs remain separate work.

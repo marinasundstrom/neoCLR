@@ -1,0 +1,16 @@
+namespace System.Text
+
+public union EncoderState {
+    case NeedsOutput
+    case Ready
+    case Finished
+
+    override func ToString() -> string {
+        return match self {
+            NeedsOutput => "NeedsOutput"
+            Ready => "Ready"
+            Finished => "Finished"
+            _ => "Empty"
+        }
+    }
+}
