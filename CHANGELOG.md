@@ -35,6 +35,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   code while retaining its typed EnvironmentUnavailable output check. Refresh
   interface-default, service-declaration, closed-dispatch graph and Raven calendar
   union fixtures to reflect implemented contracts and documented analysis limits.
+  Check source/archive sample exit codes against their declared computed results,
+  instead of treating intentional Int32 entry values as runtime failures.
 
 - Restore canonical formatting and strict Clippy gates for release preparation.
   Rename the internal slot factory, name the completion observer type and simplify

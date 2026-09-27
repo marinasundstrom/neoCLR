@@ -15,10 +15,12 @@ import tempfile
 import time
 
 
-def run(argv, cwd, capture=False, env=None):
+def run(argv, cwd, capture=False, env=None, expected_status=0):
     print("+ " + " ".join(map(str, argv)), flush=True)
-    result = subprocess.run(list(map(str, argv)), cwd=cwd, env=env, check=True,
+    result = subprocess.run(list(map(str, argv)), cwd=cwd, env=env, check=False,
                             stdout=subprocess.PIPE if capture else None, text=True, encoding="utf-8")
+    if result.returncode != expected_status:
+        raise subprocess.CalledProcessError(result.returncode, result.args, output=result.stdout)
     return result.stdout if capture else None
 
 
@@ -115,10 +117,14 @@ def main():
             program = source / "examples/source" / (name + ".neo")
             artifact = output / (name + ".neo.json")
             run([executable, "verify", program], source)
-            direct = run([executable, "run", program], source, True)
+            # Int32 Main values now become process status; these successful
+            # demonstration programs intentionally return their computed values.
+            expected_status = {"reflection": 0, "reference-identity": 0, "typeof": 0,
+                               "control-flow": 21, "reflection-hierarchy": 3}.get(name, 42)
+            direct = run([executable, "run", program], source, True, expected_status=expected_status)
             run([executable, "assemble", program, artifact], source)
             run([executable, "verify", artifact], source)
-            restored = run([executable, "run", artifact], source, True)
+            restored = run([executable, "run", artifact], source, True, expected_status=expected_status)
             if direct != restored:
                 raise RuntimeError("source/artifact output mismatch: " + name)
             report["smoke_programs"].append(name)
