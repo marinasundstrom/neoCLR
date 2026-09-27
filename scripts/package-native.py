@@ -23,13 +23,15 @@ def main():
     args = parser.parse_args()
     runtime = args.runtime.resolve()
     output = args.output.resolve()
-    output.mkdir(parents=True, exist_ok=False)
     target = {'Windows': 'win', 'Darwin': 'osx', 'Linux': 'linux'}[platform.system()]
     machine = platform.machine().lower()
     arch = {'amd64': 'x64', 'x86_64': 'x64', 'arm64': 'arm64', 'aarch64': 'arm64'}[machine]
     version = re.search(r'^version = "([^"]+)"', (ROOT / 'Cargo.toml').read_text(), re.MULTILINE).group(1)
     revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True).strip())
+    if dirty:
+        raise RuntimeError("Native release packaging requires a clean source checkout")
+    output.mkdir(parents=True, exist_ok=False)
     name = f'neoclr-{version}-{target}-{arch}'
     staged = output / name
     staged.mkdir()

@@ -19,6 +19,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Prepare Preview 11 from the bounded current surface, with Windows x64 native
   runtime packaging and extracted-sample smoke checks alongside focused host CI.
+  Keep CI reports/packages under target and reject dirty-source native packaging.
   Windows Raven SDK/bridge distribution remains unqualified. Include generic async,
   unit-delegate and interpolation consumers in the extracted toolchain bundle.
   Include routing/mapper client-server sources and separate-SDK verification, and
