@@ -485,3 +485,33 @@ error contract; this change does not introduce automatic HTTP 413 responses.
 focused DOM/stream and nested-model consumers plus independent HTTP peers. Tests
 exercise UTF-8 and escape expansion, long number spelling, the exact byte boundary,
 one byte over, borrowed ownership and untouched output on validation failure.
+
+
+## Typed arrays — development, 2026-09-27
+
+The collection slice maps vectors at the root and as properties, with String,
+Int32, Boolean, model or vector elements. Root scalar values use the same value
+mapper. Empty arrays and ordering are preserved; jagged arrays reuse recursive
+mapping. Objects and arrays both count toward four container levels. The existing
+1,024-byte, 32-value and 31-item bounds apply. Null, polymorphic elements, generic
+lists/interfaces, dictionaries and rectangular arrays remain unsupported here.
+Whole-input validation still precedes model constructors/setters, including when
+an invalid value occurs in a later array element.
+
+[System.Text.Json collection support](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/supported-types)
+(reviewed 2026-09-27) covers arrays and many generic/custom enumerable collections;
+its byte arrays have a special base64 mapping. neoCLR starts with exact typed
+vectors because it already has checked array storage and type descriptors, while
+general generic-class activation is outside its current reflection contract.
+This closes the concrete report-array use case at the cost of a narrower surface;
+byte arrays and arbitrary enumeration are not silently treated as supported JSON.
+
+Three private array services build small execution adapters using ordinary array,
+boxing and cast instructions. They do not write managed memory through a native
+shortcut; bounds/type checks, allocation limits, instruction budgets and GC roots
+remain interpreter-owned. JSON policy stays in the Raven mapper. The private
+ObjectMapper.Write bridge contract now returns JsonValue so the root can be an
+array or scalar; public JsonSerializer signatures are unchanged.
+
+See [focused collection validation](experiments/json-object-mapping/collection-validation.json)
+for runtime adapter, typed mapper and independent HTTP peer results.

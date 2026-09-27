@@ -258,3 +258,21 @@ its verifier checks 17 server cases, including 1,023/1,024-byte request bodies,
 the managed pair and an independent server. Preview 10 and the flat sample are
 unchanged. See [current validation](payload-validation.json) and the
 [budget design](../../json-dom-design.md#web-api-byte-budget--development-2026-09-27).
+
+
+## Typed collections — development, 2026-09-27
+
+The mapper now accepts one-dimensional typed arrays, including jagged arrays, of
+its supported scalars and nongeneric reference models. Scalars also work as roots.
+Arrays may appear on model properties and pass through streams and HTTP content.
+The complete supplied tree is validated before model construction, including later
+invalid elements. Nulls, element polymorphism, generic lists and dictionaries remain
+unsupported. Each array has at most 31 entries; the unchanged document-wide limits
+are 32 values, four container levels and 1,024 UTF-8 bytes.
+
+The nested station case adds required `readings: int[]` and checks 19 independent
+server cases, the managed pair and the managed client against an independent server.
+This changes the development sample's wire contract; Preview 10 remains unchanged.
+See [collection evidence](collection-validation.json), including runtime adapters and
+the independently extracted Raven target-metadata array fix. Enum, Uuid and Option
+mapping are the next author-requested slices.

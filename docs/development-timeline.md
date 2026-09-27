@@ -66,9 +66,26 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   pass with zero final live objects; see [evidence](experiments/json-object-mapping/nested-validation.json).
   Website code is extracted from the tested case. WebApplication and SQLite remain
   future work; no release or deployment is implied.
-- **Open:** exact framework/project naming, endpoint binding/result signatures,
-  JSON null/collection and limit policies, and whether to select SQLite after the
-  in-memory consumer. No subsequent author decision on these details is recorded.
+- **Subsequent author direction:** after the payload-budget slice, asks to continue
+  with collection serialization/deserialization, then adds enums and a Uuid type
+  (noting that the platform does not yet have one), and explicitly asks the JSON
+  serializer to recognize Option for JSON-nullable values.
+- **Assistant plan:** implement typed arrays first; then enum and Uuid mappings and
+  Option values. Proposes None as JSON null, Some as the contained mapping, missing
+  Option properties as None, and missing required properties as errors. These are
+  implementation choices in response to the author, not a quoted author specification.
+  The payload budget is committed as `32e63a1e`; subsequent implementation evidence
+  is recorded in the JSON design and changelog as each slice completes.
+- **Author scope correction:** “We don't have to go all the way to building a web
+  app infrastructure.” Proposes a route parser used within the handler to match
+  paths, extract parameters and return their parsed form.
+- **Assistant response:** keeps HttpServer as the host and proposes literal/named
+  path matching with explicit Int32/Uuid parsing after the JSON work. Updates the
+  roadmap and plan to defer WebApplication infrastructure. Route parsing remains
+  planned; this exchange does not claim an implemented parser.
+- **Open:** exact route-parser signatures and path normalization rules, enum/Uuid/
+  Option contracts, wider collection shapes and configurable budgets, and whether
+  to select SQLite after the in-memory consumer.
 
 ## 2026-09-26 — Streaming, modern HTTP and a finite POC
 

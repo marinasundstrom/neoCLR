@@ -7,7 +7,9 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 **Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
-`WebApplication` concept in a separate project with Minimal API endpoints.
+route parser used within an existing HttpServer handler, including named and typed
+parameters. This later author direction defers the earlier separate WebApplication
+project and Minimal API infrastructure.
 A rudimentary SQL interface with a SQLite provider is an optional follow-on based
 on the existing proposal, not a prerequisite or approval of its complete surface.
 The [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api) owns
@@ -15,7 +17,8 @@ application acceptance; the [bounded plan](web-api-plan.md) proposes the sequenc
 and records design choices still to validate. The first nested typed JSON slice is
 implemented in development with [consumer and HTTP evidence](experiments/json-object-mapping/nested-validation.json).
 JSON now matches the 1,024-byte HTTP body budget, with [boundary and case evidence](experiments/json-object-mapping/payload-validation.json).
-Next select a bounded typed collection contract before the WebApplication layer.
+Typed arrays now support collection payloads; see [collection evidence](experiments/json-object-mapping/collection-validation.json).
+Next complete enum, Uuid and Option JSON mapping, then the routed handler case.
 This explicitly supersedes the previous general useful-library priority; M2–M6
 remain candidates. Preview 10's completed POC stays closed.
 
@@ -121,7 +124,7 @@ products; their earlier ordering is not approved API scope.
 | Milestone | Sample product | Status / scope owner |
 | --- | --- | --- |
 | M1 — Communicate | Hello Service + Hello Client, now the typed HTTP/JSON exchange | Released in Preview 10; done for now |
-| Web API increment | Nested JSON + separate WebApplication/Minimal API sample | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); implementation pending |
+| Web API increment | Nested/collection JSON + typed route-parser case | Active direction; [HTTP tracker](http-capabilities.md#active-direction--minimal-web-api); JSON slices implemented; route parser planned |
 | M2 — Work with data | File Catalog | Candidate; library/data tracker |
 | M3 — Handle waiting and failure | Download Queue | Candidate; HTTP, library and runtime contracts must be selected together |
 | M4 — Human time and presentation | Activity Report | Candidate; library/data tracker |

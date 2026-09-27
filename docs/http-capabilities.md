@@ -19,8 +19,9 @@ It does not imply inclusion in published Preview 9 or production readiness.
 ## Active direction — minimal Web API
 
 **Selected 2026-09-27; nested JSON implemented in development.** The author now focuses HTTP work
-on a minimal Web API: nested typed JSON and a separate WebApplication project with
-Minimal API endpoints. See the [bounded plan](web-api-plan.md) for the proposed
+on a minimal Web API: typed JSON and, in the latest direction, a route parser
+used inside the existing handler with named parameters and typed parsing. The earlier
+separate WebApplication proposal is deferred. See the [bounded plan](web-api-plan.md) for the proposed
 sequence, .NET comparison, acceptance cases and open contracts. This is a new
 increment; it does not reopen Preview 10's completed POC.
 
@@ -31,8 +32,10 @@ consumer of the [SQL proposal](proposals/sql-data-access.md), not a Web API gate
 The [nested report evidence](experiments/json-object-mapping/nested-validation.json)
 covers independent peers and the managed pair. Development JSON now matches the
 1,024-byte HTTP body cap; [payload evidence](experiments/json-object-mapping/payload-validation.json)
-covers boundaries and the longer report case. Routing, WebApplication, typed
-collections, configurable limits and SQL remain unimplemented.
+covers boundaries and the longer report case. Typed arrays are now implemented;
+[collection evidence](experiments/json-object-mapping/collection-validation.json) covers
+array payloads and invalid elements. Enum/Uuid/Option mapping and route parsing are
+next; WebApplication, configurable limits and SQL remain deferred.
 
 ## Capability matrix
 

@@ -2791,6 +2791,7 @@ fn interpret_instructions(
                         if matches!(
                             binding,
                             crate::native::Binding::ReflectionConstruct
+                                | crate::native::Binding::ReflectionArray(_)
                                 | crate::native::Binding::ReflectionMember(_)
                                 | crate::native::Binding::ReflectionProperty(_)
                         ) {
@@ -2806,6 +2807,8 @@ fn interpret_instructions(
                                     crate::reflection_properties::adapter(
                                         module, &callee, &args, setter,
                                     )?
+                                } else if let crate::native::Binding::ReflectionArray(kind) = binding {
+                                    crate::reflection_arrays::adapter(module, &callee, &args, kind)?
                                 } else if let crate::native::Binding::ReflectionMember(kind) = binding {
                                     crate::reflection_members::adapter(module, &callee, &args, kind)?
                                 } else {

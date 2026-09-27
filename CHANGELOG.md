@@ -14,7 +14,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   document and number-token cap from 128 to 1,024 UTF-8 bytes across string, stream
   and HTTP-content paths, matching buffered HTTP bodies. Count escaped output bytes,
   validate before stream writes, and add boundary checks plus a longer station report;
-  bound object depth to four including the root, reject polymorphic property values,
+  support typed scalar/model arrays (including jagged arrays) and scalar roots,
+  validate every array element before constructing models, and use checked runtime
+  adapters for array access/construction. Integrate the independently tested Raven
+  target-metadata array fix. Bound container depth to four including the root,
+  reject polymorphic property values,
   and serialize shared children as independent subtrees. Add focused mapping checks
   and a nested station-report client/server case with on-site walkthrough and
   downloadable tested sources. Introduce a tested general HttpClient example and
@@ -22,9 +26,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   followed by its connecting client. Give the case its own page and navigation,
   retain essential code on the feature page, and record contextual cases as a
   general website convention. Record the author-selected minimal Web API priority
-  and roadmap acceptance scope; a separate WebApplication project with Minimal API
-  endpoints and optional SQLite-backed SQL remain plans. Preview 10 remains
-  flat-model-only.
+  and roadmap acceptance scope. The latest author direction selects a route parser
+  inside HttpServer with typed parameter extraction, deferring the earlier separate
+  WebApplication plan; enum/Uuid/Option mapping and optional SQLite remain planned.
+  Preview 10 remains flat-model-only.
 
 - Add development System.Runtime.GC with execution-local collection, allocation,
   retained/peak/reclaimed object counters and the host heap-object limit. Add

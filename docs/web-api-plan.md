@@ -18,11 +18,11 @@ Keep three independently usable layers:
 
 - Existing HTTP transport, messages, context and cancellation in System.Web.Http.
 - Shared typed JSON conversion in System.Data.Json and the existing HTTP JSON helpers.
-- WebApplication and endpoint routing in a **separate library project**, consumed
-  by a separate sample application. System.Web remains a candidate namespace from
-  the earlier discussion; project/package names are not yet selected.
+- A small route-pattern parser used explicitly inside the existing HttpServer
+  handler. The author subsequently replaces the earlier separate WebApplication
+  proposal with this smaller scope; a hosting framework is not required.
 
-SQL contracts and a SQLite provider remain separate from the web framework. Start
+SQL contracts and a SQLite provider remain separate from HTTP routing. Start
 with ordinary application composition; DI, a general host builder, middleware
 infrastructure and automatic discovery are not needed to prove these endpoints.
 
@@ -56,22 +56,27 @@ transport and runtime resource limits together; changing one constant is insuffi
    accepts 1,024 UTF-8 bytes, with below/at/above-boundary checks and a longer nested
    station report. See [budget evidence](experiments/json-object-mapping/payload-validation.json).
    Four levels and 32 values remain unchanged. Next add a bounded
-   collection shape for list results and make missing versus null versus optional
-   values explicit. These are separate decisions from accepting a nested object;
-   broader numeric/date/converter support is selected only through a consumer.
-3. **Separate WebApplication project.** Prove project references on the neoCLR
-   target. Add method/path registration, literal paths and single-segment route
-   parameters, asynchronous handlers, and one owner of response completion and
-   cleanup. Familiar MapGet/MapPost names are candidates. Start with explicit
-   context/route access and shared JSON reads/writes; infer arbitrary delegate
-   parameter binding only if a later compiled experiment justifies it.
-4. **End-to-end API.** Compile and run the contact sample against an independent
-   client and the neoCLR client. Specify duplicate/ambiguous route registration,
-   path decoding, query separation, 404 and 405 with Allow, malformed JSON (400),
-   unsupported media types (415), and oversized payloads (413). Keep domain-result
-   to status mapping explicit. Check cancellation, handler failures, shutdown and
-   exactly-once response completion; define HEAD behavior using current no-body
-   semantics. New public APIs require matching reference artifacts and API docs.
+   collection shape for list results. The author subsequently explicitly selects
+   collection serialization/deserialization, enum mapping, a new Uuid type, and
+   Option mapping for JSON nullability. Complete those before the route-parser
+   consumer. The proposed Option rule is None/null and Some/contained value, with
+   missing Option properties becoming None and required missing fields remaining
+   errors. Broader numeric/date/converter support is selected only through a consumer.
+3. **Route parser inside the handler — author-selected smaller scope.** Match
+   literal segments and named single-segment parameters, then expose explicit typed
+   parsing (initial candidates: Int32 and Uuid). Keep method selection, JSON reads,
+   domain behavior and response completion in the existing HttpServer handler.
+   Distinguish pattern errors, a route that does not match, and a parameter that
+   cannot be parsed. Exact public signatures remain to be tested in Raven.
+4. **End-to-end routed case.** Extend the tested station-report case with a path
+   such as /stations/{id}/reports and a connecting client. Specify case sensitivity,
+   trailing slashes, query separation and percent decoding before implementation;
+   avoid decoding an escaped slash into an additional path segment. Check literal
+   mismatch, missing/extra segments, invalid patterns, typed parameter failure and
+   successful extraction. The handler explicitly chooses 400/404/405 and owns its
+   existing cleanup. No registration table, DI, middleware, automatic delegate binding
+   or new application lifecycle is needed. New public APIs require matching reference
+   artifacts and API documentation. WebApplication remains deferred.
 5. **Optional SQL/SQLite consumer.** If selected, reduce the
    [SQL proposal](proposals/sql-data-access.md) to opening/closing a connection,
    parameterized execution, a forward reader, explicit SQL NULL/value mapping,
@@ -108,12 +113,12 @@ API snippet. The website is part of application acceptance, not a final cosmetic
 Primary sources reviewed 2026-09-27:
 
 - [ASP.NET Core Minimal APIs (.NET 10 documentation)](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-10.0)
-  combines WebApplication and route handlers. Adopt the small endpoint registration
-  experience as an ergonomic target. neoCLR's separate library composes existing
-  Result/Task and HTTP lifecycle contracts; it does not require ASP.NET Core's host,
-  service container or delegate binding machinery. Explicit binding is easier to
-  validate but needs more handler code. Keeping raw HttpServer only avoids another
-  project but repeats routing/completion policy in applications.
+  combines WebApplication and route handlers. The initial proposal targeted that
+  registration experience; the author subsequently selects explicit route matching
+  within HttpServer instead. Reusing the existing lifecycle reduces implementation
+  and conceptual scope. Applications retain method dispatch, error/status mapping
+  and route ordering themselves; no automatic binding or routing precedence is
+  claimed. This is a smaller contract, not a performance claim.
 - [System.Text.Json deserialization](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/deserialization)
   supports nested models and collections. neoCLR's missing typed recursion is an
   implementation gap, not a limitation of .NET. Extend the current reflection mapper

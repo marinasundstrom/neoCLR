@@ -33,6 +33,7 @@ pub(crate) enum Binding {
     ReflectionMember(u8),
     ReflectionMemberCheck(u8),
     ReflectionAssignable,
+    ReflectionArray(u8),
     ReflectionPropertyCheck(bool),
     ReflectionProperty(bool),
     ObjectTypeHandle,
@@ -138,6 +139,20 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             return Err(Fault::new("reflection binding signature mismatch"));
         }
         return Ok(Binding::Reflection(query));
+    }
+    for (kind, name) in ["Length", "Get", "Create"].iter().enumerate() {
+        if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") { continue; }
+        let object = Type::from_name("System.Object");
+        let expected = match kind {
+            0 => vec![object.clone()],
+            1 => vec![object.clone(), Type::Int32],
+            _ => vec![Type::from_name("System.Introspection.TypeInfo"), Type::ArrayRef(Box::new(object.clone()))],
+        };
+        let returns = if kind == 0 { Type::Int32 } else { object };
+        if function.parameters != expected || function.returns != returns || function.no_result {
+            return Err(Fault::new("reflection array signature mismatch"));
+        }
+        return Ok(Binding::ReflectionArray(kind as u8));
     }
     if function.name == "neoCLR.Runtime.ReflectionAssignable" {
         if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || function.returns != Type::Boolean || function.no_result { return Err(Fault::new("reflection assignability signature mismatch")); }

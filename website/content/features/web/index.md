@@ -213,9 +213,10 @@ is a correctness POC, not a performance benchmark. Generated async states still 
 
 ## Direction
 
-The active development direction is a small Web API with nested JSON and a
-WebApplication layer in a separate project. Nested mapping is implemented in
-development; WebApplication and Minimal API endpoint registration remain planned.
+The active development direction is a small Web API. Nested objects and typed
+arrays are implemented in development. Next, a route parser should let an existing
+HttpServer handler match paths and extract typed parameters. This smaller scope
+defers WebApplication infrastructure and automatic endpoint registration.
 SQLite-backed persistence is an optional exploration.
 
 Possible later steps include asynchronous body contracts, response streaming, TLS
@@ -409,9 +410,9 @@ cause. Cancellation remains task cancellation.
 
 The managed report sample fetches a typed report from a neoCLR server, posts it back,
 and reads a JSON acknowledgement. Preview 10 maps flat String, Int32 and Boolean
-properties. Development builds add nested reference objects with the same scalar
+properties. Development builds add nested reference objects and typed arrays with the same scalar
 rules and allow documents up to 1,024 UTF-8 bytes. Conversion is synchronous over
-buffered HTTP content. Per-call header options, collections and nullable mapping
+buffered HTTP content. Per-call header options, generic lists and nullable mapping
 remain later work. See [the API guide](/docs/json.html) for the exact scope.
 
 ## JSON DOM

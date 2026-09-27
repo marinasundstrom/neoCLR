@@ -38,7 +38,7 @@
     "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn": "aeb57eb5d04d850552ace53e8330ef5289d7962d140feedd7d9b6eef0e645775",
     "runtime/raven/src/System/Data/Json/JsonDocument.rvn": "9a76a1609410d41737ce39eb4315dd799228bf923651265d4054a4336e32eb14",
     "runtime/raven/src/System/Data/Json/JsonSyntax.rvn": "545324a12836301dac9458af43aeb4293b538c7ec06470800adf2fa5539880a0",
-    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "6ac651bfe446794adedfb05daa67764e57fbfee1a7385278733dedad69929f7f",
+    "runtime/raven/src/System/Data/Json/ObjectMapper.rvn": "1c1781678ad49d5bc8ad5acb0d075351be10cceb41888eb7bbeb4e895b09ff4b",
     "runtime/raven/src/System/Data/Json/JsonSerializer.rvn": "c43ec8a0fb5fe2b73e0b0cfec8b24ad921af16b92868d373bfd64f1628a4e7b1",
     "runtime/raven/src/System/Concurrency/Cancellation.rvn": "282d19a6ce7a57d18ba3fe3f45f59ff1eaeec4545b39048bac6b0bdd2de3111a",
     "runtime/raven/src/System/Networking/IPAddress.rvn": "5ecdd9eb17020955570880789a4f8ee4c80eb45a5575e8e26cbf9d85a4ff7322",
@@ -172,10 +172,10 @@
   },
   "outputs": {
     "JsonValue.methods.neoil": "6a47ff7e21c5cbac8042d249dd6aba8843437ed529f66436d13a50629e2b8199",
-    "JsonValue.helpers.neoil": "2511b7beb8c4dc1a6333506d3d5ba4c3fb15a92f3a6f302e8374c7ec0ae95266"
+    "JsonValue.helpers.neoil": "a38cb4f6f39fdcab7923e0b149e778c3ad3478a3ebcaff9ac09d8e34a17d4807"
   },
-  "compilerSha256": "e93241cabea700f511fb141a677919fdd9ff8bd6b19fae571e90fc5f2475c8f3",
-  "coreSha256": "6388a48392633850a157b04fc5ef4cd37e0ddd451c980dbd01f658365c3f4c60",
+  "compilerSha256": "9378ae6a3de0bdbfdc3f6025950ea769c9f1599d6a1c23d0f4a6367d4967e792",
+  "coreSha256": "7dc18308224bc7448bb61dee54a86e4386b1416bbc1b836966b3e800c9f66477",
   "exports": [
     ".ctor() -> noresult"
   ]

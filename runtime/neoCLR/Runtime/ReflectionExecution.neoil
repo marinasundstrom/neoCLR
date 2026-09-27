@@ -17,3 +17,14 @@
 .function neoCLR.Runtime.ReflectionPropertySet(System.RuntimeTypeHandle type,Int32 index,System.Object receiver,System.Object value) -> Void
 .methodimpl InternalCall
 .end
+
+; Private typed-array plumbing; JSON policy remains in the Raven mapper.
+.function neoCLR.Runtime.ReflectionArrayLength(System.Object value) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionArrayGet(System.Object value,Int32 index) -> System.Object
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionArrayCreate(System.Introspection.TypeInfo type,arrayref<System.Object> values) -> System.Object
+.methodimpl InternalCall
+.end

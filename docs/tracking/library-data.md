@@ -16,8 +16,10 @@ input tree before constructors/setters, and bounds recursion to four object leve
 Cycles fail at the depth bound; shared children are independent subtrees. Nulls
 remain rejected. The fixed document budget now matches HTTP at 1,024 UTF-8 bytes; see
 [payload evidence](../experiments/json-object-mapping/payload-validation.json).
-Collections, nullable/optional values and configurable payload limits
-remain next contract choices;
+Typed scalar/model arrays (including jagged arrays) and scalar roots are now
+supported; see [collection evidence](../experiments/json-object-mapping/collection-validation.json).
+Enum mapping, a new Uuid type and Option nullability are the next author-selected
+contracts. Generic lists, dictionaries and configurable limits remain deferred;
 the plan distinguishes the first nested-object slice from later API requirements.
 SQLite stays exploratory under the [SQL proposal](../proposals/sql-data-access.md).
 

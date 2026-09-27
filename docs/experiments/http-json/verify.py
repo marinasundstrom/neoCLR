@@ -37,7 +37,7 @@ if args.nested:
         'description': ('Indoor air-quality sensor near the café entrance. Reports are collected '
                         'during opening hours to help staff check ventilation and keep the '
                         'seating area comfortable.'),
-    }}
+    }, 'readings': [21, 22]}
 reply = {'accepted': True}
 
 
@@ -121,15 +121,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             ('GET', '/missing', None, 404, {'error': 'Not found'}),
         ]
         if args.nested:
-            cases[9] = ('POST', '/reports', b'{"station":{"name":"","description":""}}', 201, reply)
-            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true,"description":""}}', 201, reply)
+            cases[9] = ('POST', '/reports', b'{"station":{"name":"","description":""},"readings":[]}', 201, reply)
+            cases[10] = ('POST', '/reports', b'{"station":{"name":"Caf\\u00e9","extra":true,"description":""},"readings":[]}', 201, reply)
             cases += [
                 ('POST', '/reports', b'{"station":{}}', 400, {'error': 'Invalid report'}),
                 ('POST', '/reports', b'{"station":{"name":12}}', 400, {'error': 'Invalid report'}),
                 ('POST', '/reports', b'{"station":{"name":null}}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":"x","description":""},"readings":[1,"2"]}', 400, {'error': 'Invalid report'}),
+                ('POST', '/reports', b'{"station":{"name":"x","description":""},"readings":null}', 400, {'error': 'Invalid report'}),
             ]
             for size in (1023, 1024):
-                boundary = {'station': {'name': 'Café', 'description': ''}}
+                boundary = {'station': {'name': 'Café', 'description': ''}, 'readings': []}
                 base = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
                 boundary['station']['description'] = 'a' * (size - len(base))
                 payload = json.dumps(boundary, ensure_ascii=False, separators=(',', ':')).encode()
@@ -175,7 +177,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
     for iteration in range(1, args.repeat + 1):
         print(f'Iteration {iteration}/{args.repeat}: {args.case}', flush=True)
         if args.case in ('all', 'server'):
-            serve(independent, 17 if args.nested else 12)
+            serve(independent, 19 if args.nested else 12)
         if args.case in ('all', 'pair'):
             serve(client, 2 if args.mapped else 1)
         if args.case in ('all', 'client'):

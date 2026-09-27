@@ -1,5 +1,25 @@
 # Raven targeting neoCLR
 
+## Typed JSON array integration (2026-09-27)
+
+The JSON mapper uses three private checked array services for length, boxed element
+access and typed construction. Public serializer signatures stay unchanged; the
+private ObjectMapper.Write reference contract now returns JsonValue for array and
+scalar roots. Array operations execute through ordinary interpreter frames and
+retain type/bounds, allocation and GC checks. Runtime Contract settings are unchanged.
+
+Generic array results exposed a general Raven metadata-context bug. The independent
+main-based fix `f20a65b72` is integrated on the neoCLR branch as `84d1b10e0`; its
+eight focused tests pass (three new cases failed before), using ordinary reference-only
+CLI contracts and .NET 11 metadata. It does not add neoCLR policies to Raven main or
+claim execution validation on .NET Framework/NanoFramework. Consumers require the
+matching rebuilt compiler/bridge/reference.
+
+A separate general candidate remains: propagation directly inside an indexed
+assignment can leave the array/index on an early-return IL stack. The mapper uses
+a named mapped value before assignment; the isolated compiler regression is not
+yet validated or integrated. This is distinct from array type projection.
+
 ## Explicit application interface integration (2026-09-27)
 
 The development bridge imports ordinary explicit instance implementations on

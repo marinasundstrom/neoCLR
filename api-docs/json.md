@@ -5,7 +5,7 @@ title: JSON serialization
 
 **Preview 10.** [JsonSerializer](xref:System.Data.Json.JsonSerializer)
 reads/writes the closed JsonValue DOM and has provisional flat-object overloads.
-**Development after Preview 10** also maps nested nongeneric reference objects.
+**Development after Preview 10** also maps nested nongeneric reference objects, typed arrays and root String/Int32/Boolean values.
 Rebuild consumers with the matching Preview 10 reference and library; JsonError has
 new mapping cases. All operations are synchronous and return Result with [JsonError](xref:System.Data.Json.JsonError).
 
@@ -32,7 +32,7 @@ Serialize(output: OutputStream, value: Object) -> Result<unit, JsonError>
 Use `JsonSerializer.Deserialize<YourClass>(text)?` for a typed result, or pass
 `typeof(YourClass)` to the non-generic read overload. Both use the same mapper and
 return the same structured errors, including UnsupportedMapping for unsupported
-targets such as value types. Construction requires a
+targets such as unsupported value types and generic lists. Object construction requires a
 runtime-backed public nongeneric reference class with a public parameterless
 constructor. The serializer invokes real constructors/getters/setters through
 [runtime reflection](reflection.md); it never writes backing fields directly.
@@ -44,14 +44,14 @@ rebuild with matching references and library artifacts.
 ## Provisional property rules
 
 - Map String, Int32 and Boolean public instance properties, plus nested nongeneric
-  reference objects in development, with exact, case-sensitive
+  reference objects and typed arrays in development, with exact, case-sensitive
   names. No naming policy or attribute support; property order is not promised.
 - Serialize public getters, including read-only properties. Deserialize public
   setters; read-only/private setters and static properties are ignored. Fields are ignored.
 - Every writable mapped property must be present on input. Unknown JSON fields are
   ignored; duplicate decoded names remain invalid. This strict presence rule differs
   from .NET's default treatment of non-required missing properties.
-- Reject null, collections, Option, enums, unsupported scalars
+- Reject null, generic collections, Option, enums, unsupported scalars
   and indexers in participating properties. Int32 requires a checked integer token;
   fraction/exponent tokens are not coerced.
 
@@ -67,6 +67,23 @@ unsupported shapes through diagnostic text; ordinary syntax, missing-field,
 type-mismatch, number and stream causes retain their existing JsonError cases.
 Terminal Faults from user accessors/constructors are not wrapped.
 
+## Typed arrays — development
+
+Use `Deserialize<int[]>("[21,22]")` or `Deserialize<ReportPayload[]>(text)` for
+root arrays. Array-valued model properties use the same mapper; strings, Int32,
+Boolean, supported models and jagged arrays can be elements. String/Int32/Boolean
+also work as root values. The non-generic TypeInfo, borrowed stream, JsonContent
+and generic HTTP helper paths share this behavior.
+
+Order and empty arrays are preserved. Each array admits at most 31 elements;
+every object or array consumes a container level and contributes to the existing
+32-value document bound. Element types are exact, with no coercion or polymorphic
+substitution. Null arrays/elements are rejected; missing writable array properties
+remain errors. Generic lists, interfaces, dictionaries, rectangular arrays and
+unsupported scalar elements remain outside this slice. Shared model elements
+serialize repeatedly and deserialize independently. The complete input tree,
+including later elements, is validated before any model constructor/setter runs.
+
 ## Streams and limits
 
 Streams are borrowed, left open and not flushed. Reads consume through EOF and may
@@ -79,9 +96,9 @@ including whitespace, property names and escaped output. String and buffered HTT
 return LimitExceeded above that cap; stream input reads at most 1,025 bytes and returns
 Read(TextReadError.LimitExceeded), leaving the stream open. JSON number tokens use the
 same byte cap; longer tokens return InvalidNumber. Existing shape bounds apply: four container levels, 32 value occurrences,
-31 children per container. Development object mapping supports up to four object
+31 children per container. Development mapping supports up to four object/array container
 levels including the root; deeper graphs and cycles return LimitExceeded. This
-bounded recursion does not preserve reference identity. Collections, configurable
+bounded recursion does not preserve reference identity. Generic lists, dictionaries, configurable
 limits and naming/null policies remain later work. Shared content conversion is
 described below.
 

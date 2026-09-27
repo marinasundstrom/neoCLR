@@ -6,13 +6,22 @@ import System.Introspection.*
 import System.Option.*
 import System.Result.*
 import System.Runtime.Reflection.*
+import System.Runtime.CompilerServices.*
 
 internal class ObjectMapper {
     init() { }
 
     private static func CheckType(type: TypeInfo) -> Result<unit, JsonError> {
-        if type.IsValueType || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 || type.Equals(typeof(string)) {
-            return Error(JsonError.UnsupportedMapping("Expected a nongeneric reference class"))
+        if type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
+            return Ok(())
+        }
+        if type.IsArray {
+            if let Some(element) = type.GetElementType() {
+                return CheckType(element)
+            }
+        }
+        if type.IsValueType || type.IsInterface || type.IsArray || type.IsByRef || type.IsPointer || type.IsOpen || type.GenericArgumentCount != 0 {
+            return Error(JsonError.UnsupportedMapping("Expected a scalar, typed array or nongeneric reference class"))
         }
         return Ok(())
     }
@@ -21,51 +30,58 @@ internal class ObjectMapper {
         if property.GetIndexParameters().Count != 0 {
             return Error(JsonError.UnsupportedMapping("Indexed property: " + property.Name))
         }
-        let type = property.PropertyType
-        if type.Equals(typeof(string)) || type.Equals(typeof(int)) || type.Equals(typeof(bool)) {
-            return Ok(())
-        }
-        return CheckType(type)
+        return CheckType(property.PropertyType)
     }
 
-    static func Write(value: Object) -> Result<JsonObject, JsonError> {
-        return WriteObject(value, 0)
+    static func Write(value: Object) -> Result<JsonValue, JsonError> {
+        return WriteValue(value, value.GetType(), 0)
     }
 
-    private static func WriteObject(value: Object, depth: int) -> Result<JsonObject, JsonError> {
-        if depth >= 4 {
-            return Error(JsonError.LimitExceeded("Object depth exceeds four (or cyclic graph)"))
-        }
-        let type = value.GetType()
+    private static func WriteValue(value: Object?, type: TypeInfo, depth: int) -> Result<JsonValue, JsonError> {
         _ = CheckType(type)?
+        let present: Object = value ?? return Error(JsonError.UnsupportedMapping("Null mapped value"))
+        if !present.GetType().Equals(type) {
+            return Error(JsonError.UnsupportedMapping("Polymorphic mapped value"))
+        }
+        if present is string text {
+            return Ok(JsonString(text))
+        }
+        if present is int number {
+            let scalar = JsonNumber.Parse(number.ToString())?
+            return Ok(scalar)
+        }
+        if present is bool flag {
+            return Ok(JsonBoolean(flag))
+        }
+        if depth >= 4 {
+            return Error(JsonError.LimitExceeded("Container depth exceeds four (or cyclic graph)"))
+        }
+        if type.IsArray {
+            let Some(element) = type.GetElementType() else {
+                return Error(JsonError.UnsupportedMapping("Missing array element type"))
+            }
+            let count = RuntimeServices.ReflectionArrayLength(present)
+            if count > 31 {
+                return Error(JsonError.LimitExceeded("Array exceeds 31 items"))
+            }
+            let array = JsonArray()
+            for index in 0..<count {
+                let child = RuntimeServices.ReflectionArrayGet(present, index)
+                let node = WriteValue(child, element, depth + 1)?
+                _ = array.Add(node)?
+            }
+            return Ok(array)
+        }
         let document = JsonObject()
         for property in type.GetProperties() {
             if !property.IsStatic && property.GetGetMethod() is Some(_) {
                 _ = CheckProperty(property)?
-                let item: Object? = match property.GetValue(value) {
+                let item: Object? = match property.GetValue(present) {
                     Ok(let content) => content
-                    Error(let reason) => {
-                        return Error(JsonError.Reflection(reason))
-                    }
+                    Error(let reason) => return Error(JsonError.Reflection(reason))
                 }
-                if item is Object present {
-                    if !present.GetType().Equals(property.PropertyType) {
-                        return Error(JsonError.UnsupportedMapping("Polymorphic property: " + property.Name))
-                    }
-                }
-                if item is string text {
-                    _ = document.Add(property.Name, JsonString(text))?
-                } else if item is int number {
-                    let scalar = JsonNumber.Parse(number.ToString())?
-                    _ = document.Add(property.Name, scalar)?
-                } else if item is bool flag {
-                    _ = document.Add(property.Name, JsonBoolean(flag))?
-                } else if item is Object child {
-                    let nested = WriteObject(child, depth + 1)?
-                    _ = document.Add(property.Name, nested)?
-                } else {
-                    return Error(JsonError.UnsupportedMapping("Null property: " + property.Name))
-                }
+                let node = WriteValue(item, property.PropertyType, depth + 1)?
+                _ = document.Add(property.Name, node)?
             }
         }
         return Ok(document)
@@ -73,49 +89,63 @@ internal class ObjectMapper {
 
     static func Read(value: JsonValue, type: TypeInfo) -> Result<Object, JsonError> {
         // Validate the entire input tree before executing any model user code.
-        _ = ReadObject(value, type, 0, 0)?
-        return ReadObject(value, type, 0, 1)
+        _ = ReadValue(value, type, 0, 0)?
+        return ReadValue(value, type, 0, 1)
     }
 
     // Pass 0 validates; pass 1 constructs. Integer mode avoids the current bridge
     // limitation on Boolean conversions at multi-argument private calls.
-    private static func ReadObject(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
-        if depth >= 4 {
-            return Error(JsonError.LimitExceeded("Object depth exceeds four"))
-        }
+    private static func ReadValue(value: JsonValue, type: TypeInfo, depth: int, construct: int) -> Result<Object, JsonError> {
         _ = CheckType(type)?
+        if type.Equals(typeof(string)) {
+            if value is JsonString text {
+                return Ok(text.Value)
+            }
+            return Error(JsonError.TypeMismatch("string"))
+        }
+        if type.Equals(typeof(int)) {
+            if value is JsonNumber number {
+                let parsed = number.AsInt32()?
+                return Ok(parsed)
+            }
+            return Error(JsonError.TypeMismatch("Int32"))
+        }
+        if type.Equals(typeof(bool)) {
+            if value is JsonBoolean flag {
+                return Ok(flag.Value)
+            }
+            return Error(JsonError.TypeMismatch("Boolean"))
+        }
+        if depth >= 4 {
+            return Error(JsonError.LimitExceeded("Container depth exceeds four"))
+        }
+        if type.IsArray {
+            let Some(element) = type.GetElementType() else {
+                return Error(JsonError.UnsupportedMapping("Missing array element type"))
+            }
+            if value is JsonArray array {
+                let items = CheckedStorage.Reserve<Object>(array.Count)
+                for index in 0..<array.Count {
+                    let child = array.Item(index)?
+                    let mapped = ReadValue(child, element, depth + 1, construct)?
+                    items[index] = mapped
+                }
+                if construct == 0 {
+                    return Ok(array)
+                }
+                return Ok(RuntimeServices.ReflectionArrayCreate(type, items))
+            }
+            return Error(JsonError.TypeMismatch("array"))
+        }
         if value is JsonObject document {
             let properties = ArrayList<PropertyInfo>()
             let values = ArrayList<Object>()
-            // The validation pass traverses the same shape without model construction.
             for property in type.GetProperties() {
                 if !property.IsStatic && property.GetSetMethod() is Some(_) {
                     _ = CheckProperty(property)?
                     let item = document.Field(property.Name)?
-                    let propertyType = property.PropertyType
-                    if propertyType.Equals(typeof(string)) {
-                        if item is JsonString text {
-                            values.Add(text.Value)
-                        } else {
-                            return Error(JsonError.TypeMismatch("string property " + property.Name))
-                        }
-                    } else if propertyType.Equals(typeof(int)) {
-                        if item is JsonNumber number {
-                            let parsed = number.AsInt32()?
-                            values.Add(parsed)
-                        } else {
-                            return Error(JsonError.TypeMismatch("Int32 property " + property.Name))
-                        }
-                    } else if propertyType.Equals(typeof(bool)) {
-                        if item is JsonBoolean flag {
-                            values.Add(flag.Value)
-                        } else {
-                            return Error(JsonError.TypeMismatch("Boolean property " + property.Name))
-                        }
-                    } else {
-                        let nested = ReadObject(item, propertyType, depth + 1, construct)?
-                        values.Add(nested)
-                    }
+                    let mapped = ReadValue(item, property.PropertyType, depth + 1, construct)?
+                    values.Add(mapped)
                     properties.Add(property)
                 }
             }
@@ -124,9 +154,7 @@ internal class ObjectMapper {
             }
             let instance = match type.CreateInstance() {
                 Ok(let created) => created
-                Error(let reason) => {
-                    return Error(JsonError.Reflection(reason))
-                }
+                Error(let reason) => return Error(JsonError.Reflection(reason))
             }
             for index in 0..<properties.Count {
                 if let Error(reason) = properties[index].SetValue(instance, values[index]) {

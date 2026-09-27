@@ -46,6 +46,7 @@ public class Station {
 public class ReportPayload {
     init() { }
     var station: Station { get; set; } = Station()
+    var readings: int[] { get; set; } = [21, 22]
 }
 
 public class Acknowledgement {

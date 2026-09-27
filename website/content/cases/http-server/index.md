@@ -90,11 +90,12 @@ Use `--mapped` for the flat typed-model variant, which fetches then submits a re
 
 **Requires a matching development build after Preview 10.** The same report
 exchange now carries a station name and a description of where the sensor is
-installed and why staff use it. This report exceeds the old 128-byte JSON limit. The client first fetches
+installed and why staff use it, plus a `readings` array of integer measurements. This report exceeds the old 128-byte JSON limit. The client first fetches
 this model from GET `/report`, then submits it to POST `/reports`. The server
 reads the nested station and returns the same 201 acknowledgement. This is still
-an explicit HttpServer application; WebApplication and automatic endpoint binding
-are planned separately.
+an explicit HttpServer application. The next routing case is planned around a
+route parser inside the handler, with named parameters and typed parsing;
+WebApplication infrastructure remains deferred.
 
 ### Shared models
 
@@ -139,14 +140,16 @@ python3 http-json/verify.py \
 
 The verifier builds both projects, starts the server on a free loopback port,
 checks it with Python requests, runs the neoCLR client/server pair, and checks the
-client against a Python server. Expect 17 server cases, successful JSON client and
+client against a Python server. Expect 19 server cases, successful JSON client and
 server reports, and a final `Public JSON DOM + HTTP checks passed: all` line with
 an iteration count. The client response is `{"accepted":true}`. Individual server
 or client checks can be selected with `--case server` or `--case client`.
 
 Nested mapping allows 1,024 UTF-8 bytes per document, matching the buffered HTTP
 body limit, and permits four object levels
-including the root. Nulls, typed collections and polymorphic property values
+including the root, counting arrays as containers. Typed arrays preserve order and
+empty values; each array allows up to 31 items within the shared 32-value document
+limit. Nulls, generic lists and polymorphic property/element values
 remain unsupported. Shared child references are serialized as repeated objects;
 cycles fail at the depth limit. See [JSON mapping rules](/docs/json.html) for
 construction, error and stream ownership contracts.
