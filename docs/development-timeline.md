@@ -8720,3 +8720,16 @@ for scope and remaining lookup/inference work.
 - **Evidence:** [integration and validation](ravendoc-integration.md),
   [pinned publisher](../tools/ravendoc/version.json). The local preview is not a
   public deployment. Separate runtime/reflection development remains independent.
+
+### 2026-09-27 — Compact documentation typography
+
+- Author: the fonts feel too large on a 13-inch screen, especially code blocks;
+  asked for a balanced technical-documentation scale across the site. Shared
+  defaults belong in RavenDoc and must remain overridable.
+- Assistant: set relative-unit defaults equivalent to 15px prose and 13px code,
+  remove neoCLR’s oversized article-title override, and retain a distinct landing
+  hero scale. Document the CSS variables and demonstrate defaults in the sample.
+- Author feedback on the preview: “It’s better now”.
+- Review: light/dark desktop and narrow-screen checks preserved highlighting;
+  a long inline expression exposed mobile overflow, addressed by wrapping inline
+  code while keeping code-block scrolling.

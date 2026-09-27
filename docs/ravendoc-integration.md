@@ -58,3 +58,15 @@ headings and page-outline links wrap without widening JsonNumber at 390px or
 1280px viewports. The existing
 reference assembly was unchanged; only the exclusion-policy fingerprint changed.
 Local generation is not publication; deployment remains the manual website workflow.
+
+## Typography defaults
+
+The shared publisher uses `--doc-text-size: 0.9375rem` for prose/member labels
+and `--doc-code-size: 0.8125rem` for code blocks and signatures, with a 1.6 line
+height. The site adopts these defaults instead of enlarging article titles.
+Sites can override the variables in their configured stylesheet; relative units
+retain browser font preferences and zoom. Long inline code wraps in prose;
+code blocks retain internal horizontal scrolling and syntax highlighting.
+
+The typography review covered the landing page, guides, a code-heavy HTTP guide
+and API reference at desktop and narrow widths in light and dark themes.
