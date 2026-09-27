@@ -139,3 +139,21 @@ See the [2026-09-27 CPU investigation](cpu-investigation-20260927.md) for measur
 idle versus request cost, header-size scaling, the sample's fatal over-limit path,
 and the proposed bounded optimization sequence. No runtime optimization is included
 in that investigation.
+
+## Recovering from rejected connections — development, 2026-09-27
+
+The DOM and typed JSON sample loops now continue after Accept returns Protocol,
+LimitExceeded or Unsupported. Accept has already closed the rejected connection
+and released its exchange slot; it cannot return a response through HttpContext
+for that failure. No 400/431 response is claimed. Other failures still propagate.
+Rejected attempts count toward the sample's configured request count, so recovery
+cannot create an unbounded retry loop. This matches the useful host-lifetime
+property of ASP.NET Core/Kestrel: malformed input should not terminate the server,
+without claiming equivalent HTTP error handling or limits.
+
+The [focused check](header-recovery-20260927.json) sends 128-byte, 1,024-byte and
+2,049-byte headers, then a valid request. The oversized connection is closed,
+the final GET returns 200, the server exits 0 and final live managed objects are
+zero. The 2,048-byte header limit and transport deadlines are unchanged.
+`measure-server-headers.py` now asserts this recovery rather than the historical
+fatal behavior retained in the CPU investigation snapshot.

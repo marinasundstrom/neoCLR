@@ -143,3 +143,8 @@ identity/access contracts. First fix the sample exiting on over-limit requests.
 These are findings and proposed follow-ups, not completed fixes or a new numeric
 release threshold. Editor diagnosis belongs in Raven; do not change the HTTP
 scheduler to address those unrelated processes.
+
+The DOM/typed sample recovery slice now passes: an oversized connection closes
+and the subsequent valid GET succeeds, with exit 0 and zero live objects. See
+[recovery evidence](../experiments/http-json/header-recovery-20260927.json).
+Runtime error contracts, header bounds and deadlines are unchanged.

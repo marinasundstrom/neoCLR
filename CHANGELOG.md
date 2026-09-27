@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Keep the DOM and typed JSON sample servers alive after protocol, limit and
+  unsupported-request rejection. Count failed attempts toward the bounded sample
+  lifetime and retain other error propagation. Verify an oversized connection is
+  closed and a subsequent valid GET succeeds, with zero live objects at exit.
+
 - Investigate installed HTTP server CPU with repeatable idle/request profiles and
   header-size measurements. Record low steady idle cost, substantial metadata/quota
   execution overhead, and fatal sample handling of over-limit requests. Separate

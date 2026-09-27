@@ -1,0 +1,29 @@
+{
+  "requests": [
+    {
+      "header_bytes": 128,
+      "wall_seconds": 1.041813791,
+      "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+      "cpu_seconds": 0.9799999999999995
+    },
+    {
+      "header_bytes": 1024,
+      "wall_seconds": 4.294647833,
+      "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+      "cpu_seconds": 3.9300000000000006
+    },
+    {
+      "header_bytes": 2049,
+      "wall_seconds": 4.8346001659999995,
+      "response": "",
+      "cpu_seconds": 4.639999999999999
+    },
+    {
+      "header_bytes": 128,
+      "wall_seconds": 0.8745596249999998,
+      "response": "HTTP/1.1 200 OK\r\nContent-Length: 19\r\nConnection: close\r\nContent-Type: application/json; charset=utf-8\r\n\r\n{\"station\":\"Caf\u00e9\"}",
+      "cpu_seconds": 0.8499999999999996
+    }
+  ],
+  "exit_code": 0
+}

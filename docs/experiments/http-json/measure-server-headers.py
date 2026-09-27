@@ -1,4 +1,4 @@
-"""Measure sample header-size cost and its current fatal over-limit path on macOS."""
+"""Measure sample header-size cost and its recovery after an over-limit request on macOS."""
 import argparse
 import json, subprocess, socket, time, selectors
 from pathlib import Path
@@ -9,7 +9,7 @@ args = parser.parse_args()
 root = args.bundle.resolve()
 out = args.output.resolve()
 out.mkdir(parents=True, exist_ok=False)
-p = subprocess.Popen([str(root / 'tools/http-runner'), str(root / 'editable-samples/http-json/server/bin/neoclr/Debug/App.neoil'), str(root / 'lib/System.neoil'), '1024', '100000000', '--live-output', '--', '3'], stdout=subprocess.PIPE, stderr=(out / 'headers.stderr').open('w'), text=True)
+p = subprocess.Popen([str(root / 'tools/http-runner'), str(root / 'editable-samples/http-json/server/bin/neoclr/Debug/App.neoil'), str(root / 'lib/System.neoil'), '1024', '100000000', '--live-output', '--', '4'], stdout=subprocess.PIPE, stderr=(out / 'headers.stderr').open('w'), text=True)
 
 def cpu():
     s = subprocess.check_output(['ps', '-p', str(p.pid), '-o', 'time='], text=True).strip()
@@ -21,7 +21,7 @@ try:
         assert sel.select(30)
     port = int(p.stdout.readline())
     results = []
-    for length in (128, 1024, 2049):
+    for length in (128, 1024, 2049, 128):
         prefix = b'GET /report HTTP/1.1\r\nHost: localhost\r\nX-Padding: '
         suffix = b'\r\n\r\n'
         request = prefix + b'x' * (length - len(prefix) - len(suffix)) + suffix
@@ -41,8 +41,8 @@ try:
             entry['cpu_seconds'] = cpu() - start
         results.append(entry)
     p.wait(timeout=20)
-    assert p.returncode == 1, 'Expected the retained sample over-limit failure'
-    assert 'Request header limit exceeded' in (out / 'headers.stderr').read_text()
+    assert p.returncode == 0, 'Server must continue after rejecting the oversized request'
+    assert 'live=0' in (out / 'headers.stderr').read_text()
     data = {'requests': results, 'exit_code': p.returncode}
     (out / 'headers.json').write_text(json.dumps(data, indent=2) + '\n')
     print(json.dumps(data, indent=2))

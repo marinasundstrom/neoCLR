@@ -38,7 +38,19 @@ class ReportServer {
     async func Serve(server: HttpServer, count: int) -> Task<Result<unit, AppError>> {
         var index = 0
         while index < count {
-            let context = await server.Accept()?
+            let accepted = await server.Accept()
+            if let Error(reason) = accepted {
+                // Accept already closes the rejected connection and releases its slot.
+                // Count rejected attempts too, so the sample has a bounded lifetime.
+                if reason is HttpError.Protocol(_) || reason is HttpError.LimitExceeded(_) || reason is HttpError.Unsupported(_) {
+                    index += 1
+                    continue
+                }
+                return Error(AppError.Http(reason))
+            }
+            let Ok(context) = accepted else {
+                return Error(AppError.Body("Missing accepted request"))
+            }
             // Close the owned exchange before propagating a configuration failure.
             let configured = Configure(context)
             if let Error(error) = configured {
