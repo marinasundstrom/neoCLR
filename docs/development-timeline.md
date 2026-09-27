@@ -8715,7 +8715,8 @@ for scope and remaining lookup/inference work.
   The author identified the release notice as a scrolling culprit and JsonNumber
   as an overflow example. Measured sidebar space below the actual notice/header
   position and wrapped long declaring-type headings; verified menu-end access
-  without article scrolling and a 390px page without horizontal overflow.
+  without article scrolling. Also constrained the matching page-outline links;
+  verified JsonNumber without horizontal overflow at 390px and 1280px.
 - **Evidence:** [integration and validation](ravendoc-integration.md),
   [pinned publisher](../tools/ravendoc/version.json). The local preview is not a
   public deployment. Separate runtime/reflection development remains independent.

@@ -14,7 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   badges and linked origins. Include union case pages, companion merging, nominal
   generic/delegate names, closed hierarchy links, authored API content support,
   direct union/enum navigation and independent sidebar scrolling below the release
-  notice. Wrap long group headings to prevent horizontal overflow. Hide empty
+  notice. Wrap long group headings and page-outline entries to prevent horizontal
+  overflow on narrow and desktop layouts. Hide empty
   namespaces and the compiler-owned companion marker by default. Document the general compiler symbol corrections; no
   Runtime Contract or runtime behavior changes are part of this update.
 
