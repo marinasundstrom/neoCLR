@@ -2,8 +2,8 @@
 
 Version **0.1.0-preview.10** · tag **v0.1.0-preview.10**.
 
-**Release candidate: validation in progress.** This file will record the selected
-runtime/compiler revisions and evidence before publication.
+**Qualified 2026-09-27.** Runtime artifacts use neoCLR `59f9f4a7` and Raven
+`a108df82a` on `neoclr`. The final tag also contains these release notes and evidence.
 
 neoCLR is an experimental application platform. This preview's bounded HTTP POC
 lets Raven client and server applications exchange typed JSON over real sockets,
@@ -76,13 +76,33 @@ suspension are not included. The importer supports a bounded CLI subset, not arb
 The HTTP samples retain explicit workarounds for recorded compiler issues, including
 an expression-bodied conditional getter. Earlier transport timeouts under competing
 work remain unexplained; this release does not claim those observations repaired.
-Build diagnostic/stale-output qualification and the final known-defect disposition
-will be recorded with the candidate evidence before publication.
+Packaged build diagnostics and stale-output rejection pass. A boxed Completed
+pattern has a compiler binding limitation; use an explicit closed-case cast when
+inspecting IUnion.Value. Ordinary task outcome patterns and the actual boxed
+contract pass. The historical source API checklist also needs a separate refresh;
+the on-site metadata API inventory and snapshot are current.
 
 ## Validation
 
-The release uses one comprehensive canonical source/archive run, focused OS/ABI
-checks on other supported source hosts, and per-OS minimum-Rust compilation.
-Each shipped binary target needs extracted-package checks. A manual full stable
-matrix remains available. Source CI is separate from SDK/editor/package evidence.
-Final results, revisions, hashes and any remaining limitations will be linked here.
+The six-job source CI split passed at `1404454e`: the slowest job took 8.88 minutes,
+compared with the earlier 68-minute job. That run predates the union migration. At
+the author's direction, later corrections use focused validation rather than a
+repeated full platform matrix: the combined union contract, 24 task pipeline checks,
+103 affected runtime tests and ten Raven metadata tests pass.
+
+The final extracted macOS arm64 runtime/SDK passes union and editor checks, typed
+JSON with independent peers and managed pairs, and all 11 upload cases. All report
+zero live objects. Twenty-two packaged MSBuild diagnostic/build checks passed with
+the same compiler, bridge source, reference and build assets before the final native
+reflection correction. Interactive VS Code hover/build/run printed 42 from the new
+TaskOutcome union; the final packaged checks cover the rebuilt reflection path.
+
+The API snapshot, 18 website tests and 1,025-page website build pass. Prebuilt binary
+support is macOS arm64 only. Source CI does not establish packaged binary support
+on other platforms. Website publication is a separate manual workflow.
+
+See [validation evidence](preview-10-validation.json). Download matching runtime,
+SDK, VSIX and companion notices from this release. `release-manifest.json` records
+exact revisions and asset hashes; `validation-evidence.tar.gz` contains reports and
+logs. Verify downloads with `SHA256SUMS`. The separately named source archive matches
+the final tag, including release documentation added after runtime packaging.

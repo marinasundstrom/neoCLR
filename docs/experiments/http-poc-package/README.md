@@ -1,5 +1,9 @@
 # HTTP POC package acceptance — 2026-09-27
 
+Final Preview 10 qualification, including the standard union and native reflection
+corrections, is recorded in [release evidence](../../preview-10-validation.json).
+The original POC checkpoint below remains scoped to its stated revisions.
+
 The [HTTP tracker](../../http-capabilities.md) owns completion and remaining scope.
 This record covers macOS arm64 packages built from neoCLR `edf29520` and Raven
 `56083626e` on its neoCLR branch, using .NET SDK 11.0.100-rc.1.26425.128.

@@ -6,6 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-preview.10 — 2026-09-27
+
 ### 2026-09-27
 
 - Migrate Option, Result and TaskOutcome to standard Raven unions, using Raven.Core
@@ -27,7 +31,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   the old Option layout. Validate and construct the selected Raven/Neo layout at
   that boundary; retain server fault output when a peer disconnects during a check.
   Both profile accessor regressions and all mapped HTTP peer/pair checks pass with
-  the rebuilt runner, with zero live objects. Final archive qualification follows.
+  the rebuilt runner, with zero live objects. Final extracted archives also pass
+  union/editor, mapped HTTP peer/pair and all 11 upload checks. Record revisions,
+  source-CI scope, checksums and remaining compiler observations in release evidence.
 
 - Fix the socket test byte-array spelling flagged by Rust 1.98 Clippy in release CI.
   Wait for Winsock readiness before reporting a nonblocking connect as successful;

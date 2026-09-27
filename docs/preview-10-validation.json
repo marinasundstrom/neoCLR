@@ -1,0 +1,174 @@
+{
+  "version": "0.1.0-preview.10",
+  "date": "2026-09-27",
+  "status": "qualified release candidate",
+  "runtimeRevision": "59f9f4a7a7424b422391d3c4415cb925f06c9f92",
+  "ravenRevision": "a108df82adb84b891cb7171e5602716a88723834",
+  "ravenBranch": "neoclr",
+  "sdkVersion": "0.1.12-neoclr.http.20260927",
+  "binaryTargets": [
+    "osx-arm64"
+  ],
+  "dotnetSdk": "11.0.100-rc.1.26425.128",
+  "sourceCI": {
+    "url": "https://github.com/marinasundstrom/neoCLR/actions/runs/36278756461",
+    "revision": "1404454e4993ae9b064e3d0d7300b8b024338b98",
+    "jobsPassed": 6,
+    "slowestMinutes": 8.88,
+    "runnerMinutes": 17.6,
+    "scope": "Predates the union migration. Later corrections have focused contract, task, reflection and package checks at the author\u2019s explicit direction; no repeated full platform matrix."
+  },
+  "focusedSourceEvidence": "experiments/http-error-unions/standard-contract-validation.json",
+  "packageChecks": [
+    {
+      "name": "configure",
+      "command": [
+        "python3",
+        "configure.py",
+        "--sdk",
+        "$ASSETS/extracted/raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64"
+      ],
+      "exit_code": 0,
+      "seconds": 0.048,
+      "log": "configure.log",
+      "sha256": "a4b5f8b8f590a4da1ce60653a946e76f23571d4b8b41346d5413bc3236344247"
+    },
+    {
+      "name": "editor",
+      "command": [
+        "python3",
+        "tools/verify_editor.py",
+        "msbuild-demo",
+        "--unions"
+      ],
+      "exit_code": 0,
+      "seconds": 1.196,
+      "log": "editor.log",
+      "sha256": "64272f95eb94f614508d100a778e3ef08401db24a3106d78d180a3cc9fbcac62"
+    },
+    {
+      "name": "task-editor",
+      "command": [
+        "python3",
+        "tools/task-contract/verify_editor.py",
+        "msbuild-demo"
+      ],
+      "exit_code": 0,
+      "seconds": 1.319,
+      "log": "task-editor.log",
+      "sha256": "595479c04818be76048f3e356a9fd9843e712015c8f5a8a1e911bd6446b30825"
+    },
+    {
+      "name": "union-contract",
+      "command": [
+        "python3",
+        "tools/verify_union_contract.py",
+        "demo/Demo.rvnproj",
+        "--bridge",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64/tools/bridge/Probe.dll",
+        "--system",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64/lib/System.neoil",
+        "--runtime",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64/bin/neoclr"
+      ],
+      "exit_code": 0,
+      "seconds": 6.733,
+      "log": "union-contract.log",
+      "sha256": "17195d8bed11801b75f4c26ff5764d116c6cb0a2051e22833fdafb600125305c"
+    },
+    {
+      "name": "http-json",
+      "command": [
+        "python3",
+        "samples/http/http-json/verify.py",
+        "--toolchain-root",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64",
+        "--sdk",
+        "$ASSETS/extracted/raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64",
+        "--runner",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64/tools/http-runner",
+        "--mapped"
+      ],
+      "exit_code": 0,
+      "seconds": 30.645,
+      "log": "http-json.log",
+      "sha256": "de0de086ad40579957bf4d7fd8533e547a9fa4ad53be653dc0bdfa42c778e17e"
+    },
+    {
+      "name": "http-upload",
+      "command": [
+        "python3",
+        "samples/http/http-stream-upload/verify.py",
+        "--toolchain-root",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64",
+        "--sdk",
+        "$ASSETS/extracted/raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64",
+        "--runner",
+        "$ASSETS/extracted/neoclr-0.1.0-preview.10-osx-arm64/tools/http-runner"
+      ],
+      "exit_code": 0,
+      "seconds": 41.721,
+      "log": "http-upload.log",
+      "sha256": "c1e03e79db6e20cfa5cea0df3d3de2eba2aa44e033eb4d3a2c57a73e34f3e270"
+    }
+  ],
+  "httpUploadCases": 11,
+  "httpCleanup": "Zero live objects for all successful JSON and upload checks.",
+  "archiveValidation": {
+    "archives": [
+      {
+        "name": "neoclr-0.1.0-preview.10-osx-arm64.tar.gz",
+        "sha256": "65b422c370b8f711233952597e7194584e2d710f9274ad8199b7d60037918621",
+        "regular_files_verified": 1093
+      }
+    ],
+    "bundle_manifest_files_verified": 1092,
+    "extracted_root": "/Users/robert/.neoclr/builds/preview10-final-20260927/extracted"
+  },
+  "assetHashes": {
+    "neoclr-0.1.0-preview.10-osx-arm64.tar.gz": "65b422c370b8f711233952597e7194584e2d710f9274ad8199b7d60037918621",
+    "raven-sdk-0.1.12-neoclr.http.20260927-osx-arm64.tar.gz": "d4c47471ac8efddb50db1cf44969d8400fe4bb13bf183486c5b0dc4080f9cfe3",
+    "raven-vscode-0.1.12-neoclr.http.20260927.vsix": "af647205058894b0362230cf2bdcdf0e882ed879f039e2577d060d862c844b1c",
+    "raven-toolchain-notices.tar.gz": "add6aa9050c41afe61f8f43180937fba283a461273002adb82170373fcac6eb0"
+  },
+  "msbuildDiagnostics": {
+    "testedRevision": "129ea2c0",
+    "result": "passed",
+    "checks": 22,
+    "logSha256": "1a2ace2809a5c9dac6f6cedd0187399994ce863169eda736904d9b74bd4869ac",
+    "reuse": "Compiler, bridge source, reference core, library, build assets and verifier unchanged. Subsequent Rust reflection adapter correction has focused regression and final HTTP package coverage."
+  },
+  "interactiveEditor": {
+    "profile": "neoCLR Preview 10 validation",
+    "sourceRevision": "efd25eb1",
+    "vsixSha256": "af647205058894b0362230cf2bdcdf0e882ed879f039e2577d060d862c844b1c",
+    "hover": "union struct TaskOutcome<int>: IUnion; Type in Tasks",
+    "sample": "TaskOutcome<int> = Completed(42); pattern extracts payload",
+    "savedInEditor": true,
+    "task": "neoCLR: Run (MSBuild)",
+    "build": "Build succeeded in 10,2s",
+    "output": "42",
+    "problems": "No Problems",
+    "scope": "Installed VSIX with extracted matching runtime and SDK; source debugger not claimed."
+  },
+  "interactiveScope": "VSIX, SDK, library and public reference match final assets. Later changes fixed the completion verifier and native reflection snapshot materialization; final packaged contract/HTTP checks cover the rebuilt runtime.",
+  "website": {
+    "tests": 18,
+    "apiPages": 1025,
+    "publication": "Separate manual workflow, after release publication."
+  },
+  "notices": {
+    "rustPackages": 59,
+    "rustNoticeFiles": 119,
+    "toolPackageNoticeSets": 35,
+    "sdkNugetDependencies": 27,
+    "runtimeNugetDependencies": 23
+  },
+  "knownLimits": [
+    "Conditional expression-bodied getter observation remains open; upload source uses explicit getter.",
+    "Completed pattern over boxed Object has a documented compiler binding limitation; explicit closed-case cast works.",
+    "Historical source API checklist contains obsolete File fragments; current on-site metadata inventory and snapshot pass.",
+    "Cleartext HTTP/1.1 POC, bounded buffering and known-length uploads only; no TLS, pooling or HTTP/2/3."
+  ],
+  "sourceArchive": "The final tag adds release documentation to runtime revision above; release-manifest.json records the exact source archive commit and hashes."
+}

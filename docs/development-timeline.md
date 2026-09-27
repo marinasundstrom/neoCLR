@@ -7823,3 +7823,10 @@ configuration/content, not target-specific code added to Raven main.
   checks pass with the rebuilt runner and zero live objects. The Raven-source-only
   audit had not covered this
   native construction path; it is now included in the migration review.
+
+- **Final qualification:** runtime revision `59f9f4a7` with Raven `a108df82a` passes
+  extracted union/editor, mapped HTTP peer/pair and all 11 upload checks, with zero
+  live objects. The author-directed reduced validation scope is explicit: full CI
+  evidence at `1404454e` precedes migration; subsequent changes have focused checks.
+  The assistant prepares Preview 10 assets, notes and [evidence](preview-10-validation.json)
+  for publication and leaves later HTTP features tracked rather than starting them.
