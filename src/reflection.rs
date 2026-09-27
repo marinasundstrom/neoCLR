@@ -117,6 +117,7 @@ impl Query {
                     _ => None,
                 };
                 option(
+                    module,
                     type_contract(module),
                     parent
                         .map(|d| {
@@ -273,6 +274,7 @@ impl Query {
                 )
             }
             Self::BaseType => option(
+                module,
                 type_contract(module),
                 crate::inheritance::base(module, &ty)?
                     .as_ref()
@@ -280,6 +282,7 @@ impl Query {
                     .transpose()?,
             ),
             Self::ElementType => option(
+                module,
                 type_contract(module),
                 match &ty {
                     Type::Array(t)
@@ -452,8 +455,8 @@ impl Query {
                                         Value::Boolean(setter.is_some()),
                                         index_value(index)?,
                                         parameters,
-                                        option("System.Introspection.MethodInfo", get)?,
-                                        option("System.Introspection.MethodInfo", set)?,
+                                        option(module, "System.Introspection.MethodInfo", get)?,
+                                        option(module, "System.Introspection.MethodInfo", set)?,
                                     ],
                                 )))
                             })();
@@ -529,26 +532,56 @@ fn type_value(module: &Module, ty: &Type) -> Result<Value, Fault> {
         crate::type_identity::describe_loaded(module, ty)?,
     ))
 }
-fn option(name: &str, value: Option<Value>) -> Result<Value, Fault> {
+fn option(module: &Module, name: &str, value: Option<Value>) -> Result<Value, Fault> {
     let element = crate::assembler::parse_type(name)?;
-    let case = match value {
-        Some(v) => Value::Object {
-            ty: Type::Constructed {
-                definition: "System.Option.Some".into(),
-                arguments: vec![element.clone()],
-            },
-            fields: vec![v],
-        },
-        None => record("System.Option.None", vec![]),
+    let ty = Type::Constructed {
+        definition: "System.Option".into(),
+        arguments: vec![element.clone()],
     };
-    Ok(Value::Object {
-        ty: Type::Constructed {
-            definition: "System.Option".into(),
-            arguments: vec![element],
-        },
-        fields: vec![Value::Erased(Box::new(case))],
-    })
+    let some_type = Type::Constructed {
+        definition: "System.Option.Some".into(),
+        arguments: vec![element],
+    };
+    let none_type = Type::from_name("System.Option.None");
+    let layout = crate::inheritance::fields(module, &ty)?;
+    let fields = match layout.as_slice() {
+        [stored] if stored.ty == Type::Value => {
+            // The separate Neo bootstrap profile retains its erased carrier ABI.
+            let case = match value {
+                Some(value) => Value::Object {
+                    ty: some_type,
+                    fields: vec![value],
+                },
+                None => record("System.Option.None", vec![]),
+            };
+            vec![Value::Erased(Box::new(case))]
+        }
+        [tag, some, none]
+            if tag.ty == Type::Byte && some.ty == some_type && none.ty == none_type =>
+        {
+            // Raven's library profile stores a discriminator and both case records.
+            // Validate the closed storage contract before publishing the snapshot.
+            let (tag, payload) = match value {
+                Some(value) => (
+                    1,
+                    Value::Object {
+                        ty: some_type,
+                        fields: vec![value],
+                    },
+                ),
+                None => (2, crate::initialization::default_value(module, &some_type)?),
+            };
+            vec![
+                Value::Byte(tag),
+                payload,
+                record("System.Option.None", vec![]),
+            ]
+        }
+        _ => return Err(Fault::new("unsupported reflection Option storage contract")),
+    };
+    Ok(Value::Object { ty, fields })
 }
+
 pub(crate) fn array(
     name: &str,
     values: impl IntoIterator<Item = Result<Value, Fault>>,

@@ -97,6 +97,30 @@
     {
       "log": "task-website-tests.log",
       "sha256": "9a825e603840abdbaba9b863c8d9cabeb96de549aca12e5b14edf6e6900d0833"
+    },
+    {
+      "log": "reflection-option-baseline.log",
+      "sha256": "c02d484c4c4ff57e3f41162622ac076a881d9a88f622546b9521ccbd9ef038be"
+    },
+    {
+      "log": "reflection-option-fixed.log",
+      "sha256": "d7fe83201e2f2495826d6843cd468d728b4ac45ad2282210cfe06fd7831f463c"
+    },
+    {
+      "log": "reflection-option-legacy.log",
+      "sha256": "9ddda034d893237791b666cb8bc17d57291f94273a072dc37b2be680e139fc6b"
+    },
+    {
+      "log": "reflection-http-fixed.log",
+      "sha256": "24e14e8ca1907fa72b5eb5575284a32d38b6f53dda6c6605ee4a39fea7617d06"
     }
-  ]
+  ],
+  "nativeReflectionFollowUp": {
+    "finding": "Mapped HTTP failed because native property accessor snapshots still constructed the erased Option carrier.",
+    "baseline": "Focused Raven accessor regression failed with unsupported integer conversion in Option.TryGetValue.",
+    "fix": "Validate selected closed Option storage; construct Raven discriminator/case records or the Neo legacy erased case.",
+    "focusedTests": 2,
+    "mappedHttp": "All independent-peer and managed-pair checks pass with the rebuilt runner; zero live objects.",
+    "remainingManualNativeConstruction": "Intentional profile-aware reflection snapshot interop; no additional manual Raven source unions."
+  }
 }

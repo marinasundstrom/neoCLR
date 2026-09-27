@@ -16,14 +16,14 @@ maintain a second HTTP completion checklist here.
 | Standard library unions | Option/Result/TaskOutcome migrated; focused contract and task checks pass | [Contract evidence](../experiments/http-error-unions/standard-contract-validation.json); replace candidate packages before publication. |
 | API reference | Source changes require matching bridge/reference and useful member docs | [Maintenance procedure](../../api-docs/README.md), including explicit renderer exclusions; do not substitute a feature page for member coverage. |
 
+| Boxed Completed pattern binding | Open compiler observation; explicit closed-case cast validates IUnion.Value | [Union guide](../raven-union-api.md#task-outcomes); ordinary task outcome patterns pass. |
+| Historical source API checklist | Still references obsolete generated/File fragments | Refresh the separate source checklist; current on-site metadata inventory and snapshot pass. |
+
 General Raven fixes belong on independently tested main-based feature branches;
 neoCLR-specific policies stay isolated. Compiler-affecting integration requires the
 applicable documentation/changelogs in both repositories. The
 [nine Raven issue assessments](../history/planning-20260927/issue-fix-roadmap.md#raven-issues-through-the-neoclr-lens)
 are a 2026-09-26 snapshot, not a new live inventory or authorization to fix all nine.
-
-| Boxed Completed pattern binding | Open compiler observation; explicit closed-case cast validates IUnion.Value | [Union guide](../raven-union-api.md#task-outcomes); ordinary task outcome patterns pass. |
-| Historical source API checklist | Still references obsolete generated/File fragments | Refresh the separate source checklist; current on-site metadata inventory and snapshot pass. |
 
 ## Delivery and documentation
 

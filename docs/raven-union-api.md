@@ -75,3 +75,9 @@ Completed payload. In this compiler snapshot, a fully qualified Completed patter
 over Object can retain an open payload type, while qualifying it through the closed
 carrier can fail to match the boxed case. Ordinary patterns over TaskOutcome itself
 work. This compiler binding limitation is not a missing IUnion implementation.
+
+Native reflection snapshots also return Options for declaring types and property
+accessors. Their materialization boundary validates and constructs the selected
+profile's closed storage shape: discriminator plus Some/None records for Raven,
+erased case storage for the separate Neo bootstrap. This is a library interop
+contract, not a general runtime union representation or CLR metadata requirement.

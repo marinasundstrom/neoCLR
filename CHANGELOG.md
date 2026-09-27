@@ -23,7 +23,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   compiler limitation; an explicit closed-case cast works. Packaged MSBuild and
   installed VS Code hover/build/run checks pass. Update completion verification for
   Raven’s generic labels (Option<T>, Result<T,E>) while retaining host-API rejection.
-  Refreshed package and HTTP qualification remain.
+  Mapped HTTP qualification exposed native reflection snapshots still constructing
+  the old Option layout. Validate and construct the selected Raven/Neo layout at
+  that boundary; retain server fault output when a peer disconnects during a check.
+  Both profile accessor regressions and all mapped HTTP peer/pair checks pass with
+  the rebuilt runner, with zero live objects. Final archive qualification follows.
 
 - Fix the socket test byte-array spelling flagged by Rust 1.98 Clippy in release CI.
   Wait for Winsock readiness before reporting a nonblocking connect as successful;

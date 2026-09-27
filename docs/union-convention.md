@@ -43,7 +43,10 @@ the Raven API or a model for new unions. Do not mix bootstrap and Raven profile 
 The Raven runtime source audit found no remaining manual union carriers after the
 TaskOutcome migration. Standalone errors such as OverflowError are ordinary value
 types; JsonValue uses a polymorphic class hierarchy. Neither is a disguised union
-carrier requiring this migration.
+carrier requiring this migration. A subsequent mapped HTTP check found the native
+reflection snapshot adapter still constructing the old Option layout. That boundary
+now validates and constructs the selected profile’s layout; accessor regression
+checks cover both profiles.
 
 ## Composition
 

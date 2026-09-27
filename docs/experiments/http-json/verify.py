@@ -79,10 +79,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-json-') as folder:
             try:
                 consume(int(line))
             except Exception:
-                if server.poll() is None:
+                # A failed request may race the guest's fault report and cleanup.
+                try:
+                    output, errors = server.communicate(timeout=5)
+                except subprocess.TimeoutExpired:
                     server.kill()
-                output, errors = server.communicate()
-                print(output + errors, flush=True)
+                    output, errors = server.communicate()
+                print('Server exit: ' + str(server.returncode) + '\n' + output + errors, flush=True)
                 raise
             output, errors = server.communicate(timeout=180)
             assert server.returncode == 0 and output == 'Reports served\n', output + errors

@@ -14,8 +14,15 @@ fn library() -> &'static Module {
 // The selected Raven profile has interface contracts; the bundled legacy profile
 // still has value descriptors, so validate callers against the selected library.
 fn assemble(source: &str) -> Result<Module, neoclr::Fault> {
-    neoclr::assembler::read_modules(&[neoclr::assembler::ModuleInput::Source(source)], library())
-        .map(|mut modules| modules.remove(0))
+    let source = format!(
+        "{source}\n{}",
+        include_str!("fixtures/union-patterns.neoil")
+    );
+    neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(&source)],
+        library(),
+    )
+    .map(|mut modules| modules.remove(0))
 }
 
 #[test]
@@ -231,8 +238,8 @@ ret
 #[test]
 fn descriptor_private_accessor_requires_explicit_inclusion() {
     for (argument, predicate) in [
-        ("ldc.bool false", "get_IsNone"),
-        ("ldc.bool true", "get_IsSome"),
+        ("ldc.bool false", ""),
+        ("ldc.bool true", "ldc.bool false\nceq"),
     ] {
         let app = assemble(&format!(
             r#"
@@ -258,7 +265,8 @@ ldc.i4 0
 callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 {argument}
 callvirt instance System.Introspection.PropertyInfo::GetGetMethod(Boolean)
-call instance System.Option<System.Introspection.MethodInfo>::{predicate}()
+call IsNone<System.Introspection.MethodInfo>(System.Option<System.Introspection.MethodInfo>)
+{predicate}
 ret
 .end
 "#

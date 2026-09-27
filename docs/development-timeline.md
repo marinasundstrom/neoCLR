@@ -7814,3 +7814,12 @@ configuration/content, not target-specific code added to Raven main.
   checks and seven runtime task tests. API documentation and the website are refreshed.
   A boxed Completed pattern binding limitation is documented; an explicit case
   cast validates the actual boxed contract. Release package qualification follows.
+
+- **Package finding:** the first mapped HTTP response failed after migration. A
+  focused property-accessor test reproduced native reflection snapshots using the
+  old Option layout. The assistant updates that native interop boundary for the
+  selected Raven and Neo profiles and keeps release publication held for fresh
+  accessor and HTTP checks. Both profile regressions and all mapped HTTP peer/pair
+  checks pass with the rebuilt runner and zero live objects. The Raven-source-only
+  audit had not covered this
+  native construction path; it is now included in the migration review.
