@@ -30,6 +30,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   checks. Update matching API documentation and keep old artifacts unchanged.
   Keep object concatenation out of the historical Neo projection, whose type
   system has no System.Object; verify its CLI and target-layout consumers.
+  Align the non-Unicode environment test with the sample's explicit error exit
+  code while retaining its typed EnvironmentUnavailable output check.
 
 - Restore canonical formatting and strict Clippy gates for release preparation.
   Rename the internal slot factory, name the completion observer type and simplify

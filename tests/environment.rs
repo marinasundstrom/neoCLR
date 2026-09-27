@@ -127,7 +127,12 @@ func Main() -> int {
             .env("NEO_DEMO", std::ffi::OsString::from_vec(vec![0xff]))
             .output()
             .unwrap();
-        assert!(output.status.success());
+        assert_eq!(
+            output.status.code(),
+            Some(2),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
         assert!(
             String::from_utf8(output.stdout)
                 .unwrap()
