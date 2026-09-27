@@ -537,10 +537,47 @@ root unwinding while a worker retains the invocation, service-lock availability 
 join, and fault observation before any further guest instruction. Existing final-GC
 behavior still passes. No full suite, website build or API snapshot change was needed.
 
+## Guest delegate execution and native entry draining
+
+An internal adapter now invokes zero-argument guest delegates on native work contexts,
+including captured receivers and typed or completion-only results. Frames are built
+on the worker; instruction/frame budgets, heap, scheduler, files, interning and native
+memory retain their invocation owners. A callback returns without claiming the root
+completion pump or waiting for its own native job. Public Task.Run is still absent.
+
+The root completion boundary parks while native jobs run. A completion revision
+requests another default-queue drain, including when completion races the initial
+status read. Repeated waits spend no guest instruction fuel and do not repeatedly
+execute queue drains. Ready host notifications still progress while native work runs.
+The root closes and joins work on faults or unwinding; normal completion first waits
+for pending work through this boundary.
+
+Guest cancellation observes both host cancellation and work-service shutdown/sibling
+failure, including supported host waits. Noninterruptible host/native operations can
+still delay shutdown. Captured output is handed to the root once at execution/host
+boundaries and callback return. Live console output retains the existing embedding
+contract and is not replayed. Ordering follows flush batches, not a cross-thread
+wall-clock ordering guarantee. Each job currently reuses worker_result_bytes to bound
+captured output (UTF-8 line bytes plus newline and raw stream bytes); typed values
+continue to use shared heap/array limits. These internal quota choices are provisional.
+
+This follows the selected .NET comparison: shared captures and native-thread progress
+while callbacks block, with runtime-owned scheduling. Invocation-scoped lifetime and
+quotas remain deliberate differences from .NET's process-wide pool. No throughput
+claim or green-thread implementation is implied.
+
+Focused validation covers shared capture identity and mutation, forced collection,
+typed/completion-only results, shared fuel, return while another context owns dispatch,
+shutdown of a running guest loop, captured-output forwarding/limits and live console
+behavior. The entry-drain probe verifies fuel-preserving waits and observes queue work
+after native completion. Existing VM, native-work/lifecycle, linked cancellation and
+console/GC/cancellation checks pass. No full suite or website build was needed. No
+public API signatures or snapshots changed.
+
 ## Next integration slice
 
-Connect guest delegate execution and task completion to this invocation service, then
-expose the Run overloads with async callback unwrapping. The guest adapter must join
-entry draining with pending native work, share output/control state, allocate bounded
-heap participants and preserve root/payload publication at every handoff. Validate
-typed/completion-only shared captures end to end. Public Task.Run remains unimplemented.
+Bind this adapter to library task completion and expose the Run overloads, with bounded
+heap participant admission and async callback unwrapping. Preserve root/payload
+publication at submission and completion; validate typed/completion-only shared captures
+with a compiled Raven consumer. Update public API reference/snapshots when the facade
+lands. Public Task.Run remains unimplemented.

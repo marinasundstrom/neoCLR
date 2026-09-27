@@ -84,8 +84,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   closing previously omitted payload accounting. Own native work at invocation scope,
   wake the scheduler on completion, retain worker faults/panics and cancel siblings.
   Close admission and join outside graph/service locks on root exit or unwinding,
-  before releasing shared resources. Guest delegate scheduling and public Run still
-  need integration.
+  before releasing shared resources. Add internal native guest-delegate execution
+  with shared captures/services/budgets, linked host/service cancellation and bounded
+  captured-output forwarding. Keep callback return independent of the root pump;
+  park entry draining for native work and redrain on completion without spending
+  guest fuel while waiting. Public Run and async callback unwrapping still need integration.
   This is backend infrastructure, not a public Task.Run release.
 
 - Support Raven Main returning integer, Result and target Task combinations through

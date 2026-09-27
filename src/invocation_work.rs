@@ -11,7 +11,14 @@ struct State {
     work: Option<Work>,
     closed: bool,
 }
+#[derive(Default)]
+struct Output {
+    lines: Vec<String>,
+    bytes: [Vec<u8>; 2],
+}
 pub(crate) struct Service {
+    output: Mutex<Output>,
+    revision: Arc<std::sync::atomic::AtomicUsize>,
     state: Mutex<State>,
     limits: Limits,
     cancellation: CancellationToken,
@@ -25,6 +32,8 @@ impl Service {
         wake: Arc<crate::scheduler::Wake>,
     ) -> Self {
         Self {
+            output: Mutex::new(Output::default()),
+            revision: Default::default(),
             state: Mutex::new(State {
                 work: None,
                 closed: false,
@@ -58,7 +67,11 @@ impl Service {
                 self.cancellation.clone(),
                 self.limits,
             );
-            work.observe(self.wake.clone(), self.failure.clone());
+            work.observe(
+                self.wake.clone(),
+                self.failure.clone(),
+                self.revision.clone(),
+            );
             work
         });
         work.submit(access, captures, callback)
@@ -72,6 +85,31 @@ impl Service {
             .as_mut()
             .ok_or_else(|| Fault::new("invocation has no active task service"))?
             .take_ready(id)
+    }
+
+    pub(crate) fn record_output(&self, lines: &mut Vec<String>, bytes: &mut [Vec<u8>; 2]) {
+        let mut output = self.output.lock().expect("task output lock poisoned");
+        output.lines.append(lines);
+        for (target, source) in output.bytes.iter_mut().zip(bytes) {
+            target.append(source);
+        }
+    }
+
+    pub(crate) fn drain_output(&self, lines: &mut Vec<String>, bytes: &mut [Vec<u8>; 2]) {
+        let mut output = self.output.lock().expect("task output lock poisoned");
+        lines.append(&mut output.lines);
+        for (target, source) in bytes.iter_mut().zip(&mut output.bytes) {
+            target.append(source);
+        }
+    }
+
+    pub(crate) fn activity(&self) -> (bool, usize) {
+        let state = self.state.lock().expect("task service lock poisoned");
+        let running = state.work.as_ref().is_some_and(Work::running);
+        (
+            running,
+            self.revision.load(std::sync::atomic::Ordering::Acquire),
+        )
     }
 
     pub(crate) fn check(&self) -> Result<(), Fault> {

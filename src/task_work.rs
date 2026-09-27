@@ -1,5 +1,5 @@
 //! Bounded native work ownership for the shared-context Task.Run backend.
-//! This component does not yet invoke guest callbacks. Workers must publish roots
+//! The guest adapter supplies callback execution. Workers must publish roots
 //! before releasing heap access and must not hold access during blocking host work.
 //! Shutdown/join must run outside heap access (never from a worker owned here).
 use crate::{
@@ -16,6 +16,14 @@ pub(crate) struct Control {
     stop: CancellationToken,
 }
 impl Control {
+    pub(crate) fn token(&self) -> CancellationToken {
+        CancellationToken::linked(self.invocation.clone(), self.stop.clone())
+    }
+
+    pub(crate) fn check(&self) -> Result<(), Fault> {
+        cancelled(self)
+    }
+
     pub(crate) fn is_cancelled(&self) -> bool {
         self.invocation.is_cancelled() || self.stop.is_cancelled()
     }
@@ -28,6 +36,14 @@ pub(crate) struct Context {
     limits: crate::Limits,
 }
 impl Context {
+    pub(crate) fn execute(
+        mut self,
+        operation: impl FnOnce(&mut Participant, &Control) -> Result<Value, Fault>,
+    ) -> Outcome {
+        let value = operation(&mut self.participant, &self.control)?;
+        self.complete(|_| Ok(value))
+    }
+
     /// Intermediate execution intervals must publish their complete roots before
     /// returning. Blocking host operations belong outside this guard.
     pub(crate) fn enter(&mut self) -> Result<Access<'_>, Fault> {
@@ -94,6 +110,7 @@ pub(crate) struct Work {
     observer: Option<(
         std::sync::Arc<crate::scheduler::Wake>,
         std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
+        std::sync::Arc<std::sync::atomic::AtomicUsize>,
     )>,
 }
 impl Work {
@@ -120,8 +137,9 @@ impl Work {
         &mut self,
         wake: std::sync::Arc<crate::scheduler::Wake>,
         failure: std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
+        revision: std::sync::Arc<std::sync::atomic::AtomicUsize>,
     ) {
-        self.observer = Some((wake, failure));
+        self.observer = Some((wake, failure, revision));
     }
 
     // Bound total submissions; consumed handles are never reused.
@@ -192,7 +210,7 @@ impl Work {
                     Ok(completion)
                 }))
                 .unwrap_or_else(|_| Err(Fault::new("native task panicked")));
-                if let Some((wake, failure)) = observer {
+                if let Some((wake, failure, revision)) = observer {
                     if let Err(error) = &outcome {
                         if error.code != FaultCode::ExecutionCancelled {
                             let mut first = failure.lock().expect("task failure lock poisoned");
@@ -202,6 +220,7 @@ impl Work {
                             cancellation.stop.cancel();
                         }
                     }
+                    revision.fetch_add(1, std::sync::atomic::Ordering::Release);
                     wake.signal();
                 }
                 outcome
@@ -210,6 +229,10 @@ impl Work {
         let id = self.jobs.len();
         self.jobs.push(Some(worker));
         Ok(id)
+    }
+
+    pub(crate) fn running(&self) -> bool {
+        self.jobs.iter().flatten().any(|job| !job.is_finished())
     }
 
     pub(crate) fn take_ready(&mut self, id: usize) -> Result<Option<Completion>, Fault> {

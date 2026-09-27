@@ -1536,6 +1536,10 @@ fn interpret_frames(
     );
     // Stop/join shared jobs before releasing services or exporting either heap.
     let stopped = state.invocation.work.shutdown();
+    state
+        .invocation
+        .work
+        .drain_output(&mut output, &mut console_bytes);
     let result = result.and_then(|value| stopped.map(|_| value));
     drop(work_scope);
     // Source teardown may join host workers; never hold the managed graph gate.
@@ -1584,8 +1588,21 @@ fn drive_instructions(
     console_bytes: &mut [Vec<u8>; 2],
     state: &mut InstructionState,
 ) -> Result<Value, Fault> {
-    loop {
-        let mut heap = participant.enter();
+    let result = loop {
+        if let Err(fault) = transfer_task_output(state, output, console_bytes) {
+            break Err(fault);
+        }
+        if let Some(control) = &state.work_control {
+            if let Err(fault) = control.check() {
+                break Err(fault);
+            }
+        }
+        let mut heap = match participant.enter_cancellable(|| {
+            state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+        }) {
+            Ok(heap) => heap,
+            Err(fault) => break Err(fault),
+        };
         match interpret_instructions(
             module,
             frames,
@@ -1605,13 +1622,21 @@ fn drive_instructions(
             }
             Ok(InstructionProgress::HostCall(mut call)) => {
                 drop(heap);
+                if let Err(fault) = transfer_task_output(state, output, console_bytes) {
+                    break Err(fault);
+                }
                 let value = match call.run(
                     module, state, native_libraries, memory, output, console_bytes, options,
                 ) {
                     Ok(value) => value,
                     Err(fault) => break Err(fault),
                 };
-                let mut heap = participant.enter();
+                let mut heap = match participant.enter_cancellable(|| {
+                    state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+                }) {
+                    Ok(heap) => heap,
+                    Err(fault) => break Err(fault),
+                };
                 if let Err(fault) = call.resume(value, frames) {
                     break Err(fault);
                 }
@@ -1639,7 +1664,9 @@ fn drive_instructions(
             Ok(InstructionProgress::Completed(value)) => break Ok(value),
             Err(fault) => break Err(fault),
         }
-    }
+    };
+    let output_result = transfer_task_output(state, output, console_bytes);
+    result.and_then(|value| output_result.map(|_| value))
 }
 
 fn completion_notification_frame(
@@ -1712,6 +1739,9 @@ struct InstructionState {
     budget: std::sync::Arc<crate::invocation_budget::Budget>,
     completion_boundary: Option<Value>,
     dispatch_identity: std::sync::Arc<()>,
+    work_control: Option<crate::task_work::Control>,
+    work_output_bytes: usize,
+    work_revision: usize,
 }
 impl InstructionState {
     #[cfg(test)]
@@ -1732,9 +1762,16 @@ impl InstructionState {
             budget,
             completion_boundary: None,
             dispatch_identity: std::sync::Arc::new(()),
+            work_control: None,
+            work_output_bytes: 0,
+            work_revision: 0,
         }
     }
 }
+#[path = "vm_guest_work.rs"]
+mod guest_work;
+use guest_work::transfer_task_output;
+
 #[path = "vm_task_atomic.rs"]
 mod task_atomic;
 
@@ -1886,6 +1923,9 @@ fn interpret_instructions_with_dispatch(
         budget,
         completion_boundary,
         dispatch_identity,
+        work_control,
+        work_output_bytes: _,
+        work_revision,
     } = state;
     let crate::invocation::Dispatch {
         scheduler, default_task_queue, owner, ..
@@ -1905,6 +1945,12 @@ fn interpret_instructions_with_dispatch(
             }
         }
         if let Some(value) = completion_boundary.take() {
+            if work_control.is_some() && entry_drain_depth.is_none() {
+                let mut roots = Vec::new();
+                crate::gc::trace(&value, &mut roots);
+                heap.publish(roots)?;
+                return Ok(InstructionProgress::Completed(value));
+            }
             options.check_cancellation("TaskQueue.Dispatch", 0)?;
             if !crate::invocation::Dispatch::claim_owner(owner, dispatch_identity) {
                 let mut roots = execution_roots(
@@ -1917,6 +1963,11 @@ fn interpret_instructions_with_dispatch(
                 heap.publish(roots)?;
                 *completion_boundary = Some(value);
                 return Ok(InstructionProgress::Waiting);
+            }
+            let (_, revision) = invocation.work.activity();
+            if work_control.is_none() && revision != *work_revision {
+                *work_revision = revision;
+                *drain_required = true;
             }
             // Run ready default-queue work before waiting for registered host
             // results. A notification is transferred directly into a traced
@@ -1958,7 +2009,12 @@ fn interpret_instructions_with_dispatch(
             }
             let completion =
                 scheduler.completion_state(heap, default_task_queue.as_ref(), options)?;
-            if completion == crate::scheduler::CompletionState::Pending {
+            let (native_running, revision) = invocation.work.activity();
+            if completion == crate::scheduler::CompletionState::Pending
+                || (work_control.is_none()
+                    && native_running
+                    && completion == crate::scheduler::CompletionState::Idle)
+            {
                 let mut roots = execution_roots(
                     frames,
                     scheduler,
@@ -1986,6 +2042,12 @@ fn interpret_instructions_with_dispatch(
                     Ok(())
                 })?;
                 *drain_required = true;
+                continue;
+            }
+            // A job can finish after the first revision read. Observe its final
+            // callback posts before deciding that invocation draining is complete.
+            if work_control.is_none() && revision != *work_revision {
+                *completion_boundary = Some(value);
                 continue;
             }
             if entry_drain_depth.take().is_some() {
@@ -2065,6 +2127,9 @@ fn interpret_instructions_with_dispatch(
         let function = frame.function.clone();
         let pc = frame.pc;
         frame.trace_pc = pc;
+        if let Some(control) = work_control {
+            control.check()?;
+        }
         options.check_cancellation(&function.name, pc)?;
         let op = function.body.get(pc).ok_or_else(|| Fault {
             code: crate::FaultCode::InvalidProgram,

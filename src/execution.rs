@@ -11,6 +11,7 @@ use crate::{Fault, Limits};
 #[derive(Debug, Clone, Default)]
 pub struct CancellationToken {
     cancelled: Arc<AtomicBool>,
+    parents: Option<Arc<[CancellationToken; 2]>>,
 }
 
 impl CancellationToken {
@@ -25,6 +26,17 @@ impl CancellationToken {
 
     pub fn is_cancelled(&self) -> bool {
         self.cancelled.load(Ordering::Relaxed)
+            || self
+                .parents
+                .as_ref()
+                .is_some_and(|parents| parents.iter().any(Self::is_cancelled))
+    }
+
+    pub(crate) fn linked(left: Self, right: Self) -> Self {
+        Self {
+            cancelled: Arc::new(AtomicBool::new(false)),
+            parents: Some(Arc::new([left, right])),
+        }
     }
 }
 
@@ -73,5 +85,26 @@ impl ExecutionOptions {
             });
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod linked_tests {
+    use super::*;
+
+    #[test]
+    fn linked_cancellation_observes_either_parent_without_cancelling_them() {
+        for index in 0..2 {
+            let parents = [CancellationToken::new(), CancellationToken::new()];
+            let linked = CancellationToken::linked(parents[0].clone(), parents[1].clone());
+            assert!(!linked.is_cancelled());
+            parents[index].cancel();
+            assert!(linked.is_cancelled());
+            assert!(!parents[1 - index].is_cancelled());
+        }
+        let left = CancellationToken::new();
+        let right = CancellationToken::new();
+        CancellationToken::linked(left.clone(), right.clone()).cancel();
+        assert!(!left.is_cancelled() && !right.is_cancelled());
     }
 }
