@@ -1,8 +1,8 @@
 //! Bounded dynamic calls and fields, executed through ordinary interpreter frames.
 use crate::reflection_properties::{supported_value, value_matches};
 use crate::{
-    metadata::{Function, FunctionRef, Instruction as Op, Representation, Type, Visibility},
     Fault, Module, Value,
+    metadata::{Function, FunctionRef, Instruction as Op, Representation, Type, Visibility},
 };
 
 #[derive(Clone, Copy, Debug)]

@@ -101,17 +101,19 @@ impl Completion {
     }
 }
 
+type CompletionObserver = (
+    std::sync::Arc<crate::scheduler::Wake>,
+    std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
+    std::sync::Arc<std::sync::atomic::AtomicUsize>,
+);
+
 pub(crate) struct Work {
     identity: Identity,
     cancellation: Control,
     jobs: Vec<Option<JoinHandle<Outcome>>>,
     limit: usize,
     limits: crate::Limits,
-    observer: Option<(
-        std::sync::Arc<crate::scheduler::Wake>,
-        std::sync::Arc<std::sync::Mutex<Option<Fault>>>,
-        std::sync::Arc<std::sync::atomic::AtomicUsize>,
-    )>,
+    observer: Option<CompletionObserver>,
 }
 impl Work {
     pub(crate) fn new(

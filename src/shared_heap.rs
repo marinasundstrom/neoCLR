@@ -173,7 +173,11 @@ impl Access<'_> {
     /// measured separately once, regardless of the number of reference aliases.
     pub(crate) fn publish_arrays(&mut self, usage: crate::arrays::Usage, enabled: bool) {
         self.state.arrays_used |= enabled || !usage.is_empty();
-        *self.registration.arrays.lock().expect("array accounting lock poisoned") = usage;
+        *self
+            .registration
+            .arrays
+            .lock()
+            .expect("array accounting lock poisoned") = usage;
     }
 
     pub(crate) fn check_arrays(

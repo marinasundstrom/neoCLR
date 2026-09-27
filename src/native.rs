@@ -112,7 +112,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     }
     if let Some((query, integer, returns)) = crate::reflection::Query::binding(&function.name) {
         let expected = if function.name == "neoCLR.Runtime.MemberCustomAttributes" {
-            vec![Type::from_name("System.Introspection.TypeInfo"), Type::Int32]
+            vec![
+                Type::from_name("System.Introspection.TypeInfo"),
+                Type::Int32,
+            ]
         } else if integer {
             vec![Type::RuntimeTypeHandle, Type::Int32]
         } else {
@@ -144,12 +147,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::Reflection(query));
     }
     for (kind, name) in ["Length", "Get", "Create"].iter().enumerate() {
-        if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") { continue; }
+        if function.name != format!("neoCLR.Runtime.ReflectionArray{name}") {
+            continue;
+        }
         let object = Type::from_name("System.Object");
         let expected = match kind {
             0 => vec![object.clone()],
             1 => vec![object.clone(), Type::Int32],
-            _ => vec![Type::from_name("System.Introspection.TypeInfo"), Type::ArrayRef(Box::new(object.clone()))],
+            _ => vec![
+                Type::from_name("System.Introspection.TypeInfo"),
+                Type::ArrayRef(Box::new(object.clone())),
+            ],
         };
         let returns = if kind == 0 { Type::Int32 } else { object };
         if function.parameters != expected || function.returns != returns || function.no_result {
@@ -158,19 +166,47 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         return Ok(Binding::ReflectionArray(kind as u8));
     }
     if function.name == "neoCLR.Runtime.ReflectionAssignable" {
-        if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle] || function.returns != Type::Boolean || function.no_result { return Err(Fault::new("reflection assignability signature mismatch")); }
+        if function.parameters != [Type::RuntimeTypeHandle, Type::RuntimeTypeHandle]
+            || function.returns != Type::Boolean
+            || function.no_result
+        {
+            return Err(Fault::new("reflection assignability signature mismatch"));
+        }
         return Ok(Binding::ReflectionAssignable);
     }
-    for (kind, name) in ["ConstructArgs", "Invoke", "FieldGet", "FieldSet", "ConstructorInvoke"].iter().enumerate() {
+    for (kind, name) in [
+        "ConstructArgs",
+        "Invoke",
+        "FieldGet",
+        "FieldSet",
+        "ConstructorInvoke",
+    ]
+    .iter()
+    .enumerate()
+    {
         let execution = format!("neoCLR.Runtime.Reflection{name}");
         let check = function.name == format!("{execution}Check");
-        if function.name != execution && !check { continue; }
+        if function.name != execution && !check {
+            continue;
+        }
         let object = Type::from_name("System.Object");
-        let expected = vec![Type::RuntimeTypeHandle, Type::Int32, object.clone(), Type::ArrayRef(Box::new(object.clone()))];
-        if function.parameters != expected || function.returns != if check {Type::Int32} else {object} || function.no_result {
+        let expected = vec![
+            Type::RuntimeTypeHandle,
+            Type::Int32,
+            object.clone(),
+            Type::ArrayRef(Box::new(object.clone())),
+        ];
+        if function.parameters != expected
+            || function.returns != if check { Type::Int32 } else { object }
+            || function.no_result
+        {
             return Err(Fault::new("reflection member signature mismatch"));
         }
-        return Ok(if check {Binding::ReflectionMemberCheck(kind as u8)} else {Binding::ReflectionMember(kind as u8)});
+        return Ok(if check {
+            Binding::ReflectionMemberCheck(kind as u8)
+        } else {
+            Binding::ReflectionMember(kind as u8)
+        });
     }
     if let Some((setter, check)) = match function.name.as_str() {
         "neoCLR.Runtime.ReflectionPropertyGetCheck" => Some((false, true)),
@@ -203,8 +239,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::ReflectionProperty(setter)
         });
     }
-    if function.name == "neoCLR.Runtime.GCCollect"
-        || function.name == "neoCLR.Runtime.GCKeepAlive"
+    if function.name == "neoCLR.Runtime.GCCollect" || function.name == "neoCLR.Runtime.GCKeepAlive"
     {
         let keep_alive = function.name.ends_with("GCKeepAlive");
         let expected = if keep_alive {
@@ -229,8 +264,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         "GCReclaimedObjectCount",
         "GCHeapObjectLimit",
     ];
-    if let Some(index) = GC_INFO.iter().position(|name| function.name == format!("neoCLR.Runtime.{name}")) {
-        if !function.parameters.is_empty() || function.no_result || function.returns != Type::Int64 {
+    if let Some(index) = GC_INFO
+        .iter()
+        .position(|name| function.name == format!("neoCLR.Runtime.{name}"))
+    {
+        if !function.parameters.is_empty() || function.no_result || function.returns != Type::Int64
+        {
             return Err(Fault::new("GC information service signature mismatch"));
         }
         return Ok(Binding::GcInfo(index as u8));
@@ -761,8 +800,12 @@ impl Binding {
         }
         match (self, args.as_slice()) {
             (Self::GcKeepAlive, [_]) => Ok(Value::Void),
-            (Self::ReflectionAssignable, args) => Ok(Value::Boolean(crate::reflection_members::assignable(module,args))),
-            (Self::ReflectionMemberCheck(kind), args) => Ok(Value::Int32(crate::reflection_members::check(module,args,*kind))),
+            (Self::ReflectionAssignable, args) => Ok(Value::Boolean(
+                crate::reflection_members::assignable(module, args),
+            )),
+            (Self::ReflectionMemberCheck(kind), args) => Ok(Value::Int32(
+                crate::reflection_members::check(module, args, *kind),
+            )),
             (Self::ReflectionPropertyCheck(setter), args) => Ok(Value::Int32(
                 crate::reflection_properties::check(module, args, *setter),
             )),

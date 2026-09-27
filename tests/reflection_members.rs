@@ -1,4 +1,4 @@
-use neoclr::{assemble, run, Limits, Value};
+use neoclr::{Limits, Value, assemble, run};
 fn services() -> String {
     let mut s=".type class abstract System.Object\n.method instance .ctor() -> noresult\nret\n.end\n.end\n".to_string();
     for name in [
@@ -154,11 +154,18 @@ ret
 
 // Bind the retained descriptor index, rather than invoking overload selection.
 fn exact(types: &str, owner: &str, member: &str, body: &str, check: bool) -> neoclr::Module {
-    let mut m = invoke(types, &format!(
-        "{body}ldtoken {owner}\nldc.i4 123456\nldloc empty\nldloc arguments\ncall neoCLR.Runtime.ReflectionConstructorInvoke{}(System.RuntimeTypeHandle,Int32,System.Object,arrayref<System.Object>)\n{}",
-        if check { "Check" } else { "" },
-        if check { "" } else { "unbox.any Model\nldfld Model::N" }
-    ));
+    let mut m = invoke(
+        types,
+        &format!(
+            "{body}ldtoken {owner}\nldc.i4 123456\nldloc empty\nldloc arguments\ncall neoCLR.Runtime.ReflectionConstructorInvoke{}(System.RuntimeTypeHandle,Int32,System.Object,arrayref<System.Object>)\n{}",
+            if check { "Check" } else { "" },
+            if check {
+                ""
+            } else {
+                "unbox.any Model\nldfld Model::N"
+            }
+        ),
+    );
     let index = m.functions.iter().position(|f| f.name == member).unwrap() as i32;
     for f in &mut m.functions {
         for op in &mut f.body {

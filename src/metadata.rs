@@ -854,7 +854,10 @@ impl Module {
                 && (!matches!(ty, Type::ArrayRef(_)) || def.is_reference_type)
         };
         if let Some(indexes) = crate::runtime_lookup::types(self, name) {
-            indexes.iter().map(|&index| &self.types[index]).find(matches)
+            indexes
+                .iter()
+                .map(|&index| &self.types[index])
+                .find(matches)
         } else {
             self.types.iter().find(matches)
         }

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-27
 
+- Restore canonical formatting and strict Clippy gates for release preparation.
+  Rename the internal slot factory, name the completion observer type and simplify
+  equivalent expressions; retain inline completion values to avoid new allocation.
+  All-target lint and ten focused slot/alias/thread checks pass.
+
 - Install local SDK/VSIX `0.1.12-neoclr.20260927.cpu1` and the indexed-runtime
   HTTP bundle; verify editor completion, independent HTTP cases and the Raven pair.
   Preserve prior installations and record per-component source revisions/hashes.

@@ -207,9 +207,14 @@ pub(crate) fn reflection_public(
 
 /// Source field access when retained; legacy imports retain their descriptive visibility.
 pub(crate) fn field_access(owner: &crate::metadata::TypeDef, index: usize) -> SourceAccess {
-    owner.origin.as_ref().and_then(|o|o.field_access.get(index)).copied().unwrap_or_else(|| match owner.fields[index].visibility {
-        crate::metadata::Visibility::Public => SourceAccess::Public,
-        crate::metadata::Visibility::Private => SourceAccess::Private,
-        crate::metadata::Visibility::Internal => SourceAccess::Assembly,
-    })
+    owner
+        .origin
+        .as_ref()
+        .and_then(|o| o.field_access.get(index))
+        .copied()
+        .unwrap_or_else(|| match owner.fields[index].visibility {
+            crate::metadata::Visibility::Public => SourceAccess::Public,
+            crate::metadata::Visibility::Private => SourceAccess::Private,
+            crate::metadata::Visibility::Internal => SourceAccess::Assembly,
+        })
 }

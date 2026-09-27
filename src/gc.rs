@@ -125,7 +125,7 @@ impl ManagedHeap {
             )
         })?;
         self.objects
-            .insert(identity, crate::slots::Slot::new(value.ty(), Some(value)));
+            .insert(identity, crate::slots::Slot::cell(value.ty(), Some(value)));
         self.peak_objects = self.peak_objects.max(self.len());
         Ok(identity)
     }

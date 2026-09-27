@@ -91,17 +91,18 @@ impl HostCall {
 
     pub(super) fn supports(binding: &crate::native::Binding) -> bool {
         use crate::native::Binding;
-        match binding {
-            Binding::FileResource(_) | Binding::ConsoleWriteBytes => true,
-            Binding::JoinWorker
-            | Binding::JoinWorkerResult
-            | Binding::ReadAllText
-            | Binding::WriteAllText
-            | Binding::WriteLine
-            | Binding::ConsoleReadByte
-            | Binding::ConsoleFlush => true,
-            _ => false,
-        }
+        matches!(
+            binding,
+            Binding::FileResource(_)
+                | Binding::ConsoleWriteBytes
+                | Binding::JoinWorker
+                | Binding::JoinWorkerResult
+                | Binding::ReadAllText
+                | Binding::WriteAllText
+                | Binding::WriteLine
+                | Binding::ConsoleReadByte
+                | Binding::ConsoleFlush
+        )
     }
 
     pub(super) fn array_usage(
@@ -378,8 +379,18 @@ mod tests {
         )
         .unwrap();
         let mut usage = crate::arrays::Usage::default();
-        assert!(call.array_usage(&mut usage, &Limits { array_elements: 0, ..Limits::default() }).is_err());
-        call.array_usage(&mut crate::arrays::Usage::default(), &Limits::default()).unwrap();
+        assert!(
+            call.array_usage(
+                &mut usage,
+                &Limits {
+                    array_elements: 0,
+                    ..Limits::default()
+                }
+            )
+            .is_err()
+        );
+        call.array_usage(&mut crate::arrays::Usage::default(), &Limits::default())
+            .unwrap();
         reference
             .reference
             .element(0, &Type::Byte)

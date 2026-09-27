@@ -51,62 +51,65 @@ ret
         });
         let mut work = Work::new(&heap, 1, crate::CancellationToken::new(), Limits::default());
         let job = work
-            .submit(&mut heap, vec![capture], move |mut context, mut captures, control| {
-                let capture = captures.pop().unwrap();
-                // Frame metadata and native resources are created on the worker itself.
-                let mut frames = vec![Frame::new(function, vec![capture])?];
-                let options = ExecutionOptions::default();
-                let mut state = InstructionState::new(options.limits);
-                let mut memory = state.invocation.memory.clone();
-                let mut output = Vec::new();
-                let mut bytes = [Vec::new(), Vec::new()];
-                let mut libraries = None;
-                let value = loop {
-                    let progress = {
-                        let mut heap = context.enter()?;
-                        interpret_instructions(
-                            &module,
-                            &mut frames,
-                            &options,
-                            &mut libraries,
-                            &mut heap,
-                            &mut memory,
-                            &mut output,
-                            &mut bytes,
-                            &mut state,
-                            1,
-                        )?
-                    };
-                    match progress {
-                        InstructionProgress::Completed(value) => break value,
-                        InstructionProgress::Waiting => panic!("unexpected host wait"),
-                        InstructionProgress::HostCall(_) => panic!("unexpected host call"),
-                        InstructionProgress::Suspended => {
-                            step_tx
-                                .send(())
-                                .map_err(|_| Fault::new("test observer closed"))?;
-                            loop {
-                                match resume_rx.recv_timeout(std::time::Duration::from_millis(10)) {
-                                    Ok(()) => break,
-                                    Err(mpsc::RecvTimeoutError::Timeout)
-                                        if !control.is_cancelled() =>
+            .submit(
+                &mut heap,
+                vec![capture],
+                move |mut context, mut captures, control| {
+                    let capture = captures.pop().unwrap();
+                    // Frame metadata and native resources are created on the worker itself.
+                    let mut frames = vec![Frame::new(function, vec![capture])?];
+                    let options = ExecutionOptions::default();
+                    let mut state = InstructionState::new(options.limits);
+                    let mut memory = state.invocation.memory.clone();
+                    let mut output = Vec::new();
+                    let mut bytes = [Vec::new(), Vec::new()];
+                    let mut libraries = None;
+                    let value = loop {
+                        let progress = {
+                            let mut heap = context.enter()?;
+                            interpret_instructions(
+                                &module,
+                                &mut frames,
+                                &options,
+                                &mut libraries,
+                                &mut heap,
+                                &mut memory,
+                                &mut output,
+                                &mut bytes,
+                                &mut state,
+                                1,
+                            )?
+                        };
+                        match progress {
+                            InstructionProgress::Completed(value) => break value,
+                            InstructionProgress::Waiting => panic!("unexpected host wait"),
+                            InstructionProgress::HostCall(_) => panic!("unexpected host call"),
+                            InstructionProgress::Suspended => {
+                                step_tx
+                                    .send(())
+                                    .map_err(|_| Fault::new("test observer closed"))?;
+                                loop {
+                                    match resume_rx
+                                        .recv_timeout(std::time::Duration::from_millis(10))
                                     {
-                                        ()
-                                    }
-                                    _ => {
-                                        return Err(Fault::coded(
-                                            crate::FaultCode::ExecutionCancelled,
-                                            "test cancelled",
-                                        ));
+                                        Ok(()) => break,
+                                        Err(mpsc::RecvTimeoutError::Timeout)
+                                            if !control.is_cancelled() => {}
+                                        _ => {
+                                            return Err(Fault::coded(
+                                                crate::FaultCode::ExecutionCancelled,
+                                                "test cancelled",
+                                            ));
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                };
-                drop(state); // Any source teardown happens outside managed graph access.
-                context.complete(|_| Ok(value))
-            })
+                    };
+                    drop(state); // Any source teardown happens outside managed graph access.
+                    context.complete(|_| Ok(value))
+                },
+            )
             .unwrap();
         (work, job, id)
     };
@@ -211,7 +214,7 @@ fn zero_quantum_is_rejected_without_consuming_budget() {
         &mut state,
         0,
     );
-    assert!(matches!(result, Err(_)));
+    assert!(result.is_err());
     assert_eq!(state.budget.remaining(), options.limits.instructions);
 }
 
@@ -883,8 +886,7 @@ ret
 #[test]
 fn contending_dispatch_context_observes_cancellation_without_stealing_ownership() {
     let module =
-        crate::assemble(".module System\n.function Finish() -> Void\nldvoid\nret\n.end")
-            .unwrap();
+        crate::assemble(".module System\n.function Finish() -> Void\nldvoid\nret\n.end").unwrap();
     let token = crate::CancellationToken::new();
     let options = ExecutionOptions {
         cancellation: Some(token.clone()),

@@ -1348,7 +1348,7 @@ impl Frame {
         let locals = function
             .locals
             .iter()
-            .map(|ty| crate::slots::Slot::new(ty.clone(), None))
+            .map(|ty| crate::slots::Slot::cell(ty.clone(), None))
             .collect();
         Ok(Self {
             function: std::rc::Rc::new(function),
@@ -1356,7 +1356,7 @@ impl Frame {
             trace_pc: 0,
             args: args
                 .into_iter()
-                .map(|v| crate::slots::Slot::new(v.ty(), Some(v)))
+                .map(|v| crate::slots::Slot::cell(v.ty(), Some(v)))
                 .collect(),
             permit: None,
             queue_callback: false,
@@ -1636,7 +1636,10 @@ fn drive_instructions(
                 }
             }
             let mut heap = match participant.enter_cancellable(|| {
-                state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+                state
+                    .work_control
+                    .as_ref()
+                    .is_some_and(|control| control.is_cancelled())
             }) {
                 Ok(heap) => heap,
                 Err(fault) => break Err(fault),
@@ -1664,13 +1667,22 @@ fn drive_instructions(
                         break Err(fault);
                     }
                     let value = match call.run(
-                        module, state, native_libraries, memory, output, console_bytes, options,
+                        module,
+                        state,
+                        native_libraries,
+                        memory,
+                        output,
+                        console_bytes,
+                        options,
                     ) {
                         Ok(value) => value,
                         Err(fault) => break Err(fault),
                     };
                     let mut heap = match participant.enter_cancellable(|| {
-                        state.work_control.as_ref().is_some_and(|control| control.is_cancelled())
+                        state
+                            .work_control
+                            .as_ref()
+                            .is_some_and(|control| control.is_cancelled())
                     }) {
                         Ok(heap) => heap,
                         Err(fault) => break Err(fault),
@@ -1678,18 +1690,29 @@ fn drive_instructions(
                     if let Err(fault) = call.resume(value, frames) {
                         break Err(fault);
                     }
-                    if frames.iter().any(|frame| frame.stack.len() > options.limits.stack) {
+                    if frames
+                        .iter()
+                        .any(|frame| frame.stack.len() > options.limits.stack)
+                    {
                         break Err(Fault::coded(
                             crate::FaultCode::EvaluationStackOverflow,
                             "evaluation stack limit exceeded",
                         ));
                     }
-                    let usage = match frame_array_usage(frames, state.invocation_result.as_ref(), &state.invocation.limits) {
+                    let usage = match frame_array_usage(
+                        frames,
+                        state.invocation_result.as_ref(),
+                        &state.invocation.limits,
+                    ) {
                         Ok(usage) => usage,
                         Err(fault) => break Err(fault),
                     };
                     heap.publish_arrays(usage, state.arrays_used);
-                    let dispatch = state.invocation.dispatch.lock().expect("dispatch lock poisoned");
+                    let dispatch = state
+                        .invocation
+                        .dispatch
+                        .lock()
+                        .expect("dispatch lock poisoned");
                     if let Err(fault) = heap.publish(execution_roots(
                         frames,
                         &dispatch.scheduler,
@@ -1818,6 +1841,8 @@ mod task_atomic;
 mod host_call;
 use host_call::HostCall;
 
+// Keep completed values inline: this transient result does not need a heap allocation.
+#[allow(clippy::large_enum_variant)]
 enum InstructionProgress {
     Suspended,
     Waiting,
@@ -1967,7 +1992,10 @@ fn interpret_instructions_with_dispatch(
         work_revision,
     } = state;
     let crate::invocation::Dispatch {
-        scheduler, default_task_queue, owner, ..
+        scheduler,
+        default_task_queue,
+        owner,
+        ..
     } = dispatch;
     let mut executed = 0;
     loop {
@@ -2124,10 +2152,12 @@ fn interpret_instructions_with_dispatch(
         }
 
         if *arrays_used || heap.arrays_used() {
-            let check = |frames: &[Frame], heap: &crate::shared_heap::Access<'_>| -> Result<(), Fault> {
-                let usage = frame_array_usage(frames, invocation_result.as_ref(), &invocation.limits)?;
-                heap.check_arrays(usage, &invocation.limits)
-            };
+            let check =
+                |frames: &[Frame], heap: &crate::shared_heap::Access<'_>| -> Result<(), Fault> {
+                    let usage =
+                        frame_array_usage(frames, invocation_result.as_ref(), &invocation.limits)?;
+                    heap.check_arrays(usage, &invocation.limits)
+                };
             if check(frames, heap).is_err() {
                 let mut roots = vec![];
                 scheduler.trace_roots(&mut roots);
@@ -2200,7 +2230,7 @@ fn interpret_instructions_with_dispatch(
         {
             let roots = execution_roots(
                 frames,
-                &scheduler,
+                scheduler,
                 default_task_queue.as_ref(),
                 invocation_result.as_ref(),
             );
@@ -3047,7 +3077,7 @@ fn interpret_instructions_with_dispatch(
                         };
                         child.args.insert(
                             0,
-                            crate::slots::Slot::new(
+                            crate::slots::Slot::cell(
                                 owner,
                                 Some(Value::ObjectReference(object.clone())),
                             ),
@@ -3065,7 +3095,7 @@ fn interpret_instructions_with_dispatch(
                             crate::SlotReference::new(&storage).constructor_view(module, &owner)?;
                         child.args.insert(
                             0,
-                            crate::slots::Slot::new(
+                            crate::slots::Slot::cell(
                                 Type::ByRef(Box::new(owner)),
                                 Some(Value::SlotReference(receiver.clone())),
                             ),
@@ -3076,7 +3106,7 @@ fn interpret_instructions_with_dispatch(
                         child.constructing = true;
                         child.args.insert(
                             0,
-                            crate::slots::Slot::new(
+                            crate::slots::Slot::cell(
                                 owner.clone(),
                                 if definitions.is_empty() {
                                     Some(Value::Object {
@@ -3160,7 +3190,7 @@ fn interpret_instructions_with_dispatch(
                         let mut child = Frame::new(callee, args)?;
                         child.args.insert(
                             0,
-                            crate::slots::Slot::new(
+                            crate::slots::Slot::cell(
                                 Type::ByRef(Box::new(owner.clone())),
                                 Some(Value::SlotReference(receiver.clone())),
                             ),
@@ -3216,22 +3246,30 @@ fn interpret_instructions_with_dispatch(
                     restrict_reference_arguments(&callee, &mut args)?;
                     if callee.pinvoke.is_some() {
                         host_call = Some(HostCall::new(
-                            callee, args, executing_assembly.clone(), context.clone(), pc,
+                            callee,
+                            args,
+                            executing_assembly.clone(),
+                            context.clone(),
+                            pc,
                         )?);
                         return Ok(None);
                     } else if callee.is_internal_call() {
                         let binding = crate::native::bind(&callee)?;
                         if HostCall::supports(&binding) {
                             host_call = Some(HostCall::new(
-                            callee, args, executing_assembly.clone(), context.clone(), pc,
-                        )?);
+                                callee,
+                                args,
+                                executing_assembly.clone(),
+                                context.clone(),
+                                pc,
+                            )?);
                             return Ok(None);
                         }
                         if matches!(binding, crate::native::Binding::GcCollect) {
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(
                                 frames,
-                                &scheduler,
+                                scheduler,
                                 default_task_queue.as_ref(),
                                 invocation_result.as_ref(),
                             );
@@ -3245,7 +3283,6 @@ fn interpret_instructions_with_dispatch(
                             return Ok(None);
                         }
 
-
                         if matches!(binding, crate::native::Binding::ScheduleTask) {
                             // Publish the caller after consuming the argument; the
                             // child registers the callback before any pressure GC.
@@ -3255,7 +3292,8 @@ fn interpret_instructions_with_dispatch(
                                 default_task_queue.as_ref(),
                                 invocation_result.as_ref(),
                             ))?;
-                            let usage = frame_array_usage(frames, invocation_result.as_ref(), &limits)?;
+                            let usage =
+                                frame_array_usage(frames, invocation_result.as_ref(), &limits)?;
                             heap.publish_arrays(usage, *arrays_used);
                             guest_work::submit(
                                 std::sync::Arc::new(module.clone()),
@@ -3270,7 +3308,9 @@ fn interpret_instructions_with_dispatch(
 
                         if matches!(binding, crate::native::Binding::DrainEntryTasks) {
                             if entry_drain_depth.is_some() || work_control.is_some() {
-                                return Err(Fault::new("Entry task dispatch cannot be nested or run by a task callback"));
+                                return Err(Fault::new(
+                                    "Entry task dispatch cannot be nested or run by a task callback",
+                                ));
                             }
                             *entry_drain_depth = Some(frames.len());
                             *drain_required = true;
@@ -3383,8 +3423,12 @@ fn interpret_instructions_with_dispatch(
                                 _ => return Err(Fault::new("String.Intern requires text")),
                             };
                             Value::String(
-                                invocation.interned.lock().expect("intern pool lock poisoned")
-                                    .intern(text.clone()).map_err(|e| e.fault())?,
+                                invocation
+                                    .interned
+                                    .lock()
+                                    .expect("intern pool lock poisoned")
+                                    .intern(text.clone())
+                                    .map_err(|e| e.fault())?,
                             )
                         } else if let crate::native::Binding::Resolve(operation) = binding {
                             if matches!(

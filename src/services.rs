@@ -184,7 +184,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         if matches!(
             crate::native::bind(function)?,
             crate::native::Binding::ReflectionConstruct
-            | crate::native::Binding::ReflectionMember(_)
+                | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)
         ) {
             uses.extend(

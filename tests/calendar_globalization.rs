@@ -1,4 +1,4 @@
-use neoclr::{assembler::parse_function_ref, Limits, LoadedProgram, Value};
+use neoclr::{Limits, LoadedProgram, Value, assembler::parse_function_ref};
 
 fn library() -> String {
     let output = std::process::Command::new("python3")
@@ -221,11 +221,13 @@ fn calendar_policies_cannot_be_constructed_or_mutated_by_guest_il() {
             format!(".module InvalidCalendar\n.function Main() -> noresult\n{body}\nret\n.end\n");
         let error = neoclr::assembler::read_modules(
             &[neoclr::assembler::ModuleInput::Source(&source)],
-            &library
-        ).and_then(|modules| {
+            &library,
+        )
+        .and_then(|modules| {
             let program = LoadedProgram::with_library(&modules[0], &library)?;
             program.verify()
-        }).unwrap_err();
+        })
+        .unwrap_err();
         assert!(error.to_string().contains("access denied"), "{error}");
     }
 }

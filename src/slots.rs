@@ -37,7 +37,7 @@ impl SlotStorage {
 pub(crate) type Cell = Arc<SlotStorage>;
 
 impl Slot {
-    pub(crate) fn new(ty: Type, value: Option<Value>) -> Cell {
+    pub(crate) fn cell(ty: Type, value: Option<Value>) -> Cell {
         Arc::new(SlotStorage::new(Self {
             ty,
             value,
@@ -74,7 +74,7 @@ impl Slot {
         Ok(Value::SlotReference(reference))
     }
     pub(crate) fn construction(ty: Type, fields: Vec<Value>) -> Cell {
-        let cell = Self::new(ty.clone(), Some(Value::Object { ty, fields }));
+        let cell = Self::cell(ty.clone(), Some(Value::Object { ty, fields }));
         cell.borrow_mut().construction = Some(vec![]);
         cell
     }
@@ -654,7 +654,7 @@ mod tests {
             ty: ty.clone(),
             fields: vec![Value::Int32(n), Value::Int32(n)],
         };
-        let cell = Slot::new(ty.clone(), Some(pair(0)));
+        let cell = Slot::cell(ty.clone(), Some(pair(0)));
         let reference = crate::SlotReference::new(&cell);
         let start = std::sync::Barrier::new(2);
         std::thread::scope(|scope| {
@@ -677,7 +677,7 @@ mod tests {
 
     #[test]
     fn cross_thread_array_mutation_invalidates_payload_summary() {
-        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("a")));
+        let cell = Slot::cell(Type::Array(Box::new(Type::String)), Some(text_array("a")));
         budget(&cell, 1, std::mem::size_of::<Value>() + 1).unwrap();
         let element = crate::SlotReference::new(&cell)
             .element(0, &Type::String)
@@ -712,7 +712,7 @@ mod tests {
     #[test]
     fn payload_summary_tracks_replacement_failed_stores_and_reset() {
         let size = std::mem::size_of::<Value>();
-        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("a")));
+        let cell = Slot::cell(Type::Array(Box::new(Type::String)), Some(text_array("a")));
         budget(&cell, 1, size + 1).unwrap();
         cell.borrow_mut().set(text_array("longer")).unwrap();
         assert_eq!(
@@ -735,7 +735,7 @@ mod tests {
         let size = std::mem::size_of::<Value>();
         let array_type = Type::Array(Box::new(Type::String));
         let owner = Type::from_name("Container");
-        let cell = Slot::new(
+        let cell = Slot::cell(
             owner.clone(),
             Some(Value::Object {
                 ty: owner,
@@ -758,7 +758,7 @@ mod tests {
     #[test]
     fn payload_summary_rechecks_limits_and_accumulates_all_roots() {
         let size = std::mem::size_of::<Value>();
-        let cell = Slot::new(Type::Array(Box::new(Type::String)), Some(text_array("abc")));
+        let cell = Slot::cell(Type::Array(Box::new(Type::String)), Some(text_array("abc")));
         // An initial failed measurement must not publish incomplete counts.
         assert!(budget(&cell, 0, 0).is_err());
         budget(&cell, 1, size + 3).unwrap();
@@ -828,7 +828,7 @@ mod tests {
 
     #[test]
     fn references_retain_storage_and_failed_stores_do_not_fulfill_outputs() {
-        let cell = Slot::new(Type::Int32, Some(Value::Int32(7)));
+        let cell = Slot::cell(Type::Int32, Some(Value::Int32(7)));
         let reference = SlotReference::new(&cell);
         let output = reference.output().unwrap();
         assert!(output.write(Value::String("wrong".into())).is_err());
@@ -849,12 +849,12 @@ mod tests {
 
     #[test]
     fn reference_replacement_releases_only_the_replaced_retention() {
-        let first = Slot::new(Type::String, Some(Value::String("first".into())));
-        let second = Slot::new(Type::String, Some(Value::String("second".into())));
+        let first = Slot::cell(Type::String, Some(Value::String("first".into())));
+        let second = Slot::cell(Type::String, Some(Value::String("second".into())));
         let first_lifetime = Arc::downgrade(&first);
         let second_lifetime = Arc::downgrade(&second);
         let alias = SlotReference::new(&first);
-        let holder = Slot::new(
+        let holder = Slot::cell(
             Type::ByRef(Box::new(Type::String)),
             Some(Value::SlotReference(alias.clone())),
         );
