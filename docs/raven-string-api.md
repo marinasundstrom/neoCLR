@@ -181,3 +181,14 @@ or native FFI Char ABI is introduced.
 literals such as `'é'` and `'👨‍👩‍👧‍👦'` have type char. Use `ToString`, `Equals`
 and `CompareTo` for text operations, and `System.Text.UnicodeScalar` for explicit
 scalar classification. See the [tested sample](experiments/raven-target/samples/library-grapheme-strings.rvn).
+
+
+## Explicit comparison modes (development)
+
+The post-Preview-10 surface includes `String.Compare(left, right, comparison)` with
+`StringComparison.Ordinal` or `OrdinalIgnoreCase`, and the direct
+`CompareOrdinalIgnoreCase` shortcut. `StringComparer.OrdinalIgnoreCase` supplies
+matching equality, hash and ordering policies. See the [full comparison contract](ordinal-text.md#explicit-comparison-modes-development)
+for Unicode 17 default simple folding, .NET differences and invalid-mode behavior.
+These APIs require matching development reference, bridge, library and native runtime.
+Further String expansion is paused for the [author-directed design review](tracking/library-data.md#string-design-review-before-further-expansion).

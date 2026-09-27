@@ -59,6 +59,8 @@ static class RuntimeServiceBindings
             ("StringGraphemeAt", ["String", "Int32"], "Char"),
             ("StringIntern", ["String"], "String"),
             ("StringConcat", ["String", "String"], "String"),
+            ("StringCompareOrdinalIgnoreCase", ["String", "String"], "Int32"),
+            ("StringHashOrdinalIgnoreCase", ["String"], "Int32"),
             ("StringCompareOrdinal", ["String", "String"], "Int32"),
             ("StringContainsOrdinal", ["String", "String"], "Boolean"),
             ("StringStartsWithOrdinal", ["String", "String"], "Boolean"),

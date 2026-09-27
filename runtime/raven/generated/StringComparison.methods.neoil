@@ -1,0 +1,87 @@
+; Generated from runtime/raven/src/System/StringComparison.rvn. Regenerate with build_runtime_library.py.
+.type System.StringComparison
+.enum Int32
+.field private Bits Int32
+.literal Ordinal 0
+.literal OrdinalIgnoreCase 1
+.method static FromValue(Int32 value) -> System.StringComparison
+ldarg value
+newobj System.StringComparison
+ret
+.end
+.method instance get_Value() -> Int32
+ldarg this
+ldfld 0
+ret
+.end
+.method instance Or(System.StringComparison other) -> System.StringComparison
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+or
+newobj System.StringComparison
+ret
+.end
+.method instance And(System.StringComparison other) -> System.StringComparison
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+newobj System.StringComparison
+ret
+.end
+.method instance Xor(System.StringComparison other) -> System.StringComparison
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+xor
+newobj System.StringComparison
+ret
+.end
+.method instance Not() -> System.StringComparison
+ldarg this
+ldfld 0
+not
+newobj System.StringComparison
+ret
+.end
+.method instance HasFlag(System.StringComparison other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+and
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method instance Equals(System.StringComparison other) -> Boolean
+ldarg this
+ldfld 0
+ldarg other
+ldfld 0
+ceq
+ret
+.end
+.method instance override byref ToString() -> String
+ldtoken System.StringComparison
+ldarg this
+ldfld 0
+call neoCLR.Runtime.EnumFormat(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.method static Ordinal() -> System.StringComparison
+ldc.i4 0
+newobj System.StringComparison
+ret
+.end
+.method static OrdinalIgnoreCase() -> System.StringComparison
+ldc.i4 1
+newobj System.StringComparison
+ret
+.end
+.end

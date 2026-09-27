@@ -43,6 +43,23 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringEquals(m_value, other)
     }
 
+    /// Compares non-null strings using an explicit policy; unknown modes fault.
+    static func Compare(left: string, right: string, comparison: StringComparison) -> int {
+        if comparison == StringComparison.Ordinal {
+            return CompareOrdinal(left, right)
+        }
+        if comparison == StringComparison.OrdinalIgnoreCase {
+            return CompareOrdinalIgnoreCase(left, right)
+        }
+        System.Fault("Unsupported StringComparison")
+        return 0
+    }
+
+    /// Uses Unicode 17 default simple folding without normalization or expansion.
+    static func CompareOrdinalIgnoreCase(left: string, right: string) -> int {
+        return RuntimeServices.StringCompareOrdinalIgnoreCase(left, right)
+    }
+
     static func CompareOrdinal(left: string, right: string) -> int {
         return RuntimeServices.StringCompareOrdinal(left, right)
     }

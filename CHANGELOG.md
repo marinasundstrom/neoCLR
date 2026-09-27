@@ -18,10 +18,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and StringComparer.Ordinal. Add HashMap policy construction while preserving the
   callback constructor; both comparer methods retain the map's reentry protection.
   Ordinal uses exact content equality/hash and native UTF-8 ordering. No universal
-  default, case-insensitive or culture policy is added. Refresh library/reference
+  default or culture policy is added. Refresh library/reference
   artifacts, API docs, feature pages and focused source/metadata/GC/editor evidence.
   Correct the signature probe's TaskOutcome interface assertion; its obsolete
   Result payload-setter assertion remains tracked separately.
+- Add explicit StringComparison.Ordinal/OrdinalIgnoreCase, String.Compare with a
+  required mode, CompareOrdinalIgnoreCase and a matching StringComparer policy.
+  Unicode 17 default simple folding drives equality, ordering and hashing; it does
+  not normalize, expand mappings or promise .NET OrdinalIgnoreCase equivalence.
+  Existing ordinal behavior is unchanged. Refresh matching native/library/reference
+  artifacts and focused contract evidence; these APIs are not in Preview 10.
+- Record .NET as the ergonomic target rather than an exact API template, learning
+  from other frameworks and UTF-8 constraints. Finish the comparison slice, then
+  stop further string expansion for an author-directed whole-surface design review.
 - Record the author's focused-validation policy: only necessary checks, performance
   tests when relevant, and a full suite only when needed. Skip unrelated website builds.
 

@@ -25,8 +25,14 @@ scope remains frozen. Thematic consolidation is complete.
 The author-selected comparer slice is implemented in development: equality/hash and
 ordering policies, callback adapters, StringComparer.Ordinal and a HashMap policy
 constructor. See the [library/data sequence and evidence](tracking/library-data.md#active-direction--useful-api-gaps).
-The next candidate is useful text construction, including a minimal StringBuilder
-for a report consumer. M2–M6 remain candidate applications; no complete File Catalog
+The author-selected explicit String comparison modes and matching ignore-case policy
+are implemented in development. **Stop string feature expansion here for a design
+review**: reassess the complete String/Char surface, using .NET ergonomics as the
+target while learning from other frameworks and accounting for native UTF-8.
+The [library tracker](tracking/library-data.md#string-design-review-before-further-expansion)
+owns the review and its completion boundary. StringBuilder and casing additions
+remain candidates after that review, not automatic next implementation tasks.
+M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 
 ## Theme trackers

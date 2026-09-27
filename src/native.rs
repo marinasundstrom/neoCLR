@@ -60,6 +60,8 @@ pub(crate) enum Binding {
     StringScalars,
     StringByteCount,
     StringCompareOrdinal,
+    StringCompareOrdinalIgnoreCase,
+    StringHashOrdinalIgnoreCase,
     StringContainsOrdinal,
     StringStartsWithOrdinal,
     StringEndsWithOrdinal,
@@ -209,6 +211,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.StringCompareOrdinal", [Type::String, Type::String]) => {
             (Binding::StringCompareOrdinal, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringCompareOrdinalIgnoreCase", [Type::String, Type::String]) => {
+            (Binding::StringCompareOrdinalIgnoreCase, Type::Int32)
+        }
+        ("neoCLR.Runtime.StringHashOrdinalIgnoreCase", [Type::String]) => {
+            (Binding::StringHashOrdinalIgnoreCase, Type::Int32)
         }
         ("neoCLR.Runtime.StringContainsOrdinal", [Type::String, Type::String]) => {
             (Binding::StringContainsOrdinal, Type::Boolean)
@@ -925,6 +933,18 @@ impl Binding {
                     std::cmp::Ordering::Greater => 1,
                 }))
             }
+            (Self::StringCompareOrdinalIgnoreCase, [Value::String(left), Value::String(right)]) => {
+                Ok(Value::Int32(
+                    match crate::string_comparison::compare_ignore_case(left, right) {
+                        std::cmp::Ordering::Less => -1,
+                        std::cmp::Ordering::Equal => 0,
+                        std::cmp::Ordering::Greater => 1,
+                    },
+                ))
+            }
+            (Self::StringHashOrdinalIgnoreCase, [Value::String(value)]) => Ok(Value::Int32(
+                crate::string_comparison::hash_ignore_case(value),
+            )),
             (Self::StringContainsOrdinal, [Value::String(value), Value::String(pattern)]) => {
                 Ok(Value::Boolean(value.contains(pattern.as_str())))
             }

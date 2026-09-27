@@ -3,7 +3,10 @@
 Every roadmap capability and substantive revision of an implemented feature belongs
 in this discussion: what .NET/CLR already provides, what problem remains for neoCLR,
 and which solution best serves the platform. Familiar APIs and observable behavior
-are the starting point. Different syntax or internals are permitted, but difference
+are the starting point. The author reaffirmed on 2026-09-27 that .NET is the ergonomic
+target, not an exact API-shape requirement. Learn from other frameworks and let
+neoCLR’s UTF-8 and text model inform fundamental API contracts.
+Different syntax or internals are permitted, but difference
 alone is not an improvement. More runtime machinery is an option to evaluate, not
 an automatic preference. Historical .NET/CLR compatibility accommodations are
 context, not constraints: neoCLR may choose a more consistent contract across its

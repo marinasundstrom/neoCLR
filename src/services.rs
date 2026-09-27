@@ -141,6 +141,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::StringIntern
             | crate::native::Binding::StringConcat
             | crate::native::Binding::StringCompareOrdinal
+            | crate::native::Binding::StringCompareOrdinalIgnoreCase
+            | crate::native::Binding::StringHashOrdinalIgnoreCase
             | crate::native::Binding::StringContainsOrdinal
             | crate::native::Binding::StringStartsWithOrdinal
             | crate::native::Binding::StringEndsWithOrdinal

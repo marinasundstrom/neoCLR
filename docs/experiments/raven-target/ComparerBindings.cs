@@ -20,9 +20,11 @@ static class ComparerBindings
                 public int GetHashCode(T value) => default;
             }
         }
+        public enum StringComparison { Ordinal = 0, OrdinalIgnoreCase = 1 }
         public sealed class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {
             private StringComparer() { }
             public static StringComparer Ordinal => default;
+            public static StringComparer OrdinalIgnoreCase => default;
             public bool Equals(string left, string right) => default;
             public int GetHashCode(string value) => default;
             public int Compare(string left, string right) => default;
@@ -82,7 +84,7 @@ static class ComparerBindings
         (string Args, string Result, bool Static) expected = (kind, reference.Name) switch {
             ("DelegateComparer", ".ctor") => ($"System.Func<{element},{element},Int32>", "noresult", false),
             ("DelegateEqualityComparer", ".ctor") => ($"System.Func<{element},{element},Boolean>,System.Func<{element},Int32>", "noresult", false),
-            ("StringComparer", "get_Ordinal") => ("", StringOwner, true),
+            ("StringComparer", "get_Ordinal" or "get_OrdinalIgnoreCase") => ("", StringOwner, true),
             ("StringComparer" or "Comparer" or "DelegateComparer", "Compare") => ($"{element},{element}", "Int32", false),
             ("StringComparer" or "EqualityComparer" or "DelegateEqualityComparer", "Equals") => ($"{element},{element}", "Boolean", false),
             ("StringComparer" or "EqualityComparer" or "DelegateEqualityComparer", "GetHashCode") => (element, "Int32", false),

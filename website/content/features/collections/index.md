@@ -115,8 +115,10 @@ bytes/Unicode scalar values, which differs from .NET UTF-16 ordering for some ch
 
 Use `DelegateEqualityComparer<T>` or `DelegateComparer<T>` to adapt callbacks, or
 implement the interfaces for a named policy. Policy behavior and keys must remain
-stable while stored; callbacks must not reenter the same map. No universal default,
-culture or case-insensitive policy is supplied. The development APIs require rebuilt
+stable while stored; callbacks must not reenter the same map. No universal default or
+culture policy is supplied. `StringComparer.OrdinalIgnoreCase` additionally uses
+Unicode simple folding consistently for equality/hash and ordering; see the
+[string comparison contract](../strings/#explicit-comparison-policies-development). The development APIs require rebuilt
 matching references and runtime library artifacts; they are not in Preview 10.
 
 ## API reference

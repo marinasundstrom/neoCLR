@@ -6,7 +6,10 @@ then renders Raven signatures with the same layout, navigation and development
 notice as the Markdown guides. No DocFX build, metadata YAML or second site exists.
 
 The site documents Preview 10 plus explicitly labeled development additions.
-Comparer policies and the HashMap policy constructor are post-Preview-10 APIs. Keep generated signatures and authored guides
+Comparer policies, the HashMap policy constructor and explicit String comparison
+modes are post-Preview-10 APIs. StringComparison, both comparison methods and
+StringComparer.OrdinalIgnoreCase have type/member coverage; the reference describes
+simple-fold/.NET differences and invalid modes. Keep generated signatures and authored guides
 aligned with the matching runtime and compiler reference artifacts.
 
 ## Build and refresh

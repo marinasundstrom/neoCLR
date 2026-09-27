@@ -1,0 +1,84 @@
+{
+  "runtime": ".NET 10.0.0",
+  "platform": "macOS 27.0.0",
+  "results": [
+    {
+      "left": "A",
+      "right": "a",
+      "compare": 0,
+      "sameHash": true
+    },
+    {
+      "left": "Å",
+      "right": "å",
+      "compare": 0,
+      "sameHash": true
+    },
+    {
+      "left": "Σ",
+      "right": "ς",
+      "compare": 0,
+      "sameHash": true
+    },
+    {
+      "left": "ß",
+      "right": "ss",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "ẞ",
+      "right": "ß",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "K",
+      "right": "k",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "ı",
+      "right": "I",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "İ",
+      "right": "i",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "ſ",
+      "right": "S",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "𐐀",
+      "right": "𐐨",
+      "compare": 0,
+      "sameHash": true
+    },
+    {
+      "left": "é",
+      "right": "é",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "𐀀",
+      "right": "",
+      "compare": 1,
+      "sameHash": false
+    },
+    {
+      "left": "[",
+      "right": "A",
+      "compare": 1,
+      "sameHash": false
+    }
+  ]
+}

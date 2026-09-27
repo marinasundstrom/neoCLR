@@ -1,0 +1,58 @@
+{
+  "date": "2026-09-27",
+  "status": "implemented; focused checks passed; not released",
+  "ravenRevision": "a108df82adb84b891cb7171e5602716a88723834",
+  "ravenBranch": "neoclr",
+  "platform": "macOS arm64",
+  "unicodeFolding": "Unicode 17.0.0 default simple C/S mappings",
+  "artifacts": {
+    "System.neoil": "882da90eccd6ec65230d149c0f3c97a2053bac9fa4052befc138484de483fcc7",
+    "NeoCLR.CoreProbe.dll": "f2db99896264745259e60336dacc6db0cfb38395dae22a2573f3cb157d6b28e8",
+    "neoclr": "67c31ddc704d1742198ca2a325e3c397f4fea6bc4895fc4470e99cdf4b29b29d"
+  },
+  "checks": [
+    {
+      "command": "cargo test --locked --lib string_comparison",
+      "passed": 2,
+      "coverage": "All mapped scalar pairs: valid ordered table, idempotent folding and equality/hash agreement; Unicode edge cases and ordering"
+    },
+    {
+      "command": "python3 docs/experiments/raven-target/verify_string_comparison.py PROJECT --bridge BRIDGE --system SYSTEM --runtime RUNTIME",
+      "passed": 3,
+      "scenarios": [
+        "Compiled Raven comparison/interface/hash/HashMap consumer",
+        "Unnamed mode faults",
+        "Two-argument default Compare rejected"
+      ]
+    },
+    {
+      "command": "dotnet BRIDGE --comparer-signatures OUTPUT",
+      "passed": 11,
+      "coverage": "Existing six comparer checks plus explicit enum mode, new factory/shortcut and malformed metadata checks"
+    },
+    {
+      "command": "cargo test --locked --test ordinal_text compare_uses_utf8_scalar_order_including_supplementary_text",
+      "passed": 1,
+      "coverage": "Existing archived-profile ordinal behavior through serialized IL"
+    },
+    {
+      "command": "python3 docs/experiments/raven-target/build_runtime_library.py --check-snapshot",
+      "status": "passed; final full library regeneration produces byte-identical tested System profile"
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --refresh target/api-docs/input/NeoCLR.CoreProbe.dll --check",
+      "status": "passed; matching public type inventory and XML"
+    },
+    {
+      "command": "dotnet run --project docs/experiments/ordinal-text-dotnet -- --ignore-case",
+      "status": "completed on .NET 10.0.0 macOS; comparison results retained in ignore-case-results.json"
+    }
+  ],
+  "limitations": [
+    "Simple folding is not .NET OrdinalIgnoreCase equivalence or ordering; no normalization, expansion or culture tailoring.",
+    "Segmentation and scalar classification remain Unicode 16.",
+    "Private Boolean constructor adaptation exposed a bridge access limitation; private integer constructor argument avoids it.",
+    "Full suite, website build and unrelated platform/GC tests skipped by focused-validation direction; no performance claim or benchmark.",
+    "No Raven compiler changes or Runtime Contract switch. No package or website publication. Further String expansion stops for the author-directed design review."
+  ]
+}

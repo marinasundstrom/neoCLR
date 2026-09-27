@@ -1,0 +1,9 @@
+namespace System
+
+/// Explicit, locale-independent string comparison policies.
+public enum StringComparison {
+    /// Exact UTF-8 byte ordering, equivalent to Unicode scalar ordering.
+    Ordinal = 0
+    /// Unicode 17 default simple case folding followed by scalar ordering.
+    OrdinalIgnoreCase = 1
+}

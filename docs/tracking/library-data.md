@@ -12,7 +12,11 @@ StringBuilder and better time APIs. See the [recorded text requests](../developm
 and [application discussion](../development-timeline.md#2026-09-24--future-minimal-http-application-namespace-map).
 The author subsequently requested implementing comparers. That first slice is now
 implemented in development. Later ordering remains an assistant recommendation;
-broader culture/time contracts remain design decisions.
+broader culture/time contracts remain design decisions. The subsequent explicit
+comparison slice is implemented in development; the author then directs a stop for
+the string design review below before further string API expansion.
+
+Earlier proposed sequence; the review below now precedes further text implementation.
 
 | Order | Bounded work | What it enables and completion boundary |
 | --- | --- | --- |
@@ -26,8 +30,8 @@ Comparer<T>, both Delegate* adapters and StringComparer.Ordinal are implemented 
 Raven. HashMap accepts an equality policy and retains callback construction. The
 [Map design](../map-contracts.md#comparer-policies-development) records signatures,
 .NET comparisons, null domains and native UTF-8 ordering. No universal Default,
-culture/case-insensitive policy or sorting API is claimed. Next candidate: the
-bounded text-construction/report slice above.
+culture policy or sorting API is claimed. The subsequent String comparison slice
+adds a documented simple-fold policy; further text construction awaits review.
 
 [Validation evidence](../experiments/raven-target/comparer-validation.json): six
 focused source scenarios, six metadata admission checks and five existing map/GC
@@ -62,6 +66,41 @@ necessary. Avoid routine website builds for unrelated work. Include performance 
 concrete performance question requires them. Reuse unaffected evidence; run a full
 suite or platform matrix only when the change or unresolved uncertainty requires it,
 per the author’s 2026-09-27 clarification.
+
+## String design review before further expansion
+
+**Author-directed next step (2026-09-27):** finish explicit comparison modes, then
+stop implementation and reassess strings as a whole. .NET is the ergonomic target;
+exact API spelling, behavior and implementation are not mandatory. Learn from other
+frameworks and evaluate benefits and costs specific to valid UTF-8 text.
+
+The completed development slice supplies `StringComparison.Ordinal` and
+`OrdinalIgnoreCase`, `String.Compare(left, right, comparison)`,
+`CompareOrdinalIgnoreCase` and `StringComparer.OrdinalIgnoreCase`. Existing ordinal
+operations remain unchanged. [Contract and tradeoffs](../ordinal-text.md#explicit-comparison-modes-development)
+cover Unicode 17 simple folding, shared equality/hash rules, .NET differences and
+focused validation. [Recorded evidence](../experiments/raven-target/string-comparison-validation.json):
+two native folding tests, three Raven scenarios, eleven metadata checks and one
+archived-profile ordinal regression pass, with matching library/API snapshots.
+Website and full-suite runs are skipped. These additions do not settle the long-term
+string design.
+
+Review the current String, Char, scalar/byte views, length/index/slicing, comparison,
+search, equality/hash, normalization, casing, text construction and encoding boundaries
+as a coherent API. Compare real tasks in .NET and relevant UTF-8/grapheme-oriented
+frameworks (for example Rust, Go and Swift), using their primary documentation and
+small examples; these are research candidates, not preselected designs. Include
+Unicode-version consistency: segmentation/classification currently use Unicode 16,
+while this folding table uses 17. Examine whether the familiar OrdinalIgnoreCase
+name adequately communicates the selected simple-fold behavior.
+
+**Review deliverable:** a compact keep/change/defer matrix in the existing text
+design documents, concrete consumer examples, tradeoffs and unresolved questions,
+and a recommended next bounded slice. Distinguish proven usability improvements
+from hypotheses; benchmark only performance claims that matter. Do not start a
+redesign, StringBuilder, generalized casing or additional comparison overloads
+while producing that recommendation. This review supersedes the earlier proposed
+text-construction-first ordering; it does not reopen the released HTTP POC.
 
 ## Recorded checkpoints and remaining scope
 

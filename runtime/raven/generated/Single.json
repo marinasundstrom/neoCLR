@@ -6,7 +6,8 @@
     "runtime/raven/src/System/Collections/Comparer.rvn": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592",
     "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn": "8e3f4cc920337f644af19d7fa1837178e9af2c870be367a56616a86507e8bb96",
     "runtime/raven/src/System/Collections/DelegateComparer.rvn": "763508b3a329f0bb172769167adc1facf06217c4d808bee08586ba9b99af8ed6",
-    "runtime/raven/src/System/StringComparer.rvn": "44f8a3d9b552999a9041d9cdfd86b97d80cb230b1ad2d808508035c42550e7e4",
+    "runtime/raven/src/System/StringComparison.rvn": "aa73d44c5e53d5487d092998401033e82f4e11d86d1a4537babd3bd3c9986944",
+    "runtime/raven/src/System/StringComparer.rvn": "b436f00a4b16f9d3121e367860daa7808a458b849c6c2f516aca5c5f4dc7cf97",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": "278c700bbfec1a1279298bfe9927278c14227bbcb7e1760f15dbd6f8de06deb1",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "2b40ec91485820efbde7fac4db1a9e052d1245027fd3998627e98f78b5723ce7",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
@@ -80,7 +81,7 @@
     "runtime/raven/src/System/OverflowError.rvn": "eaa0f653ef045d8c0898baa8006d9dec11a676fa814bbe79ae277909ed6f46a8",
     "runtime/raven/src/System/EnvironmentError.rvn": "08d7ca88cd6395e47a000c413b910c7c61b501417c9827dda7ef40b63b5c11f4",
     "runtime/raven/src/System/Void.rvn": "cec6e383555235c0144b80860e7e384061f3a74d26e8b74178f1547d2bd12e75",
-    "runtime/raven/src/System/String.rvn": "032fc92b2303fb8c6ba38aabeac3a63187d58ffe57971e6ff0f99ad86cc57b3d",
+    "runtime/raven/src/System/String.rvn": "90e8ad24e9b8099e1ed92ee4b93205c05ce5e11e7e7c7365dc00e1753f455c33",
     "runtime/raven/src/System/Text/Utf8.rvn": "fee5b25307e2b88264ef99c57f93874cf2525d69b4592611e34c57230a165e54",
     "runtime/raven/src/System/Text/UnicodeScalar.rvn": "ed347a9d60b3d7a13da14df968bc0b55f7b2c4a74d94d9524bd639da7f8c8fa8",
     "runtime/raven/src/System/Text/InvalidUtf8Error.rvn": "5c03b55b9af6557e60123e50600e5b968a7b0020bd5bdb2fba9d355d90391d91",
@@ -137,7 +138,7 @@
     "runtime/raven/src/System/Boolean.rvn": "3daceb359864c13e8b4c1ba2c22b7666e8ac8c4591747cb973e43f0f2cc38081",
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
-    "runtime/raven/System.Runtime.rvnproj": "d9c219246f4dcda77eb01b82dc6f889f76eec4b75dbc9acc457f2bd6564c54e0",
+    "runtime/raven/System.Runtime.rvnproj": "d00a4ed38f61f97f9c4511e7f018fa386578d139b5bc9a4b3409bcffd47fff31",
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
@@ -145,7 +146,7 @@
     "Single.helpers.neoil": "3a68db74505b3614dcd99db43f35869674c75bf0517df3e34687ee96fba64b4f"
   },
   "compilerSha256": "9e540c5c3f3d2ea673e6e60e4bfc621180d8d7b6158a4a22e085e8439a9a7e1c",
-  "coreSha256": "1922a81348abb9d5c8877872d990b4315ae4138281f0d7203a8424835dfe182b",
+  "coreSha256": "285b0fa0c07ac0e1f30bba1929577cfe2caf341bb1f261d70b2e5d52e9e60be0",
   "exports": [
     "readonly byref CompareTo(Single other) -> Int32"
   ]

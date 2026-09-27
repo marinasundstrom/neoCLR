@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringHashOrdinalIgnoreCase(String value) -> Int32
+    .methodimpl InternalCall
+.end

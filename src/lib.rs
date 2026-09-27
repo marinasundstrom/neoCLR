@@ -40,6 +40,8 @@ mod references;
 mod reflection;
 mod reflection_execution;
 mod reflection_properties;
+mod string_case_folding;
+mod string_comparison;
 pub use reachability::{FunctionImplementation, Reachability, ReachableCall, ReachableFunction};
 mod scope;
 mod services;

@@ -99,3 +99,10 @@ When Cargo.lock changes, review the full resolved package set with
 and preserve new or changed notices. Include target-specific and build dependencies.
 The recorded registry checksums identify package artifacts; notice hashes check the
 copied texts, not the complete provenance of neoCLR's source.
+
+## Derived Unicode data
+
+The generated scalar-category and simple-case-fold tables use Unicode data under
+[Unicode License V3](third-party/unicode/LICENSE.txt). Case folding uses Unicode
+17.0.0 CaseFolding.txt; its pinned source URL and SHA-256 are recorded in
+`scripts/generate-string-case-folding.py` and `src/string_case_folding.rs`.

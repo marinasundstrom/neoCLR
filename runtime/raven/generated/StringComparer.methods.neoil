@@ -3,66 +3,158 @@
 .sealed
 .implements System.Collections.EqualityComparer<String>
 .implements System.Collections.Comparer<String>
+.field private ignoreCase Boolean
 .property static Ordinal() -> System.StringComparer
 .get System.StringComparer::get_Ordinal()
 .end
-.method private instance .ctor() -> noresult
+.property static OrdinalIgnoreCase() -> System.StringComparer
+.get System.StringComparer::get_OrdinalIgnoreCase()
+.end
+.method private instance .ctor(Int32 mode) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
 M00000001_IL_0002:
 pop
 M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 0
+M00000001_IL_0009:
+ldarg 1
+M00000001_IL_000a:
+ldc.i4 1
+M00000001_IL_000b:
+ceq
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000001_IL_000d:
+call neoCLR.Library.System.StringComparer.RuntimeBooleanFromInt32(Int32)
+stfld System.StringComparer::ignoreCase
+M00000001_IL_0012:
 ret
 .end
 .method static get_Ordinal() -> System.StringComparer
 M00000002_IL_0000:
 M00000002_IL_0001:
-newobj instance System.StringComparer::.ctor()
-M00000002_IL_0006:
+ldc.i4 0
+M00000002_IL_0002:
+newobj instance System.StringComparer::.ctor(Int32)
+M00000002_IL_0007:
+ret
+.end
+.method static get_OrdinalIgnoreCase() -> System.StringComparer
+M00000003_IL_0000:
+M00000003_IL_0001:
+ldc.i4 1
+M00000003_IL_0002:
+newobj instance System.StringComparer::.ctor(Int32)
+M00000003_IL_0007:
 ret
 .end
 .method instance Equals(String left,String right) -> Boolean
-M00000003_IL_0000:
-M00000003_IL_0001:
-M00000003_IL_0002:
+M00000004_IL_0000:
+M00000004_IL_0001:
+M00000004_IL_0002:
+ldarg 0
+M00000004_IL_0003:
+ldfld System.StringComparer::ignoreCase
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0008:
+brtrue M00000004_IL_0012
+M00000004_IL_000d:
+br M00000004_IL_001e
+M00000004_IL_0012:
+M00000004_IL_0013:
 ldarg 1
-M00000003_IL_0003:
+M00000004_IL_0014:
 ldarg 2
-M00000003_IL_0004:
+M00000004_IL_0015:
+call System.String::CompareOrdinalIgnoreCase(String,String)
+M00000004_IL_001a:
+ldc.i4 0
+M00000004_IL_001b:
+ceq
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_001d:
+call neoCLR.Library.System.StringComparer.RuntimeBooleanFromInt32(Int32)
+ret
+M00000004_IL_001e:
+M00000004_IL_001f:
+M00000004_IL_0020:
+ldarg 1
+M00000004_IL_0021:
+ldarg 2
+M00000004_IL_0022:
 call neoCLR.Library.System.StringComparer.RuntimeStringEquals(String,String)
 call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
-M00000003_IL_0009:
+M00000004_IL_0027:
 call neoCLR.Library.System.StringComparer.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance GetHashCode(String value) -> Int32
 .local System.Object local0
-M00000004_IL_0000:
-M00000004_IL_0001:
-M00000004_IL_0002:
-ldarg 1
-M00000004_IL_0003:
-castclass System.Object
-stloc local0
-M00000004_IL_0004:
-M00000004_IL_0005:
-ldloc local0
-M00000004_IL_0006:
-call neoCLR.Library.System.StringComparer.RuntimeReflection9D228A0DB4CAD74E(System.Object)
-M00000004_IL_000b:
-ret
-.end
-.method instance Compare(String left,String right) -> Int32
 M00000005_IL_0000:
 M00000005_IL_0001:
 M00000005_IL_0002:
-ldarg 1
+ldarg 0
 M00000005_IL_0003:
+ldfld System.StringComparer::ignoreCase
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000005_IL_0008:
+brtrue M00000005_IL_0012
+M00000005_IL_000d:
+br M00000005_IL_001a
+M00000005_IL_0012:
+M00000005_IL_0013:
+ldarg 1
+M00000005_IL_0014:
+call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
+M00000005_IL_0019:
+ret
+M00000005_IL_001a:
+M00000005_IL_001b:
+M00000005_IL_001c:
+ldarg 1
+M00000005_IL_001d:
+castclass System.Object
+stloc local0
+M00000005_IL_001e:
+M00000005_IL_001f:
+ldloc local0
+M00000005_IL_0020:
+call neoCLR.Library.System.StringComparer.RuntimeReflection9D228A0DB4CAD74E(System.Object)
+M00000005_IL_0025:
+ret
+.end
+.method instance Compare(String left,String right) -> Int32
+M00000006_IL_0000:
+M00000006_IL_0001:
+M00000006_IL_0002:
+ldarg 0
+M00000006_IL_0003:
+ldfld System.StringComparer::ignoreCase
+call neoCLR.Library.System.StringComparer.RuntimeBooleanToInt32(Boolean)
+M00000006_IL_0008:
+brtrue M00000006_IL_0012
+M00000006_IL_000d:
+br M00000006_IL_001b
+M00000006_IL_0012:
+M00000006_IL_0013:
+ldarg 1
+M00000006_IL_0014:
 ldarg 2
-M00000005_IL_0004:
+M00000006_IL_0015:
+call System.String::CompareOrdinalIgnoreCase(String,String)
+M00000006_IL_001a:
+ret
+M00000006_IL_001b:
+M00000006_IL_001c:
+M00000006_IL_001d:
+ldarg 1
+M00000006_IL_001e:
+ldarg 2
+M00000006_IL_001f:
 call System.String::CompareOrdinal(String,String)
-M00000005_IL_0009:
+M00000006_IL_0024:
 ret
 .end
 .end

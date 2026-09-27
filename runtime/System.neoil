@@ -39,6 +39,8 @@
 .include "neoCLR/Runtime/StringConcat.neoil"
 .include "neoCLR/Runtime/StringByteCount.neoil"
 .include "neoCLR/Runtime/StringScalars.neoil"
+.include "neoCLR/Runtime/StringCompareOrdinalIgnoreCase.neoil"
+.include "neoCLR/Runtime/StringHashOrdinalIgnoreCase.neoil"
 .include "neoCLR/Runtime/StringCompareOrdinal.neoil"
 .include "neoCLR/Runtime/StringContainsOrdinal.neoil"
 .include "neoCLR/Runtime/StringStartsWithOrdinal.neoil"

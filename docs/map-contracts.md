@@ -177,7 +177,7 @@ while stored. Hash codes may be negative, collide, and change between runtime
 versions; never persist them as identities. No universal Default policy is added.
 
 StringComparer accepts non-null strings, including empty text and embedded NUL.
-It neither normalizes Unicode nor ignores case. U+10000 sorts after U+E000, retaining
+The Ordinal policy neither normalizes Unicode nor ignores case. U+10000 sorts after U+E000, retaining
 neoCLR's [native ordinal order](ordinal-text.md). The map continues to delegate its
 key domain, including nullable reference keys, to the selected policy. It adds no
 uniform null-key rejection; passing null outside a policy's declared domain is
@@ -227,3 +227,10 @@ content hash agreement, collisions including Int32.MinValue, growth, equivalent-
 replacement, original reference preservation, user-defined policies and the legacy
 constructor. The focused verifier also checks reentrant policy faults and rejects
 mismatched policy types. See the library tracker for completed validation evidence.
+
+
+The subsequent development comparison slice adds `StringComparer.OrdinalIgnoreCase`.
+It shares Unicode 17 default simple folding across equality, ordering and hashing;
+HashMap retains the original spelling when a differently cased key replaces its
+value. See the [text contract](ordinal-text.md#explicit-comparison-modes-development)
+for .NET differences, normalization/expansion limits and matching-runtime requirements.

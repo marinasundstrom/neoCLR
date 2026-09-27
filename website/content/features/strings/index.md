@@ -199,7 +199,7 @@ overhead and temporary inputs are not included in those payload counts. See the
 [String API reference](xref:System.String) and [Fault/limit reference](../../docs/faults.html).
 
 
-## Comparer policy (development)
+## Explicit comparison policies (development)
 
 `StringComparer.Ordinal` combines exact equality, String's Object content hash and
 native UTF-8 ordering in one reusable policy. It accepts non-null strings and does
@@ -208,3 +208,20 @@ or through `EqualityComparer<string>` and `Comparer<string>`.
 See [collections and comparer policies](../collections/#comparer-policies-development)
 for a tested example and [StringComparer](xref:System.StringComparer) for signatures.
 This addition is not included in Preview 10.
+
+
+`String.Compare(left, right, StringComparison.Ordinal)` selects exact UTF-8 ordering.
+Use `StringComparison.OrdinalIgnoreCase` or `String.CompareOrdinalIgnoreCase(left,
+right)` for Unicode 17 default simple folding. `StringComparer.OrdinalIgnoreCase`
+uses the same rules for comparison, equality and hashing, including HashMap keys.
+
+The tested comparison sample compares `"ReadMe"` with `"README"` and uses the policy
+for duplicate detection and lookup. Simple folding equates `ẞ/ß` and `K/k`, but not
+`ß/ss`; it does not normalize text or apply language-specific rules. These results
+and folded ordering can differ from .NET's OrdinalIgnoreCase. An unknown mode faults.
+See [StringComparison](xref:System.StringComparison) and [StringComparer](xref:System.StringComparer).
+Use matching development runtime and SDK artifacts; Preview 10 lacks these additions.
+
+Further String expansion is paused for a review of the complete text API. .NET is
+the ergonomic target, with UTF-8 and lessons from other frameworks shaping the
+choices. Casing, normalization, indexing and text construction remain open directions.

@@ -1,3 +1,25 @@
+using System.Text.Json;
+
+if (args.Contains("--ignore-case")) {
+    var pairs = new (string, string)[] {
+        ("A", "a"), ("Å", "å"), ("Σ", "ς"), ("ß", "ss"), ("ẞ", "ß"),
+        ("K", "k"), ("ı", "I"), ("İ", "i"), ("ſ", "S"), ("𐐀", "𐐨"),
+        ("é", "e\u0301"), ("\U00010000", "\uE000"), ("[", "A")
+    };
+    Console.WriteLine(JsonSerializer.Serialize(new {
+        runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+        platform = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+        results = pairs.Select(pair => new {
+            left = pair.Item1,
+            right = pair.Item2,
+            compare = Math.Sign(string.Compare(pair.Item1, pair.Item2, StringComparison.OrdinalIgnoreCase)),
+            sameHash = StringComparer.OrdinalIgnoreCase.GetHashCode(pair.Item1)
+                == StringComparer.OrdinalIgnoreCase.GetHashCode(pair.Item2)
+        })
+    }, new JsonSerializerOptions { WriteIndented = true }));
+    return;
+}
+
 static void Check(bool value) { if (!value) throw new Exception("ordinal mismatch"); }
 foreach (var (left, right, sign) in new[] {
     ("", "", 0), ("", "x", -1), ("x", "", 1), ("A", "a", -1),

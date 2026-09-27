@@ -9,6 +9,8 @@ static class StringBindings
         new("Concat", ["String", "String"], "String"),
         new("op_Equality", ["String", "String"], "Boolean"),
         new("op_Inequality", ["String", "String"], "Boolean"),
+        new("Compare", ["String", "String", "System.StringComparison"], "Int32"),
+        new("CompareOrdinalIgnoreCase", ["String", "String"], "Int32"),
         new("CompareOrdinal", ["String", "String"], "Int32"),
         new("Equals", ["String"], "Boolean", true, true),
         new("ContainsOrdinal", ["String"], "Boolean", true, true),
@@ -23,7 +25,8 @@ static class StringBindings
         new("SliceUtf8", ["Int32", "Int32"], ResultBindings.Slice, true)
     ];
     static string ParameterName(Member member, int index) => member.Name switch {
-        "Concat" or "CompareOrdinal" => index == 0 ? "left" : "right",
+        "Compare" => index == 0 ? "left" : index == 1 ? "right" : "comparison",
+        "Concat" or "CompareOrdinal" or "CompareOrdinalIgnoreCase" => index == 0 ? "left" : "right",
         "Intern" => "text",
         "Equals" => "other",
         "ContainsOrdinal" => "substring",
@@ -32,9 +35,9 @@ static class StringBindings
         "SliceUtf8" => index == 0 ? "byteStart" : "byteLength",
         _ => throw new InvalidDataException("Missing String parameter name: " + member.Name)
     };
-    static string CSharp(string type) => type switch { "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
+    static string CSharp(string type) => type switch { "System.StringComparison" => "StringComparison", "String" => "string", "Char" => "char", "System.Collections.Iterator<Char>" => "Collections.Iterator<char>", "System.Collections.Sequence<UInt32>" => "Collections.Sequence<uint>", "Int32" => "int", "Boolean" => "bool", ResultBindings.Slice => "Result<string, Text.Utf8SliceError>", _ => throw new InvalidDataException(type) };
     public static string Declarations(bool results, bool collections) => "public sealed class String { " + string.Join(" ", Members.Where(m => (results || m.Result != ResultBindings.Slice)
-        && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item"))).Select(m =>
+        && (collections || m.Name is not ("GetIterator" or "GetScalars" or "get_Item" or "Compare" or "CompareOrdinalIgnoreCase"))).Select(m =>
         m.Name == "get_Item" ? "public char this[int index] => default;" :
         m.Name == "get_Length" ? "public int Length => default;" :
         m.Name == "get_IsEmpty" ? "public bool IsEmpty => default;" : m.Name is "op_Equality" or "op_Inequality"
@@ -60,7 +63,7 @@ static class StringBindings
     public static Binding? Bind(MethodReference reference, MethodDefinition definition, bool callvirt)
     {
         if (reference.DeclaringType.FullName != "System.String" || !RuntimeSignatures.IsCore(reference.DeclaringType.Scope)) return null;
-        var signature = RuntimeSignatures.Match(reference, definition, t => CollectionBindings.Type(t) ?? ResultBindings.Type(t));
+        var signature = RuntimeSignatures.Match(reference, definition, t => EnumBindings.Type(t) ?? CollectionBindings.Type(t) ?? ResultBindings.Type(t));
         var member = Members.SingleOrDefault(m => m.Name == reference.Name && m.Instance == reference.HasThis
             && m.Result == signature.Result && m.Parameters.SequenceEqual(signature.Args))
             ?? throw new InvalidDataException("Unsupported String member: " + reference.FullName);

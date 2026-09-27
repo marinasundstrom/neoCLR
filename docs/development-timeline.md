@@ -7888,3 +7888,31 @@ configuration/content, not target-specific code added to Raven main.
   validation by default, with broader suites/builds when the change or unresolved
   uncertainty justifies them. The current request to skip another website build
   still applies; there is no blanket prohibition on necessary future validation.
+
+
+## 2026-09-27 — Explicit comparison and a pause to rethink strings
+
+- **Author:** asks for String comparison shortcuts by ordinality and case.
+- **Assistant proposal:** String.Compare with explicit Ordinal/OrdinalIgnoreCase
+  modes, keeping CompareOrdinal and adding CompareOrdinalIgnoreCase.
+- **Author decision:** “Yes, explicit comparison modes”. Then clarifies that .NET
+  ergonomics and familiarity matter, but APIs need not look exactly like .NET.
+- **Assistant implementation choice:** Unicode default simple folding shared by
+  comparison, equality and hashing, retaining native UTF-8/scalar ordering. This is
+  the assistant's bounded design choice, not a claim the author selected every
+  Unicode detail or that .NET behaves identically.
+- **Author follow-up:** directs learning from other frameworks, accounting for UTF-8
+  and reconsidering the whole String design: “So implement this, and then we have
+  to stop and re-evaluate: what can we do differently, and what can we improve on
+  .NET?”
+- **Assistant response/action:** implements the requested slice and records a stop
+  before additional string feature implementation. The existing library tracker
+  owns a keep/change/defer review with concrete examples and explicit tradeoffs.
+  StringBuilder and broader casing are candidates after that review, not automatic
+  next tasks. .NET remains the ergonomic target; differences require justification.
+- **Evidence:** the [comparison contract](ordinal-text.md#explicit-comparison-modes-development)
+  documents simple-fold differences and matching artifacts. Two native folding tests, three Raven scenarios, eleven metadata checks and an
+  archived ordinal regression pass; library/API snapshots match. See the
+  [focused evidence](experiments/raven-target/string-comparison-validation.json).
+  Website/full-suite runs are skipped. No complete redesign, new release or website
+  publication is claimed.

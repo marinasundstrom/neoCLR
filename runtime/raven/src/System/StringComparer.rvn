@@ -1,22 +1,42 @@
 namespace System
 
-/// Exact string equality, content hashing and native UTF-8 ordinal ordering.
+import System.Runtime.CompilerServices.RuntimeServices
+
+/// Consistent string equality, hashing and ordering under an explicit ordinal policy.
 public class StringComparer : Collections.EqualityComparer<string>, Collections.Comparer<string> {
-    private init() { }
+    // Explicit field: the current compiler cannot constructor-assign an uninitialized private val.
+    private field ignoreCase: bool
+
+    // A CLI integer avoids a top-level Boolean adapter crossing private constructor access.
+    private init(mode: int) {
+        ignoreCase = mode == 1
+    }
 
     /// Returns a stateless ordinal policy. Instance identity is not guaranteed.
-    static val Ordinal: StringComparer => StringComparer()
+    static val Ordinal: StringComparer => StringComparer(0)
+
+    /// Uses Unicode 17 default simple folding for equality, hashing and ordering.
+    static val OrdinalIgnoreCase: StringComparer => StringComparer(1)
 
     func Equals(left: string, right: string) -> bool {
+        if ignoreCase {
+            return String.CompareOrdinalIgnoreCase(left, right) == 0
+        }
         return left.Equals(right)
     }
 
     func GetHashCode(value: string) -> int {
+        if ignoreCase {
+            return RuntimeServices.StringHashOrdinalIgnoreCase(value)
+        }
         let instance: Object = value
         return instance.GetHashCode()
     }
 
     func Compare(left: string, right: string) -> int {
+        if ignoreCase {
+            return String.CompareOrdinalIgnoreCase(left, right)
+        }
         return String.CompareOrdinal(left, right)
     }
 }

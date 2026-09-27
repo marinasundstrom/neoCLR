@@ -248,6 +248,7 @@
   "System.Storage.StorageProvider",
   "System.String",
   "System.StringComparer",
+  "System.StringComparison",
   "System.SystemClock",
   "System.Tasks.Promise`1",
   "System.Tasks.TaskOperators",

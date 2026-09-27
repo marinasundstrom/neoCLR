@@ -1,0 +1,58 @@
+import System.*
+import System.Collections.*
+import System.Option.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+public func CheckFold(left: string, right: string) {
+    let comparer = StringComparer.OrdinalIgnoreCase
+    let equality: EqualityComparer<string> = comparer
+    let ordering: Comparer<string> = comparer
+    Check(String.Compare(left, right, StringComparison.OrdinalIgnoreCase) == 0, "explicit folding")
+    Check(String.CompareOrdinalIgnoreCase(left, right) == 0, "folding shortcut")
+    Check(equality.Equals(left, right), "policy equality")
+    Check(ordering.Compare(left, right) == 0, "policy order")
+    Check(equality.GetHashCode(left) == equality.GetHashCode(right), "policy hash agreement")
+}
+
+func Main() {
+    CheckFold("", "")
+    CheckFold("ReadMe", "README")
+    CheckFold("Å", "å")
+    CheckFold("Σ", "ς")
+    CheckFold("𐐀", "𐐨")
+    CheckFold("ẞ", "ß")
+    CheckFold("K", "k")
+    CheckFold("ſ", "S")
+    CheckFold("A\u0000B", "a\u0000b")
+    Check(String.Compare("A", "a", StringComparison.Ordinal) < 0, "ordinal case sensitivity")
+    Check(String.CompareOrdinal("A", "a") < 0, "existing shortcut")
+    Check(!StringComparer.Ordinal.Equals("A", "a"), "ordinal policy unchanged")
+    let boxed: Object = "abc"
+    Check(StringComparer.Ordinal.GetHashCode("abc") == boxed.GetHashCode(), "ordinal hash unchanged")
+    Check(String.CompareOrdinalIgnoreCase("ß", "ss") != 0, "no full fold expansion")
+    Check(String.CompareOrdinalIgnoreCase("é", "é") != 0, "no normalization")
+    Check(String.CompareOrdinalIgnoreCase("İ", "i") != 0, "no Turkic tailoring")
+    Check(String.CompareOrdinalIgnoreCase("ı", "I") != 0, "dotless I distinct")
+    Check(String.CompareOrdinalIgnoreCase("[", "A") < 0, "folded scalar order")
+    Check(String.CompareOrdinalIgnoreCase("𐀀", "") > 0, "supplementary scalar order")
+    Check(String.CompareOrdinalIgnoreCase("abc", "ABCD") < 0, "prefix order")
+    Check(String.CompareOrdinalIgnoreCase("ABCD", "abc") > 0, "reverse prefix order")
+    let files = HashMap<string, int>(StringComparer.OrdinalIgnoreCase)
+    Check(files.TryAdd("ReadMe", 1), "insert")
+    Check(!files.TryAdd("README", 2), "folded duplicate")
+    files.Set("readme", 42)
+    match files.Find("rEaDmE") {
+        Some(let value) => Check(value == 42, "folded lookup")
+        None => System.Fault("missing folded key")
+    }
+    Check(files.Count == 1, "map replacement")
+    Check(files.Keys[0] == "ReadMe", "original spelling retained")
+    Check(files.TryAdd("K", 7), "unicode insert")
+    Check(files.ContainsKey("k"), "unicode folded hash lookup")
+    Console.WriteLine("String comparison contract passed")
+}

@@ -1,4 +1,15 @@
 ; Generated from runtime/raven/src/System/String.rvn. Regenerate with build_runtime_library.py.
+.function neoCLR.Library.System.String.RuntimeEqual(Int32 left,Int32 right) -> Int32
+ldarg left
+ldarg right
+ceq
+brfalse False
+ldc.i4 1
+ret
+False:
+ldc.i4 0
+ret
+.end
 .function neoCLR.Library.System.String.RuntimeErrorSystemTextUtf8SliceErrorNewSystemTextUtf8SliceErrorOutOfRange(System.Text.Utf8SliceError.OutOfRange value) -> System.Text.Utf8SliceError
 ldarg value
 newobj instance System.Text.Utf8SliceError::.ctor(System.Text.Utf8SliceError.OutOfRange)
@@ -60,6 +71,13 @@ True:
 False:
     ldc.i4 0
     ret
+.end
+.function neoCLR.Library.System.String.RuntimeCliCall0(System.StringComparison arg0,Int32 arg1) -> Int32
+ldarg arg0
+call instance System.StringComparison::get_Value()
+ldarg arg1
+call neoCLR.Library.System.String.RuntimeEqual(Int32,Int32)
+ret
 .end
 .function neoCLR.Library.System.String.RuntimeServiceStringGraphemes(String arg0) -> arrayref<Char>
 .local Char[] source

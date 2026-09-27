@@ -388,6 +388,9 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DelegateComparer'">
     <Compile Include="src/System/Collections/DelegateComparer.rvn" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparison'">
+    <Compile Include="src/System/StringComparison.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparer'">
     <Compile Include="src/System/StringComparer.rvn" />
   </ItemGroup>

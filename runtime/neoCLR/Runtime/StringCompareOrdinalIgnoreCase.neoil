@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String left, String right) -> Int32
+    .methodimpl InternalCall
+.end

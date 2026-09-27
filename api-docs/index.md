@@ -4,8 +4,8 @@ toc: false
 ---
 # API documentation
 
-**Preview 10 plus labeled development APIs.** Comparer policies and the HashMap
-policy constructor are development additions after Preview 10. Rebuild applications
+**Preview 10 plus labeled development APIs.** Comparer policies, explicit String comparison
+modes and the HashMap policy constructor are development additions after Preview 10. Rebuild applications
 with matching compiler, references and runtime library artifacts.
 
 [String](xref:System.String) documents construction from [Sequence&lt;Char&gt;](xref:System.Collections.Sequence`1),
@@ -15,7 +15,10 @@ UTF-8 operations, with [Object content behavior](objects.md#string-through-objec
 [Comparer policies](/features/collections/#comparer-policies-development) cover
 [EqualityComparer](xref:System.Collections.EqualityComparer`1),
 [Comparer](xref:System.Collections.Comparer`1) and
-[StringComparer.Ordinal](xref:System.StringComparer).
+[StringComparer](xref:System.StringComparer), including OrdinalIgnoreCase.
+[StringComparison](xref:System.StringComparison) selects the explicit String.Compare
+mode. These development additions use documented Unicode simple-fold semantics,
+which can differ from .NET.
 
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)

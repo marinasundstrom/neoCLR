@@ -14,6 +14,7 @@ SLICES = {
     "Comparer": "System.Collections.Comparer",
     "DelegateEqualityComparer": "System.Collections.DelegateEqualityComparer",
     "DelegateComparer": "System.Collections.DelegateComparer",
+    "StringComparison": "System.StringComparison",
     "StringComparer": "System.StringComparer",
 
     "ReflectionError": "System.Runtime.Reflection.ReflectionError",
@@ -149,6 +150,7 @@ SOURCES = {
     "Comparer": "runtime/raven/src/System/Collections/Comparer.rvn",
     "DelegateEqualityComparer": "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn",
     "DelegateComparer": "runtime/raven/src/System/Collections/DelegateComparer.rvn",
+    "StringComparison": "runtime/raven/src/System/StringComparison.rvn",
     "StringComparer": "runtime/raven/src/System/StringComparer.rvn",
 
     "ReflectionError": "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn",
@@ -357,6 +359,8 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
             types.remove(body)
             methods = [body[:-len('.end\n')] + ''.join(methods) + '.end\n']
     if name == 'String' and bootstrap:
+        # Explicit comparison modes are a Raven-profile API.
+        methods = [re.sub(r'(?ms)^\.method static (?:Compare|CompareOrdinalIgnoreCase)\(.*?^\.end\n', '', body) for body in methods]
         # The archived Neo profile uses borrowed collection interfaces. Keep its
         # scalar-independent String operations; Raven uses the complete source.
         methods = [re.sub(r'(?ms)^\.method (?:private )?(?:internal static |instance (?:readonly byref )?)(?:GetIterator|GetScalars|CreateFromCharacters|CollectionCount)\(.*?^\.end\n', '', body)
