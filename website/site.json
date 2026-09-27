@@ -42,7 +42,9 @@
   "toc": "toc.yml",
   "favicon": "favicon.svg",
   "extensionNamespaces": [
+    "System",
     "System.Linq",
-    "System.Runtime.Reflection"
+    "System.Runtime.Reflection",
+    "System.Tasks"
   ]
 }

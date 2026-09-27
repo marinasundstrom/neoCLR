@@ -89,3 +89,13 @@ preserving other query parameters and anchors. Valid shared settings override
 saved preferences; opening a shared URL does not change those preferences.
 Desktop/mobile browser checks verify layout, URL precedence, invalid-value fallback
 and preservation of existing query parameters and fragments.
+
+The website enables extensions from `System`, `System.Tasks`, `System.Linq` and
+`System.Runtime.Reflection`. This includes outcome and task composition methods
+on their applicable receiver pages; extension namespaces are an explicit site
+selection rather than a RavenDoc hard-coded list.
+
+RavenDoc resolves open generic receivers with their type parameters and keeps
+extension containers’ own declarations visible even with `extensions=false`.
+Static classes show no inherited instance members: `Task` is the static submission
+API, while `Task<T>` is the awaitable operation type.
