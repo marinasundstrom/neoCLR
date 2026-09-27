@@ -28,6 +28,7 @@
     <EmbeddedResource Include="../../../runtime/raven/src/System/ConsoleReadError.rvn" LogicalName="NeoCLR.ConsoleReadError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Text/Utf8SliceError.rvn" LogicalName="NeoCLR.Utf8SliceError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Int32ParseError.rvn" LogicalName="NeoCLR.Int32ParseError.rvn" />
+    <EmbeddedResource Include="../../../runtime/raven/src/System/Int64ParseError.rvn" LogicalName="NeoCLR.Int64ParseError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/Linq/SingleError.rvn" LogicalName="NeoCLR.SingleError.rvn" />
     <EmbeddedResource Include="../../../runtime/raven/src/System/IntegerDivisionError.rvn" LogicalName="NeoCLR.IntegerDivisionError.rvn" />
     <None Update="samples/*.rvn" CopyToOutputDirectory="PreserveNewest" />

@@ -1,0 +1,3 @@
+.function neoCLR.Runtime.StringToLowerInvariant(string value) -> string
+    .methodimpl InternalCall
+.end

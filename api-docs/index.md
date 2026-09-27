@@ -20,6 +20,9 @@ UTF-8 operations, with [Object content behavior](objects.md#string-through-objec
 mode. These development additions use documented Unicode simple-fold semantics,
 which can differ from .NET.
 
+[Casing and decimal reporting](text-numbers.md) covers development
+String.ToUpperInvariant/ToLowerInvariant and Int64 parsing, formatting and bounds.
+
 [Char](xref:System.Char) now has a generated type/member reference for grapheme
 construction, equality, ordering and display; see [Object contracts](objects.md)
 for boxed behavior.

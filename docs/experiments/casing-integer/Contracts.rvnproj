@@ -1,0 +1,36 @@
+<Project>
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
+    <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
+    <RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>
+    <RavenUnitType>System.Void</RavenUnitType>
+    <RavenGraphemeChar>true</RavenGraphemeChar>
+    <RavenHeapAsyncStateMachines>true</RavenHeapAsyncStateMachines>
+    <RavenPropagateAsyncCancellation>true</RavenPropagateAsyncCancellation>
+    <RavenCaptureAsyncExceptions>false</RavenCaptureAsyncExceptions>
+    <RavenUseHostFrameworkReferences>false</RavenUseHostFrameworkReferences>
+    <RavenAllowArrayCovariance>false</RavenAllowArrayCovariance>
+    <RavenAllowNullableValueTypes>false</RavenAllowNullableValueTypes>
+    <RavenPropagationAssemblyName>NeoCLR.CoreProbe</RavenPropagationAssemblyName>
+    <RavenPropagationInterfaceType>System.Propagatable`3</RavenPropagationInterfaceType>
+    <RavenIterationAssemblyName>NeoCLR.CoreProbe</RavenIterationAssemblyName>
+    <RavenIterationArrayShapeType>System.Array`1</RavenIterationArrayShapeType>
+    <RavenIterationIterableType>System.Collections.Iterable`1</RavenIterationIterableType>
+    <RavenIterationIteratorType>System.Collections.Iterator`1</RavenIterationIteratorType>
+    <RavenRecordAssemblyName>NeoCLR.CoreProbe</RavenRecordAssemblyName>
+    <RavenRecordEquatableType>System.EquatableTo`1</RavenRecordEquatableType>
+    <RavenRecordHashCodeType>System.HashCode</RavenRecordHashCodeType>
+    <RavenTypeOfAssemblyName>NeoCLR.CoreProbe</RavenTypeOfAssemblyName>
+    <RavenTypeOfInfoType>System.Introspection.TypeInfo</RavenTypeOfInfoType>
+    <RavenTypeOfContextType>System.Runtime.RuntimeContext</RavenTypeOfContextType>
+    <ImplicitImports>disable</ImplicitImports>
+    <RavenFrameworkProjections>None</RavenFrameworkProjections>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.rvn" />
+    <Reference Include="NeoCLR.CoreProbe">
+      <HintPath>NeoCLR.CoreProbe.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

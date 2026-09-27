@@ -46,6 +46,11 @@ UTF-8/strict-ASCII encoding foundation is complete. Broader codecs, general writ
 completion and further text capabilities need separately scoped consumer work. General
 scalar/range APIs and the broader portfolio are not prerequisites. Experimental
 types and proposed names are not adopted System APIs.
+The subsequent author-selected [casing and Int64 report slices](design/text-casing-integer.md)
+are implemented in development: Unicode 17 full default String casing, typed strict
+Int64 parsing, decimal formatting and bounds properties. Focused consumer/native/
+metadata checks and matching API artifacts cover this bounded work. No new broader
+milestone is selected by completing these slices.
 M2–M6 remain candidate applications; no complete File Catalog
 or additional HTTP feature is required by the comparer slice.
 

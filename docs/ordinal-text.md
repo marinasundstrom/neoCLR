@@ -188,3 +188,11 @@ scalar's idempotency/hash consistency, edge cases, interface dispatch and map us
 invalid modes, explicit-mode enforcement and metadata admission. The API snapshot
 is refreshed; no full test suite, performance claim or website build is required
 for this bounded contract. See the [recorded outcomes](experiments/raven-target/string-comparison-validation.json).
+
+## Full casing (development)
+
+The author-selected whole-String upper/lower operations are implemented with Unicode
+17 full default casing. [Contract and comparisons](design/text-casing-integer.md)
+explain expansion/context, pinned data and .NET differences. They do not change the
+existing simple-fold comparer or its hash contract; do not substitute uppercase or
+lowercase materialization as its key transformation.

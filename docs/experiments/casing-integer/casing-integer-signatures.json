@@ -1,0 +1,18 @@
+[
+  "Parse binds",
+  "Parse rejects wrong result",
+  "Parse rejects wrong receiver",
+  "ToString binds",
+  "ToString rejects wrong result",
+  "ToString rejects wrong receiver",
+  "get_MinValue binds",
+  "get_MinValue rejects wrong result",
+  "get_MinValue rejects wrong receiver",
+  "get_MaxValue binds",
+  "get_MaxValue rejects wrong result",
+  "get_MaxValue rejects wrong receiver",
+  "ToUpperInvariant binds",
+  "ToUpperInvariant rejects char result",
+  "ToLowerInvariant binds",
+  "ToLowerInvariant rejects char result"
+]

@@ -1,5 +1,21 @@
 using System.Text.Json;
 
+if (args.Contains("--casing-integer")) {
+    var text = new[] { "Straße ﬃ", "İıI", "ΟΣ", "ΟΣΑ", "AΣ́", "𐐀𐐨👩‍💻", "é é" };
+    var integers = new[] { "9223372036854775807", "-9223372036854775808", "+42", "-0", " 1", "1 ", "１２", "9223372036854775808", "99999999999999999999999999999x" };
+    Console.WriteLine(JsonSerializer.Serialize(new {
+        runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+        platform = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+        casing = text.Select(value => new { input = value, lower = value.ToLowerInvariant(), upper = value.ToUpperInvariant() }),
+        integers = integers.Select(value => {
+            try { var parsed = long.Parse(value, System.Globalization.CultureInfo.InvariantCulture);
+                return new { input = value, output = parsed.ToString(System.Globalization.CultureInfo.InvariantCulture), error = "" }; }
+            catch (Exception error) { return new { input = value, output = "", error = error.GetType().Name }; }
+        })
+    }, new JsonSerializerOptions { WriteIndented = true }));
+    return;
+}
+
 if (args.Contains("--ignore-case")) {
     var pairs = new (string, string)[] {
         ("A", "a"), ("Å", "å"), ("Σ", "ς"), ("ß", "ss"), ("ẞ", "ß"),

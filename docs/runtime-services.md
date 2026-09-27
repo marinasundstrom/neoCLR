@@ -42,6 +42,7 @@ Duplicate entries in the supplied service set have no additional effect.
 | ManagedHeap | heap.new, newarr and array.new (also require SlotReferences) |
 | ManagedArrays | Array creation, length and element operations; access operations conservatively also require SlotReferences |
 | ParseInt32 | Validated neoCLR.Runtime.ParseInt32 InternalCall |
+| ParseInt64 | Validated neoCLR.Runtime.ParseInt64 InternalCall (development) |
 | FormatInt32 | Validated neoCLR.Runtime.Int32ToString InternalCall |
 | ConsoleOutput | Validated neoCLR.Runtime.WriteLine InternalCall |
 | NativeInterop | P/Invoke declarations |
@@ -121,3 +122,7 @@ retained native outcome without requiring dispatch. The generated array-copy hel
 additionally uses managed-array services through its actual instructions. These
 requirements describe reachability, not permission grants or a complete platform
 support check. See the [DNS contract](socket-api-design.md#public-hostname-lookup-and-networking-poc--2026-09-24).
+
+Development full String casing uses StringOperations; Int64 parsing has its own
+ParseInt64 service requirement. Int64 decimal formatting reuses the existing
+StringOperations-classified integer formatting service.

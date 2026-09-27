@@ -1,2 +1,2 @@
-.include "../raven/generated/Int64.methods.neoil"
-.include "../raven/generated/Int64.helpers.neoil"
+.include "../raven/generated/Int64.bootstrap.methods.neoil"
+.include "../raven/generated/Int64.bootstrap.helpers.neoil"

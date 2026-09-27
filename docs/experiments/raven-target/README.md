@@ -1303,3 +1303,25 @@ custom final bytes, failure handling and a 65536-byte write. Larger fixtures use
 established measure_async host budget; runtime defaults stay unchanged. API/library
 snapshot checks accompany the implementation. No full suite or website build. See
 neoCLR docs/experiments/text-boundaries/public-encoder-validation.json.
+
+### Unicode casing and Int64 report integration (2026-09-27)
+
+Development reference signatures add String.ToUpperInvariant/ToLowerInvariant,
+Int64.Parse/ToString and static MinValue/MaxValue getters. Int64ParseError is emitted
+from its ordinary Raven union source. Exact catalogs admit these signatures and
+three native services (two String transforms and ParseInt64); no Runtime Contract
+option, general importer relaxation or Raven compiler semantic/emission change.
+The Int64 formatter keeps the existing byref primitive receiver convention.
+
+The archived Neo bootstrap omits the new Int64.Parse method and its standard-union
+adapters. The current Raven library contains the full method and standard error
+union; no new manual carrier is introduced for an archived frontend. String casing
+and simple primitive formatting/bounds can load in both profiles. Native services
+require a matching new runtime; rebuild runtime, references and System together.
+The source manifest generator maintains separate Int64 bootstrap fragments just as
+it already does for profile-specific String methods.
+
+`--casing-integer-checks <directory>` verifies 16 exact admissions/rejections.
+See [the focused report](../casing-integer/README.md) for source/native checks and
+[design comparisons](../../design/text-casing-integer.md) for full casing versus
+.NET behavior. These are target integration additions, not general compiler fixes.

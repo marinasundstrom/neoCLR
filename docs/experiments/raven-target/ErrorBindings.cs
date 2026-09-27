@@ -21,6 +21,7 @@ static class ErrorBindings
         ["System.ConsoleReadError"] = ["Unavailable", "ReadFailed"],
         ["System.Text.InvalidUtf8Error"] = [],
         ["System.Text.Utf8SliceError"] = ["OutOfRange", "InvalidBoundary"],
+        ["System.Int64ParseError"] = ["InvalidFormat", "Overflow"],
         ["System.Int32ParseError"] = ["InvalidFormat", "Overflow"],
         ["System.Linq.SingleError"] = ["Empty", "Multiple"],
         ["System.IntegerDivisionError"] = ["DivisionByZero", "Overflow"],

@@ -64,6 +64,16 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringCompareOrdinal(left, right)
     }
 
+    /// Unicode 17 full default uppercase; no locale tailoring or normalization.
+    func ToUpperInvariant() -> string {
+        return RuntimeServices.StringToUpperInvariant(m_value)
+    }
+
+    /// Unicode 17 full default lowercase, including final sigma context.
+    func ToLowerInvariant() -> string {
+        return RuntimeServices.StringToLowerInvariant(m_value)
+    }
+
     func ContainsOrdinal(substring: string) -> bool {
         return RuntimeServices.StringContainsOrdinal(m_value, substring)
     }

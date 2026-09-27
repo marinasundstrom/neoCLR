@@ -306,3 +306,11 @@ including eight string/Uri and optional-token overloads. Type/member XML, namesp
 navigation and the API landing page describe the buffered limits and error/cancellation
 policy. HttpJsonError case payload properties use the same explicitly linked manual
 payload reference as JsonError until RavenDoc produces those individual pages.
+
+## Casing and Int64 development slice
+
+String.ToUpperInvariant/ToLowerInvariant, Int64.Parse/ToString/MinValue/MaxValue
+and standard Int64ParseError now have generated type/member coverage and XML
+contracts. [Casing and decimal reporting](text-numbers.md) explains Unicode 17 full
+mappings, .NET differences, typed failures and static bounds properties. Matching
+native runtime, library and reference artifacts are required; no manual exclusions.
