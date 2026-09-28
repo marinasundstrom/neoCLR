@@ -7,6 +7,27 @@ foundation sweep. Useful API coverage is now selected in the
 expansion below remains deferred unless that work exposes a concrete dependency
 or later author direction selects it.
 
+## Function types and objects — 2026-09-28
+
+**In progress on the feature branch; native structural foundation implemented.**
+The author directs structural Function types describing callable shape, Function
+objects holding the invocation target, removal of delegates, and a
+`NominalTypeInfo`/`TypeInfo.IsNominalType` split. Named function types may follow
+later; transparent alias versus distinct nominal identity remains open.
+The [design and migration plan](../function-types.md) separates author decisions
+from assistant recommendations and records the existing execution/introspection
+dependencies. Native structural shape identity and checked Function binding/Invoke
+now run without a nominal declaration; [focused tests](../../tests/function_types.rs)
+cover substitution, artifacts, captures and signature rejection. Delegate declarations
+remain temporarily admitted during migration; library/Raven APIs are unchanged.
+
+Next: settle public object identity/equality/nullability and descriptor classifications,
+extend the structural validation coverage and migrate Raven,
+library callback contracts, reflection consumers and documentation artifacts.
+Other structural families are direction, not part of this Function replacement's
+completion claim. Acceptance requires the full migration and focused positive and
+negative cases listed in the plan; a renamed delegate carrier is insufficient.
+
 ## Value tuples — 2026-09-28
 
 Author-selected naming and capability: `System.Tuple` corresponds to .NET's value

@@ -62,6 +62,18 @@ pub(crate) fn resolve(
     module: &Module,
     target: &FunctionRef,
 ) -> Result<crate::metadata::Function, Fault> {
+    if let Some(owner @ Type::Function(_)) = &target.owner {
+        let contract = crate::delegates::contract(module, owner)?;
+        if target.name != contract.name
+            || !target.instance
+            || target.definition.is_some()
+            || !target.generic_arguments.is_empty()
+            || target.parameters != contract.parameters
+        {
+            return Err(Fault::new("invalid Function Invoke reference"));
+        }
+        return Ok(contract);
+    }
     if let Some(indexes) = crate::runtime_lookup::functions(module, &target.name) {
         resolve_candidates(module, target, indexes.iter().copied())
     } else {
@@ -1184,6 +1196,13 @@ fn check_type_context_seen(
     }
     let mut nested = |ty: &Type| check_type_context_seen(ty, module, arity, depth + 1, seen);
     match ty {
+        Type::Function(shape) => {
+            shape.validate()?;
+            for parameter in &shape.parameters {
+                nested(parameter)?;
+            }
+            nested(&shape.returns)
+        }
         Type::Scoped { .. } => Err(Fault::new("unresolved scoped type signature")),
         Type::TypeParameter(index) if *index as usize >= arity.types => {
             Err(Fault::new("type parameter outside declaring context"))
@@ -2576,6 +2595,7 @@ fn interpret_instructions_with_dispatch(
                 Op::Call(target) | Op::CallVirtual(target)
                     if target.instance
                         && match &target.owner {
+                            Some(Type::Function(_)) => true,
                             Some(owner) => module
                                 .type_definition(owner)
                                 .is_some_and(|d| d.representation == Representation::Delegate),
@@ -2588,7 +2608,7 @@ fn interpret_instructions_with_dispatch(
                     crate::access::check_call(module, Some(&function), &signature)?;
                     let ty = signature.owner.as_ref().unwrap();
                     let mut args = frame.args(module, &signature.argument_types()[1..])?;
-                    let Value::Delegate(binding) = frame.pop()? else {
+                    let Value::Function(binding) = frame.pop()? else {
                         return Err(Fault::new("Invoke requires a delegate value"));
                     };
                     if &binding.ty != ty {
@@ -4283,7 +4303,7 @@ fn debug_value(
         Value::ObjectReference(object) => {
             result.value = format!("object reference heap#{}", object.allocation_id());
         }
-        Value::Delegate(binding) => {
+        Value::Function(binding) => {
             result.value = debug_text(&format!(
                 "delegate {}<{:?}>",
                 binding.target.name, binding.target.generic_arguments

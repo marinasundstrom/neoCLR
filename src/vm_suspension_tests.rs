@@ -402,7 +402,7 @@ ret
             reference: heap.address(id).unwrap(),
             view: None,
         });
-        let callback = Value::Delegate(crate::Delegate {
+        let callback = Value::Function(crate::Function {
             ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
             target: crate::assembler::parse_function_ref(
                 "instance System.Tasks.TaskQueue::Drain()",

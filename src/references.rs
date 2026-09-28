@@ -58,6 +58,15 @@ pub(crate) fn check_type(linked: &Module, source: &Module, ty: &Type) -> Result<
         return Ok(());
     }
     match ty {
+        Type::Function(shape) => {
+            for part in shape
+                .parameters
+                .iter()
+                .chain(std::iter::once(&shape.returns))
+            {
+                check_type(linked, source, part)?;
+            }
+        }
         Type::Array(t)
         | Type::ArrayRef(t)
         | Type::ByRef(t)
@@ -96,6 +105,9 @@ pub(crate) fn check_call(
     target: &FunctionRef,
 ) -> Result<(), Fault> {
     let function = crate::vm::resolve(linked, target)?;
+    if matches!(function.owner, Some(Type::Function(_))) {
+        return check_type(linked, source, function.owner.as_ref().unwrap());
+    }
     let definition = function
         .definition
         .ok_or_else(|| Fault::new("missing function identity"))?;

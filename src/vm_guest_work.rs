@@ -10,7 +10,7 @@ pub(super) fn submit(
     callback: Value,
     mut options: ExecutionOptions,
 ) -> Result<usize, Fault> {
-    let Value::Delegate(binding) = &callback else {
+    let Value::Function(binding) = &callback else {
         return Err(Fault::new("task submission requires a delegate"));
     };
     let contract = crate::delegates::contract(&module, &binding.ty)?;
@@ -24,7 +24,7 @@ pub(super) fn submit(
     invocation
         .work
         .submit(heap, vec![callback], move |context, mut captures, _| {
-            let Value::Delegate(binding) = captures.pop().expect("registered callback") else {
+            let Value::Function(binding) = captures.pop().expect("registered callback") else {
                 unreachable!()
             };
             let args = binding

@@ -456,7 +456,7 @@ mod tests {
     fn ready_graphs(heap: &mut ManagedHeap) -> (Value, Value) {
         let captured = object(heap, vec![Value::Int32(42)]);
         let receiver = object(heap, vec![captured]);
-        let callback = Value::Delegate(crate::Delegate {
+        let callback = Value::Function(crate::Function {
             ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
             target: crate::assembler::parse_function_ref("instance TestOwner::Complete()").unwrap(),
             receiver: Some(Box::new(receiver)),

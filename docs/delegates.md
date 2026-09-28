@@ -158,6 +158,12 @@ receiver location; the guest Equals/GetHashCode API is not added here.
 
 ## Function-type review reopened (2026-09-13)
 
+**Superseded direction, 2026-09-28:** the author now selects Function types and
+Function objects to replace and remove delegates, with a nominal/structural
+introspection split. See the [design and migration plan](function-types.md).
+Named function types may follow later; their identity rules remain open. The
+replacement is not implemented. The text below preserves the earlier position.
+
 The author asked whether delegates could instead be modeled as function types, without
 selecting that direction. Keep the implemented [Raven callback/closure path](raven-delegates-lambdas.md)
 as the baseline during investigation. The earlier Neo/address-mode description above

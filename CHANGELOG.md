@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-28
 
+- Begin the selected Function type/object migration with native structural
+  signature metadata and identity, generic substitution, checked binding and Invoke,
+  artifact round trips and retained receiver tracing. Add focused shape, signature,
+  capture-lifetime and collection tests. The native host surface now uses Function
+  and Value::Function in place of Delegate and Value::Delegate; consumers must
+  update those names. Transitional delegate declarations and input encodings remain
+  while library/compiler migration is pending. NominalTypeInfo and
+  TypeInfo.IsNominalType are not yet implemented.
+  Record the direction and migration plan: structural
+  callable shapes, replacement/removal of delegates, and a NominalTypeInfo split
+  with TypeInfo.IsNominalType. Preserve named function types as a possible future
+  addition with undecided identity rules. Raven-facing APIs remain unchanged.
+
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,
   names, deconstruction and nested values through the matching target compiler,

@@ -4,6 +4,15 @@
 
 **Proposal**
 
+**Author direction, 2026-09-28:** structural Function types and Function objects,
+delegate removal, `NominalTypeInfo` and `TypeInfo.IsNominalType` are now selected
+direction. The [design and migration plan](../function-types.md) owns the bounded
+next work; no replacement is implemented yet. Named function types may be added
+in the future, with alias-versus-nominal identity undecided. The optional retention
+of low-level "delegates" discussed below is superseded by the removal direction.
+Other facilities in this proposal remain exploratory, including dynamic/foreign
+dispatch, unbound methods, native projections and multicast collections.
+
 ## Summary
 
 neoCLR should introduce **function types** and **function objects** as first-class runtime concepts.

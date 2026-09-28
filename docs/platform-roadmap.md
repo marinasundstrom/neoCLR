@@ -139,6 +139,16 @@ The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) own
 
 ## Theme trackers
 
+The author selected [Function types and Function objects](function-types.md) on
+2026-09-28: structural callable shapes and their instances will replace delegates,
+with `NominalTypeInfo` and `TypeInfo.IsNominalType` beginning a nominal/structural
+split. Named function types remain a possible future addition; their identity
+rules are not selected. A native structural binding foundation is implemented on
+the feature branch; the complete replacement and descriptor split remain pending.
+This does not permanently change the Web API priority. The
+[runtime tracker](tracking/runtime-language.md#function-types-and-objects--2026-09-28)
+owns implementation status.
+
 Each work item has one status owner. Use that tracker for its status, remaining
 scope, next evidence and linked design. Cross-theme dependencies link to their
 owner; they do not create a second checklist.

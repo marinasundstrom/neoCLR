@@ -177,6 +177,12 @@ The descriptive model supports the bounded development reflection extensions abo
 
 [See the proposals and their tradeoffs →](../../proposals/#introspection)
 
+The selected Function type direction introduces `NominalTypeInfo` for names,
+namespaces and declaration metadata, alongside `TypeInfo.IsNominalType`.
+Structural Function types will describe callable shapes, with Function objects
+as their instances. This split and the replacement of delegates are planned,
+not implemented APIs. Named function types may follow later.
+
 <a id="feedback"></a>
 
 ## Questions and contributions

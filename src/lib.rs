@@ -21,7 +21,7 @@ mod shared_heap;
 // Internal native submission is tested before connecting guest VM safepoints.
 #[allow(dead_code)]
 mod task_work;
-pub use delegates::Delegate;
+pub use delegates::FunctionObject as Function;
 mod inheritance;
 mod initialization;
 mod input;

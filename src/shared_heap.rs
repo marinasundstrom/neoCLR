@@ -232,7 +232,7 @@ impl Access<'_> {
                     receiver: reference,
                     ..
                 } => Some(reference),
-                Value::Delegate(delegate) => {
+                Value::Function(delegate) => {
                     pending.extend(delegate.receiver.as_deref());
                     None
                 }

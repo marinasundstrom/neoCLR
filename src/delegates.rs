@@ -1,4 +1,4 @@
-//! Nominal, single-target managed callables. Binding is a checked capability.
+//! Checked single-target Function objects and transitional nominal delegate admission.
 use crate::{
     Fault, Module, Value,
     metadata::{Function, FunctionRef, Representation, Type},
@@ -6,13 +6,13 @@ use crate::{
 
 /// Opaque runtime binding. Guest artifacts cannot manufacture live bindings.
 #[derive(Debug, Clone)]
-pub struct Delegate {
+pub struct FunctionObject {
     pub(crate) ty: Type,
     pub(crate) target: FunctionRef,
     pub(crate) receiver: Option<Box<Value>>,
 }
 
-impl PartialEq for Delegate {
+impl PartialEq for FunctionObject {
     fn eq(&self, other: &Self) -> bool {
         fn slot(value: &Value) -> Option<&crate::SlotReference> {
             match value {
@@ -33,6 +33,9 @@ impl PartialEq for Delegate {
 }
 
 pub(crate) fn is_contract(module: &Module, function: &Function) -> bool {
+    if matches!(function.owner, Some(Type::Function(_))) {
+        return true;
+    }
     function
         .owner
         .as_ref()
@@ -41,6 +44,40 @@ pub(crate) fn is_contract(module: &Module, function: &Function) -> bool {
 }
 
 pub(crate) fn contract(module: &Module, ty: &Type) -> Result<Function, Fault> {
+    if let Type::Function(shape) = ty {
+        shape.validate()?;
+        return Ok(Function {
+            origin: None,
+            sequence_points: vec![],
+            visibility: crate::metadata::Visibility::Public,
+            definition: None,
+            custom_attributes: vec![],
+            name: "$Function.Invoke".into(),
+            owner: Some(ty.clone()),
+            instance: true,
+            parameters: shape.parameters.clone(),
+            parameter_names: vec![],
+            receiver_byref: false,
+            receiver_readonly: false,
+            is_virtual: false,
+            is_override: false,
+            is_abstract: false,
+            interface_implementations: vec![],
+            generic_parameters: vec![],
+            generic_constraints: vec![],
+            generic_arguments: vec![],
+            out_parameters: shape.out_parameters.clone(),
+            out_when_true: shape.out_when_true.clone(),
+            readonly_parameters: vec![],
+            no_result: shape.no_result,
+            returns: shape.returns.clone(),
+            locals: vec![],
+            local_names: vec![],
+            impl_flags: 0,
+            pinvoke: None,
+            body: vec![],
+        });
+    }
     let def = module
         .type_definition(ty)
         .filter(|d| d.representation == Representation::Delegate)
@@ -262,7 +299,7 @@ fn finish(ty: &Type, callee: Function, receiver: Option<Box<Value>>) -> Value {
         parameters: callee.parameters,
         generic_arguments: callee.generic_arguments,
     };
-    Value::Delegate(Delegate {
+    Value::Function(FunctionObject {
         ty: ty.clone(),
         target,
         receiver,

@@ -25,6 +25,37 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-28 — Function types, objects and nominal introspection
+
+- **Author:** selects Function types describing a function's shape and Function
+  objects instantiated from those types, holding the invocation method reference.
+  Describes this as the first move toward a nominal/structural split encompassing
+  tuples, unions, intersections and function types. Directs a `NominalTypeInfo`
+  interface for Name, Namespace and nominal information, `TypeInfo.IsNominalType`,
+  and replacement/removal of delegates.
+- **Assistant:** inspects the checked delegate binding implementation and existing
+  TypeInfo/MemberInfo inheritance, identifies reusable execution safety machinery
+  and the need to separate structural identity from declaration metadata, and
+  asks whether this turn should implement the replacement or establish the plan
+  first. No answer selecting between those scopes has been received at this point.
+- **Author follow-up:** “We might support named function types in the future as a
+  replacement for delegates.”
+- **Assistant response:** records named function types as future scope, leaving
+  transparent alias versus distinct nominal identity open. Recommends exact shape
+  matching initially and preserving binding, capture and lifetime checks; these
+  details are recommendations, not additional author decisions.
+- **Action/outcome:** writes the [design and migration plan](function-types.md),
+  updates roadmap/tracker status and marks the older investigation-only and
+  retained-delegate proposal positions as superseded. No runtime or compiler
+  changes or new execution validation are reported. Object equality/nullability,
+  descriptor classification and compiler transport remain open.
+- **Implementation follow-up:** the assistant begins native structural metadata,
+  identity, substitution, checked binding/Invoke and the Function object carrier,
+  with focused tests. Existing delegate admission remains transitional; Raven and
+  introspection migration are still pending. The author then directs: “Commit to
+  feature branch.” The assistant creates `feature/function-types` and prepares
+  this bounded foundation for a commit, without declaring the overall goal complete.
+
 ## 2026-09-27 — Focus on a minimal Web API
 
 - **Author:** “We should focus on the Http story”, specifying the minimum features

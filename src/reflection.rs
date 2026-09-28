@@ -255,6 +255,7 @@ impl Query {
                             !d.is_reference_type && d.representation != Representation::Interface
                         }),
                     Type::String
+                    | Type::Function(_)
                     | Type::ByRef(_)
                     | Type::ReadOnlyByRef(_)
                     | Type::ArrayRef(_)
@@ -894,6 +895,22 @@ fn method(
 pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {
     let nested = |id| from_identity(module, id).map(Box::new);
     Ok(match identity {
+        TypeIdentity::Function {
+            parameters,
+            returns,
+            no_result,
+            out_parameters,
+            out_when_true,
+        } => Type::Function(Box::new(crate::metadata::FunctionType {
+            parameters: parameters
+                .iter()
+                .map(|t| from_identity(module, t))
+                .collect::<Result<_, _>>()?,
+            returns: *nested(returns)?,
+            no_result: *no_result,
+            out_parameters: out_parameters.clone(),
+            out_when_true: out_when_true.clone(),
+        })),
         TypeIdentity::GenericParameter { index, .. } => Type::TypeParameter(*index),
         TypeIdentity::ByRef(t) => Type::ByRef(nested(t)?),
         TypeIdentity::ReadOnlyByRef(t) => Type::ReadOnlyByRef(nested(t)?),
@@ -1101,6 +1118,11 @@ pub(crate) fn materialize(
 // also expose only visible element/argument types; visibility grants no execution.
 fn publicly_visible(module: &Module, ty: &Type) -> bool {
     match ty {
+        Type::Function(shape) => shape
+            .parameters
+            .iter()
+            .chain(std::iter::once(&shape.returns))
+            .all(|t| publicly_visible(module, t)),
         Type::Array(t)
         | Type::ArrayRef(t)
         | Type::ByRef(t)

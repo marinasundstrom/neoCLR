@@ -11,6 +11,7 @@ pub(crate) fn normalize_type(context: &Module, ty: &Type) -> Result<Type, Fault>
         }
         let nested = |ty: &Type| bind(context, ty, depth + 1);
         let normalized = match ty {
+            Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
             Type::Scoped {
                 module,
                 name,
