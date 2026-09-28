@@ -25,6 +25,32 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-28: Function signature member discovery
+
+- **Author:** directs continuation, then clarifies “Invoke should be discoverable
+  through GetMethods,” adds FunctionTypeInfo.InvokeMethod, and requests
+  TypeInfo.IsFunctionType.
+- **Author follow-up:** asks for an OfType<T>() collection extension and gives
+  `module.GetTypes().OfType<NominalType>()` as the use case. The assistant uses the
+  existing NominalTypeInfo name and implements lazy filtering/narrowing in System.Linq,
+  with no new runtime type-conversion instruction.
+- **Assistant:** implements both discovery paths over the same signature-owned
+  MethodInfo and a Function descriptor provider. Proposes optional declaration
+  metadata rather than a separate synthesized-method interface. The author does
+  not explicitly select a metadata representation; the assistant proceeds with
+  that recommendation as an implementation choice.
+- **Author refinement:** FunctionTypeInfo should expose Parameters and the other
+  signature data directly, without requiring callers to go through InvokeMethod.
+  A generalized function-info interface may be considered later, but is not wanted
+  now. The assistant adds Parameters and ReturnType directly to FunctionTypeInfo.
+- **Implementation:** declared members retain available metadata through Option;
+  synthesized Invoke and parameters have no module/token, and Invoke has no
+  declaration index. Bound targets remain instance data. Named function inheritance
+  and general structural inheritance remain future work. Validation is recorded
+  in [the Function design](function-types.md). Thirteen Function/OfType integration
+  checks and sixty focused native cases pass, with six migrated reflection consumers
+  and matching API/bootstrap snapshots. Named inheritance remains future work.
+
 ## 2026-09-28 — Function types, objects and nominal introspection
 
 - **Author:** selects Function types describing a function's shape and Function

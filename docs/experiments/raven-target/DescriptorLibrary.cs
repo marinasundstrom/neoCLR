@@ -19,7 +19,7 @@ static class DescriptorLibrary
         Func<TypeDefinition, TypeDefinition, string, MethodDefinition[]> interfaces)
     {
         var result = new List<MethodDefinition>();
-        var contracts = Layouts.Keys.Append("TypeInfo").Append("NominalTypeInfo").ToArray();
+        var contracts = Layouts.Keys.Append("TypeInfo").Append("NominalTypeInfo").Append("FunctionTypeInfo").ToArray();
         // The closed family is authored together; bind the explicit source/core
         // pairs before checking its mutually referring signatures.
         foreach (var name in contracts.Concat(new[] { "CustomAttributeData", "CustomAttributeTypedArgument" }))
@@ -57,6 +57,8 @@ static class DescriptorLibrary
             core.GetType("System.Introspection.RuntimeTypeInfo"), "System.Introspection.RuntimeTypeInfo"));
         result.AddRange(roots(source.GetType("System.Introspection.RuntimeNominalTypeInfo"),
             core.GetType("System.Introspection.RuntimeNominalTypeInfo"), "System.Introspection.RuntimeNominalTypeInfo"));
+        result.AddRange(roots(source.GetType("System.Introspection.RuntimeFunctionTypeInfo"),
+            core.GetType("System.Introspection.RuntimeFunctionTypeInfo"), "System.Introspection.RuntimeFunctionTypeInfo"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.TypeReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.PropertyReflectionExtensions"));
         result.AddRange(LibraryImplementation.Roots(source, core, "System.Runtime.Reflection.ConstructorReflectionExtensions"));
@@ -73,8 +75,8 @@ static class DescriptorLibrary
     }
     public static string Base(TypeDefinition type) => type.Name == "RuntimeMemberInfo" ? "System.Object" : "System.Introspection.RuntimeMemberInfo";
     public static bool IsProvider(TypeReference type) => type.Namespace == "System.Introspection"
-        && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeNominalTypeInfo" or "RuntimeParameterInfo" or "RuntimeAssemblyInfo" or "RuntimeModuleInfo");
+        && (IsDescriptor(type) || type.Name is "RuntimeTypeInfo" or "RuntimeNominalTypeInfo" or "RuntimeFunctionTypeInfo" or "RuntimeParameterInfo" or "RuntimeAssemblyInfo" or "RuntimeModuleInfo");
     public static bool SameType(TypeReference left, TypeReference right) => (IsProvider(left)
-        || left.Namespace == "System.Introspection" && left.Name is "CustomAttributeData" or "CustomAttributeTypedArgument" or "MemberInfo" or "FieldInfo" or "MethodInfo" or "ConstructorInfo" or "PropertyInfo" or "TypeInfo" or "NominalTypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
+        || left.Namespace == "System.Introspection" && left.Name is "CustomAttributeData" or "CustomAttributeTypedArgument" or "MemberInfo" or "FieldInfo" or "MethodInfo" or "ConstructorInfo" or "PropertyInfo" or "TypeInfo" or "NominalTypeInfo" or "FunctionTypeInfo" or "ParameterInfo" or "AssemblyInfo" or "ModuleInfo")
         && left.FullName == right.FullName && RuntimeSignatures.IsCore(left.Scope) && ApplicationTypes.IsLibrary(right);
 }

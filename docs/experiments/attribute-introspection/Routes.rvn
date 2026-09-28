@@ -1,4 +1,5 @@
 import System.*
+import System.Linq.*
 import System.Introspection.*
 import System.Option.*
 
@@ -17,16 +18,17 @@ public union CatalogRoutes {
 func ReadRouteDeclarations() -> int {
     let routes = (NominalTypeInfo)typeof(CatalogRoutes)
     var count = 0
-    for discovered in routes.Module.GetTypes() {
-        let candidate = (NominalTypeInfo)discovered
-        if let Some(parent) = candidate.DeclaringType {
-            if parent.Equals(routes) {
-                for attribute in candidate.GetCustomAttributesData() {
-                    if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
-                        let arguments = attribute.GetConstructorArguments()
-                        if arguments[0].Value is string pattern {
-                            Console.WriteLine(candidate.Name + " => " + pattern)
-                            count += 1
+    if let Some(module) = routes.Module {
+        for candidate in module.GetTypes().OfType<NominalTypeInfo>() {
+            if let Some(parent) = candidate.DeclaringType {
+                if parent.Equals(routes) {
+                    for attribute in candidate.GetCustomAttributesData() {
+                        if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
+                            let arguments = attribute.GetConstructorArguments()
+                            if arguments[0].Value is string pattern {
+                                Console.WriteLine(candidate.Name + " => " + pattern)
+                                count += 1
+                            }
                         }
                     }
                 }

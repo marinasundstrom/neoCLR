@@ -1,3 +1,4 @@
+import System.Option.*
 import System.*
 import System.Console.*
 import System.Introspection.*
@@ -50,7 +51,7 @@ func Main() {
     Show(method.IsVirtual)
     Show(method.IsOverride)
     Show(method.IsAbstract)
-    Show(method.DefinitionIndex >= 0)
+    Show(method.DefinitionIndex is Some(let index) && index >= 0)
     let parameters = method.GetParameters()
     WriteLine(parameters[0].Name)
     WriteLine(parameters[0].Position)

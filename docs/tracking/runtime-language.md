@@ -22,7 +22,7 @@ from assistant recommendations and records the existing execution/introspection
 dependencies. Native structural shape identity and checked Function binding/Invoke
 now run without a nominal declaration; [focused tests](../../tests/function_types.rs)
 cover substitution, artifacts, captures and signature rejection. Legacy delegate declarations and binding encodings are now rejected. The Raven descriptor API now separates
-TypeInfo (DisplayName/IsNominalType) from NominalTypeInfo (declaration metadata);
+TypeInfo (DisplayName/IsNominalType/IsFunctionType) from NominalTypeInfo (declaration metadata);
 [executable and negative cases](../experiments/function-types/README.md) cover this split.
 Library callback source and imported signatures now use structural Function shapes;
 runtime Func declarations are removed. CLI delegate metadata remains an explicitly
@@ -30,14 +30,23 @@ bounded compiler transport. Function/extension and Task.Run/async consumers exec
 fixed Raven generic-construction binder.
 
 The bounded object contract compares shape/target/receiver, shares captures, uses
-null defaults and checks constructor initialization. Ordinary Object conversion,
-synthetic Invoke descriptors and general structural member enumeration remain
-follow-up work. The planned FunctionTypeInfo describes one specific signature and
-its synthesized instance Invoke, distinct from an object's bound target. Current member/extension documentation is a manual Function family
-page; a general RavenDoc renderer remains future work.
+null defaults and checks constructor initialization. FunctionTypeInfo describes one
+specific signature: InvokeMethod and GetMethods expose its synthesized public
+instance Invoke, distinct from an object's bound target. Module/token metadata is
+optional for members and parameters, and MethodInfo.DefinitionIndex is optional.
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
 
-Validation: 157 selected native consumer tests and twelve Raven integration checks
-pass, with matching API/bootstrap snapshots and focused GC/queue/debugger evidence.
+Ordinary Object conversion, dynamic invocation through reflection and general
+structural member enumeration remain follow-up work. Current member/extension
+documentation includes the manual Function family page and generated FunctionTypeInfo
+reference; a general RavenDoc structural renderer remains future work.
+
+Validation: the replacement checkpoint passed 157 native cases and twelve Raven
+checks. The descriptor/OfType follow-up passes sixty selected native cases and thirteen
+Raven checks, plus the six migrated reflection consumers. Matching API/bootstrap
+snapshots and the earlier unaffected GC/queue/debugger evidence remain recorded.
 See the [evidence record](../experiments/function-types/README.md). Subsequent work
 returns to the active roadmap milestone unless directed otherwise.
 Other structural families are direction, not part of this Function replacement's

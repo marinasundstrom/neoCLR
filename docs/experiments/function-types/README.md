@@ -119,4 +119,39 @@ adapters, named-delegate rejection and seven nominal-only member rejections.
 Full library regeneration, bootstrap hashes, API reference/snapshot checks and
 source coverage inventory/audit pass. Named function types, Object conversion,
 Function parameter/result descriptor APIs and general structural member enumeration
-remain outside this first slice. No website build or publication was performed.
+remained outside that removal checkpoint. No website build or publication was performed.
+
+## Signature descriptors and OfType validation — 2026-09-28
+
+The follow-up implements FunctionTypeInfo.Parameters, ReturnType and InvokeMethod,
+TypeInfo.IsFunctionType, and GetMethods discovery of the same synthesized public
+instance Invoke. It preserves shape-owned parameter types/modes, equality, member
+filters and absent declaration metadata. Named function inheritance and a generalized
+function-info interface are not introduced. OfType<U>() lazily filters and narrows
+Iterable<T>, including module.GetTypes().OfType<NominalTypeInfo>().
+
+The updated `verify.py` passes thirteen checks. Its descriptor case covers direct
+Parameters/ReturnType projection, zero-parameter unit functions, agreement with
+InvokeMethod/GetMethods, absent metadata/attributes, filtering, owner/equality/hash,
+generic-argument provider selection, and UnboundMetadata for dynamic reflection
+invocation. The OfType case covers mixed/null/boxed values, numeric non-coercion,
+value inputs, empty input, descriptor narrowing, module discovery, deferred evaluation,
+order, repeated enumeration, and disposal at early termination and exhaustion.
+
+Sixty selected native cases pass across function_types, reflection,
+reflection_members, query_terminals and raven_reflection. Four older Raven reflection
+cases initially used the removed common FullName/token contract; the migrated cases
+pass focused reruns. Unaffected passing cases were not rerun. The six migrated
+introspection-object, reflection-members, reflection-execution, attribute-introspection,
+union-construction and runtime-route-mapper consumers compile, verify and execute.
+The route mapper uses its existing 100,000,000-instruction runner budget; the ordinary
+CLI default was insufficient for its complete scenario.
+
+Full library regeneration and bootstrap hashes, API reference/source fingerprints,
+source inventory and coverage audit pass. Generic OfType provider storage uses
+explicit fields because the current importer rejects the private var/val storage
+form; this bounded constraint is recorded in the query design. No website build or
+publication is needed for this change.
+
+The three updated documentation samples, library-assembly-info,
+library-introspection-tour and library-reflection, also compile, verify and execute.

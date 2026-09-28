@@ -214,6 +214,7 @@ impl Query {
             }
             Self::Shape => Ok(Value::Boolean(match argument {
                 12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
+                13 => matches!(handle.identity, TypeIdentity::Function { .. }),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -455,6 +456,15 @@ impl Query {
             Self::Methods | Self::Constructors => {
                 let constructors = matches!(self, Self::Constructors);
                 validate_flags(argument)?;
+                if matches!(ty, Type::Function(_)) && !constructors {
+                    let invoke = crate::function_objects::contract(module, &ty)?;
+                    return array(
+                        "System.Introspection.MethodInfo",
+                        selected(argument, Visibility::Public, false)
+                            .then(|| method(module, &ty, &invoke, &[], limits)),
+                        limits,
+                    );
+                }
                 let owner = definition.map(|d| d.open_type());
                 array(
                     if constructors {
@@ -791,16 +801,27 @@ fn parameters(
             if type_contract(module) == "System.Introspection.TypeInfo" {
                 let f = function
                     .ok_or_else(|| Fault::new("parameter snapshot requires declaring member"))?;
-                fields.push(Value::Int32(crate::metadata_tokens::parameter(
-                    module, f, i,
-                )?));
-                fields.push(crate::metadata_tokens::module_value(
+                let synthesized = matches!(declaring_type, Type::Function(_));
+                fields.push(Value::Int32(if synthesized {
+                    0
+                } else {
+                    crate::metadata_tokens::parameter(module, f, i)?
+                }));
+                fields.push(option(
                     module,
-                    f.origin.as_ref(),
-                    &f.definition
-                        .as_ref()
-                        .ok_or_else(|| Fault::new("missing method identity"))?
-                        .module,
+                    "System.Introspection.ModuleInfo",
+                    if synthesized {
+                        None
+                    } else {
+                        Some(crate::metadata_tokens::module_value(
+                            module,
+                            f.origin.as_ref(),
+                            &f.definition
+                                .as_ref()
+                                .ok_or_else(|| Fault::new("missing method identity"))?
+                                .module,
+                        )?)
+                    },
                 )?);
                 // Retain a compact owner key, not a member snapshot containing
                 // this parameter list. Equality does not depend on token presence.
@@ -825,6 +846,18 @@ fn method(
             "generic method definition reflection is not yet supported",
         ));
     }
+    let synthesized = matches!(owner, Type::Function(_));
+    let definition_index = if synthesized {
+        -1
+    } else {
+        i32::try_from(
+            f.definition
+                .as_ref()
+                .ok_or_else(|| Fault::new("missing method identity"))?
+                .index,
+        )
+        .map_err(|_| Fault::new("method definition index overflow"))?
+    };
     let parameter_types = f
         .parameters
         .iter()
@@ -832,7 +865,11 @@ fn method(
         .collect::<Result<Vec<_>, _>>()?;
     Ok(member_record(
         module,
-        crate::metadata_tokens::method(f)?,
+        if synthesized {
+            0
+        } else {
+            crate::metadata_tokens::method(f)?
+        },
         if f.name.ends_with("..ctor") {
             "System.Introspection.ConstructorInfo"
         } else {
@@ -842,15 +879,22 @@ fn method(
             Value::String(
                 // Imported bodies may use escaped names. Preserve source names
                 // for display without changing dispatch identities.
-                f.origin
-                    .as_ref()
-                    .map(|origin| origin.name.as_str())
-                    .unwrap_or_else(|| {
-                        f.name
-                            .strip_prefix(&format!("{}.", owner.definition_name().unwrap_or("")))
-                            .unwrap_or(&f.name)
-                    })
-                    .into(),
+                if synthesized {
+                    "Invoke"
+                } else {
+                    f.origin
+                        .as_ref()
+                        .map(|origin| origin.name.as_str())
+                        .unwrap_or_else(|| {
+                            f.name
+                                .strip_prefix(&format!(
+                                    "{}.",
+                                    owner.definition_name().unwrap_or("")
+                                ))
+                                .unwrap_or(&f.name)
+                        })
+                }
+                .into(),
             ),
             type_value(module, owner)?,
             type_value(module, &f.returns.substitute_type_parameters(arguments)?)?,
@@ -859,21 +903,17 @@ fn method(
             Value::Boolean(member_access(f) == SourceAccess::Private),
             Value::Boolean(member_access(f) == SourceAccess::Assembly),
             Value::Boolean(f.receiver_byref),
-            index_value(
-                f.definition
-                    .as_ref()
-                    .ok_or_else(|| Fault::new("missing method identity"))?
-                    .index as usize,
-            )?,
+            Value::Int32(definition_index),
             parameters(
                 module,
                 Some(f),
                 owner,
                 2, // Method identity; keep in step with the descriptor hash kinds.
-                f.definition
-                    .as_ref()
-                    .ok_or_else(|| Fault::new("missing method identity"))?
-                    .index as usize,
+                if synthesized {
+                    0
+                } else {
+                    definition_index as usize
+                },
                 &parameter_types,
                 &f.parameter_names,
                 &f.out_parameters,
@@ -1023,6 +1063,9 @@ pub(crate) fn materialize(
                             if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Definition { .. }))
                             {
                                 "System.Introspection.RuntimeNominalTypeInfo"
+                            } else if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Function { .. }))
+                            {
+                                "System.Introspection.RuntimeFunctionTypeInfo"
                             } else {
                                 "System.Introspection.RuntimeTypeInfo"
                             }

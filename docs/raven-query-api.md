@@ -6,6 +6,7 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | Method | Result | Evaluation |
 | --- | --- | --- |
 | `Filter<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
+| `OfType<T, U>(Iterable<T>)` | `Iterable<U>` | Lazily skips null and incompatible elements; narrows each match |
 | `Map<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
 | `Any<T>(Iterable<T>)` / `Any<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first element / first match |
 | `All<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first failure; true for empty input |
@@ -522,3 +523,46 @@ the basic website sample with its exact expected output. Tests cover empty input
 non-positive and excessive bounds, callback counts, nested and early disposal,
 re-enumeration, reference payloads and folds with different state/element types.
 The Int32 overflow guard is reviewed but a 2-billion-element stress run is not claimed.
+
+## Runtime type filtering — 2026-09-28 development
+
+The author requested `module.GetTypes().OfType<NominalType>()` during the Function
+reflection work. The implemented descriptor name is NominalTypeInfo:
+
+```raven
+import System.Linq.*
+for type in module.GetTypes().OfType<NominalTypeInfo>() {
+    Console.WriteLine(type.Name)
+}
+```
+
+OfType extends Iterable, so arrays and collection/query results participate. Its
+source element type is inferred; the explicit type argument selects the result.
+The query preserves order, skips null and incompatible values, and performs no
+numeric coercion. Query construction does not enumerate. Each GetIterator creates
+a fresh source iterator; exhaustion and explicit disposal dispose it once, including
+when a terminal or Take ends enumeration early. Current follows the existing query
+iterator fault contract outside an active match.
+
+This follows the shipped [.NET Enumerable.OfType contract](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.oftype?view=net-10.0)
+(primary API documentation checked 2026-09-28): deferred filtering of non-null,
+compatible elements. neoCLR uses generic Iterable rather than .NET's nongeneric
+IEnumerable entry point. A Filter-plus-Map composition would require two callbacks and
+force callers to spell the cast; eager materialization would change query timing and
+storage costs. A dedicated library iterator reuses runtime type tests and existing
+Object conversions, adding no VM instruction. It allocates query/iterator state and
+may box value inputs; no performance improvement is claimed. Function-to-Object
+conversion and other unsupported Object representations remain limits. Existing
+cross-platform query research above applies; this is a conventional library operator,
+not a new type conversion system.
+
+The [executable consumer](experiments/function-types/OfType.rvn) checks descriptor
+narrowing, module discovery, mixed/null/boxed inputs, order, laziness, repeated
+enumeration and disposal after early termination and exhaustion.
+
+The generic query providers intentionally retain explicit private fields, matching
+the existing iterator storage convention. Switching their storage to private var/val
+currently fails bridge admission with `Unsupported private library dependency:
+System.Linq.OfTypeSequence` (2026-09-28 probe). Revisit the spelling when the importer
+admits that storage form; the rejection cause is not diagnosed, and this is not a
+public API constraint.

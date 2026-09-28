@@ -1,3 +1,4 @@
+import System.Option.*
 import System.*
 import System.Collections.*
 import System.Introspection.*
@@ -34,10 +35,18 @@ func Main() {
         }
     }
 
-    if description.MetadataToken == ((NominalTypeInfo)typeof(Widget)).MetadataToken {
-        Console.WriteLine("Same definition token")
+    if let Some(token) = description.MetadataToken {
+        if let Some(declaredToken) = ((NominalTypeInfo)typeof(Widget)).MetadataToken {
+            if token == declaredToken {
+                Console.WriteLine("Same definition token")
+            }
+        }
     }
-    Console.WriteLine(description.Module.Name)
+    if let Some(module) = description.Module {
+        Console.WriteLine(module.Name)
+    } else {
+        System.Fault("Missing nominal module")
+    }
 
     let methods: Sequence<MethodInfo> = typeof(int).GetMethods()
     Console.WriteLine(methods.Count)

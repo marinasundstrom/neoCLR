@@ -43,13 +43,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   FunctionComparer and FunctionEqualityComparer. Preserve target/receiver equality,
   fix bound class-receiver identity comparison, and report NullReference on null
   Function invocation. Keep constructor Function fields explicitly initialized.
-  Ordinary Object conversion, synthetic Invoke descriptors and general structural
-  member enumeration remain outside this first slice; named Function types remain
-  future work. Clarify the planned FunctionTypeInfo signature/synthesized Invoke
-  contract and the future nominal-function inheritance proposal: matching signatures
-  do not erase nominal identity, and non-nominal inheritance requires explicit
-  eligibility. These are design clarifications, not implemented descriptor or
-  inheritance APIs.
+  Add TypeInfo.IsFunctionType and FunctionTypeInfo.Parameters, ReturnType and
+  InvokeMethod; GetMethods discovers the same synthesized public instance Invoke
+  with signature parameters and ordinary binding-flag filtering. Make MemberInfo/ParameterInfo Module and MetadataToken,
+  and MethodInfo.DefinitionIndex, optional so synthetic members expose no invented
+  declaration metadata. Migrate reflection consumers and refresh reference docs.
+  Ordinary Object conversion, dynamic reflection invocation of synthetic Invoke,
+  general structural member enumeration and named Function types remain future work.
+  Matching signatures will not erase future nominal-function identity; structural
+  inheritance requires explicit eligibility and is not implemented.
+
+- Add lazy Iterable.OfType<T>() in System.Linq, inferring the source element type
+  and retaining non-null elements compatible with the requested result type.
+  Preserve order and iterator disposal; use it to narrow module type queries to
+  NominalTypeInfo. Include public API documentation and executable mixed-value,
+  descriptor, laziness and disposal coverage.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

@@ -225,7 +225,7 @@ static class LibraryImplementation
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
-        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.RuntimeTypeInfo" or "System.Introspection.RuntimeNominalTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.RuntimeTypeInfo" or "System.Introspection.RuntimeNominalTypeInfo" or "System.Introspection.RuntimeFunctionTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");
@@ -235,13 +235,13 @@ static class LibraryImplementation
                 ("StoredName", "System.String"), ("StoredPosition", "System.Int32"),
                 ("StoredParameterType", "System.Introspection.TypeInfo"), ("StoredIsOut", "System.Boolean"),
                 ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean"),
-                ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Introspection.ModuleInfo"),
+                ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Option`1<System.Introspection.ModuleInfo>"),
                 ("StoredDeclaringType", "System.Introspection.TypeInfo"),
                 ("StoredMemberKind", "System.Int32"), ("StoredMemberIndex", "System.Int32")
             };
             if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
                 p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type
-                || (p.Second.Type is "System.Introspection.TypeInfo" or "System.Introspection.ModuleInfo" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
+                || (p.Second.Type is "System.Introspection.TypeInfo" or "System.Option`1<System.Introspection.ModuleInfo>" ? !RuntimeSignatures.IsCore(p.First.FieldType.Scope)
                     : p.First.FieldType.MetadataType is not (MetadataType.String or MetadataType.Int32 or MetadataType.Boolean))))
                 throw new InvalidDataException("ParameterInfo library layout must match the runtime snapshot fields: "
                     + string.Join(";", type.Fields.Select(f => f.Name + ":" + f.FieldType.FullName + "@" + f.FieldType.Scope)));

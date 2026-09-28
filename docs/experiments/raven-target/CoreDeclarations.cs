@@ -51,7 +51,7 @@ static class CoreDeclarations
                 localFactory.Parameters.Add(new Mono.Cecil.ParameterDefinition("ticks", Mono.Cecil.ParameterAttributes.None,
                     module.GetType("System.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
                 local.Methods.Add(localFactory);
-                foreach (var provider in new[] { "RuntimeTypeInfo", "RuntimeNominalTypeInfo" })
+                foreach (var provider in new[] { "RuntimeTypeInfo", "RuntimeNominalTypeInfo", "RuntimeFunctionTypeInfo" })
                 {
                     var info = module.GetType("System.Introspection." + provider);
                     // Metadata-only C# emission omits internal getters. Retain this

@@ -48,8 +48,9 @@ and namespaces, while `TypeInfo.IsNominalType` distinguishes nominal types. This
 a wider nominal/structural split; it does not yet change tuple or union identity.
 A future nominal function type may inherit an eligible Function shape, while
 separate nominal types remain non-interchangeable despite matching signatures.
-Non-nominal types are not generally inheritable. Planned FunctionTypeInfo descriptors
-will describe specific signatures and their synthesized instance Invoke methods.
+Non-nominal types are not generally inheritable. Development FunctionTypeInfo descriptors
+describe specific signatures, with InvokeMethod also discoverable through GetMethods.
+TypeInfo.IsFunctionType identifies these shapes.
 Unlike .NET's nominal delegate types, structural shapes can share identity across
 different methods. The cost is migration of compiler metadata, callback APIs and
 introspection consumers.

@@ -1,4 +1,5 @@
 import System.*
+import System.Linq.*
 import System.Introspection.*
 import System.Option.*
 import System.Result.*
@@ -22,27 +23,28 @@ public class ItemRouteFactory {
 
     static func Prepare() -> Result<ItemRouteFactory, string> {
         let routes = (NominalTypeInfo)typeof(CatalogRoutes)
-        for discovered in routes.Module.GetTypes() {
-            let candidate = (NominalTypeInfo)discovered
-            if let Some(parent) = candidate.DeclaringType {
-                if parent.Equals(routes) {
-                    for attribute in candidate.GetCustomAttributesData() {
-                        if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
-                            let values = attribute.GetConstructorArguments()
-                            if values[0].Value is string pattern {
-                                if pattern == "/items/{id}" {
-                                    let constructors = candidate.GetConstructors()
-                                    if constructors.Count != 1 {
-                                        return Error("Expected one case constructor")
-                                    }
-                                    let parameters = constructors[0].GetParameters()
-                                    if parameters.Count != 1 || parameters[0].Name != "id" || !parameters[0].ParameterType.Equals(typeof(int)) {
-                                        return Error("Expected one Int32 payload")
-                                    }
-                                    for carrier in routes.GetConstructors() {
-                                        let payloads = carrier.GetParameters()
-                                        if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
-                                            return Ok(ItemRouteFactory(constructors[0], carrier))
+        if let Some(module) = routes.Module {
+            for candidate in module.GetTypes().OfType<NominalTypeInfo>() {
+                if let Some(parent) = candidate.DeclaringType {
+                    if parent.Equals(routes) {
+                        for attribute in candidate.GetCustomAttributesData() {
+                            if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
+                                let values = attribute.GetConstructorArguments()
+                                if values[0].Value is string pattern {
+                                    if pattern == "/items/{id}" {
+                                        let constructors = candidate.GetConstructors()
+                                        if constructors.Count != 1 {
+                                            return Error("Expected one case constructor")
+                                        }
+                                        let parameters = constructors[0].GetParameters()
+                                        if parameters.Count != 1 || parameters[0].Name != "id" || !parameters[0].ParameterType.Equals(typeof(int)) {
+                                            return Error("Expected one Int32 payload")
+                                        }
+                                        for carrier in routes.GetConstructors() {
+                                            let payloads = carrier.GetParameters()
+                                            if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
+                                                return Ok(ItemRouteFactory(constructors[0], carrier))
+                                            }
                                         }
                                     }
                                 }

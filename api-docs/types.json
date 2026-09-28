@@ -138,6 +138,7 @@
   "System.Introspection.CustomAttributeData",
   "System.Introspection.CustomAttributeTypedArgument",
   "System.Introspection.FieldInfo",
+  "System.Introspection.FunctionTypeInfo",
   "System.Introspection.MemberInfo",
   "System.Introspection.MethodInfo",
   "System.Introspection.ModuleInfo",

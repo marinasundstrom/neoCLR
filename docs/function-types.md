@@ -69,9 +69,9 @@ The implemented split and planned Function-specific descriptor are:
 
 | Contract | Responsibility |
 | --- | --- |
-| `TypeInfo` | Common type identity, equality, shape queries and `IsNominalType`; usable for parameter/result/component types. |
+| `TypeInfo` | Common type identity, equality, shape queries, `IsNominalType` and `IsFunctionType`; usable for parameter/result/component types. |
 | `NominalTypeInfo : TypeInfo, MemberInfo` | Nominal declaration name, namespace and declaration identity metadata. |
-| `FunctionTypeInfo : TypeInfo` (planned) | One specific signature and its synthesized instance `Invoke`; ordered parameter contracts and return type, without invented nominal declaration metadata. |
+| `FunctionTypeInfo : TypeInfo` | One specific signature and its synthesized instance `Invoke`; ordered parameter contracts and return type, without invented nominal declaration metadata. |
 | Function object | Bound target and environment, plus its Function type and typed invocation. |
 
 `IsNominalType` must agree with whether the descriptor implements `NominalTypeInfo`.
@@ -88,12 +88,38 @@ target and environment. The synthesized Invoke descriptor belongs to the shape,
 while the selected target method belongs to the instance's binding. Different
 bound targets do not create different Invoke signatures or Function types.
 
-This descriptor contract is planned, not an API already emitted by the reference
-assembly. Its implementation must represent a synthesized member without inventing
-a nominal type name or declaration token. How synthetic method descriptors fit the
-existing declaration-oriented MemberInfo/MethodInfo contracts remains an explicit
-implementation question. RavenDoc's Function family page can document the common
-member contract, while a concrete FunctionTypeInfo describes one actual signature.
+The development API now exposes `TypeInfo.IsFunctionType` and
+direct `FunctionTypeInfo.Parameters` and `ReturnType` properties, plus
+`FunctionTypeInfo.InvokeMethod`. `GetMethods()` returns the same synthesized public
+instance method; flag overloads apply ordinary public/instance filtering. The
+property and enumeration return equal descriptors, without promising shared wrapper
+allocation identity. Parameter order, types and readonly/out/out-when-true modes
+come from the signature; names are empty because a shape has no parameter declaration.
+
+`MemberInfo.Module` and `MetadataToken`, and the corresponding ParameterInfo
+properties, now return Option. Declared members preserve available metadata;
+synthesized Invoke and its parameters return None and empty custom attributes.
+`MethodInfo.DefinitionIndex` is also optional. This is a source/reference contract
+break: callers must pattern-match the optional values and rebuild matching artifacts.
+The closed TypeInfo hierarchy also gains FunctionTypeInfo; exhaustive matches must
+account for that case.
+Internal snapshot sentinels are never exposed as declaration metadata. Invoke's
+DeclaringType remains Some(the Function signature). General dynamic reflection
+invocation still returns UnboundMetadata for this synthesized method; typed Function
+invocation continues to execute the object's binding. RavenDoc's family page and
+FunctionTypeInfo reference document these different operations.
+
+The reflection choice reuses the Function identity research above. Compared with
+[.NET GetMethods](https://learn.microsoft.com/en-us/dotnet/api/system.type.getmethods?view=net-10.0),
+the public/instance discovery model stays familiar. [.NET MetadataToken](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.memberinfo.metadatatoken?view=net-10.0)
+is an integer scoped by Module and documents exceptional cases; neoCLR makes
+absence explicit in the descriptor contract (primary API pages checked 2026-09-28).
+A separate synthetic-method interface would avoid changing metadata getters but
+fragment ordinary GetMethods consumers. Fabricated modules/tokens would misrepresent
+the shape as a declaration. Optional metadata keeps one MethodInfo interface, at
+the cost of consumer migration and Option storage for parameter modules. No speed
+or allocation improvement is claimed; native and Raven consumers validate the
+contract. Broader reflection research remains in the linked introspection design.
 
 Audit every existing member when splitting the interfaces. In particular,
 `FullName`, module/token/custom attributes and declaring-type relationships must
@@ -316,10 +342,10 @@ comparison; no performance improvement is claimed.
 
 Structural types continue to support members and extensions. Invoke is synthesized
 from each Function shape, and Function extensions execute in the Raven consumer.
-The common TypeInfo still owns member queries, but declaration-based GetMethods
-currently has no synthetic Invoke descriptor or token. Dedicated Function parameter/
-result descriptor APIs and general structural member enumeration remain follow-up
-work; the current family page documents Invoke and extensions explicitly. This
+The common TypeInfo owns member queries, including synthesized Function Invoke.
+FunctionTypeInfo.Parameters and ReturnType provide direct signature access; no
+shared function-info interface is introduced. General structural
+member enumeration beyond this Function operation remains follow-up work. This
 initial replacement does not reclassify existing nominal Tuple/union declarations,
 implement intersections, select named Function identity, or build a general RavenDoc
 structural renderer. Earlier checkpoint sections above remain historical evidence.

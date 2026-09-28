@@ -3,11 +3,11 @@
 ## Function and nominal descriptor migration (2026-09-28)
 
 The feature branch has native structural Function metadata, checked binding and
-Invoke, with higher-order/generic, lifetime and no-result tests. Full callback
-library/import migration and removal of delegate admission are still pending.
+Invoke, with higher-order/generic, lifetime and no-result tests. Callback
+library/import migration and removal of native delegate admission are complete.
 The [Function plan](../../function-types.md) and
 [consumer evidence](../function-types/README.md) distinguish the completed native
-foundation from the unfinished replacement.
+implementation from its remaining Object and general structural-type limits.
 
 The updated reference and Raven-authored descriptors split TypeInfo from MemberInfo.
 Use TypeInfo.DisplayName for diagnostics; test/cast to NominalTypeInfo for Name,
@@ -1624,3 +1624,25 @@ policy is recorded in Raven commit `09f4c91bd` and
 metadata is reference transport, explicitly excluded from nominal API pages;
 [Function family documentation](../../../api-docs/functions.md) covers the runtime
 Invoke/extension contract. Legacy native declaration admission is still transitional.
+
+### Function descriptors and type filtering (2026-09-28)
+
+Matching references now expose FunctionTypeInfo.InvokeMethod, TypeInfo.IsFunctionType
+and synthetic Invoke through GetMethods. MemberInfo and ParameterInfo module/token
+properties are optional, as is MethodInfo.DefinitionIndex. The bootstrap snapshot
+retains empty declaration data for synthetic methods without inventing a module.
+Runtime typeof configuration remains unchanged. OfType<U>() extends Iterable<T>
+and narrows module queries to NominalTypeInfo using existing type-test/boxing rules.
+The bridge validates its inferred source and explicit result type arguments.
+
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
+
+The concise `InvokeMethod => GetMethods()[0]` form initially emitted a null body
+on the current target compiler; an explicit getter using a local service result
+emits and executes correctly. Record this with the existing deferred getter-emission
+candidate for independent Raven diagnosis; no compiler fix or broader target claim
+is made. Generic pattern binding also encountered the importer's definite-assignment
+restriction; OfType uses an explicit type test and checked cast after matching.
+See the Function consumer evidence for the completed source/runtime checks.

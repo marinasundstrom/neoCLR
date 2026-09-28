@@ -31,6 +31,15 @@ extension signature `static func self`; both overloads and their XML description
 remain present. The [manual reflection guide](reflection.md)
 provides the intended Invoke spelling. This renderer naming limitation adds no exclusion.
 
+The Function descriptor slice includes FunctionTypeInfo.InvokeMethod and
+TypeInfo.IsFunctionType in the generated reference. The [Function family page](functions.md)
+documents synthetic Invoke, optional declaration metadata and the dynamic invocation
+limit; the general structural-family renderer remains a tracked gap.
+
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not

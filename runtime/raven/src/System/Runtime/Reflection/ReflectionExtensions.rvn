@@ -143,11 +143,11 @@ public extension MethodReflectionExtensions for MethodInfo {
     func Invoke(receiver: Object?, params arguments: Object?[]) -> Result<Object?, ReflectionError> {
         if self is RuntimeMethodInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeNominalTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner && implementation.DefinitionIndex is Some(let index) {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionInvokeCheck(handle, implementation.DefinitionIndex, receiver, arguments)
+                    let status = RuntimeServices.ReflectionInvokeCheck(handle, index, receiver, arguments)
                     if status == 0 {
-                        let value: Object? = RuntimeServices.ReflectionInvoke(handle, implementation.DefinitionIndex, receiver, arguments)
+                        let value: Object? = RuntimeServices.ReflectionInvoke(handle, index, receiver, arguments)
                         return Ok(value)
                     }
                     if status == 1 {

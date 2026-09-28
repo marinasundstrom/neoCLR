@@ -389,3 +389,43 @@ func Main() -> string {
         Value::String("System.Collections.List<System.Int32&>".into())
     );
 }
+
+#[test]
+fn structural_functions_expose_their_synthesized_invoke() {
+    for (shape, count) in [
+        ("fn<Int32,Int32>", 1),
+        ("fn<readonly Int32&,out Int32&,Void>", 2),
+        ("fn<outtrue Int32&,Boolean>", 1),
+        ("fn<Void>", 0),
+        ("fn<noresult Void>", 0),
+    ] {
+        for (flags, expected) in [(28, 1), (20, 1), (24, 0), (36, 0), (0, 0)] {
+            let result = program(
+                &format!("ldtoken {shape}\nldc.i4 {flags}\ncall neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)"),
+                "System.Introspection.MethodInfo[]",
+            )
+            .run(Limits::default())
+            .unwrap();
+            let methods = array(&result.value);
+            assert_eq!(methods.len(), expected, "{shape}, flags={flags}");
+            if expected == 0 {
+                continue;
+            }
+            let invoke = fields(&methods[0]);
+            assert_eq!(invoke[0], Value::String("Invoke".into()));
+            assert_eq!(invoke[3], Value::Boolean(false)); // instance
+            assert_eq!(invoke[4], Value::Boolean(true)); // public
+            assert_eq!(invoke[8], Value::Int32(-1)); // no declaration index
+            assert_eq!(invoke[12], Value::Boolean(false)); // concrete runtime method
+            let parameters = array(&invoke[9]);
+            assert_eq!(parameters.len(), count);
+            if shape.contains("readonly") {
+                assert_eq!(fields(&parameters[0])[5], Value::Boolean(true));
+                assert_eq!(fields(&parameters[1])[3], Value::Boolean(true));
+            }
+            if shape.contains("outtrue") {
+                assert_eq!(fields(&parameters[0])[4], Value::Boolean(true));
+            }
+        }
+    }
+}

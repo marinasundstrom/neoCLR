@@ -68,21 +68,26 @@ rejected. Rebuild applications with matching compiler, reference, library and
 runtime artifacts. Comparer adapters are now named FunctionComparer and
 FunctionEqualityComparer.
 
-Common TypeInfo member queries remain available. The synthetic Invoke operation
-is documented on this family page; it has no declaration token and is not returned
-by the existing declaration-based GetMethods implementation. General structural
-member discovery remains future work.
+Common TypeInfo member queries include the synthesized public instance `Invoke`.
+`TypeInfo.IsFunctionType` identifies its structural signature descriptor. Narrow to
+`FunctionTypeInfo` for direct `Parameters` and `ReturnType` access. Its
+`InvokeMethod` property provides the member view of the same signature, so callers
+can choose either path. No generalized function-info interface is introduced. Repeated queries
+compare equal but need not share wrapper identity. Parameter names are empty and
+positions and modes come from the signature.
 
-## Planned signature descriptors and nominal function types
+Invoke and its parameters have no declaration module or metadata token: their
+optional properties return None, as does MethodInfo.DefinitionIndex. DeclaringType
+returns Some(the Function signature), and custom attributes are empty. Ordinary
+members now expose optional metadata too; consumers must pattern-match it.
+This descriptive method does not support MethodReflectionExtensions.Invoke yet;
+use ordinary typed Function invocation to execute the bound target.
 
-`FunctionTypeInfo` is planned to describe one specific signature and its synthesized
-instance Invoke method. An object created from that Function type has Invoke with
-that signature; its bound target is separate instance data. This descriptor is not
-yet part of the public reference assembly.
+## Future nominal function types
 
 A future nominal function type may inherit an eligible structural Function shape.
 Two nominal function types sharing that shape would remain distinct and could not
 directly convert to each other solely on signature equality. Non-nominal types are
 not generally inheritable; permitted kinds need explicit rules. This proposal does
 not make Array, Tuple, Union or Intersection inheritable. Conversion/rebinding rules
-and synthetic member metadata remain future design work.
+remain future design work.

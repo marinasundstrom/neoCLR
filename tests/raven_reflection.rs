@@ -295,7 +295,7 @@ fn object_get_type_preserves_concrete_type_through_reference_views() {
         ),
     ] {
         let app = assemble(&format!(
-            ".module GetType\n.entry Main\n.function Main() -> String\n{body}\ncall instance System.Object::GetType()\ncallvirt instance System.Introspection.TypeInfo::get_FullName()\nret\n.end"
+            ".module GetType\n.entry Main\n.function Main() -> String\n{body}\ncall instance System.Object::GetType()\ncallvirt instance System.Introspection.TypeInfo::get_DisplayName()\nret\n.end"
         )).unwrap();
         let program = LoadedProgram::with_library(&app, library()).unwrap();
         program.verify().unwrap();
@@ -339,7 +339,7 @@ stloc tag
 ldloc tag
 castclass System.Object
 call instance System.Object::GetType()
-callvirt instance System.Introspection.TypeInfo::get_FullName()
+callvirt instance System.Introspection.TypeInfo::get_DisplayName()
 ret
 .end
 "#,
@@ -364,7 +364,7 @@ call System.Runtime.RuntimeContext::get_Current()
 ldtoken System.Introspection.BindingFlags
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 callvirt instance System.Introspection.TypeInfo::GetEnumUnderlyingType()
-callvirt instance System.Introspection.TypeInfo::get_FullName()
+callvirt instance System.Introspection.TypeInfo::get_DisplayName()
 ret
 .end
 "#,
@@ -473,11 +473,13 @@ call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.Runtim
         ),
     ] {
         assert_eq!(
-            run_introspection(&format!("{prefix}{query}\nret\n.end")),
+            run_introspection(&format!(
+                "{prefix}{query}\ncall UnwrapSome<Int32>(System.Option<Int32>)\nret\n.end"
+            )),
             Value::Int32(expected)
         );
     }
-    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
+    let query = "callvirt instance System.Introspection.TypeInfo::GetMethods()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.MethodInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.MethodInfo::GetParameters()\nldc.i4 0\ncallvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)\ncallvirt instance System.Introspection.ParameterInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Option<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Name()";
     assert_eq!(
         run_introspection(&format!(
             "{}{query}\nret\n.end",
@@ -556,12 +558,8 @@ ret
 }
 
 #[test]
-fn constructed_types_reuse_definition_tokens_and_arrays_have_no_definition_token() {
-    for (name, expected) in [
-        ("Box<Int32>", 0x02000001),
-        ("Box<String>", 0x02000001),
-        ("Int32[]", 0),
-    ] {
+fn constructed_types_reuse_definition_tokens_and_arrays_are_not_members() {
+    for (name, expected) in [("Box<Int32>", 0x02000001), ("Box<String>", 0x02000001)] {
         assert_eq!(
             run_introspection(&format!(
                 r#"
@@ -576,6 +574,7 @@ ldtoken {name}
 call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
 castclass System.Introspection.MemberInfo
 callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
+call UnwrapSome<Int32>(System.Option<Int32>)
 ret
 .end
 "#
@@ -583,6 +582,23 @@ ret
             Value::Int32(expected)
         );
     }
+    assert_eq!(
+        run_introspection(
+            r#"
+.module ArrayShape
+.entry Main
+.function Main() -> Boolean
+call System.Runtime.RuntimeContext::get_Current()
+ldtoken Int32[]
+call instance System.Runtime.RuntimeContext::GetTypeInfoFromHandle(System.RuntimeTypeHandle)
+isinst System.Introspection.MemberInfo
+ref.isnull
+ret
+.end
+"#
+        ),
+        Value::Boolean(true)
+    );
 }
 
 #[test]
@@ -599,6 +615,7 @@ ldc.i4 0
 callvirt instance System.Collections.Sequence<System.Introspection.PropertyInfo>::get_Item(Int32)
 castclass System.Introspection.MemberInfo
 callvirt instance System.Introspection.MemberInfo::get_MetadataToken()
+call UnwrapSome<Int32>(System.Option<Int32>)
 ret
 .end
 "#;
@@ -608,8 +625,8 @@ ret
     assert_eq!(token >> 24, 0x17);
     assert_ne!(token & 0x00ff_ffff, 0);
     let query = query.replace("Main() -> Int32", "Main() -> String").replace(
-        "callvirt instance System.Introspection.MemberInfo::get_MetadataToken()",
-        "callvirt instance System.Introspection.MemberInfo::get_Module()\ncallvirt instance System.Introspection.ModuleInfo::get_Assembly()\ncallvirt instance System.Introspection.AssemblyInfo::get_Name()"
+        "callvirt instance System.Introspection.MemberInfo::get_MetadataToken()\ncall UnwrapSome<Int32>(System.Option<Int32>)",
+        "callvirt instance System.Introspection.MemberInfo::get_Module()\ncall UnwrapSome<System.Introspection.ModuleInfo>(System.Option<System.Introspection.ModuleInfo>)\ncallvirt instance System.Introspection.ModuleInfo::get_Assembly()\ncallvirt instance System.Introspection.AssemblyInfo::get_Name()"
     );
     assert_eq!(
         run_introspection(&query),

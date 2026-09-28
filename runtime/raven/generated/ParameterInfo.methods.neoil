@@ -3,9 +3,9 @@
 .closedhierarchy
 .method instance GetCustomAttributesData() -> System.Collections.Sequence<System.Introspection.CustomAttributeData>
 .end
-.method instance get_MetadataToken() -> Int32
+.method instance get_MetadataToken() -> System.Option<Int32>
 .end
-.method instance get_Module() -> System.Introspection.ModuleInfo
+.method instance get_Module() -> System.Option<System.Introspection.ModuleInfo>
 .end
 .method instance get_Name() -> String
 .end
@@ -19,10 +19,10 @@
 .end
 .method instance get_IsReadOnly() -> Boolean
 .end
-.property instance MetadataToken() -> Int32
+.property instance MetadataToken() -> System.Option<Int32>
 .get instance System.Introspection.ParameterInfo::get_MetadataToken()
 .end
-.property instance Module() -> System.Introspection.ModuleInfo
+.property instance Module() -> System.Option<System.Introspection.ModuleInfo>
 .get instance System.Introspection.ParameterInfo::get_Module()
 .end
 .property instance Name() -> String

@@ -5,6 +5,10 @@ import System.Option.*
 import System.Result.*
 
 public extension Operators<T> for Iterable<T> {
+    func OfType<U>() -> Iterable<U> {
+        return OfTypeSequence<T, U>(self)
+    }
+
     func Filter(predicate: (T) -> bool) -> Iterable<T> {
         return WhereSequence<T>(self, predicate)
     }
@@ -267,6 +271,68 @@ internal class WhereIterator<T> : Iterator<T> {
     }
 }
 
+
+internal class OfTypeSequence<T, U> : Iterable<U> {
+    private field source: Iterable<T>
+
+    init(input: Iterable<T>) {
+        source = input
+    }
+
+    func GetIterator() -> Iterator<U> {
+        return OfTypeIterator<T, U>(source.GetIterator())
+    }
+}
+
+internal class OfTypeIterator<T, U> : Iterator<U> {
+    private field source: Iterator<T>
+    private field cached: U[]
+    private field active: bool
+    private field finished: bool
+
+    init(input: Iterator<T>) {
+        source = input
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        while source.MoveNext() {
+            let value: System.Object? = source.Current
+            if value is U {
+                cached[0] = (U)value!
+                active = true
+                return true
+            }
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: U {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+        source.Dispose()
+    }
+}
 
 internal class SelectSequence<T, U> : Iterable<U> {
     private field source: Iterable<T>

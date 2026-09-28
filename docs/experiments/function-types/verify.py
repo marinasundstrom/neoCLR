@@ -30,6 +30,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-function-types-') as directory:
     executed = run([tools['runtime'], 'run', output / 'App.neoil', '--system', tools['system']])
     assert executed.stdout == 'Nominal and structural descriptors passed\n' and not executed.stderr, executed
     print('descriptor-provider-selection: passed', flush=True)
+    shutil.copyfile(here / 'OfType.rvn', root / 'Main.rvn')
+    oftype = root / 'oftype'
+    run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', oftype])
+    run([tools['runtime'], 'verify', oftype / 'App.neoil', '--system', tools['system']])
+    executed = run([tools['runtime'], 'run', oftype / 'App.neoil', '--system', tools['system']])
+    assert executed.stdout == 'OfType query contracts passed\n' and not executed.stderr, executed
+    print('oftype-query-contracts: passed', flush=True)
     shutil.copyfile(here / 'Callbacks.rvn', root / 'Main.rvn')
     callbacks = root / 'callbacks'
     run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', callbacks])

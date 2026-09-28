@@ -1,6 +1,8 @@
 import System.*
 import System.Introspection.*
 import System.Option.*
+import System.Result.*
+import System.Runtime.Reflection.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
@@ -10,17 +12,17 @@ public func Check(condition: bool, message: string) {
 
 func Main() -> int {
     let number = typeof(int)
-    Check(number.IsNominalType, "Int32 is nominal")
+    Check(number.IsNominalType && !number.IsFunctionType, "Int32 is nominal")
     Check(number is NominalTypeInfo, "Nominal capability agrees with the flag")
     let nominal = (NominalTypeInfo)number
     Check(nominal.Name == "System.Int32" && nominal.Namespace == "System", "Declaration names")
     Check(nominal.FullName == number.DisplayName, "Nominal display")
-    Check(nominal.MetadataToken != 0, "Declaration metadata")
+    Check(nominal.MetadataToken is Some(let token) && token != 0, "Declaration metadata")
     let member: MemberInfo = nominal
     Check(member.Name == nominal.Name, "Nominal MemberInfo view")
 
     let array = typeof(int[])
-    Check(!array.IsNominalType && !(array is NominalTypeInfo), "Array is structural")
+    Check(!array.IsFunctionType && !array.IsNominalType && !(array is NominalTypeInfo), "Array is structural")
     Check(!(array is MemberInfo), "Structural descriptors are not declarations")
     Check(array.IsArray, "Common shape query")
     if let Some(element) = array.GetElementType() {
@@ -38,6 +40,39 @@ func Main() -> int {
     Check(number.GetHashCode() == typeof(int).GetHashCode(), "Nominal hash consistency")
     let boxed: Object = 42
     Check(boxed.GetType() is NominalTypeInfo, "Object acquisition chooses nominal provider")
+    let function = (FunctionTypeInfo)typeof((int) -> string)
+    let invoke = function.InvokeMethod
+    Check(function.IsFunctionType && !function.IsNominalType && !(function is MemberInfo), "Function has no declaration name")
+    Check(function.GetMethods().Count == 1, "Function exposes one method")
+    Check(invoke.Equals(function.GetMethods()[0]), "Both paths describe the same Invoke")
+    Check(invoke.Name == "Invoke" && invoke.IsPublic && !invoke.IsStatic && !invoke.IsAbstract, "Synthesized public instance Invoke")
+    Check(function.ReturnType.Equals(typeof(string)), "Direct Function return type")
+    Check(invoke.ReturnType.Equals(function.ReturnType), "Invoke agrees with Function return type")
+    Check(invoke.MetadataToken is None && invoke.Module is None && invoke.DefinitionIndex is None, "No fabricated declaration metadata")
+    Check(invoke.GetCustomAttributesData().Count == 0, "No declaration attributes")
+    if let Some(owner) = invoke.DeclaringType {
+        Check(owner.Equals(function) && owner is FunctionTypeInfo, "Invoke belongs to its signature")
+    } else {
+        System.Fault("Missing Function owner")
+    }
+    let parameters = function.Parameters
+    Check(parameters.Count == invoke.GetParameters().Count && parameters[0].Equals(invoke.GetParameters()[0]), "Direct Function parameters agree with Invoke")
+    Check(parameters.Count == 1 && parameters[0].ParameterType.Equals(typeof(int)), "Invoke parameter signature")
+    Check(parameters[0].Position == 0 && parameters[0].Name == "", "Shape has positions, no source parameter names")
+    Check(parameters[0].MetadataToken is None && parameters[0].Module is None, "Synthesized parameter has no declaration")
+    Check(parameters[0].GetCustomAttributesData().Count == 0, "No parameter attributes")
+    Check(function.GetMethods(BindingFlags.Public | BindingFlags.Static).Count == 0, "Static filter excludes Invoke")
+    Check(function.GetMethods(BindingFlags.NonPublic | BindingFlags.Instance).Count == 0, "Nonpublic filter excludes Invoke")
+    Check(function.GetConstructors().Count == 0, "No declared Function constructor")
+    let repeated = (FunctionTypeInfo)typeof((int) -> string)
+    Check(function.Equals(repeated) && function.GetHashCode() == repeated.GetHashCode(), "Repeated signature identity")
+    Check(invoke.Equals(repeated.InvokeMethod) && invoke.GetHashCode() == repeated.InvokeMethod.GetHashCode(), "Repeated Invoke identity")
+    Check(parameters[0].Equals(repeated.InvokeMethod.GetParameters()[0]), "Repeated parameter identity")
+    let unit = (FunctionTypeInfo)typeof(() -> ())
+    Check(unit.Parameters.Count == 0 && unit.ReturnType.Equals(typeof(System.Void)), "Zero-parameter unit signature")
+    Check(invoke.Invoke(null) is Error(ReflectionError.UnboundMetadata), "Synthesized member is descriptive in dynamic reflection")
+    let nested = typeof(Option<(int) -> string>).GetGenericArgument(0)
+    Check(nested is FunctionTypeInfo && nested.Equals(function), "Generic argument chooses Function provider")
     System.Runtime.GC.Collect()
     Check(number.Equals(typeof(int)), "Descriptor survives collection")
     Console.WriteLine("Nominal and structural descriptors passed")

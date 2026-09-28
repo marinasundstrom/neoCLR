@@ -181,13 +181,20 @@ The selected Function type direction introduces `NominalTypeInfo` for names,
 namespaces and declaration metadata, alongside `TypeInfo.IsNominalType`.
 Structural Function types describe callable shapes, with Function objects
 as their instances. The descriptor split is implemented on the development feature branch: common
-TypeInfo exposes DisplayName and IsNominalType; declaration metadata requires
+TypeInfo exposes DisplayName, IsNominalType and IsFunctionType; declaration metadata requires
 NominalTypeInfo. Structural types can still have members and extension members;
 member discovery stays on common TypeInfo. Raven callbacks now import into structural
 Function shapes, and a tested extension can target a function shape. Legacy
-delegate declarations and opcodes are removed. Synthetic Invoke enumeration
-through GetMethods remains follow-up work. See the [Function API reference](/docs/functions.html). Named function
+delegate declarations and opcodes are removed. FunctionTypeInfo.InvokeMethod and
+GetMethods expose the same synthesized public instance Invoke signature. Member
+and parameter Module/MetadataToken, and MethodInfo.DefinitionIndex, are optional;
+synthesized descriptors return None. Typed invocation is supported; dynamic
+reflection invocation of this descriptor remains future work. See the [Function API reference](/docs/functions.html). Named function
 types may follow later.
+
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
 
 <a id="feedback"></a>
 

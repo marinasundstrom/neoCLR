@@ -44,6 +44,12 @@ Only the current loaded program is supported. Dynamic loading, separate executio
 contexts, generic-class invocation and static-field access remain future work. These
 extensions do not make every introspection descriptor executable.
 
+Development FunctionTypeInfo.InvokeMethod and TypeInfo.GetMethods expose a synthesized
+Function Invoke descriptor. It has no declaration index, token or module; optional
+properties return None. MethodReflectionExtensions.Invoke returns UnboundMetadata
+for it. Use typed Function invocation to execute a binding. Declared MethodInfo
+DefinitionIndex and MemberInfo/ParameterInfo metadata now require Option matching.
+
 ## Imported artifact access information
 
 The Rust host's `metadata_origin::MetadataOrigin` adds optional `publicly_visible`
