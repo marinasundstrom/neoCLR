@@ -142,8 +142,9 @@ The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) own
 The author selected [Function types and Function objects](function-types.md) on
 2026-09-28: structural callable shapes and their instances will replace delegates,
 with `NominalTypeInfo` and `TypeInfo.IsNominalType` beginning a nominal/structural
-split. Named function types remain a possible future addition; their identity
-rules are not selected. A native structural binding foundation is implemented on
+split. A future nominal function type may inherit an explicitly eligible structural
+Function shape while retaining distinct nominal identity. This does not introduce
+general inheritance of non-nominal types. A native structural binding foundation is implemented on
 the feature branch, including the TypeInfo/NominalTypeInfo descriptor split and
 structural Raven callback transport. Native legacy delegate admission is removed;
 focused migration validation passes; bounded limitations are tracked below.

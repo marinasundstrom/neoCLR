@@ -45,7 +45,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Function invocation. Keep constructor Function fields explicitly initialized.
   Ordinary Object conversion, synthetic Invoke descriptors and general structural
   member enumeration remain outside this first slice; named Function types remain
-  future work.
+  future work. Clarify the planned FunctionTypeInfo signature/synthesized Invoke
+  contract and the future nominal-function inheritance proposal: matching signatures
+  do not erase nominal identity, and non-nominal inheritance requires explicit
+  eligibility. These are design clarifications, not implemented descriptor or
+  inheritance APIs.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

@@ -72,3 +72,17 @@ Common TypeInfo member queries remain available. The synthetic Invoke operation
 is documented on this family page; it has no declaration token and is not returned
 by the existing declaration-based GetMethods implementation. General structural
 member discovery remains future work.
+
+## Planned signature descriptors and nominal function types
+
+`FunctionTypeInfo` is planned to describe one specific signature and its synthesized
+instance Invoke method. An object created from that Function type has Invoke with
+that signature; its bound target is separate instance data. This descriptor is not
+yet part of the public reference assembly.
+
+A future nominal function type may inherit an eligible structural Function shape.
+Two nominal function types sharing that shape would remain distinct and could not
+directly convert to each other solely on signature equality. Non-nominal types are
+not generally inheritable; permitted kinds need explicit rules. This proposal does
+not make Array, Tuple, Union or Intersection inheritable. Conversion/rebinding rules
+and synthetic member metadata remain future design work.

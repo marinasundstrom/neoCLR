@@ -46,7 +46,10 @@ and Function objects hold the method and any bound environment for invocation.
 They replace delegates in development artifacts. Development `NominalTypeInfo` carries declaration names
 and namespaces, while `TypeInfo.IsNominalType` distinguishes nominal types. This begins
 a wider nominal/structural split; it does not yet change tuple or union identity.
-Named function types remain a possible later addition, with identity rules open.
+A future nominal function type may inherit an eligible Function shape, while
+separate nominal types remain non-interchangeable despite matching signatures.
+Non-nominal types are not generally inheritable. Planned FunctionTypeInfo descriptors
+will describe specific signatures and their synthesized instance Invoke methods.
 Unlike .NET's nominal delegate types, structural shapes can share identity across
 different methods. The cost is migration of compiler metadata, callback APIs and
 introspection consumers.

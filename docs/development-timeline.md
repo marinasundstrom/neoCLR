@@ -114,6 +114,19 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   and named function types remain follow-up scope, rather than invented nominal
   metadata or claims of a general RavenDoc renderer.
 
+- **Author, further clarification:** FunctionTypeInfo describes a specific signature
+  and its synthesized Invoke; an instance created from that Function type has that
+  method. Proposes a future nominal function type inheriting a Function shape,
+  retaining distinct nominal identity so equal signatures do not permit direct
+  conversion between different nominal function types. Directs selective inheritance
+  eligibility: non-nominal types should not generally be inheritable.
+- **Assistant, response and action:** records the signature/Invoke descriptor
+  contract, distinguishes the synthesized member from the instance's bound target,
+  and updates the future nominal-function proposal without implementing it. Flags
+  structural-base conversions, explicit rebinding and synthetic method metadata as
+  design questions; does not infer that other structural families become inheritable.
+  Updates the design, tracker, API future-direction note and website proposal.
+
 ## 2026-09-27 — Focus on a minimal Web API
 
 - **Author:** “We should focus on the Http story”, specifying the minimum features

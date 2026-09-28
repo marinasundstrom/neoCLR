@@ -12,10 +12,14 @@ The [original proposal](proposals/function-types-and-objects.md) remains broader
 exploration, not blanket authorization for its dynamic, native or event facilities.
 
 Author follow-up: named function types might be supported in the future as a
-replacement for delegates. They are not part of this first structural slice.
-Whether such a name is a transparent shape alias or introduces nominal identity
-is open; do not infer that choice from the word "named". Removing delegates now
-must not be documented as rejecting all future named callable contracts.
+replacement for delegates. The later clarification proposes a **nominal function
+type inheriting a structural Function type with the required signature**. Separate
+nominal function types would retain distinct identities even with the same signature;
+one must not directly convert to the other merely because their shapes match.
+This refines the earlier open alias-versus-nominal discussion for that proposed
+facility. Neither nominal function inheritance nor transparent aliases are implemented
+or selected for the current slice. Removing delegates does not reject future named
+callable contracts.
 
 ## Shape and instance
 
@@ -61,13 +65,13 @@ work, and are not reasons to retain a neoCLR Delegate feature.
 The development Raven `TypeInfo` is now independent of `MemberInfo`.
 `NominalTypeInfo` inherits both interfaces and owns `FullName` and `Namespace`;
 `MemberInfo` supplies declaration names, module/token, ownership and attributes.
-The implemented split and remaining Function-specific proposal are:
+The implemented split and planned Function-specific descriptor are:
 
 | Contract | Responsibility |
 | --- | --- |
 | `TypeInfo` | Common type identity, equality, shape queries and `IsNominalType`; usable for parameter/result/component types. |
 | `NominalTypeInfo : TypeInfo, MemberInfo` | Nominal declaration name, namespace and declaration identity metadata. |
-| `FunctionTypeInfo : TypeInfo` (proposed name) | Ordered parameter contracts and return type; no invented declaration name, namespace or metadata token. |
+| `FunctionTypeInfo : TypeInfo` (planned) | One specific signature and its synthesized instance `Invoke`; ordered parameter contracts and return type, without invented nominal declaration metadata. |
 | Function object | Bound target and environment, plus its Function type and typed invocation. |
 
 `IsNominalType` must agree with whether the descriptor implements `NominalTypeInfo`.
@@ -75,6 +79,21 @@ Structural descriptors must not implement that interface with empty placeholders
 The common diagnostic display is `DisplayName`, independent of nominal `FullName`. A display string is not a type identity or hash
 substitute. Common descriptor equality must compare handles across implementations,
 not unconditionally cast to the current `RuntimeTypeInfo` implementation.
+
+Author clarification: `FunctionTypeInfo` describes a specific Function signature,
+not just the Function family. For `(Int32) -> String`, it describes that shape and
+its synthesized instance method `Invoke(Int32) -> String`. Each Function object
+created from the type has that method; invocation dispatches to the object's bound
+target and environment. The synthesized Invoke descriptor belongs to the shape,
+while the selected target method belongs to the instance's binding. Different
+bound targets do not create different Invoke signatures or Function types.
+
+This descriptor contract is planned, not an API already emitted by the reference
+assembly. Its implementation must represent a synthesized member without inventing
+a nominal type name or declaration token. How synthetic method descriptors fit the
+existing declaration-oriented MemberInfo/MethodInfo contracts remains an explicit
+implementation question. RavenDoc's Function family page can document the common
+member contract, while a concrete FunctionTypeInfo describes one actual signature.
 
 Audit every existing member when splitting the interfaces. In particular,
 `FullName`, module/token/custom attributes and declaring-type relationships must
@@ -93,6 +112,34 @@ Named declared unions and future structural union expressions must be distinguis
 the identity and migration rules for those other families remain follow-on work.
 Array, pointer, byref, generic-parameter and constructed-type classification must
 also be enumerated before finalizing `IsNominalType` for every existing descriptor.
+
+## Selective inheritance and future nominal Function types
+
+Non-nominal types are not generally inheritable. Structural identity and member
+support do not by themselves grant permission to use a type as a base. Inheritance
+eligibility must be explicitly defined for each supported kind; do not enable it
+for arrays, tuples, unions, intersections or arbitrary structural shapes by analogy.
+
+The author's proposed exception is a nominal function type whose base is a Function
+shape. Conceptually, two nominal types A and B could both derive from `(Int32) ->
+String` and have its Invoke contract, while A and B remain distinct types. Equal
+signatures must not create a direct conversion from A to B. A type's nominal identity
+and its base shape's structural identity would remain separate in introspection.
+This is future design, not implemented inheritance syntax or a restored Delegate API.
+
+Assistant analysis: base-shape substitutability, explicit construction/rebinding,
+and conversions back from a structural value need separate rules. In particular,
+a structural intermediate must not accidentally introduce an implicit A-to-B
+conversion. This identifies a validation need, not an author decision to forbid
+all explicit rebinding. Multiple bases, variance, further derivation and the precise
+set of inheritable non-nominal kinds also remain open.
+
+Compared with the nominal .NET delegate identity described below, the proposal keeps
+separate named contracts non-interchangeable while sharing one structural invocation
+base. Its benefit is reuse of signature and Invoke metadata without losing nominal
+boundaries; its cost is new inheritance, conversion and descriptor rules beyond the
+current structural replacement. Existing delegate research supplies the comparison;
+no new .NET behavior or performance claim is made here.
 
 ## Comparison and tradeoffs
 

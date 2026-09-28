@@ -13,7 +13,10 @@ or later author direction selects it.
 The author directs structural Function types describing callable shape, Function
 objects holding the invocation target, removal of delegates, and a
 `NominalTypeInfo`/`TypeInfo.IsNominalType` split. Named function types may follow
-later; transparent alias versus distinct nominal identity remains open.
+later. The author proposes distinct nominal function types inheriting an explicitly
+eligible structural Function shape, without direct conversion between different
+nominal types merely because their signatures match. Non-nominal types are not
+generally inheritable.
 The [design and migration plan](../function-types.md) separates author decisions
 from assistant recommendations and records the existing execution/introspection
 dependencies. Native structural shape identity and checked Function binding/Invoke
@@ -29,7 +32,8 @@ fixed Raven generic-construction binder.
 The bounded object contract compares shape/target/receiver, shares captures, uses
 null defaults and checks constructor initialization. Ordinary Object conversion,
 synthetic Invoke descriptors and general structural member enumeration remain
-follow-up work. Current member/extension documentation is a manual Function family
+follow-up work. The planned FunctionTypeInfo describes one specific signature and
+its synthesized instance Invoke, distinct from an object's bound target. Current member/extension documentation is a manual Function family
 page; a general RavenDoc renderer remains future work.
 
 Validation: 157 selected native consumer tests and twelve Raven integration checks
