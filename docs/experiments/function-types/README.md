@@ -155,3 +155,16 @@ publication is needed for this change.
 
 The three updated documentation samples, library-assembly-info,
 library-introspection-tour and library-reflection, also compile, verify and execute.
+
+## Transitional target inspection
+
+Function objects expose a synthesized Function: MethodInfo property. Native tests
+cover same-target equality, distinct generic instantiations, module-function targets,
+null property access and reachability (inspection does not count as invocation).
+The Raven callback consumer exercises the property, target descriptor equality and
+shape-based Function equality; the descriptor consumer checks property/getter
+membership and filtering. FunctionInfo remains deferred. The compiler reference
+projects Function onto CLI callback transport types, and the importer lowers that
+access to the structural get_Function contract and callable comparisons to native
+value equality. No Runtime Contract switch or general Raven callable hierarchy is
+introduced. Use matching regenerated runtime/reference artifacts.

@@ -76,7 +76,7 @@ walks through the compiled hostname/echo POC.
 | Area | Read the guide | Browse types and members |
 | --- | --- | --- |
 | Collections and arrays | [Collections and queries](/features/collections/) · [Arrays](/features/arrays/) | [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [System.Collections](xref:System.Collections) · [Array](xref:System.Array`1) |
-| Outcomes and callbacks | [Outcomes](/features/outcomes/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Func](xref:System.Func`2) |
+| Outcomes and callbacks | [Outcomes](/features/outcomes/) · [Function types](/features/functions/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Function shapes](functions.md) |
 | Queries | [Collections and queries](/features/collections/) | [System.Linq](xref:System.Linq) |
 | Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Date) · [Time](xref:System.Time) · [Instant](xref:System.Instant) · [Clock](xref:System.Clock) |
 | Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) · [Encoding](xref:System.Text.Encoding) · [Decoder](xref:System.Text.Decoder) · [Encoder](xref:System.Text.Encoder) |

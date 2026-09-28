@@ -8,6 +8,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct FunctionObject {
     pub(crate) ty: Type,
+    pub(crate) object_view: bool,
+    pub(crate) identity: std::sync::Arc<()>,
     pub(crate) target: FunctionRef,
     pub(crate) receiver: Option<Box<Value>>,
 }
@@ -77,6 +79,156 @@ pub(crate) fn contract(_module: &Module, ty: &Type) -> Result<Function, Fault> {
         });
     }
     Err(Fault::new("expected structural Function type"))
+}
+
+/// Transitional bound-target inspection member on every structural Function shape.
+pub(crate) fn function_getter(module: &Module, ty: &Type) -> Result<Function, Fault> {
+    let mut getter = contract(module, ty)?;
+    getter.name = "$Function.get_Function".into();
+    getter.parameters.clear();
+    getter.out_parameters.clear();
+    getter.out_when_true.clear();
+    getter.no_result = false;
+    getter.returns = Type::from_name("System.Introspection.MethodInfo");
+    Ok(getter)
+}
+
+pub(crate) fn to_string_contract(module: &Module, ty: &Type) -> Result<Function, Fault> {
+    let mut method = function_getter(module, ty)?;
+    method.name = "$Function.ToString".into();
+    method.returns = Type::String;
+    method.is_virtual = true;
+    method.is_override = true;
+    Ok(method)
+}
+
+pub(crate) fn object_contract(module: &Module, ty: &Type, name: &str) -> Result<Function, Fault> {
+    let mut f = to_string_contract(module, ty)?;
+    f.name = format!("$Function.{name}");
+    match name {
+        "Equals" => {
+            f.parameters = vec![Type::from_name("System.Object")];
+            f.returns = Type::Boolean;
+        }
+        "GetHashCode" => {
+            f.returns = Type::Int32;
+        }
+        "ToString" => {}
+        _ => return Err(Fault::new("unknown Function Object member")),
+    }
+    Ok(f)
+}
+
+pub(crate) fn value_hash(binding: &FunctionObject) -> i32 {
+    use std::hash::{Hash, Hasher};
+    let mut hash = std::collections::hash_map::DefaultHasher::new();
+    binding.ty.hash(&mut hash);
+    binding.target.hash(&mut hash);
+    let receiver = binding.receiver.as_deref().and_then(|value| match value {
+        Value::ObjectReference(object) => Some(object.allocation_id()),
+        Value::SlotReference(slot) | Value::SlotInterface { receiver: slot, .. } => {
+            slot.allocation_id()
+        }
+        _ => None,
+    });
+    receiver.hash(&mut hash);
+    // Hashes may collide; never observe mutable receiver state.
+    crate::object_identity::mix_hash(hash.finish())
+}
+
+pub(crate) fn object_dispatch(
+    module: &Module,
+    binding: &FunctionObject,
+    name: &str,
+    args: &[Value],
+) -> Result<Option<Value>, Fault> {
+    Ok(match (name, args) {
+        ("ToString", []) => Some(Value::String(
+            target_display(module, &crate::vm::resolve(module, &binding.target)?)?.into(),
+        )),
+        ("GetHashCode", []) => Some(Value::Int32(value_hash(binding))),
+        ("Equals", [other]) => Some(Value::Boolean(
+            matches!(other, Value::Function(other) if binding == other),
+        )),
+        _ => None,
+    })
+}
+
+/// Diagnostic target text. Never inspect or invoke the retained receiver.
+pub(crate) fn target_display(module: &Module, target: &Function) -> Result<String, Fault> {
+    fn type_name(module: &Module, ty: &Type) -> Result<String, Fault> {
+        let info = crate::type_identity::describe_loaded(module, ty)?;
+        fn display(info: &crate::TypeDescriptor) -> String {
+            if info.generic_arguments.is_empty() {
+                return info.name.clone();
+            }
+            format!(
+                "{}<{}>",
+                info.name,
+                info.generic_arguments
+                    .iter()
+                    .map(display)
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            )
+        }
+        Ok(display(&info))
+    }
+    let mut name = if let Some(owner) = &target.owner {
+        let member = target
+            .origin
+            .as_ref()
+            .map(|o| o.name.as_str())
+            .unwrap_or_else(|| target.name.rsplit('.').next().unwrap_or(&target.name));
+        format!("{}.{member}", type_name(module, owner)?)
+    } else {
+        target
+            .origin
+            .as_ref()
+            .map(|o| o.full_name.as_deref().unwrap_or(&o.name))
+            .unwrap_or(&target.name)
+            .to_owned()
+    };
+    if !target.generic_arguments.is_empty() {
+        let arguments = target
+            .generic_arguments
+            .iter()
+            .map(|t| type_name(module, t))
+            .collect::<Result<Vec<_>, _>>()?;
+        name.push_str(&format!("<{}>", arguments.join(", ")));
+    }
+    let parameters = target
+        .parameters
+        .iter()
+        .enumerate()
+        .map(|(i, ty)| {
+            let mode = if target.out_when_true.contains(&i) {
+                "out(true) "
+            } else if target.out_parameters.contains(&i) {
+                "out "
+            } else if target.readonly_parameters.contains(&i) {
+                "readonly "
+            } else {
+                ""
+            };
+            Ok(format!("{mode}{}", type_name(module, ty)?))
+        })
+        .collect::<Result<Vec<_>, Fault>>()?;
+    let result = if target.no_result {
+        "noresult".into()
+    } else {
+        type_name(module, &target.returns)?
+    };
+    let scope = target
+        .origin
+        .as_ref()
+        .map(|o| o.module.as_str())
+        .or_else(|| target.definition.as_ref().map(|id| id.module.as_str()))
+        .unwrap_or("");
+    Ok(format!(
+        "[{scope}]{name}({}) -> {result}",
+        parameters.join(", ")
+    ))
 }
 
 fn readonly(f: &Function, i: usize) -> bool {
@@ -256,6 +408,8 @@ fn finish(ty: &Type, callee: Function, receiver: Option<Box<Value>>) -> Value {
     };
     Value::Function(FunctionObject {
         ty: ty.clone(),
+        object_view: false,
+        identity: std::sync::Arc::new(()),
         target,
         receiver,
     })

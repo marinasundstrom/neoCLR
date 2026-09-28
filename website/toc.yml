@@ -6,6 +6,8 @@
       href: comparison/index.md
     - name: Namespaces
       href: docs/namespaces.md
+    - name: Function types
+      href: features/functions/index.md
     - name: Collections and queries
       href: features/collections/index.md
     - name: Public reference coverage

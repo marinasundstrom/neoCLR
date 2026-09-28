@@ -428,4 +428,6 @@ CLI Delegate/MulticastDelegate, Func (one through five generic arguments) and
 Action (zero through four arguments) remain in the complete reference inventory
 but have explicit scaffold exclusions: they carry compiler metadata and do not
 define nominal runtime types. Their public callback signatures remain documented
-under their actual CLI IDs. This is distinct from omitting a runtime API.
+under their actual CLI IDs. Their target-only synthesized Function property is
+documented in the manual Function family page, including MethodInfo results and
+GetProperties/GetMethods discovery. This is distinct from omitting a runtime API.

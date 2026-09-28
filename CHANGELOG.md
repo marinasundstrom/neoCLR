@@ -48,7 +48,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with signature parameters and ordinary binding-flag filtering. Make MemberInfo/ParameterInfo Module and MetadataToken,
   and MethodInfo.DefinitionIndex, optional so synthetic members expose no invented
   declaration metadata. Migrate reflection consumers and refresh reference docs.
-  Ordinary Object conversion, dynamic reflection invocation of synthetic Invoke,
+  Enforce Function value equality and signature identity with regression coverage;
+  synthesize read-only Function: MethodInfo for bound-target inspection, with
+  GetProperties/GetMethods discovery and closed target descriptor identity.
+  Preserve ownerless module targets without inventing a DeclaringType. Add a
+  dedicated website feature page, distinguish structural compatibility from
+  delegate-like binding, and record common callable contracts, future FunctionInfo
+  and structural introspection factories as open design work.
+  Function types inherit Object while remaining structural; support Object views,
+  exact-shape cast-back, GetType and virtual value equality/hash overrides.
+  ToString reports the source-qualified target and closed signature without
+  inspecting captures. Copies preserve reference identity; independently created
+  equal bindings remain distinct for ReferenceEquals. This does not generalize
+  Object inheritance to other structural families.
+  Dynamic reflection invocation of synthetic Invoke,
   general structural member enumeration and named Function types remain future work.
   Matching signatures will not erase future nominal-function identity; structural
   inheritance requires explicit eligibility and is not implemented.

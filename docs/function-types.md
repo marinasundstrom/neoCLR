@@ -53,10 +53,13 @@ as arguments, results, fields and generic arguments, with GC tracing through tho
 containers. Direct method calls need no Function object. Calling an object uses
 the checked target and ordinary argument/result checks.
 
-These recommendations preserve existing execution safety; they do not settle
-public Function equality, nullability, object identity, allocation strategy or the
-final public method-inspection API. Those choices need resolution before adopting
-their production contracts. A managed method reference must not expose a raw native
+These recommendations preserve existing execution safety. Author clarification on
+2026-09-28 fixes the value contract: the same signature denotes the same Function
+type, and independently created Function objects bound to the same closed target
+and receiver compare equal. Receiver/capture identity participates; equal current
+capture contents do not make different environments equal. Equality does not compare
+function outputs or imply referential purity. Allocation strategy and a generalized
+public function-inspection model remain provisional. A managed method reference must not expose a raw native
 entry address. Native ABI projections and multicast/event collections are separate
 work, and are not reasons to retain a neoCLR Delegate feature.
 
@@ -65,7 +68,7 @@ work, and are not reasons to retain a neoCLR Delegate feature.
 The development Raven `TypeInfo` is now independent of `MemberInfo`.
 `NominalTypeInfo` inherits both interfaces and owns `FullName` and `Namespace`;
 `MemberInfo` supplies declaration names, module/token, ownership and attributes.
-The implemented split and planned Function-specific descriptor are:
+The current descriptor responsibilities are:
 
 | Contract | Responsibility |
 | --- | --- |
@@ -91,7 +94,7 @@ bound targets do not create different Invoke signatures or Function types.
 The development API now exposes `TypeInfo.IsFunctionType` and
 direct `FunctionTypeInfo.Parameters` and `ReturnType` properties, plus
 `FunctionTypeInfo.InvokeMethod`. `GetMethods()` returns the same synthesized public
-instance method; flag overloads apply ordinary public/instance filtering. The
+instance method, along with the `Function` property getter; flag overloads apply ordinary public/instance filtering. The
 property and enumeration return equal descriptors, without promising shared wrapper
 allocation identity. Parameter order, types and readonly/out/out-when-true modes
 come from the signature; names are empty because a shape has no parameter declaration.
@@ -332,12 +335,13 @@ shape, closed target and retained receiver determine equality, and copies share
 captures. Bound class-receiver equality now compares heap identity as slot receivers
 already did. Ordinary storage defaults to null and null Invoke reports NullReference;
 constructors must explicitly initialize Function fields before publication. Function
-objects currently have no independent heap allocation identity or ordinary Object
-conversion. These are explicit limitations of this first slice, not reasons to
-retain delegates. Compared with .NET Delegate, there is no nominal callable identity
+objects now inherit Object while their types remain non-nominal. Object conversion,
+GetType, cast-back, and virtual Equals/GetHashCode/ToString preserve the callable
+contract. Separate bindings retain separate reference identity; copying a binding
+preserves it. ReferenceEquals can differ from value equality. Compared with .NET Delegate, there is no nominal callable identity
 or invocation list; target/receiver equality is retained. Benefits are shared shapes
 across methods and no declaration boilerplate, at the cost of rebuilding artifacts
-and a bounded Object/introspection surface. Existing research above supplies the
+and a bounded introspection surface. Existing research above supplies the
 comparison; no performance improvement is claimed.
 
 Structural types continue to support members and extensions. Invoke is synthesized
@@ -349,3 +353,72 @@ member enumeration beyond this Function operation remains follow-up work. This
 initial replacement does not reclassify existing nominal Tuple/union declarations,
 implement intersections, select named Function identity, or build a general RavenDoc
 structural renderer. Earlier checkpoint sections above remain historical evidence.
+
+## Bound target inspection and open object-model questions
+
+Author direction, 2026-09-28: a Function object is a value binding to a method or
+function, typed by a structural signature. The synthesized read-only instance
+property `Function: MethodInfo` reports that target. `InvokeMethod` remains the
+shape's invocation descriptor. `GetProperties()` discovers `Function`, and
+`GetMethods()` discovers `Invoke` and `get_Function`. Repeated target descriptors
+compare by closed method identity, including generic substitutions; receivers are
+part of Function-object equality, not MethodInfo equality. A module-level target
+has no DeclaringType; its module and definition metadata remain available.
+
+This is transitional. The author explicitly defers a shared `FunctionInfo`
+interface over `MethodInfo` and possible module `ModuleFunctionInfo` descriptors.
+The property returns MethodInfo now. It does not expose a native code address,
+retain the bound receiver, or make a synthetic Invoke dynamically executable.
+Ownerless method/parameter attributes and reflective invocation of ownerless
+methods remain unsupported by the current type-based reflection services.
+
+The benefit over nominal delegates is signature-based identity and compatibility,
+not the mere presence of callables in the type system: .NET delegates are types too.
+The binding mechanism still resembles a single-target delegate. Whether that is the
+long-term object model remains open. Documented questions, not added APIs:
+
+- Removing the Delegate hierarchy also removes a common contract for inferred
+  callable types. [ASP.NET Core Minimal APIs](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-10.0)
+  accept Delegate route handlers, including lambdas and method groups;
+  [RequestDelegateFactory](https://source.dot.net/Microsoft.AspNetCore.Http.Extensions/RequestDelegateFactory.cs.html)
+  accepts that common handler contract. Should Function shapes implement a common
+  interface or have an eligible base type signaling “accepts any function/method”?
+  Erasing a signature would require explicit validation before invocation.
+- In a fuller functional object model, does an object represent the method/function
+  itself, or is a value binding whose type only describes its shape sufficient?
+  Keep declaration identity, receiver binding and invocation shape distinct while
+  evaluating that question.
+- Introspection should eventually construct array, Function, tuple, union and
+  intersection types. Factory names, normalization, identity, invalid combinations
+  and recursive shapes are open; these constructors are not implemented here.
+- Named nominal Function types and selective structural inheritance remain possible
+  future work. Equal shapes must not erase distinct nominal identities. A common
+  callable contract would not make all structural types inheritable.
+
+Structural families can have members and extensions despite having no declaration
+name. RavenDoc can document Array, Tuple, Union, Intersection and Function families
+and their members; that does not turn each constructed shape into a nominal type.
+
+### Object inheritance and target display
+
+Author follow-up: Function objects should inherit Object despite being structural,
+as arrays already can; other structural families require their own contracts.
+The assistant's initial suggestion of a standalone ToString without Object was
+superseded by this explicit direction. Structural identity is independent of
+Object inheritance. This change does not reclassify tuples/unions or grant arbitrary
+structural inheritance.
+
+ToString overrides Object's virtual member and reports the target's source-qualified
+name with module, closed generic arguments, parameters and return type. It never
+invokes the target or prints captured values/receiver state. Lowered imported methods
+retain optional source-qualified name metadata for this purpose. Display is diagnostic,
+not a stable serialization format or identity key. Equal display text does not imply
+equal Function values: different receivers can bind the same method.
+
+Function types also synthesize virtual Equals(Object) and GetHashCode overrides;
+GetMethods includes these and ToString alongside Invoke and get_Function. Object
+views retain the precise runtime Function type and support type tests and cast-back.
+Separate bindings may be value-equal but ReferenceEquals is false; copies preserve
+reference identity. Hashes follow value equality and never depend on mutable captures.
+Object inheritance does not solve the open “any callable” marker/interface question:
+Object also accepts values which cannot be called.

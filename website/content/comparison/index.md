@@ -66,3 +66,12 @@ The linked feature pages own detailed contracts and limitations. This comparison
 is reviewed when those contracts or release availability change; its review date
 records the last check, not a release date. Microsoft references above were
 consulted on 27 September 2026.
+
+## Structural Function types (development)
+
+[Function types](../features/functions/) identify callables by signature, while
+.NET delegate types have nominal identity. Function objects still bind a target
+and receiver much like single-target delegates. This avoids requiring shared named
+callback declarations, but a common “accept any callable” base/interface remains an
+open design question. The current Function property returns MethodInfo; a shared
+function-info interface and named nominal Function types are future possibilities.

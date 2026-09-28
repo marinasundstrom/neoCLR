@@ -220,10 +220,87 @@ fn function_identity_uses_loaded_component_identities() {
 
 #[test]
 fn artifacts_cannot_redefine_the_synthesized_invoke_contract() {
+    assert!(assemble(".module Bad\n.type class NamedFunction\n.extends fn<Int32>\n.end").is_err());
     let m = module("ldc.i4 42", "");
     let mut json = serde_json::to_value(m).unwrap();
     json["functions"][0]["owner"] = serde_json::to_value(parse_type("fn<Int32>").unwrap()).unwrap();
     json["functions"][0]["instance"] = true.into();
     json["functions"][0]["name"] = "$Function.Invoke".into();
     assert!(neoclr::load(&json.to_string()).is_err());
+}
+
+#[test]
+fn repeated_bindings_compare_by_target_not_creation() {
+    for (target, expected) in [
+        ("First<Int32>()", true),
+        ("First<String>()", false),
+        ("Second()", false),
+    ] {
+        let m = assemble(&format!(".module Equality\n.entry Main\n.function First<T>() -> Int32\nldc.i4 42\nret\n.end\n.function Second() -> Int32\nldc.i4 42\nret\n.end\n.function Main() -> Boolean\nfunction.bind fn<Int32> = First<Int32>()\nfunction.bind fn<Int32> = {target}\nceq\nret\n.end")).unwrap();
+        verify(&m).unwrap();
+        assert_eq!(
+            run(&m, Limits::default()).unwrap().value,
+            Value::Boolean(expected)
+        );
+    }
+}
+
+#[test]
+fn function_property_describes_bound_target_and_null_access_faults() {
+    let declarations = ".function Identity<T>(T value) -> T\nldarg 0\nret\n.end";
+    let source = format!(
+        ".module Target\n.entry Main\n{declarations}\n.function Main() -> System.Introspection.MethodInfo\nfunction.bind fn<Int32,Int32> = Identity<Int32>(Int32)\ncall instance fn<Int32,Int32>::get_Function()\nret\n.end"
+    );
+    let m = assemble(&source).unwrap();
+    verify(&m).unwrap();
+    let result = run(&m, Limits::default()).unwrap();
+    let Value::Object { fields, .. } = result.value else {
+        panic!("expected method snapshot")
+    };
+    assert_eq!(fields[0], Value::String("Identity".into()));
+    assert!(matches!(fields[1], Value::NullObjectReference(_)));
+    let graph = LoadedProgram::new(&m)
+        .unwrap()
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            100,
+        )
+        .unwrap();
+    assert!(
+        graph.functions[graph.roots[0]]
+            .function_invocations
+            .is_empty()
+    );
+    let null = assemble(&source.replace(
+        "function.bind fn<Int32,Int32> = Identity<Int32>(Int32)",
+        ".local fn<Int32,Int32> empty\nldloca empty\ninitobj fn<Int32,Int32>\nldloc empty",
+    ))
+    .unwrap();
+    verify(&null).unwrap();
+    assert_eq!(
+        run(&null, Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::NullReference
+    );
+}
+
+#[test]
+fn function_display_includes_closed_target_signature() {
+    let source = ".module Display\n.entry Main\n.function Identity<T>(T) -> T\nldarg 0\nret\n.end\n.function Main() -> String\nfunction.bind fn<Int32,Int32> = Identity<Int32>(Int32)\ncallvirt instance fn<Int32,Int32>::ToString()\nret\n.end";
+    let m = assemble(source).unwrap();
+    verify(&m).unwrap();
+    assert_eq!(
+        run(&m, Limits::default()).unwrap().value,
+        Value::String("[Display]Identity<System.Int32>(System.Int32) -> System.Int32".into())
+    );
+}
+
+#[test]
+fn function_object_roundtrip_preserves_value_and_reference_contracts() {
+    let source = ".module ObjectFunctions\n.entry Main\n.type class abstract System.Object\n.end\n.function Keep<T>(T value) -> T\n.constraint T System.Object\nldarg value\nret\n.end\n.function Identity(Int32) -> Int32\nldarg 0\nret\n.end\n.function Main() -> Int32\n.local fn<Int32,Int32> first\n.local System.Object saved\nfunction.bind fn<Int32,Int32> = Identity(Int32)\ncall Keep<fn<Int32,Int32>>(fn<Int32,Int32>)\nstloc first\nldloc first\ncastclass System.Object\nstloc saved\nldloc saved\nisinst fn<Int32,Int32>\nref.isnull\nbrtrue Bad\nldloc saved\ncastclass fn<Int32,Int32>\nldloc first\nceq\nbrfalse Bad\nldloc saved\nldloc first\nref.eq\nbrfalse Bad\nldloc saved\nfunction.bind fn<Int32,Int32> = Identity(Int32)\nref.eq\nbrtrue Bad\nldloc saved\ncastclass fn<Int32,Int32>\nldc.i4 42\ncallvirt instance fn<Int32,Int32>::Invoke(Int32)\nret\nBad:\nldc.i4 0\nret\n.end";
+    let m = assemble(source).unwrap();
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+    let wrong = assemble(&source.replacen("castclass fn<Int32,Int32>", "castclass fn<String,String>", 1)).unwrap();
+    assert_eq!(run(&wrong, Limits::default()).unwrap_err().code, neoclr::FaultCode::InvalidCast);
+
 }

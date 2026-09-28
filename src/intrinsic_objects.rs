@@ -61,7 +61,7 @@ pub(crate) fn dispatch(
         ));
     };
     let equal = match other {
-        Value::NullObjectReference(_) => false,
+        Value::NullObjectReference(_) | Value::Function(_) => false,
         Value::ObjectReference(other) => {
             other.reference.assigned()?;
             if other.concrete_type() == object.concrete_type() {

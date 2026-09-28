@@ -75,7 +75,7 @@ static class CoreDeclarations
                     }
                 }
             }
-            if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); CancellationBindings.Project(module); SocketBindings.Project(module, libraryBootstrap); HttpBindings.Project(module); ReaderBindings.Project(module); }
+            if (collectionProbe) { IntrospectionHierarchy.Project(module); FunctionBindings.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); CancellationBindings.Project(module); SocketBindings.Project(module, libraryBootstrap); HttpBindings.Project(module); ReaderBindings.Project(module); }
             StorageHierarchy.Project(module);
             IPAddressBindings.Project(module);
             if (collectionProbe) JsonBindings.Project(module);

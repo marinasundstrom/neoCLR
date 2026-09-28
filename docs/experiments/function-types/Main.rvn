@@ -43,7 +43,7 @@ func Main() -> int {
     let function = (FunctionTypeInfo)typeof((int) -> string)
     let invoke = function.InvokeMethod
     Check(function.IsFunctionType && !function.IsNominalType && !(function is MemberInfo), "Function has no declaration name")
-    Check(function.GetMethods().Count == 1, "Function exposes one method")
+    Check(function.GetMethods().Count == 5, "Function exposes Invoke, property getter and Object overrides")
     Check(invoke.Equals(function.GetMethods()[0]), "Both paths describe the same Invoke")
     Check(invoke.Name == "Invoke" && invoke.IsPublic && !invoke.IsStatic && !invoke.IsAbstract, "Synthesized public instance Invoke")
     Check(function.ReturnType.Equals(typeof(string)), "Direct Function return type")
@@ -54,6 +54,17 @@ func Main() -> int {
         Check(owner.Equals(function) && owner is FunctionTypeInfo, "Invoke belongs to its signature")
     } else {
         System.Fault("Missing Function owner")
+    }
+    let properties = function.GetProperties()
+    Check(properties.Count == 1 && properties[0].Name == "Function", "Synthesized Function property")
+    Check(properties[0].PropertyType.Equals(typeof(MethodInfo)), "Function returns MethodInfo")
+    Check(properties[0].CanRead && !properties[0].CanWrite, "Read-only target property")
+    Check(function.GetProperties(BindingFlags.Public | BindingFlags.Static).Count == 0, "Instance property filter")
+    if let Some(getter) = properties[0].GetGetMethod() {
+        Check(getter.Name == "get_Function" && !getter.Equals(invoke), "Distinct synthetic getter")
+        Check(getter.Equals(function.GetMethods()[1]), "Property and method discovery agree")
+    } else {
+        System.Fault("Missing Function getter")
     }
     let parameters = function.Parameters
     Check(parameters.Count == invoke.GetParameters().Count && parameters[0].Equals(invoke.GetParameters()[0]), "Direct Function parameters agree with Invoke")
@@ -68,6 +79,12 @@ func Main() -> int {
     Check(function.Equals(repeated) && function.GetHashCode() == repeated.GetHashCode(), "Repeated signature identity")
     Check(invoke.Equals(repeated.InvokeMethod) && invoke.GetHashCode() == repeated.InvokeMethod.GetHashCode(), "Repeated Invoke identity")
     Check(parameters[0].Equals(repeated.InvokeMethod.GetParameters()[0]), "Repeated parameter identity")
+    let objectShape = (FunctionTypeInfo)typeof((Object) -> bool)
+    for member in objectShape.GetMethods() {
+        if member.Name == "Equals" {
+            Check(!member.GetParameters()[0].Equals(objectShape.Parameters[0]), "Different synthetic members own different parameters")
+        }
+    }
     let unit = (FunctionTypeInfo)typeof(() -> ())
     Check(unit.Parameters.Count == 0 && unit.ReturnType.Equals(typeof(System.Void)), "Zero-parameter unit signature")
     Check(invoke.Invoke(null) is Error(ReflectionError.UnboundMetadata), "Synthesized member is descriptive in dynamic reflection")

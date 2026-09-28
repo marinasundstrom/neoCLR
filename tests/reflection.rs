@@ -1,6 +1,8 @@
 use neoclr::{Limits, LoadedProgram, RuntimeService, Value, assemble, frontend};
 
 const MODEL: &str = r#"
+.type class abstract System.Object
+.end
 .type Box<T>
 .field public Item T
 .field private Hidden Int32
@@ -399,7 +401,7 @@ fn structural_functions_expose_their_synthesized_invoke() {
         ("fn<Void>", 0),
         ("fn<noresult Void>", 0),
     ] {
-        for (flags, expected) in [(28, 1), (20, 1), (24, 0), (36, 0), (0, 0)] {
+        for (flags, expected) in [(28, 5), (20, 5), (24, 0), (36, 0), (0, 0)] {
             let result = program(
                 &format!("ldtoken {shape}\nldc.i4 {flags}\ncall neoCLR.Runtime.TypeMethods(System.RuntimeTypeHandle,Int32)"),
                 "System.Introspection.MethodInfo[]",

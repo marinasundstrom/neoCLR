@@ -877,7 +877,7 @@ pub enum Instruction {
 
 impl Module {
     pub fn is_reference_type(&self, ty: &Type) -> bool {
-        matches!(ty, Type::ArrayRef(_))
+        matches!(ty, Type::ArrayRef(_) | Type::Function(_))
             || self
                 .type_definition(ty)
                 .is_some_and(|definition| definition.is_reference_type)

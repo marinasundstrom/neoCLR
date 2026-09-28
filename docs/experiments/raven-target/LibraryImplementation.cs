@@ -237,7 +237,8 @@ static class LibraryImplementation
                 ("StoredIsOutWhenTrue", "System.Boolean"), ("StoredIsReadOnly", "System.Boolean"),
                 ("StoredMetadataToken", "System.Int32"), ("StoredModule", "System.Option`1<System.Introspection.ModuleInfo>"),
                 ("StoredDeclaringType", "System.Introspection.TypeInfo"),
-                ("StoredMemberKind", "System.Int32"), ("StoredMemberIndex", "System.Int32")
+                ("StoredMemberKind", "System.Int32"), ("StoredMemberIndex", "System.Int32"),
+                ("StoredMemberIdentity", "System.String")
             };
             if (type.Fields.Count != layout.Length || type.Fields.Zip(layout).Any(p =>
                 p.First.Name != p.Second.Name || p.First.FieldType.FullName != p.Second.Type

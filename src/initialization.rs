@@ -25,9 +25,6 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
             ));
         }
         *remaining -= 1;
-        if module.is_object_reference_type(ty) {
-            return Ok(Value::NullObjectReference(ty.clone()));
-        }
         if matches!(ty, Type::Function(_)) {
             // Function slots have a null default, but constructors must initialize
             // captured callback fields before publishing their receiver.
@@ -36,6 +33,9 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
             } else {
                 Value::NullObjectReference(ty.clone())
             });
+        }
+        if module.is_object_reference_type(ty) {
+            return Ok(Value::NullObjectReference(ty.clone()));
         }
         Ok(match ty {
             Type::Void => Value::Void,

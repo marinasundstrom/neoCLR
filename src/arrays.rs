@@ -263,6 +263,8 @@ mod tests {
     #[test]
     fn function_object_receiver_inline_payload_counts_toward_budget() {
         let value = Value::Function(crate::Function {
+            object_view: false,
+            identity: std::sync::Arc::new(()),
             ty: Type::from_name("Callback"),
             target: crate::metadata::FunctionRef {
                 definition: None,

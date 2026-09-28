@@ -41,21 +41,20 @@ help offline tools, but requires explicit resolution, identity and lifetime rule
 
 ### Function types and nominal type information
 
-Selected direction, in development: native Function types describe callable shapes,
-and Function objects hold the method and any bound environment for invocation.
-They replace delegates in development artifacts. Development `NominalTypeInfo` carries declaration names
-and namespaces, while `TypeInfo.IsNominalType` distinguishes nominal types. This begins
-a wider nominal/structural split; it does not yet change tuple or union identity.
-A future nominal function type may inherit an eligible Function shape, while
-separate nominal types remain non-interchangeable despite matching signatures.
-Non-nominal types are not generally inheritable. Development FunctionTypeInfo descriptors
-describe specific signatures, with InvokeMethod also discoverable through GetMethods.
-TypeInfo.IsFunctionType identifies these shapes.
-Unlike .NET's nominal delegate types, structural shapes can share identity across
-different methods. The cost is migration of compiler metadata, callback APIs and
-introspection consumers.
+[Function types](../features/functions/) now describe structural signatures, with
+value objects binding methods and receivers. The transitional Function property
+returns MethodInfo. The shared FunctionInfo interface, possibly covering MethodInfo
+and module ModuleFunctionInfo, is deferred.
 
-[Function type design and migration plan](https://github.com/marinasundstrom/neoCLR/blob/main/docs/function-types.md)
+Open questions include a common base/interface for “any callable” (including inferred
+request handlers), whether function objects should represent functions beyond a
+signature and binding, and introspection factories for arrays, functions, tuples,
+unions and intersections. Named nominal Function types could inherit an explicitly
+eligible Function shape; equal signatures would not erase nominal identity.
+Structural types are not generally inheritable. Structural-family RavenDoc pages
+can describe members without inventing names for individual shapes.
+
+[Design, .NET comparison and open questions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/function-types.md#bound-target-inspection-and-open-object-model-questions)
 
 ## Collections
 

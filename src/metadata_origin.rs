@@ -27,6 +27,9 @@ pub enum SourceAccess {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MetadataOrigin {
+    /// Optional source-qualified method name, independent of lowered target names.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub full_name: Option<String>,
     pub assembly: String,
     pub module: String,
     pub name: String,
@@ -117,6 +120,9 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new(
                 "source access metadata does not match definition kind",
             ));
+        }
+        if origin.full_name.as_ref().is_some_and(|name| !text(name)) {
+            return Err(Fault::new("invalid source-qualified member name"));
         }
         if table != 0x02 && origin.declaring_type_token.is_some() {
             return Err(Fault::new(

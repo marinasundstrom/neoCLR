@@ -25,6 +25,42 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-28: Function value bindings and the transitional target property
+
+- **Author:** asks for a website feature page, describing the model as closer to
+  true Function types while retaining some delegate quirks, with its long-term
+  form still open. Then prioritizes enforcing “same signature same function type”
+  and Function objects as values equal when pointing to the same function.
+- **Author:** requests a synthesized `Function` property reporting the referenced
+  method. Suggests a later FunctionInfo interface spanning MethodInfo and possible
+  ModuleFunctionInfo descriptors, then explicitly clarifies that this interface
+  comes later and Function returns MethodInfo now.
+- **Author questions:** records the loss of Delegate's common hierarchy used by
+  inferred ASP.NET Core request handlers; asks about a base/interface accepting any
+  callable, whether a functional object model should represent functions beyond
+  shape descriptions, and future introspection construction of array, Function,
+  tuple, union and intersection types.
+- **Assistant:** distinguishes existing structural signature identity from .NET's
+  nominal delegate identity (delegates are also types). Clarifies that a Function
+  object remains a target/receiver binding; equality includes the receiver or
+  capture identity rather than comparing captured contents or computed outputs.
+  Adds bound-target member discovery and regression coverage, with closed method
+  descriptors independent of bound receivers. The user then directs docs and
+  website updates after implementation.
+- **Author refinement:** suggests ToString display the referenced function's full
+  name. The assistant proposes qualified target plus closed signature, without
+  captured state. The author corrects the suggested absence of an Object base:
+  Function objects should inherit Object despite being structural, as arrays can;
+  other structural types are different. The assistant implements Function-specific
+  Object inheritance, preserving value equality and separate reference identity.
+- **Assistant implementation:** exposes the transitional MethodInfo property,
+  retains absent DeclaringType for module functions, and keeps synthetic Invoke
+  distinct from its bound target. Documents the common-interface and structural
+  factory questions as future work in [the design](function-types.md),
+  [manual API reference](../api-docs/functions.md), and
+  [website feature page](../website/content/features/functions/index.md).
+  Validation results are recorded with the implementation evidence.
+
 ## 2026-09-28: Function signature member discovery
 
 - **Author:** directs continuation, then clarifies “Invoke should be discoverable

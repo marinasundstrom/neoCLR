@@ -15,6 +15,21 @@ static class FunctionBindings
         + string.Join("\n", Enumerable.Range(0, 5).Select(n => "public delegate void Action"
             + (n == 0 ? "" : "<" + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i)) + ">")
             + "(" + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i + " arg" + i)) + ");"));
+    // Metadata transport for the target-only synthesized instance property.
+    public static void Project(ModuleDefinition module)
+    {
+        var info = module.GetType("System.Introspection.MethodInfo");
+        foreach (var type in module.Types.Where(t => t.Namespace == "System"
+            && (t.Name.StartsWith("Func`") || t.Name == "Action" || t.Name.StartsWith("Action`"))))
+        {
+            var getter = new MethodDefinition("get_Function", MethodAttributes.Public
+                | MethodAttributes.HideBySig | MethodAttributes.SpecialName, info);
+            type.Methods.Add(getter);
+            type.Methods.Add(new MethodDefinition("ToString", MethodAttributes.Public
+                | MethodAttributes.HideBySig, module.TypeSystem.String));
+            type.Properties.Add(new PropertyDefinition("Function", PropertyAttributes.None, info) { GetMethod = getter });
+        }
+    }
     public static string? Type(TypeReference type)
     {
         if (type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
@@ -50,6 +65,15 @@ static class FunctionBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         var signature = Shapes[owner];
+        if (reference.HasThis && callvirt && reference.Name == "ToString"
+            && args.Length == 0 && result == "String")
+            return new(owner + "::ToString", [owner], result,
+                Instruction: $"callvirt instance {owner}::ToString()");
+        if (reference.HasThis && callvirt && reference.Name == "get_Function"
+            && args.Length == 0 && result == "System.Introspection.MethodInfo")
+            return new(owner + "::get_Function", [owner], result,
+                Instruction: $"callvirt instance {owner}::get_Function()");
+
         if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || (result != signature[^1] && !(result == "noresult" && signature[^1] == "Void")))
             throw new InvalidDataException($"Unsupported delegate invocation: {reference.FullName}; callvirt={callvirt}, actual={string.Join(',', args)} -> {result}, expected={string.Join(',', signature)}.");
         // Source unit Functions use an inhabited Void result. CLI Action is transport:

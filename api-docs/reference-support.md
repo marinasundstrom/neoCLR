@@ -7,9 +7,10 @@ runtime providers and private helpers are outside this public inventory.
 
 Many sample programs use [ArrayList](xref:System.Collections.ArrayList`1),
 [HashMap](xref:System.Collections.HashMap`2), [Sequence](xref:System.Collections.Sequence`1),
-[Option](xref:System.Option`1), [Result](xref:System.Result`2), [Func](xref:System.Func`2)
+[Option](xref:System.Option`1), [Result](xref:System.Result`2), [Function shapes](functions.md)
 and [query operators](xref:System.Linq.Operators). Their member references supplement
-the [collections](/features/collections/) and [outcomes](/features/outcomes/) walkthroughs.
+the [collections](/features/collections/), [outcomes](/features/outcomes/) and
+[Function types](/features/functions/) walkthroughs.
 
 [Enum](xref:System.Enum) additionally exposes executable development helpers for
 names and values, with TypeInfo and constrained generic overloads. Its class remains
@@ -20,7 +21,9 @@ non-constructible; its presence does not imply every .NET Enum method is support
 Public visibility in a compiler reference does not mean that every CLR support type
 is an executable neoCLR service. ValueType, Delegate, MulticastDelegate,
 Attribute, attribute metadata and NotImplementedException support compilation or
-reference-body scaffolding. Their pages identify that role. In particular,
+reference-body scaffolding. Delegate and MulticastDelegate are excluded transport
+scaffolds; the Function family page documents the runtime contract. Other scaffold
+pages identify their role. In particular,
 MulticastDelegate does not promise multicast callbacks, and the placeholder exception
 does not add exception construction or throwing to applications.
 

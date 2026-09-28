@@ -551,8 +551,8 @@ IEnumerable entry point. A Filter-plus-Map composition would require two callbac
 force callers to spell the cast; eager materialization would change query timing and
 storage costs. A dedicated library iterator reuses runtime type tests and existing
 Object conversions, adding no VM instruction. It allocates query/iterator state and
-may box value inputs; no performance improvement is claimed. Function-to-Object
-conversion and other unsupported Object representations remain limits. Existing
+may box value inputs; no performance improvement is claimed. Function Object views can now be filtered by their exact shape; other unsupported
+Object representations remain limits. Existing
 cross-platform query research above applies; this is a conventional library operator,
 not a new type conversion system.
 

@@ -281,3 +281,6 @@ conversions. Source generation remains a future alternative.
 The [retained constructor case](../reflection/#development-case-preparing-union-constructors-for-routes)
 uses these attribute descriptions to select case/carrier constructors once, then
 constructs ordinary union values through checked Reflection extensions.
+
+See [Function types and objects](../functions/) for signature identity, value bindings
+and the transitional bound-target Function property.

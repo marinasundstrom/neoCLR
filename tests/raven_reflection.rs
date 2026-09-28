@@ -1028,3 +1028,48 @@ ret
         .unwrap_err();
     assert_eq!(fault.code, neoclr::FaultCode::HeapLimitExceeded);
 }
+
+#[test]
+fn bound_function_parameters_keep_closed_module_method_identity() {
+    let app = assemble(
+        r#"
+.module FunctionParameters
+.entry Main
+.function Tagged<T>(Int32 value) -> Int32
+ldarg value
+ret
+.end
+.function Parameter<T>() -> System.Object
+function.bind fn<Int32,Int32> = Tagged<T>(Int32)
+call instance fn<Int32,Int32>::get_Function()
+callvirt instance System.Introspection.MethodInfo::GetParameters()
+ldc.i4 0
+callvirt instance System.Collections.Sequence<System.Introspection.ParameterInfo>::get_Item(Int32)
+castclass System.Object
+ret
+.end
+.function Main() -> Boolean
+call Parameter<Int32>()
+call Parameter<Int32>()
+callvirt instance System.Object::Equals(System.Object)
+brfalse Bad
+call Parameter<Int32>()
+call Parameter<String>()
+callvirt instance System.Object::Equals(System.Object)
+brtrue Bad
+ldc.bool true
+ret
+Bad:
+ldc.bool false
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let program = LoadedProgram::with_library(&app, library()).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Boolean(true)
+    );
+}

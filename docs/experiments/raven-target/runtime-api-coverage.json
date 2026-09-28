@@ -1478,12 +1478,17 @@
         {
           "service": "neoCLR.Runtime.TypeName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5038
+          "line": 5003
         },
         {
           "service": "neoCLR.Runtime.TypeEquals",
           "file": "runtime/System/Type.neoil",
           "line": 40
+        },
+        {
+          "service": "neoCLR.Runtime.TypeEquals",
+          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
+          "line": 4257
         },
         {
           "service": "neoCLR.Runtime.TypeEquals",
@@ -1498,7 +1503,7 @@
         {
           "service": "neoCLR.Runtime.TypeEquals",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4362
+          "line": 5149
         },
         {
           "service": "neoCLR.Runtime.TypeEquals",
@@ -1513,7 +1518,7 @@
         {
           "service": "neoCLR.Runtime.TypeEquals",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5254
+          "line": 5999
         },
         {
           "service": "neoCLR.Runtime.TypeEquals",
@@ -1526,11 +1531,6 @@
           "line": 6069
         },
         {
-          "service": "neoCLR.Runtime.TypeEquals",
-          "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6104
-        },
-        {
           "service": "neoCLR.Runtime.TypeArgumentCount",
           "file": "runtime/System/Type.neoil",
           "line": 24
@@ -1538,17 +1538,17 @@
         {
           "service": "neoCLR.Runtime.TypeArgumentCount",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4232
+          "line": 4197
         },
         {
           "service": "neoCLR.Runtime.TypeArgumentCount",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5124
+          "line": 5089
         },
         {
           "service": "neoCLR.Runtime.TypeArgumentCount",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5974
+          "line": 5939
         },
         {
           "service": "neoCLR.Runtime.TypeArgument",
@@ -1558,17 +1558,17 @@
         {
           "service": "neoCLR.Runtime.TypeArgument",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4246
+          "line": 4211
         },
         {
           "service": "neoCLR.Runtime.TypeArgument",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5138
+          "line": 5103
         },
         {
           "service": "neoCLR.Runtime.TypeArgument",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5988
+          "line": 5953
         },
         {
           "service": "neoCLR.Runtime.TypeFields",
@@ -1583,7 +1583,7 @@
         {
           "service": "neoCLR.Runtime.TypeFields",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 652
+          "line": 677
         },
         {
           "service": "neoCLR.Runtime.TypeMethods",
@@ -1598,7 +1598,7 @@
         {
           "service": "neoCLR.Runtime.TypeMethods",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 724
+          "line": 749
         },
         {
           "service": "neoCLR.Runtime.TypeProperties",
@@ -1613,7 +1613,7 @@
         {
           "service": "neoCLR.Runtime.TypeProperties",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 760
+          "line": 785
         },
         {
           "service": "neoCLR.Runtime.TypeInterfaces",
@@ -1628,7 +1628,7 @@
         {
           "service": "neoCLR.Runtime.TypeInterfaces",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 546
+          "line": 571
         },
         {
           "service": "neoCLR.Runtime.TypeGenericArguments",
@@ -1638,7 +1638,7 @@
         {
           "service": "neoCLR.Runtime.TypeGenericArguments",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 795
+          "line": 820
         },
         {
           "service": "neoCLR.Runtime.TypeElementType",
@@ -1648,17 +1648,17 @@
         {
           "service": "neoCLR.Runtime.TypeElementType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4667
+          "line": 4632
         },
         {
           "service": "neoCLR.Runtime.TypeElementType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5559
+          "line": 5524
         },
         {
           "service": "neoCLR.Runtime.TypeElementType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6409
+          "line": 6374
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
@@ -1703,222 +1703,222 @@
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 3952
+          "line": 3917
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 3972
+          "line": 3937
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4202
+          "line": 4167
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4218
+          "line": 4183
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4465
+          "line": 4430
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4481
+          "line": 4446
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4497
+          "line": 4462
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4513
+          "line": 4478
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4529
+          "line": 4494
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4545
+          "line": 4510
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4561
+          "line": 4526
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4577
+          "line": 4542
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4593
+          "line": 4558
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4609
+          "line": 4574
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4625
+          "line": 4590
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4641
+          "line": 4606
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5094
+          "line": 5059
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5110
+          "line": 5075
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5357
+          "line": 5322
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5373
+          "line": 5338
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5389
+          "line": 5354
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5405
+          "line": 5370
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5421
+          "line": 5386
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5437
+          "line": 5402
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5453
+          "line": 5418
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5469
+          "line": 5434
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5485
+          "line": 5450
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5501
+          "line": 5466
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5517
+          "line": 5482
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5533
+          "line": 5498
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5944
+          "line": 5909
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5960
+          "line": 5925
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6207
+          "line": 6172
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6223
+          "line": 6188
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6239
+          "line": 6204
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6255
+          "line": 6220
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6271
+          "line": 6236
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6287
+          "line": 6252
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6303
+          "line": 6268
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6319
+          "line": 6284
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6335
+          "line": 6300
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6351
+          "line": 6316
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6367
+          "line": 6332
         },
         {
           "service": "neoCLR.Runtime.TypeShape",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 6383
+          "line": 6348
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
@@ -1933,27 +1933,27 @@
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4188
+          "line": 4153
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5052
+          "line": 5017
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5066
+          "line": 5031
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5080
+          "line": 5045
         },
         {
           "service": "neoCLR.Runtime.TypeDisplayName",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5930
+          "line": 5895
         },
         {
           "service": "neoCLR.Runtime.TypeBaseType",
@@ -1968,17 +1968,17 @@
         {
           "service": "neoCLR.Runtime.TypeBaseType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4002
+          "line": 3967
         },
         {
           "service": "neoCLR.Runtime.TypeBaseType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4812
+          "line": 4777
         },
         {
           "service": "neoCLR.Runtime.TypeBaseType",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5744
+          "line": 5709
         },
         {
           "service": "neoCLR.Runtime.TypeEnumNames",
@@ -1993,7 +1993,7 @@
         {
           "service": "neoCLR.Runtime.TypeEnumNames",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 616
+          "line": 641
         },
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
@@ -2008,17 +2008,17 @@
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4050
+          "line": 4015
         },
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 4860
+          "line": 4825
         },
         {
           "service": "neoCLR.Runtime.TypeEnumUnderlying",
           "file": "runtime/raven/generated/Descriptors.helpers.neoil",
-          "line": 5792
+          "line": 5757
         }
       ]
     },

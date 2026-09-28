@@ -28,8 +28,10 @@ selection, shared captures and heap retention. Frame receivers and unpublished
 constructor receivers cannot escape through a binding. Default slots contain null;
 invocation faults with NullReference. Constructors must initialize Function fields
 before publication. Equality compares shape, closed method and retained receiver
-identity. Ordinary Object conversion and separate Function allocation identity
-are outside this slice. No multicast or native function-pointer contract is added.
+identity. Function shapes inherit Object while remaining structural. Object views
+retain the shape, support casts back, and dispatch value equality/hash and qualified
+target ToString. Copies retain reference identity; separate equal bindings are
+reference-distinct. Function: MethodInfo describes the bound target. No multicast or native function-pointer contract is added.
 Named function types remain possible future work.
 
 Examples: [method groups](../examples/source/function-objects.neo),

@@ -167,7 +167,13 @@ impl Value {
     pub fn ty(&self) -> Type {
         match self {
             Self::Uninitialized(ty) => ty.clone(),
-            Self::Function(d) => d.ty.clone(),
+            Self::Function(d) => {
+                if d.object_view {
+                    Type::from_name("System.Object")
+                } else {
+                    d.ty.clone()
+                }
+            }
             Self::Void => Type::Void,
             Self::Single(_) => Type::Single,
             Self::Double(_) => Type::Double,
@@ -238,6 +244,10 @@ impl Value {
                     object.reference.assigned()?;
                     object.view = Some(ty.clone());
                     return Ok(Self::ObjectReference(object));
+                }
+                Self::Function(mut binding) if *ty == Type::from_name("System.Object") => {
+                    binding.object_view = true;
+                    return Ok(Self::Function(binding));
                 }
                 Self::NullObjectReference(_) => return Ok(Self::NullObjectReference(ty.clone())),
                 other => return other.for_storage(ty),

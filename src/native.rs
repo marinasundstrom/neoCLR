@@ -812,6 +812,7 @@ impl Binding {
                         object.concrete_type()
                     }
                     Value::String(_) => Type::String,
+                    Value::Function(binding) => binding.ty.clone(),
                     Value::NullObjectReference(_) => {
                         return Err(Fault::coded(
                             crate::FaultCode::NullReference,

@@ -123,7 +123,9 @@ pub(crate) fn analyze(
             if let Instruction::Call(target) | Instruction::CallVirtual(target) = op {
                 let callee = crate::vm::resolve(module, target)?;
                 if crate::function_objects::is_contract(module, &callee) {
-                    function_invocations.push((instruction, callee.owner.unwrap()));
+                    if callee.name == "$Function.Invoke" {
+                        function_invocations.push((instruction, callee.owner.unwrap()));
+                    }
                     continue;
                 }
             }

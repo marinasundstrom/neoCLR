@@ -61,18 +61,20 @@ public sealed interface PropertyInfo : MemberInfo {
 
 internal sealed class RuntimeMemberInfo {
     private field StoredName: string
-    private field StoredDeclaringType: TypeInfo
+    private field StoredDeclaringType: TypeInfo?
     private field StoredMetadataToken: int
+    private field StoredModule: Option<ModuleInfo>
 
     protected init(name: string, declaringType: TypeInfo, metadataToken: int) {
         StoredName = name
         StoredDeclaringType = declaringType
         StoredMetadataToken = metadataToken
+        StoredModule = None
     }
 
     func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
-        if StoredDeclaringType.IsNominalType {
-            return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, StoredMetadataToken)
+        if StoredDeclaringType is NominalTypeInfo nominal {
+            return RuntimeServices.MemberCustomAttributes(nominal, StoredMetadataToken)
         }
         return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
@@ -80,6 +82,9 @@ internal sealed class RuntimeMemberInfo {
     val MetadataToken: Option<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
     val Module: Option<ModuleInfo> {
         get {
+            if let Some(module) = StoredModule {
+                return Some(module)
+            }
             if StoredDeclaringType is NominalTypeInfo nominal {
                 if let Some(module) = nominal.Module {
                     return Some(module)
@@ -89,7 +94,14 @@ internal sealed class RuntimeMemberInfo {
         }
     }
     val Name: string => StoredName
-    val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
+    val DeclaringType: Option<TypeInfo> {
+        get {
+            if StoredDeclaringType is TypeInfo owner {
+                return Some(owner)
+            }
+            return None
+        }
+    }
 
     override func ToString() -> string => Name
 }
@@ -158,6 +170,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
     private field StoredIsVirtual: bool
     private field StoredIsOverride: bool
     private field StoredIsAbstract: bool
+    private field StoredIdentity: string
 
     private init(
         name: string, declaringType: TypeInfo, metadataToken: int,
@@ -179,6 +192,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         StoredIsVirtual = isVirtual
         StoredIsOverride = isOverride
         StoredIsAbstract = isAbstract
+        StoredIdentity = ""
     }
 
     val ReturnType: TypeInfo => StoredReturnType
@@ -206,24 +220,12 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeMethodInfo implementation {
-            if let Some(owner) = DeclaringType {
-                if let Some(otherOwner) = implementation.DeclaringType {
-                    return owner.Equals(otherOwner) && StoredDefinitionIndex == implementation.StoredDefinitionIndex
-                }
-            }
+            return StoredIdentity == implementation.StoredIdentity
         }
         return false
     }
 
-    override func GetHashCode() -> int {
-        var hash = HashCode()
-        hash.Add(2)
-        if let Some(owner) = DeclaringType {
-            hash.Add(owner.DisplayName)
-        }
-        hash.Add(StoredDefinitionIndex)
-        return hash.ToHashCode()
-    }
+    override func GetHashCode() -> int => StoredIdentity.GetHashCode()
 
 }
 

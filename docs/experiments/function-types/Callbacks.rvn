@@ -1,5 +1,6 @@
 import System.*
 import System.Introspection.*
+import System.Option.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
@@ -12,6 +13,20 @@ public func Double(value: int) -> int => value * 2
 public func Apply(callback: (int) -> int, value: int) -> int => callback(value)
 public func Forward<T>(callback: () -> T) -> T => callback()
 
+public func MakeCounter() -> Object {
+    var count = 0
+    let next: () -> int = () => {
+        count += 1
+        return count
+    }
+    return next
+}
+
+public class Echoer {
+    func Echo(value: int) -> int => value
+}
+
+
 public extension FunctionExtensions for (int) -> int {
     func Twice(value: int) -> int {
         return self(self(value))
@@ -22,12 +37,61 @@ func Main() -> int {
     let first: (int) -> int = AddOne
     let second: (int) -> int = Double
     Check(Apply(first, 41) == 42 && Apply(second, 21) == 42, "Shared function shape")
+    let repeated: (int) -> int = AddOne
+    Check(first == repeated && first != second, "Function value equality")
+    Check(first.ToString() == "[Contracts]AddOne(System.Int32) -> System.Int32", first.ToString())
+    Check(first.ToString() == repeated.ToString() && first.ToString() != second.ToString(), "Target display is stable")
+    Check(first.Function.Name == "AddOne", "Function reports bound target")
+    Check(first.Function.Equals(repeated.Function), "Repeated target descriptor identity")
+    Check(first.Function.GetHashCode() == repeated.Function.GetHashCode(), "Target hash consistency")
+    Check(!first.Function.Equals(second.Function), "Different target descriptors")
+    Check(first.Function.ReturnType.Equals(typeof(int)), "Target return type")
+    Check(first.Function.GetParameters()[0].ParameterType.Equals(typeof(int)), "Target parameters")
+    let firstObject: Object = first
+    let repeatedObject: Object = repeated
+    let secondObject: Object = second
+    Check(firstObject.Equals(repeatedObject) && !firstObject.Equals(secondObject), "Object virtual value equality")
+    Check(!firstObject.Equals("other") && !"other".Equals(firstObject), "Mixed Object equality is false")
+    Check(firstObject.GetHashCode() == repeatedObject.GetHashCode(), "Equal bindings have equal Object hashes")
+    Check(firstObject.ToString() == first.ToString(), "Object virtual target display")
+    let restored = ((int) -> int)firstObject
+    Check(restored == first && restored(41) == 42, "Object cast-back restores callable shape")
+    Check(firstObject.GetType().Equals(typeof((int) -> int)), "Object GetType retains Function shape")
+    Check(Object.ReferenceEquals(firstObject, firstObject), "Copied binding preserves reference identity")
+    Check(!Object.ReferenceEquals(firstObject, repeatedObject), "Separate equal bindings have separate reference identity")
+    if let Some(baseType) = typeof((int) -> int).BaseType {
+        Check(baseType.Equals(typeof(Object)), "Function shape inherits Object")
+    } else {
+        System.Fault("Missing Object base")
+    }
+    let left = Echoer()
+    let right = Echoer()
+    let leftFunction: (int) -> int = left.Echo
+    let sameFunction: (int) -> int = left.Echo
+    let rightFunction: (int) -> int = right.Echo
+    Check(leftFunction == sameFunction && leftFunction != rightFunction, "Value equality includes receiver identity")
+    Check(leftFunction.Function.Equals(rightFunction.Function), "MethodInfo is independent of receiver")
+    Check(leftFunction.Function.Equals(typeof(Echoer).GetMethods()[0]), "Target descriptor agrees with ordinary member discovery")
+    Check(leftFunction.ToString() == rightFunction.ToString(), "Display does not inspect receiver identity")
+    Check(leftFunction.ToString() == "[Contracts]Echoer.Echo(System.Int32) -> System.Int32", "Qualified instance target display")
+    if let Some(owner) = leftFunction.Function.DeclaringType {
+        Check(owner.Equals(typeof(Echoer)), "Instance target preserves declaring type")
+    } else {
+        System.Fault("Missing target declaring type")
+    }
     Check(first.Twice(40) == 42, "Structural function extension member")
     let shape = typeof((int) -> int)
     Check(!shape.IsNominalType && !(shape is NominalTypeInfo), "Function shape is structural")
     Check(!(shape is MemberInfo), "Function shape has no declaration identity")
     Check(shape.Equals(typeof((int) -> int)), "Function shape identity")
     Check(!shape.Equals(typeof(() -> int)), "Parameter shape participates in identity")
+
+    let retainedObject = MakeCounter()
+    let hashBefore = retainedObject.GetHashCode()
+    System.Runtime.GC.Collect()
+    let retained = (() -> int)retainedObject
+    Check(retained() == 1 && retained() == 2, "Object view retains captures after creator returns and GC")
+    Check(retainedObject.GetHashCode() == hashBefore, "Mutable captures do not change value hash")
 
     var count = 0
     let next: () -> int = () => {

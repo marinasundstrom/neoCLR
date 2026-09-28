@@ -245,6 +245,14 @@ pub(super) fn property(
 ) -> Result<Option<(Ty, String, crate::metadata::Function)>, Fault> {
     let module = crate::library::system()?;
     let metadata = crate::assembler::parse_type(&ty.il())?;
+    if matches!(metadata, crate::metadata::Type::Function(_)) && name == "Function" {
+        let getter = crate::function_objects::function_getter(module, &metadata)?;
+        return Ok(Some((
+            Ty::from_metadata(&getter.returns)?,
+            format!("instance {}::get_Function()", ty.il()),
+            getter,
+        )));
+    }
     for owner in owners(module, &metadata)? {
         let Some(definition) = module.type_definition(&owner) else {
             continue;

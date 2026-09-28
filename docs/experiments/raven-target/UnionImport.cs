@@ -779,6 +779,13 @@ static class UnionImport
                         code.AppendLine(instruction.OpCode.Name).Append(BooleanBindings.Convert("Boolean", "Int32"));
                         break;
                     case Code.Ceq:
+                        if (stack.Count >= 2 && FunctionBindings.IsType(stack[^1].Type)
+                            && stack[^1].Type == stack[^2].Type)
+                        {
+                            Pop(); Pop(); Push(new("Int32"));
+                            code.AppendLine("ceq").Append(BooleanBindings.Convert("Boolean", "Int32"));
+                            break;
+                        }
                         if (stack.Count >= 2 &&
                             (stack[^1].Type == "FaultNull" && ManagedArrayBindings.IsReference(stack[^2].Type)
                             || stack[^2].Type == "FaultNull" && ManagedArrayBindings.IsReference(stack[^1].Type)))

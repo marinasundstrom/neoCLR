@@ -53,15 +53,16 @@ contains the complete source examples and tracks their current validation.
 `typeof((int) -> int)` returns common TypeInfo. IsNominalType is false; the
 descriptor has no NominalTypeInfo or MemberInfo view. DisplayName is diagnostic
 shape text. Member queries remain part of TypeInfo; absence of a declaration name
-does not prohibit members or extensions. Dedicated parameter/result introspection
-and a general RavenDoc structural-family renderer remain open.
+does not prohibit members or extensions. FunctionTypeInfo exposes Parameters and ReturnType directly; a general RavenDoc
+structural-family renderer remains open.
 
 The transport carrier types are explicitly excluded from generated type pages;
 member signatures retain their matching CLI documentation IDs. Function equality compares shape, closed method and retained receiver identity.
 Copies share captures; they do not copy a receiver. Default Function slots contain
 null and Invoke faults with NullReference. Constructors must initialize their
-Function fields before publication. Ordinary Object conversion and a separate
-Function allocation identity are not supported in this slice.
+Function fields before publication. Function objects inherit Object, support Object views and cast-back, and preserve
+their precise signature through GetType. Separate bindings have separate reference
+identity even when value-equal; copies retain reference identity.
 There is no multicast combination or native function-pointer interop contract.
 Legacy `.delegate`, `delegate.bind` and serialized Delegate representations are
 rejected. Rebuild applications with matching compiler, reference, library and
@@ -91,3 +92,47 @@ directly convert to each other solely on signature equality. Non-nominal types a
 not generally inheritable; permitted kinds need explicit rules. This proposal does
 not make Array, Tuple, Union or Intersection inheritable. Conversion/rebinding rules
 remain future design work.
+
+## Bound target property (development)
+
+Every Function signature synthesizes a read-only public instance property
+`Function: MethodInfo`. Read it on a Function object to inspect the actual bound
+method/function. The signature's `FunctionTypeInfo.InvokeMethod` continues to
+represent `Invoke`; it is not the bound target. `GetProperties()` exposes Function,
+and `GetMethods()` includes its `get_Function` accessor as well as Invoke.
+All synthetic methods have absent module, token and definition-index metadata.
+The synthetic property's legacy integer DefinitionIndex is -1 and is not a
+metadata-table index; its module/token are absent. Dynamic execution of these
+synthetic descriptors returns UnboundMetadata; use the typed property or invocation.
+
+The target MethodInfo has its available module/token/definition information,
+closed parameter and result types, and a declaring type when the target has one.
+Module functions have no DeclaringType. Their custom attributes and dynamic
+reflection invocation are not supported by the current type-based services.
+The descriptor describes the method independently of a bound receiver.
+Repeated reads return equal descriptors, without promising wrapper identity.
+Null Function property access raises NullReference.
+
+Same signature means same Function type. Function objects are value bindings:
+the same closed target and receiver/capture identity compare equal, regardless
+of when the bindings were created. Different targets, generic instantiations or
+receivers differ. Equal computed results do not imply equal Function objects.
+A future common FunctionInfo interface is deferred; Function returns MethodInfo now.
+
+## Object members (development)
+
+Function types have Object as their BaseType while IsNominalType remains false.
+They synthesize virtual overrides of ToString(), Equals(Object?) and GetHashCode(),
+also discoverable through GetMethods. Typed and Object calls agree: Equals compares
+closed target and receiver identity, equal values hash equally, and ToString displays
+the module-qualified target name with its closed signature. GetType on an Object
+view returns the actual Function signature. Type tests and casts back require the
+exact compatible shape; a different signature does not become callable by casting.
+Object.ReferenceEquals compares binding creation identity, not value equality.
+
+ToString does not invoke user code, inspect receiver state or serialize captures.
+Lambdas may display compiler-generated target names. The diagnostic spelling may
+evolve and is not an equality key. Imported source
+names are retained independently of lowered implementation names. Null member access
+raises NullReference. This Object inheritance contract applies to Functions;
+structural identity alone does not imply the same behavior for other type families.

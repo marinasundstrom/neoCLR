@@ -411,7 +411,7 @@ impl Query {
                             )
                         })
                         .map(|(index, f)| {
-                            Ok(member_record(
+                            member_record(
                                 module,
                                 crate::metadata_tokens::member(
                                     module,
@@ -448,7 +448,7 @@ impl Query {
                                     Value::Boolean(false),
                                     index_value(index)?,
                                 ],
-                            ))
+                            )
                         }),
                     limits,
                 )
@@ -457,11 +457,19 @@ impl Query {
                 let constructors = matches!(self, Self::Constructors);
                 validate_flags(argument)?;
                 if matches!(ty, Type::Function(_)) && !constructors {
-                    let invoke = crate::function_objects::contract(module, &ty)?;
+                    let members = [
+                        crate::function_objects::contract(module, &ty)?,
+                        crate::function_objects::function_getter(module, &ty)?,
+                        crate::function_objects::to_string_contract(module, &ty)?,
+                        crate::function_objects::object_contract(module, &ty, "Equals")?,
+                        crate::function_objects::object_contract(module, &ty, "GetHashCode")?,
+                    ];
                     return array(
                         "System.Introspection.MethodInfo",
-                        selected(argument, Visibility::Public, false)
-                            .then(|| method(module, &ty, &invoke, &[], limits)),
+                        members
+                            .iter()
+                            .filter(|_| selected(argument, Visibility::Public, false))
+                            .map(|f| method(module, &ty, f, &[], limits)),
                         limits,
                     );
                 }
@@ -495,6 +503,40 @@ impl Query {
             }
             Self::Properties => {
                 validate_flags(argument)?;
+                if matches!(ty, Type::Function(_)) {
+                    let getter = crate::function_objects::function_getter(module, &ty)?;
+                    return array(
+                        "System.Introspection.PropertyInfo",
+                        selected(argument, Visibility::Public, false).then(|| {
+                            member_record(
+                                module,
+                                0,
+                                "System.Introspection.PropertyInfo",
+                                vec![
+                                    Value::String("Function".into()),
+                                    type_value(module, &ty)?,
+                                    type_value(module, &getter.returns)?,
+                                    Value::Boolean(false),
+                                    Value::Boolean(true),
+                                    Value::Boolean(false),
+                                    Value::Int32(-1),
+                                    array(
+                                        "System.Introspection.ParameterInfo",
+                                        std::iter::empty(),
+                                        limits,
+                                    )?,
+                                    option(
+                                        module,
+                                        "System.Introspection.MethodInfo",
+                                        Some(method(module, &ty, &getter, &[], limits)?),
+                                    )?,
+                                    option(module, "System.Introspection.MethodInfo", None)?,
+                                ],
+                            )
+                        }),
+                        limits,
+                    );
+                }
                 array(
                     "System.Introspection.PropertyInfo",
                     definition
@@ -573,7 +615,7 @@ impl Query {
                                         option(module, "System.Introspection.MethodInfo", get)?,
                                         option(module, "System.Introspection.MethodInfo", set)?,
                                     ],
-                                )))
+                                )?))
                             })();
                             match result {
                                 Ok(None) => None,
@@ -663,11 +705,17 @@ fn attribute_data(
     ))
 }
 
-fn member_record(module: &Module, token: i32, name: &str, mut fields: Vec<Value>) -> Value {
+fn member_record(
+    module: &Module,
+    token: i32,
+    name: &str,
+    mut fields: Vec<Value>,
+) -> Result<Value, Fault> {
     if type_contract(module) == "System.Introspection.TypeInfo" {
         fields.insert(2, Value::Int32(token));
+        fields.insert(3, option(module, "System.Introspection.ModuleInfo", None)?);
     }
-    record(name, fields)
+    Ok(record(name, fields))
 }
 fn type_contract(module: &Module) -> &'static str {
     if module
@@ -801,7 +849,8 @@ fn parameters(
             if type_contract(module) == "System.Introspection.TypeInfo" {
                 let f = function
                     .ok_or_else(|| Fault::new("parameter snapshot requires declaring member"))?;
-                let synthesized = matches!(declaring_type, Type::Function(_));
+                let synthesized =
+                    f.definition.is_none() && matches!(declaring_type, Type::Function(_));
                 fields.push(Value::Int32(if synthesized {
                     0
                 } else {
@@ -828,6 +877,13 @@ fn parameters(
                 fields.push(type_value(module, declaring_type)?);
                 fields.push(Value::Int32(member_kind));
                 fields.push(index_value(member_index)?);
+                fields.push(Value::String(
+                    format!(
+                        "{:?}|{:?}|{member_kind}|{member_index}|{:?}",
+                        f.definition, declaring_type, f.generic_arguments
+                    )
+                    .into(),
+                ));
             }
             Ok(record("System.Introspection.ParameterInfo", fields))
         }),
@@ -841,12 +897,12 @@ fn method(
     arguments: &[Type],
     limits: &Limits,
 ) -> Result<Value, Fault> {
-    if !f.generic_parameters.is_empty() {
+    if !f.generic_parameters.is_empty() && f.generic_arguments.len() != f.generic_parameters.len() {
         return Err(Fault::new(
             "generic method definition reflection is not yet supported",
         ));
     }
-    let synthesized = matches!(owner, Type::Function(_));
+    let synthesized = f.definition.is_none() && matches!(owner, Type::Function(_));
     let definition_index = if synthesized {
         -1
     } else {
@@ -863,7 +919,7 @@ fn method(
         .iter()
         .map(|t| t.substitute_type_parameters(arguments))
         .collect::<Result<Vec<_>, _>>()?;
-    Ok(member_record(
+    let mut result = member_record(
         module,
         if synthesized {
             0
@@ -880,7 +936,7 @@ fn method(
                 // Imported bodies may use escaped names. Preserve source names
                 // for display without changing dispatch identities.
                 if synthesized {
-                    "Invoke"
+                    f.name.strip_prefix("$Function.").unwrap()
                 } else {
                     f.origin
                         .as_ref()
@@ -908,9 +964,16 @@ fn method(
                 module,
                 Some(f),
                 owner,
-                2, // Method identity; keep in step with the descriptor hash kinds.
+                if f.owner.is_none() { 4 } else { 2 }, // Module targets have no declaring-type identity.
                 if synthesized {
-                    0
+                    match f.name.as_str() {
+                        "$Function.Invoke" => 0,
+                        "$Function.get_Function" => 1,
+                        "$Function.ToString" => 2,
+                        "$Function.Equals" => 3,
+                        "$Function.GetHashCode" => 4,
+                        _ => return Err(Fault::new("unknown synthesized Function member")),
+                    }
                 } else {
                     definition_index as usize
                 },
@@ -930,7 +993,53 @@ fn method(
             Value::Boolean(f.is_override),
             Value::Boolean(crate::interfaces::is_bodyless(module, f)),
         ],
-    ))
+    )?;
+    if type_contract(module) == "System.Introspection.TypeInfo" {
+        if let Value::Object { fields, .. } = &mut result {
+            fields.push(Value::String(
+                format!(
+                    "{:?}|{:?}|{}|{:?}",
+                    f.definition, owner, f.name, f.generic_arguments
+                )
+                .into(),
+            ));
+        }
+    }
+    Ok(result)
+}
+
+/// The binding's target descriptor, never the signature's synthesized Invoke.
+pub(crate) fn bound_function(
+    module: &Module,
+    binding: &crate::Function,
+    target: &Function,
+    limits: &Limits,
+) -> Result<Value, Fault> {
+    let owner = target.owner.as_ref().unwrap_or(&binding.ty);
+    // A module function has no nominal owner. Use the shape only as the internal
+    // parameter identity key, and clear the public declaring type below.
+    let mut result = method(module, owner, target, &[], limits)?;
+    if let Value::Object { fields, .. } = &mut result {
+        if target.owner.is_none() {
+            fields[1] = Value::NullObjectReference(Type::from_name(type_contract(module)));
+        }
+        if type_contract(module) == "System.Introspection.TypeInfo" {
+            let id = target
+                .definition
+                .as_ref()
+                .ok_or_else(|| Fault::new("missing target identity"))?;
+            fields[3] = option(
+                module,
+                "System.Introspection.ModuleInfo",
+                Some(crate::metadata_tokens::module_value(
+                    module,
+                    target.origin.as_ref(),
+                    &id.module,
+                )?),
+            )?;
+        }
+    }
+    Ok(result)
 }
 
 pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<Type, Fault> {

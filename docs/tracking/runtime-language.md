@@ -38,7 +38,12 @@ Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
 InvokeMethod remains the member-reflection view; no generalized function-info
 interface is introduced.
 
-Ordinary Object conversion, dynamic invocation through reflection and general
+Function objects now expose Function: MethodInfo for the closed bound target and
+inherit Object without becoming nominal. Object views preserve GetType, exact-shape
+cast-back, value equality/hash and diagnostic qualified-target ToString. Copies
+preserve reference identity; separate equal bindings have distinct reference identity.
+GetProperties exposes Function; GetMethods also exposes its getter and Object
+overrides. Dynamic invocation of synthetic reflection descriptors and general
 structural member enumeration remain follow-up work. Current member/extension
 documentation includes the manual Function family page and generated FunctionTypeInfo
 reference; a general RavenDoc structural renderer remains future work.
