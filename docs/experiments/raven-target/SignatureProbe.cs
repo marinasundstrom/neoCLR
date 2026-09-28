@@ -739,8 +739,8 @@ static class SignatureProbe
         var invoke = func.Methods.Single(m => m.Name == "Invoke");
         var voidInvoke = Reference(invoke, voidFunc);
         Check("Generic Void return stays a value signature", RuntimeSignatures.Match(voidInvoke, invoke, GenericUnionBindings.Type).Result == "Void");
-        Check("Generic completion delegate preserves inhabited unit", DelegateBindings.Bind(voidInvoke, invoke, true)?.Result == "Void");
-        Reject("Delegate requires virtual invocation", () => DelegateBindings.Bind(voidInvoke, invoke, false));
+        Check("Generic completion delegate preserves inhabited unit", FunctionBindings.Bind(voidInvoke, invoke, true)?.Result == "Void");
+        Reject("Delegate requires virtual invocation", () => FunctionBindings.Bind(voidInvoke, invoke, false));
         var taskDefinition = module.GetType("System.Tasks.Task`1");
         var taskInt = new GenericInstanceType(taskDefinition);
         taskInt.GenericArguments.Add(module.TypeSystem.Int32);

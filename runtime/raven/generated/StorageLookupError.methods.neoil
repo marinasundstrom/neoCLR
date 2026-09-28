@@ -1083,218 +1083,218 @@ ldobj System.Storage.StorageLookupError
 M00000010_IL_0009:
 stloc local0
 M00000010_IL_000a:
+ldloc local0
 M00000010_IL_000b:
-ldloc local0
-M00000010_IL_000c:
 stloc local2
-M00000010_IL_000d:
-ldloca local2
-M00000010_IL_000f:
+M00000010_IL_000c:
 ldloca local3
-M00000010_IL_0011:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.InvalidPath&)
+M00000010_IL_000e:
+initobj System.Storage.StorageLookupError.InvalidPath
+M00000010_IL_0014:
+ldloca local2
 M00000010_IL_0016:
-brfalse M00000010_IL_0034
-M00000010_IL_001b:
-ldloc local3
-M00000010_IL_001c:
-pop
+ldloca local3
+M00000010_IL_0018:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.InvalidPath&)
 M00000010_IL_001d:
-M00000010_IL_001e:
-br M00000010_IL_0029
-M00000010_IL_0029:
-ldstr "InvalidPath"
+brfalse M00000010_IL_003a
+M00000010_IL_0022:
+M00000010_IL_0023:
+br M00000010_IL_002e
 M00000010_IL_002e:
-stloc local1
 M00000010_IL_002f:
-br M00000010_IL_015b
+ldstr "InvalidPath"
 M00000010_IL_0034:
+stloc local1
 M00000010_IL_0035:
-M00000010_IL_0036:
-ldloc local0
-M00000010_IL_0037:
-stloc local4
-M00000010_IL_0039:
-ldloca local4
+br M00000010_IL_017f
+M00000010_IL_003a:
 M00000010_IL_003b:
+ldloc local0
+M00000010_IL_003c:
+stloc local4
+M00000010_IL_003e:
 ldloca local5
-M00000010_IL_003d:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.NotFound&)
-M00000010_IL_0042:
-brfalse M00000010_IL_0061
-M00000010_IL_0047:
-ldloc local5
-M00000010_IL_0049:
-pop
+M00000010_IL_0040:
+initobj System.Storage.StorageLookupError.NotFound
+M00000010_IL_0046:
+ldloca local4
+M00000010_IL_0048:
+ldloca local5
 M00000010_IL_004a:
-M00000010_IL_004b:
-br M00000010_IL_0056
-M00000010_IL_0056:
-ldstr "NotFound"
-M00000010_IL_005b:
-stloc local1
-M00000010_IL_005c:
-br M00000010_IL_015b
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.NotFound&)
+M00000010_IL_004f:
+brfalse M00000010_IL_006c
+M00000010_IL_0054:
+M00000010_IL_0055:
+br M00000010_IL_0060
+M00000010_IL_0060:
 M00000010_IL_0061:
-M00000010_IL_0062:
-M00000010_IL_0063:
-ldloc local0
-M00000010_IL_0064:
-stloc local6
+ldstr "NotFound"
 M00000010_IL_0066:
-ldloca local6
-M00000010_IL_0068:
+stloc local1
+M00000010_IL_0067:
+br M00000010_IL_017f
+M00000010_IL_006c:
+M00000010_IL_006d:
+ldloc local0
+M00000010_IL_006e:
+stloc local6
+M00000010_IL_0070:
 ldloca local7
-M00000010_IL_006a:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.AccessDenied&)
-M00000010_IL_006f:
-brfalse M00000010_IL_008e
-M00000010_IL_0074:
-ldloc local7
-M00000010_IL_0076:
-pop
-M00000010_IL_0077:
+M00000010_IL_0072:
+initobj System.Storage.StorageLookupError.AccessDenied
 M00000010_IL_0078:
-br M00000010_IL_0083
-M00000010_IL_0083:
-ldstr "AccessDenied"
-M00000010_IL_0088:
-stloc local1
-M00000010_IL_0089:
-br M00000010_IL_015b
-M00000010_IL_008e:
-M00000010_IL_008f:
-M00000010_IL_0090:
-ldloc local0
-M00000010_IL_0091:
-stloc local8
+ldloca local6
+M00000010_IL_007a:
+ldloca local7
+M00000010_IL_007c:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.AccessDenied&)
+M00000010_IL_0081:
+brfalse M00000010_IL_009e
+M00000010_IL_0086:
+M00000010_IL_0087:
+br M00000010_IL_0092
+M00000010_IL_0092:
 M00000010_IL_0093:
-ldloca local8
-M00000010_IL_0095:
+ldstr "AccessDenied"
+M00000010_IL_0098:
+stloc local1
+M00000010_IL_0099:
+br M00000010_IL_017f
+M00000010_IL_009e:
+M00000010_IL_009f:
+ldloc local0
+M00000010_IL_00a0:
+stloc local8
+M00000010_IL_00a2:
 ldloca local9
-M00000010_IL_0097:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.WrongKind&)
-M00000010_IL_009c:
-brfalse M00000010_IL_00bb
-M00000010_IL_00a1:
-ldloc local9
-M00000010_IL_00a3:
-pop
 M00000010_IL_00a4:
-M00000010_IL_00a5:
-br M00000010_IL_00b0
-M00000010_IL_00b0:
-ldstr "WrongKind"
-M00000010_IL_00b5:
-stloc local1
-M00000010_IL_00b6:
-br M00000010_IL_015b
-M00000010_IL_00bb:
-M00000010_IL_00bc:
-M00000010_IL_00bd:
-ldloc local0
-M00000010_IL_00be:
-stloc local10
-M00000010_IL_00c0:
-ldloca local10
-M00000010_IL_00c2:
-ldloca local11
+initobj System.Storage.StorageLookupError.WrongKind
+M00000010_IL_00aa:
+ldloca local8
+M00000010_IL_00ac:
+ldloca local9
+M00000010_IL_00ae:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.WrongKind&)
+M00000010_IL_00b3:
+brfalse M00000010_IL_00d0
+M00000010_IL_00b8:
+M00000010_IL_00b9:
+br M00000010_IL_00c4
 M00000010_IL_00c4:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.IoFailure&)
-M00000010_IL_00c9:
-brfalse M00000010_IL_00e8
-M00000010_IL_00ce:
-ldloc local11
+M00000010_IL_00c5:
+ldstr "WrongKind"
+M00000010_IL_00ca:
+stloc local1
+M00000010_IL_00cb:
+br M00000010_IL_017f
 M00000010_IL_00d0:
-pop
 M00000010_IL_00d1:
+ldloc local0
 M00000010_IL_00d2:
-br M00000010_IL_00dd
-M00000010_IL_00dd:
-ldstr "IoFailure"
-M00000010_IL_00e2:
-stloc local1
-M00000010_IL_00e3:
-br M00000010_IL_015b
-M00000010_IL_00e8:
-M00000010_IL_00e9:
+stloc local10
+M00000010_IL_00d4:
+ldloca local11
+M00000010_IL_00d6:
+initobj System.Storage.StorageLookupError.IoFailure
+M00000010_IL_00dc:
+ldloca local10
+M00000010_IL_00de:
+ldloca local11
+M00000010_IL_00e0:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.IoFailure&)
+M00000010_IL_00e5:
+brfalse M00000010_IL_0102
 M00000010_IL_00ea:
-ldloc local0
 M00000010_IL_00eb:
-stloc local12
-M00000010_IL_00ed:
-ldloca local12
-M00000010_IL_00ef:
-ldloca local13
-M00000010_IL_00f1:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.InvalidRange&)
+br M00000010_IL_00f6
 M00000010_IL_00f6:
-brfalse M00000010_IL_0115
-M00000010_IL_00fb:
-ldloc local13
+M00000010_IL_00f7:
+ldstr "IoFailure"
+M00000010_IL_00fc:
+stloc local1
 M00000010_IL_00fd:
-pop
-M00000010_IL_00fe:
-M00000010_IL_00ff:
-br M00000010_IL_010a
-M00000010_IL_010a:
-ldstr "InvalidRange"
-M00000010_IL_010f:
-stloc local1
+br M00000010_IL_017f
+M00000010_IL_0102:
+M00000010_IL_0103:
+ldloc local0
+M00000010_IL_0104:
+stloc local12
+M00000010_IL_0106:
+ldloca local13
+M00000010_IL_0108:
+initobj System.Storage.StorageLookupError.InvalidRange
+M00000010_IL_010e:
+ldloca local12
 M00000010_IL_0110:
-br M00000010_IL_015b
-M00000010_IL_0115:
-M00000010_IL_0116:
-ldloc local0
+ldloca local13
+M00000010_IL_0112:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.InvalidRange&)
 M00000010_IL_0117:
-stloc local14
-M00000010_IL_0119:
-ldloca local14
-M00000010_IL_011b:
-ldloca local15
+brfalse M00000010_IL_0134
+M00000010_IL_011c:
 M00000010_IL_011d:
-call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.LimitExceeded&)
-M00000010_IL_0122:
-brfalse M00000010_IL_0141
-M00000010_IL_0127:
-ldloc local15
+br M00000010_IL_0128
+M00000010_IL_0128:
 M00000010_IL_0129:
-pop
-M00000010_IL_012a:
-M00000010_IL_012b:
-br M00000010_IL_0136
-M00000010_IL_0136:
-ldstr "LimitExceeded"
-M00000010_IL_013b:
+ldstr "InvalidRange"
+M00000010_IL_012e:
 stloc local1
-M00000010_IL_013c:
-br M00000010_IL_015b
-M00000010_IL_0141:
-M00000010_IL_0142:
+M00000010_IL_012f:
+br M00000010_IL_017f
+M00000010_IL_0134:
+M00000010_IL_0135:
 ldloc local0
-M00000010_IL_0143:
-pop
+M00000010_IL_0136:
+stloc local14
+M00000010_IL_0138:
+ldloca local15
+M00000010_IL_013a:
+initobj System.Storage.StorageLookupError.LimitExceeded
+M00000010_IL_0140:
+ldloca local14
+M00000010_IL_0142:
+ldloca local15
 M00000010_IL_0144:
-ldc.i4 1
-M00000010_IL_0145:
-brfalse M00000010_IL_0156
-M00000010_IL_014a:
-M00000010_IL_014b:
-ldstr "Empty"
-M00000010_IL_0150:
-stloc local1
-M00000010_IL_0151:
-br M00000010_IL_015b
-M00000010_IL_0156:
-M00000010_IL_0157:
-M00000010_IL_0158:
-M00000010_IL_0159:
+call instance System.Storage.StorageLookupError::TryGetValue(System.Storage.StorageLookupError.LimitExceeded&)
+M00000010_IL_0149:
+brfalse M00000010_IL_0165
+M00000010_IL_014e:
+M00000010_IL_014f:
+br M00000010_IL_015a
 M00000010_IL_015a:
+ldstr "LimitExceeded"
+M00000010_IL_015f:
+stloc local1
+M00000010_IL_0160:
+br M00000010_IL_017f
+M00000010_IL_0165:
+M00000010_IL_0166:
+ldloc local0
+M00000010_IL_0167:
+pop
+M00000010_IL_0168:
+ldc.i4 1
+M00000010_IL_0169:
+brfalse M00000010_IL_017a
+M00000010_IL_016e:
+M00000010_IL_016f:
+ldstr "Empty"
+M00000010_IL_0174:
+stloc local1
+M00000010_IL_0175:
+br M00000010_IL_017f
+M00000010_IL_017a:
+M00000010_IL_017b:
+M00000010_IL_017c:
+M00000010_IL_017d:
+M00000010_IL_017e:
 fault "Guest program reached a terminal failure"
-M00000010_IL_015b:
-M00000010_IL_015c:
+M00000010_IL_017f:
+M00000010_IL_0180:
 ldloc local1
-M00000010_IL_015d:
+M00000010_IL_0181:
 ret
 .end
 .method instance byref get_Value() -> System.Object

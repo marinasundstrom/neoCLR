@@ -51,7 +51,7 @@ static class AsyncBindings
             "GetStateMachine" => ("", state),
             "AwaitOnCompleted" => (Prefix + "ITaskAwaiter," + state, "noresult"),
             "MoveNext" => ("", "noresult"),
-            "OnCompleted" => ("System.Func<Void>", "noresult"),
+            "OnCompleted" => ("fn<Void>", "noresult"),
             _ => throw new InvalidDataException("Unsupported async member: " + definition.FullName)
         };
         if (string.Join(',', args) != expected.Item1 || result != expected.Item2)

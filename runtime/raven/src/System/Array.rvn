@@ -19,7 +19,7 @@ public class Array<T> : Collections.MutableSequence<T> {
         set { m_value[index] = value }
     }
 
-    func ForEach(action: Func<T, Void>) {
+    func ForEach(action: (T) -> Void) {
         let buffer = m_value
         var index = 0
         while index < buffer.Length {

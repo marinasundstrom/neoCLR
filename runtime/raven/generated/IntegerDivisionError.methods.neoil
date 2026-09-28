@@ -327,79 +327,79 @@ ldloc local0
 M00000006_IL_000b:
 stloc local2
 M00000006_IL_000c:
-ldloca local2
-M00000006_IL_000e:
 ldloca local3
-M00000006_IL_0010:
+M00000006_IL_000e:
+initobj System.IntegerDivisionError.DivisionByZero
+M00000006_IL_0014:
+ldloca local2
+M00000006_IL_0016:
+ldloca local3
+M00000006_IL_0018:
 call instance System.IntegerDivisionError::TryGetValue(System.IntegerDivisionError.DivisionByZero&)
-M00000006_IL_0015:
-brfalse M00000006_IL_0033
-M00000006_IL_001a:
-ldloc local3
-M00000006_IL_001b:
-pop
-M00000006_IL_001c:
 M00000006_IL_001d:
-br M00000006_IL_0028
-M00000006_IL_0028:
-ldstr "DivisionByZero"
-M00000006_IL_002d:
-stloc local1
+brfalse M00000006_IL_0039
+M00000006_IL_0022:
+M00000006_IL_0023:
+br M00000006_IL_002e
 M00000006_IL_002e:
-br M00000006_IL_007a
+ldstr "DivisionByZero"
 M00000006_IL_0033:
+stloc local1
 M00000006_IL_0034:
-M00000006_IL_0035:
-ldloc local0
-M00000006_IL_0036:
-stloc local4
-M00000006_IL_0038:
-ldloca local4
+br M00000006_IL_0085
+M00000006_IL_0039:
 M00000006_IL_003a:
-ldloca local5
-M00000006_IL_003c:
-call instance System.IntegerDivisionError::TryGetValue(System.IntegerDivisionError.Overflow&)
-M00000006_IL_0041:
-brfalse M00000006_IL_0060
-M00000006_IL_0046:
-ldloc local5
-M00000006_IL_0048:
-pop
-M00000006_IL_0049:
-M00000006_IL_004a:
-br M00000006_IL_0055
-M00000006_IL_0055:
-ldstr "Overflow"
-M00000006_IL_005a:
-stloc local1
-M00000006_IL_005b:
-br M00000006_IL_007a
-M00000006_IL_0060:
-M00000006_IL_0061:
 ldloc local0
-M00000006_IL_0062:
-pop
-M00000006_IL_0063:
-ldc.i4 1
-M00000006_IL_0064:
-brfalse M00000006_IL_0075
-M00000006_IL_0069:
-M00000006_IL_006a:
-ldstr "Empty"
-M00000006_IL_006f:
+M00000006_IL_003b:
+stloc local4
+M00000006_IL_003d:
+ldloca local5
+M00000006_IL_003f:
+initobj System.IntegerDivisionError.Overflow
+M00000006_IL_0045:
+ldloca local4
+M00000006_IL_0047:
+ldloca local5
+M00000006_IL_0049:
+call instance System.IntegerDivisionError::TryGetValue(System.IntegerDivisionError.Overflow&)
+M00000006_IL_004e:
+brfalse M00000006_IL_006b
+M00000006_IL_0053:
+M00000006_IL_0054:
+br M00000006_IL_005f
+M00000006_IL_005f:
+M00000006_IL_0060:
+ldstr "Overflow"
+M00000006_IL_0065:
 stloc local1
-M00000006_IL_0070:
-br M00000006_IL_007a
+M00000006_IL_0066:
+br M00000006_IL_0085
+M00000006_IL_006b:
+M00000006_IL_006c:
+ldloc local0
+M00000006_IL_006d:
+pop
+M00000006_IL_006e:
+ldc.i4 1
+M00000006_IL_006f:
+brfalse M00000006_IL_0080
+M00000006_IL_0074:
 M00000006_IL_0075:
-M00000006_IL_0076:
-M00000006_IL_0077:
-M00000006_IL_0078:
-M00000006_IL_0079:
-fault "Guest program reached a terminal failure"
+ldstr "Empty"
 M00000006_IL_007a:
+stloc local1
 M00000006_IL_007b:
+br M00000006_IL_0085
+M00000006_IL_0080:
+M00000006_IL_0081:
+M00000006_IL_0082:
+M00000006_IL_0083:
+M00000006_IL_0084:
+fault "Guest program reached a terminal failure"
+M00000006_IL_0085:
+M00000006_IL_0086:
 ldloc local1
-M00000006_IL_007c:
+M00000006_IL_0087:
 ret
 .end
 .method instance byref get_Value() -> System.Object

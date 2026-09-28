@@ -36,17 +36,17 @@ func Done() {
 }
 
 func Main() {
-    let zero: Func<int> = Number
-    let one: Func<int, int> = Identity
-    let two: Func<int, int, int> = First
-    let three: Func<int, int, int, int> = Middle
-    let four: Func<int, int, int, int, int> = Last
+    let zero: () -> int = Number
+    let one: (int) -> int = Identity
+    let two: (int, int) -> int = First
+    let three: (int, int, int) -> int = Middle
+    let four: (int, int, int, int) -> int = Last
     WriteLine(zero())
     WriteLine(one(42))
     WriteLine(two(42, 7))
     WriteLine(three(7, 42, 9))
     WriteLine(four(1, 2, 3, 42))
-    let done: Func<Void> = Done
+    let done: () -> Void = Done
     done()
     let values = ArrayList<int>()
     values.Add(7)

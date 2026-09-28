@@ -255,7 +255,7 @@ impl Sockets {
             return Err(Error::Closed);
         }
         if !matches!(&callback, Value::Function(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -327,7 +327,7 @@ impl Sockets {
             }
         }
         if !matches!(&callback, Value::Function(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -666,7 +666,7 @@ impl Sockets {
             return Err(Error::InvalidRange);
         }
         if !matches!(&callback, Value::Function(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -1007,7 +1007,7 @@ mod tests {
     }
     fn callback() -> Value {
         Value::Function(crate::Function {
-            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref("Ready()").unwrap(),
             receiver: None,
         })

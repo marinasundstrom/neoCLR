@@ -47,7 +47,7 @@ static class CollectionBindings
         if (kind is null) return null;
         var element = parameterMap?.Invoke(g.GenericArguments[0]) ?? GenericUnionBindings.Type(g.GenericArguments[0]);
         if (element is null || !((parameterMap is not null || GenericUnionBindings.ParameterMap is not null) && g.GenericArguments[0] is GenericParameter || element is "Int32" or "Double" or "Boolean" or "String" or "Void" or "System.Object"
-            || (IPAddressBindings.IsName(element) || UriBindings.IsName(element)) || (JsonBindings.IsName(element) || HttpBindings.IsName(element)) || ApplicationTypes.IsType(element) || GenericUnionBindings.IsType(element) || ErrorBindings.IsType(element) || DelegateBindings.IsType(element) || ReflectionBindings.IsReference(element) || IsReference(element) || InterfaceBindings.IsInterface(element) || element.StartsWith("arrayref<", StringComparison.Ordinal)
+            || (IPAddressBindings.IsName(element) || UriBindings.IsName(element)) || (JsonBindings.IsName(element) || HttpBindings.IsName(element)) || ApplicationTypes.IsType(element) || GenericUnionBindings.IsType(element) || ErrorBindings.IsType(element) || FunctionBindings.IsType(element) || ReflectionBindings.IsReference(element) || IsReference(element) || InterfaceBindings.IsInterface(element) || element.StartsWith("arrayref<", StringComparison.Ordinal)
             || CancellationBindings.IsReference(element) || EnumBindings.IsType(element) || PrimitiveBindings.Types.Contains(element) || (element == CancellationBindings.Token || CalendarBindings.Types.Contains(element)) || ErrorBindings.IsEmpty(element))) return null;
         var owner = $"System.Collections.{kind}<{element}>";
         Shapes[owner] = (kind, element);
@@ -83,7 +83,7 @@ static class CollectionBindings
         if (MapBindings.Bind(reference, definition, callvirt) is { } map) return map;
         var owner = Type(reference.DeclaringType, parameterMap);
         if (owner is null) return null;
-        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => parameterMap?.Invoke(t) ?? ApplicationTypes.Type(t) ?? Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: parameterMap is not null);
+        var (parameters, result) = RuntimeSignatures.Match(reference, definition, t => parameterMap?.Invoke(t) ?? ApplicationTypes.Type(t) ?? Type(t) ?? FunctionBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: parameterMap is not null);
         var (kind, element) = owner == Disposable ? ("Disposable", "") : Shapes[owner];
         var expected = (kind, definition.Name) switch {
             ("List" or "ArrayList", "Add") => (element, "noresult", true),
@@ -91,10 +91,10 @@ static class CollectionBindings
             ("Collection" or "ArrayList", "get_Count") => ("", "Int32", true),
             ("Sequence" or "MutableSequence" or "ArrayList", "get_Item") => ("Int32", element, true),
             ("MutableSequence" or "ArrayList", "set_Item") => ("Int32," + element, "noresult", true),
-            ("ArrayList", "FindIndex" or "FindLastIndex") => ($"System.Func<{element},Boolean>", "System.Option<Int32>", true),
-            ("ArrayList", "Exists" or "TrueForAll") => ($"System.Func<{element},Boolean>", "Boolean", true),
-            ("ArrayList", "Find" or "FindLast") => ($"System.Func<{element},Boolean>", $"System.Option<{element}>", true),
-            ("ArrayList", "FindAll") => ($"System.Func<{element},Boolean>", owner, true),
+            ("ArrayList", "FindIndex" or "FindLastIndex") => ($"fn<{element},Boolean>", "System.Option<Int32>", true),
+            ("ArrayList", "Exists" or "TrueForAll") => ($"fn<{element},Boolean>", "Boolean", true),
+            ("ArrayList", "Find" or "FindLast") => ($"fn<{element},Boolean>", $"System.Option<{element}>", true),
+            ("ArrayList", "FindAll") => ($"fn<{element},Boolean>", owner, true),
             ("ArrayList", "Copy") => ("", owner, true),
             ("Iterable" or "ArrayList", "GetIterator") => ("", $"System.Collections.Iterator<{element}>", true),
             ("Iterator", "MoveNext") => ("", "Boolean", true),

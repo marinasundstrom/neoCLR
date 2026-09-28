@@ -13,5 +13,17 @@
   "T:System.Tasks.TaskOutcome.Completed`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:Raven.Runtime.CompilerServices.RavenUnionCaseAttribute": "Raven-owned compiler-reference case metadata, not an executable platform API. The bridge consumes it; the runtime has no dependency on this attribute.",
   "T:Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute": "Raven-owned marker associating a generic union with its metadata companion; not an executable platform API. RavenDoc uses this metadata to merge the companion into the logical union.",
-  "T:System.Runtime.CompilerServices.TupleElementNamesAttribute": "Compiler-reference metadata scaffold preserving source tuple labels. Not an executable guest API; see /docs/tuples.html."
+  "T:System.Runtime.CompilerServices.TupleElementNamesAttribute": "Compiler-reference metadata scaffold preserving source tuple labels. Not an executable guest API; see /docs/tuples.html.",
+  "T:System.Delegate": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.MulticastDelegate": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Action": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Action`1": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Action`2": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Action`3": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Action`4": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Func`1": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Func`2": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Func`3": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Func`4": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract.",
+  "T:System.Func`5": "CLI compiler transport scaffold only; the importer creates unnamed structural Function shapes. See /docs/functions.html for the Function family and Invoke member contract."
 }

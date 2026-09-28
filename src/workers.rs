@@ -256,7 +256,7 @@ impl Workers {
                 "Worker notification requires a handle and callback",
             ));
         };
-        if callback.ty() != crate::assembler::parse_type("System.Func<Void>")? {
+        if callback.ty() != crate::assembler::parse_type("fn<Void>")? {
             return Err(Fault::new(
                 "Worker notification callback must be Func<Void>",
             ));

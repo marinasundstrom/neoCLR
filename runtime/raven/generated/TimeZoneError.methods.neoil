@@ -447,110 +447,110 @@ ldobj System.TimeZoneError
 M00000008_IL_0009:
 stloc local0
 M00000008_IL_000a:
+ldloc local0
 M00000008_IL_000b:
-ldloc local0
-M00000008_IL_000c:
 stloc local2
-M00000008_IL_000d:
-ldloca local2
-M00000008_IL_000f:
+M00000008_IL_000c:
 ldloca local3
-M00000008_IL_0011:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.UnknownZone&)
+M00000008_IL_000e:
+initobj System.TimeZoneError.UnknownZone
+M00000008_IL_0014:
+ldloca local2
 M00000008_IL_0016:
-brfalse M00000008_IL_0034
-M00000008_IL_001b:
-ldloc local3
-M00000008_IL_001c:
-pop
+ldloca local3
+M00000008_IL_0018:
+call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.UnknownZone&)
 M00000008_IL_001d:
-M00000008_IL_001e:
-br M00000008_IL_0029
-M00000008_IL_0029:
-ldstr "UnknownZone"
+brfalse M00000008_IL_003a
+M00000008_IL_0022:
+M00000008_IL_0023:
+br M00000008_IL_002e
 M00000008_IL_002e:
-stloc local1
 M00000008_IL_002f:
-br M00000008_IL_00a7
+ldstr "UnknownZone"
 M00000008_IL_0034:
+stloc local1
 M00000008_IL_0035:
-M00000008_IL_0036:
-ldloc local0
-M00000008_IL_0037:
-stloc local4
-M00000008_IL_0039:
-ldloca local4
+br M00000008_IL_00b7
+M00000008_IL_003a:
 M00000008_IL_003b:
+ldloc local0
+M00000008_IL_003c:
+stloc local4
+M00000008_IL_003e:
 ldloca local5
-M00000008_IL_003d:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.OutOfRange&)
-M00000008_IL_0042:
-brfalse M00000008_IL_0061
-M00000008_IL_0047:
-ldloc local5
-M00000008_IL_0049:
-pop
+M00000008_IL_0040:
+initobj System.TimeZoneError.OutOfRange
+M00000008_IL_0046:
+ldloca local4
+M00000008_IL_0048:
+ldloca local5
 M00000008_IL_004a:
-M00000008_IL_004b:
-br M00000008_IL_0056
-M00000008_IL_0056:
-ldstr "OutOfRange"
-M00000008_IL_005b:
-stloc local1
-M00000008_IL_005c:
-br M00000008_IL_00a7
+call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.OutOfRange&)
+M00000008_IL_004f:
+brfalse M00000008_IL_006c
+M00000008_IL_0054:
+M00000008_IL_0055:
+br M00000008_IL_0060
+M00000008_IL_0060:
 M00000008_IL_0061:
-M00000008_IL_0062:
-ldloc local0
-M00000008_IL_0063:
-stloc local6
-M00000008_IL_0065:
-ldloca local6
+ldstr "OutOfRange"
+M00000008_IL_0066:
+stloc local1
 M00000008_IL_0067:
-ldloca local7
-M00000008_IL_0069:
-call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.SystemZoneUnavailable&)
-M00000008_IL_006e:
-brfalse M00000008_IL_008d
-M00000008_IL_0073:
-ldloc local7
-M00000008_IL_0075:
-pop
-M00000008_IL_0076:
-M00000008_IL_0077:
-br M00000008_IL_0082
-M00000008_IL_0082:
-ldstr "SystemZoneUnavailable"
-M00000008_IL_0087:
-stloc local1
-M00000008_IL_0088:
-br M00000008_IL_00a7
-M00000008_IL_008d:
-M00000008_IL_008e:
+br M00000008_IL_00b7
+M00000008_IL_006c:
+M00000008_IL_006d:
 ldloc local0
-M00000008_IL_008f:
-pop
-M00000008_IL_0090:
-ldc.i4 1
-M00000008_IL_0091:
-brfalse M00000008_IL_00a2
-M00000008_IL_0096:
+M00000008_IL_006e:
+stloc local6
+M00000008_IL_0070:
+ldloca local7
+M00000008_IL_0072:
+initobj System.TimeZoneError.SystemZoneUnavailable
+M00000008_IL_0078:
+ldloca local6
+M00000008_IL_007a:
+ldloca local7
+M00000008_IL_007c:
+call instance System.TimeZoneError::TryGetValue(System.TimeZoneError.SystemZoneUnavailable&)
+M00000008_IL_0081:
+brfalse M00000008_IL_009d
+M00000008_IL_0086:
+M00000008_IL_0087:
+br M00000008_IL_0092
+M00000008_IL_0092:
+ldstr "SystemZoneUnavailable"
 M00000008_IL_0097:
-ldstr "Empty"
-M00000008_IL_009c:
 stloc local1
+M00000008_IL_0098:
+br M00000008_IL_00b7
 M00000008_IL_009d:
-br M00000008_IL_00a7
-M00000008_IL_00a2:
-M00000008_IL_00a3:
-M00000008_IL_00a4:
-M00000008_IL_00a5:
+M00000008_IL_009e:
+ldloc local0
+M00000008_IL_009f:
+pop
+M00000008_IL_00a0:
+ldc.i4 1
+M00000008_IL_00a1:
+brfalse M00000008_IL_00b2
 M00000008_IL_00a6:
-fault "Guest program reached a terminal failure"
 M00000008_IL_00a7:
-M00000008_IL_00a8:
+ldstr "Empty"
+M00000008_IL_00ac:
+stloc local1
+M00000008_IL_00ad:
+br M00000008_IL_00b7
+M00000008_IL_00b2:
+M00000008_IL_00b3:
+M00000008_IL_00b4:
+M00000008_IL_00b5:
+M00000008_IL_00b6:
+fault "Guest program reached a terminal failure"
+M00000008_IL_00b7:
+M00000008_IL_00b8:
 ldloc local1
-M00000008_IL_00a9:
+M00000008_IL_00b9:
 ret
 .end
 .method instance byref get_Value() -> System.Object

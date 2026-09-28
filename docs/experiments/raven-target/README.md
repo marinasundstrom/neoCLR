@@ -1615,3 +1615,12 @@ worktree contains target-only identity policy commit `79a5d7ffc`. Rebuild the br
 against it and refresh the Tuple slice and consumer reference together. Existing
 installed SDKs and published Preview 11 artifacts do not gain these APIs from a
 source edit; packaging and installation require separate qualification.
+
+The Function migration now maps CLI callback transport to structural `fn<...>`
+signatures and emits `function.bind`; it emits no runtime Func declarations.
+Raven callback source uses function notation. The isolated compiler's unit-function
+policy is recorded in Raven commit `09f4c91bd` and
+[the migration evidence](../function-types/README.md). CLI Func/Action/Delegate
+metadata is reference transport, explicitly excluded from nominal API pages;
+[Function family documentation](../../../api-docs/functions.md) covers the runtime
+Invoke/extension contract. Legacy native declaration admission is still transitional.

@@ -2,8 +2,8 @@
 .type class System.Collections.DelegateComparer<T0>
 .sealed
 .implements System.Collections.Comparer<T0>
-.field private compare System.Func<T0,T0,Int32>
-.method instance .ctor(System.Func<T0,T0,Int32> compare) -> noresult
+.field private compare fn<T0,T0,Int32>
+.method instance .ctor(fn<T0,T0,Int32> compare) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -31,7 +31,7 @@ ldarg 1
 M00000002_IL_0009:
 ldarg 2
 M00000002_IL_000a:
-callvirt instance System.Func<T0,T0,Int32>::Invoke(T0,T0)
+callvirt instance fn<T0,T0,Int32>::Invoke(T0,T0)
 M00000002_IL_000f:
 ret
 .end

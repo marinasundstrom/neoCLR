@@ -16,7 +16,7 @@ static class ArrayCallbackBindings
         if (element is null || !ManagedArrayBindings.Defaultable(element) && !(libraryMap is not null && owner.GenericArguments[0] is GenericParameter))
             throw new InvalidDataException("Unsupported Array<T> element.");
         var (args, result) = RuntimeSignatures.Match(reference, definition,
-            t => libraryMap is null ? ManagedArrayBindings.Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t) : libraryMap(t));
+            t => libraryMap is null ? ManagedArrayBindings.Type(t) ?? FunctionBindings.Type(t) ?? GenericUnionBindings.Type(t) : libraryMap(t));
         var array = $"arrayref<{element}>";
         var type = $"System.Array<{element}>";
         if (libraryMap is not null && reference.Name == "get_Length" && reference.HasThis && args.Length == 0 && result == "Int32")
@@ -25,7 +25,7 @@ static class ArrayCallbackBindings
             return new(type + "::get_Empty", args, result,
                 Instruction: $"call {type}::get_Empty()");
         if (reference.Name == "ForEach" && reference.HasThis && result == "noresult"
-            && args.SequenceEqual(new[] { $"System.Func<{element},Void>" }))
+            && args.SequenceEqual(new[] { $"fn<{element},Void>" }))
             return new(type + "::ForEach", new[] { array }.Concat(args).ToArray(), result,
                 Instruction: $"callvirt instance {type}::ForEach({string.Join(',', args)})");
         throw new InvalidDataException("Unsupported Array<T> member contract.");

@@ -22,11 +22,14 @@ cover substitution, artifacts, captures and signature rejection. Delegate declar
 remain temporarily admitted during migration. The Raven descriptor API now separates
 TypeInfo (DisplayName/IsNominalType) from NominalTypeInfo (declaration metadata);
 [executable and negative cases](../experiments/function-types/README.md) cover this split.
-Library callback APIs still await structural migration.
+Library callback source and imported signatures now use structural Function shapes;
+runtime Func declarations are removed. CLI delegate metadata remains an explicitly
+bounded compiler transport. Function/extension and Task.Run/async consumers execute with the independently
+fixed Raven generic-construction binder.
 
 Next: settle public object identity/equality/nullability,
-extend the structural validation coverage and migrate Raven,
-library callback contracts, reflection consumers and documentation artifacts.
+finish legacy frontend/artifact admission removal and the remaining
+consumer/documentation migration.
 Other structural families are direction, not part of this Function replacement's
 completion claim. Acceptance requires the full migration and focused positive and
 negative cases listed in the plan; a renamed delegate carrier is insufficient.

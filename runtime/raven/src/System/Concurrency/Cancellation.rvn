@@ -35,7 +35,7 @@ public struct CancellationToken {
     }
 
     /// Registers an invocation-local callback; an already requested token invokes it inline.
-    func Register(callback: Func<Void>) -> CancellationRegistration {
+    func Register(callback: () -> Void) -> CancellationRegistration {
         let owner = source
         if owner is CancellationTokenSource active {
             return active.Register(callback)
@@ -103,7 +103,7 @@ public class CancellationTokenSource : Disposable {
         }
     }
 
-    internal func Register(callback: Func<Void>) -> CancellationRegistration {
+    internal func Register(callback: () -> Void) -> CancellationRegistration {
         if disposed {
             System.Fault("Cancellation source is disposed")
         }
@@ -138,10 +138,10 @@ public class CancellationTokenSource : Disposable {
 /// A disposable callback registration. Disposing removes a callback that has not started.
 public class CancellationRegistration : Disposable {
     private var owner: CancellationTokenSource?
-    private var callback: Option<Func<Void>>
+    private var callback: Option<() -> Void>
     private var next: CancellationRegistration?
 
-    internal init(owner: CancellationTokenSource?, callback: Option<Func<Void>>, next: CancellationRegistration?) {
+    internal init(owner: CancellationTokenSource?, callback: Option<() -> Void>, next: CancellationRegistration?) {
         self.owner = owner
         self.callback = callback
         self.next = next

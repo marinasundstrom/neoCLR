@@ -1,0 +1,47 @@
+import System.*
+import System.Introspection.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+public func AddOne(value: int) -> int => value + 1
+public func Double(value: int) -> int => value * 2
+public func Apply(callback: (int) -> int, value: int) -> int => callback(value)
+public func Forward<T>(callback: () -> T) -> T => callback()
+
+public extension FunctionExtensions for (int) -> int {
+    func Twice(value: int) -> int {
+        return self(self(value))
+    }
+}
+
+func Main() -> int {
+    let first: (int) -> int = AddOne
+    let second: (int) -> int = Double
+    Check(Apply(first, 41) == 42 && Apply(second, 21) == 42, "Shared function shape")
+    Check(first.Twice(40) == 42, "Structural function extension member")
+    let shape = typeof((int) -> int)
+    Check(!shape.IsNominalType && !(shape is NominalTypeInfo), "Function shape is structural")
+    Check(!(shape is MemberInfo), "Function shape has no declaration identity")
+    Check(shape.Equals(typeof((int) -> int)), "Function shape identity")
+    Check(!shape.Equals(typeof(() -> int)), "Parameter shape participates in identity")
+
+    var count = 0
+    let next: () -> int = () => {
+        count += 1
+        return count
+    }
+    let notify: () -> () = () => {
+        count += 1
+    }
+    Check(Forward<int>(next) == 1, "Generic function argument")
+    notify()
+    Forward<()>(notify)
+    System.Runtime.GC.Collect()
+    Check(next() == 4, "Shared captured state survives collection")
+    Console.WriteLine("Structural function callbacks passed")
+    return 0
+}

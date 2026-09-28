@@ -146,3 +146,20 @@ fn nominal_classification_follows_identity_not_display_names() {
         );
     }
 }
+
+#[test]
+fn named_generic_parameters_bind_inside_function_shapes() {
+    let m = module(
+        "function.bind fn<Int32,Int32> = Identity<Int32>(Int32)\nldc.i4 42\ncall Apply<Int32>(fn<Int32,Int32>,Int32)",
+        ".type Holder<T>\n.field Callback fn<T,T>\n.end\n.function Identity<T>(T) -> T\nldarg 0\nret\n.end\n.function Apply<T>(fn<T,T> callback,T value) -> T\nldarg callback\nldarg value\ncall instance fn<T,T>::Invoke(T)\nret\n.end",
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+    let field = &m
+        .types
+        .iter()
+        .find(|ty| ty.name == "Holder")
+        .unwrap()
+        .fields[0];
+    assert_eq!(field.ty, parse_type("fn<!0,!0>").unwrap());
+}

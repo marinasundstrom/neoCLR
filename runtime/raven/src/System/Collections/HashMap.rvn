@@ -12,7 +12,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
     private field next: ArrayList<int>
     private field busy: bool
 
-    init(equal: System.Func<K, K, bool>, hash: System.Func<K, int>) {
+    init(equal: (K, K) -> bool, hash: (K) -> int) {
         comparer = DelegateEqualityComparer<K>(equal, hash)
         buckets = [0, 0, 0, 0]
         keys = ArrayList<K>()

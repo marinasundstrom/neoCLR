@@ -3,10 +3,10 @@ namespace System.Collections
 /// Adapts equality and hash callbacks into one reusable policy.
 public class DelegateEqualityComparer<T> : EqualityComparer<T> {
     // Explicit storage: the pinned compiler treats uninitialized private var as getter-only.
-    private field equal: System.Func<T, T, bool>
-    private field hash: System.Func<T, int>
+    private field equal: (T, T) -> bool
+    private field hash: (T) -> int
 
-    init(equal: System.Func<T, T, bool>, hash: System.Func<T, int>) {
+    init(equal: (T, T) -> bool, hash: (T) -> int) {
         self.equal = equal
         self.hash = hash
     }

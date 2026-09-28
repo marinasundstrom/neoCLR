@@ -6,14 +6,14 @@ import System.Result.*
 import System.Tasks.TaskOutcome.*
 
 public extension TaskOperators<T> for Task<T> {
-    func Map<U>(transform: Func<T, U>) -> Task<U> {
+    func Map<U>(transform: (T) -> U) -> Task<U> {
         let promise = Promise<U>(self.Dispatcher())
         let continuation = MapContinuation<T, U>(self, promise, transform)
         self.OnCompleted(continuation.Run)
         return promise.Task
     }
 
-    func Then<U>(continuation: Func<T, Task<U>>) -> Task<U> {
+    func Then<U>(continuation: (T) -> Task<U>) -> Task<U> {
         let promise = Promise<U>(self.Dispatcher())
         let state = ThenContinuation<T, U>(self, promise, continuation)
         self.OnCompleted(state.Run)
@@ -24,9 +24,9 @@ public extension TaskOperators<T> for Task<T> {
 internal class MapContinuation<T, U> {
     private field input: Task<T>
     private field output: Promise<U>
-    private field transform: Func<T, U>
+    private field transform: (T) -> U
 
-    init(input: Task<T>, output: Promise<U>, transform: Func<T, U>) {
+    init(input: Task<T>, output: Promise<U>, transform: (T) -> U) {
         self.input = input
         self.output = output
         self.transform = transform
@@ -46,9 +46,9 @@ internal class MapContinuation<T, U> {
 internal class ThenContinuation<T, U> {
     private field input: Task<T>
     private field output: Promise<U>
-    private field continuation: Func<T, Task<U>>
+    private field continuation: (T) -> Task<U>
 
-    init(input: Task<T>, output: Promise<U>, continuation: Func<T, Task<U>>) {
+    init(input: Task<T>, output: Promise<U>, continuation: (T) -> Task<U>) {
         self.input = input
         self.output = output
         self.continuation = continuation
@@ -89,7 +89,7 @@ internal class OutcomeTransfer<T> {
 
 // Result-aware composition is explicit; Task itself treats Result as a value.
 public extension TaskResultOperators<T, E> for Task<Result<T, E>> {
-    func MapResult<U>(transform: Func<T, U>) -> Task<Result<U, E>> {
+    func MapResult<U>(transform: (T) -> U) -> Task<Result<U, E>> {
         let promise = Promise<Result<U, E>>(self.Dispatcher())
         let continuation = TaskResultMapContinuation<T, E, U>(self, promise, transform)
         self.OnCompleted(continuation.Run)
@@ -100,9 +100,9 @@ public extension TaskResultOperators<T, E> for Task<Result<T, E>> {
 internal class TaskResultMapContinuation<T, E, U> {
     private field input: Task<Result<T, E>>
     private field output: Promise<Result<U, E>>
-    private field transform: Func<T, U>
+    private field transform: (T) -> U
 
-    init(input: Task<Result<T, E>>, output: Promise<Result<U, E>>, transform: Func<T, U>) {
+    init(input: Task<Result<T, E>>, output: Promise<Result<U, E>>, transform: (T) -> U) {
         self.input = input
         self.output = output
         self.transform = transform

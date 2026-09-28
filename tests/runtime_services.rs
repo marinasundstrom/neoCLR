@@ -156,14 +156,13 @@ fn unreachable_memory_operations_and_native_imports_remain_conservative_requirem
 fn worker_notification_requires_worker_and_dispatch_services() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/raven/generated/Func.methods.neoil"),
         include_str!("../runtime/neoCLR/Runtime/Workers.neoil")
     ))
     .unwrap();
     let graph = LoadedProgram::new(&module)
         .unwrap()
         .analyze_reachability(
-            &[parse_function_ref("neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)").unwrap()],
+            &[parse_function_ref("neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)").unwrap()],
             1,
         )
         .unwrap();
@@ -194,20 +193,19 @@ fn worker_notification_requires_worker_and_dispatch_services() {
 fn socket_submission_requires_socket_and_dispatch_services() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/raven/generated/Func.methods.neoil"),
         include_str!("../runtime/neoCLR/Runtime/Sockets.neoil")
     ))
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     for signature in [
-        "SocketConnectAddressesUntil(arrayref<String>,Int32,Int64,System.Func<Void>)",
-        "SocketReceiveUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)",
-        "SocketSendUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,System.Func<Void>)",
-        "SocketConnectAddresses(arrayref<String>,Int32,System.Func<Void>)",
-        "SocketAccept(Int64,System.Func<Void>)",
-        "SocketConnect(String,Int32,System.Func<Void>)",
-        "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)",
-        "SocketSend(Int64,arrayref<Byte>,Int32,Int32,System.Func<Void>)",
+        "SocketConnectAddressesUntil(arrayref<String>,Int32,Int64,fn<Void>)",
+        "SocketReceiveUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,fn<Void>)",
+        "SocketSendUntil(Int64,arrayref<Byte>,Int32,Int32,Int64,fn<Void>)",
+        "SocketConnectAddresses(arrayref<String>,Int32,fn<Void>)",
+        "SocketAccept(Int64,fn<Void>)",
+        "SocketConnect(String,Int32,fn<Void>)",
+        "SocketReceive(Int64,arrayref<Byte>,Int32,Int32,fn<Void>)",
+        "SocketSend(Int64,arrayref<Byte>,Int32,Int32,fn<Void>)",
     ] {
         let graph = program
             .analyze_reachability(
@@ -246,17 +244,13 @@ fn socket_submission_requires_socket_and_dispatch_services() {
 fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
     let module = assemble(concat!(
         ".module System\n",
-        include_str!("../runtime/raven/generated/Func.methods.neoil"),
         include_str!("../runtime/neoCLR/Runtime/Dns.neoil")
     ))
     .unwrap();
     let program = LoadedProgram::new(&module).unwrap();
     let deadline_graph = program
         .analyze_reachability(
-            &[
-                parse_function_ref("neoCLR.Runtime.DnsLookupUntil(String,Int64,System.Func<Void>)")
-                    .unwrap(),
-            ],
+            &[parse_function_ref("neoCLR.Runtime.DnsLookupUntil(String,Int64,fn<Void>)").unwrap()],
             1,
         )
         .unwrap();
@@ -277,7 +271,7 @@ fn dns_uses_host_resolution_and_dispatch_without_guest_workers() {
     );
     let graph = program
         .analyze_reachability(
-            &[parse_function_ref("neoCLR.Runtime.DnsLookup(String,System.Func<Void>)").unwrap()],
+            &[parse_function_ref("neoCLR.Runtime.DnsLookup(String,fn<Void>)").unwrap()],
             1,
         )
         .unwrap();

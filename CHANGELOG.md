@@ -15,7 +15,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and Value::Function in place of Delegate and Value::Delegate; consumers must
   update those names. Native binding metadata is now BindFunction with a function_type
   operand, and reachability exposes function_invocations. Transitional delegate
-  declarations and input encodings remain while library/compiler migration is pending.
+  input encodings remain while removal of the old frontend/admission paths is pending.
+  Raven library callbacks now use function syntax, and the importer maps CLI callback
+  transport to structural fn signatures and function.bind. Remove runtime Func
+  declarations and their generated slice; migrate native service callback signatures.
+  The isolated Raven target uses inhabited unit-result function transport consistently
+  with generic unit-result functions. Fix named generic parameter binding inside
+  Function shapes and unit storage when specializing application helpers. Integrate
+  an independently tested Raven fix for silently omitted generic constructors with
+  function type arguments, exposed by the async Promise callback list.
   Split Raven TypeInfo from MemberInfo: NominalTypeInfo exposes declaration metadata,
   and TypeInfo adds IsNominalType and DisplayName. Clients must narrow to NominalTypeInfo
   for Name/Namespace/FullName/module/token/attribute access. Regenerate descriptor,
@@ -25,7 +33,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Record the direction and migration plan: structural
   callable shapes, replacement/removal of delegates, and a NominalTypeInfo split
   with TypeInfo.IsNominalType. Preserve named function types as a possible future
-  addition with undecided identity rules. Complete callback API migration is still pending.
+  addition with undecided identity rules. Document Function Invoke and extensions in
+  a structural-family API page; explicitly exclude CLI transport scaffolds from
+  generated nominal pages. Validate synchronous/extension and async consumers;
+  refresh the source coverage audit after removing the Func slice, including
+  service callers in generated method bodies. Full legacy delegate removal remains
+  in progress.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

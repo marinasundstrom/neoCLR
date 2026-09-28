@@ -15,7 +15,7 @@ extension ListOperations for ArrayList<int> {
 }
 
 extension SequenceOperations for Iterable<int> {
-    func Visit(action: Func<int, System.Void>) {
+    func Visit(action: (int) -> System.Void) {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             action(iterator.Current)

@@ -216,7 +216,7 @@ callvirt instance System.Tasks.Promise<T0>::Read()
 M0000000e_IL_000d:
 ret
 .end
-.method instance OnCompleted(System.Func<Void> callback) -> noresult
+.method instance OnCompleted(fn<Void> callback) -> noresult
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 M0000000f_IL_0002:
@@ -226,7 +226,7 @@ ldfld System.Tasks.Task<T0>::source
 M0000000f_IL_0008:
 ldarg 1
 M0000000f_IL_0009:
-callvirt instance System.Tasks.Promise<T0>::Register(System.Func<Void>)
+callvirt instance System.Tasks.Promise<T0>::Register(fn<Void>)
 M0000000f_IL_000e:
 M0000000f_IL_000f:
 ret

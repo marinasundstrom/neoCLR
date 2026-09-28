@@ -1,0 +1,32 @@
+import System.*
+import System.Tasks.*
+
+class SharedState {
+    var Value: int = 0
+}
+
+async func Calculate() -> Task<int> {
+    let value = await Task.Run(() => 20)
+    return value + 1
+}
+
+async func Main() -> Task<()> {
+    let state = SharedState()
+    let result = await Task.Run(() => {
+        state.Value = 40
+        return state.Value + 2
+    })
+    Console.WriteLine(result)
+    let same = await Task.Run(() => state)
+    Console.WriteLine(Object.ReferenceEquals(state, same))
+    let completion = Task.Run(() => {
+        state.Value = state.Value + 1
+    })
+    await completion
+    Console.WriteLine(state.Value)
+    let unwrapped = await Task.Run(Calculate)
+    Console.WriteLine(unwrapped)
+    let nested = await Task.Run(() => Task.Run(() => 7))
+    Console.WriteLine(nested)
+    return ()
+}

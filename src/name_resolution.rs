@@ -177,7 +177,7 @@ impl Resolver {
             return Err(Error::InvalidName);
         }
         if !matches!(callback, Value::Function(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -293,7 +293,7 @@ mod tests {
     use std::sync::{Condvar, Mutex};
     fn callback() -> Value {
         Value::Function(crate::Function {
-            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref("Ready()").unwrap(),
             receiver: None,
         })

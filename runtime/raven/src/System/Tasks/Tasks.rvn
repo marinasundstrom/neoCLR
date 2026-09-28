@@ -7,21 +7,21 @@ import System.Tasks.TaskOutcome.*
 
 // Submission owns no public thread handle; all overloads use the default dispatcher.
 public static class Task {
-    static func Run(callback: Func<System.Void>) -> Task<System.Void> {
+    static func Run(callback: () -> System.Void) -> Task<System.Void> {
         let source = Promise<System.Void>(TaskQueue.Default)
         let work = TaskRunWork<System.Void>(callback, source)
         System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
         return source.Task
     }
 
-    static func Run<T>(callback: Func<T>) -> Task<T> {
+    static func Run<T>(callback: () -> T) -> Task<T> {
         let source = Promise<T>(TaskQueue.Default)
         let work = TaskRunWork<T>(callback, source)
         System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
         return source.Task
     }
 
-    static func Run<T>(callback: Func<Task<T>>) -> Task<T> {
+    static func Run<T>(callback: () -> Task<T>) -> Task<T> {
         let source = Promise<T>(TaskQueue.Default)
         let work = TaskRunAsyncWork<T>(callback, source)
         System.Runtime.CompilerServices.RuntimeServices.ScheduleTask(work.Run)
@@ -31,10 +31,10 @@ public static class Task {
 
 internal class TaskRunWork<T> {
     // Explicit fields retain bootstrap compatibility for constructor-assigned storage.
-    private field callback: Func<T>
+    private field callback: () -> T
     private field source: Promise<T>
 
-    init(callback: Func<T>, source: Promise<T>) {
+    init(callback: () -> T, source: Promise<T>) {
         self.callback = callback
         self.source = source
     }
@@ -46,10 +46,10 @@ internal class TaskRunWork<T> {
 
 internal class TaskRunAsyncWork<T> {
     // Explicit fields retain bootstrap compatibility for constructor-assigned storage.
-    private field callback: Func<Task<T>>
+    private field callback: () -> Task<T>
     private field source: Promise<T>
 
-    init(callback: Func<Task<T>>, source: Promise<T>) {
+    init(callback: () -> Task<T>, source: Promise<T>) {
         self.callback = callback
         self.source = source
     }
@@ -63,11 +63,11 @@ internal class TaskRunAsyncWork<T> {
 
 // Explicit, single-invocation dispatcher for the provisional Task proof of concept.
 public class TaskQueue {
-    private field pending: ArrayList<Func<System.Void>>
+    private field pending: ArrayList<() -> System.Void>
     private field running: bool
 
     init() {
-        pending = ArrayList<Func<System.Void>>()
+        pending = ArrayList<() -> System.Void>()
         running = false
     }
 
@@ -93,11 +93,11 @@ public class TaskQueue {
         }
     }
 
-    func Post(callback: Func<System.Void>) {
+    func Post(callback: () -> System.Void) {
         pending.Add(callback)
     }
 
-    func Run(callback: Func<System.Void>) {
+    func Run(callback: () -> System.Void) {
         if running {
             System.Fault("Task queue cannot be pumped recursively")
         }
@@ -114,7 +114,7 @@ public class TaskQueue {
         running = true
         while pending.Count != 0 {
             let batch = pending
-            pending = ArrayList<Func<System.Void>>()
+            pending = ArrayList<() -> System.Void>()
             for callback in batch {
                 callback()
             }
@@ -171,7 +171,7 @@ public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
 
     func GetResult() -> T => source.Read()
 
-    func OnCompleted(callback: Func<System.Void>) {
+    func OnCompleted(callback: () -> System.Void) {
         source.Register(callback)
     }
 }
@@ -179,7 +179,7 @@ public class Task<T> : System.Runtime.CompilerServices.ITaskAwaiter {
 public class Promise<T> {
     private field queue: TaskQueue
     private field slot: ArrayList<T>
-    private field callbacks: ArrayList<Func<System.Void>>
+    private field callbacks: ArrayList<() -> System.Void>
     private field task: Task<T>
     private field cancelled: bool
 
@@ -187,7 +187,7 @@ public class Promise<T> {
         queue = TaskQueue.Current
         cancelled = false
         slot = ArrayList<T>(1)
-        callbacks = ArrayList<Func<System.Void>>()
+        callbacks = ArrayList<() -> System.Void>()
         task = Task<T>(self)
     }
 
@@ -195,7 +195,7 @@ public class Promise<T> {
         self.queue = queue
         cancelled = false
         slot = ArrayList<T>(1)
-        callbacks = ArrayList<Func<System.Void>>()
+        callbacks = ArrayList<() -> System.Void>()
         task = Task<T>(self)
     }
 
@@ -207,7 +207,7 @@ public class Promise<T> {
         }
         slot.Add(value)
         let pending = callbacks
-        callbacks = ArrayList<Func<System.Void>>()
+        callbacks = ArrayList<() -> System.Void>()
         for callback in pending {
             queue.Post(callback)
         }
@@ -220,7 +220,7 @@ public class Promise<T> {
         }
         cancelled = true
         let pending = callbacks
-        callbacks = ArrayList<Func<System.Void>>()
+        callbacks = ArrayList<() -> System.Void>()
         for callback in pending {
             queue.Post(callback)
         }
@@ -243,7 +243,7 @@ public class Promise<T> {
         return slot[0]
     }
 
-    internal func Register(callback: Func<System.Void>) {
+    internal func Register(callback: () -> System.Void) {
         if self.Completed() {
             queue.Post(callback)
         } else {
@@ -265,7 +265,7 @@ namespace System.Runtime.CompilerServices {
     }
 
     public interface ITaskAwaiter {
-        func OnCompleted(callback: Func<System.Void>)
+        func OnCompleted(callback: () -> System.Void)
     }
 
     public class AsyncTaskMethodBuilder<T> {

@@ -150,7 +150,7 @@ static class ApplicationTypes
         if (type is null || !Modules.Contains(type.Module) || type.FullName == "System.Unit" || type.Name == "<Module>") return null;
         if (type.HasGenericParameters && !LibraryNames.ContainsKey(type) && !IsGenericApplication(type) || type.IsEnum && !FlagsLibrary.IsMatched(type)
             || type.IsExplicitLayout && !IsEmptyCaseUnion(type) && !IsInt32CaseUnion(type) || (type.DeclaringType?.HasGenericParameters ?? false) && !IsGenericApplication(type.DeclaringType!)
-            || (!type.IsInterface && !DelegateLibrary.IsMatched(type) && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !(type.BaseType?.FullName == "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope)) && !IsModule(type.BaseType?.Resolve()?.Module))
+            || (!type.IsInterface && !FlagsLibrary.IsMatched(type) && !MarkerLibrary.IsMatched(type) && type.BaseType?.FullName is not ("System.Object" or "System.ValueType") && !(type.BaseType?.FullName == "System.Attribute" && RuntimeSignatures.IsCore(type.BaseType.Scope)) && !IsModule(type.BaseType?.Resolve()?.Module))
             || !FlagsLibrary.IsMatched(type) && type.Fields.Any(f => f.IsStatic || f.HasMarshalInfo)
             || type.Methods.Any(m => m.IsConstructor && m.IsStatic))
             throw new InvalidDataException("Unsupported application type: " + type.FullName);
@@ -205,7 +205,7 @@ static class ApplicationTypes
         while (Types.Any(t => !Expanded.Contains(t.Key)))
         {
             var (name, type) = Types.First(t => !Expanded.Contains(t.Key)); Expanded.Add(name);
-            if (DelegateLibrary.IsMatched(type) || FlagsLibrary.IsMatched(type) || MarkerLibrary.IsMatched(type)) continue;
+            if (FlagsLibrary.IsMatched(type) || MarkerLibrary.IsMatched(type)) continue;
             if (IsModule(type.BaseType?.Resolve()?.Module)) { CheckAccess(type.BaseType!, type.Module); map(type.BaseType!, false); }
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             AttributeMetadata.Discover(type, pending);
@@ -446,7 +446,6 @@ static class ApplicationTypes
             var (name, type) = Types.First(t => !emitted.Contains(t.Key)); emitted.Add(name);
             if (MarkerLibrary.IsMatched(type)) { output.Append(MarkerLibrary.Declaration(type, bodies)); continue; }
             if (FlagsLibrary.IsMatched(type)) { output.Append(EnumBindings.Declaration(type)); continue; }
-            if (DelegateLibrary.IsMatched(type)) { output.Append(DelegateLibrary.Declaration(type, name, map)); continue; }
             // Union cases retain lexical ownership, not merely a dotted display name.
             if (IsLibrary(type) && GenericUnionLibrary.IsContainer(type))
             {

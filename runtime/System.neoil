@@ -83,7 +83,7 @@
 .include "System/Reflection.neoil"
 .include "System/TypeInfo.neoil"
 
-.include "System/Func.neoil"
+.include "System/Function.neoil"
 
 .include "System/Date.neoil"
 .include "System/Time.neoil"

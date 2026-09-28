@@ -179,12 +179,13 @@ The descriptive model supports the bounded development reflection extensions abo
 
 The selected Function type direction introduces `NominalTypeInfo` for names,
 namespaces and declaration metadata, alongside `TypeInfo.IsNominalType`.
-Structural Function types will describe callable shapes, with Function objects
+Structural Function types describe callable shapes, with Function objects
 as their instances. The descriptor split is implemented on the development feature branch: common
 TypeInfo exposes DisplayName and IsNominalType; declaration metadata requires
 NominalTypeInfo. Structural types can still have members and extension members;
-member discovery stays on common TypeInfo. Native structural Function binding is implemented, while Raven
-callback migration and full delegate removal remain in progress. Named function
+member discovery stays on common TypeInfo. Raven callbacks now import into structural
+Function shapes, and a tested extension can target a function shape. Full legacy
+delegate removal remains in progress. See the [Function API reference](/docs/functions.html). Named function
 types may follow later.
 
 <a id="feedback"></a>

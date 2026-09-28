@@ -4,6 +4,9 @@ toc: false
 ---
 # API documentation
 
+[Function shapes and objects](functions.md) document the development structural
+callable family and its Invoke/extension-member contracts.
+
 [Value tuples](tuples.md) are a development addition after Preview 11, using
 `System.Tuple<T1,...,TN>` as the value-type family.
 

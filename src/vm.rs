@@ -1766,7 +1766,7 @@ fn completion_notification_frame(
             owner: Some(Type::from_name("System.Tasks.TaskQueue")),
             instance: true,
             generic_arguments: vec![],
-            parameters: vec![crate::assembler::parse_type("System.Func<Void>")?],
+            parameters: vec![crate::assembler::parse_type("fn<Void>")?],
         },
     )?;
     if !post.no_result
@@ -4223,8 +4223,8 @@ fn interpret_instructions_with_dispatch(
                                 slot.borrow().get().is_ok_and(|value| value == *queue)
                             })
                             && matches!(caller.function.body.get(caller.trace_pc), Some(Op::Call(target) | Op::CallVirtual(target))
-                        if target.name == "System.Func.Invoke" && target.instance
-                            && target.owner.as_ref() == Some(&crate::assembler::parse_type("System.Func<Void>")?)
+                        if target.name == "$Function.Invoke" && target.instance
+                            && target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<Void>")?)
                             && target.parameters.is_empty())
                             && scheduler.poll(heap, queue)?
                         {

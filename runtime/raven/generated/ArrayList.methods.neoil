@@ -496,7 +496,7 @@ newobj instance neoCLR.Library.System.Collections.ArrayList.Type_53797374656D2E4
 M00000009_IL_0013:
 ret
 .end
-.method instance Find(System.Func<T0,Boolean> match) -> System.Option<T0>
+.method instance Find(fn<T0,Boolean> match) -> System.Option<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -555,7 +555,7 @@ ldarg 1
 M0000000a_IL_002f:
 ldloc local3
 M0000000a_IL_0030:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000a_IL_0035:
 brtrue M0000000a_IL_003f
@@ -590,7 +590,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option
 M0000000a_IL_0062:
 ret
 .end
-.method instance FindLast(System.Func<T0,Boolean> match) -> System.Option<T0>
+.method instance FindLast(fn<T0,Boolean> match) -> System.Option<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -658,7 +658,7 @@ ldarg 1
 M0000000b_IL_0034:
 ldloc local3
 M0000000b_IL_0035:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000b_IL_003a:
 brtrue M0000000b_IL_0044
@@ -693,7 +693,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion1<T0>(System.Option
 M0000000b_IL_0067:
 ret
 .end
-.method instance FindIndex(System.Func<T0,Boolean> match) -> System.Option<Int32>
+.method instance FindIndex(fn<T0,Boolean> match) -> System.Option<Int32>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -752,7 +752,7 @@ ldarg 1
 M0000000c_IL_002f:
 ldloc local3
 M0000000c_IL_0030:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000c_IL_0035:
 brtrue M0000000c_IL_003f
@@ -787,7 +787,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.Non
 M0000000c_IL_0062:
 ret
 .end
-.method instance FindLastIndex(System.Func<T0,Boolean> match) -> System.Option<Int32>
+.method instance FindLastIndex(fn<T0,Boolean> match) -> System.Option<Int32>
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -855,7 +855,7 @@ ldarg 1
 M0000000d_IL_0034:
 ldloc local3
 M0000000d_IL_0035:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000d_IL_003a:
 brtrue M0000000d_IL_0044
@@ -890,7 +890,7 @@ call neoCLR.Library.System.Collections.ArrayList.RuntimeUnion4(System.Option.Non
 M0000000d_IL_0067:
 ret
 .end
-.method instance Exists(System.Func<T0,Boolean> match) -> Boolean
+.method instance Exists(fn<T0,Boolean> match) -> Boolean
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -943,7 +943,7 @@ ldloc local2
 M0000000e_IL_0028:
 ldelem T0
 M0000000e_IL_002d:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000e_IL_0032:
 brtrue M0000000e_IL_003c
@@ -975,7 +975,7 @@ M0000000e_IL_004d:
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance TrueForAll(System.Func<T0,Boolean> match) -> Boolean
+.method instance TrueForAll(fn<T0,Boolean> match) -> Boolean
 .local arrayref<T0> local0
 .local Int32 local1
 .local Int32 local2
@@ -1028,7 +1028,7 @@ ldloc local2
 M0000000f_IL_0028:
 ldelem T0
 M0000000f_IL_002d:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M0000000f_IL_0032:
 ldc.i4 0
@@ -1065,7 +1065,7 @@ M0000000f_IL_0050:
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance FindAll(System.Func<T0,Boolean> match) -> System.Collections.ArrayList<T0>
+.method instance FindAll(fn<T0,Boolean> match) -> System.Collections.ArrayList<T0>
 .local arrayref<T0> local0
 .local Int32 local1
 .local System.Collections.ArrayList<T0> local2
@@ -1131,7 +1131,7 @@ ldarg 1
 M00000010_IL_0036:
 ldloc local4
 M00000010_IL_0038:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Collections.ArrayList.RuntimeBooleanToInt32(Boolean)
 M00000010_IL_003d:
 brtrue M00000010_IL_0047

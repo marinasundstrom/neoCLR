@@ -227,7 +227,7 @@ mod dispatch_tests {
             dispatch.bind(&mut heap).unwrap();
             dispatch.default_task_queue = Some(object(&mut heap));
             let callback = Value::Function(crate::Function {
-                ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+                ty: crate::assembler::parse_type("fn<Void>").unwrap(),
                 target: crate::assembler::parse_function_ref("instance Capture::Callback()")
                     .unwrap(),
                 receiver: Some(Box::new(object(&mut heap))),

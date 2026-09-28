@@ -4,7 +4,7 @@ alias Task = System.Tasks.Task
 
 async func Main() -> Task<int> {
     var count = 0
-    let callback: Func<()> = () => { count = 42 }
+    let callback: () -> () = () => { count = 42 }
     let work = Task.Run(callback)
     await work
     return count

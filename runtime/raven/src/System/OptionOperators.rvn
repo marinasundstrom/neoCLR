@@ -4,21 +4,21 @@ import System.Option.*
 import System.Result.*
 
 public extension OptionOperators<T> for Option<T> {
-    func Map<U>(mapper: Func<T, U>) -> Option<U> {
+    func Map<U>(mapper: (T) -> U) -> Option<U> {
         return self match {
             Some(let value) => Some(mapper(value))
             None => None
         }
     }
 
-    func Then<U>(binder: Func<T, Option<U>>) -> Option<U> {
+    func Then<U>(binder: (T) -> Option<U>) -> Option<U> {
         return self match {
             Some(let value) => binder(value)
             None => None
         }
     }
 
-    func Filter(predicate: Func<T, bool>) -> Option<T> {
+    func Filter(predicate: (T) -> bool) -> Option<T> {
         if self is Some(let value) {
             if predicate(value) {
                 return self
@@ -27,14 +27,14 @@ public extension OptionOperators<T> for Option<T> {
         return None
     }
 
-    func OrElse(alternative: Func<Option<T>>) -> Option<T> {
+    func OrElse(alternative: () -> Option<T>) -> Option<T> {
         return self match {
             Some(_) => self
             None => alternative()
         }
     }
 
-    func UnwrapOrElse(factory: Func<T>) -> T {
+    func UnwrapOrElse(factory: () -> T) -> T {
         return self match {
             Some(let value) => value
             None => factory()
@@ -48,21 +48,21 @@ public extension OptionOperators<T> for Option<T> {
         }
     }
 
-    func Match<U>(some: Func<T, U>, none: Func<U>) -> U {
+    func Match<U>(some: (T) -> U, none: () -> U) -> U {
         return self match {
             Some(let value) => some(value)
             None => none()
         }
     }
 
-    func Tap(action: Func<T, System.Void>) -> Option<T> {
+    func Tap(action: (T) -> System.Void) -> Option<T> {
         if self is Some(let value) {
             action(value)
         }
         return self
     }
 
-    func TapNone(action: Func<System.Void>) -> Option<T> {
+    func TapNone(action: () -> System.Void) -> Option<T> {
         if self is None {
             action()
         }
@@ -77,14 +77,14 @@ public extension OptionOperators<T> for Option<T> {
         return values
     }
 
-    func ThenResult<U, E>(binder: Func<T, Result<U, E>>, noneError: Func<E>) -> Result<U, E> {
+    func ThenResult<U, E>(binder: (T) -> Result<U, E>, noneError: () -> E) -> Result<U, E> {
         return self match {
             Some(let value) => binder(value)
             None => Error(noneError())
         }
     }
 
-    func MapResult<U, E>(mapper: Func<T, U>, noneError: Func<E>) -> Result<U, E> {
+    func MapResult<U, E>(mapper: (T) -> U, noneError: () -> E) -> Result<U, E> {
         return self match {
             Some(let value) => Ok(mapper(value))
             None => Error(noneError())
@@ -98,7 +98,7 @@ public extension OptionOperators<T> for Option<T> {
         }
     }
 
-    func OkOr<E>(errorFactory: Func<E>) -> Result<T, E> {
+    func OkOr<E>(errorFactory: () -> E) -> Result<T, E> {
         return self match {
             Some(let value) => Ok(value)
             None => Error(errorFactory())

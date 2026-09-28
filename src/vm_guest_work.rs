@@ -211,11 +211,11 @@ ldloc job
 ldfld Job::Source
 callvirt instance System.Tasks.Promise<Int32>::get_Task()
 ldloc job
-delegate.bind System.Func<Void> = instance Job::Observe()
-callvirt instance System.Tasks.Task<Int32>::OnCompleted(System.Func<Void>)
+delegate.bind fn<Void> = instance Job::Observe()
+callvirt instance System.Tasks.Task<Int32>::OnCompleted(fn<Void>)
 ldloc job
-delegate.bind System.Func<Void> = instance Job::Run()
-call neoCLR.Runtime.ScheduleTask(System.Func<Void>)
+delegate.bind fn<Void> = instance Job::Run()
+call neoCLR.Runtime.ScheduleTask(fn<Void>)
 pop
 ldloc job
 ret

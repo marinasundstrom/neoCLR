@@ -344,14 +344,10 @@ fn completion_wait_probe(cancel: bool) {
     let module = crate::assemble(
         r#"
 .module System
-.delegate System.Func<T>
-.method instance Invoke() -> T
-.end
-.end
 .type class System.Tasks.TaskQueue
 .field Posts Int32
 .field Drains Int32
-.method instance Post(System.Func<Void> callback) -> noresult
+.method instance Post(fn<Void> callback) -> noresult
 ldarg 0
 ldarg 0
 ldfld System.Tasks.TaskQueue::Posts
@@ -403,7 +399,7 @@ ret
             view: None,
         });
         let callback = Value::Function(crate::Function {
-            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref(
                 "instance System.Tasks.TaskQueue::Drain()",
             )

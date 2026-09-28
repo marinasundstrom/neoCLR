@@ -16,7 +16,7 @@
 .property instance Keys() -> System.Collections.Sequence<T0>
 .get instance System.Collections.HashMap<T0,T1>::get_Keys()
 .end
-.method instance .ctor(System.Func<T0,T0,Boolean> equal,System.Func<T0,Int32> hash) -> noresult
+.method instance .ctor(fn<T0,T0,Boolean> equal,fn<T0,Int32> hash) -> noresult
 M00000001_IL_0000:
 M00000001_IL_0001:
 ldarg 0
@@ -30,7 +30,7 @@ ldarg 1
 M00000001_IL_000a:
 ldarg 2
 M00000001_IL_000b:
-newobj instance System.Collections.DelegateEqualityComparer<T0>::.ctor(System.Func<T0,T0,Boolean>,System.Func<T0,Int32>)
+newobj instance System.Collections.DelegateEqualityComparer<T0>::.ctor(fn<T0,T0,Boolean>,fn<T0,Int32>)
 M00000001_IL_0010:
 castclass System.Collections.EqualityComparer<T0>
 stfld System.Collections.HashMap<T0,T1>::comparer

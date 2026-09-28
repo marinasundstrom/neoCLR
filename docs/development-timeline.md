@@ -77,6 +77,28 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   page labels do not create nominal runtime names. A general RavenDoc renderer
   remains future work, distinct from the updated reference for current public APIs.
 
+- **Assistant, performed continuation:** committed the common/nominal split as
+  `c0a5487a`, then migrated Raven callback source and imported runtime signatures
+  to structural Function shapes. Removed the runtime Func declaration slice.
+  Isolated Raven commit `09f4c91bd` makes unit-returning function syntax use the
+  same inhabited transport as generic functions instantiated with unit; ordinary
+  CLR targets retain Action, with 65 focused compiler checks passing.
+- **Assistant, verification:** source callback identity/capture/generic-unit checks
+  and an extension declared on `(int) -> int` execute; native Function and service
+  suites pass 10 and 12 tests. Full library regeneration passes. Legacy frontend
+  admission/removal and remaining object contracts are still unfinished.
+
+- **Assistant, diagnosed and fixed:** async execution exposed a missing Promise
+  callback-list constructor. An independent ordinary .NET reduction found that
+  Raven omitted generic constructors with function type arguments without an error.
+  A five-line binder correction on main-based `fix/function-type-construction`
+  passes 15 focused tests, including three previously failing constructor cases.
+  Standalone commit `e316703ca` is integrated into the isolated target as
+  `6b5418e57`; main integration remains separate from the experimental target.
+  Matching regenerated artifacts execute the async consumer successfully with
+  shared captures and unit/nested Task results. The validation script initially
+  expected lowercase `true`; its expectation now matches runtime `True`.
+
 ## 2026-09-27 — Focus on a minimal Web API
 
 - **Author:** “We should focus on the Http story”, specifying the minimum features

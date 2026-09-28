@@ -457,7 +457,7 @@ mod tests {
         let captured = object(heap, vec![Value::Int32(42)]);
         let receiver = object(heap, vec![captured]);
         let callback = Value::Function(crate::Function {
-            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref("instance TestOwner::Complete()").unwrap(),
             receiver: Some(Box::new(receiver)),
         });

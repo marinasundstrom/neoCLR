@@ -221,3 +221,25 @@ need not each generate a separate type page. Family membership, member applicabi
 and rendered shape signatures need explicit documentation metadata rather than
 fabricated Name/Namespace values. This is a documentation direction; a generic
 RavenDoc structural-family renderer is not implemented in this checkpoint.
+
+## Raven callback migration checkpoint
+
+The library now spells callback types with Raven function syntax. FunctionBindings
+converts CLI Func/Action transport into structural native shapes and emits
+function.bind. Runtime Func declarations and their generated slice are removed;
+native service callback signatures use Function shapes. The isolated Raven policy
+in commit `09f4c91bd` selects inhabited unit-result transport for source unit
+functions, matching generic function results instantiated with unit. Other targets
+retain Action. This required no new source syntax or Runtime Contract setting.
+
+The callback fixture compiles and executes shared shapes, captured state, generic
+unit results and structural type identity. An extension declared on `(int) -> int`
+also executes. Named generic parameters now bind recursively inside Function
+shapes; a ten-test native suite and twelve runtime-service tests pass. Full library
+regeneration and bootstrap hash validation pass. Asynchronous callback validation
+is tracked in the migration fixture.
+
+[Function family member documentation](../api-docs/functions.md) describes Invoke
+and extensions without declaring a nominal Function type. CLI transport scaffolds
+remain inventoried with explicit documentation exclusions. Removing legacy
+delegate admission/frontends and settling object equality/nullability remain open.

@@ -1,10 +1,10 @@
-.function neoCLR.Runtime.SocketConnect(String address,Int32 port,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketConnect(String address,Int32 port,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketConnectResult(Int64 operation) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketReceive(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketReceive(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketTransferResult(Int64 operation) -> Value
@@ -13,19 +13,19 @@
 .function neoCLR.Runtime.SocketClose(Int64 socket) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketSend(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketListen(String address,Int32 port,Int32 backlog) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketAccept(Int64 listener,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketAccept(Int64 listener,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketLocalPort(Int64 socket) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketConnectAddresses(arrayref<String> addresses,Int32 port,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketConnectAddresses(arrayref<String> addresses,Int32 port,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketDeadlineAfter(Int32 milliseconds) -> Int64
@@ -34,13 +34,13 @@
 .function neoCLR.Runtime.SocketDeadlineExpired(Int64 deadline) -> Boolean
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketConnectAddressesUntil(arrayref<String> addresses,Int32 port,Int64 deadline,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketConnectAddressesUntil(arrayref<String> addresses,Int32 port,Int64 deadline,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketReceiveUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketReceiveUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
-.function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.SocketSendUntil(Int64 socket,arrayref<Byte> buffer,Int32 offset,Int32 count,Int64 deadline,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SocketCancel(Int64 operation) -> Boolean

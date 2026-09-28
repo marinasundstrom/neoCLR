@@ -84,7 +84,6 @@ static class LibraryImplementation
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
         if (EnumBindings.IsType(owner)) return FlagsLibrary.Roots(source, core, owner);
-        if (owner == "System.Func") return DelegateLibrary.Roots(source, core);
         if (owner == "System.Introspection.MemberInfo")
             return DescriptorLibrary.Roots(source, core, InstanceRoots, InterfaceRoots);
         if (owner is "System.Introspection.TypeInfo" or "System.Introspection.ParameterInfo" or "System.Introspection.AssemblyInfo" or "System.Introspection.ModuleInfo")

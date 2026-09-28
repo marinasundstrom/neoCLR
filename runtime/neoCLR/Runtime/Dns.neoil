@@ -1,4 +1,4 @@
-.function neoCLR.Runtime.DnsLookup(String hostName,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.DnsLookup(String hostName,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DnsResult(Int64 operation) -> Value
@@ -9,7 +9,7 @@ ldarg payload
 value.unpack String[]
 ret
 .end
-.function neoCLR.Runtime.DnsLookupUntil(String hostName,Int64 deadline,System.Func<Void> callback) -> Value
+.function neoCLR.Runtime.DnsLookupUntil(String hostName,Int64 deadline,fn<Void> callback) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DnsCancel(Int64 operation) -> Boolean

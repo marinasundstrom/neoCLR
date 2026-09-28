@@ -1488,6 +1488,15 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
 }
 pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
+        Type::Function(mut shape) => {
+            shape.parameters = shape
+                .parameters
+                .into_iter()
+                .map(|ty| bind_parameters(ty, names, method))
+                .collect();
+            shape.returns = bind_parameters(shape.returns, names, method);
+            Type::Function(shape)
+        }
         Type::Scoped {
             module,
             name,

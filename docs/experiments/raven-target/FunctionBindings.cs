@@ -1,7 +1,8 @@
 using Mono.Cecil;
 
-// Existing nominal Func family; target admission and closure lowering live in UnionImport.
-static class DelegateBindings
+// CLI delegate metadata is transport only. Imported callable identity is a structural
+// Function shape; target admission and closure lowering live in UnionImport.
+static class FunctionBindings
 {
     static readonly Dictionary<string, string[]> Shapes = new();
     public static void Reset() => Shapes.Clear();
@@ -10,14 +11,23 @@ static class DelegateBindings
     public static string Declarations => "public abstract class Delegate { } public abstract class MulticastDelegate : Delegate { } "
         + string.Join("\n", Enumerable.Range(0, 5).Select(n => "public delegate TResult Func<"
             + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i).Append("TResult")) + ">("
-            + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i + " arg" + i)) + ");"));
+            + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i + " arg" + i)) + ");"))
+        + string.Join("\n", Enumerable.Range(0, 5).Select(n => "public delegate void Action"
+            + (n == 0 ? "" : "<" + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i)) + ">")
+            + "(" + string.Join(',', Enumerable.Range(0, n).Select(i => "T" + i + " arg" + i)) + ");"));
     public static string? Type(TypeReference type)
     {
-        if (type.IsValueType || type is not GenericInstanceType g || !RuntimeSignatures.IsCore(type.Scope)
-            || g.GenericArguments.Count is < 1 or > 5 || g.ElementType.FullName != "System.Func`" + g.GenericArguments.Count) return null;
-        var signature = g.GenericArguments.Select(t => CollectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t)).ToArray();
+        if (type.IsValueType || !RuntimeSignatures.IsCore(type.Scope)) return null;
+        var generic = type as GenericInstanceType;
+        var arguments = generic?.GenericArguments.ToArray() ?? [];
+        var elementName = generic?.ElementType.FullName ?? type.FullName;
+        var isAction = elementName == "System.Action" && arguments.Length == 0
+            || arguments.Length is >= 1 and <= 4 && elementName == "System.Action`" + arguments.Length;
+        if (!isAction && !(arguments.Length is >= 1 and <= 5 && elementName == "System.Func`" + arguments.Length)) return null;
+        var signature = arguments.Select(t => CollectionBindings.Type(t) ?? ProcessBindings.ArrayType(t) ?? GenericUnionBindings.Type(t)).ToArray();
+        if (isAction) signature = signature.Append("Void").ToArray();
         if (signature.Any(t => t is null)) return null;
-        var name = "System.Func<" + string.Join(',', signature) + ">";
+        var name = "fn<" + string.Join(',', signature) + ">";
         Shapes[name] = signature.Select(t => t!).ToArray();
         return name;
     }
@@ -40,11 +50,11 @@ static class DelegateBindings
         if (owner is null) return null;
         var (args, result) = RuntimeSignatures.Match(reference, definition, t => Type(t) ?? CollectionBindings.Type(t) ?? GenericUnionBindings.Type(t), allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         var signature = Shapes[owner];
-        if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || result != signature[^1])
+        if (!reference.HasThis || !callvirt || reference.Name != "Invoke" || !args.SequenceEqual(signature[..^1]) || (result != signature[^1] && !(result == "noresult" && signature[^1] == "Void")))
             throw new InvalidDataException($"Unsupported delegate invocation: {reference.FullName}; callvirt={callvirt}, actual={string.Join(',', args)} -> {result}, expected={string.Join(',', signature)}.");
-        // A generic TResult instantiated with the inhabited unit remains a stack value.
-        // The caller's IL owns any pop; only a literal CLI void return has no result.
+        // Source unit Functions use an inhabited Void result. CLI Action is transport:
+        // binding adapters create that value, and CLI void invocation discards it.
         return new(owner + "::Invoke", new[] { owner }.Concat(args).ToArray(), result,
-            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})");
+            Instruction: $"callvirt instance {owner}::Invoke({string.Join(',', args)})" + (result == "noresult" ? "\npop" : ""));
     }
 }

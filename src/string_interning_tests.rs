@@ -272,7 +272,7 @@ fn isolated_workers_receive_independent_intern_quotas() {
     let helper = ".function Canon(String input) -> String\nldarg input\ncall neoCLR.Runtime.StringIntern(String)\nret\n.end";
     for operation in ["StartWorker", "QueueWorker"] {
         let body = format!(
-            "ldarg input\ncall neoCLR.Runtime.StringIntern(String)\npop\ndelegate.bind System.Func<String,String> = Canon(String)\nldstr \"child\"\ncall neoCLR.Runtime.{operation}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)\nret"
+            "ldarg input\ncall neoCLR.Runtime.StringIntern(String)\npop\ndelegate.bind fn<String,String> = Canon(String)\nldstr \"child\"\ncall neoCLR.Runtime.{operation}(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)\nret"
         );
         let p = program(&body, helper, "String");
         let result = execute(

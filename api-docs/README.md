@@ -106,7 +106,7 @@ including String construction and its read-only grapheme indexer. String Count i
 an explicit Collection implementation, visible through Sequence/Collection only.
 
 The current audit covers every public reference type through generated type pages,
-three explicit manual entries and ten explicitly excluded metadata scaffolds. Collections, arrays, delegates, query operators,
+explicit manual entries and explicitly excluded metadata scaffolds. Collections, arrays, functions, query operators,
 Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
 scaffolds are identified as such; they do not promise executable CLR services.
@@ -413,3 +413,10 @@ with ordinary API-reference detail. Family page titles and navigation keys are
 documentation identities, not synthesized nominal type names. The current snapshot
 covers the implemented common/nominal interfaces; generic structural-family rendering
 remains open. See [the Function design](../docs/function-types.md#structural-members-and-documentation).
+
+The Function family's current manual member reference is [functions.md](functions.md).
+CLI Delegate/MulticastDelegate, Func (one through five generic arguments) and
+Action (zero through four arguments) remain in the complete reference inventory
+but have explicit scaffold exclusions: they carry compiler metadata and do not
+define nominal runtime types. Their public callback signatures remain documented
+under their actual CLI IDs. This is distinct from omitting a runtime API.

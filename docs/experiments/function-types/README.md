@@ -27,11 +27,10 @@ python3 docs/experiments/function-types/verify.py \
   --reference target/function-types/NeoCLR.CoreProbe.dll
 ```
 
-The descriptor consumer has compiled, passed native verification, and executed with
-`Nominal and structural descriptors passed`. Full Function replacement is not
-complete: the Raven callable importer and library still admit delegate transport
-and nominal callable declarations. The native shape tests do not prove that every
-Raven function expression yet has structural runtime identity.
+The descriptor consumer compiles, passes native verification, and executes with
+`Nominal and structural descriptors passed`. Raven callbacks import to structural
+Function signatures; native legacy declaration and instruction aliases still need
+removal. The remaining scope is tracked separately from passing consumer evidence.
 
 ## Deferred general compiler candidate
 
@@ -65,3 +64,38 @@ attributes and union-case discovery. No website build or publication was perform
 The migrated reflection, flags and type-preview consumers execute, and the old
 System.Reflection descriptor namespace is rejected by the compiler. Raven's
 matching integration note is committed on its isolated neoclr branch as `0218f75af`.
+
+## Callable transport migration (in progress)
+
+Raven source callbacks now use function syntax. Its isolated neoCLR compiler policy
+selects inhabited Func transport for unit results, matching generic `() -> T`
+instantiated with unit. The importer converts CLI Func/Action carriers into native
+structural `fn<...>` signatures; a CLI no-result target is adapted to return the
+inhabited unit, and imported Action.Invoke discards that value for CLI stack balance.
+CLI carrier names are transport details, not runtime nominal type declarations.
+The source library Func declarations and their generated slice are removed.
+The source callback consumer executes, including structural identity, generic unit
+results, mutable captures, collection retention and an extension on `(int) -> int`.
+Full library regeneration and async consumer validation use the compiler fix below. Ordinary CLR target selection remains unchanged.
+
+## General function-construction compiler fix
+
+The async fixture exposed a null Promise callback list. An independent ordinary
+.NET reduction on Raven main-based branch `fix/function-type-construction` found
+that `List<() -> ()>()` produced an invalid semantic operation with no diagnostic
+and silently omitted construction during emission. The expression-side type binder
+was missing FunctionTypeSyntax handling. Commit `e316703ca` fixes that binding and
+is integrated into the isolated target as `6b5418e57`; it is ready for independent
+main integration, not a reason to merge the target branch wholesale.
+
+Fifteen focused compiler tests pass afterward; three function-signature constructor
+cases failed before the fix, while the non-function control passed. Tests check
+ObjectCreation operations, initialized runtime state and invalid-type diagnostics.
+The source-order getter observation above remains a separate deferred candidate.
+
+With the fixed compiler, the descriptor and callback/extension consumers pass.
+The async consumer verifies and executes with `42`, `True`, `41`, `21`, `7`,
+covering shared captures, unit callbacks and nested Task results. The validation
+script's initially lowercase Boolean expectation was corrected to the observed
+runtime display contract. Full source/bootstrap hash, API snapshot and source
+coverage audit checks pass. No website build or publication was needed.
