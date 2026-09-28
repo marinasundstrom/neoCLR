@@ -73,6 +73,14 @@ static class LibraryImplementation
             foreach (var name in names) ApplicationTypes.BindLibrary(source.GetType(name), name.Split('`')[0]);
             return names.SelectMany(name => source.GetType(name).IsInterface ? InterfaceRoots(source.GetType(name), core.GetType(name), name) : InstanceRoots(source.GetType(name), core.GetType(name), name.Split('`')[0])).Concat(Roots(source, core, "System.Tasks.Task", includeTaskFamily: false)).Concat(Roots(source, core, "System.Tasks.TaskOperators")).Concat(Roots(source, core, "System.Tasks.TaskResultOperators")).ToArray();
         }
+        if (owner == "System.Tuple")
+            return Enumerable.Range(1, 7).SelectMany(n => {
+                var type = source.GetType("System.Tuple`" + n);
+                var contract = core.GetType("System.Tuple`" + n);
+                TupleBindings.Validate(type);
+                TupleBindings.Validate(contract);
+                return InstanceRoots(type, contract, owner);
+            }).ToArray();
         if (owner == "System.Array") return InstanceRoots(source.GetType("System.Array`1") ?? throw new InvalidDataException("Missing Array implementation."), core.GetType("System.Array`1"), owner);
         if (MarkerLibrary.IsOwner(owner)) return MarkerLibrary.Roots(source, core, owner);
         if (EnumBindings.IsType(owner)) return FlagsLibrary.Roots(source, core, owner);
@@ -252,7 +260,7 @@ static class LibraryImplementation
         {
             // Unlike reference classes, a value's instance layout is an ABI contract.
             // Start with scalar, nongeneric sequential records; do not infer layout.
-            if (type.HasGenericParameters && !GenericUnionLibrary.IsFamily(type)
+            if (type.HasGenericParameters && !GenericUnionLibrary.IsFamily(type) && !TupleBindings.IsDefinition(type)
                 || !type.IsSequentialLayout || !contract.IsSequentialLayout
                 || type.PackingSize != contract.PackingSize || type.ClassSize != contract.ClassSize
                 || type.Fields.Count != contract.Fields.Count
@@ -260,6 +268,7 @@ static class LibraryImplementation
                     || !SameType(p.First.FieldType, p.Second.FieldType)
                     || (p.First.FieldType.MetadataType is not (MetadataType.Int32 or MetadataType.Int64 or MetadataType.Boolean)
                         && !GenericUnionLibrary.IsFamily(type)
+                        && !TupleBindings.IsDefinition(type)
                         && !CancellationBindings.IsTokenLayout(type)
                         && !(ErrorCarrierLibrary.IsCarrier(type) && p.First.FieldType.FullName == "System.Value" && RuntimeSignatures.IsCore(p.First.FieldType.Scope))
                         && !(owner == "System.LocalDateTime" && p.First.FieldType.FullName is "System.Date" or "System.Time"
@@ -298,13 +307,13 @@ static class LibraryImplementation
             && left.Parameters.Count == right.Parameters.Count
             && left.Parameters.Zip(right.Parameters).All(p => p.First.Name == p.Second.Name && p.First.IsOut == p.Second.IsOut
                 && MatchType(p.First.ParameterType, p.Second.ParameterType));
-        if (type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
-            || contract.Fields.Any(f => !f.IsPrivate))
+        if (!TupleBindings.IsDefinition(type) && (type.Fields.Any(f => !f.IsPrivate || f.IsStatic || f.IsInitOnly || f.HasMarshalInfo)
+            || contract.Fields.Any(f => !f.IsPrivate)))
             throw new InvalidDataException("Instance library requires private mutable implementation fields.");
         var declarationOnly = type.IsValueType && !type.HasFields && !contract.HasFields
             && !contract.HasMethods && !type.HasProperties && !type.HasInterfaces
             && type.Methods.All(PrimitiveLibrary.IsDefaultConstructor);
-        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
+        var methods = type.Methods.Where(m => !OpaqueLibrary.IsOmittedConstructor(m) && !ArrayLibrary.OmitConstructor(m) && !EmptyLibrary.OmitConstructor(m) && !((TupleBindings.IsDefinition(type) || ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)) && (!(PrimitiveLibrary.IsPrimitive(type) || declarationOnly) || !PrimitiveLibrary.IsDefaultConstructor(m))).ToArray();
         if (methods.Length == 0 && !declarationOnly || methods.Any(m => !(m.IsPublic || (DescriptorLibrary.IsDescriptor(type) || type.FullName == IPAddressBindings.Root || type.FullName == JsonBindings.Root) && m.IsFamily && m.IsConstructor || m.IsPrivate && (!m.IsVirtual || OpaqueLibrary.MatchesStringCount(m) && contract.Methods.Count(OpaqueLibrary.MatchesStringCount) == 1)
             || m.IsAssembly && !m.IsVirtual && contract.Methods.Count(c => c.IsAssembly && MatchMethod(c, m)) == 1) || !m.HasBody || m.HasGenericParameters && !JsonBindings.IsGenericSerializerMethod(m)
             || m.ExplicitThis || m.IsConstructor && m.IsStatic || (m.CallingConvention != MethodCallingConvention.Default && !JsonBindings.IsGenericSerializerMethod(m))

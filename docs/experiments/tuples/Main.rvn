@@ -1,0 +1,35 @@
+import System.*
+
+func Pair() -> (number: int, text: string) {
+    return (42, "tuple")
+}
+
+func Main() -> int {
+    let pair = Pair()
+    if pair.number != 42 || pair.text != "tuple" {
+        return 1
+    }
+    var copy = pair
+    copy.Item1 = 7
+    if pair.Item1 != 42 || copy.Item1 != 7 {
+        return 2
+    }
+    let (number, text) = pair
+    if number != 42 || text != "tuple" {
+        return 3
+    }
+    let explicit = Tuple<int, string>(9, "named")
+    if explicit.Item1 != 9 || explicit.Item2 != "named" {
+        return 4
+    }
+    let nested = (pair, (true, 6))
+    if nested.Item1.Item1 != 42 || nested.Item2.Item2 != 6 {
+        return 5
+    }
+    let seven = (1, 2, 3, 4, 5, 6, 7)
+    if seven.Item7 != 7 {
+        return 6
+    }
+    Console.WriteLine("Tuple contracts passed")
+    return 0
+}

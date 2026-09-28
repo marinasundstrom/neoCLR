@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "case": "syntax-copy-nesting",
+      "status": "passed"
+    },
+    {
+      "case": "arity-1-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-2-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-3-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-4-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-5-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-6-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "arity-7-construction-default",
+      "status": "passed"
+    },
+    {
+      "case": "boxing-array",
+      "status": "passed"
+    }
+  ]
+}

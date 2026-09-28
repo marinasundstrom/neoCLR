@@ -1,0 +1,484 @@
+; Generated from runtime/raven/src/System/Tuple.rvn. Regenerate with build_runtime_library.py.
+.type System.Tuple<T0>
+.sealed
+.field Item1 T0
+.method instance byref .ctor(T0 item1) -> Void
+.local T0 local0
+M00000001_IL_0000:
+M00000001_IL_0001:
+ldarg 0
+M00000001_IL_0002:
+pop
+M00000001_IL_0007:
+M00000001_IL_0008:
+ldarg 1
+M00000001_IL_0009:
+stloc local0
+M00000001_IL_000a:
+ldarg 0
+M00000001_IL_000b:
+ldloc local0
+M00000001_IL_000c:
+stfld System.Tuple<T0>::Item1
+pop
+M00000001_IL_0011:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.method instance byref .ctor(T0 item1,T1 item2) -> Void
+.local T0 local0
+.local T1 local1
+M00000002_IL_0000:
+M00000002_IL_0001:
+ldarg 0
+M00000002_IL_0002:
+pop
+M00000002_IL_0007:
+M00000002_IL_0008:
+ldarg 1
+M00000002_IL_0009:
+stloc local0
+M00000002_IL_000a:
+ldarg 0
+M00000002_IL_000b:
+ldloc local0
+M00000002_IL_000c:
+stfld System.Tuple<T0,T1>::Item1
+pop
+M00000002_IL_0011:
+M00000002_IL_0012:
+ldarg 2
+M00000002_IL_0013:
+stloc local1
+M00000002_IL_0014:
+ldarg 0
+M00000002_IL_0015:
+ldloc local1
+M00000002_IL_0016:
+stfld System.Tuple<T0,T1>::Item2
+pop
+M00000002_IL_001b:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1,T2>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.field Item3 T2
+.method instance byref .ctor(T0 item1,T1 item2,T2 item3) -> Void
+.local T0 local0
+.local T1 local1
+.local T2 local2
+M00000003_IL_0000:
+M00000003_IL_0001:
+ldarg 0
+M00000003_IL_0002:
+pop
+M00000003_IL_0007:
+M00000003_IL_0008:
+ldarg 1
+M00000003_IL_0009:
+stloc local0
+M00000003_IL_000a:
+ldarg 0
+M00000003_IL_000b:
+ldloc local0
+M00000003_IL_000c:
+stfld System.Tuple<T0,T1,T2>::Item1
+pop
+M00000003_IL_0011:
+M00000003_IL_0012:
+ldarg 2
+M00000003_IL_0013:
+stloc local1
+M00000003_IL_0014:
+ldarg 0
+M00000003_IL_0015:
+ldloc local1
+M00000003_IL_0016:
+stfld System.Tuple<T0,T1,T2>::Item2
+pop
+M00000003_IL_001b:
+M00000003_IL_001c:
+ldarg 3
+M00000003_IL_001d:
+stloc local2
+M00000003_IL_001e:
+ldarg 0
+M00000003_IL_001f:
+ldloc local2
+M00000003_IL_0020:
+stfld System.Tuple<T0,T1,T2>::Item3
+pop
+M00000003_IL_0025:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1,T2,T3>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.field Item3 T2
+.field Item4 T3
+.method instance byref .ctor(T0 item1,T1 item2,T2 item3,T3 item4) -> Void
+.local T0 local0
+.local T1 local1
+.local T2 local2
+.local T3 local3
+M00000004_IL_0000:
+M00000004_IL_0001:
+ldarg 0
+M00000004_IL_0002:
+pop
+M00000004_IL_0007:
+M00000004_IL_0008:
+ldarg 1
+M00000004_IL_0009:
+stloc local0
+M00000004_IL_000a:
+ldarg 0
+M00000004_IL_000b:
+ldloc local0
+M00000004_IL_000c:
+stfld System.Tuple<T0,T1,T2,T3>::Item1
+pop
+M00000004_IL_0011:
+M00000004_IL_0012:
+ldarg 2
+M00000004_IL_0013:
+stloc local1
+M00000004_IL_0014:
+ldarg 0
+M00000004_IL_0015:
+ldloc local1
+M00000004_IL_0016:
+stfld System.Tuple<T0,T1,T2,T3>::Item2
+pop
+M00000004_IL_001b:
+M00000004_IL_001c:
+ldarg 3
+M00000004_IL_001d:
+stloc local2
+M00000004_IL_001e:
+ldarg 0
+M00000004_IL_001f:
+ldloc local2
+M00000004_IL_0020:
+stfld System.Tuple<T0,T1,T2,T3>::Item3
+pop
+M00000004_IL_0025:
+M00000004_IL_0026:
+ldarg 4
+M00000004_IL_0028:
+stloc local3
+M00000004_IL_0029:
+ldarg 0
+M00000004_IL_002a:
+ldloc local3
+M00000004_IL_002b:
+stfld System.Tuple<T0,T1,T2,T3>::Item4
+pop
+M00000004_IL_0030:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1,T2,T3,T4>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.field Item3 T2
+.field Item4 T3
+.field Item5 T4
+.method instance byref .ctor(T0 item1,T1 item2,T2 item3,T3 item4,T4 item5) -> Void
+.local T0 local0
+.local T1 local1
+.local T2 local2
+.local T3 local3
+.local T4 local4
+M00000005_IL_0000:
+M00000005_IL_0001:
+ldarg 0
+M00000005_IL_0002:
+pop
+M00000005_IL_0007:
+M00000005_IL_0008:
+ldarg 1
+M00000005_IL_0009:
+stloc local0
+M00000005_IL_000a:
+ldarg 0
+M00000005_IL_000b:
+ldloc local0
+M00000005_IL_000c:
+stfld System.Tuple<T0,T1,T2,T3,T4>::Item1
+pop
+M00000005_IL_0011:
+M00000005_IL_0012:
+ldarg 2
+M00000005_IL_0013:
+stloc local1
+M00000005_IL_0014:
+ldarg 0
+M00000005_IL_0015:
+ldloc local1
+M00000005_IL_0016:
+stfld System.Tuple<T0,T1,T2,T3,T4>::Item2
+pop
+M00000005_IL_001b:
+M00000005_IL_001c:
+ldarg 3
+M00000005_IL_001d:
+stloc local2
+M00000005_IL_001e:
+ldarg 0
+M00000005_IL_001f:
+ldloc local2
+M00000005_IL_0020:
+stfld System.Tuple<T0,T1,T2,T3,T4>::Item3
+pop
+M00000005_IL_0025:
+M00000005_IL_0026:
+ldarg 4
+M00000005_IL_0028:
+stloc local3
+M00000005_IL_0029:
+ldarg 0
+M00000005_IL_002a:
+ldloc local3
+M00000005_IL_002b:
+stfld System.Tuple<T0,T1,T2,T3,T4>::Item4
+pop
+M00000005_IL_0030:
+M00000005_IL_0031:
+ldarg 5
+M00000005_IL_0033:
+stloc local4
+M00000005_IL_0035:
+ldarg 0
+M00000005_IL_0036:
+ldloc local4
+M00000005_IL_0038:
+stfld System.Tuple<T0,T1,T2,T3,T4>::Item5
+pop
+M00000005_IL_003d:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1,T2,T3,T4,T5>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.field Item3 T2
+.field Item4 T3
+.field Item5 T4
+.field Item6 T5
+.method instance byref .ctor(T0 item1,T1 item2,T2 item3,T3 item4,T4 item5,T5 item6) -> Void
+.local T0 local0
+.local T1 local1
+.local T2 local2
+.local T3 local3
+.local T4 local4
+.local T5 local5
+M00000006_IL_0000:
+M00000006_IL_0001:
+ldarg 0
+M00000006_IL_0002:
+pop
+M00000006_IL_0007:
+M00000006_IL_0008:
+ldarg 1
+M00000006_IL_0009:
+stloc local0
+M00000006_IL_000a:
+ldarg 0
+M00000006_IL_000b:
+ldloc local0
+M00000006_IL_000c:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item1
+pop
+M00000006_IL_0011:
+M00000006_IL_0012:
+ldarg 2
+M00000006_IL_0013:
+stloc local1
+M00000006_IL_0014:
+ldarg 0
+M00000006_IL_0015:
+ldloc local1
+M00000006_IL_0016:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item2
+pop
+M00000006_IL_001b:
+M00000006_IL_001c:
+ldarg 3
+M00000006_IL_001d:
+stloc local2
+M00000006_IL_001e:
+ldarg 0
+M00000006_IL_001f:
+ldloc local2
+M00000006_IL_0020:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item3
+pop
+M00000006_IL_0025:
+M00000006_IL_0026:
+ldarg 4
+M00000006_IL_0028:
+stloc local3
+M00000006_IL_0029:
+ldarg 0
+M00000006_IL_002a:
+ldloc local3
+M00000006_IL_002b:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item4
+pop
+M00000006_IL_0030:
+M00000006_IL_0031:
+ldarg 5
+M00000006_IL_0033:
+stloc local4
+M00000006_IL_0035:
+ldarg 0
+M00000006_IL_0036:
+ldloc local4
+M00000006_IL_0038:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item5
+pop
+M00000006_IL_003d:
+M00000006_IL_003e:
+ldarg 6
+M00000006_IL_0040:
+stloc local5
+M00000006_IL_0042:
+ldarg 0
+M00000006_IL_0043:
+ldloc local5
+M00000006_IL_0045:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5>::Item6
+pop
+M00000006_IL_004a:
+ldvoid
+ret
+.end
+.end
+.type System.Tuple<T0,T1,T2,T3,T4,T5,T6>
+.sealed
+.field Item1 T0
+.field Item2 T1
+.field Item3 T2
+.field Item4 T3
+.field Item5 T4
+.field Item6 T5
+.field Item7 T6
+.method instance byref .ctor(T0 item1,T1 item2,T2 item3,T3 item4,T4 item5,T5 item6,T6 item7) -> Void
+.local T0 local0
+.local T1 local1
+.local T2 local2
+.local T3 local3
+.local T4 local4
+.local T5 local5
+.local T6 local6
+M00000007_IL_0000:
+M00000007_IL_0001:
+ldarg 0
+M00000007_IL_0002:
+pop
+M00000007_IL_0007:
+M00000007_IL_0008:
+ldarg 1
+M00000007_IL_0009:
+stloc local0
+M00000007_IL_000a:
+ldarg 0
+M00000007_IL_000b:
+ldloc local0
+M00000007_IL_000c:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item1
+pop
+M00000007_IL_0011:
+M00000007_IL_0012:
+ldarg 2
+M00000007_IL_0013:
+stloc local1
+M00000007_IL_0014:
+ldarg 0
+M00000007_IL_0015:
+ldloc local1
+M00000007_IL_0016:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item2
+pop
+M00000007_IL_001b:
+M00000007_IL_001c:
+ldarg 3
+M00000007_IL_001d:
+stloc local2
+M00000007_IL_001e:
+ldarg 0
+M00000007_IL_001f:
+ldloc local2
+M00000007_IL_0020:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item3
+pop
+M00000007_IL_0025:
+M00000007_IL_0026:
+ldarg 4
+M00000007_IL_0028:
+stloc local3
+M00000007_IL_0029:
+ldarg 0
+M00000007_IL_002a:
+ldloc local3
+M00000007_IL_002b:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item4
+pop
+M00000007_IL_0030:
+M00000007_IL_0031:
+ldarg 5
+M00000007_IL_0033:
+stloc local4
+M00000007_IL_0035:
+ldarg 0
+M00000007_IL_0036:
+ldloc local4
+M00000007_IL_0038:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item5
+pop
+M00000007_IL_003d:
+M00000007_IL_003e:
+ldarg 6
+M00000007_IL_0040:
+stloc local5
+M00000007_IL_0042:
+ldarg 0
+M00000007_IL_0043:
+ldloc local5
+M00000007_IL_0045:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item6
+pop
+M00000007_IL_004a:
+M00000007_IL_004b:
+ldarg 7
+M00000007_IL_004d:
+stloc local6
+M00000007_IL_004f:
+ldarg 0
+M00000007_IL_0050:
+ldloc local6
+M00000007_IL_0052:
+stfld System.Tuple<T0,T1,T2,T3,T4,T5,T6>::Item7
+pop
+M00000007_IL_0057:
+ldvoid
+ret
+.end
+.end

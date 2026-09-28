@@ -395,3 +395,10 @@ retention, constants, non-execution and source limitations. No manual exclusions
 The 2026-09-27 constructor execution increment includes ConstructorReflectionExtensions
 and Invoke in generated type/member coverage, with exact boxing/access limitations
 in [the reflection reference](reflection.md). TypeInfo activation is unchanged.
+
+### Tuple development checkpoint (2026-09-28)
+
+All seven System.Tuple arities, constructors and fields have XML documentation and
+automatic public type selection. [The guide](tuples.md) records the bounded surface
+and naming difference from .NET. TupleElementNamesAttribute is a compiler-reference
+scaffold with an exact exclusion, not an executable guest API.

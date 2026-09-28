@@ -6,6 +6,18 @@ using Raven.CodeAnalysis;
 using Raven.CodeAnalysis.Syntax;
 using AssemblyDefinition = Mono.Cecil.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--tuple-image-checks")
+{
+    TupleChecks.VerifyImage(args[1]);
+    return;
+}
+
+if (args.Length == 2 && args[0] == "--tuple-checks")
+{
+    TupleChecks.Verify(args[1]);
+    return;
+}
+
 if (args.Length == 1 && args[0] == "--generic-helper-checks")
 {
     ApplicationSpecializationChecks.Verify();

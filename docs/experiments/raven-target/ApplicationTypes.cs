@@ -210,7 +210,7 @@ static class ApplicationTypes
             foreach (var contract in type.Interfaces) { CheckAccess(contract.InterfaceType, type.Module); map(contract.InterfaceType, false); }
             AttributeMetadata.Discover(type, pending);
             foreach (var field in type.Fields) map(field.FieldType, false);
-            foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface || !IsLibrary(type) && m.IsPublic && !m.IsConstructor && !m.HasGenericParameters && m.HasBody) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
+            foreach (var method in type.Methods.Where(m => (!m.IsStatic || type.IsInterface || !IsLibrary(type) && m.IsPublic && !m.IsConstructor && !m.HasGenericParameters && m.HasBody) && !(PrimitiveLibrary.IsMatched(type) && PrimitiveLibrary.IsDefaultConstructor(m)) && !(IsLibrary(type) && (OpaqueLibrary.IsOmittedConstructor(m) || ArrayLibrary.OmitConstructor(m) || EmptyLibrary.OmitConstructor(m) || (TupleBindings.IsDefinition(type) || ErrorCarrierLibrary.IsCarrier(type) || GenericUnionLibrary.IsFamily(type) && type.HasFields) && PrimitiveLibrary.IsDefaultConstructor(m)))))
             {
                 CheckMethod(method);
                 if (!OpaqueLibrary.IsExplicitStringCount(method) && !IsExplicitApplicationImplementation(method) && (method.Overrides.Any(o => !method.IsPublic || o.Name != method.Name || o.DeclaringType.Resolve()?.IsInterface != true

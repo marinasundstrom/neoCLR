@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-27.** This is the authoritative default for work priorities,
+**Updated 2026-09-28.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
@@ -131,6 +131,11 @@ The author selected a bounded `System.Runtime.GC` API after Reflection: executio
 object counters, explicit full collection and lifetime use. See the
 [GC contract](runtime-gc.md); generation/byte accounting and collector tuning remain
 outside this one-off author-directed slice.
+
+The author selected [value tuple support](tuples.md) on 2026-09-28, using
+`System.Tuple` as the neoCLR name corresponding to .NET `System.ValueTuple`.
+This is a bounded author-directed addition; it does not replace the Web API direction.
+The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) owns status.
 
 ## Theme trackers
 

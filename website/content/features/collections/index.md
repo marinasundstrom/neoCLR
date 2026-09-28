@@ -130,3 +130,10 @@ Browse [ArrayList](xref:System.Collections.ArrayList`1),
 [collection interfaces](xref:System.Collections) and
 [query operators](xref:System.Linq.Operators) for signatures,
 member descriptions and the current development contract.
+
+## Value tuples (development)
+
+After Preview 11, `System.Tuple<T1,...,TN>` adds heterogeneous value tuples with one
+through seven components. Raven tuple syntax uses this family; copying a tuple
+copies its fields while retaining the identity of referenced objects. See the
+[value-tuple API guide](/docs/tuples.html) for construction, fields and limitations.

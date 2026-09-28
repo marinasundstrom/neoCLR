@@ -7,6 +7,17 @@ foundation sweep. Useful API coverage is now selected in the
 expansion below remains deferred unless that work exposes a concrete dependency
 or later author direction selects it.
 
+## Value tuples — 2026-09-28
+
+Author-selected naming and capability: `System.Tuple` corresponds to .NET's value
+Tuple family. The [contract](../tuples.md) records ordinary generic value storage,
+component-copy semantics and compiler/importer ownership. The bounded development
+slice supports one through seven components, explicit construction, tuple syntax,
+names, deconstruction and nesting. [Focused evidence](../experiments/tuples/README.md)
+separates the general Raven metadata fix (independently tested on .NET and integrated
+on main) from the isolated neoCLR identity policy. Wider flat tuples/Rest and
+additional tuple-specific interfaces remain open; no broader milestone is selected.
+
 ## Author-selected Task.Run work — 2026-09-27
 
 **Active direction; development API implemented with bounded import limitations.** Task.Run is the canonical submission

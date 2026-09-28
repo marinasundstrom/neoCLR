@@ -12,5 +12,6 @@
   "T:System.Tasks.TaskOutcome.Cancelled": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:System.Tasks.TaskOutcome.Completed`1": "Physical case-carrier scaffold in the non-generic companion. RavenDoc publishes the logical case under its generic union instead of duplicating this metadata type.",
   "T:Raven.Runtime.CompilerServices.RavenUnionCaseAttribute": "Raven-owned compiler-reference case metadata, not an executable platform API. The bridge consumes it; the runtime has no dependency on this attribute.",
-  "T:Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute": "Raven-owned marker associating a generic union with its metadata companion; not an executable platform API. RavenDoc uses this metadata to merge the companion into the logical union."
+  "T:Raven.Runtime.CompilerServices.RavenUnionCompanionAttribute": "Raven-owned marker associating a generic union with its metadata companion; not an executable platform API. RavenDoc uses this metadata to merge the companion into the logical union.",
+  "T:System.Runtime.CompilerServices.TupleElementNamesAttribute": "Compiler-reference metadata scaffold preserving source tuple labels. Not an executable guest API; see /docs/tuples.html."
 }

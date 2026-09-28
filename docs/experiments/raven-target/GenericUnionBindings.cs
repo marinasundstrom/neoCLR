@@ -32,6 +32,7 @@ static class GenericUnionBindings
         if (type.FullName == "System.Object" && (type.MetadataType == MetadataType.Object
             || RuntimeSignatures.IsCore(type.Scope))) return "System.Object";
         if (depth > 24) throw new InvalidDataException("Union payload nesting limit exceeded.");
+        if (TupleBindings.Type(type) is { } tuple) return tuple;
         if (type is GenericInstanceType g && RuntimeSignatures.IsCore(type.Scope) && type.IsValueType)
         {
             var kind = g.ElementType.FullName switch {

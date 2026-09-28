@@ -1,0 +1,106 @@
+namespace System
+
+/// A 1-component value tuple. Assignment copies its fields.
+public struct Tuple<T1> {
+    field Item1: T1
+
+    init(item1: T1) {
+        Item1 = item1
+    }
+}
+
+/// A 2-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2> {
+    field Item1: T1
+    field Item2: T2
+
+    init(item1: T1, item2: T2) {
+        Item1 = item1
+        Item2 = item2
+    }
+}
+
+/// A 3-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2, T3> {
+    field Item1: T1
+    field Item2: T2
+    field Item3: T3
+
+    init(item1: T1, item2: T2, item3: T3) {
+        Item1 = item1
+        Item2 = item2
+        Item3 = item3
+    }
+}
+
+/// A 4-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2, T3, T4> {
+    field Item1: T1
+    field Item2: T2
+    field Item3: T3
+    field Item4: T4
+
+    init(item1: T1, item2: T2, item3: T3, item4: T4) {
+        Item1 = item1
+        Item2 = item2
+        Item3 = item3
+        Item4 = item4
+    }
+}
+
+/// A 5-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2, T3, T4, T5> {
+    field Item1: T1
+    field Item2: T2
+    field Item3: T3
+    field Item4: T4
+    field Item5: T5
+
+    init(item1: T1, item2: T2, item3: T3, item4: T4, item5: T5) {
+        Item1 = item1
+        Item2 = item2
+        Item3 = item3
+        Item4 = item4
+        Item5 = item5
+    }
+}
+
+/// A 6-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2, T3, T4, T5, T6> {
+    field Item1: T1
+    field Item2: T2
+    field Item3: T3
+    field Item4: T4
+    field Item5: T5
+    field Item6: T6
+
+    init(item1: T1, item2: T2, item3: T3, item4: T4, item5: T5, item6: T6) {
+        Item1 = item1
+        Item2 = item2
+        Item3 = item3
+        Item4 = item4
+        Item5 = item5
+        Item6 = item6
+    }
+}
+
+/// A 7-component value tuple. Assignment copies its fields.
+public struct Tuple<T1, T2, T3, T4, T5, T6, T7> {
+    field Item1: T1
+    field Item2: T2
+    field Item3: T3
+    field Item4: T4
+    field Item5: T5
+    field Item6: T6
+    field Item7: T7
+
+    init(item1: T1, item2: T2, item3: T3, item4: T4, item5: T5, item6: T6, item7: T7) {
+        Item1 = item1
+        Item2 = item2
+        Item3 = item3
+        Item4 = item4
+        Item5 = item5
+        Item6 = item6
+        Item7 = item7
+    }
+}

@@ -5,6 +5,9 @@
     <NeoCLRRoot>$(NeoCLRBootstrapRoot)</NeoCLRRoot>
   </PropertyGroup>
   <Import Project="../../build/NeoCLR.Raven.props" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Tuple'">
+    <Compile Include="src/System/Tuple.rvn" />
+  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'GC'">
     <Compile Include="src/System/Runtime/GC.rvn" />
   </ItemGroup>

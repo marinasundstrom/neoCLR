@@ -8940,3 +8940,36 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
 - **Action:** added the model to the Web guide and extracted the existing bounded
   report-server accept loop into its case page. The explanation covers rejection,
   completion, cleanup and shutdown without proposing a new HttpServer API.
+
+
+## 2026-09-28 — Tuple value types and isolated Raven integration
+
+- **Author:** “We should add tuple support via System.Tuple (which will be the name
+  corresponding System.ValueTuple in .NET)”. This selects the public name and value
+  representation; it does not specify every ValueTuple API or tuple arity.
+- **Assistant proposal/action:** traced Raven's tuple binding/emission and neoCLR's
+  generic value admission, then selected an initial one-through-seven-component
+  family with public Item fields, constructors, tuple syntax, labels, copying and
+  nesting. Kept empty parentheses on the existing System.Void unit contract.
+  Wider flat tuples and additional interfaces remain an assistant-scoped boundary,
+  not an author rejection of those capabilities.
+- **Author correction:** “You might need a separate worktree for work in Raven repo”.
+  The assistant created Raven-neoclr-tuples on codex/neoclr-tuples, based on neoclr,
+  preserving the original checkout and its untracked investigation file.
+- **Assistant finding/action:** nested tuple metadata exposed a general Raven failure.
+  Created Raven-tuple-metadata from main, reproduced it with standard .NET ValueTuple,
+  and independently validated the fix with 31 focused tests including execution.
+  Commit 90b996b1b was fast-forwarded into local Raven main and cherry-picked into
+  the isolated target worktree as ee3a23d15. Target naming policy remains separate.
+- **Author reaffirmation:** “Make sure that what should be backported to main/.NET is
+  cherry picked over - fixes and such”. The assistant confirmed the general fix was
+  already on main and committed to keeping further general fixes independent.
+- **Outcome/evidence:** see the [tuple experiment](experiments/tuples/README.md) for
+  actual consumer, metadata and importer validation. The .NET baseline comparison
+  and costs are in the [contract](tuples.md). This is development work after Preview
+  11, not a release, SDK installation or website publication. Target identity policy
+  is isolated in Raven commit 79a5d7ffc; the original Raven checkout remains unchanged.
+  The Web API direction remains unchanged.
+  The broader source-ownership audit has two reproduced pre-existing failures;
+  an eight-element tuple probe fails at emission rather than with a specific arity
+  diagnostic. Both are recorded as open limitations, not passing checks.

@@ -6,6 +6,20 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-28
+
+- Add development System.Tuple value types with one through seven components,
+  mutable Item fields and positional constructors. Integrate Raven tuple syntax,
+  names, deconstruction and nested values through the matching target compiler,
+  checked importer and generated Raven library. Add focused metadata, malformed
+  layout/signature and native consumer coverage, with matching API reference docs.
+  This is neoCLR's name for the ValueTuple representation, not .NET's reference
+  Tuple class. Unit remains System.Void; wider flat tuples/Rest and the full .NET
+  equality/comparison/formatting API remain outside this initial slice. Matching
+  development compiler/reference/importer/library artifacts are required.
+  Independently validate Raven's general tuple metadata fix on .NET and integrate
+  it into Raven main and the isolated target worktree.
+
 ### 2026-09-27
 
 - Correct the website's shared banner, footer and release link to Preview 11;

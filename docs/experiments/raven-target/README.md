@@ -1579,3 +1579,21 @@ visibility, including imported enclosing-type visibility and compound type argum
 Runtime Contract configuration and Raven compiler emission are unchanged. Use matching
 bridge, reference, library and runner artifacts. HttpClient and Descriptors library
 slices were regenerated; other manifests only refresh their shared source hashes.
+
+
+## Value tuple identity (development, 2026-09-28)
+
+The [tuple contract](../../tuples.md) uses System.Tuple rather than .NET's ValueTuple
+name. The current target supplies arities one through seven, mutable Item fields
+and constructors, with Raven expressions, labels and deconstruction. Empty `()`
+remains System.Void. Larger flat tuples/Rest and the full ValueTuple API are pending.
+The [focused experiment](../tuples/README.md) records metadata, malformed layout/
+signature and native execution checks. The compiler target option remains
+RavenTargetCoreAssemblyName=NeoCLR.CoreProbe; no independent tuple option is added.
+
+General Raven tuple metadata fixes were independently validated on main-based
+90b996b1b and cherry-picked into isolated codex/neoclr-tuples as ee3a23d15. That
+worktree contains target-only identity policy commit `79a5d7ffc`. Rebuild the bridge
+against it and refresh the Tuple slice and consumer reference together. Existing
+installed SDKs and published Preview 11 artifacts do not gain these APIs from a
+source edit; packaging and installation require separate qualification.

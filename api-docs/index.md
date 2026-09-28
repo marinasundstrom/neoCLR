@@ -4,6 +4,9 @@ toc: false
 ---
 # API documentation
 
+[Value tuples](tuples.md) are a development addition after Preview 11, using
+`System.Tuple<T1,...,TN>` as the value-type family.
+
 **Preview 11 API.** Comparer policies, explicit String comparison modes and the
 HashMap policy constructor are included. Rebuild applications
 with matching compiler, references and runtime library artifacts.
