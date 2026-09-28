@@ -56,6 +56,27 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   feature branch.” The assistant creates `feature/function-types` and prepares
   this bounded foundation for a commit, without declaring the overall goal complete.
 
+- **Author:** asks to commit to a feature branch and continue directly afterward.
+- **Assistant, performed:** created `feature/function-types` and committed the
+  native foundation as `81243d48`; continued with separate nominal/structural
+  descriptor providers, DisplayName and IsNominalType, reference metadata and
+  consumer migration. The new Raven consumer and seven negative member-access
+  compilation cases pass; native Function coverage now contains nine tests.
+  Complete callback migration and delegate removal remain open.
+- **Assistant, observed:** a source-order-dependent getter emission failure in
+  the experimental Raven compiler was avoided with a validated declaration order
+  and recorded as a deferred general compiler candidate, not as a compiler fix.
+  See the [integration evidence](experiments/function-types/README.md).
+
+- **Author, clarification:** structural types still support members and extension
+  members; they have no declared name. RavenDoc can describe Array, Tuple, Union,
+  Intersection and Function families and their members similarly to nominal types.
+- **Assistant, response and action:** retained common TypeInfo member queries and
+  corrected the design text that implied member support required nominal identity.
+  Proposed family pages with shape signatures and member/extension documentation;
+  page labels do not create nominal runtime names. A general RavenDoc renderer
+  remains future work, distinct from the updated reference for current public APIs.
+
 ## 2026-09-27 — Focus on a minimal Web API
 
 - **Author:** “We should focus on the Http story”, specifying the minimum features

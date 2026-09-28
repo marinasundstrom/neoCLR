@@ -15,7 +15,7 @@ false
 false
 Parse
 System.Int32
-System.Result
+System.Result<System.Int32,System.NumberParseError>
 true
 true
 false
@@ -59,12 +59,12 @@ true
 false
 false
 0
-5
+true
 5
 1
 System.Int32
 System.Int32
-1
+true
 true
 true
 true

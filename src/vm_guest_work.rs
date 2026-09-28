@@ -13,12 +13,12 @@ pub(super) fn submit(
     let Value::Function(binding) = &callback else {
         return Err(Fault::new("task submission requires a delegate"));
     };
-    let contract = crate::delegates::contract(&module, &binding.ty)?;
+    let contract = crate::function_objects::contract(&module, &binding.ty)?;
     if !contract.parameters.is_empty() {
         return Err(Fault::new("task callback must have no parameters"));
     }
     let function = resolve(&module, &binding.target)?;
-    crate::delegates::compatible(&contract, &function)?;
+    crate::function_objects::compatible(&contract, &function)?;
     options.limits = invocation.limits;
     let worker_invocation = invocation.clone();
     invocation

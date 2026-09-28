@@ -1,7 +1,7 @@
 # Function types and Function objects
 
 **Author-selected direction, 2026-09-28; native foundation implemented on the feature
-branch. Full replacement and introspection split remain incomplete.**
+branch, including the common/nominal descriptor split. Full delegate replacement remains incomplete.**
 
 The author selects structural Function types, Function objects instantiated from
 those types, replacement and removal of delegates, and a nominal/structural
@@ -58,30 +58,33 @@ work, and are not reasons to retain a neoCLR Delegate feature.
 
 ## Introspection split
 
-The current Raven `TypeInfo` extends `MemberInfo`, which supplies `Name`, `Module`,
-`MetadataToken`, `DeclaringType` and custom attributes. Adding `IsNominalType` alone
-would leave structural shapes pretending to be declarations. The proposed split is:
+The development Raven `TypeInfo` is now independent of `MemberInfo`.
+`NominalTypeInfo` inherits both interfaces and owns `FullName` and `Namespace`;
+`MemberInfo` supplies declaration names, module/token, ownership and attributes.
+The implemented split and remaining Function-specific proposal are:
 
 | Contract | Responsibility |
 | --- | --- |
 | `TypeInfo` | Common type identity, equality, shape queries and `IsNominalType`; usable for parameter/result/component types. |
-| `NominalTypeInfo : TypeInfo, MemberInfo` | Nominal declaration name, namespace and declaration metadata; nominal inheritance, members and visibility where applicable. |
+| `NominalTypeInfo : TypeInfo, MemberInfo` | Nominal declaration name, namespace and declaration identity metadata. |
 | `FunctionTypeInfo : TypeInfo` (proposed name) | Ordered parameter contracts and return type; no invented declaration name, namespace or metadata token. |
 | Function object | Bound target and environment, plus its Function type and typed invocation. |
 
 `IsNominalType` must agree with whether the descriptor implements `NominalTypeInfo`.
 Structural descriptors must not implement that interface with empty placeholders.
-Keep a common diagnostic type display, independent of nominal `FullName`; its
-final spelling needs selection. A display string is not a type identity or hash
+The common diagnostic display is `DisplayName`, independent of nominal `FullName`. A display string is not a type identity or hash
 substitute. Common descriptor equality must compare handles across implementations,
 not unconditionally cast to the current `RuntimeTypeInfo` implementation.
 
 Audit every existing member when splitting the interfaces. In particular,
 `FullName`, module/token/custom attributes and declaring-type relationships must
 not leak back onto all shapes via another shared base. Preserve shape inspection
-without requiring consumers to cast every type to a nominal descriptor. Reflection
-consumers that need declared fields/constructors must explicitly handle nominal
-types and reject or branch on structural types.
+without requiring consumers to cast every type to a nominal descriptor. Member support does not imply nominal identity. Structural types may have members
+and extension members; member queries remain on common TypeInfo. Consumers require
+a nominal view only for declaration identity metadata, not merely to discover or
+use a member. Existing execution support is still bounded by the runtime; this
+direction does not claim that every structural family already supports reflection
+invocation.
 
 This is the first step toward the author's split covering tuples, unions,
 intersections and function types. It does not retroactively make the current
@@ -134,7 +137,7 @@ belongs to the compiler phase, not an unsupported claim of compatibility.
    signature, readonly/out, frame-lifetime, private-access and forged-artifact cases.
 3. Split introspection descriptors and migrate callers, including reflection, JSON
    mapping, hashing and formatting. Verify interface tests and `IsNominalType` agree;
-   inspect Function parameter/result descriptors and preserve nominal member queries.
+   inspect Function parameter/result descriptors and preserve common member queries.
 4. Integrate Raven on its isolated target branch, update reference emission and
    importer lowering, and regenerate the authored runtime. Compiler transport may
    need CLR-compatible metadata internally, but must not leak nominal delegates
@@ -172,8 +175,8 @@ artifact round trips, structural identity, shared shape storage, reference/outpu
 distinctions, incompatible binding rejection, retained receivers under collection
 and rejection of frame receivers. The existing delegate suite remains regression
 coverage during migration. The transitional parser still admits delegate declarations
-and old binding encodings; removing those, migrating the library/Raven and implementing
-the descriptor split remain required. No completed public Function introspection,
+and old binding encodings; removing those and migrating library/Raven callbacks
+remain required. The common/nominal descriptor split is now implemented. No completed public Function introspection,
 named-function-type facility or full delegate removal is claimed.
 
 Checkpoint validation, 2026-09-28: `cargo check --locked --quiet` passes;
@@ -181,3 +184,40 @@ Checkpoint validation, 2026-09-28: `cargo check --locked --quiet` passes;
 6 structural Function tests and 26 existing callback regression tests. `cargo fmt
 --all` and the Git whitespace check pass. No Raven compiler or website build was
 needed for this native foundation; their migration remains outstanding.
+
+## Nominal descriptor checkpoint
+
+Development `TypeInfo` exposes `DisplayName` and `IsNominalType`, with represented
+type equality across its separate runtime providers. Nominal declarations, including
+constructed named generics and current Tuple/union declarations, implement
+`NominalTypeInfo : TypeInfo, MemberInfo`. Arrays, references, pointers, generic
+parameters and structural Function shapes do not. Existing general shape and member
+queries stay on TypeInfo; declaration identity metadata requires a nominal view.
+This is a breaking source contract: use DisplayName for diagnostic text, and narrow
+to NominalTypeInfo when declaration metadata is required.
+
+The [executable consumer and negative compilation cases](experiments/function-types/README.md)
+verify provider selection, equality, object discovery, collection and the absence of
+declaration-only members on TypeInfo. Native coverage now also exercises higher-order
+shapes, no-result call/callvirt and nominal classification (nine tests).
+Public reference metadata and documentation include the new interface and members.
+A source-order-dependent Raven getter emission issue remains a documented general
+compiler candidate; this change does not claim to fix the compiler.
+
+## Structural members and documentation
+
+Author clarification, 2026-09-28: structural types can have members and extension
+members; the distinction is the absence of a declared type name. Neither member
+discovery nor extension eligibility should require NominalTypeInfo merely because
+a type has members. A structural descriptor's DisplayName is diagnostic formatting,
+not a nominal declaration name. Individual members may still have names.
+
+RavenDoc should document structural families such as Array, Tuple, Union,
+Intersection and Function with the same member-level detail as nominal types.
+The assistant proposes stable family pages plus shape/signature examples and
+applicable extension-member documentation. Documentation labels and navigation
+identifiers do not create nominal runtime identities; closed structural shapes
+need not each generate a separate type page. Family membership, member applicability
+and rendered shape signatures need explicit documentation metadata rather than
+fabricated Name/Namespace values. This is a documentation direction; a generic
+RavenDoc structural-family renderer is not implemented in this checkpoint.

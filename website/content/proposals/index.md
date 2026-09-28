@@ -41,10 +41,10 @@ help offline tools, but requires explicit resolution, identity and lifetime rule
 
 ### Function types and nominal type information
 
-Selected direction, not implemented: Function types will describe callable shapes,
+Selected direction, in development: native Function types describe callable shapes,
 and Function objects will hold the method and any bound environment for invocation.
-They will replace delegates. `NominalTypeInfo` will carry declaration names and
-namespaces, while `TypeInfo.IsNominalType` distinguishes nominal types. This begins
+They will replace delegates. Development `NominalTypeInfo` carries declaration names
+and namespaces, while `TypeInfo.IsNominalType` distinguishes nominal types. This begins
 a wider nominal/structural split; it does not yet change tuple or union identity.
 Named function types remain a possible later addition, with identity rules open.
 Unlike .NET's nominal delegate types, structural shapes can share identity across

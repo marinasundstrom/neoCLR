@@ -64,7 +64,7 @@ public func Check(attributes: Sequence<CustomAttributeData>, text: string) {
         return
     }
     let attribute = attributes[0]
-    if attribute.AttributeType.Name != "NoteAttribute" || attribute.Constructor.Name != ".ctor" {
+    if ((NominalTypeInfo)attribute.AttributeType).Name != "NoteAttribute" || attribute.Constructor.Name != ".ctor" {
         System.Fault("Wrong attribute identity")
         return
     }
@@ -107,10 +107,10 @@ public func Check(attributes: Sequence<CustomAttributeData>, text: string) {
 }
 
 func Main() {
-    if typeof(PlainItem).GetCustomAttributesData().Count != 0 {
+    if ((NominalTypeInfo)typeof(PlainItem)).GetCustomAttributesData().Count != 0 {
         System.Fault("Unannotated type has attributes")
     }
-    let repeated = typeof(RepeatedItem).GetCustomAttributesData()
+    let repeated = ((NominalTypeInfo)typeof(RepeatedItem)).GetCustomAttributesData()
     if repeated.Count != 3 {
         System.Fault("Multiple attributes were lost")
     }
@@ -131,9 +131,10 @@ func Main() {
     if !repeated[1].AttributeType.Equals(typeof(NoteAttribute)) {
         System.Fault("Mixed attribute declaration missing")
     }
-    let routeType = typeof(AppRoutes)
+    let routeType = (NominalTypeInfo)typeof(AppRoutes)
     var routeCases = 0
-    for candidate in routeType.Module.GetTypes() {
+    for discovered in routeType.Module.GetTypes() {
+        let candidate = (NominalTypeInfo)discovered
         if let Some(parent) = candidate.DeclaringType {
             if parent.Equals(routeType) {
                 Check(candidate.GetCustomAttributesData(), "route")
@@ -144,7 +145,7 @@ func Main() {
     if routeCases != 1 {
         System.Fault("Union case metadata missing")
     }
-    let type = typeof(Item)
+    let type = (NominalTypeInfo)typeof(Item)
     let Some(note) = FindNote(type) else {
         System.Fault("Attribute lookup failed")
         return

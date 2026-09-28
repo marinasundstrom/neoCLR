@@ -6,6 +6,16 @@ Type/TypeInfo split and class-based descriptor direction in the
 that the entire target model or RuntimeContext is implemented. The eight Info contracts are sealed interfaces in the Raven profile; unified
 acquisition and the minimal loaded-program discovery surface are implemented below.
 
+## Development nominal split — 2026-09-28
+
+The author-directed [Function migration](function-types.md) now separates TypeInfo
+from MemberInfo. Common descriptors expose DisplayName and IsNominalType;
+NominalTypeInfo inherits both TypeInfo and MemberInfo and owns FullName/Namespace.
+Declaration metadata is available only on nominal views. Arrays and Function shapes
+are structural; current declared Tuple and union families remain nominal.
+This development change supersedes the common MemberInfo inheritance described
+in the earlier design below. Matching reference and library artifacts are required.
+
 ## Author-directed implementation step — 2026-09-19
 
 After completing the Raven source port, establish the System.Runtime project

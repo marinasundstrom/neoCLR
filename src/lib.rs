@@ -14,14 +14,14 @@ mod execution;
 mod path;
 mod time_zones;
 pub use console::{Console, StdioConsole};
-mod delegates;
 pub mod frontend;
+mod function_objects;
 mod gc;
 mod shared_heap;
 // Internal native submission is tested before connecting guest VM safepoints.
 #[allow(dead_code)]
 mod task_work;
-pub use delegates::FunctionObject as Function;
+pub use function_objects::FunctionObject as Function;
 mod inheritance;
 mod initialization;
 mod input;

@@ -1,0 +1,45 @@
+import System.*
+import System.Introspection.*
+import System.Option.*
+
+public func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fault(message)
+    }
+}
+
+func Main() -> int {
+    let number = typeof(int)
+    Check(number.IsNominalType, "Int32 is nominal")
+    Check(number is NominalTypeInfo, "Nominal capability agrees with the flag")
+    let nominal = (NominalTypeInfo)number
+    Check(nominal.Name == "System.Int32" && nominal.Namespace == "System", "Declaration names")
+    Check(nominal.FullName == number.DisplayName, "Nominal display")
+    Check(nominal.MetadataToken != 0, "Declaration metadata")
+    let member: MemberInfo = nominal
+    Check(member.Name == nominal.Name, "Nominal MemberInfo view")
+
+    let array = typeof(int[])
+    Check(!array.IsNominalType && !(array is NominalTypeInfo), "Array is structural")
+    Check(!(array is MemberInfo), "Structural descriptors are not declarations")
+    Check(array.IsArray, "Common shape query")
+    if let Some(element) = array.GetElementType() {
+        Check(element.Equals(number) && element.IsNominalType, "Element identity")
+    } else {
+        System.Fault("Missing array element")
+    }
+    let generic = typeof(Option<int[]>)
+    let argument = generic.GetGenericArgument(0)
+    Check(generic.IsNominalType && generic is NominalTypeInfo, "Constructed declaration is nominal")
+    Check(argument.Equals(array) && !argument.IsNominalType, "Generic component keeps structural identity")
+    Check(!(argument is NominalTypeInfo) && !(argument is MemberInfo), "Generic component chooses structural provider")
+    Check(array.Equals(typeof(int[])), "Structural descriptor equality")
+    Check(!number.Equals(array) && !array.Equals(number), "Cross-provider equality")
+    Check(number.GetHashCode() == typeof(int).GetHashCode(), "Nominal hash consistency")
+    let boxed: Object = 42
+    Check(boxed.GetType() is NominalTypeInfo, "Object acquisition chooses nominal provider")
+    System.Runtime.GC.Collect()
+    Check(number.Equals(typeof(int)), "Descriptor survives collection")
+    Console.WriteLine("Nominal and structural descriptors passed")
+    return 0
+}

@@ -91,3 +91,58 @@ fn functions_with_identical_shapes_share_a_storage_contract() {
     );
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
 }
+
+#[test]
+fn no_result_invoke_preserves_the_caller_stack() {
+    for instruction in ["call", "callvirt"] {
+        let m = module(
+            &format!(
+                "ldc.i4 42\nfunction.bind fn<noresult Void> = Empty()\n{instruction} instance fn<noresult Void>::Invoke()"
+            ),
+            ".function Empty() -> noresult\nret\n.end",
+        );
+        verify(&m).unwrap();
+        assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+    }
+}
+
+#[test]
+fn higher_order_generic_functions_accept_structural_shapes() {
+    let m = module(
+        "function.bind fn<Int32,Int32> = Identity<Int32>(Int32)\ncall Keep<fn<Int32,Int32>>(fn<Int32,Int32>)\nldc.i4 42\ncallvirt instance fn<Int32,Int32>::Invoke(Int32)",
+        ".function Keep<T>(T) -> T\nldarg 0\nret\n.end\n.function Identity<T>(T) -> T\nldarg 0\nret\n.end",
+    );
+    verify(&m).unwrap();
+    assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
+    let graph = LoadedProgram::new(&m)
+        .unwrap()
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            100,
+        )
+        .unwrap();
+    let main = &graph.functions[graph.roots[0]];
+    assert_eq!(main.bindings.len(), 1);
+    assert_eq!(main.function_invocations.len(), 1);
+}
+
+#[test]
+fn nominal_classification_follows_identity_not_display_names() {
+    for (shape, expected) in [
+        ("Int32", 1),
+        ("fn<Int32,Int32>", 0),
+        ("Int32&", 0),
+        ("Int32[]", 0),
+    ] {
+        let m = module(
+            &format!(
+                "ldtoken {shape}\nldc.i4 12\ncall neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)\nbrtrue Nominal\nldc.i4 0\nret\nNominal:\nldc.i4 1"
+            ),
+            "",
+        );
+        assert_eq!(
+            run(&m, Limits::default()).unwrap().value,
+            Value::Int32(expected)
+        );
+    }
+}

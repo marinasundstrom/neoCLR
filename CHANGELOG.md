@@ -13,13 +13,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   artifact round trips and retained receiver tracing. Add focused shape, signature,
   capture-lifetime and collection tests. The native host surface now uses Function
   and Value::Function in place of Delegate and Value::Delegate; consumers must
-  update those names. Transitional delegate declarations and input encodings remain
-  while library/compiler migration is pending. NominalTypeInfo and
-  TypeInfo.IsNominalType are not yet implemented.
+  update those names. Native binding metadata is now BindFunction with a function_type
+  operand, and reachability exposes function_invocations. Transitional delegate
+  declarations and input encodings remain while library/compiler migration is pending.
+  Split Raven TypeInfo from MemberInfo: NominalTypeInfo exposes declaration metadata,
+  and TypeInfo adds IsNominalType and DisplayName. Clients must narrow to NominalTypeInfo
+  for Name/Namespace/FullName/module/token/attribute access. Regenerate descriptor,
+  Object display and parameter-hash implementations with matching reference contracts.
+  Preserve common member queries: structural types may have members and extensions
+  without declared names; record RavenDoc structural-family documentation direction.
   Record the direction and migration plan: structural
   callable shapes, replacement/removal of delegates, and a NominalTypeInfo split
   with TypeInfo.IsNominalType. Preserve named function types as a possible future
-  addition with undecided identity rules. Raven-facing APIs remain unchanged.
+  addition with undecided identity rules. Complete callback API migration is still pending.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

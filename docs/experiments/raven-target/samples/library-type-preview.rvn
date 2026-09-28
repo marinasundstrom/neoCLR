@@ -4,7 +4,7 @@ import System.Introspection.*
 
 func Main() {
     let type = typeof(int)
-    WriteLine(type.Name)
+    WriteLine(type.DisplayName)
     if type.IsValueType {
         WriteLine("Value type")
     }

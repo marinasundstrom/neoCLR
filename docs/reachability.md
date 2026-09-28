@@ -83,7 +83,7 @@ indices so backend planning preserves reference receiver and output contracts.
 
 
 Delegate binding dependencies are reported in `ReachableFunction.bindings`, separate
-from direct `calls`. `delegate_invocations` records (instruction, closed delegate
+from direct `calls`. `function_invocations` records (instruction, callable
 type) for indirect Invoke sites. Backends must retain binding edges as executable
 dependencies; an Invoke site does not identify a unique target. Virtual/interface
 binding conservatively includes dispatch candidates. An Invoke declaration alone

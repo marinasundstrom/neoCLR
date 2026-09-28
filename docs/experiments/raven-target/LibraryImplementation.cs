@@ -226,7 +226,7 @@ static class LibraryImplementation
         if (type.IsValueType != contract.IsValueType)
             throw new InvalidDataException("Library value/reference representation does not match reference contract.");
         // Native snapshot factories construct Type from precisely one opaque handle.
-        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.RuntimeTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
+        if (owner is "System.Introspection.TypeInfo" or "System.Introspection.RuntimeTypeInfo" or "System.Introspection.RuntimeNominalTypeInfo" && (type.Fields.Count != 1 || type.Fields[0].Name != "Handle"
             || type.Fields[0].FieldType.FullName != "System.RuntimeTypeHandle"
             || !RuntimeSignatures.IsCore(type.Fields[0].FieldType.Scope)))
             throw new InvalidDataException("Type library layout must contain exactly one core RuntimeTypeHandle.");

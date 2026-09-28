@@ -29,9 +29,9 @@ ldarg arg1
 callvirt instance System.Introspection.TypeInfo::Equals(System.Introspection.TypeInfo)
 ret
 .end
-.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo arg0) -> String
+.function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionB5AA950FE5FB29D0(System.Introspection.TypeInfo arg0) -> String
 ldarg arg0
-callvirt instance System.Introspection.TypeInfo::get_FullName()
+callvirt instance System.Introspection.TypeInfo::get_DisplayName()
 ret
 .end
 .function neoCLR.Library.System.Introspection.ParameterInfo.RuntimeServiceMemberCustomAttributes(System.Introspection.TypeInfo arg0,Int32 arg1) -> arrayref<System.Introspection.CustomAttributeData>
@@ -422,7 +422,7 @@ ldarg 0
 M0000000c_IL_000b:
 ldfld System.Introspection.RuntimeParameterInfo::StoredDeclaringType
 M0000000c_IL_0010:
-call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo)
+call neoCLR.Library.System.Introspection.ParameterInfo.RuntimeReflectionB5AA950FE5FB29D0(System.Introspection.TypeInfo)
 M0000000c_IL_0015:
 call instance System.HashCode::Add(String)
 pop

@@ -14,8 +14,9 @@ func Kind(member: MemberInfo) -> string {
     return match member {
         FieldInfo => "Field"
         MethodInfo => "Method"
+        ConstructorInfo => "Constructor"
         PropertyInfo => "Property"
-        TypeInfo => "Type"
+        NominalTypeInfo => "Type"
     }
 }
 
@@ -29,11 +30,11 @@ func Main() {
 
     let member: MemberInfo = typeof(Date).GetProperties()[0]
     match member.DeclaringType {
-        .Some(let owner) => WriteLine(owner.Name)
+        .Some(let owner) => WriteLine(owner.DisplayName)
         .None => Fault("Expected a declaring type")
     }
     WriteLine(Kind(typeof(Date).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))
     WriteLine(Kind(typeof(Date).GetMethods()[0]))
     WriteLine(Kind(member))
-    WriteLine(Kind(typeof(Date)))
+    WriteLine(Kind((NominalTypeInfo)typeof(Date)))
 }

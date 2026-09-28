@@ -51,25 +51,28 @@ static class CoreDeclarations
                 localFactory.Parameters.Add(new Mono.Cecil.ParameterDefinition("ticks", Mono.Cecil.ParameterAttributes.None,
                     module.GetType("System.Instant").Methods.Single(m => m.Name == "FromUnixTimeTicks").Parameters[0].ParameterType));
                 local.Methods.Add(localFactory);
-                var info = module.GetType("System.Introspection.RuntimeTypeInfo");
-                // Metadata-only C# emission omits internal getters. Retain this
-                // exact provider capability for library authoring, never consumers.
-                if (!info.Methods.Any(m => m.Name == "get_ExecutionHandle"))
+                foreach (var provider in new[] { "RuntimeTypeInfo", "RuntimeNominalTypeInfo" })
                 {
-                    var getter = new Mono.Cecil.MethodDefinition("get_ExecutionHandle",
-                        Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.HideBySig
-                        | Mono.Cecil.MethodAttributes.SpecialName, module.GetType("System.RuntimeTypeHandle"));
-                    info.Methods.Add(getter);
-                    info.Properties.Add(new Mono.Cecil.PropertyDefinition("ExecutionHandle",
-                        Mono.Cecil.PropertyAttributes.None, getter.ReturnType) { GetMethod = getter });
-                }
-                if (!info.Methods.Any(m => m.Name == "FromHandle"))
-                {
-                    var factory = new Mono.Cecil.MethodDefinition("FromHandle",
-                        Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, module.GetType("System.Introspection.TypeInfo"));
-                    factory.Parameters.Add(new Mono.Cecil.ParameterDefinition("handle", Mono.Cecil.ParameterAttributes.None,
-                        module.GetType("System.RuntimeTypeHandle")));
-                    info.Methods.Add(factory);
+                    var info = module.GetType("System.Introspection." + provider);
+                    // Metadata-only C# emission omits internal getters. Retain this
+                    // exact provider capability for library authoring, never consumers.
+                    if (!info.Methods.Any(m => m.Name == "get_ExecutionHandle"))
+                    {
+                        var getter = new Mono.Cecil.MethodDefinition("get_ExecutionHandle",
+                            Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.HideBySig
+                            | Mono.Cecil.MethodAttributes.SpecialName, module.GetType("System.RuntimeTypeHandle"));
+                        info.Methods.Add(getter);
+                        info.Properties.Add(new Mono.Cecil.PropertyDefinition("ExecutionHandle",
+                            Mono.Cecil.PropertyAttributes.None, getter.ReturnType) { GetMethod = getter });
+                    }
+                    if (!info.Methods.Any(m => m.Name == "FromHandle"))
+                    {
+                        var factory = new Mono.Cecil.MethodDefinition("FromHandle",
+                            Mono.Cecil.MethodAttributes.Assembly | Mono.Cecil.MethodAttributes.Static | Mono.Cecil.MethodAttributes.HideBySig, module.GetType("System.Introspection.TypeInfo"));
+                        factory.Parameters.Add(new Mono.Cecil.ParameterDefinition("handle", Mono.Cecil.ParameterAttributes.None,
+                            module.GetType("System.RuntimeTypeHandle")));
+                        info.Methods.Add(factory);
+                    }
                 }
             }
             if (collectionProbe) { IntrospectionHierarchy.Project(module); TaskBindings.Project(module); WorkerBindings.Project(module); CancellationBindings.Project(module); SocketBindings.Project(module, libraryBootstrap); HttpBindings.Project(module); ReaderBindings.Project(module); }

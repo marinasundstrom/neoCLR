@@ -44,7 +44,7 @@ pub(crate) fn analyze(module: &Module) -> Result<Verification, Fault> {
     }
     let mut functions = Vec::new();
     for (index, function) in module.functions.iter().enumerate() {
-        if crate::delegates::is_contract(module, function)
+        if crate::function_objects::is_contract(module, function)
             || function.is_abstract
             || function.is_internal_call()
             || function.pinvoke.is_some()
@@ -666,7 +666,7 @@ fn effect(
         CreateArray(_) | ArrayElement(_) | ArrayAddress(_) => (2, 1),
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
-        BindDelegate { target, .. } => (usize::from(target.instance), 1),
+        BindFunction { target, .. } => (usize::from(target.instance), 1),
         Call(target) | CallVirtual(target) => (
             target.parameters.len() + usize::from(target.instance),
             usize::from(!crate::vm::resolve(module, target)?.no_result),
@@ -1090,8 +1090,12 @@ fn typed_effect(
                 "interface.borrow requires a typed pointer or managed slot reference",
             )),
         },
-        BindDelegate { delegate, target } => {
-            let callee = crate::delegates::validate_binding(module, function, delegate, target)?;
+        BindFunction {
+            function_type: delegate,
+            target,
+        } => {
+            let callee =
+                crate::function_objects::validate_binding(module, function, delegate, target)?;
             if callee.instance {
                 let owner = callee.owner.as_ref().unwrap();
                 stored(
@@ -1110,11 +1114,15 @@ fn typed_effect(
         }
         CallVirtual(target) => {
             let callee = crate::vm::resolve(module, target)?;
-            if crate::delegates::is_contract(module, &callee) {
+            if crate::function_objects::is_contract(module, &callee) {
                 for (value, ty) in values.iter().zip(callee.argument_types()) {
                     stored(module, value, &ty)?;
                 }
-                return Ok(vec![loaded(&callee.returns)]);
+                return Ok(if callee.no_result {
+                    vec![]
+                } else {
+                    vec![loaded(&callee.returns)]
+                });
             }
             let interface = callee.owner.clone().ok_or_else(|| {
                 crate::Fault::coded(

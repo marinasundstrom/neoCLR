@@ -25,7 +25,7 @@ fn static_closed_generic_binding_roundtrips_and_invokes() {
         .unwrap();
     let main = &graph.functions[graph.roots[0]];
     assert_eq!(main.bindings.len(), 1);
-    assert_eq!(main.delegate_invocations.len(), 1);
+    assert_eq!(main.function_invocations.len(), 1);
     assert!(main.calls.is_empty());
     assert_eq!(
         graph.functions[main.bindings[0].target]

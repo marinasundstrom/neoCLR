@@ -1,5 +1,23 @@
 # Raven targeting neoCLR
 
+## Function and nominal descriptor migration (2026-09-28)
+
+The feature branch has native structural Function metadata, checked binding and
+Invoke, with higher-order/generic, lifetime and no-result tests. Full callback
+library/import migration and removal of delegate admission are still pending.
+The [Function plan](../../function-types.md) and
+[consumer evidence](../function-types/README.md) distinguish the completed native
+foundation from the unfinished replacement.
+
+The updated reference and Raven-authored descriptors split TypeInfo from MemberInfo.
+Use TypeInfo.DisplayName for diagnostics; test/cast to NominalTypeInfo for Name,
+Namespace, FullName, module/token and attribute information. IsNominalType agrees
+with that capability, including through object discovery. Arrays use the structural
+provider; declared generic tuples and unions remain nominal. Runtime typeof contract
+settings are unchanged and still return TypeInfo. Matching regenerated artifacts
+are required. The evidence also records a deferred source-order compiler candidate;
+no Raven compiler implementation change is included in this checkpoint.
+
 ## Task.Run integration (2026-09-27)
 
 Development references expose the static System.Tasks.Task submission owner alongside

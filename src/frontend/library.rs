@@ -356,7 +356,7 @@ pub(super) fn delegate(ty: &Ty) -> Result<Option<crate::metadata::Function>, Fau
         .type_definition(&ty)
         .is_some_and(|d| d.representation == crate::metadata::Representation::Delegate)
     {
-        crate::delegates::contract(module, &ty).map(Some)
+        crate::function_objects::contract(module, &ty).map(Some)
     } else {
         Ok(None)
     }

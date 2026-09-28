@@ -94,7 +94,7 @@ impl Query {
             let Value::Object { ty, fields } = &snapshot else {
                 return Err(Fault::new("invalid TypeInfo snapshot"));
             };
-            if ty.definition_name() != Some("System.Introspection.RuntimeTypeInfo")
+            if ty.definition_name() != Some("System.Introspection.RuntimeNominalTypeInfo")
                 || fields.len() != 1
             {
                 return Err(Fault::new("invalid TypeInfo provider"));
@@ -213,6 +213,7 @@ impl Query {
                 )
             }
             Self::Shape => Ok(Value::Boolean(match argument {
+                12 => matches!(handle.identity, TypeIdentity::Definition { .. }),
                 8 => definition.is_some_and(|d| {
                     (d.is_reference_type || d.representation == Representation::Interface)
                         && !d.is_sealed
@@ -1018,7 +1019,14 @@ pub(crate) fn materialize(
                         "System.Introspection.ModuleInfo" => {
                             "System.Introspection.RuntimeModuleInfo"
                         }
-                        "System.Introspection.TypeInfo" => "System.Introspection.RuntimeTypeInfo",
+                        "System.Introspection.TypeInfo" => {
+                            if matches!(fields.first(), Some(Value::RuntimeTypeHandle(handle)) if matches!(handle.identity, TypeIdentity::Definition { .. }))
+                            {
+                                "System.Introspection.RuntimeNominalTypeInfo"
+                            } else {
+                                "System.Introspection.RuntimeTypeInfo"
+                            }
+                        }
                         "System.Introspection.ParameterInfo" => {
                             "System.Introspection.RuntimeParameterInfo"
                         }

@@ -21,8 +21,9 @@ public class ItemRouteFactory {
     }
 
     static func Prepare() -> Result<ItemRouteFactory, string> {
-        let routes = typeof(CatalogRoutes)
-        for candidate in routes.Module.GetTypes() {
+        let routes = (NominalTypeInfo)typeof(CatalogRoutes)
+        for discovered in routes.Module.GetTypes() {
+            let candidate = (NominalTypeInfo)discovered
             if let Some(parent) = candidate.DeclaringType {
                 if parent.Equals(routes) {
                     for attribute in candidate.GetCustomAttributesData() {

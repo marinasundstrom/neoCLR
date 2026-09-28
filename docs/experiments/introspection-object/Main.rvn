@@ -21,16 +21,18 @@ func Main() {
     let second = typeof(First)
     let different = typeof(Second)
     let contract: EquatableTo<TypeInfo> = first
-    let member: MemberInfo = first
+    let firstNominal = (NominalTypeInfo)first
+    let secondNominal = (NominalTypeInfo)second
+    let member: MemberInfo = firstNominal
     Check(!Object.ReferenceEquals(first, second), "Descriptors have separate allocation identity")
     Check(first.Equals(second) && contract.Equals(second), "Typed represented-type equality")
     Check(Same(first, second) && Same(second, member), "Object represented-type equality")
     Check(!Same(first, different) && !Same(first, null) && !Same(first, 42), "Reject another type, null and non-descriptor")
     Check(Hash(first) == Hash(second), "Equal type hashes")
-    Check(Display(first) == first.FullName, "Represented-type display")
+    Check(Display(first) == first.DisplayName, "Represented-type display")
 
-    let module = first.Module
-    let repeatedModule = second.Module
+    let module = firstNominal.Module
+    let repeatedModule = secondNominal.Module
     let assembly = module.Assembly
     let repeatedAssembly = repeatedModule.Assembly
     Check(!Object.ReferenceEquals(module, repeatedModule), "Separate module wrappers")
@@ -70,13 +72,13 @@ func Main() {
     } else {
         System.Fault("Repeated descriptor missed map entry")
     }
-    Check(Same(first, typeof(First)) && Display(first) == first.FullName, "Retained descriptor survives collection")
-    if let Some(value) = assemblies.Find(first.Module.Assembly) {
+    Check(Same(first, typeof(First)) && Display(first) == first.DisplayName, "Retained descriptor survives collection")
+    if let Some(value) = assemblies.Find(firstNominal.Module.Assembly) {
         Check(value == 1, "Assembly identity survives collection")
     } else {
         System.Fault("Assembly lookup failed after collection")
     }
-    if let Some(value) = modules.Find(first.Module) {
+    if let Some(value) = modules.Find(firstNominal.Module) {
         Check(value == 1, "Module identity survives collection")
     } else {
         System.Fault("Module lookup failed after collection")

@@ -19,16 +19,17 @@ func Main() {
     for module in assembly.GetModules() {
         Console.WriteLine(module.Name)
         Console.WriteLine(module.MetadataToken)
-        for typeInfo in module.GetTypes() {
+        for discovered in module.GetTypes() {
+            let typeInfo = (NominalTypeInfo)discovered
             Console.WriteLine(typeInfo.Name)
             if typeInfo.MetadataToken > 0 {
                 Console.WriteLine("Type token available")
             }
         }
     }
-    let description = widget.GetType()
+    let description = (NominalTypeInfo)widget.GetType()
     Console.WriteLine(description.Module.Assembly.Name)
-    if description.MetadataToken == typeof(Widget).MetadataToken {
+    if description.MetadataToken == ((NominalTypeInfo)typeof(Widget)).MetadataToken {
         Console.WriteLine("Same definition token")
     }
 }

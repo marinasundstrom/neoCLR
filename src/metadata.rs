@@ -770,9 +770,9 @@ pub enum Instruction {
     #[serde(rename = "call")]
     Call(FunctionRef),
     #[serde(rename = "function.bind", alias = "delegate.bind")]
-    BindDelegate {
+    BindFunction {
         #[serde(rename = "function_type", alias = "delegate")]
-        delegate: Type,
+        function_type: Type,
         target: FunctionRef,
     },
     #[serde(rename = "newobj.ctor")]
@@ -1127,7 +1127,10 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
-                Instruction::BindDelegate { delegate, target } => {
+                Instruction::BindFunction {
+                    function_type: delegate,
+                    target,
+                } => {
                     *delegate = map(delegate)?;
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;

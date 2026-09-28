@@ -2,6 +2,7 @@
   "format": "raven-library-bootstrap-v1",
   "owner": "System",
   "inputs": {
+    "runtime/raven/src/System/Tuple.rvn": "64032ba68457d933deecfe7cf8da40d70699b9d98aedb307a147053bf12043e5",
     "runtime/raven/src/System/Web/Http/Routes.rvn": "d928c737333e3d3e09006d0e641180fd62df170d2ff3df1f9bd5c5273f97e4eb",
     "runtime/raven/src/System/Runtime/GC.rvn": "1c672a79b8eb146f353d73ec5d075235976dbc68397843d2e1b7ce669dd915d0",
     "runtime/raven/src/System/DateTime.rvn": "8ba1677cd951cd8da8449ed57f76df8805756c5fa3dadbdcaafac9bbd7f6f870",
@@ -30,7 +31,7 @@
     "runtime/raven/src/System/StringComparison.rvn": "aa73d44c5e53d5487d092998401033e82f4e11d86d1a4537babd3bd3c9986944",
     "runtime/raven/src/System/StringComparer.rvn": "b436f00a4b16f9d3121e367860daa7808a458b849c6c2f516aca5c5f4dc7cf97",
     "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn": "6e033d4fafdf7b49578bbae8cea6af0719bafc025031e659cb42382f679e1a4f",
-    "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "445f72510bdc8387a8cd27efa07e46ce92b4e5b1b763c3ef6d3d682d3dee5765",
+    "runtime/raven/src/System/Runtime/Reflection/ReflectionExtensions.rvn": "7bae6cb439620aafb73a1e722a9e8e04feabf73fe06911ac0ac8cfddf5f23b9a",
     "runtime/raven/src/System/Data/Json/JsonValue.rvn": "0c2084dca1bcdf2d1494d9f1942fceb25d060a7a25cd8256a4bfee3fc46a5426",
     "runtime/raven/src/System/Data/Json/JsonError.rvn": "91c54ccae315e879e1ba14b40386e95d7061e4b1c07a67e74eccbe0e116e8713",
     "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn": "f10af4bc1ee9818f697f7aa7210c4ab85d55184c0752ff6cee48f768b48ddcce",
@@ -78,14 +79,14 @@
     "runtime/raven/src/System/Tasks/Tasks.rvn": "4eb3c33b07d476f06469f5523122ab2f8296f1571e12e1a3bbf163a51258f621",
     "runtime/raven/src/System/Concurrency/Workers.rvn": "aa21357c65b4b9d081e3bcb01dde1e152012684120e30cc7747072758dabc941",
     "runtime/raven/src/System/Array.rvn": "8015702d1767e692f05502b65d5cd06939936c73f0dbb16b12ab9768d7ae0ae9",
-    "runtime/raven/src/System/Object.rvn": "08ab2ced4f543f591a1cda673445363d68ade4a898b415628df01954a3a9766a",
+    "runtime/raven/src/System/Object.rvn": "90099db9a0975b66b1e95a16b988a88913fef41ecf6d9e0690f93413a502d45c",
     "runtime/raven/src/System/HashCode.rvn": "e6937956209544dcf3b1326132ff18204c894f8c1bbd7c3c69889e488ced9103",
     "runtime/raven/src/System/Runtime/CompilerServices/UnionAttribute.rvn": "2b5dc7aca6883217188df40ce57c31025703caa869bcdcf775309eda34c804d9",
     "runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
     "runtime/raven/src/System/Func.rvn": "4720a0463a88be11a4ff213363cad1c6680cd41afd457c813e247e5c4e3cbd2e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "394a5f5ae67374a03e252d6e310b5bcb1f1fe848f3bb23822ef2aff5e84e4a94",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "8918e84fef8b26d5d1d3661aabe27c24b26760bf17065713863193a55c48536f",
     "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96",
     "runtime/raven/src/System/Result.rvn": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -138,7 +139,7 @@
     "runtime/raven/src/System/Clock.rvn": "1043b7bbabbd554ae9bfab607a9ca6ac16618c76d1cdcc3dc9c69d0175ef98d2",
     "runtime/raven/src/System/Introspection/AssemblyInfo.rvn": "137b4758422d334157bab90b8d2dadc99e47c7328c683df9a52d19d26ccff2c3",
     "runtime/raven/src/System/Introspection/ModuleInfo.rvn": "3f5342a964cbe95317e56ca8f2856dc87c4abe12a4d730cb6278de577003ef6d",
-    "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "b14df0cda91c7e2a43d15249006e70c2d4a08e54e1ab1b47d86f13cfadf82627",
+    "runtime/raven/src/System/Introspection/ParameterInfo.rvn": "dfcfed6d9620cf4af9ea5e19889c3e7be704a9feac8e0a765e8bdb94513409e9",
     "runtime/raven/src/System/Duration.rvn": "c721be8cd945e3ca1dd94020d624880b3bd3240ee4844187db487577bf67d0bf",
     "runtime/raven/src/System/Instant.rvn": "321cff97417a63671689cbf22f8668ea2b5a1306012b6433293c2076fdf5e40f",
     "runtime/raven/src/System/Runtime/RuntimeContext.rvn": "157fb5dce345c541090f1e9c395c6074cd475db41f34ffc8517c6f587cbd91e0",
@@ -169,14 +170,13 @@
     "runtime/raven/src/System/Tasks/TaskOperators.rvn": "8224595f58ddf16cf1a1c3fa810db78ab991ff7826b44976451cc7f8fea3047b",
     "runtime/raven/src/System/Console/Streams.rvn": "2df30b451aee6dc2361caa46ffd22a8f0d18ebfea45f1534e4b514eaa8e71bb3",
     "runtime/raven/System.Runtime.rvnproj": "8c441b6fc701059e7a1c867e275b50dade614d3aad819c0c7d20786d4027545b",
-    "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b",
-    "runtime/raven/src/System/Tuple.rvn": "64032ba68457d933deecfe7cf8da40d70699b9d98aedb307a147053bf12043e5"
+    "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
     "Fault.methods.neoil": "37ad513ef3f873183bb14418b5b687aefb70aacc90fd097c4e6537a80b49c612",
     "Fault.helpers.neoil": "f0a1251238c7fd02285cc4933df812494ff04bdabb8a8c98e1931f11deb99171"
   },
-  "compilerSha256": "bf60acd0061b65d5ff171eb77f485807a288fbc550925c6023cb95dd40dbe266",
-  "coreSha256": "bf2400976b1484444097b82e39f24692da3d5213b78467a609f20588df8e8974",
+  "compilerSha256": "4e038cbc21a4b60f99ea1c28b84dda0a1c4fd0aa442d7ab5d29233408d71d0a3",
+  "coreSha256": "4d70f25d688f4908052f183021192d2bf62cccb39b341e756759236bdf6c14d8",
   "exports": []
 }

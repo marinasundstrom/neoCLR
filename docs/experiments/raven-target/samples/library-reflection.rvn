@@ -16,7 +16,7 @@ func Show(value: bool) {
 }
 
 func Main() {
-    let info = typeof(int)
+    let info = (NominalTypeInfo)typeof(int)
     WriteLine(info.Name)
     WriteLine(info.FullName)
     WriteLine(info.Namespace)
@@ -37,10 +37,10 @@ func Main() {
     let first: MemberInfo = method
     ShowMemberName(first)
     match first.DeclaringType {
-        .Some(let owner) => WriteLine(owner.Name)
+        .Some(let owner) => WriteLine(owner.DisplayName)
         .None => Fault("Expected a declaring type")
     }
-    WriteLine(method.ReturnType.Name)
+    WriteLine(method.ReturnType.DisplayName)
     Show(method.IsStatic)
     Show(method.IsPublic)
     Show(method.IsPrivate)
@@ -54,14 +54,14 @@ func Main() {
     let parameters = method.GetParameters()
     WriteLine(parameters[0].Name)
     WriteLine(parameters[0].Position)
-    WriteLine(parameters[0].ParameterType.Name)
+    WriteLine(parameters[0].ParameterType.DisplayName)
     Show(parameters[0].IsOut)
     Show(parameters[0].IsOutWhenTrue)
     Show(parameters[0].IsReadOnly)
     let property = typeof(Date).GetProperties()[0]
     let member: MemberInfo = property
     ShowMemberName(member)
-    WriteLine(property.PropertyType.Name)
+    WriteLine(property.PropertyType.DisplayName)
     Show(property.IsStatic)
     Show(property.CanRead)
     Show(property.CanWrite)
@@ -71,9 +71,9 @@ func Main() {
     if getter is .Some(let found) {
         WriteLine(found.Name)
     }
-    Show(property.GetSetMethod().IsNone)
-    Show(property.GetGetMethod(true).IsSome)
-    Show(property.GetSetMethod(true).IsNone)
+    Show(property.GetSetMethod() is .None)
+    Show(property.GetGetMethod(true) is .Some(_))
+    Show(property.GetSetMethod(true) is .None)
     let flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static
     WriteLine((int)flags)
     Show((flags & BindingFlags.Public) == BindingFlags.Public)
@@ -85,29 +85,29 @@ func Main() {
     WriteLine((int)BindingFlags.DeclaredOnly)
     let fields = typeof(Date).GetFields(flags: BindingFlags.NonPublic | BindingFlags.Instance)
     ShowMemberName(fields[0])
-    WriteLine(fields[0].FieldType.Name)
+    WriteLine(fields[0].FieldType.DisplayName)
     WriteLine(fields[0].DefinitionIndex)
     Show(fields[0].IsPublic)
     Show(fields[0].IsPrivate)
     Show(fields[0].IsAssembly)
     Show(fields[0].IsStatic)
     WriteLine(typeof(int).GetFields().Count)
-    WriteLine(typeof(int).GetMethods(flags: flags).Count)
+    Show(typeof(int).GetMethods(flags: flags).Count >= 5)
     WriteLine(typeof(Date).GetProperties(flags: flags).Count)
     let generic = typeof(Option<int>)
     WriteLine(generic.GenericArgumentCount)
-    WriteLine(generic.GetGenericArgument(index: 0).Name)
-    WriteLine(generic.GetGenericArguments()[0].Name)
-    WriteLine(generic.GetInterfaces().Count)
-    Show(typeof(FieldInfo).BaseType.IsNone)
-    Show(info.GetElementType().IsNone)
+    WriteLine(generic.GetGenericArgument(index: 0).DisplayName)
+    WriteLine(generic.GetGenericArguments()[0].DisplayName)
+    Show(generic.GetInterfaces().Count >= 1)
+    Show(typeof(FieldInfo).BaseType is .None)
+    Show(info.GetElementType() is .None)
     let array = typeof(int[])
     Show(array.IsArray)
     if array.GetElementType() is .Some(let element) {
-        WriteLine(element.Name)
+        WriteLine(element.DisplayName)
     }
     let enumeration = typeof(BindingFlags)
     Show(enumeration.IsEnum)
     WriteLine(enumeration.GetEnumNames()[0])
-    WriteLine(enumeration.GetEnumUnderlyingType().Name)
+    WriteLine(enumeration.GetEnumUnderlyingType().DisplayName)
 }

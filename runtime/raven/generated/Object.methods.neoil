@@ -24,7 +24,7 @@ ldarg 0
 M00000002_IL_0002:
 callvirt instance System.Object::GetType()
 M00000002_IL_0007:
-call neoCLR.Library.System.Object.RuntimeReflectionF572EF30E2C7291B(System.Introspection.TypeInfo)
+call neoCLR.Library.System.Object.RuntimeReflectionB5AA950FE5FB29D0(System.Introspection.TypeInfo)
 M00000002_IL_000c:
 ret
 .end

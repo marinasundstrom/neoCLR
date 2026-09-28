@@ -19,9 +19,12 @@ from assistant recommendations and records the existing execution/introspection
 dependencies. Native structural shape identity and checked Function binding/Invoke
 now run without a nominal declaration; [focused tests](../../tests/function_types.rs)
 cover substitution, artifacts, captures and signature rejection. Delegate declarations
-remain temporarily admitted during migration; library/Raven APIs are unchanged.
+remain temporarily admitted during migration. The Raven descriptor API now separates
+TypeInfo (DisplayName/IsNominalType) from NominalTypeInfo (declaration metadata);
+[executable and negative cases](../experiments/function-types/README.md) cover this split.
+Library callback APIs still await structural migration.
 
-Next: settle public object identity/equality/nullability and descriptor classifications,
+Next: settle public object identity/equality/nullability,
 extend the structural validation coverage and migrate Raven,
 library callback contracts, reflection consumers and documentation artifacts.
 Other structural families are direction, not part of this Function replacement's

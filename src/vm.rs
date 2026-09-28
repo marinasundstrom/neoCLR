@@ -63,7 +63,7 @@ pub(crate) fn resolve(
     target: &FunctionRef,
 ) -> Result<crate::metadata::Function, Fault> {
     if let Some(owner @ Type::Function(_)) = &target.owner {
-        let contract = crate::delegates::contract(module, owner)?;
+        let contract = crate::function_objects::contract(module, owner)?;
         if target.name != contract.name
             || !target.instance
             || target.definition.is_some()
@@ -376,7 +376,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             ));
         }
         if def.representation == Representation::Delegate {
-            crate::delegates::contract(module, &def.open_type())?;
+            crate::function_objects::contract(module, &def.open_type())?;
         }
         let ty = Type::from_name(&def.name);
         if ty.definition_name() != Some(def.name.as_str()) {
@@ -763,8 +763,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if arity > 0 && (function.pinvoke.is_some() || function.impl_flags != 0) {
             return Err(Fault::new("generic owners require IL methods"));
         }
-        if crate::delegates::is_contract(module, function) {
-            crate::delegates::contract(module, function.owner.as_ref().unwrap())?;
+        if crate::function_objects::is_contract(module, function) {
+            crate::function_objects::contract(module, function.owner.as_ref().unwrap())?;
             continue;
         }
         if crate::interfaces::is_contract(module, function) {
@@ -884,7 +884,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         "cannot rebind or take the address of a managed reference parameter",
                     ));
                 }
-                Op::BindDelegate { delegate, target } => {
+                Op::BindFunction {
+                    function_type: delegate,
+                    target,
+                } => {
                     check(delegate)?;
                     if let Some(owner) = &target.owner {
                         check(owner)?;
@@ -892,7 +895,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     for ty in target.parameters.iter().chain(&target.generic_arguments) {
                         check(ty)?;
                     }
-                    crate::delegates::validate_binding(module, function, delegate, target)?;
+                    crate::function_objects::validate_binding(module, function, delegate, target)?;
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
@@ -938,7 +941,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     let supports_virtual_call = (interface_call
                         || callee.is_virtual
                         || ordinary_class_instance
-                        || crate::delegates::is_contract(module, &callee))
+                        || crate::function_objects::is_contract(module, &callee))
                         && !(crate::interfaces::is_contract(module, &callee)
                             && crate::interfaces::is_helper(&callee));
                     if (interface_call
@@ -2599,9 +2602,10 @@ fn interpret_instructions_with_dispatch(
                             Some(owner) => module
                                 .type_definition(owner)
                                 .is_some_and(|d| d.representation == Representation::Delegate),
-                            None => {
-                                crate::delegates::is_contract(module, &resolve(module, target)?)
-                            }
+                            None => crate::function_objects::is_contract(
+                                module,
+                                &resolve(module, target)?,
+                            ),
                         } =>
                 {
                     let signature = resolve(module, target)?;
@@ -2615,7 +2619,7 @@ fn interpret_instructions_with_dispatch(
                         return Err(Fault::new("delegate nominal type mismatch"));
                     }
                     let callee = resolve(module, &binding.target)?;
-                    crate::delegates::compatible(&signature, &callee)?;
+                    crate::function_objects::compatible(&signature, &callee)?;
                     if let Some(receiver) = binding.receiver {
                         receiver.ensure_heap_references()?;
                         args.insert(0, *receiver);
@@ -3141,14 +3145,18 @@ fn interpret_instructions_with_dispatch(
                     }
                     frames.push(child);
                 }
-                Op::BindDelegate { delegate, target } => {
+                Op::BindFunction {
+                    function_type: delegate,
+                    target,
+                } => {
                     let receiver = if target.instance {
                         Some(frame.pop()?)
                     } else {
                         None
                     };
-                    let value =
-                        crate::delegates::bind(module, &function, delegate, target, receiver)?;
+                    let value = crate::function_objects::bind(
+                        module, &function, delegate, target, receiver,
+                    )?;
                     frame.stack.push(value);
                 }
                 Op::Call(target) => {

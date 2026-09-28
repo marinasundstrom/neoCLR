@@ -26,5 +26,5 @@ func Main() {
     WriteLine("Empty array length:")
     WriteLine(Array<int>.Empty.Length)
     WriteLine("Array element type:")
-    WriteLine(typeof(Array<int>).GetGenericArguments()[0].Name)
+    WriteLine(typeof(Array<int>).GetGenericArguments()[0].DisplayName)
 }

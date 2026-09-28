@@ -75,7 +75,7 @@ internal sealed class RuntimeMemberInfo {
     }
 
     val MetadataToken: int => StoredMetadataToken
-    val Module: ModuleInfo => StoredDeclaringType.Module
+    val Module: ModuleInfo => ((NominalTypeInfo)StoredDeclaringType).Module
     val Name: string => StoredName
     val DeclaringType: Option<TypeInfo> => Some(StoredDeclaringType)
 
@@ -125,7 +125,7 @@ internal class RuntimeFieldInfo : RuntimeMemberInfo, FieldInfo {
         var hash = HashCode()
         hash.Add(1)
         if let Some(owner) = DeclaringType {
-            hash.Add(owner.FullName)
+            hash.Add(owner.DisplayName)
         }
         hash.Add(DefinitionIndex)
         return hash.ToHashCode()
@@ -207,7 +207,7 @@ internal class RuntimeMethodInfo : RuntimeMemberInfo, MethodInfo {
         var hash = HashCode()
         hash.Add(2)
         if let Some(owner) = DeclaringType {
-            hash.Add(owner.FullName)
+            hash.Add(owner.DisplayName)
         }
         hash.Add(DefinitionIndex)
         return hash.ToHashCode()
@@ -289,7 +289,7 @@ internal class RuntimeConstructorInfo : RuntimeMemberInfo, ConstructorInfo {
         var hash = HashCode()
         hash.Add(2)
         if let Some(owner) = DeclaringType {
-            hash.Add(owner.FullName)
+            hash.Add(owner.DisplayName)
         }
         hash.Add(DefinitionIndex)
         return hash.ToHashCode()
@@ -381,7 +381,7 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
         var hash = HashCode()
         hash.Add(3)
         if let Some(owner) = DeclaringType {
-            hash.Add(owner.FullName)
+            hash.Add(owner.DisplayName)
         }
         hash.Add(DefinitionIndex)
         return hash.ToHashCode()
@@ -389,9 +389,14 @@ internal class RuntimePropertyInfo : RuntimeMemberInfo, PropertyInfo {
 
 }
 
-public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
+public sealed interface NominalTypeInfo : TypeInfo, MemberInfo {
     val FullName: string { get }
     val Namespace: string { get }
+}
+
+public sealed interface TypeInfo : EquatableTo<TypeInfo> {
+    val DisplayName: string { get }
+    val IsNominalType: bool { get }
     val GenericArgumentCount: int { get }
     func GetGenericArgument(index: int) -> TypeInfo
     func Equals(other: TypeInfo) -> bool
@@ -426,6 +431,127 @@ public sealed interface TypeInfo : MemberInfo, EquatableTo<TypeInfo> {
 }
 
 internal class RuntimeTypeInfo : TypeInfo {
+    private field Handle: RuntimeTypeHandle
+
+    internal val ExecutionHandle: RuntimeTypeHandle => Handle
+
+    private init(handle: RuntimeTypeHandle) {
+        Handle = handle
+    }
+
+    internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
+        if RuntimeServices.TypeShape(handle, 12) {
+            return RuntimeNominalTypeInfo.FromHandle(handle)
+        }
+        return RuntimeTypeInfo(handle)
+    }
+
+    val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
+
+    func GetInterfaces() -> Sequence<TypeInfo> {
+        return RuntimeServices.TypeInterfaces(Handle)
+    }
+
+    func GetEnumValues() -> Sequence<Object> {
+        return RuntimeServices.TypeEnumValues(Handle)
+    }
+
+    func GetEnumNames() -> Sequence<string> {
+        return RuntimeServices.TypeEnumNames(Handle)
+    }
+
+    func GetEnumUnderlyingType() -> TypeInfo {
+        return RuntimeServices.TypeEnumUnderlying(Handle)
+    }
+
+    func GetFields() -> Sequence<FieldInfo> {
+        return RuntimeServices.TypeFields(Handle, 28)
+    }
+
+    func GetFields(flags: BindingFlags) -> Sequence<FieldInfo> {
+        return RuntimeServices.TypeFields(Handle, (int)flags)
+    }
+
+    func GetConstructors() -> Sequence<ConstructorInfo> {
+        return RuntimeServices.TypeConstructors(Handle, 20)
+    }
+
+    func GetConstructors(flags: BindingFlags) -> Sequence<ConstructorInfo> {
+        return RuntimeServices.TypeConstructors(Handle, (int)flags)
+    }
+
+    func GetMethods() -> Sequence<MethodInfo> {
+        return RuntimeServices.TypeMethods(Handle, 28)
+    }
+
+    func GetMethods(flags: BindingFlags) -> Sequence<MethodInfo> {
+        return RuntimeServices.TypeMethods(Handle, (int)flags)
+    }
+
+    func GetProperties() -> Sequence<PropertyInfo> {
+        return RuntimeServices.TypeProperties(Handle, 28)
+    }
+
+    func GetProperties(flags: BindingFlags) -> Sequence<PropertyInfo> {
+        return RuntimeServices.TypeProperties(Handle, (int)flags)
+    }
+    val DisplayName: string => RuntimeServices.TypeDisplayName(Handle, 0)
+    val IsNominalType: bool => RuntimeServices.TypeShape(Handle, 12)
+    val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
+
+    func GetGenericArgument(index: int) -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(RuntimeServices.TypeArgument(Handle, index))
+    }
+
+    func Equals(other: TypeInfo) -> bool {
+        if other is RuntimeTypeInfo implementation {
+            return RuntimeServices.TypeEquals(Handle, implementation.ExecutionHandle)
+        }
+        if other is RuntimeNominalTypeInfo nominal {
+            return RuntimeServices.TypeEquals(Handle, nominal.ExecutionHandle)
+        }
+        return false
+    }
+
+    override func Equals(other: Object?) -> bool {
+        if other is TypeInfo info {
+            return Equals(info)
+        }
+        return false
+    }
+
+    override func GetHashCode() -> int {
+        var hash = HashCode()
+        hash.Add(DisplayName)
+        return hash.ToHashCode()
+    }
+
+    override func ToString() -> string => DisplayName
+
+    val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
+    val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)
+    val IsPointer: bool => RuntimeServices.TypeShape(Handle, 2)
+    val IsInterface: bool => RuntimeServices.TypeShape(Handle, 3)
+    val IsReadOnly: bool => RuntimeServices.TypeShape(Handle, 4)
+    val IsAbstract: bool => RuntimeServices.TypeShape(Handle, 5)
+    val IsOpen: bool => RuntimeServices.TypeShape(Handle, 8)
+    val IsClosedHierarchy: bool => RuntimeServices.TypeShape(Handle, 9)
+    val IsUnion: bool => RuntimeServices.TypeShape(Handle, 10)
+    val IsEnum: bool => RuntimeServices.TypeShape(Handle, 6)
+    val IsValueType: bool => RuntimeServices.TypeShape(Handle, 7)
+    val IsVisible: bool => RuntimeServices.TypeShape(Handle, 11)
+
+
+    func GetGenericArguments() -> Sequence<TypeInfo> {
+        return RuntimeServices.TypeGenericArguments(Handle)
+    }
+
+    func GetElementType() -> Option<TypeInfo> {
+        return RuntimeServices.TypeElementType(Handle)
+    }
+}
+
+internal class RuntimeNominalTypeInfo : NominalTypeInfo {
     func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
         return RuntimeServices.MemberCustomAttributes(self, MetadataToken)
     }
@@ -439,7 +565,7 @@ internal class RuntimeTypeInfo : TypeInfo {
     }
 
     internal static func FromHandle(handle: RuntimeTypeHandle) -> TypeInfo {
-        return RuntimeTypeInfo(handle)
+        return RuntimeNominalTypeInfo(handle)
     }
 
     val BaseType: Option<TypeInfo> => RuntimeServices.TypeBaseType(Handle)
@@ -497,31 +623,38 @@ internal class RuntimeTypeInfo : TypeInfo {
     val Name: string => RuntimeServices.TypeName(Handle)
     val FullName: string => RuntimeServices.TypeDisplayName(Handle, 0)
     val Namespace: string => RuntimeServices.TypeDisplayName(Handle, 1)
+    val DisplayName: string => RuntimeServices.TypeDisplayName(Handle, 0)
+    val IsNominalType: bool => RuntimeServices.TypeShape(Handle, 12)
     val GenericArgumentCount: int => RuntimeServices.TypeArgumentCount(Handle)
 
     func GetGenericArgument(index: int) -> TypeInfo {
-        return FromHandle(RuntimeServices.TypeArgument(Handle, index))
+        return RuntimeTypeInfo.FromHandle(RuntimeServices.TypeArgument(Handle, index))
     }
 
     func Equals(other: TypeInfo) -> bool {
-        let implementation = (RuntimeTypeInfo)other
-        return RuntimeServices.TypeEquals(Handle, implementation.Handle)
+        if other is RuntimeTypeInfo implementation {
+            return RuntimeServices.TypeEquals(Handle, implementation.ExecutionHandle)
+        }
+        if other is RuntimeNominalTypeInfo nominal {
+            return RuntimeServices.TypeEquals(Handle, nominal.ExecutionHandle)
+        }
+        return false
     }
 
     override func Equals(other: Object?) -> bool {
-        if other is RuntimeTypeInfo implementation {
-            return RuntimeServices.TypeEquals(Handle, implementation.Handle)
+        if other is TypeInfo info {
+            return Equals(info)
         }
         return false
     }
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(FullName)
+        hash.Add(DisplayName)
         return hash.ToHashCode()
     }
 
-    override func ToString() -> string => FullName
+    override func ToString() -> string => DisplayName
 
     val IsArray: bool => RuntimeServices.TypeShape(Handle, 0)
     val IsByRef: bool => RuntimeServices.TypeShape(Handle, 1)

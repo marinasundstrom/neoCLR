@@ -402,3 +402,14 @@ All seven System.Tuple arities, constructors and fields have XML documentation a
 automatic public type selection. [The guide](tuples.md) records the bounded surface
 and naming difference from .NET. TupleElementNamesAttribute is a compiler-reference
 scaffold with an exact exclusion, not an executable guest API.
+
+### Structural family documentation direction (2026-09-28)
+
+Structural types can have members and extension members without a declared type
+name. TypeInfo member queries remain common; NominalTypeInfo adds declaration
+identity. Future RavenDoc support should describe Array, Tuple, Union, Intersection
+and Function families, including their members, extensions and shape signatures,
+with ordinary API-reference detail. Family page titles and navigation keys are
+documentation identities, not synthesized nominal type names. The current snapshot
+covers the implemented common/nominal interfaces; generic structural-family rendering
+remains open. See [the Function design](../docs/function-types.md#structural-members-and-documentation).

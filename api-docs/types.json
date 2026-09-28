@@ -136,6 +136,7 @@
   "System.Introspection.MemberInfo",
   "System.Introspection.MethodInfo",
   "System.Introspection.ModuleInfo",
+  "System.Introspection.NominalTypeInfo",
   "System.Introspection.ParameterInfo",
   "System.Introspection.PropertyInfo",
   "System.Introspection.TypeInfo",

@@ -15,9 +15,10 @@ public union CatalogRoutes {
 
 // Inspect declarations during startup, before the server accepts requests.
 func ReadRouteDeclarations() -> int {
-    let routes = typeof(CatalogRoutes)
+    let routes = (NominalTypeInfo)typeof(CatalogRoutes)
     var count = 0
-    for candidate in routes.Module.GetTypes() {
+    for discovered in routes.Module.GetTypes() {
+        let candidate = (NominalTypeInfo)discovered
         if let Some(parent) = candidate.DeclaringType {
             if parent.Equals(routes) {
                 for attribute in candidate.GetCustomAttributesData() {

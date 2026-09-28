@@ -71,9 +71,11 @@ public class RouteUnionMapper {
         if !type.IsVisible || !type.IsUnion || !type.IsValueType || type.IsOpen || type.GenericArgumentCount != 0 {
             return Error("Expected a public nongeneric value union")
         }
+        let nominal = (NominalTypeInfo)type
         let prepared = ArrayList<BoundRoute>()
         let carriers = type.GetConstructors()
-        for candidate in type.Module.GetTypes() {
+        for discovered in nominal.Module.GetTypes() {
+            let candidate = (NominalTypeInfo)discovered
             if let Some(parent) = candidate.DeclaringType {
                 if parent.Equals(type) {
                     if !candidate.IsVisible || !candidate.IsValueType || candidate.IsEnum || candidate.IsOpen {

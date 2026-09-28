@@ -70,7 +70,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(StoredDeclaringType.FullName)
+        hash.Add(StoredDeclaringType.DisplayName)
         hash.Add(StoredMemberKind)
         hash.Add(StoredMemberIndex)
         hash.Add(Position)

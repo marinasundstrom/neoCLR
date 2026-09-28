@@ -8,25 +8,26 @@ class Outer {
 }
 
 func Main() {
-    let nested: MemberInfo = typeof(Outer.Inner)
+    let nested: MemberInfo = (NominalTypeInfo)typeof(Outer.Inner)
     Console.WriteLine(nested.Name)
     match nested.DeclaringType {
         .Some(let owner) => {
-            Console.WriteLine(owner.Name)
+            Console.WriteLine(owner.DisplayName)
             if owner.Equals(typeof(Outer)) {
                 Console.WriteLine("Actual declaring type")
             }
         }
         .None => Fault("Expected a declaring type")
     }
-    match typeof(Outer).DeclaringType {
+    match ((NominalTypeInfo)typeof(Outer)).DeclaringType {
         .Some(_) => Fault("Top-level type has an owner")
         .None => Console.WriteLine("Top-level type")
     }
     match nested {
-        TypeInfo => Console.WriteLine("Type member")
+        NominalTypeInfo => Console.WriteLine("Type member")
         FieldInfo => Fault("Unexpected field")
         MethodInfo => Fault("Unexpected method")
+        ConstructorInfo => Fault("Unexpected constructor")
         PropertyInfo => Fault("Unexpected property")
     }
 }

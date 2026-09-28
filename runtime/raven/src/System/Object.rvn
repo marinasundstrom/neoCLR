@@ -7,7 +7,7 @@ import System.Runtime.CompilerServices.*
 public abstract class Object {
     protected init() { }
     virtual func ToString() -> string {
-        return GetType().FullName
+        return GetType().DisplayName
     }
 
     static func ReferenceEquals(left: Object?, right: Object?) -> bool {

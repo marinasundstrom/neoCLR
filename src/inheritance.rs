@@ -227,7 +227,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
     }
     for method in &module.functions {
         if crate::interfaces::is_contract(module, method)
-            || crate::delegates::is_contract(module, method)
+            || crate::function_objects::is_contract(module, method)
         {
             continue;
         }
