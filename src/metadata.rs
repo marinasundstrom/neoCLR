@@ -367,7 +367,6 @@ pub enum Representation {
     Record,
     Runtime,
     Interface,
-    Delegate,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -769,9 +768,9 @@ pub enum Instruction {
     Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
-    #[serde(rename = "function.bind", alias = "delegate.bind")]
+    #[serde(rename = "function.bind")]
     BindFunction {
-        #[serde(rename = "function_type", alias = "delegate")]
+        #[serde(rename = "function_type")]
         function_type: Type,
         target: FunctionRef,
     },
@@ -1128,10 +1127,10 @@ impl Function {
         for op in &mut result.body {
             match op {
                 Instruction::BindFunction {
-                    function_type: delegate,
+                    function_type,
                     target,
                 } => {
-                    *delegate = map(delegate)?;
+                    *function_type = map(function_type)?;
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }

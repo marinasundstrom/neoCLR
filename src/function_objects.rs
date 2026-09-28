@@ -1,7 +1,7 @@
-//! Checked single-target Function objects and transitional nominal delegate admission.
+//! Checked single-target objects instantiated from structural Function shapes.
 use crate::{
     Fault, Module, Value,
-    metadata::{Function, FunctionRef, Representation, Type},
+    metadata::{Function, FunctionRef, Type},
 };
 
 /// Opaque runtime binding. Guest artifacts cannot manufacture live bindings.
@@ -24,26 +24,24 @@ impl PartialEq for FunctionObject {
             && self.target == other.target
             && match (&self.receiver, &other.receiver) {
                 (None, None) => true,
-                (Some(a), Some(b)) => slot(a)
-                    .zip(slot(b))
-                    .is_some_and(|(a, b)| a.same_location(b)),
+                (Some(a), Some(b)) => match (a.as_ref(), b.as_ref()) {
+                    (Value::ObjectReference(a), Value::ObjectReference(b)) => {
+                        a.reference.same_location(&b.reference)
+                    }
+                    _ => slot(a)
+                        .zip(slot(b))
+                        .is_some_and(|(a, b)| a.same_location(b)),
+                },
                 _ => false,
             }
     }
 }
 
-pub(crate) fn is_contract(module: &Module, function: &Function) -> bool {
-    if matches!(function.owner, Some(Type::Function(_))) {
-        return true;
-    }
-    function
-        .owner
-        .as_ref()
-        .and_then(|t| module.type_definition(t))
-        .is_some_and(|d| d.representation == Representation::Delegate)
+pub(crate) fn is_contract(_module: &Module, function: &Function) -> bool {
+    matches!(function.owner, Some(Type::Function(_)))
 }
 
-pub(crate) fn contract(module: &Module, ty: &Type) -> Result<Function, Fault> {
+pub(crate) fn contract(_module: &Module, ty: &Type) -> Result<Function, Fault> {
     if let Type::Function(shape) = ty {
         shape.validate()?;
         return Ok(Function {
@@ -78,50 +76,7 @@ pub(crate) fn contract(module: &Module, ty: &Type) -> Result<Function, Fault> {
             body: vec![],
         });
     }
-    let def = module
-        .type_definition(ty)
-        .filter(|d| d.representation == Representation::Delegate)
-        .ok_or_else(|| Fault::new("expected delegate type"))?;
-    if !def.fields.is_empty()
-        || !def.implements.is_empty()
-        || def.base.is_some()
-        || !def.properties.is_empty()
-        || def.is_abstract
-    {
-        return Err(Fault::new(
-            "delegate requires a fieldless declaration without inheritance",
-        ));
-    }
-    let mut methods = module
-        .functions
-        .iter()
-        .filter(|f| f.owner.as_ref() == Some(&def.open_type()));
-    let f = methods
-        .next()
-        .ok_or_else(|| Fault::new("delegate requires one Invoke declaration"))?;
-    if methods.next().is_some()
-        || f.name != format!("{}.Invoke", def.name)
-        || !f.instance
-        || f.receiver_byref
-        || f.receiver_readonly
-        || f.is_abstract
-        || f.is_virtual
-        || f.is_override
-        || !f.interface_implementations.is_empty()
-        || !f.body.is_empty()
-        || !f.locals.is_empty()
-        || f.pinvoke.is_some()
-        || f.impl_flags != 0
-        || !f.generic_parameters.is_empty()
-        || f.visibility != crate::metadata::Visibility::Public
-    {
-        return Err(Fault::new("invalid delegate Invoke declaration"));
-    }
-    let arguments = match ty {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
-    f.map_types(|t| t.substitute_type_parameters(arguments))
+    Err(Fault::new("expected structural Function type"))
 }
 
 fn readonly(f: &Function, i: usize) -> bool {
@@ -149,7 +104,7 @@ pub(crate) fn compatible(contract: &Function, target: &Function) -> Result<(), F
         })
     {
         return Err(Fault::new(
-            "delegate signature or reference contract mismatch",
+            "Function signature or reference contract mismatch",
         ));
     }
     Ok(())
@@ -181,7 +136,7 @@ pub(crate) fn validate_binding(
             && !crate::interfaces::is_contract(module, &callee))
     {
         return Err(Fault::new(
-            "delegate target requires a concrete IL function or managed dispatch contract",
+            "Function target requires a concrete IL function or managed dispatch contract",
         ));
     }
     Ok(callee)
@@ -196,11 +151,11 @@ pub(crate) fn bind(
 ) -> Result<Value, Fault> {
     let mut callee = validate_binding(module, caller, ty, target)?;
     let receiver = if callee.instance {
-        let value = receiver.ok_or_else(|| Fault::new("delegate target requires receiver"))?;
+        let value = receiver.ok_or_else(|| Fault::new("Function target requires receiver"))?;
         if let Value::ObjectReference(mut object) = value {
             let owner = callee.owner.as_ref().unwrap();
             if object.target() != owner && !module.reference_assignable(object.target(), owner) {
-                return Err(Fault::new("delegate receiver type mismatch"));
+                return Err(Fault::new("Function receiver type mismatch"));
             }
             object.reference.assigned()?;
             if crate::interfaces::is_contract(module, &callee) {
@@ -218,7 +173,7 @@ pub(crate) fn bind(
                 || crate::interfaces::is_contract(module, &callee)
             {
                 return Err(Fault::new(
-                    "nominal delegate requires a concrete class implementation",
+                    "Function binding requires a concrete class implementation",
                 ));
             }
             compatible(&contract(module, ty)?, &callee)?;
@@ -237,22 +192,22 @@ pub(crate) fn bind(
             } => (interface, receiver),
             _ => {
                 return Err(Fault::new(
-                    "delegate receiver requires a heap managed reference",
+                    "Function receiver requires a heap managed reference",
                 ));
             }
         };
         if callee.owner.as_ref() != Some(&view) {
-            return Err(Fault::new("delegate receiver type mismatch"));
+            return Err(Fault::new("Function receiver type mismatch"));
         }
         slot.assigned()?;
         if slot.allocation_id().is_none() {
             return Err(Fault::new(
-                "frame-backed references cannot be retained by delegates",
+                "frame-backed references cannot be retained by Function objects",
             ));
         }
         if slot.is_readonly() && !callee.receiver_readonly {
             return Err(Fault::new(
-                "delegate cannot bind mutating method through readonly receiver",
+                "Function cannot bind mutating method through readonly receiver",
             ));
         }
         if crate::interfaces::is_contract(module, &callee) {
@@ -268,7 +223,7 @@ pub(crate) fn bind(
             || (!callee.receiver_byref && !crate::interfaces::is_contract(module, &callee))
         {
             return Err(Fault::new(
-                "delegate implementation requires managed IL receiver",
+                "Function implementation requires managed IL receiver",
             ));
         }
         compatible(&contract(module, ty)?, &callee)?;
@@ -283,7 +238,7 @@ pub(crate) fn bind(
         Some(Box::new(value))
     } else {
         if receiver.is_some() {
-            return Err(Fault::new("static delegate cannot have receiver"));
+            return Err(Fault::new("static Function cannot have receiver"));
         }
         None
     };

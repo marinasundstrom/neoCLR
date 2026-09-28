@@ -25,7 +25,7 @@ func Main() -> int {
     let readOnly: readonly Item& = item
     let readOnlyResult = Result<readonly Item&,string>.Ok(readOnly)
     if (readOnlyResult match { Ok(let view) => view.Value, Error(_) => 0 }) != 42 { return -6 }
-    let callback = Result<System.Func<int>,string>.Ok(() => 42)
+    let callback = Result<fn<int>,string>.Ok(() => 42)
     if (callback match { Ok(let call) => call(), Error(_) => 0 }) != 42 { return -7 }
     return explicit match { Ok(let n) => n, Error(_) => -5 }
 }

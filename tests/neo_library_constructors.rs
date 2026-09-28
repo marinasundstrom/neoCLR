@@ -30,7 +30,7 @@ func Main() -> int {
     if !ReferenceEquals(alias, counter) { return -2 }
     alias.Value = 41
     let view = System.Option.Some<readonly Counter&>(counter)
-    let callback = System.Option.Some<System.Func<int, int>>(Add)
+    let callback = System.Option.Some<fn<int, int>>(Add)
     let empty = System.Result.Ok<Void>(Nothing())
     let voidResult = Result<Void, string>(empty)
     if let Ok(_) = voidResult { return callback.Value(view.Value.Value) }

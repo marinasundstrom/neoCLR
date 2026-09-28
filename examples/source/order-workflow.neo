@@ -42,7 +42,7 @@ func Purchase(product: Product&, quantity: int,
     return Ok(receipt)
 }
 
-func MakeRestock(product: Product&) -> System.Func<int, void> {
+func MakeRestock(product: Product&) -> fn<int, void> {
     return amount => { product.Stock = product.Stock + amount }
 }
 

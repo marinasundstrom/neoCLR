@@ -39,7 +39,7 @@ execution. Entry completion drains pending work. Expected failures remain Result
 values; a callback Fault fails the invocation and requests sibling shutdown.
 
 Importing `System.Tasks.*` supports `Task.Run` alongside `Task<T>` without an alias.
-Inline block callbacks infer their value result; an explicitly typed delegate local
+Inline block callbacks infer their value result; an explicitly typed function local
 is optional. Direct completion-only await uses the ordinary Task protocol. Mutable locals in
 ordinary async methods share storage with their callbacks,
 including across suspension. Generic async methods on nongeneric owners now support shared captures and

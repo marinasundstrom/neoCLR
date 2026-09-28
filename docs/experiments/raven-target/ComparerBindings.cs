@@ -5,17 +5,17 @@ static class ComparerBindings
 {
     const string Prefix = "System.Collections.";
     public const string StringOwner = "System.StringComparer";
-    static readonly string[] Kinds = ["Comparer", "EqualityComparer", "DelegateComparer", "DelegateEqualityComparer"];
+    static readonly string[] Kinds = ["Comparer", "EqualityComparer", "FunctionComparer", "FunctionEqualityComparer"];
     public const string Declarations = """
         namespace Collections {
             public interface Comparer<T> { int Compare(T left, T right); }
             public interface EqualityComparer<T> { bool Equals(T left, T right); int GetHashCode(T value); }
-            public sealed class DelegateComparer<T> : Comparer<T> {
-                public DelegateComparer(Func<T,T,int> compare) { }
+            public sealed class FunctionComparer<T> : Comparer<T> {
+                public FunctionComparer(Func<T,T,int> compare) { }
                 public int Compare(T left, T right) => default;
             }
-            public sealed class DelegateEqualityComparer<T> : EqualityComparer<T> {
-                public DelegateEqualityComparer(Func<T,T,bool> equal, Func<T,int> hash) { }
+            public sealed class FunctionEqualityComparer<T> : EqualityComparer<T> {
+                public FunctionEqualityComparer(Func<T,T,bool> equal, Func<T,int> hash) { }
                 public bool Equals(T left, T right) => default;
                 public int GetHashCode(T value) => default;
             }
@@ -44,8 +44,8 @@ static class ComparerBindings
     }
     public static bool Converts(string source, string target) => source == StringOwner
         ? target is "System.Collections.Comparer<String>" or "System.Collections.EqualityComparer<String>"
-        : source.StartsWith(Prefix + "Delegate", StringComparison.Ordinal) && IsName(source)
-            && target == Prefix + source[(Prefix.Length + "Delegate".Length)..];
+        : source.StartsWith(Prefix + "Function", StringComparison.Ordinal) && IsName(source)
+            && target == Prefix + source[(Prefix.Length + "Function".Length)..];
 
     public static void Validate(ModuleDefinition module)
     {
@@ -56,8 +56,8 @@ static class ComparerBindings
             var contract = kind is "Comparer" or "EqualityComparer";
             var parents = kind switch {
                 "StringComparer" => new[] { Prefix + "EqualityComparer`1<System.String>", Prefix + "Comparer`1<System.String>" },
-                "DelegateComparer" => new[] { Prefix + "Comparer`1<T>" },
-                "DelegateEqualityComparer" => new[] { Prefix + "EqualityComparer`1<T>" },
+                "FunctionComparer" => new[] { Prefix + "Comparer`1<T>" },
+                "FunctionEqualityComparer" => new[] { Prefix + "EqualityComparer`1<T>" },
                 _ => Array.Empty<string>()
             };
             if (!type.IsPublic || type.IsValueType || type.IsInterface != contract || type.IsAbstract != contract
@@ -82,12 +82,12 @@ static class ComparerBindings
         var kind = owner == StringOwner ? "StringComparer" : owner[Prefix.Length..owner.IndexOf('<')];
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type, allowOpenMethodParameters: GenericUnionBindings.ParameterMap is not null);
         (string Args, string Result, bool Static) expected = (kind, reference.Name) switch {
-            ("DelegateComparer", ".ctor") => ($"fn<{element},{element},Int32>", "noresult", false),
-            ("DelegateEqualityComparer", ".ctor") => ($"fn<{element},{element},Boolean>,fn<{element},Int32>", "noresult", false),
+            ("FunctionComparer", ".ctor") => ($"fn<{element},{element},Int32>", "noresult", false),
+            ("FunctionEqualityComparer", ".ctor") => ($"fn<{element},{element},Boolean>,fn<{element},Int32>", "noresult", false),
             ("StringComparer", "get_Ordinal" or "get_OrdinalIgnoreCase") => ("", StringOwner, true),
-            ("StringComparer" or "Comparer" or "DelegateComparer", "Compare") => ($"{element},{element}", "Int32", false),
-            ("StringComparer" or "EqualityComparer" or "DelegateEqualityComparer", "Equals") => ($"{element},{element}", "Boolean", false),
-            ("StringComparer" or "EqualityComparer" or "DelegateEqualityComparer", "GetHashCode") => (element, "Int32", false),
+            ("StringComparer" or "Comparer" or "FunctionComparer", "Compare") => ($"{element},{element}", "Int32", false),
+            ("StringComparer" or "EqualityComparer" or "FunctionEqualityComparer", "Equals") => ($"{element},{element}", "Boolean", false),
+            ("StringComparer" or "EqualityComparer" or "FunctionEqualityComparer", "GetHashCode") => (element, "Int32", false),
             _ => throw new InvalidDataException("Unsupported comparer member: " + reference.FullName)
         };
         var contract = IsInterface(owner);

@@ -8,14 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-28
 
-- Begin the selected Function type/object migration with native structural
+- Implement structural Function types and objects with native
   signature metadata and identity, generic substitution, checked binding and Invoke,
   artifact round trips and retained receiver tracing. Add focused shape, signature,
   capture-lifetime and collection tests. The native host surface now uses Function
   and Value::Function in place of Delegate and Value::Delegate; consumers must
   update those names. Native binding metadata is now BindFunction with a function_type
-  operand, and reachability exposes function_invocations. Transitional delegate
-  input encodings remain while removal of the old frontend/admission paths is pending.
+  operand, and reachability exposes function_invocations. Reject legacy delegate
+  declarations, binding instructions, serialized representations and operand aliases;
+  rebuild older artifacts. Migrate the archived Neo frontend and callback tests to
+  structural shapes.
   Raven library callbacks now use function syntax, and the importer maps CLI callback
   transport to structural fn signatures and function.bind. Remove runtime Func
   declarations and their generated slice; migrate native service callback signatures.
@@ -37,8 +39,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   a structural-family API page; explicitly exclude CLI transport scaffolds from
   generated nominal pages. Validate synchronous/extension and async consumers;
   refresh the source coverage audit after removing the Func slice, including
-  service callers in generated method bodies. Full legacy delegate removal remains
-  in progress.
+  service callers in generated method bodies. Rename callback comparer adapters to
+  FunctionComparer and FunctionEqualityComparer. Preserve target/receiver equality,
+  fix bound class-receiver identity comparison, and report NullReference on null
+  Function invocation. Keep constructor Function fields explicitly initialized.
+  Ordinary Object conversion, synthetic Invoke descriptors and general structural
+  member enumeration remain outside this first slice; named Function types remain
+  future work.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

@@ -69,7 +69,7 @@ func Main() {
     Check(files.Count == 3, "map count")
 
     let divisor = 10
-    let policy = DelegateEqualityComparer<int>(
+    let policy = FunctionEqualityComparer<int>(
         (left, right) => left % divisor == right % divisor,
         value => -2147483648)
     let buckets = HashMap<int, int>(policy)
@@ -84,7 +84,7 @@ func Main() {
     }
     Check(buckets.Count == 10, "custom count")
     Check(buckets.Keys[2] == 2, "preserve original key")
-    let reverse: Comparer<int> = DelegateComparer<int>((left, right) => right.CompareTo(left))
+    let reverse: Comparer<int> = FunctionComparer<int>((left, right) => right.CompareTo(left))
     Check(reverse.Compare(-2147483648, 2147483647) > 0, "reverse ordering without subtraction overflow")
     Check(reverse.Compare(7, 7) == 0, "equal ordering")
 

@@ -217,7 +217,7 @@ impl Access<'_> {
         Identity(Arc::downgrade(self.shared))
     }
 
-    /// Validate native result provenance, including nested values and delegates.
+    /// Validate native result provenance, including nested values and functions.
     /// Allocation IDs alone cannot distinguish two invocations with the same ID.
     fn value_roots(&self, value: &crate::Value) -> Result<Vec<usize>, Fault> {
         use crate::Value;
@@ -232,8 +232,8 @@ impl Access<'_> {
                     receiver: reference,
                     ..
                 } => Some(reference),
-                Value::Function(delegate) => {
-                    pending.extend(delegate.receiver.as_deref());
+                Value::Function(function_object) => {
+                    pending.extend(function_object.receiver.as_deref());
                     None
                 }
                 Value::Object { fields, .. }

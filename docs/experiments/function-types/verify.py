@@ -48,6 +48,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-function-types-') as directory:
     executed = run([tools['runtime'], 'run', asynchronous / 'App.neoil', '--system', tools['system']])
     assert executed.stdout == '42\nTrue\n41\n21\n7\n' and not executed.stderr, executed
     print('structural-function-async: passed', flush=True)
+    shutil.copyfile(here.parent / 'raven-target/samples/library-comparers.rvn', root / 'Main.rvn')
+    comparers = root / 'comparers'
+    run(['dotnet', tools['bridge'], '--project', root / 'Contracts.rvnproj', comparers])
+    run([tools['runtime'], 'verify', comparers / 'App.neoil', '--system', tools['system']])
+    executed = run([tools['runtime'], 'run', comparers / 'App.neoil', '--system', tools['system']])
+    assert executed.stdout == 'Comparer contract passed\n' and not executed.stderr, executed
+    print('function-comparer-adapters: passed', flush=True)
     (root / 'Main.rvn').write_text('public delegate Named(value: int) -> int\n'
         'public func Identity(value: int) -> int => value\n'
         'func Main() -> int { let f: Named = Identity; return f(42) }\n')

@@ -66,7 +66,7 @@ func Main() { let map = HashMap<int, string>(StringComparer.Ordinal) }
     check('ordering is not equality', '''import System.*
 import System.Collections.*
 func Main() {
-    let ordering = DelegateComparer<int>((left, right) => left.CompareTo(right))
+    let ordering = FunctionComparer<int>((left, right) => left.CompareTo(right))
     let map = HashMap<int, int>(ordering)
 }
 ''', 'RAV', success=False)

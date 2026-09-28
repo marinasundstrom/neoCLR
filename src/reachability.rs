@@ -28,7 +28,7 @@ pub struct ReachableFunction {
     pub implementation: FunctionImplementation,
     /// Every syntactic call in the specialized IL body, including unreachable code.
     pub calls: Vec<ReachableCall>,
-    /// Code retained by delegate binding, including possible virtual implementations.
+    /// Code retained by Function binding, including possible virtual implementations.
     pub bindings: Vec<ReachableCall>,
     /// Typed indirect call sites; targets are retained at binding sites, not guessed here.
     pub function_invocations: Vec<(usize, Type)>,
@@ -60,7 +60,7 @@ pub(crate) fn analyze(
     let mut intern = |function: Function, functions: &mut Vec<Function>| -> Result<usize, Fault> {
         if crate::function_objects::is_contract(module, &function) {
             return Err(Fault::new(
-                "delegate Invoke is an indirect call contract, not a concrete graph root",
+                "Function Invoke is an indirect call contract, not a concrete graph root",
             ));
         }
         let definition = function

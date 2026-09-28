@@ -95,7 +95,7 @@ impl Invocation {
             return Err(Error::InvalidRange);
         }
         // Harness-created delegate only. This is not production signature binding.
-        let Value::Delegate(delegate) = &callback else {
+        let Value::Function(delegate) = &callback else {
             return Err(Error::InvalidCallback);
         };
         let Some(Value::ObjectReference(receiver)) = delegate.receiver.as_deref() else {

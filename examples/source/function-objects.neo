@@ -1,6 +1,5 @@
 import System.Console.*
 
-delegate Transform(value: int) -> int
 
 class Counter {
     var Value: int
@@ -11,15 +10,15 @@ class Counter {
     }
 }
 func Identity<T>(value: T) -> T { return value }
-func Apply(callback: Transform, value: int) -> int {
+func Apply(callback: fn<int,int>, value: int) -> int {
     return callback(value)
 }
-func MakeCallback() -> Transform {
+func MakeCallback() -> fn<int,int> {
     let counter = new Counter(40)
     return counter.Add
 }
 func Main() -> int {
-    let identity: Transform = Identity<int>
+    let identity: fn<int,int> = Identity<int>
     WriteLine(Apply(identity, 42))
     let callback = MakeCallback()
     WriteLine(callback.Invoke(1))

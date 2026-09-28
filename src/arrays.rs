@@ -61,7 +61,7 @@ pub(crate) fn measure(value: &Value, usage: &mut Usage, limits: &Limits) -> Resu
             }
             Value::Object { fields, .. } => Some((fields.as_slice(), inside)),
             Value::Erased(v) => Some((std::slice::from_ref(v.as_ref()), inside)),
-            Value::Function(delegate) => delegate
+            Value::Function(function_object) => function_object
                 .receiver
                 .as_deref()
                 .map(|receiver| (std::slice::from_ref(receiver), inside)),
@@ -261,7 +261,7 @@ mod tests {
     }
 
     #[test]
-    fn delegate_receiver_inline_payload_counts_toward_budget() {
+    fn function_object_receiver_inline_payload_counts_toward_budget() {
         let value = Value::Function(crate::Function {
             ty: Type::from_name("Callback"),
             target: crate::metadata::FunctionRef {

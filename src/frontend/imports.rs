@@ -38,10 +38,6 @@ pub(super) fn resolve(source: &Source) -> Result<HashMap<String, Vec<String>>, F
                     .interfaces
                     .iter()
                     .any(|interface| interface.name.text == name)
-                || source
-                    .delegates
-                    .iter()
-                    .any(|delegate| delegate.name.text == name)
             {
                 continue;
             }

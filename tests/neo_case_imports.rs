@@ -48,7 +48,7 @@ import Shape.*
 import Shape.*
 union Shape { case Circle(radius: int) }
 func Main() -> int {
-    let Circle: System.Func<int, int> = value => value + 2
+    let Circle: fn<int, int> = value => value + 2
     let explicit = Shape.Circle(40)
     return Circle(explicit.radius)
 }
@@ -162,7 +162,7 @@ fn bundled_imports_keep_shadowing_and_ambiguity_rules() {
     );
     assert_eq!(
         run(
-            "import System.Result.*\nfunc Main() -> int { let Ok: System.Func<int,int> = value => value + 2; return Ok(40) }"
+            "import System.Result.*\nfunc Main() -> int { let Ok: fn<int,int> = value => value + 2; return Ok(40) }"
         ),
         Value::Int32(42)
     );

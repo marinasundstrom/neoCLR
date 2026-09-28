@@ -163,3 +163,67 @@ fn named_generic_parameters_bind_inside_function_shapes() {
         .fields[0];
     assert_eq!(field.ty, parse_type("fn<!0,!0>").unwrap());
 }
+
+#[test]
+fn legacy_delegate_artifacts_and_source_declarations_are_rejected() {
+    assert!(
+        assemble(".module Legacy\n.delegate Old\n.method instance Invoke() -> Int32\n.end\n.end")
+            .is_err()
+    );
+    assert!(
+        neoclr::frontend::compile("delegate Old() -> int\nfunc Main() -> int { return 0 }")
+            .unwrap_err()
+            .message
+            .contains("removed")
+    );
+    let m = module(
+        "function.bind fn<Int32,Int32> = Identity(Int32)\nldc.i4 42\ncall instance fn<Int32,Int32>::Invoke(Int32)",
+        ".function Identity(Int32) -> Int32\nldarg 0\nret\n.end",
+    );
+    let json = serde_json::to_string(&m).unwrap();
+    assert!(neoclr::load(&json.replace("function.bind", "delegate.bind")).is_err());
+    assert!(neoclr::load(&json.replace("function_type", "delegate")).is_err());
+    let nominal = assemble(".module Legacy\n.type Old\n.end").unwrap();
+    let mut json = serde_json::to_value(nominal).unwrap();
+    json["types"][0]["representation"] = "Delegate".into();
+    assert!(neoclr::load(&json.to_string()).is_err());
+    assert!(assemble(".module Legacy\n.function Main() -> Int32\ndelegate.bind fn<Int32,Int32> = Identity(Int32)\nldc.i4 42\nret\n.end").is_err());
+}
+
+#[test]
+fn function_identity_uses_loaded_component_identities() {
+    let modules = neoclr::assembler::assemble_modules(&[
+        ".module App\n.references (Left,Right)\n.entry Main\n.function Main() -> Int32\nldc.i4 0\nret\n.end",
+        ".module Left\n.type Left.Payload\n.field Number Int32\n.end",
+        ".module Right\n.type Right.Payload\n.field Number Int32\n.end",
+    ]).unwrap();
+    let program = LoadedProgram::with_modules(
+        &modules[0],
+        neoclr::library::system().unwrap(),
+        &modules[1..],
+    )
+    .unwrap();
+    let identity = |text| {
+        program
+            .resolve_type_identity(&parse_type(text).unwrap())
+            .unwrap()
+    };
+    assert_eq!(
+        identity("fn<[System]Int32,[System]Int32>"),
+        identity("fn<Int32,Int32>")
+    );
+    assert_ne!(
+        identity("fn<[Left]Left.Payload,Int32>"),
+        identity("fn<[Right]Right.Payload,Int32>")
+    );
+}
+
+#[test]
+fn artifacts_cannot_redefine_the_synthesized_invoke_contract() {
+    let m = module("ldc.i4 42", "");
+    let mut json = serde_json::to_value(m).unwrap();
+    json["functions"][0]["owner"] = serde_json::to_value(parse_type("fn<Int32>").unwrap()).unwrap();
+    json["functions"][0]["instance"] = true.into();
+    json["functions"][0]["name"] = "$Function.Invoke".into();
+    assert!(neoclr::load(&json.to_string()).is_err());
+}

@@ -288,9 +288,9 @@ const MAP_START: &str = r#"
 .local System.Collections.HashMap<Int32,Int32> map
 .local System.Collections.Map<Int32,Int32> reader
 .local System.Collections.MutableMap<Int32,Int32> writer
-delegate.bind System.Func<Int32,Int32,Boolean> = Equal(Int32,Int32)
-delegate.bind System.Func<Int32,Int32> = Hash(Int32)
-newobj instance System.Collections.HashMap<Int32,Int32>::.ctor(System.Func<Int32,Int32,Boolean>,System.Func<Int32,Int32>)
+function.bind fn<Int32,Int32,Boolean> = Equal(Int32,Int32)
+function.bind fn<Int32,Int32> = Hash(Int32)
+newobj instance System.Collections.HashMap<Int32,Int32>::.ctor(fn<Int32,Int32,Boolean>,fn<Int32,Int32>)
 stloc map
 ldloc map
 stloc reader
@@ -434,9 +434,9 @@ ret
 .local System.Collections.HashMap<Box,Box> map
 .local Box key
 .local Box value
-delegate.bind System.Func<Box,Box,Boolean> = Equal(Box,Box)
-delegate.bind System.Func<Box,Int32> = Hash(Box)
-newobj instance System.Collections.HashMap<Box,Box>::.ctor(System.Func<Box,Box,Boolean>,System.Func<Box,Int32>)
+function.bind fn<Box,Box,Boolean> = Equal(Box,Box)
+function.bind fn<Box,Int32> = Hash(Box)
+newobj instance System.Collections.HashMap<Box,Box>::.ctor(fn<Box,Box,Boolean>,fn<Box,Int32>)
 stloc map
 ldc.i4 7
 newobj Box
@@ -512,10 +512,10 @@ initobj System.Collections.HashMap<Int32,Int32>
 ldloc map
 newobj CallbackState
 stloc state
-delegate.bind System.Func<Int32,Int32,Boolean> = Equal(Int32,Int32)
+function.bind fn<Int32,Int32,Boolean> = Equal(Int32,Int32)
 ldloc state
-delegate.bind System.Func<Int32,Int32> = instance CallbackState::Reenter(Int32)
-newobj instance System.Collections.HashMap<Int32,Int32>::.ctor(System.Func<Int32,Int32,Boolean>,System.Func<Int32,Int32>)
+function.bind fn<Int32,Int32> = instance CallbackState::Reenter(Int32)
+newobj instance System.Collections.HashMap<Int32,Int32>::.ctor(fn<Int32,Int32,Boolean>,fn<Int32,Int32>)
 stloc map
 ldloc state
 ldloc map

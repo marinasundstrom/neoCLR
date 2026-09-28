@@ -1,7 +1,7 @@
 # Function types and Function objects
 
-**Author-selected direction, 2026-09-28; native foundation implemented on the feature
-branch, including the common/nominal descriptor split. Full delegate replacement remains incomplete.**
+**Author-selected direction, 2026-09-28; structural Function replacement and the
+common/nominal descriptor split are implemented on the development feature branch.**
 
 The author selects structural Function types, Function objects instantiated from
 those types, replacement and removal of delegates, and a nominal/structural
@@ -155,7 +155,7 @@ belongs to the compiler phase, not an unsupported claim of compatibility.
 The status owner is the [runtime/language tracker](tracking/runtime-language.md).
 The steps above describe full acceptance, not completion of the feature branch.
 
-## Native foundation checkpoint
+## Native foundation checkpoint (historical)
 
 The native metadata model now represents Function shapes directly, outside nominal
 `TypeDef` declarations. Internal IL uses `fn<ParameterTypes...,ResultType>` and
@@ -222,7 +222,7 @@ and rendered shape signatures need explicit documentation metadata rather than
 fabricated Name/Namespace values. This is a documentation direction; a generic
 RavenDoc structural-family renderer is not implemented in this checkpoint.
 
-## Raven callback migration checkpoint
+## Raven callback migration checkpoint (historical)
 
 The library now spells callback types with Raven function syntax. FunctionBindings
 converts CLI Func/Action transport into structural native shapes and emits
@@ -243,3 +243,36 @@ is tracked in the migration fixture.
 and extensions without declaring a nominal Function type. CLI transport scaffolds
 remain inventoried with explicit documentation exclusions. Removing legacy
 delegate admission/frontends and settling object equality/nullability remain open.
+
+## Structural replacement contract — 2026-09-28
+
+The native runtime, Raven source library, importer and archived Neo frontend now
+use structural Function shapes. Native `.delegate`, `delegate.bind`, the serialized
+Delegate representation and delegate operand alias are rejected. There is no
+nominal fallback. Named Raven delegates are not admitted; named function types
+remain possible future work. Rebuild older artifacts against matching components.
+The archived frontend spells the native shape `fn<P...,R>`; Raven uses arrow syntax.
+Comparer adapters are FunctionComparer and FunctionEqualityComparer.
+
+The bounded object contract preserves the earlier callable capability semantics:
+shape, closed target and retained receiver determine equality, and copies share
+captures. Bound class-receiver equality now compares heap identity as slot receivers
+already did. Ordinary storage defaults to null and null Invoke reports NullReference;
+constructors must explicitly initialize Function fields before publication. Function
+objects currently have no independent heap allocation identity or ordinary Object
+conversion. These are explicit limitations of this first slice, not reasons to
+retain delegates. Compared with .NET Delegate, there is no nominal callable identity
+or invocation list; target/receiver equality is retained. Benefits are shared shapes
+across methods and no declaration boilerplate, at the cost of rebuilding artifacts
+and a bounded Object/introspection surface. Existing research above supplies the
+comparison; no performance improvement is claimed.
+
+Structural types continue to support members and extensions. Invoke is synthesized
+from each Function shape, and Function extensions execute in the Raven consumer.
+The common TypeInfo still owns member queries, but declaration-based GetMethods
+currently has no synthetic Invoke descriptor or token. Dedicated Function parameter/
+result descriptor APIs and general structural member enumeration remain follow-up
+work; the current family page documents Invoke and extensions explicitly. This
+initial replacement does not reclassify existing nominal Tuple/union declarations,
+implement intersections, select named Function identity, or build a general RavenDoc
+structural renderer. Earlier checkpoint sections above remain historical evidence.

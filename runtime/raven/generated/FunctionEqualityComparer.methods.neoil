@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn. Regenerate with build_runtime_library.py.
-.type class System.Collections.DelegateEqualityComparer<T0>
+; Generated from runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn. Regenerate with build_runtime_library.py.
+.type class System.Collections.FunctionEqualityComparer<T0>
 .sealed
 .implements System.Collections.EqualityComparer<T0>
 .field private equal fn<T0,T0,Boolean>
@@ -16,14 +16,14 @@ ldarg 0
 M00000001_IL_0009:
 ldarg 1
 M00000001_IL_000a:
-stfld System.Collections.DelegateEqualityComparer<T0>::equal
+stfld System.Collections.FunctionEqualityComparer<T0>::equal
 M00000001_IL_000f:
 M00000001_IL_0010:
 ldarg 0
 M00000001_IL_0011:
 ldarg 2
 M00000001_IL_0012:
-stfld System.Collections.DelegateEqualityComparer<T0>::hash
+stfld System.Collections.FunctionEqualityComparer<T0>::hash
 M00000001_IL_0017:
 ret
 .end
@@ -33,16 +33,16 @@ M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.Collections.DelegateEqualityComparer<T0>::equal
+ldfld System.Collections.FunctionEqualityComparer<T0>::equal
 M00000002_IL_0008:
 ldarg 1
 M00000002_IL_0009:
 ldarg 2
 M00000002_IL_000a:
 callvirt instance fn<T0,T0,Boolean>::Invoke(T0,T0)
-call neoCLR.Library.System.Collections.DelegateEqualityComparer.RuntimeBooleanToInt32(Boolean)
+call neoCLR.Library.System.Collections.FunctionEqualityComparer.RuntimeBooleanToInt32(Boolean)
 M00000002_IL_000f:
-call neoCLR.Library.System.Collections.DelegateEqualityComparer.RuntimeBooleanFromInt32(Int32)
+call neoCLR.Library.System.Collections.FunctionEqualityComparer.RuntimeBooleanFromInt32(Int32)
 ret
 .end
 .method instance GetHashCode(T0 value) -> Int32
@@ -51,7 +51,7 @@ M00000003_IL_0001:
 M00000003_IL_0002:
 ldarg 0
 M00000003_IL_0003:
-ldfld System.Collections.DelegateEqualityComparer<T0>::hash
+ldfld System.Collections.FunctionEqualityComparer<T0>::hash
 M00000003_IL_0008:
 ldarg 1
 M00000003_IL_0009:

@@ -29,8 +29,9 @@ python3 docs/experiments/function-types/verify.py \
 
 The descriptor consumer compiles, passes native verification, and executes with
 `Nominal and structural descriptors passed`. Raven callbacks import to structural
-Function signatures; native legacy declaration and instruction aliases still need
-removal. The remaining scope is tracked separately from passing consumer evidence.
+Function signatures. Native legacy declarations, instructions and serialized
+representations are now rejected. Bounded Object/introspection limitations are
+documented separately from the completed callable migration.
 
 ## Deferred general compiler candidate
 
@@ -65,7 +66,7 @@ The migrated reflection, flags and type-preview consumers execute, and the old
 System.Reflection descriptor namespace is rejected by the compiler. Raven's
 matching integration note is committed on its isolated neoclr branch as `0218f75af`.
 
-## Callable transport migration (in progress)
+## Callable transport migration checkpoint
 
 Raven source callbacks now use function syntax. Its isolated neoCLR compiler policy
 selects inhabited Func transport for unit results, matching generic `() -> T`
@@ -85,8 +86,8 @@ The async fixture exposed a null Promise callback list. An independent ordinary
 that `List<() -> ()>()` produced an invalid semantic operation with no diagnostic
 and silently omitted construction during emission. The expression-side type binder
 was missing FunctionTypeSyntax handling. Commit `e316703ca` fixes that binding and
-is integrated into the isolated target as `6b5418e57`; it is ready for independent
-main integration, not a reason to merge the target branch wholesale.
+is integrated into the isolated target as `6b5418e57`; it was independently fast-forwarded into main after a clean-worktree check; the
+experimental target branch was not merged wholesale.
 
 Fifteen focused compiler tests pass afterward; three function-signature constructor
 cases failed before the fix, while the non-function control passed. Tests check
@@ -99,3 +100,23 @@ covering shared captures, unit callbacks and nested Task results. The validation
 script's initially lowercase Boolean expectation was corrected to the observed
 runtime display contract. Full source/bootstrap hash, API snapshot and source
 coverage audit checks pass. No website build or publication was needed.
+
+## Final structural replacement validation
+
+The removal checkpoint passes 157 tests across 16 selected native suites: Function
+shapes/objects/receivers, library loading, closures, collection/query callbacks,
+archived frontend consumers and workers. Separate debugger, generic array and
+no-result suites pass; six generated task-queue atomicity checks and three Function
+GC/shared-work checks pass. Thirteen external-I/O GC probe checks also pass with
+Function carriers, along with the TCP completion consumer exercising both VM
+collection paths and an empty-queue wait. Optimized binaries were used for the large full-library consumer
+runs; debug loading was slow, and an initial linker run required selecting the SDK
+from the active Xcode installation instead of a mismatched CommandLineTools SDK.
+
+The final verify.py run passes all twelve checks: descriptor selection, Function
+callbacks/extensions, async/shared capture/unit/nested Tasks, renamed comparer
+adapters, named-delegate rejection and seven nominal-only member rejections.
+Full library regeneration, bootstrap hashes, API reference/snapshot checks and
+source coverage inventory/audit pass. Named function types, Object conversion,
+Function parameter/result descriptor APIs and general structural member enumeration
+remain outside this first slice. No website build or publication was performed.

@@ -680,22 +680,25 @@ See [managed constructor chaining](constructor-chaining.md) for byref .ctor rece
 base/this call validation, partial initialization and managed stfld writes.
 
 
-## Managed delegates
+## Structural Function objects
 
-`.delegate Name<T>` declares a fieldless nominal callable with exactly one bodyless
-public `.method instance Invoke(...) -> R`. It has no base, instance fields or
-layout overrides. Generic owner parameters are substituted normally.
+`fn<P0,...,R>` describes a shape independently of nominal type declarations.
+Ordered types, readonly/out/outtrue parameter contracts and the return convention
+participate in identity. `fn<Void>` has no inputs and returns inhabited unit;
+`fn<noresult Void>` returns no stack value. Generic components substitute normally.
 
-`delegate.bind D = Target(...)` pushes D. For an instance target it first consumes
-one heap-backed managed receiver. For a static target it consumes none. Binding
-checks the exact invocation contract and access; virtual/interface selection retains
-the concrete owner. `call instance D::Invoke(...)` and `callvirt` consume D followed
-by its arguments and push R, using the ordinary call frame and output rules.
-`ldobj D` reads callable storage through D&. No default/null callable is manufactured.
+`function.bind fn<...> = Target(...)` creates a checked callable object. Instance
+binding consumes one retained heap receiver; static binding consumes none. Access,
+exact signature, virtual/interface dispatch and capture lifetime checks apply.
+`call instance fn<...>::Invoke(...)` and `callvirt` consume the object and arguments
+and obey the shape's result convention. Invoke is synthesized, not a re-definable
+artifact function. `ldobj fn<...>` reads Function storage through a managed reference.
+Default storage is null and null Invoke faults with NullReference. Class constructors
+must initialize Function fields before publication.
 
-See [delegates](delegates.md) for examples, Func<Void>, lifetime restrictions and the
-[CLR instruction comparison](delegate-contract.md). delegate.bind is a new opcode;
-Invoke reuses call/callvirt.
+`.delegate`, `delegate.bind` and serialized nominal Delegate representations are
+removed. Rebuild older artifacts. See the [Function contract](function-types.md)
+and [API family reference](../api-docs/functions.md) for equality and limitations.
 
 ## Enum literal metadata (format 5 extension)
 

@@ -1,5 +1,10 @@
 # Delegate contract and CLR comparison
 
+**Historical contract.** Development after Preview 11 replaces neoCLR delegates
+with [structural Function types and objects](function-types.md). The comparisons
+and probes below document the earlier baseline; current behavior is in the
+[Function API reference](../api-docs/functions.md).
+
 Status: first runtime/IL and Neo implementation, 2026-09-08. See the
 [delegate guide](delegates.md) for the implemented surface and commands. The earlier
 [interface-adapter example](../examples/source/callback-groundwork.neo) remains

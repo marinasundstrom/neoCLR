@@ -349,13 +349,10 @@ pub(super) fn indexer(ty: &Ty, setter: bool) -> Result<(String, crate::metadata:
     Ok((signature, function))
 }
 
-pub(super) fn delegate(ty: &Ty) -> Result<Option<crate::metadata::Function>, Fault> {
+pub(super) fn function(ty: &Ty) -> Result<Option<crate::metadata::Function>, Fault> {
     let module = crate::library::system()?;
     let ty = crate::assembler::parse_type(&ty.il())?;
-    if module
-        .type_definition(&ty)
-        .is_some_and(|d| d.representation == crate::metadata::Representation::Delegate)
-    {
+    if matches!(ty, crate::metadata::Type::Function(_)) {
         crate::function_objects::contract(module, &ty).map(Some)
     } else {
         Ok(None)

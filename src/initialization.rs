@@ -28,13 +28,9 @@ fn build_default(module: &Module, ty: &Type, allow_uninitialized: bool) -> Resul
         if module.is_object_reference_type(ty) {
             return Ok(Value::NullObjectReference(ty.clone()));
         }
-        if matches!(ty, Type::Function(_))
-            || module.type_definition(ty).is_some_and(|definition| {
-                definition.representation == crate::metadata::Representation::Delegate
-            })
-        {
-            // Delegate payloads have the same null default as CLI delegates.
-            // This does not turn them into ordinary heap-object references.
+        if matches!(ty, Type::Function(_)) {
+            // Function slots have a null default, but constructors must initialize
+            // captured callback fields before publishing their receiver.
             return Ok(if allow_uninitialized {
                 Value::Uninitialized(ty.clone())
             } else {

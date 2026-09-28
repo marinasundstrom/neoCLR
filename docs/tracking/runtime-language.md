@@ -9,7 +9,7 @@ or later author direction selects it.
 
 ## Function types and objects — 2026-09-28
 
-**In progress on the feature branch; native structural foundation implemented.**
+**Structural replacement implemented and validated on the feature branch.**
 The author directs structural Function types describing callable shape, Function
 objects holding the invocation target, removal of delegates, and a
 `NominalTypeInfo`/`TypeInfo.IsNominalType` split. Named function types may follow
@@ -18,8 +18,7 @@ The [design and migration plan](../function-types.md) separates author decisions
 from assistant recommendations and records the existing execution/introspection
 dependencies. Native structural shape identity and checked Function binding/Invoke
 now run without a nominal declaration; [focused tests](../../tests/function_types.rs)
-cover substitution, artifacts, captures and signature rejection. Delegate declarations
-remain temporarily admitted during migration. The Raven descriptor API now separates
+cover substitution, artifacts, captures and signature rejection. Legacy delegate declarations and binding encodings are now rejected. The Raven descriptor API now separates
 TypeInfo (DisplayName/IsNominalType) from NominalTypeInfo (declaration metadata);
 [executable and negative cases](../experiments/function-types/README.md) cover this split.
 Library callback source and imported signatures now use structural Function shapes;
@@ -27,9 +26,16 @@ runtime Func declarations are removed. CLI delegate metadata remains an explicit
 bounded compiler transport. Function/extension and Task.Run/async consumers execute with the independently
 fixed Raven generic-construction binder.
 
-Next: settle public object identity/equality/nullability,
-finish legacy frontend/artifact admission removal and the remaining
-consumer/documentation migration.
+The bounded object contract compares shape/target/receiver, shares captures, uses
+null defaults and checks constructor initialization. Ordinary Object conversion,
+synthetic Invoke descriptors and general structural member enumeration remain
+follow-up work. Current member/extension documentation is a manual Function family
+page; a general RavenDoc renderer remains future work.
+
+Validation: 157 selected native consumer tests and twelve Raven integration checks
+pass, with matching API/bootstrap snapshots and focused GC/queue/debugger evidence.
+See the [evidence record](../experiments/function-types/README.md). Subsequent work
+returns to the active roadmap milestone unless directed otherwise.
 Other structural families are direction, not part of this Function replacement's
 completion claim. Acceptance requires the full migration and focused positive and
 negative cases listed in the plan; a renamed delegate carrier is insufficient.

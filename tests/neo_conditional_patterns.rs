@@ -80,11 +80,11 @@ func Main() -> int {
 #[test]
 fn successful_pattern_bindings_can_be_captured_by_returned_closures() {
     let execution = run(r#"
-func Guard(text: string) -> System.Func<int> {
+func Guard(text: string) -> fn<int> {
     let Ok(value) = Int32.Parse(text) else { return () => 0 }
     return () => value
 }
-func Conditional(text: string) -> System.Func<int> {
+func Conditional(text: string) -> fn<int> {
     if let Ok(value) = Int32.Parse(text) { return () => value }
     else { return () => 0 }
 }

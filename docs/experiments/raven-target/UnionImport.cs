@@ -598,7 +598,7 @@ static class UnionImport
                             if (!functionTarget.HasThis) throw new InvalidDataException("Virtual function address requires receiver.");
                             var receiverType = ApplicationTypes.Receiver(functionTarget);
                             Expect(receiverType);
-                            var checkName = "CheckDelegateReceiver_" + MetadataIdentity.TypeName(functionTarget.DeclaringType).Replace('.', '_');
+                            var checkName = "CheckFunctionReceiver_" + MetadataIdentity.TypeName(functionTarget.DeclaringType).Replace('.', '_');
                             functionAdapters[checkName] = $".function {checkName}({receiverType}) -> void\n.local {receiverType} empty\nldloca empty\ninitobj {receiverType}\nldarg 0\nldloc empty\nref.eq\nbrfalse Valid\nfault \"null Function receiver\"\nValid:\nret\n.end\n";
                             code.AppendLine($"call {checkName}({receiverType})");
                         }

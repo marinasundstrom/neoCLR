@@ -1091,11 +1091,11 @@ fn typed_effect(
             )),
         },
         BindFunction {
-            function_type: delegate,
+            function_type,
             target,
         } => {
             let callee =
-                crate::function_objects::validate_binding(module, function, delegate, target)?;
+                crate::function_objects::validate_binding(module, function, function_type, target)?;
             if callee.instance {
                 let owner = callee.owner.as_ref().unwrap();
                 stored(
@@ -1110,7 +1110,7 @@ fn typed_effect(
                     },
                 )?;
             }
-            one(delegate.clone())
+            one(function_type.clone())
         }
         CallVirtual(target) => {
             let callee = crate::vm::resolve(module, target)?;

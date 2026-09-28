@@ -11,9 +11,9 @@ func Main() -> int {
     System.Array.ForEach<int>(heap, Print)
 
     var value = 41
-    let increment: System.Func<int&, void> = Increment
+    let increment: fn<int&, void> = Increment
     increment(&value)
-    let noop: System.Func<void> = Noop
+    let noop: fn<void> = Noop
     noop.Invoke()
     return value
 }

@@ -1,6 +1,6 @@
 import System.Console.*
 
-func MakeCounter(start: int) -> System.Func<int> {
+func MakeCounter(start: int) -> fn<int> {
     var value = start
     return () => {
         value = value + 1

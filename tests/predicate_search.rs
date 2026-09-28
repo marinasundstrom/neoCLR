@@ -46,7 +46,7 @@ record Item(Value: int)
 func Main() -> int {
     let values = System.Collections.ArrayList<Item&>(0)
     var calls = 0
-    let predicate: System.Func<Item&, bool> = item => { calls = calls + 1; return true }
+    let predicate: fn<Item&, bool> = item => { calls = calls + 1; return true }
     if !values.Find(predicate).IsNone { return -1 }
     if values.Exists(predicate) { return -2 }
     if values.FindIndex(predicate) != -1 { return -3 }

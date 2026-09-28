@@ -591,7 +591,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
-                        "function.bind" | "delegate.bind" => {
+                        "function.bind" => {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
                                 Fault::new("expected function.bind Type = Target(...)")
                             })?;
@@ -686,7 +686,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     module.revision = Some(rest.into());
                 }
-                ".type" | ".interface" | ".delegate" => {
+                ".type" | ".interface" => {
                     let (visibility, rest) = match rest.split_once(char::is_whitespace) {
                         Some(("public", rest)) => {
                             (crate::metadata::Visibility::Public, rest.trim())
@@ -752,9 +752,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         properties: vec![],
                         packing: None,
                         minimum_size: None,
-                        representation: if word == ".delegate" {
-                            Representation::Delegate
-                        } else if word == ".interface" {
+                        representation: if word == ".interface" {
                             Representation::Interface
                         } else if ty.is_primitive() {
                             Representation::Runtime

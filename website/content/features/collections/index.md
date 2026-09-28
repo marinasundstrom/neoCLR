@@ -113,7 +113,7 @@ The `Check` helper faults if a condition fails. Equal text has equal hashes, whi
 case and normalization differences remain distinct. Ordinal ordering follows UTF-8
 bytes/Unicode scalar values, which differs from .NET UTF-16 ordering for some characters.
 
-Use `DelegateEqualityComparer<T>` or `DelegateComparer<T>` to adapt callbacks, or
+Use `FunctionEqualityComparer<T>` or `FunctionComparer<T>` to adapt callbacks, or
 implement the interfaces for a named policy. Policy behavior and keys must remain
 stable while stored; callbacks must not reenter the same map. No universal default or
 culture policy is supplied. `StringComparer.OrdinalIgnoreCase` additionally uses

@@ -46,7 +46,7 @@ ret
 #[test]
 fn dedicated_and_pooled_workers_exchange_owned_text() {
     for name in ["StartWorker", "QueueWorker"] {
-        let result = execute(&format!("delegate.bind System.Func<String,String> = Echo(String)\nldstr \"👩‍💻\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"), "").unwrap();
+        let result = execute(&format!("function.bind fn<String,String> = Echo(String)\nldstr \"👩‍💻\"\ncall neoCLR.Runtime.{name}(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"), "").unwrap();
         assert_eq!(result.value, Value::String("👩‍💻".into()));
     }
 }
@@ -65,7 +65,7 @@ fn worker_results_share_a_byte_budget_with_captured_output() {
             ("Print", "", 0, false), // empty lines still cost one byte
         ] {
             let body = format!(
-                "delegate.bind System.Func<String,String> = {callback}(String)\nldstr \"{input}\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+                "function.bind fn<String,String> = {callback}(String)\nldstr \"{input}\"\ncall neoCLR.Runtime.{name}(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
             );
             let result = execute_options(
                 &body,
@@ -115,7 +115,7 @@ fn invalid_and_reused_handles_fault() {
             .message
             .contains("Unknown")
     );
-    let body = ".local Int32 handle\ndelegate.bind System.Func<String,String> = Echo(String)\nldstr \"ok\"\ncall neoCLR.Runtime.StartWorker(System.Func<String,String>,String)\nstloc handle\nldloc handle\ncall neoCLR.Runtime.JoinWorker(Int32)\npop\nldloc handle\ncall neoCLR.Runtime.JoinWorker(Int32)";
+    let body = ".local Int32 handle\nfunction.bind fn<String,String> = Echo(String)\nldstr \"ok\"\ncall neoCLR.Runtime.StartWorker(fn<String,String>,String)\nstloc handle\nldloc handle\ncall neoCLR.Runtime.JoinWorker(Int32)\npop\nldloc handle\ncall neoCLR.Runtime.JoinWorker(Int32)";
     assert!(
         execute(body, "")
             .unwrap_err()
@@ -126,8 +126,8 @@ fn invalid_and_reused_handles_fault() {
 
 #[test]
 fn worker_fault_reaches_join_and_nested_workers_are_rejected() {
-    let extra = ".function Nested(String input) -> String\ndelegate.bind System.Func<String,String> = Echo(String)\nldarg input\ncall neoCLR.Runtime.StartWorker(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)\nret\n.end";
-    let body = "delegate.bind System.Func<String,String> = Nested(String)\nldstr \"nested\"\ncall neoCLR.Runtime.QueueWorker(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)";
+    let extra = ".function Nested(String input) -> String\nfunction.bind fn<String,String> = Echo(String)\nldarg input\ncall neoCLR.Runtime.StartWorker(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)\nret\n.end";
+    let body = "function.bind fn<String,String> = Nested(String)\nldstr \"nested\"\ncall neoCLR.Runtime.QueueWorker(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)";
     assert!(
         execute(body, extra)
             .unwrap_err()
@@ -173,9 +173,9 @@ ret
 .local arrayref<Byte> buffer
 call System.Tasks.TaskQueue::get_Default()
 pop
-delegate.bind System.Func<String,String> = Echo(String)
+function.bind fn<String,String> = Echo(String)
 ldstr "data"
-call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
+call neoCLR.Runtime.StartWorker(fn<String,String>,String)
 stloc handle
 ldc.i4 1
 newarr Byte
@@ -189,8 +189,8 @@ ldloc handle
 ldloc handle
 ldloc buffer
 newobj CopyCompletion
-delegate.bind System.Func<Void> = instance CopyCompletion::Complete()
-call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)
+function.bind fn<Void> = instance CopyCompletion::Complete()
+call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)
 pop
 ldvoid
 ret
@@ -204,8 +204,8 @@ fn registered_completion_survives_both_vm_collection_paths_and_dispatches() {
 call Launch()
 pop
 call System.Tasks.TaskQueue::get_Default()
-delegate.bind System.Func<Void> = Ready()
-call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+function.bind fn<Void> = Ready()
+call instance System.Tasks.TaskQueue::Post(fn<Void>)
 ldc.i4 0
 stloc index
 Again:
@@ -241,7 +241,7 @@ ldstr "entry"
 
 #[test]
 fn notification_rejects_missing_dispatcher_unknown_and_duplicate_handles() {
-    let call = "ldc.i4 0\ndelegate.bind System.Func<Void> = Ready()\ncall neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop\nldstr \"done\"";
+    let call = "ldc.i4 0\nfunction.bind fn<Void> = Ready()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop\nldstr \"done\"";
     assert!(
         execute(call, NOTIFY_TYPES)
             .unwrap_err()
@@ -337,7 +337,7 @@ fn worker_output_capture_keeps_console_input_unavailable() {
     let extra = ".function Read(String input) -> String\ncall neoCLR.Runtime.ConsoleReadByte()\nvalue.unpack Int32\nldc.i4 1\nbeq Unavailable\nfault \"Worker input must be unavailable\"\nUnavailable:\nldarg input\nret\n.end";
     for name in ["StartWorker", "QueueWorker"] {
         let body = format!(
-            "delegate.bind System.Func<String,String> = Read(String)\nldstr \"ok\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+            "function.bind fn<String,String> = Read(String)\nldstr \"ok\"\ncall neoCLR.Runtime.{name}(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
         );
         assert_eq!(
             execute(&body, extra).unwrap().value,
@@ -419,7 +419,7 @@ fn cancellation_during_worker_output_stops_delivery_and_guest_continuation() {
                 } else {
                     (
                         format!(
-                            "delegate.bind System.Func<String,String> = Print(String)\nldstr \"data\"\ncall neoCLR.Runtime.{name}(System.Func<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
+                            "function.bind fn<String,String> = Print(String)\nldstr \"data\"\ncall neoCLR.Runtime.{name}(fn<String,String>,String)\ncall neoCLR.Runtime.JoinWorker(Int32)"
                         ),
                         producer.into(),
                     )
@@ -470,8 +470,8 @@ pop
 ldarg this
 ldfld BusyQueue::Queue
 ldarg this
-delegate.bind System.Func<Void> = instance BusyQueue::Tick()
-call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+function.bind fn<Void> = instance BusyQueue::Tick()
+call instance System.Tasks.TaskQueue::Post(fn<Void>)
 ldvoid
 ret
 Finished:
@@ -503,9 +503,9 @@ call System.Tasks.TaskQueue::get_Default()
 pop
 {queue}
 stloc queue
-delegate.bind System.Func<String,String> = Echo(String)
+function.bind fn<String,String> = Echo(String)
 ldstr "ready"
-call neoCLR.Runtime.StartWorker(System.Func<String,String>,String)
+call neoCLR.Runtime.StartWorker(fn<String,String>,String)
 ldc.i4 0
 ldloc queue
 newobj BusyQueue
@@ -513,13 +513,13 @@ stloc state
 ldloc state
 ldfld BusyQueue::Handle
 ldloc state
-delegate.bind System.Func<Void> = instance BusyQueue::Complete()
-call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)
+function.bind fn<Void> = instance BusyQueue::Complete()
+call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)
 pop
 ldloc queue
 ldloc state
-delegate.bind System.Func<Void> = instance BusyQueue::Tick()
-call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+function.bind fn<Void> = instance BusyQueue::Tick()
+call instance System.Tasks.TaskQueue::Post(fn<Void>)
 {drain}
 ldstr "entry"
 "#
@@ -566,13 +566,13 @@ fn individual_worker_cancellation_is_acknowledged_without_cancelling_siblings() 
             r#"
 .local Int32 cancelled
 .local Int32 sibling
-delegate.bind System.Func<String,String> = UntilCancelled(String)
+function.bind fn<String,String> = UntilCancelled(String)
 ldstr ""
-call neoCLR.Runtime.{start}(System.Func<String,String>,String)
+call neoCLR.Runtime.{start}(fn<String,String>,String)
 stloc cancelled
-delegate.bind System.Func<String,String> = Echo(String)
+function.bind fn<String,String> = Echo(String)
 ldstr "sibling survived"
-call neoCLR.Runtime.{start}(System.Func<String,String>,String)
+call neoCLR.Runtime.{start}(fn<String,String>,String)
 stloc sibling
 ldloc cancelled
 call neoCLR.Runtime.RequestWorkerCancellation(Int32)

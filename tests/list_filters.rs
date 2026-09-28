@@ -78,7 +78,7 @@ fn start(values: &[i32], target: i32) -> String {
 }
 fn invoke(name: &str) -> String {
     format!(
-        "ldloc list\nldloc callback\ndelegate.bind System.Func<Int32,Boolean> = instance Callback::Check(Int32)\ncall instance System.Collections.ArrayList<Int32>::{name}(System.Func<Int32,Boolean>)\n"
+        "ldloc list\nldloc callback\nfunction.bind fn<Int32,Boolean> = instance Callback::Check(Int32)\ncall instance System.Collections.ArrayList<Int32>::{name}(fn<Int32,Boolean>)\n"
     )
 }
 fn assert_integer(actual: &str, expected: i32, label: &str) -> String {
@@ -195,7 +195,7 @@ fn scalar_searches_add_no_managed_allocations_and_predicate_faults_stay_faults()
     ] {
         let body = setup.clone()
             + &format!(
-                "ldloc list\ndelegate.bind System.Func<Int32,Boolean> = Yes(Int32)\ncall instance System.Collections.ArrayList<Int32>::{method}(System.Func<Int32,Boolean>)\npop\nldc.i4 0"
+                "ldloc list\nfunction.bind fn<Int32,Boolean> = Yes(Int32)\ncall instance System.Collections.ArrayList<Int32>::{method}(fn<Int32,Boolean>)\npop\nldc.i4 0"
             );
         let result = program(&body).run(Limits::default()).unwrap();
         assert_eq!(
@@ -215,7 +215,7 @@ fn scalar_searches_add_no_managed_allocations_and_predicate_faults_stay_faults()
     ] {
         let body = setup.clone()
             + &format!(
-                "ldloc list\ndelegate.bind System.Func<Int32,Boolean> = Fail(Int32)\ncall instance System.Collections.ArrayList<Int32>::{method}(System.Func<Int32,Boolean>)\npop\nldc.i4 0"
+                "ldloc list\nfunction.bind fn<Int32,Boolean> = Fail(Int32)\ncall instance System.Collections.ArrayList<Int32>::{method}(fn<Int32,Boolean>)\npop\nldc.i4 0"
             );
         assert!(
             program(&body)
@@ -279,8 +279,8 @@ newobj Mutator
 stloc callback
 ldloc list
 ldloc callback
-delegate.bind System.Func<Int32,Boolean> = instance Mutator::Check(Int32)
-call instance System.Collections.ArrayList<Int32>::FindAll(System.Func<Int32,Boolean>)
+function.bind fn<Int32,Boolean> = instance Mutator::Check(Int32)
+call instance System.Collections.ArrayList<Int32>::FindAll(fn<Int32,Boolean>)
 stloc filtered
 ldloc filtered
 call instance System.Collections.ArrayList<Int32>::get_Count()

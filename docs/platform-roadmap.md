@@ -145,7 +145,8 @@ with `NominalTypeInfo` and `TypeInfo.IsNominalType` beginning a nominal/structur
 split. Named function types remain a possible future addition; their identity
 rules are not selected. A native structural binding foundation is implemented on
 the feature branch, including the TypeInfo/NominalTypeInfo descriptor split and
-structural Raven callback transport. Legacy delegate removal remains pending.
+structural Raven callback transport. Native legacy delegate admission is removed;
+focused migration validation passes; bounded limitations are tracked below.
 This does not permanently change the Web API priority. The
 [runtime tracker](tracking/runtime-language.md#function-types-and-objects--2026-09-28)
 owns implementation status.

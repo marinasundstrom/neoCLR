@@ -375,9 +375,6 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "managed System.Array<T> requires the intrinsic System array shape",
             ));
         }
-        if def.representation == Representation::Delegate {
-            crate::function_objects::contract(module, &def.open_type())?;
-        }
         let ty = Type::from_name(&def.name);
         if ty.definition_name() != Some(def.name.as_str()) {
             return Err(Fault::new("type definitions must use canonical names"));
@@ -408,7 +405,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if !def.generic_parameters.is_empty()
             && (!matches!(
                 def.representation,
-                Representation::Record | Representation::Interface | Representation::Delegate
+                Representation::Record | Representation::Interface
             ) || matches!(
                 def.name.as_str(),
                 "Option" | "Result" | "Ref" | "Ptr" | "InterfaceRef"
@@ -764,8 +761,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             return Err(Fault::new("generic owners require IL methods"));
         }
         if crate::function_objects::is_contract(module, function) {
-            crate::function_objects::contract(module, function.owner.as_ref().unwrap())?;
-            continue;
+            return Err(Fault::new(
+                "Function Invoke is synthesized from its shape; artifacts cannot redefine it",
+            ));
         }
         if crate::interfaces::is_contract(module, function) {
             crate::interfaces::validate_contract(function)?;
@@ -885,17 +883,22 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     ));
                 }
                 Op::BindFunction {
-                    function_type: delegate,
+                    function_type,
                     target,
                 } => {
-                    check(delegate)?;
+                    check(function_type)?;
                     if let Some(owner) = &target.owner {
                         check(owner)?;
                     }
                     for ty in target.parameters.iter().chain(&target.generic_arguments) {
                         check(ty)?;
                     }
-                    crate::function_objects::validate_binding(module, function, delegate, target)?;
+                    crate::function_objects::validate_binding(
+                        module,
+                        function,
+                        function_type,
+                        target,
+                    )?;
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
@@ -950,7 +953,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         || (matches!(op, Op::CallVirtual(_)) && !supports_virtual_call)
                     {
                         return Err(Fault::new(
-                            "callvirt requires an ordinary class instance, delegate Invoke, interface declaration or virtual record method",
+                            "callvirt requires an ordinary class instance, Function Invoke, interface declaration or virtual record method",
                         ));
                     }
                     if matches!(op, Op::Construct(_)) {
@@ -2599,9 +2602,7 @@ fn interpret_instructions_with_dispatch(
                     if target.instance
                         && match &target.owner {
                             Some(Type::Function(_)) => true,
-                            Some(owner) => module
-                                .type_definition(owner)
-                                .is_some_and(|d| d.representation == Representation::Delegate),
+                            Some(_) => false,
                             None => crate::function_objects::is_contract(
                                 module,
                                 &resolve(module, target)?,
@@ -2612,11 +2613,18 @@ fn interpret_instructions_with_dispatch(
                     crate::access::check_call(module, Some(&function), &signature)?;
                     let ty = signature.owner.as_ref().unwrap();
                     let mut args = frame.args(module, &signature.argument_types()[1..])?;
-                    let Value::Function(binding) = frame.pop()? else {
-                        return Err(Fault::new("Invoke requires a delegate value"));
+                    let binding = match frame.pop()? {
+                        Value::Function(binding) => binding,
+                        Value::NullObjectReference(actual) if &actual == ty => {
+                            return Err(Fault::coded(
+                                crate::FaultCode::NullReference,
+                                "Function Invoke requires a non-null object",
+                            ));
+                        }
+                        _ => return Err(Fault::new("Invoke requires a Function object")),
                     };
                     if &binding.ty != ty {
-                        return Err(Fault::new("delegate nominal type mismatch"));
+                        return Err(Fault::new("Function shape mismatch"));
                     }
                     let callee = resolve(module, &binding.target)?;
                     crate::function_objects::compatible(&signature, &callee)?;
@@ -3146,7 +3154,7 @@ fn interpret_instructions_with_dispatch(
                     frames.push(child);
                 }
                 Op::BindFunction {
-                    function_type: delegate,
+                    function_type,
                     target,
                 } => {
                     let receiver = if target.instance {
@@ -3155,7 +3163,11 @@ fn interpret_instructions_with_dispatch(
                         None
                     };
                     let value = crate::function_objects::bind(
-                        module, &function, delegate, target, receiver,
+                        module,
+                        &function,
+                        function_type,
+                        target,
+                        receiver,
                     )?;
                     frame.stack.push(value);
                 }
@@ -4313,7 +4325,7 @@ fn debug_value(
         }
         Value::Function(binding) => {
             result.value = debug_text(&format!(
-                "delegate {}<{:?}>",
+                "Function {}<{:?}>",
                 binding.target.name, binding.target.generic_arguments
             ));
             if let Some(receiver) = &binding.receiver {

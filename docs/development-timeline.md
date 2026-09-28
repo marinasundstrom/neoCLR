@@ -94,10 +94,25 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   A five-line binder correction on main-based `fix/function-type-construction`
   passes 15 focused tests, including three previously failing constructor cases.
   Standalone commit `e316703ca` is integrated into the isolated target as
-  `6b5418e57`; main integration remains separate from the experimental target.
+  `6b5418e57`; main was independently fast-forwarded to the standalone fix after a clean-worktree
+  check; the experimental target branch was not merged.
   Matching regenerated artifacts execute the async consumer successfully with
   shared captures and unit/nested Task results. The validation script initially
   expected lowercase `true`; its expectation now matches runtime `True`.
+
+- **Assistant, performed final migration:** committed structural Raven callback
+  transport as `ba8b9a66`, continued directly, removed native delegate declarations,
+  opcodes, serialized representations and nominal fallback, and migrated archived
+  frontend/test consumers. Renamed comparer adapters to FunctionComparer and
+  FunctionEqualityComparer. Retained shape/target/receiver equality and shared
+  captures, fixed class-receiver equality, and made null Invoke report NullReference.
+- **Assistant, verification and bounds:** 157 selected native consumer tests and
+  twelve Raven integration checks pass with regenerated library and API snapshots.
+  Focused debugger, queue atomicity and GC checks also pass. Current structural
+  family documentation covers Invoke and extensions. General structural member
+  enumeration, dedicated Function signature descriptors, ordinary Object conversion
+  and named function types remain follow-up scope, rather than invented nominal
+  metadata or claims of a general RavenDoc renderer.
 
 ## 2026-09-27 — Focus on a minimal Web API
 

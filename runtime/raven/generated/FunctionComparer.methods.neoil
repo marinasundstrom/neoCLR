@@ -1,5 +1,5 @@
-; Generated from runtime/raven/src/System/Collections/DelegateComparer.rvn. Regenerate with build_runtime_library.py.
-.type class System.Collections.DelegateComparer<T0>
+; Generated from runtime/raven/src/System/Collections/FunctionComparer.rvn. Regenerate with build_runtime_library.py.
+.type class System.Collections.FunctionComparer<T0>
 .sealed
 .implements System.Collections.Comparer<T0>
 .field private compare fn<T0,T0,Int32>
@@ -15,7 +15,7 @@ ldarg 0
 M00000001_IL_0009:
 ldarg 1
 M00000001_IL_000a:
-stfld System.Collections.DelegateComparer<T0>::compare
+stfld System.Collections.FunctionComparer<T0>::compare
 M00000001_IL_000f:
 ret
 .end
@@ -25,7 +25,7 @@ M00000002_IL_0001:
 M00000002_IL_0002:
 ldarg 0
 M00000002_IL_0003:
-ldfld System.Collections.DelegateComparer<T0>::compare
+ldfld System.Collections.FunctionComparer<T0>::compare
 M00000002_IL_0008:
 ldarg 1
 M00000002_IL_0009:

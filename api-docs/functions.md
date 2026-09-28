@@ -57,8 +57,18 @@ does not prohibit members or extensions. Dedicated parameter/result introspectio
 and a general RavenDoc structural-family renderer remain open.
 
 The transport carrier types are explicitly excluded from generated type pages;
-member signatures retain their matching CLI documentation IDs. Function object
-equality, nullability and conversion to Object are not finalized by this checkpoint.
+member signatures retain their matching CLI documentation IDs. Function equality compares shape, closed method and retained receiver identity.
+Copies share captures; they do not copy a receiver. Default Function slots contain
+null and Invoke faults with NullReference. Constructors must initialize their
+Function fields before publication. Ordinary Object conversion and a separate
+Function allocation identity are not supported in this slice.
 There is no multicast combination or native function-pointer interop contract.
-Legacy declaration/opcode admission is still being removed; rebuild applications
-with matching compiler, reference, library and runtime artifacts.
+Legacy `.delegate`, `delegate.bind` and serialized Delegate representations are
+rejected. Rebuild applications with matching compiler, reference, library and
+runtime artifacts. Comparer adapters are now named FunctionComparer and
+FunctionEqualityComparer.
+
+Common TypeInfo member queries remain available. The synthetic Invoke operation
+is documented on this family page; it has no declaration token and is not returned
+by the existing declaration-based GetMethods implementation. General structural
+member discovery remains future work.

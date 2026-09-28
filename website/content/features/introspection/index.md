@@ -184,8 +184,9 @@ as their instances. The descriptor split is implemented on the development featu
 TypeInfo exposes DisplayName and IsNominalType; declaration metadata requires
 NominalTypeInfo. Structural types can still have members and extension members;
 member discovery stays on common TypeInfo. Raven callbacks now import into structural
-Function shapes, and a tested extension can target a function shape. Full legacy
-delegate removal remains in progress. See the [Function API reference](/docs/functions.html). Named function
+Function shapes, and a tested extension can target a function shape. Legacy
+delegate declarations and opcodes are removed. Synthetic Invoke enumeration
+through GetMethods remains follow-up work. See the [Function API reference](/docs/functions.html). Named function
 types may follow later.
 
 <a id="feedback"></a>

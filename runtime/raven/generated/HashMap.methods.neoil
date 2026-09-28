@@ -30,7 +30,7 @@ ldarg 1
 M00000001_IL_000a:
 ldarg 2
 M00000001_IL_000b:
-newobj instance System.Collections.DelegateEqualityComparer<T0>::.ctor(fn<T0,T0,Boolean>,fn<T0,Int32>)
+newobj instance System.Collections.FunctionEqualityComparer<T0>::.ctor(fn<T0,T0,Boolean>,fn<T0,Int32>)
 M00000001_IL_0010:
 castclass System.Collections.EqualityComparer<T0>
 stfld System.Collections.HashMap<T0,T1>::comparer

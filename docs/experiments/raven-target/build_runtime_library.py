@@ -28,8 +28,8 @@ SLICES = {
     "DateTimeFormat": "System.Globalization.DateTimeFormat",
     "EqualityComparer": "System.Collections.EqualityComparer",
     "Comparer": "System.Collections.Comparer",
-    "DelegateEqualityComparer": "System.Collections.DelegateEqualityComparer",
-    "DelegateComparer": "System.Collections.DelegateComparer",
+    "FunctionEqualityComparer": "System.Collections.FunctionEqualityComparer",
+    "FunctionComparer": "System.Collections.FunctionComparer",
     "StringComparison": "System.StringComparison",
     "StringComparer": "System.StringComparer",
 
@@ -197,8 +197,8 @@ SOURCES = {
     "DateTimeFormat": "runtime/raven/src/System/Globalization/DateTimeFormat.rvn",
     "EqualityComparer": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
     "Comparer": "runtime/raven/src/System/Collections/Comparer.rvn",
-    "DelegateEqualityComparer": "runtime/raven/src/System/Collections/DelegateEqualityComparer.rvn",
-    "DelegateComparer": "runtime/raven/src/System/Collections/DelegateComparer.rvn",
+    "FunctionEqualityComparer": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+    "FunctionComparer": "runtime/raven/src/System/Collections/FunctionComparer.rvn",
     "StringComparison": "runtime/raven/src/System/StringComparison.rvn",
     "StringComparer": "runtime/raven/src/System/StringComparer.rvn",
 
