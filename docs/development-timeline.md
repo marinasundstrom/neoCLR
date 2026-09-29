@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-29: Finish Function work and browse structural families
+
+- **Author:** asks to finish the work, make structural types show up in RavenDoc,
+  and serve the site.
+- **Assistant:** uses RavenDoc's existing authored reference/navigation support
+  to expose Array, Function, Tuple, Union and Intersection family pages with member
+  documentation. Distinguishes today's nominal Tuple/union declarations and future
+  structural forms; documentation labels do not introduce nominal runtime types.
+- **Implementation:** ordinary instance bindings preserve the actual target method;
+  unavoidable generated adapters without declaration metadata expose None for
+  module/token lookup. The callback consumer checks original member discovery,
+  receiver-sensitive equality, target display, Object views and retained captures.
+- **Validation/outcome:** 54 focused native cases, three internal Function tests,
+  all 13 Raven integration checks and 18 publisher tests pass. Regenerated bootstrap
+  and API snapshots are checked. The site build validates 1,797 pages and the local
+  server returns the structural-family reference successfully.
+- **Scope:** local website serving is requested for review. Publication is a
+  separate operation. Automatic extraction of arbitrary synthetic shape members
+  remains future RavenDoc work.
+
 ## 2026-09-28: Function value bindings and the transitional target property
 
 - **Author:** asks for a website feature page, describing the model as closer to

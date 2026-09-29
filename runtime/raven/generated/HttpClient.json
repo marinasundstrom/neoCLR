@@ -85,7 +85,7 @@
     "runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
     "runtime/raven/src/System/Functions.rvn": "ac8c17cd3cde8cfd78b2d1214454a92120d7f65b93d27d5d8e7258981fb1a70d",
     "runtime/raven/src/System/Runtime/InteropServices/NativeMemory/Functions.rvn": "ef66171b634c2e59249dd875a8d13b275c0c8243c8a8e7f575238683a91ced7d",
-    "runtime/raven/src/System/Introspection/Descriptors.rvn": "fde1ffe5f0cceecdd8fc02f3ea7affc728e1509fa3d626b1ecb3865dac6ad75e",
+    "runtime/raven/src/System/Introspection/Descriptors.rvn": "424f13ba9f84b06a6fc6ba5a133943c9b9071f20d0b4d38fc90a6ef090872c7b",
     "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96",
     "runtime/raven/src/System/Result.rvn": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835",
     "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
@@ -172,8 +172,8 @@
     "build/NeoCLR.Raven.props": "4eb1e8c16f00288330d6ea56b2966d6719dea83e6aab42fa77f38a3dffc3e75b"
   },
   "outputs": {
-    "HttpClient.methods.neoil": "389d22a5ca0addd959e37135c75d73770b824fa15e6a89d2642d7ea626b558c8",
-    "HttpClient.helpers.neoil": "1691a489e633136731078852a18d746673efba7984af6f1c8fead9a722696d5a"
+    "HttpClient.methods.neoil": "3b7766bc1f83afcbbf1e5e01fb58c87f8a059776729b35469755a4a745284332",
+    "HttpClient.helpers.neoil": "46b718fccb199e003d7323c8b302988cb37d157f1173f4f1b3ebc38742e0d087"
   },
   "compilerSha256": "7c851ca39f89e3c7f9573a0bb79c8e0b638c6e16735bd423d77ab6a55fbab53c",
   "coreSha256": "a68648856ffdbb7433c3ecee3f3e1daf9f799e80f376253dce76633aaa7f4803",

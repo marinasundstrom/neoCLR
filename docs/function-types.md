@@ -422,3 +422,20 @@ Separate bindings may be value-equal but ReferenceEquals is false; copies preser
 reference identity. Hashes follow value equality and never depend on mutable captures.
 Object inheritance does not solve the open “any callable” marker/interface question:
 Object also accepts values which cannot be called.
+
+
+## RavenDoc family browsing (2026-09-29)
+
+The API browser now exposes Array, Function, Tuple, Union and Intersection through
+RavenDoc's existing authored-page navigation. The family reference documents
+implemented members and links to generated nominal member pages where applicable.
+Tuple and declared unions retain their current nominal classification; proposed
+structural forms and Intersection are explicitly labeled. Documentation family
+names do not create runtime declarations. Automatic extraction of every synthetic
+shape member remains future tooling work; the current family pages are maintained
+alongside runtime contracts.
+
+Ordinary instance Function bindings now retain the actual method for target
+inspection rather than a forwarding wrapper. Necessary adapters may still expose
+generated target names and lack source module/token metadata; those optional
+properties return None instead of attempting a nonexistent module lookup.

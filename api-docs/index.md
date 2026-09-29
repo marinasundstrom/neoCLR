@@ -4,6 +4,10 @@ toc: false
 ---
 # API documentation
 
+Browse [structural type families](structural-types.md): Array, Function, Tuple,
+Union and Intersection, with current member contracts and explicit proposal status.
+
+
 [Function shapes and objects](functions.md) document the development structural
 callable family and its Invoke/extension-member contracts.
 

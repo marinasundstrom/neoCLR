@@ -810,6 +810,16 @@ pub(crate) fn array(
     }
     Ok(Value::Array { element, elements })
 }
+fn has_method_metadata(module: &Module, f: &Function) -> bool {
+    f.origin.is_some()
+        || f.definition.as_ref().is_some_and(|id| {
+            module
+                .assemblies
+                .iter()
+                .any(|a| a.modules.contains(&id.module))
+        })
+}
+
 // Keep the independent CLI parameter tables explicit at this metadata boundary.
 #[allow(clippy::too_many_arguments)]
 fn parameters(
@@ -849,8 +859,7 @@ fn parameters(
             if type_contract(module) == "System.Introspection.TypeInfo" {
                 let f = function
                     .ok_or_else(|| Fault::new("parameter snapshot requires declaring member"))?;
-                let synthesized =
-                    f.definition.is_none() && matches!(declaring_type, Type::Function(_));
+                let synthesized = !has_method_metadata(module, f);
                 fields.push(Value::Int32(if synthesized {
                     0
                 } else {
@@ -921,10 +930,10 @@ fn method(
         .collect::<Result<Vec<_>, _>>()?;
     let mut result = member_record(
         module,
-        if synthesized {
-            0
-        } else {
+        if has_method_metadata(module, f) {
             crate::metadata_tokens::method(f)?
+        } else {
+            0
         },
         if f.name.ends_with("..ctor") {
             "System.Introspection.ConstructorInfo"
@@ -1023,7 +1032,9 @@ pub(crate) fn bound_function(
         if target.owner.is_none() {
             fields[1] = Value::NullObjectReference(Type::from_name(type_contract(module)));
         }
-        if type_contract(module) == "System.Introspection.TypeInfo" {
+        if type_contract(module) == "System.Introspection.TypeInfo"
+            && has_method_metadata(module, target)
+        {
             let id = target
                 .definition
                 .as_ref()

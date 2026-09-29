@@ -34,7 +34,11 @@ provides the intended Invoke spelling. This renderer naming limitation adds no e
 The Function descriptor slice includes FunctionTypeInfo.InvokeMethod and
 TypeInfo.IsFunctionType in the generated reference. The [Function family page](functions.md)
 documents synthetic Invoke, optional declaration metadata and the dynamic invocation
-limit; the general structural-family renderer remains a tracked gap.
+limit. The API browser now includes authored Array, Function, Tuple, Union and
+Intersection family pages through RavenDoc's existing table-of-contents support.
+Current nominal Tuple/union declarations and proposed structural forms are explicitly
+distinguished. Automatic extraction of arbitrary structural shape members remains
+future publisher work; the authored family member references cover current APIs.
 
 Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
 InvokeMethod remains the member-reflection view; no generalized function-info

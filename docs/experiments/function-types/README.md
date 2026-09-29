@@ -168,3 +168,21 @@ projects Function onto CLI callback transport types, and the importer lowers tha
 access to the structural get_Function contract and callable comparisons to native
 value equality. No Runtime Contract switch or general Raven callable hierarchy is
 introduced. Use matching regenerated runtime/reference artifacts.
+
+
+## Completion validation (2026-09-29)
+
+The matching regenerated library/reference and current bridge pass all thirteen
+`verify.py` checks. Callbacks now cover original instance MethodInfo discovery,
+receiver identity, unit callback target/module inspection, qualified ToString,
+Object round trips, reference versus value equality, and captures retained through
+Object after collection. Ordinary instance bindings avoid unnecessary forwarding
+wrappers; unavoidable adapters without source metadata return absent module/token
+information. The shared FunctionInfo interface remains deferred.
+
+Focused native validation passes 54 cases across function_types, raven_reflection
+and reflection, plus three internal Function tests. The internal GC probe fixture
+was updated for Function reference identity. Full bootstrap regeneration, source
+inventory, coverage audit and API snapshot checks pass. All 18 publisher tests pass;
+the website build checks 1,797 pages including the structural-family API browser.
+The site is served locally for review; it has not been published.

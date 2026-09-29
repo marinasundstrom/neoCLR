@@ -1388,69 +1388,90 @@ M00000004_IL_0046:
 M00000004_IL_0047:
 ldarg 0
 M00000004_IL_0048:
-ldfld System.Introspection.RuntimeMemberInfo::DeclaringType
+ldfld System.Introspection.RuntimeMemberInfo::MetadataToken
 M00000004_IL_004d:
-isinst System.Introspection.NominalTypeInfo
-M00000004_IL_0052:
-dup
-M00000004_IL_0053:
-stloc local1
-M00000004_IL_0054:
+ldc.i4 0
+M00000004_IL_004e:
+ceq
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
+M00000004_IL_0050:
+brtrue M00000004_IL_005a
 M00000004_IL_0055:
+br M00000004_IL_0065
+M00000004_IL_005a:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0()
+M00000004_IL_005f:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1(System.Option.None)
+M00000004_IL_0064:
+ret
+M00000004_IL_0065:
+M00000004_IL_0066:
+M00000004_IL_0067:
+ldarg 0
+M00000004_IL_0068:
+ldfld System.Introspection.RuntimeMemberInfo::DeclaringType
+M00000004_IL_006d:
+isinst System.Introspection.NominalTypeInfo
+M00000004_IL_0072:
+dup
+M00000004_IL_0073:
+stloc local1
+M00000004_IL_0074:
+M00000004_IL_0075:
 ref.isnull
 ldc.bool false
 ceq
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeBooleanToInt32(Boolean)
-M00000004_IL_0057:
-brtrue M00000004_IL_0061
-M00000004_IL_005c:
-br M00000004_IL_00a7
-M00000004_IL_0061:
-M00000004_IL_0062:
-ldloc local1
-M00000004_IL_0063:
-callvirt instance System.Introspection.MemberInfo::get_Module()
-M00000004_IL_0068:
-stloc local5
-M00000004_IL_006a:
-ldloca local6
-M00000004_IL_006c:
-initobj System.Option.Some<System.Introspection.ModuleInfo>
-M00000004_IL_0072:
-ldloca local5
-M00000004_IL_0074:
-ldloca local6
-M00000004_IL_0076:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Option<System.Introspection.ModuleInfo>&,System.Option.Some<System.Introspection.ModuleInfo>&)
-M00000004_IL_007b:
-brfalse M00000004_IL_0094
-M00000004_IL_0080:
-ldloca local6
+M00000004_IL_0077:
+brtrue M00000004_IL_0081
+M00000004_IL_007c:
+br M00000004_IL_00c7
+M00000004_IL_0081:
 M00000004_IL_0082:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.ModuleInfo>&)
-M00000004_IL_0087:
-stloc local2
+ldloc local1
+M00000004_IL_0083:
+callvirt instance System.Introspection.MemberInfo::get_Module()
 M00000004_IL_0088:
-M00000004_IL_0089:
-br M00000004_IL_0099
+stloc local5
+M00000004_IL_008a:
+ldloca local6
+M00000004_IL_008c:
+initobj System.Option.Some<System.Introspection.ModuleInfo>
+M00000004_IL_0092:
+ldloca local5
 M00000004_IL_0094:
-br M00000004_IL_00a6
-M00000004_IL_0099:
-M00000004_IL_009a:
-ldloc local2
+ldloca local6
+M00000004_IL_0096:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion5(System.Option<System.Introspection.ModuleInfo>&,System.Option.Some<System.Introspection.ModuleInfo>&)
 M00000004_IL_009b:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion7(System.Introspection.ModuleInfo)
+brfalse M00000004_IL_00b4
 M00000004_IL_00a0:
-call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion8(System.Option.Some<System.Introspection.ModuleInfo>)
-M00000004_IL_00a5:
-ret
-M00000004_IL_00a6:
+ldloca local6
+M00000004_IL_00a2:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion6(System.Option.Some<System.Introspection.ModuleInfo>&)
 M00000004_IL_00a7:
+stloc local2
 M00000004_IL_00a8:
+M00000004_IL_00a9:
+br M00000004_IL_00b9
+M00000004_IL_00b4:
+br M00000004_IL_00c6
+M00000004_IL_00b9:
+M00000004_IL_00ba:
+ldloc local2
+M00000004_IL_00bb:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion7(System.Introspection.ModuleInfo)
+M00000004_IL_00c0:
+call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion8(System.Option.Some<System.Introspection.ModuleInfo>)
+M00000004_IL_00c5:
+ret
+M00000004_IL_00c6:
+M00000004_IL_00c7:
+M00000004_IL_00c8:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion0()
-M00000004_IL_00ad:
+M00000004_IL_00cd:
 call neoCLR.Library.System.Introspection.MemberInfo.RuntimeUnion1(System.Option.None)
-M00000004_IL_00b2:
+M00000004_IL_00d2:
 ret
 .end
 .method instance get_Name() -> String

@@ -665,9 +665,12 @@ static class UnionImport
                             if (!targetArguments.SequenceEqual(signature[..^1]) || (targetResult != signature[^1] && !(targetResult == "noresult" && signature[^1] == "Void")))
                                 throw new InvalidDataException("Function target signature mismatch.");
                             if (!function.IsAbstract) pending.Enqueue(function);
-                            if (addressSlot.ConstructedFunction is not null && targetResult != "noresult")
+                            // Preserve the actual method identity whenever native binding can
+                            // perform the same dispatch without a return-value adapter.
+                            if (function.HasThis && targetResult != "noresult"
+                                && (!function.IsVirtual || addressSlot.VirtualFunction || addressSlot.ConstructedFunction is not null))
                             {
-                                code.AppendLine($"function.bind {delegateType} = instance {addressSlot.FunctionReceiver}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
+                                code.AppendLine($"function.bind {delegateType} = instance {addressSlot.FunctionReceiver ?? ProfileType(function.DeclaringType)}::{ApplicationTypes.MethodName(function)}({string.Join(',', targetArguments)})");
                                 Push(new(delegateType)); break;
                             }
                             if (function.HasThis)

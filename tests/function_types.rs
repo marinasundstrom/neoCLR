@@ -300,7 +300,14 @@ fn function_object_roundtrip_preserves_value_and_reference_contracts() {
     let m = assemble(source).unwrap();
     verify(&m).unwrap();
     assert_eq!(run(&m, Limits::default()).unwrap().value, Value::Int32(42));
-    let wrong = assemble(&source.replacen("castclass fn<Int32,Int32>", "castclass fn<String,String>", 1)).unwrap();
-    assert_eq!(run(&wrong, Limits::default()).unwrap_err().code, neoclr::FaultCode::InvalidCast);
-
+    let wrong = assemble(&source.replacen(
+        "castclass fn<Int32,Int32>",
+        "castclass fn<String,String>",
+        1,
+    ))
+    .unwrap();
+    assert_eq!(
+        run(&wrong, Limits::default()).unwrap_err().code,
+        neoclr::FaultCode::InvalidCast
+    );
 }

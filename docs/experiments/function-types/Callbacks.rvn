@@ -102,6 +102,8 @@ func Main() -> int {
         count += 1
     }
     Check(Forward<int>(next) == 1, "Generic function argument")
+    _ = notify.Function.Module
+    Check(notify.Function.GetParameters().Count == 0, "Unit callback target is inspectable")
     notify()
     Forward<()>(notify)
     System.Runtime.GC.Collect()

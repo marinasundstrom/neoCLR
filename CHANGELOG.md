@@ -6,6 +6,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-29
+
+- Complete Function target inspection for ordinary instance bindings: preserve the
+  actual method rather than an unnecessary forwarding wrapper, and expose absent
+  module/token metadata for generated adapters without a source declaration.
+  Add callback coverage for target discovery and unit adapters; update the internal
+  GC probe for Function reference identity. Regenerate library and API snapshots. Add Array,
+  Function, Tuple, Union and Intersection family entries to RavenDoc's API browser,
+  with member references and explicit current/proposed distinctions. These labels
+  do not introduce nominal runtime types; existing Tuple/union declarations remain
+  nominal. Local site serving is for review, not publication.
+
 ### 2026-09-28
 
 - Implement structural Function types and objects with native

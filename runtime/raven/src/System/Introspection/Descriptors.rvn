@@ -85,6 +85,9 @@ internal sealed class RuntimeMemberInfo {
             if let Some(module) = StoredModule {
                 return Some(module)
             }
+            if StoredMetadataToken == 0 {
+                return None
+            }
             if StoredDeclaringType is NominalTypeInfo nominal {
                 if let Some(module) = nominal.Module {
                     return Some(module)

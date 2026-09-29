@@ -5,6 +5,21 @@ Function object is an instance of that shape, holding a checked method target an
 any bound receiver or captured environment. This page documents the structural
 family; “Function” is a documentation label, not a nominal type declaration.
 
+## Members
+
+| Member | Contract |
+| --- | --- |
+| [Invoke(P0, …): R](#invoke) | Calls the bound target with this shape's parameters and result. |
+| [Function: MethodInfo](#bound-target-property-development) | Read-only property describing the closed bound target. |
+| [ToString(): String](#object-members-development) | Module-qualified target name and closed signature. |
+| [Equals(Object?): bool](#object-members-development) | Compares shape, closed target and receiver identity. |
+| [GetHashCode(): int](#object-members-development) | Hash consistent with value equality. |
+
+GetMethods exposes Invoke, get_Function and the three synthesized Object overrides.
+GetProperties exposes Function. Object's GetType reports the actual signature even
+through an Object view. Applicable extension members are defined by their extension
+containers; they do not give the shape a nominal name.
+
 ## Shape
 
 Raven uses `(P0, P1, ...) -> R` (or `() -> R` without parameters). Ordered
@@ -53,8 +68,9 @@ contains the complete source examples and tracks their current validation.
 `typeof((int) -> int)` returns common TypeInfo. IsNominalType is false; the
 descriptor has no NominalTypeInfo or MemberInfo view. DisplayName is diagnostic
 shape text. Member queries remain part of TypeInfo; absence of a declaration name
-does not prohibit members or extensions. FunctionTypeInfo exposes Parameters and ReturnType directly; a general RavenDoc
-structural-family renderer remains open.
+does not prohibit members or extensions. FunctionTypeInfo exposes Parameters and ReturnType directly. The
+[structural family browser](structural-types.md) includes this authored member
+reference alongside the generated metadata reference.
 
 The transport carrier types are explicitly excluded from generated type pages;
 member signatures retain their matching CLI documentation IDs. Function equality compares shape, closed method and retained receiver identity.
@@ -107,7 +123,8 @@ synthetic descriptors returns UnboundMetadata; use the typed property or invocat
 
 The target MethodInfo has its available module/token/definition information,
 closed parameter and result types, and a declaring type when the target has one.
-Module functions have no DeclaringType. Their custom attributes and dynamic
+Necessary importer adapters can expose generated targets without source module/token
+metadata; those optional properties return None. Module functions have no DeclaringType. Their custom attributes and dynamic
 reflection invocation are not supported by the current type-based services.
 The descriptor describes the method independently of a bound receiver.
 Repeated reads return equal descriptors, without promising wrapper identity.
