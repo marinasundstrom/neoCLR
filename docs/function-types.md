@@ -439,3 +439,10 @@ Ordinary instance Function bindings now retain the actual method for target
 inspection rather than a forwarding wrapper. Necessary adapters may still expose
 generated target names and lack source module/token metadata; those optional
 properties return None instead of attempting a nonexistent module lookup.
+
+
+Author clarification, 2026-09-29: the intended future RavenDoc presentation projects
+structural types into type-and-member pages similar to nominal type pages. The
+current authored family guides are interim. This presentation work is explicitly
+deferred; documentation identities must still remain distinct from nominal runtime
+names and declarations.

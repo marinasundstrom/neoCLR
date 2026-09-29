@@ -16,7 +16,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Function, Tuple, Union and Intersection family entries to RavenDoc's API browser,
   with member references and explicit current/proposed distinctions. These labels
   do not introduce nominal runtime types; existing Tuple/union declarations remain
-  nominal. Local site serving is for review, not publication.
+  nominal. Frame the website feature as Function types—delegates evolved—using
+  implemented signature and binding behavior, with proposal-only directions kept
+  off the feature page. Record nominal-style structural type/member pages as
+  deferred RavenDoc work; authored family guides remain interim. Local site serving
+  is for review, not publication.
 
 ### 2026-09-28
 

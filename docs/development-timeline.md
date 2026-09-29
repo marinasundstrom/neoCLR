@@ -41,6 +41,17 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   all 13 Raven integration checks and 18 publisher tests pass. Regenerated bootstrap
   and API snapshots are checked. The site build validates 1,797 pages and the local
   server returns the structural-family reference successfully.
+- **Author follow-up:** asks to frame the feature as “function types” and
+  “delegates evolved,” as in the [proposal](proposals/delegates-evolved.md), while
+  omitting unimplemented parts of that proposal from the feature presentation.
+- **Assistant action:** updates the feature introduction, homepage card, guide entry
+  and .NET comparison around the familiar callable binding with structural signature
+  identity. Removes speculative additions from the feature page and comparison;
+  keeps the development-build label and links to the detailed API contract.
+- **Author clarification:** prefers structural types to be projected into pages
+  similar to nominal type pages, explicitly deferring that work. The current
+  authored family pages are an interim presentation, not the intended final
+  RavenDoc structural-type experience.
 - **Scope:** local website serving is requested for review. Publication is a
   separate operation. Automatic extraction of arbitrary synthetic shape members
   remains future RavenDoc work.

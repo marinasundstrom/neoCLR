@@ -1,12 +1,18 @@
-# Function types and objects
+# Function types
 
-A Function type describes a callable signature. A Function object binds a particular
-method or function to that signature, retaining its receiver or captured environment
-when needed. The same signature means the same structural Function type.
+## Delegates evolved
 
-**Development API:** requires the matching development runtime and Raven toolchain.
-This model replaces delegates in development artifacts and is not part of the
-published Preview 11 contract.
+Function types evolve the familiar delegate model: a callable object holds a target
+method or function, retains its receiver or captured environment when needed, and
+calls it through Invoke. The signature itself becomes a structural type.
+
+For a signature such as `(int) -> int`, matching parameter types, return type and
+reference-passing contracts mean the same Function type. Callers can share that
+contract directly, without declaring a named delegate type. A Function object is
+an instance of the signature, bound to a particular target.
+
+**Development API:** available in development builds after Preview 11, using the
+matching runtime and Raven toolchain.
 
 ## Pass behavior by its signature
 
@@ -38,8 +44,7 @@ computed results, and mutable captures remain mutable.
 
 The read-only synthesized `Function` property returns a `MethodInfo` describing the
 bound target. It is distinct from the Function type's synthesized Invoke descriptor.
-It retains method identity, not the bound receiver. This transitional property will
-continue to return MethodInfo until a broader function-info model is designed.
+The descriptor identifies the method independently of the bound receiver.
 
 ## Inspect the shape
 
@@ -57,34 +62,13 @@ names and namespaces. Collections can narrow descriptor results with
 See [introspection](../introspection/) and the [Function API reference](../../docs/functions.html)
 for exact contracts and limits.
 
-## Relationship to delegates
-
-The binding mechanism remains similar to a single-target delegate. The difference
-is structural signature identity: callers do not need to share a named delegate
-declaration. .NET delegates are also represented in its type system; neoCLR makes
-the signature itself the Function type. This offers signature-based compatibility,
-while giving up the existing Delegate class hierarchy and its common callable contract.
+## Function objects and Object
 
 Function types inherit Object while remaining structural. Object views support
 GetType, value Equals/GetHashCode, and casts back to the matching signature.
 ToString displays the bound target's qualified name and closed signature without
 printing captured values. Separate equal bindings have distinct reference identity;
-copies retain it. This does not imply Object inheritance for every structural family.
+copies retain it.
 
-There is no multicast invocation list. Dynamic execution of synthetic reflection
-descriptors is not supported. Typed invocation and property access are supported.
-Null access raises NullReference. The current balance of structural types and delegate-like binding
-is provisional.
-
-## Open direction
-
-A common base type or interface could express “accept any function/method,” useful
-for inferred request handlers. A future FunctionInfo interface might cover methods
-and module functions; it is not introduced now. We are also considering whether a
-fuller functional object model should represent the function itself beyond its
-binding and signature, and how introspection should construct structural types.
-
-Named nominal Function types may eventually inherit explicitly eligible Function
-shapes. Matching signatures would not make distinct nominal Function types directly
-interchangeable; structural types would not become generally inheritable.
-See the [open questions](../../proposals/#function-types-and-nominal-type-information).
+Typed invocation and property access use the Function object's bound target.
+Null member access raises NullReference.
