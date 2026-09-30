@@ -21,7 +21,13 @@ signatures, broader member contracts and body import remain readiness gaps. The 
 now selects **Refactor Raven for platform targets** (activity
 `01a0f154-2448-7df3-8536-c837097b46c2`) as the integration consumer: attempt a bounded
 compiler import/emission/runtime case once this subset suffices, then drive remaining
-metadata support from that case rather than waiting for exhaustive coverage. See the
+metadata support from that case rather than waiting for exhaustive coverage. Stage 1
+now passes: Raven binds a small source program and an API-produced PE dependency;
+an opt-in adapter consumes public operations and emits native bytes through the separate
+library, which neoCLR verifies and executes to 42 ([evidence](experiments/extended-cli-metadata/raven-compiler-validation.json)).
+The frontend still uses the .NET metadata provider; native provider/production emitter
+composition are next. The case exposed shared operation and parameter-import fixes,
+validated by 87 focused Raven tests and integrated into local Raven main. See the
 [inspected compiler boundaries and next case](design/extended-cli-metadata.md#refactored-compiler-as-the-next-end-to-end-consumer-2026-09-30). Structural types remain a future
 design requirement (arrays, tuples, Function types, unions/intersections and synthesized
 members), not a prerequisite for that first compiler integration. The

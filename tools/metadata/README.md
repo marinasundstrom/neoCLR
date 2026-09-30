@@ -142,3 +142,18 @@ of the emitted static Int32/no-result subset. General signatures remain opaque; 
 and general signature/member import remain pending. Physical MemberRefs now resolve
 the writer's static Int32/no-result method subset through explicit dependencies. See the manual API reference for
 ownership and reader resource bounds.
+
+
+## Raven consumer, first stage
+
+Raven's `tools/NeoClrMetadataProbe` at commit `7e18edb66` on
+`codex/metadata-consumer` consumes this project through an explicit
+`NeoClrMetadataProject` project-reference property. Its source program binds against
+an API-produced PE dependency through the existing .NET provider, then its operations
+adapter emits a native application through this API. neoCLR verifies/runs the resulting
+application and dependency with result 42. [Recorded evidence](../../docs/experiments/extended-cli-metadata/raven-compiler-validation.json).
+
+This is an independent compiler-side consumer, not Raven code moved into this library.
+It is not yet an installed native loader/emitter target. Production target composition,
+native metadata symbol loading and wider signatures remain staged follow-ups. The
+consumer also checks unsupported operators and compiler binding failures.

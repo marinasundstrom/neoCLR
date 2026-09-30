@@ -699,3 +699,27 @@ is deliberately modified after emission.
 The format-5 backend is separate from experimental NEOX and does not imply direct PE
 or structural runtime support. The author-directed next sequence is ordinary metadata
 read/write readiness, refactored Raven compiler integration, then structural extensions.
+
+## Raven compiler consumer, stage 1
+
+The next consumer lives in Raven, independently of the metadata project. At Raven
+`7e18edb66` (`codex/metadata-consumer`), run from that checkout:
+
+```sh
+dotnet run --project tools/NeoClrMetadataProbe \
+  -p:NeoClrMetadataProject=/absolute/path/to/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj \
+  -- /absolute/path/to/neoclr /fresh/output/directory
+```
+
+Raven binds a source program with a local Offset function and a call to the
+API-produced `Example.Math.Twice(20)` dependency. The operations adapter produces a
+native application through the independent metadata API. neoCLR directly verifies
+and executes it with the API-produced native dependency, returning 42. Unsupported
+division and a missing method fail before output emission. The source and artifacts
+are retained by the runner. [raven-compiler-validation.json](raven-compiler-validation.json)
+records compiler, metadata library, runtime and output hashes from the successful run.
+
+The input loader remains Raven's .NET provider over the generated PE. This does not
+claim a native metadata loader or installed Compilation.Emit target. The consumer
+uses the .NET frontend contract only for its explicit Int32 subset; the CLI importer
+is not used for application emission. Further integration will extend this case.

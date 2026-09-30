@@ -102,7 +102,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   planned consumer is a bounded compiler-to-runtime case that drives remaining format
   support, rather than waiting for exhaustive metadata coverage. Clarify that the
   Cecil-style API remains an independent library project consumed by Raven's neoCLR
-  target, with compiler-owned adapters and no reverse compiler dependency.
+  target, with compiler-owned adapters and no reverse compiler dependency. Add a
+  first Raven source-to-native runtime consumer on Raven's codex/metadata-consumer:
+  public operations feed the independent metadata API, and neoCLR verifies/runs the
+  resulting application and dependency to 42. The input provider remains .NET-based;
+  native target composition is still pending. The case drove general Raven fixes for
+  binary-operation facts, invocation receivers and signature-only required parameters;
+  87 focused compiler tests pass and those fixes are on local Raven main.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

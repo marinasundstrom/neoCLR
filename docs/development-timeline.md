@@ -9183,3 +9183,25 @@ remote synchronization does not publish a runtime bundle or website.
 - **Outcome:** the existing independent .NET project already matches this ownership.
   No code relocation or compiler change was needed. Package distribution, any repository
   split and actual adapter implementation remain open. [Ownership decision](design/extended-cli-metadata.md#independent-metadata-project-raven-target-consumer-2026-09-30).
+
+## 2026-09-30 — First incremental Raven-to-metadata integration
+
+- **Author direction:** continue work; complete integration in multiple steps rather
+  than expecting all support immediately, and continue Raven refactoring when needed.
+- **Assistant action:** created Raven `codex/metadata-consumer` from shared main in an
+  isolated worktree. Added a compiler-side executable consuming the independent
+  metadata project through public semantic operations. The frontend still uses its
+  .NET provider for an API-produced PE dependency, with that limitation explicit.
+- **Observed compiler gaps and fixes:** added resolved binary operator facts; reproduced
+  and corrected callee-as-receiver projection (two failing cases); reproduced and
+  corrected a required signature-only parameter incorrectly acquiring a null default
+  (one failure, two passing controls). These shared fixes were committed separately
+  as `1ea0ca263` and `d7040e21d` and fast-forwarded onto local Raven main.
+- **Observed outcome:** the Raven program emitted through the metadata API loads,
+  verifies and runs in neoCLR with result/exit 42. Unsupported division and a missing
+  method fail as expected. All 87 focused Raven tests pass; compiler builds pass for
+  .NET 10/11. The experimental consumer is `7e18edb66`, with paired integration docs
+  and [recorded hashes](experiments/extended-cli-metadata/raven-compiler-validation.json).
+- **Open:** native metadata provider, production emitter/target configuration and wider
+  ordinary metadata support. The prototype is not advertised as full target support.
+  No code or messages were sent to another thread, and no remote push was performed.

@@ -68,9 +68,10 @@ rewriting can discard the extension. A development .NET model now emits a bounde
 Int32 subset as PE or existing native assemblies. Native output includes functions
 outside types and has a direct neoCLR load/run test. The PE reader recovers callable
 declarations and resolves the emitted method-reference subset through explicit
-dependencies, with documented signature limits. Next comes ordinary metadata
-coverage for the refactored compiler, then compiler integration, then structural
-extensions. Production NEOX loading and structural runtime support remain pending;
+dependencies, with documented signature limits. A first opt-in Raven consumer now
+binds a small program and emits native output through the separate library, with a
+successful neoCLR run. Its input provider is still .NET-based. Native target adapters
+and broader ordinary metadata coverage come next, followed by structural extensions. Production NEOX loading and structural runtime support remain pending;
 this is not a published platform format.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)

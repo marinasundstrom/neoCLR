@@ -778,3 +778,34 @@ independent project through the neoCLR target. Keep the library's standalone C# 
 and contract tests, and add compiler-side consumer tests for symbol import and emission
 plus native runtime acceptance. Packaging/versioning and the eventual Raven port can
 evolve separately; neither is implied complete by this boundary decision.
+
+## First Raven compiler consumer outcome (2026-09-30)
+
+The author explicitly expects several integration steps and authorizes Raven
+refactoring when needed. A first compiler-owned consumer now exists in Raven at
+`7e18edb66` on `codex/metadata-consumer`, based on shared main `89ba7ecc9`.
+The separate metadata project is consumed via an explicit project reference. The
+compiler library itself acquires no metadata-project dependency.
+
+The probe uses Raven's public semantic operations to emit a small source application,
+including a local top-level function and a call to an API-produced library. Native
+output is produced directly through the metadata builder and executed by neoCLR with
+result 42. The .NET input provider remains a documented bootstrap: a native symbol
+loader and production target emitter are not implied by this result. This provides
+a running source-to-runtime case now instead of waiting for all metadata capabilities.
+[Evidence](../experiments/extended-cli-metadata/raven-compiler-validation.json).
+
+The consumer exposed concrete shared compiler gaps: missing resolved binary operator
+facts; Invocation.Instance projecting callee syntax instead of the receiver; and
+MetadataLoadContext's synthetic null/default flag for a required signature parameter
+without a Param row. Raven now exposes the bound operator facts, corrects receiver
+projection, and checks actual row/default presence. General regressions and controls
+pass (87 focused tests); these changes were fast-forwarded to local main independently
+of the probe. They are not permanently experimental just because this consumer found
+them. No remote push or release was performed.
+
+Next: turn the adapter's explicit configuration and failure results into target-owned
+compiler services, establish native metadata symbol loading, then widen ordinary
+signatures and operations as source cases require. The current hand-constructed
+fixture dependency is not an arbitrary PE-to-native importer. Structural improvements
+remain after this ordinary compiler integration, as directed.

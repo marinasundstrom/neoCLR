@@ -46,3 +46,37 @@ requires an explicit expected-extended input profile, a metadata-root marker and
 matching stream digest. Future Raven native-metadata loading must reject failures
 without falling back to carrier/ordinary CLI interpretation; ordinary .NET targeting
 remains separate. This is a Python probe contract, not an implemented Raven loader.
+
+## Independent metadata consumer, stage 1 (2026-09-30)
+
+Raven's `codex/metadata-consumer` at `7e18edb66` adds an opt-in
+`tools/NeoClrMetadataProbe` consumer of the independent metadata library. The frontend
+uses the existing .NET provider and default runtime contract to bind primitive Int32
+source and an API-produced PE library. A compiler-side public-operations adapter emits
+the application as native format-5 JSON through the metadata API. The dependency is
+also emitted natively by that API. neoCLR loads/verifies both and returns 42.
+The application does not go through the existing CLI import bridge.
+
+This is a staged bootstrap, not a new Runtime Contract option or a completed native
+ICompilationEmitter/ISemanticDataLoader. The PE dependency and host-core identity are
+temporary inputs to the .NET frontend. Native top-level functions have no artificial
+user type. Only required Int32 values, returns, primitive unchecked/unlifted arithmetic,
+local calls and the explicit static dependency are supported. Other constructs and
+unresolved methods are rejected; attributes, defaults, debug data and structural
+contracts are not silently advertised as preserved. Parameter names/source mappings
+are not yet emitted by the native subset.
+
+Ownership remains Raven symbols/operations/adapters -> separate metadata model/format
+library -> native runtime loader/verifier/VM. The next stages replace the .NET metadata
+bootstrap with native symbol loading, integrate target diagnostics/configuration, and
+expand ordinary format support using this executable consumer. Shared operations and
+missing-Param-row fixes are general Raven corrections, already fast-forwarded to local
+main as `1ea0ca263` and `d7040e21d`; the consumer remains experimental.
+
+Validation: the .NET 10 consumer runs the native output to 42 and rejects unsupported
+division plus an unresolved method. Raven's .NET 11 operations/default-parameter filter
+passes 87 tests; two invocation and one missing-parameter-row regression failed before
+the fixes. Compiler builds pass for .NET 10/11. See
+[hash evidence](experiments/extended-cli-metadata/raven-compiler-validation.json) and
+[reproduction](experiments/extended-cli-metadata/README.md#raven-compiler-consumer-stage-1).
+No full native target, structural execution, NanoFramework or release is claimed.
