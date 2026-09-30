@@ -1470,3 +1470,22 @@ default. This is an explicit compatibility change for that experimental tool, no
 silent relaxation of schema 2. Semantic admission, linking and verification remain
 runtime responsibilities. Larger budgets increase possible memory/CPU costs; they
 are finite limits, not streaming or lazy-loading guarantees.
+
+
+### Rust host native assembly writer
+
+`metadata_container::write_module(module: &Module) -> Result<Vec<u8>, Fault>` encodes
+an immutable borrowed native module into owned standalone schema-3 NEOX bytes. It
+serializes the model directly, without JSON, and preserves its definitions/references.
+Unsupported semantic format (anything except 5), empty/whitespace module name, encoding
+failures, payload/item/depth
+budget violations return Fault. The byte sink rejects output beyond 8 MiB minus envelope
+framing before extending its payload buffer; the completed encoding is checked by the
+same schema guard as the reader. It does not link dependencies, validate declarations
+or type-verify bodies. Callers perform those steps separately.
+
+The CLI `assemble --format neox` uses the existing assembler/resolver and verifies the
+complete load set before invoking this API and creating the output file. Only the root
+module is serialized. This Rust-host function is not a new guest introspection API or
+an addition to the .NET Cecil-style object model. The independent .NET NativeModuleContainer
+reader validates the emitted wire format in the cross-reader consumer tests.

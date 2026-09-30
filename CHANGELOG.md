@@ -57,6 +57,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   unsigned floating operand bits. Refresh the API source fingerprint after regenerating
   the unchanged reference assembly with the corrected match fixture. Native compiler
   symbol import remains pending.
+  Add direct neoil assembly with `assemble --format neox`, preserving default/explicit
+  JSON output. The bounded Rust writer emits schema 3 without JSON and the CLI verifies
+  the load set before creating output; dependencies remain separate and overwrites fail.
+  Validate 21 focused Rust tests plus four complete-value C# reader comparisons; full
+  Raven collection System and three applications assemble directly and run successfully.
+  This is the existing neoil subset, not complete ILAsm parity or native Raven source emission.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

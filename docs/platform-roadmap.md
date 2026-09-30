@@ -42,6 +42,12 @@ Raven System. The neoil binary producer and direct native compiler/symbol import
 next work. [Profile and validation](design/extended-cli-metadata.md#library-execution-profile-3--2026-09-30).
 [Experiment and reproducible checks](experiments/extended-cli-metadata/raven-sample-translation.md).
 
+**Direct assembler checkpoint:** `assemble --format neox` now emits schema-3 native
+assemblies directly from neoil, with verification before output and JSON kept as the
+default. The full Raven collection System and three sample applications pass independent
+.NET metadata comparisons and native execution. Direct Raven class-library source emission
+and native compiler symbol import remain next. [Producer evidence](experiments/extended-cli-metadata/direct-assembly.md).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

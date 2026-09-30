@@ -215,3 +215,12 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
 Direct Raven source compilation through the new emitter and broad compiler symbol
 import are subsequent milestones. Translation preserves the existing pipeline output
 as a regression baseline for those compiler changes, not independent proof of its semantics.
+
+
+### Direct neoil assembly
+
+`neoclr assemble input.neoil output.neox --format neox` now writes schema 3 directly
+from the native model, without JSON. The separate .NET API can read these assemblies;
+`NeoCLR.Metadata.Experimental.Tests --compare-native <assembly.neox> <baseline.json>`
+compares all values through that independent reader. See the
+[direct assembler consumer](../../docs/experiments/extended-cli-metadata/direct-assembly.md).

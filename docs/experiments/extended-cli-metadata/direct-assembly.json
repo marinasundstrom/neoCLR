@@ -1,0 +1,35 @@
+{
+  "producer": "neoil -> native Module -> schema-3 CBOR (no JSON intermediate)",
+  "runtimeSha256": "1fbb862eb56f4464d5fb989a74d6aaabf620f839f47d436ae2a5df6995aed026",
+  "metadataReaderSha256": "4bb7820cdbaa1b9f63b536c1d1477d5875a385a1b17e15b9512c300541ccd3e2",
+  "systemSourceSha256": "44f6b30e1e80836fe61fa6a0571fe9d599c49d1e408606947c806ca0f5652045",
+  "cases": {
+    "OptionPositional": {
+      "allMetadataValuesMatch": true,
+      "verifiedByAssembler": true,
+      "stdout": "42\n-1\n",
+      "bytes": 225446,
+      "sha256": "007686d37e4c5b95b8dd89f2fb56b058496d0224108e1a6ce045516e8532739f"
+    },
+    "FloatingMath": {
+      "allMetadataValuesMatch": true,
+      "verifiedByAssembler": true,
+      "stdout": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n-1\n",
+      "bytes": 238988,
+      "sha256": "2dc83d8fd20696d7dd7624c603ca6419757feed2a06376b881f5478bc2037c31"
+    },
+    "ValueCopy": {
+      "allMetadataValuesMatch": true,
+      "verifiedByAssembler": true,
+      "stdout": "42\n7\n",
+      "bytes": 223166,
+      "sha256": "29df465c9ddd6d2be8a4f54166809d6845be47c8fa9a75072f7469d127092ff7"
+    }
+  },
+  "system": {
+    "bytes": 5542303,
+    "sha256": "a19756e92fdc1357a71840db67b83361330887e93dada37a779230d4a62a86ec",
+    "allMetadataValuesMatch": true,
+    "verifiedByAssembler": true
+  }
+}

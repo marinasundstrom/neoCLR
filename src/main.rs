@@ -8,7 +8,7 @@ use std::{
 
 const USAGE: &str = "Usage:
   neoclr emit-il <source.neo> [output.neoil]
-  neoclr assemble <source.neoil> <output.neo.json> [--module <input>]... [--system <input>]
+  neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
   neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
@@ -115,12 +115,21 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut gc_stats = false;
     let mut gc_events = false;
     let mut show_result = false;
+    let mut output_format = None;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
             "--" if matches!(command, "run" | "debug") => {
                 guest_arguments.extend(options.cloned());
                 break;
+            }
+            "--format" if command == "assemble" && output_format.is_none() => {
+                let format = options
+                    .next()
+                    .map(String::as_str)
+                    .filter(|value| matches!(*value, "json" | "neox"))
+                    .ok_or_else(|| format!("Expected --format json or neox\n{USAGE}"))?;
+                output_format = Some(format);
             }
             "--show-result" if command == "run" && !show_result => show_result = true,
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
@@ -203,14 +212,19 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         ),
         "assemble" => {
             let output = &args[2];
-            let json = serde_json::to_string_pretty(module).map_err(|e| e.to_string())?;
+            let image = if output_format == Some("neox") {
+                program.verify().map_err(|e| e.to_string())?;
+                neoclr::metadata_container::write_module(module).map_err(|e| e.to_string())?
+            } else {
+                serde_json::to_vec_pretty(module).map_err(|e| e.to_string())?
+            };
             // Validate everything before creating the one requested artifact; preserve no-overwrite behavior.
             let mut file = fs::OpenOptions::new()
                 .write(true)
                 .create_new(true)
                 .open(output)
                 .map_err(|e| format!("Cannot create {output}: {e}"))?;
-            file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+            file.write_all(&image).map_err(|e| e.to_string())?;
             Ok(vec![format!("Assembled {} -> {output}", module.name)])
         }
         "check" => Ok(vec![format!(

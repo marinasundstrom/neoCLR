@@ -325,3 +325,15 @@ owns the versioned encoding; neoCLR owns admission/execution. No CLI projection 
 compiler symbol provider is added. PE/#Neo remains on schema 1/2; the translator's new
 schema-3 default requires the matching runtime feature branch.
 [Contract and tested consumer](design/extended-cli-metadata.md#library-execution-profile-3--2026-09-30).
+
+
+## Direct neoil assembly output — 2026-09-30
+
+The runtime assembler now accepts `--format neox`, letting the existing bridge's neoil
+output become a native assembly without a JSON translation step. Compiler Runtime
+Contracts and semantic/emission mappings are unchanged; the assembler preserves the
+root module and verifies the explicit dependency set. The independent metadata API
+remains separate and checks the produced values in C# consumer tests. Full matching
+System, FloatingMath, OptionPositional and ValueCopy pass. This removes an artifact
+conversion stage; it does not add direct Raven native emission or compiler symbol import.
+[Validation and commands](experiments/extended-cli-metadata/direct-assembly.md).

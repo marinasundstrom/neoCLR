@@ -126,6 +126,11 @@ fn csharp_library_container_preserves_double_operand_bits() {
     let image = include_bytes!("fixtures/metadata-container/floating-bits.neox");
     let module = metadata_container::load_envelope(image).unwrap();
     let value = serde_json::to_value(&module).unwrap();
+    let written = metadata_container::write_module(&module).unwrap();
+    assert_eq!(
+        serde_json::to_value(metadata_container::decode_envelope(&written).unwrap()).unwrap(),
+        value
+    );
     for (index, bits) in [0x8000000000000000u64, 0xfff8000000000001, u64::MAX]
         .iter()
         .enumerate()

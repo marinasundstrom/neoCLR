@@ -2,7 +2,8 @@
 
 All four commands accept repeatable `--module <input>` dependency arguments and one
 optional `--system <input>` runtime library. Inputs ending in `.neoil` are sources;
-other module inputs are JSON artifacts. The root of `assemble` is always treated as
+other module inputs are JSON artifacts or recognized PE/#Neo and standalone NEOX
+containers (feature-branch metadata support). The root of `assemble` is always treated as
 source, preserving the existing command's behavior.
 
 ```sh
@@ -64,3 +65,32 @@ discovery, automatic rebuild, or file downloading. References, exact revision pi
 scope checks, unique-name restrictions, and entry-point rules follow the existing
 [module-set contract](module-sets.md). CLI flags do not introduce a new module format
 or alter execution and memory-management semantics.
+
+
+## Direct native binary output (feature-branch development)
+
+```sh
+cargo run -- assemble examples/modules/models.neoil out/models.neox --format neox
+cargo run -- assemble examples/modules/operations.neoil out/operations.neox \
+  --format neox --module out/models.neox
+cargo run -- assemble examples/modules/app.neoil out/app.neox --format neox \
+  --module out/operations.neox --module out/models.neox
+cargo run -- run out/app.neox --module out/operations.neox --module out/models.neox
+```
+
+`--format neox` serializes the root native Module directly to required execution schema 3.
+There is no serialized JSON module intermediate, PE projection or dependency flattening. References,
+definition identities and bodies retain the assembled module's values. A supplied
+`--system` can also be binary; use the matching target profile for Raven-generated IL.
+
+Before creating output, binary assembly requires typed verification of the complete
+load set and checks schema-3 encoding limits. Invalid bodies/options or exceeded limits
+leave no output file. The write still uses create-new semantics. This adds verification
+work during assembly; it neither executes guest entry points nor claims faster assembly.
+A later I/O failure can leave a partial file, as with the existing JSON writer.
+
+The default and explicit `--format json` retain the existing JSON output/validation
+behavior. Output extension does not select the format. Only one format option is
+accepted, and it is available only for `assemble`. Standalone native assemblies require
+a schema-3-capable runtime, with 8 MiB envelope and 2,097,152-item limits. Debug/source
+text and a .NET compiler reference projection are not embedded.

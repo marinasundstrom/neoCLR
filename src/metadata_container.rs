@@ -254,6 +254,25 @@ pub fn decode(image: &[u8]) -> Result<Module, Fault> {
     decode_payload(payload(image)?)
 }
 
+/// Encode a format-5 module as an owned standalone schema-3 NEOX assembly.
+/// Uses direct binary serialization, preserves definition/reference identities and
+/// enforces the library profile's budgets. Does not link or verify method bodies.
+pub fn write_module(module: &Module) -> Result<Vec<u8>, Fault> {
+    let payload = crate::native_binary::encode_library(module)?;
+    let mut image = vec![0u8; 32];
+    image[..4].copy_from_slice(b"NEOX");
+    image[6..8].copy_from_slice(&1u16.to_le_bytes());
+    image[8..12].copy_from_slice(&1u32.to_le_bytes());
+    image[12..16].copy_from_slice(&((32 + payload.len()) as u32).to_le_bytes());
+    image[16..18].copy_from_slice(&256u16.to_le_bytes());
+    image[18..20].copy_from_slice(&3u16.to_le_bytes());
+    image[20..24].copy_from_slice(&1u32.to_le_bytes());
+    image[24..28].copy_from_slice(&32u32.to_le_bytes());
+    image[28..32].copy_from_slice(&(payload.len() as u32).to_le_bytes());
+    image.extend_from_slice(&payload);
+    Ok(image)
+}
+
 /// Decode a standalone NEOX native module without a CLI projection or PE binding.
 /// The same runtime validation and dependency rules apply after decoding.
 pub fn decode_envelope(image: &[u8]) -> Result<Module, Fault> {

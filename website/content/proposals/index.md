@@ -92,7 +92,9 @@ Hello/generic dependency consumers pass. This is a load-format regression baseli
 direct Raven class-library source compilation and broad compiler symbol import remain
 next steps. A larger versioned native profile now also runs selected Raven samples
 against binary collection System and preserves unsigned floating operand bits. These
-native-only containers have no .NET reference projection.
+native-only containers have no .NET reference projection. The neoil assembler now
+produces them directly with `--format neox`, verified against the separate .NET reader
+and existing Raven sample behavior.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 

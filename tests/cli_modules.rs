@@ -206,3 +206,101 @@ fn cli_rejects_bad_flags_and_revision_mismatches_before_creating_output() {
     assert!(String::from_utf8_lossy(&output.stderr).contains("revision mismatch"));
     assert!(!std::path::Path::new(&artifact).exists());
 }
+
+#[test]
+fn assembler_emits_verified_native_assemblies_and_preserves_dependencies() {
+    let fixture = Fixture::new();
+    let models = fixture.path("models.neox");
+    let operations = fixture.path("operations.neox");
+    let app = fixture.path("app.neox");
+    success(&[
+        "assemble",
+        "examples/modules/models.neoil",
+        &models,
+        "--format",
+        "neox",
+    ]);
+    success(&[
+        "assemble",
+        "examples/modules/operations.neoil",
+        &operations,
+        "--format",
+        "neox",
+        "--module",
+        &models,
+    ]);
+    success(&[
+        "assemble",
+        "examples/modules/app.neoil",
+        &app,
+        "--format",
+        "neox",
+        "--module",
+        &operations,
+        "--module",
+        &models,
+    ]);
+    let bytes = fs::read(&app).unwrap();
+    assert!(bytes.starts_with(b"NEOX"));
+    assert_eq!(u16::from_le_bytes(bytes[18..20].try_into().unwrap()), 3);
+    let module = neoclr::metadata_container::decode_envelope(&bytes).unwrap();
+    assert_eq!(module.name, "Application");
+    assert!(
+        module.types.is_empty(),
+        "dependencies must not be flattened into the output"
+    );
+    assert_eq!(
+        success(&["run", &app, "--module", &operations, "--module", &models]),
+        "42\n"
+    );
+    assert!(!cli(&["run", &app]).status.success());
+    assert!(
+        !cli(&[
+            "assemble",
+            "examples/modules/app.neoil",
+            &app,
+            "--format",
+            "neox",
+            "--module",
+            &operations,
+            "--module",
+            &models
+        ])
+        .status
+        .success()
+    );
+    assert_eq!(fs::read(&app).unwrap(), bytes);
+}
+
+#[test]
+fn native_assembler_rejects_bad_bodies_and_options_before_output_creation() {
+    let fixture = Fixture::new();
+    let source = fixture.write("invalid.neoil", ".module Invalid\n.entry Main\n.function Main() -> Int32\nldstr \"wrong type\"\nret\n.end\n");
+    let output = fixture.path("invalid.neox");
+    assert!(
+        !cli(&["assemble", &source, &output, "--format", "neox"])
+            .status
+            .success()
+    );
+    assert!(!std::path::Path::new(&output).exists());
+    for options in [
+        vec!["--format"],
+        vec!["--format", "unknown"],
+        vec!["--format", "neox", "--format", "neox"],
+    ] {
+        let mut args = vec!["assemble", "examples/hello.neoil", &output];
+        args.extend(options);
+        assert!(!cli(&args).status.success());
+        assert!(!std::path::Path::new(&output).exists());
+    }
+    let json = fixture.path("explicit.json");
+    success(&[
+        "assemble",
+        "examples/hello.neoil",
+        &json,
+        "--format",
+        "json",
+    ]);
+    let legacy: serde_json::Value = serde_json::from_slice(&fs::read(json).unwrap()).unwrap();
+    assert_eq!(legacy["name"], "HelloWorld");
+}

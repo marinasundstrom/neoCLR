@@ -60,3 +60,28 @@ metadata, module references, a full verifier, and a CLI-based binary backend.
 Each milestone should add representative source-to-metadata/IL round trips and
 execution or inspection tests, documenting unsupported features explicitly rather
 than silently dropping them.
+
+
+## Direct binary producer checkpoint — 2026-09-30
+
+The metadata feature branch now adds `assemble ... --format neox`, preserving JSON as
+the default. This is the first native binary-output path through the existing neoil
+parser, resolver and verifier; it is not a claim of full ILAsm expressiveness. Like the
+CLI assembly tooling role in the ECMA-335 baseline above, it preserves declarations,
+references and instruction bodies in a runtime-loadable artifact. The representation
+is neoCLR's schema-3 native module rather than PE/CLI tables.
+
+Rust serializes the Module directly through the bounded CBOR writer and existing schema
+validator. The separate .NET metadata library remains a reader/writer of the same format;
+it is not embedded into the assembler or moved into Raven. Cross-reader tests compare
+complete native values with saved JSON baselines, including the full Raven collection
+System, UInt64 double operands, Option patterns and value copies. A generic three-module
+consumer tests independent assembly and missing-dependency rejection.
+
+Binary output requires successful typed verification and encoding before opening the
+output path. This avoids publishing a newly assembled artifact outside the supported
+executable subset, at the cost of verification during assembly. JSON compatibility
+remains useful for inspection and earlier workflows. Whole-module allocation and the
+schema-3 limits remain; streaming, native compiler symbol loading, direct Raven source
+emission and broader metadata syntax are subsequent work.
+[Reproduction and evidence](experiments/extended-cli-metadata/direct-assembly.md).

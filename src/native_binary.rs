@@ -6,6 +6,35 @@ fn invalid(message: impl std::fmt::Display) -> Fault {
     Fault::new(format!("invalid binary native metadata: {message}"))
 }
 
+/// Serialize the native model directly, without a JSON intermediate.
+pub(crate) fn encode_library(module: &Module) -> Result<Vec<u8>, Fault> {
+    struct Bounded(Vec<u8>);
+    impl std::io::Write for Bounded {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            if bytes.len() > (8 * 1024 * 1024 - 32) - self.0.len() {
+                return Err(std::io::Error::other(
+                    "native payload exceeds library envelope limit",
+                ));
+            }
+            self.0.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    if module.format != 5 {
+        return Err(invalid("unsupported semantic module format (expected 5)"));
+    }
+    if module.name.trim().is_empty() {
+        return Err(invalid("native module name must not be empty"));
+    }
+    let mut output = Bounded(Vec::new());
+    ciborium::into_writer(module, &mut output).map_err(invalid)?;
+    validate_profile(&output.0, true)?;
+    Ok(output.0)
+}
+
 pub(crate) fn decode(data: &[u8], library: bool) -> Result<Module, Fault> {
     validate_profile(data, library)?;
     // Deserialize into the runtime model, without a JSON string or serde_json::Value tree.
@@ -146,6 +175,19 @@ impl<'a> Reader<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn direct_writer_rejects_unsupported_format_and_payload_overflow() {
+        let mut module: Module =
+            serde_json::from_str(r#"{"format":5,"name":"Large","functions":[]}"#).unwrap();
+        module.format = 4;
+        assert!(encode_library(&module).is_err());
+        module.format = 5;
+        module.name.clear();
+        assert!(encode_library(&module).is_err());
+        module.name = "x".repeat(8 * 1024 * 1024);
+        assert!(encode_library(&module).is_err());
+    }
+
     #[test]
     fn library_profile_preserves_unsigned_bits_and_separate_budgets() {
         let unsigned = [0x1b, 255, 255, 255, 255, 255, 255, 255, 255];

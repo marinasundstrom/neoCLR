@@ -4,6 +4,16 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--compare-native")
+{
+    var decoded = NeoCLR.Metadata.Experimental.NativeModuleContainer.Read(File.ReadAllBytes(args[1]));
+    if (!System.Text.Json.Nodes.JsonNode.DeepEquals(System.Text.Json.Nodes.JsonNode.Parse(decoded),
+        System.Text.Json.Nodes.JsonNode.Parse(File.ReadAllBytes(args[2]))))
+        throw new Exception("native assembly values differ from the JSON baseline");
+    Console.WriteLine("PASS independent .NET reader: complete native values match JSON baseline");
+    return 0;
+}
+
 if (args.Length == 2 && args[0] == "--library-json-check")
 {
     LibraryBinaryChecks.RoundTripFile(args[1]);

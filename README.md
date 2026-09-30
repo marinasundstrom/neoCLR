@@ -121,6 +121,17 @@ cargo build --locked
 ./target/debug/neoclr run hello.neo.json
 ```
 
+Feature-branch development also supports direct native binary assemblies:
+
+```sh
+./target/debug/neoclr assemble examples/hello.neoil hello.neox --format neox
+./target/debug/neoclr run hello.neox
+```
+
+`--format neox` verifies the load set and writes a standalone schema-3 assembly,
+without an intermediate JSON file. JSON remains the default (`--format json`).
+Both outputs refuse overwrites. See [module-set assembly](docs/cli-module-sets.md).
+
 Use `cargo build --locked --release` for an optimized build in `target/release`.
 Run `cargo test --locked` to execute the Rust test suite.
 
