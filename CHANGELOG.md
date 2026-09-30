@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   value. Migrate development `System.Number<T>` to non-generic `System.Number`
   using Self operands/results and `ComparableTo<Self>`, with an opt-in Raven
   target contract. This changes Number's arity: rebuild reference, library and
-  applications together. See [the contract and boundaries](docs/self-types.md).
+  applications together. Add borrowed generic instance Self dispatch and a tested
+  Raven class/struct cloning consumer, preserving receiver slots without boxing;
+  reject null, incompatible receiver modes and erased Self calls. Existing
+  Clonable<T> remains unchanged. See [the contract and boundaries](docs/self-types.md).
 
 - Prepare and validate a local Function types toolchain, SDK and isolated VS Code
   extension installation (`0.1.12-neoclr.20260929.functions1`). Include an editable

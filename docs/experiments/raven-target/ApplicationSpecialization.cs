@@ -5,6 +5,13 @@ using Mono.Cecil.Cil;
 // Number algorithms additionally resolve their supported constrained calls.
 sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<ModuleDefinition> applications)
 {
+    readonly HashSet<Instruction> borrowedSelfLoads = new();
+    public bool IsBorrowedSelfLoad(Instruction instruction) => borrowedSelfLoads.Contains(instruction);
+    static bool IsSelf(TypeReference type) => type.FullName == "System.Runtime.CompilerServices.Self" && RuntimeSignatures.IsCore(type.Scope);
+    bool IsCloneContract(TypeReference type) => type.Resolve() is { IsInterface: true, HasGenericParameters: false, HasInterfaces: false } contract
+        && modules.Contains(contract.Module)
+        && contract.Methods.Count == 1 && contract.Methods[0] is { Name: "Clone", IsStatic: false, IsAbstract: true, IsPublic: true, HasGenericParameters: false } method
+        && method.Parameters.Count == 0 && IsSelf(method.ReturnType);
     readonly Dictionary<Instruction, string> nativeSelfCalls = new();
     public string? NativeSelfCall(Instruction instruction) => nativeSelfCalls.GetValueOrDefault(instruction);
 
@@ -57,6 +64,15 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                 if (actual is ByReferenceType || actual.MetadataType is MetadataType.Void or MetadataType.TypedByReference)
                     throw new InvalidDataException("Unsupported application specialization argument: " + actual.FullName);
                 _ = RuntimeSignatures.Close(actual, source.DeclaringType);
+                continue;
+            }
+            if (parameter.Attributes == GenericParameterAttributes.NonVariant && parameter.Constraints.Count == 1
+                && IsCloneContract(parameter.Constraints[0].ConstraintType))
+            {
+                var implementation = actual.Resolve();
+                if (!modules.Contains(implementation.Module) || implementation.HasGenericParameters
+                    || !implementation.Interfaces.Any(i => MetadataIdentity.TypeKey(i.InterfaceType) == MetadataIdentity.TypeKey(parameter.Constraints[0].ConstraintType)))
+                    throw new InvalidDataException("Self cloning requires a closed application implementation of its exact contract.");
                 continue;
             }
             if (parameter.Attributes != GenericParameterAttributes.NonVariant || parameter.Constraints.Count != 1
@@ -130,6 +146,25 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
         {
             var prefix = copy.Body.Instructions[index];
             if (prefix.OpCode.Code != Code.Constrained) continue;
+            if (prefix.Operand is TypeReference cloneType && index + 1 < copy.Body.Instructions.Count
+                && copy.Body.Instructions[index + 1] is var cloneInstruction
+                && cloneInstruction.Operand is MethodReference cloneCall && IsCloneContract(cloneCall.DeclaringType))
+            {
+                if (cloneInstruction.OpCode.Code != Code.Callvirt || cloneCall.Name != "Clone" || cloneCall.Parameters.Count != 0 || !IsSelf(cloneCall.ReturnType))
+                    throw new InvalidDataException("Invalid constrained Self clone call.");
+                var cloneCandidates = cloneType.Resolve().Methods.Where(m => m.Name == "Clone" && m.IsPublic && !m.IsStatic && !m.HasGenericParameters
+                    && m.Parameters.Count == 0 && MetadataIdentity.TypeKey(m.ReturnType) == MetadataIdentity.TypeKey(cloneType)).ToArray();
+                if (cloneCandidates.Length != 1) throw new InvalidDataException("Missing exact Self clone implementation.");
+                var cloneOwner = ApplicationTypes.Type(cloneType) ?? throw new InvalidDataException("Unsupported Self clone type.");
+                var contract = ApplicationTypes.Type(cloneCall.DeclaringType) ?? throw new InvalidDataException("Unsupported Self clone contract.");
+                nativeSelfCalls[cloneInstruction] = $"callself borrow {cloneOwner} = instance {contract}::Clone()";
+                prefix.OpCode = cloneType.IsValueType ? OpCodes.Nop : OpCodes.Ldobj;
+                prefix.Operand = cloneType.IsValueType ? null : cloneType;
+                if (!cloneType.IsValueType) borrowedSelfLoads.Add(prefix);
+                cloneInstruction.OpCode = OpCodes.Call;
+                cloneInstruction.Operand = cloneCandidates[0];
+                continue;
+            }
             if (prefix.Operand is not TypeReference concrete || !NumberBindings.IsNumber(concrete.FullName)
                 || index + 1 >= copy.Body.Instructions.Count)
                 throw new InvalidDataException("Unsupported numeric constrained receiver.");

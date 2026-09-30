@@ -9208,3 +9208,20 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
 - **Delivery:** Raven implementation committed as `764c22789` on the isolated
   `codex/neoclr-native-self` branch. neoCLR changes remain on `codex/native-self`
   for the matching commit. No feature branch was merged into Raven main or neoclr.
+
+
+### 2026-09-30 — Generic Self cloning follow-up
+
+- **Author:** asked what to consider next, then directed “Continue”.
+- **Assistant proposal:** generic cloning first, followed by explicit inheritance,
+  erasure and tooling decisions. The assistant selected a bounded borrowed-receiver
+  contract for this continuation, without claiming all proposed follow-ons complete.
+- **Actions/outcome:** added native `callself borrow`, forwarding value slots or
+  loading class references without boxing. The Raven compiler already emitted the
+  constrained generic call; its focused test now covers that path. The importer
+  gained a bounded direct application Clone contract, with passing struct/class
+  execution and missing-bound, wrong-result and erased-call rejection evidence in
+  [the probe](experiments/native-self/README.md). Existing System.Clonable<T> remains.
+- **Open:** broad inherited Self semantics, general instance importer contracts,
+  independent method generics and expanded language-service support. Work remains
+  on the two native-Self feature branches; the Web API priority is unchanged.

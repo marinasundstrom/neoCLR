@@ -1,0 +1,39 @@
+import System.*
+
+interface Clonable {
+    func Clone() -> Self
+}
+
+struct Cell : Clonable {
+    var Value: int
+
+    init(value: int) {
+        Value = value
+    }
+
+    func Clone() -> Self => Cell(Value)
+}
+
+class Box : Clonable {
+    var Value: int
+
+    init(value: int) {
+        Value = value
+    }
+
+    func Clone() -> Self => Box(Value)
+}
+
+func Copy<T>(value: T) -> T where T: Clonable => value.Clone()
+
+func Main() {
+    let cell = Cell(20)
+    let copiedCell = Copy<Cell>(cell)
+    let box = Box(22)
+    let copiedBox = Copy<Box>(box)
+    box.Value = 99
+    if copiedCell.Value + copiedBox.Value != 42 {
+        System.Fault("Self cloning did not preserve independent values")
+    }
+    Console.WriteLine("Generic Self cloning passed")
+}

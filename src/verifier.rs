@@ -1117,8 +1117,13 @@ fn typed_effect(
             }
             one(function_type.clone())
         }
-        CallSelf { self_type, target } => {
-            let callee = crate::self_types::signature(module, function, self_type, target)?;
+        CallSelf {
+            self_type,
+            target,
+            borrowed,
+        } => {
+            let callee =
+                crate::self_types::signature(module, function, self_type, target, *borrowed)?;
             for (value, ty) in values.iter().zip(callee.argument_types()) {
                 stored(module, value, &ty)?;
             }

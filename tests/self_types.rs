@@ -272,3 +272,222 @@ ret
         Value::Int32(42)
     );
 }
+
+const GENERIC_CLONE: &str = r#"
+.module GenericClone
+.entry Main
+.interface Clonable
+.method instance Clone() -> Self
+.end
+.end
+.type Cell
+.implements Clonable
+.field Value Int32
+.method instance byref Clone() -> Cell
+ldarg this
+ldobj Cell
+ret
+.end
+.end
+.type class Box
+.implements Clonable
+.field Value Int32
+.method instance .ctor(Int32 value) -> noresult
+ldarg this
+ldarg value
+stfld Box::Value
+ret
+.end
+.method instance Clone() -> Box
+ldarg this
+ldfld Box::Value
+newobj instance Box::.ctor(Int32)
+ret
+.end
+.end
+.function Clone<T>(T value) -> T
+.constraint T Clonable
+ldarga value
+callself borrow T = instance Clonable::Clone()
+ret
+.end
+.function Main() -> Int32
+.local Cell cell
+.local Box original
+.local Box copy
+ldc.i4 20
+newobj Cell
+call Clone<Cell>(Cell)
+stloc cell
+ldc.i4 22
+newobj instance Box::.ctor(Int32)
+stloc original
+ldloc original
+call Clone<Box>(Box)
+stloc copy
+ldloc original
+ldc.i4 99
+stfld Box::Value
+ldloc copy
+ldfld Box::Value
+ldloc cell
+ldfld Cell::Value
+add
+ret
+.end
+"#;
+
+#[test]
+fn generic_clone_adapts_value_and_reference_receivers_without_boxing() {
+    let program = prepare(GENERIC_CLONE).unwrap();
+    let execution = program.run(Limits::default()).unwrap();
+    assert_eq!(execution.value, Value::Int32(42));
+    assert_eq!(execution.heap.statistics().allocated_objects, 2);
+}
+
+#[test]
+fn generic_clone_rejects_unproven_copying_and_readonly_receivers() {
+    for source in [
+        GENERIC_CLONE.replace(".constraint T Clonable", ""),
+        GENERIC_CLONE.replace("callself borrow T", "callself T"),
+        GENERIC_CLONE.replace("ldarga value", "ldarg value"),
+        GENERIC_CLONE.replace(
+            "instance byref Clone() -> Cell\nldarg this\nldobj Cell",
+            "instance Clone() -> Cell\nldarg this",
+        ),
+    ] {
+        assert!(
+            prepare(&source)
+                .and_then(|program| program.run(Limits::default()))
+                .is_err(),
+            "invalid borrowed Self call accepted: {source}"
+        );
+    }
+    let readonly = GENERIC_CLONE
+        .split(".function Main()")
+        .next()
+        .unwrap()
+        .replace("Clone<T>(T value)", "Clone<T>(readonly T& value)")
+        .replace("ldarga value", "ldarg value")
+        + ".function Main() -> Int32\nldc.i4 0\nret\n.end\n";
+    assert!(
+        prepare(&readonly)
+            .err()
+            .unwrap()
+            .message
+            .contains("readonly")
+    );
+    assert!(prepare(&PROGRAM.replace("callself T", "callself borrow T")).is_err());
+}
+
+#[test]
+fn generic_clone_checks_null_even_when_implementation_ignores_receiver() {
+    let source = GENERIC_CLONE
+        .replace("ldarg this\nldfld Box::Value\nnewobj", "ldc.i4 42\nnewobj")
+        .replace(
+            "ldc.i4 22\nnewobj instance Box::.ctor(Int32)\nstloc original",
+            "ldloca original\ninitobj Box",
+        );
+    assert!(
+        prepare(&source)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap_err()
+            .message
+            .contains("null Self receiver")
+    );
+}
+
+#[test]
+fn borrowed_self_mutation_preserves_the_original_value_slot() {
+    let source = GENERIC_CLONE
+        .replace("Clone<T>(T value)", "Clone<T>(T& value)")
+        .replace("ldarga value", "ldarg value")
+        .replace("instance byref Clone() -> Cell\nldarg this", "instance byref Clone() -> Cell\nldarg this\nldc.i4 21\nstfld Cell::Value\npop\nldarg this");
+    let source = source.split(".function Main()").next().unwrap().to_owned()
+        + r#"
+.function Main() -> Int32
+.local Cell original
+ldc.i4 20
+newobj Cell
+stloc original
+ldloca original
+call Clone<Cell>(Cell&)
+ldfld Cell::Value
+ldloc original
+ldfld Cell::Value
+add
+ret
+.end
+"#;
+    assert_eq!(
+        prepare(&source)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn borrowed_self_reference_dispatch_preserves_virtual_targets_in_execution_and_graph() {
+    let source = r#"
+.module BorrowedVirtual
+.entry Main
+.interface Reader
+.method instance Read() -> Int32
+.end
+.end
+.type class Base
+.implements Reader
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance virtual Read() -> Int32
+ldc.i4 20
+ret
+.end
+.end
+.type class Derived
+.extends Base
+.method instance .ctor() -> noresult
+ldarg this
+call instance Base::.ctor()
+ret
+.end
+.method instance override Read() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Read<T>(T value) -> Int32
+.constraint T Reader
+ldarga value
+callself borrow T = instance Reader::Read()
+ret
+.end
+.function Main() -> Int32
+newobj instance Derived::.ctor()
+call Read<Base>(Base)
+ret
+.end
+"#;
+    let program = prepare(source).unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+    let graph = program
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            30,
+        )
+        .unwrap();
+    assert!(
+        graph
+            .functions
+            .iter()
+            .any(|f| f.target.name == "Derived.Read")
+    );
+}

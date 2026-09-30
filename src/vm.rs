@@ -946,7 +946,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         target,
                     )?;
                 }
-                Op::CallSelf { self_type, target } => {
+                Op::CallSelf {
+                    self_type,
+                    target,
+                    borrowed,
+                } => {
                     check(self_type)?;
                     if let Some(owner) = &target.owner {
                         check(owner)?;
@@ -965,7 +969,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     for ty in &target.generic_arguments {
                         check(ty)?;
                     }
-                    crate::self_types::signature(module, function, self_type, target)?;
+                    crate::self_types::signature(module, function, self_type, target, *borrowed)?;
                     crate::access::check_call(module, Some(function), &resolve(module, target)?)?;
                 }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
@@ -2743,9 +2747,47 @@ fn interpret_instructions_with_dispatch(
                     callback.queue_callback = queue_callback;
                     frames.push(callback);
                 }
-                Op::CallSelf { self_type, target } => {
-                    let callee = crate::self_types::implementation(module, self_type, target)?;
-                    let args = frame.args(module, &callee.argument_types())?;
+                Op::CallSelf {
+                    self_type,
+                    target,
+                    borrowed,
+                } => {
+                    let mut callee = crate::self_types::implementation(module, self_type, target)?;
+                    let args = if *borrowed {
+                        let signature = crate::self_types::signature(
+                            module, &function, self_type, target, true,
+                        )?;
+                        let mut args = frame.args(module, &signature.argument_types())?;
+                        if !callee.receiver_byref {
+                            let Value::SlotReference(receiver) = &args[0] else {
+                                return Err(Fault::new(
+                                    "borrowed callself requires a managed receiver slot",
+                                ));
+                            };
+                            let mut value = receiver.read()?;
+                            if module.is_reference_type(self_type) {
+                                let Value::ObjectReference(object) = &mut value else {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::NullReference,
+                                        "null Self receiver",
+                                    ));
+                                };
+                                if callee.is_virtual {
+                                    callee = crate::inheritance::dispatch(
+                                        module,
+                                        &object.concrete_type(),
+                                        &callee,
+                                    )?;
+                                }
+                                object.view = callee.owner.clone();
+                            }
+                            args[0] =
+                                value.for_storage_in(module, callee.owner.as_ref().unwrap())?;
+                        }
+                        args
+                    } else {
+                        frame.args(module, &callee.argument_types())?
+                    };
                     if frames.len() >= limits.frames {
                         return Err(Fault::coded(
                             crate::FaultCode::StackOverflow,

@@ -829,6 +829,9 @@ pub enum Instruction {
     /// Dispatch an interface contract with an explicit, statically known Self.
     #[serde(rename = "callself")]
     CallSelf {
+        /// Adapt a managed receiver slot to the concrete implementation without boxing.
+        #[serde(default)]
+        borrowed: bool,
         self_type: Type,
         target: FunctionRef,
     },
@@ -1185,7 +1188,9 @@ impl Function {
                         *ty = map(ty)?;
                     }
                 }
-                Instruction::CallSelf { self_type, target } => {
+                Instruction::CallSelf {
+                    self_type, target, ..
+                } => {
                     *self_type = map(self_type)?;
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;

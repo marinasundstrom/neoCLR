@@ -1667,4 +1667,7 @@ The application importer still specializes its bounded closed numeric helpers,
 but emits native `callself` for Number members. Native validation and dispatch
 resolve the implementing type and check the substituted signature. The numeric
 verification script checks retained native dispatch and exercises ten primitive
-types. This does not extend the importer to arbitrary instance Self consumers.
+types. The subsequent [generic cloning probe](../native-self/README.md) adds
+bounded direct application Clone implementations for structs and classes. Its
+constrained receiver becomes native `callself borrow`. The importer still rejects
+arbitrary instance Self contracts and inherited cloning conformances.

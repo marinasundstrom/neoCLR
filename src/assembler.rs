@@ -595,8 +595,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
                                 Fault::new("expected callself Type = Target(...)")
                             })?;
+                            let (borrowed, ty) = ty
+                                .trim()
+                                .strip_prefix("borrow ")
+                                .map_or((false, ty.trim()), |ty| (true, ty));
                             Some(
-                                serde_json::json!({"self_type": parse_type(ty.trim())?, "target": parse_function_ref(target.trim())?}),
+                                serde_json::json!({"borrowed": borrowed, "self_type": parse_type(ty)?, "target": parse_function_ref(target.trim())?}),
                             )
                         }
                         "function.bind" => {

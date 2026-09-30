@@ -44,9 +44,14 @@ and serialized metadata are checked; compiler acceptance cannot bypass conforman
 argument types, access or generic-bound checks. Calls participate in metadata
 reference binding, reachability and runtime-service discovery.
 
-The first slice supports static calls through generic bounds and instance calls
-with a concrete receiver type. Open generic instance calls need a receiver-mode
-contract and are rejected. Ordinary class methods may use Raven `Self` as their
+Static calls work through generic bounds. Generic instance calls use an explicit
+borrowed receiver: `callself borrow T = instance Clonable::Clone()`. The stack
+supplies a managed `T&` slot. For values, the runtime forwards the original slot
+to a byref implementation; for classes, it reads the object reference from the
+slot. It checks null, lifetime, assignment, readonly compatibility and conformance.
+By-value value implementations are rejected for this mode instead of silently
+copying the receiver. Open generic instance calls without `borrow` remain invalid.
+The serialized `borrowed` flag defaults to false for older callself metadata. Ordinary class methods may use Raven `Self` as their
 declaring constructed type; inherited methods do not acquire covariant signatures
 for each subclass. Redeclaring a conformance must supply matching signatures.
 
@@ -93,7 +98,7 @@ repeating a generic argument at every conformance. The cost is a new metadata
 signature, substitution/dispatch rules, compiler projection and an incompatible
 Number arity change. An explicit `TSelf` encoding would retain ordinary CLR
 execution compatibility; it is deliberately not the selected architecture.
-There is no performance claim and no new boxing policy.
+There is no performance claim. Borrowed Self dispatch has no boxing fallback.
 
 ## Evidence
 
@@ -114,3 +119,28 @@ Zero/One, ordering and parsing across all ten primitive number types, with nativ
 [recorded numeric evidence](experiments/numeric-contracts/native-self-validation.json).
 The existing generic-helper consumer also passed identity and rejection checks.
 No website build or publication was performed.
+
+
+## Generic cloning follow-up (2026-09-30)
+
+The [Raven cloning probe](experiments/native-self/README.md) uses a separate
+nongeneric application interface with `Clone() -> Self`. Its generic Copy function
+returns T for both a struct and a class. Existing System.Clonable<T> is unchanged.
+The bounded importer specializes closed static helpers with one exact application
+cloning bound, preserving native borrowed dispatch. It requires a direct concrete
+implementation and a single public abstract nongeneric Clone method; arbitrary
+instance Self contracts and inherited application conformances remain outside it.
+No covariant subclass interpretation of Self is introduced.
+
+.NET's shipped [constrained prefix](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.constrained?view=net-10.0)
+also takes a managed receiver pointer and chooses value/reference treatment.
+neoCLR adopts that useful receiver adaptation, with native Self signature
+substitution and no boxing fallback. The benefit is shared generic code without
+copying a mutable value receiver; the cost is an explicit borrowed operand and
+rejection of implementations that cannot honor it. Source reviewed 2026-09-30.
+
+The follow-up passed 12 Self tests and 31 generic-bound/interface regressions,
+including original-slot mutation, virtual reference dispatch/reachability, two-object class clone allocation, null,
+missing bounds, erased receivers and invalid receiver modes. The Raven compiler's
+three focused Self tests include generic instance binding/emission; the imported
+class/struct consumer passed execution and three compiler rejection cases.

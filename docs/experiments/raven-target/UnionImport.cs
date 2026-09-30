@@ -456,7 +456,7 @@ static class UnionImport
                         throw new InvalidDataException("Unsupported runtime field write.");
                     case Code.Ldobj:
                         var copiedToken = (TypeReference)instruction.Operand;
-                        if (!copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !(TupleBindings.Type(copiedToken) is not null || ApplicationTypes.IsLibrary(copiedToken) || ApplicationTypes.IsModule(copiedToken.Resolve().Module)))
+                        if (!applicationSpecialization.IsBorrowedSelfLoad(instruction) && (!copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !(TupleBindings.Type(copiedToken) is not null || ApplicationTypes.IsLibrary(copiedToken) || ApplicationTypes.IsModule(copiedToken.Resolve().Module))))
                             throw new InvalidDataException("Only matched library value loads are admitted.");
                         var copiedType = ProfileType(copiedToken);
                         if (LibraryImplementation.IsByValueReceiver(method) && GenericUnionLibrary.IsMatched(method.DeclaringType)
@@ -467,7 +467,10 @@ static class UnionImport
                         var copiedAddress = Expect(copiedType + "&");
                         if (copiedAddress.Local >= 0 && !assigned[copiedAddress.Local])
                             throw new InvalidDataException("Read through uninitialized value address.");
-                        Push(new(copiedType)); code.AppendLine("ldobj " + copiedType); break;
+                        Push(new(copiedType));
+                        // The native call consumes the original receiver slot; only the Cecil validation view loads the class value.
+                        if (!applicationSpecialization.IsBorrowedSelfLoad(instruction)) code.AppendLine("ldobj " + copiedType);
+                        break;
                     case Code.Stobj:
                         var storedOutput = ProfileType((TypeReference)instruction.Operand);
                         ConvertTop(storedOutput);

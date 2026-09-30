@@ -1,0 +1,15 @@
+{
+  "report": "Generic Self cloning passed",
+  "rejected": [
+    "missing bound",
+    "wrong Self result",
+    "erased receiver"
+  ],
+  "sourceSha256": "7f346e6328ace6c2bb903b4887e36d70e12f84cd70fdb8d135c28c9090b6d863",
+  "sha256": {
+    "runtime": "424aa18d941e51a7a5d49c711f8fbe6c921a20afaedd60b90a940271403a0268",
+    "bridge": "e97b17d5c4b2e9e8425aaf4e59d99ac4a64dc15e34eac17fb44cf88f8a9eb638",
+    "system": "41dd2a9d2288147fd6f5faf80a2d8970c7251436011469e97e2d982afa6644ae",
+    "reference": "8c4ac983ed15ac42ffa3b55c05f28bdb6a2ed459cd95351182b594a273aa6efc"
+  }
+}
