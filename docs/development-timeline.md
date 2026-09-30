@@ -40,6 +40,12 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
 - **Evidence/context:** the preceding PE probe is committed as `b7f07407`. Ordinary
   .NET/Cecil inspection passes, but Cecil rewriting strips #Neo; that constrains the
   proposed writer architecture. It is not a test of runtime execution.
+- **Author clarification:** libraries will serve Raven's compiler symbol loader and
+  code generation; neoCLR also needs metadata libraries to load assemblies into
+  Introspection and emit assemblies.
+- **Assistant action:** makes these the explicit consumer contracts in the metadata
+  and Introspection designs. Separates Raven symbol/code-generation adapters from the
+  reusable libraries, and requires a neoCLR load-inspect-emit-reopen consumer as evidence.
 - **Open:** production format recognition, real dependency binding, both platforms'
   library implementations, native/managed sharing and guest-language API coverage.
 

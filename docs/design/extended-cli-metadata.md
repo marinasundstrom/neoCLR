@@ -248,14 +248,32 @@ import path from Raven to the current runtime. Exact package names and implement
 languages remain provisional. The Python codec is a research harness, not the proposed
 shipping library on either platform.
 
-| Consumer | Reader responsibility | Writer responsibility |
+The author clarifies the concrete library consumers:
+
+| Library consumer | Reader integration | Writer integration |
 | --- | --- | --- |
-| .NET-hosted tools, including Raven | Read ordinary CLI data and required neoCLR extensions into a lossless raw model; expose structural signatures and member references to a semantic adapter | Build declarations, signatures, extension records and the container together, fixing up all references; reject unsupported output requirements |
-| neoCLR native implementation | Validate bytes independently of the producing compiler; resolve native semantic identities and required capabilities before loading | Support native tooling/export where justified by a concrete consumer; never require a .NET process to serialize the format |
-| Programs running on neoCLR | Offer offline metadata inspection and construction through an eventual managed library | Produce images without loading or executing them; connect higher-level Emit later through explicit contracts |
+| Raven compiler on .NET | Symbol loader imports assembly metadata into Raven symbols, including structural types, synthesized members and owner contexts | Code generation supplies declarations, signatures and generated bodies to the metadata/image writer, which validates and fixes up references |
+| neoCLR programs and tooling | Load assembly metadata into the shared Introspection model through a metadata-backed provider, resolving dependencies explicitly | Emit constructs assemblies through metadata/image builders and writes them for later inspection or loading |
+
+The format libraries provide reusable reader/writer machinery. Raven-specific symbol
+construction and code generation remain compiler adapters, not dependencies of the
+neoCLR libraries. The neoCLR provider projects the same metadata into Introspection;
+it must not expose Raven compiler symbols or require Raven to be installed. Metadata
+writing owns encoding, handle assignment and fixups; Raven code generation owns source
+lowering and method-body generation. An eventual Emit layer supplies generated bodies
+and descriptions through the corresponding neoCLR writer.
+
+“Load assemblies into Introspection” means opening their metadata and producing usable
+assembly/module/type/member descriptions. It does not implicitly execute initializers
+or realize executable types in RuntimeContext. The existing separation between metadata
+inspection and explicit runtime loading remains applicable. Likewise, emitting an
+assembly does not automatically load it. Structural descriptions must remain available
+even where a particular runtime execution capability is unsupported, with unsupported
+required metadata semantics diagnosed rather than silently discarded.
 
 The native implementation and guest library may share machinery, but a Rust-only
-internal loader does not satisfy guest-accessible reader/writer support. Conversely,
+internal loader does not satisfy the Introspection-loading and assembly-emission library
+requirements. Conversely,
 a .NET package called by the development bridge is not a library running on neoCLR.
 Keep both distinctions visible in acceptance evidence.
 
@@ -317,10 +335,12 @@ No extra mandatory metadata package belongs in System.Runtime merely for offline
   equality only for a documented canonical output mode.
 - Establish a guest-accessible library on neoCLR, either by porting a portable core or
   exposing validated native services through a managed API. Acceptance must include a
-  neoCLR program reading and writing an artifact without invoking .NET. Pair public API
+  neoCLR program loading an artifact into Introspection, inspecting its structural
+  type/member descriptions, emitting an assembly and reopening it without invoking
+  .NET. Pair public API
   documentation with that implementation, not with speculative names in this plan.
-- Finally integrate Raven import/emission and higher-level Emit/Introspection as
-  consumers. Run cross-produced artifacts through both implementations, including
+- Integrate Raven’s symbol loader and code generation as explicit consumers of the
+  .NET libraries; integrate neoCLR Introspection loading and Emit through its libraries. Run cross-produced artifacts through both implementations, including
   malformed inputs, unknown required features, structural members and owner contexts.
 
 Track ordinary CLI compatibility, extension understanding, rewriting preservation and

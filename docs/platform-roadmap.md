@@ -20,7 +20,9 @@ without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
 separates shared format/conformance contracts, .NET tooling, native support and an
-actual neoCLR guest library; these libraries remain planned.
+actual neoCLR guest library. Concrete consumers are Raven’s symbol loader/code
+generation and neoCLR assembly loading into Introspection/assembly emission; these
+libraries remain planned.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
 After the bounded main backport below, put the structural Function experiment on

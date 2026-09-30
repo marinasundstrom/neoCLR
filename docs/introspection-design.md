@@ -435,6 +435,22 @@ equivalent definitions in distinct contexts and incompatible revisions. Require
 clear binding diagnostics rather than representation-dependent late failures.
 Automatic binding when unambiguous versus explicit import remains undecided.
 
+## Metadata library direction — 2026-09-30
+
+The author explicitly requests neoCLR metadata libraries that load assemblies into
+Introspection and emit assemblies. The
+[extended metadata library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
+also identifies .NET-hosted libraries for Raven's symbol loader and code generation.
+These consumers share a format contract, not Raven compiler symbol objects.
+
+For neoCLR, the reader/provider must produce metadata-backed AssemblyInfo, ModuleInfo,
+TypeInfo and member descriptions through the shared Introspection contracts. The writer
+must support assembly construction/emission and reopening for inspection. This remains
+planned, including structural signatures and synthesized-member descriptions; it is not
+implemented by the Python codec or native loader experiments. Opening metadata remains
+separate from executable loading into RuntimeContext. Exact packages and API names are
+not settled here; the deferred-work section records the present implementation boundary.
+
 ## Deferred work
 
 Full MetadataContext and metadata-file loading are outside v1. They require parsing,

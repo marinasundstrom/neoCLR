@@ -27,7 +27,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   compiled cross-module evidence and Raven compiler changes remain pending.
   Record the author-directed plan for reader/writer libraries on both .NET and
   neoCLR, including native versus guest-accessible support and cross-platform
-  conformance. Package/API names and implementation sharing remain undecided.
+  conformance. Clarify their consumers: Raven symbol loading/code generation and
+  neoCLR assembly loading into Introspection/assembly emission. Package/API names
+  and implementation sharing remain undecided.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
