@@ -25,6 +25,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   This is inspection evidence, not an execution or semantics-preserving rewrite
   guarantee. Production recognition/loading, real CLI dependency resolution,
   compiled cross-module evidence and Raven compiler changes remain pending.
+  Record the author-directed plan for reader/writer libraries on both .NET and
+  neoCLR, including native versus guest-accessible support and cross-platform
+  conformance. Package/API names and implementation sharing remain undecided.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

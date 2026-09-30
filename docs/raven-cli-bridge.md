@@ -35,3 +35,8 @@ but Cecil rewriting strips the stream. Do not route native metadata through an o
 Cecil rewrite without preservation/remapping support. Current marker/carrier behavior
 and Runtime Contract configuration remain as described above. No native runtime-loaded
 artifact or Raven compiler bundle is validated by this experiment.
+
+The [reader/writer architecture](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
+plans a .NET-hosted metadata library for Raven and corresponding support on neoCLR,
+including a guest-accessible library. Format codecs, semantic resolution and Raven
+symbol/emission adapters remain separate; the current bridge is not that library.

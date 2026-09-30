@@ -239,3 +239,92 @@ Self and Function examples. Keep native and bridge artifacts independently ident
 Publish paired Raven compiler documentation, neoCLR integration notes, changelogs and
 matching tool revisions when compiler behavior changes. This planning slice changes no
 Raven source/configuration and has no tested Raven bundle revision.
+
+## Reader and writer support on .NET and neoCLR
+
+**Author direction, 2026-09-30:** eventually provide metadata reader and writer support
+for both .NET and neoCLR. This is a shared format/tooling requirement, not merely an
+import path from Raven to the current runtime. Exact package names and implementation
+languages remain provisional. The Python codec is a research harness, not the proposed
+shipping library on either platform.
+
+| Consumer | Reader responsibility | Writer responsibility |
+| --- | --- | --- |
+| .NET-hosted tools, including Raven | Read ordinary CLI data and required neoCLR extensions into a lossless raw model; expose structural signatures and member references to a semantic adapter | Build declarations, signatures, extension records and the container together, fixing up all references; reject unsupported output requirements |
+| neoCLR native implementation | Validate bytes independently of the producing compiler; resolve native semantic identities and required capabilities before loading | Support native tooling/export where justified by a concrete consumer; never require a .NET process to serialize the format |
+| Programs running on neoCLR | Offer offline metadata inspection and construction through an eventual managed library | Produce images without loading or executing them; connect higher-level Emit later through explicit contracts |
+
+The native implementation and guest library may share machinery, but a Rust-only
+internal loader does not satisfy guest-accessible reader/writer support. Conversely,
+a .NET package called by the development bridge is not a library running on neoCLR.
+Keep both distinctions visible in acceptance evidence.
+
+### Shared contracts and platform adapters
+
+Use one versioned wire specification and shared golden/malformed fixtures. Separate:
+
+1. **Byte access and encoding:** bounded buffers/streams, integer encodings, offsets,
+   tables, heaps, tokens, diagnostics and resource limits. No assembly loading.
+2. **Raw metadata model:** declarations, signature expressions, required features and
+   extension relationships. Physical handles stay distinct from resolved type/member
+   identities. Preserve information even when a high-level API does not expose it.
+3. **Resolution and semantic projection:** explicit dependency resolver, generic/Self
+   owner contexts, structural identity and the Introspection adapter. No implicit
+   host reflection or executable dependency loading to answer metadata questions.
+4. **Construction:** builders with symbolic handles, validation and final token/heap
+   assignment. Emission remaps every dependent extension reference. Loading the output
+   and executing it remain separate operations.
+
+The raw reader should work without native runtime layout/GC services. The semantic
+adapter may use those services where actual runtime support is needed, but offline
+inspection must not instantiate them. This follows the existing
+[Introspection/Reflection/Emit separation](../introspection-design.md#emit-and-cross-origin-composition)
+and [managed foundation boundary](../system-runtime-assembly.md).
+
+On .NET, prefer evaluating System.Reflection.Metadata/PEReader and metadata builders
+for conventional structures, with an explicit neoCLR extension codec and lossless
+model above them. The existing probe is evidence for conventional inspection only.
+It does not establish that standard signature decoders, emitters or Roslyn's importer
+understand structural neoCLR types. Raven needs an adapter to the shared semantic
+contract; it must not reverse-engineer nominal carriers to recover native semantics.
+
+Cecil remains a useful independent comparison reader, but the observed removal of
+#Neo on rewrite rules out an unmodified Cecil read/write pipeline as our writer.
+Simply copying an opaque stream back after rewriting is also insufficient if tokens
+or heaps moved. Unknown optional data may be preserved when copying an unchanged image;
+semantic rewriting must refuse unknown reference-bearing schemas unless it can remap
+or prove their independence. Required features must always be understood.
+
+For neoCLR, compare a native codec with a Raven-authored portable managed codec using
+a small byte-buffer API. A shared portable implementation would reduce duplicated logic
+but depends on guest language/library maturity and the bootstrap. Independent .NET and
+native implementations allow earlier compiler/runtime work and valuable cross-checks,
+but cost more maintenance. Start with shared contracts and conformance tests rather than
+committing now to a source-sharing mechanism, FFI boundary or final assembly split.
+No extra mandatory metadata package belongs in System.Runtime merely for offline tools.
+
+### Staged delivery and acceptance
+
+- First close artifact recognition and actual PE-reference binding gaps using the
+  current harness. Establish a minimal format profile, diagnostics and fixtures that
+  both readers can implement without copying prototype accidents into public APIs.
+- Then build the first .NET reader/writer library slice with a standalone executable
+  consumer, using the same fixtures. Keep Raven integration as a separate adapter and
+  use the .NET writer as one producer of runtime-independent test images.
+- Add native neoCLR reader/writer support for that same bounded profile. Test both
+  .NET-write → neoCLR-read and neoCLR-write → .NET-read, plus each local round trip.
+  Verify semantic equivalence after legitimate row/heap renumbering; require byte
+  equality only for a documented canonical output mode.
+- Establish a guest-accessible library on neoCLR, either by porting a portable core or
+  exposing validated native services through a managed API. Acceptance must include a
+  neoCLR program reading and writing an artifact without invoking .NET. Pair public API
+  documentation with that implementation, not with speculative names in this plan.
+- Finally integrate Raven import/emission and higher-level Emit/Introspection as
+  consumers. Run cross-produced artifacts through both implementations, including
+  malformed inputs, unknown required features, structural members and owner contexts.
+
+Track ordinary CLI compatibility, extension understanding, rewriting preservation and
+execution as four separate results. The present PE probe proves only the bounded first
+category plus transport to the Python extension inspector. It does not complete either
+platform's reader/writer library. This direction does not move structural runtime work
+to main or change Raven's ordinary .NET target.

@@ -25,6 +25,24 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Metadata tooling on both platforms
+
+- **Author:** “We eventually need to figure out how to build neoCLR metadata reader
+  and writer support both for .NET and NeoCLR”.
+- **Assistant proposal:** use one wire contract and shared conformance fixtures,
+  with explicit reader/writer implementations for .NET tools and neoCLR. Distinguish
+  native loader/tooling support from a library callable by neoCLR guest programs;
+  neither the Python harness nor the .NET development bridge completes that goal.
+- **Action:** records the [cross-platform architecture and delivery plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr),
+  including cross-produced artifacts, offline reading/building, token/heap fixups,
+  and later Raven adapters. No package name, implementation language or source-sharing
+  strategy is settled by this documentation slice.
+- **Evidence/context:** the preceding PE probe is committed as `b7f07407`. Ordinary
+  .NET/Cecil inspection passes, but Cecil rewriting strips #Neo; that constrains the
+  proposed writer architecture. It is not a test of runtime execution.
+- **Open:** production format recognition, real dependency binding, both platforms'
+  library implementations, native/managed sharing and guest-language API coverage.
+
 ## 2026-09-30: Begin extended CLI metadata design
 
 - **Author:** asks to start developing an extended CLI metadata format suitable for

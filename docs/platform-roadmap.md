@@ -17,6 +17,10 @@ type/member keys. A bounded PE32 #Neo probe preserves conventional metadata for
 .NET/Cecil inspection; Cecil rewriting strips the extension. Fail-closed artifact
 recognition is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
+The author additionally requires eventual reader/writer support on both .NET and
+neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
+separates shared format/conformance contracts, .NET tooling, native support and an
+actual neoCLR guest library; these libraries remain planned.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
 After the bounded main backport below, put the structural Function experiment on
