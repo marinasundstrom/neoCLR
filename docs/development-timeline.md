@@ -9225,3 +9225,22 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
 - **Open:** broad inherited Self semantics, general instance importer contracts,
   independent method generics and expanded language-service support. Work remains
   on the two native-Self feature branches; the Web API priority is unchanged.
+
+
+### 2026-09-30 — Migrate the actual Clonable library contract
+
+- **Author:** “Clonable is a candidate next. Continue”.
+- **Assistant/action:** selected the actual System.Clonable<T> migration, replacing
+  its type argument with native Self and updating the reference bridge, runtime
+  library snapshots, consumer and API documentation. The prior application-only
+  clone fixture is replaced by use of the library contract.
+- **Contract:** typed Clone result, with implementation-defined copy depth and
+  documented sharing/ownership; no implicit deep-copy or subclass-Self guarantee.
+  Archived Neo bootstrap contracts remain historical. See
+  [the migration and evidence](self-types.md#systemclonable-migration-2026-09-30).
+- **Validation/outcome:** 13 native Self tests pass, along with actual library
+  class/struct execution, four rejection checks, signature checks and regenerated
+  library/API snapshot checks. Obsolete generic bounds are rejected at import;
+  earlier generic-arity diagnostics remain a deferred general compiler candidate.
+  The neoCLR and Raven feature branches contain the implementation/integration
+  documentation; inherited Self and cloning policy remain explicit open boundaries.

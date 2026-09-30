@@ -4,6 +4,8 @@ toc: false
 ---
 # API documentation
 
+[Cloning with Self](cloning.md) documents the development nongeneric Clonable contract.
+
 Browse [structural type families](structural-types.md): Array, Function, Tuple,
 Union and Intersection, with current member contracts and explicit proposal status.
 

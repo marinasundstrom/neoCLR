@@ -2,14 +2,15 @@
   "report": "Generic Self cloning passed",
   "rejected": [
     "missing bound",
+    "obsolete generic arity",
     "wrong Self result",
     "erased receiver"
   ],
-  "sourceSha256": "7f346e6328ace6c2bb903b4887e36d70e12f84cd70fdb8d135c28c9090b6d863",
+  "sourceSha256": "86b1a94ddcc193bb56e7bace1573f1b53a9163f38021e5f473aa5db1cb3f3476",
   "sha256": {
-    "runtime": "424aa18d941e51a7a5d49c711f8fbe6c921a20afaedd60b90a940271403a0268",
-    "bridge": "e97b17d5c4b2e9e8425aaf4e59d99ac4a64dc15e34eac17fb44cf88f8a9eb638",
-    "system": "41dd2a9d2288147fd6f5faf80a2d8970c7251436011469e97e2d982afa6644ae",
-    "reference": "8c4ac983ed15ac42ffa3b55c05f28bdb6a2ed459cd95351182b594a273aa6efc"
+    "runtime": "380dbdd28aaa4841b7bd7b5a7c81b7d8ca26178b5b28d5329ae646efdaa25d0e",
+    "bridge": "f7183ee4c85857d6cde74839876b46ed298d8a591195f19848d7e39e6fba148d",
+    "system": "f2b2eef4daf7c67537099836a7e0790ce174b25ed9a137ed969f16ba49eaea69",
+    "reference": "2f06599cc96f9f2d6c95364c5afbf883fcf620b4146630002a0fca4e4c5be0f2"
   }
 }

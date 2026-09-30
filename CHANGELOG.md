@@ -15,8 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   target contract. This changes Number's arity: rebuild reference, library and
   applications together. Add borrowed generic instance Self dispatch and a tested
   Raven class/struct cloning consumer, preserving receiver slots without boxing;
-  reject null, incompatible receiver modes and erased Self calls. Existing
-  Clonable<T> remains unchanged. See [the contract and boundaries](docs/self-types.md).
+  reject null, incompatible receiver modes and erased Self calls.
+  System.Clonable<T> is now also migrated to nongeneric Clonable with Clone() -> Self;
+  update conformances/bounds and rebuild matching artifacts. Copy depth remains
+  implementation-defined. The archived Neo bootstrap is unchanged. See
+  [the contract and boundaries](docs/self-types.md).
 
 - Prepare and validate a local Function types toolchain, SDK and isolated VS Code
   extension installation (`0.1.12-neoclr.20260929.functions1`). Include an editable

@@ -1,8 +1,8 @@
 # Fundamental interfaces through Raven
 
-The collection target profile now exposes EquatableTo<T>, ComparableTo<T>, ConvertibleInto<T>, Clonable<T>
+The collection target profile now exposes EquatableTo<T>, ComparableTo<T>, ConvertibleInto<T>, Clonable
 and Closable<E>, alongside Disposable and the collection interfaces. These keep
-neoCLR's existing names and invariant type parameters. Closable.Close returns
+neoCLR's existing names; Clonable is now nongeneric with native Self, while the other generic contracts retain invariant parameters. Closable.Close returns
 Result<Void,E>; Disposable.Dispose is an ordinary no-result call. This is explicit
 resource cleanup, not automatic destructor or unwind behavior.
 
@@ -27,13 +27,13 @@ EquatableTo implementations, and restores Type's EquatableTo contract after its 
 migration. [The saved sample](experiments/raven-target/samples/library-value-interfaces.rvn)
 checks value-copy independence, calls through parameters, String and Type equality,
 Date ordering/equality, and numeric/Boolean interfaces. The signature probe checks
-all five contracts, including Clonable and Closable results and invariance. Completion
+the generic contracts and invariance, plus Clonable’s nongeneric Self result. Completion
 checks include each interface's member.
 
-Clonable and Closable have no concrete implementations in the existing library.
-Their metadata and call imports are available; a saved-source demonstration that
-defines a new implementing application class still needs broader application-type
-import. Do not claim that the declarations alone demonstrate such an implementation.
+Clonable now has a tested [application class/struct consumer](experiments/native-self/README.md)
+using the actual System.Clonable contract, a T constraint and native Self dispatch.
+The signature probe checks its zero arity, Self result and erased-call rejection.
+Closable's broader application implementation evidence remains separate.
 Disposed iterator behavior remains covered by the existing collection checks.
 
 This follows the .NET interface-call model, with names and result-based Close adapted

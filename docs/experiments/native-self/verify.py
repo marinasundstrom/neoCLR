@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-self-') as directory:
     shutil.copyfile(artifacts['reference'], work / 'NeoCLR.CoreProbe.dll')
     run(['dotnet', artifacts['bridge'], '--project', work / 'Contracts.rvnproj', work / 'out'])
     app = work / 'out/App.neoil'
-    if 'callself borrow ' not in app.read_text():
+    if 'callself borrow ' not in app.read_text() or 'instance System.Clonable::Clone()' not in app.read_text():
         raise SystemExit('Importer lost borrowed native Self dispatch')
     run([artifacts['runtime'], 'verify', app, '--system', artifacts['system']])
     report = 'Generic Self cloning passed'
@@ -40,16 +40,19 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-self-') as directory:
     source = (here / 'Main.rvn').read_text()
     for name, changed in (
         ('missing-bound', source.replace(' where T: Clonable', '')),
+        ('obsolete-arity', source.replace('where T: Clonable', 'where T: Clonable<T>')),
         ('wrong-result', source.replace('func Clone() -> Self => Cell(Value)', 'func Clone() -> int => Value')),
         ('erased-receiver', source.replace('value: T) -> T where T: Clonable', 'value: Clonable) -> T where T: Clonable')),
     ):
         (work / 'Main.rvn').write_text(changed)
         rejected = subprocess.run(['dotnet', str(artifacts['bridge']), '--project', str(work / 'Contracts.rvnproj'), str(work / name)],
                                   text=True, capture_output=True, timeout=180)
-        if rejected.returncode == 0 or 'error RAV' not in rejected.stdout + rejected.stderr:
-            raise SystemExit(f'Expected compiler rejection for {name}: {rejected.stdout}{rejected.stderr}')
+        expected = ('Application specialization requires a supported nongeneric Self cloning or Number bound:'
+                    if name == 'obsolete-arity' else 'error RAV')
+        if rejected.returncode == 0 or expected not in rejected.stdout + rejected.stderr:
+            raise SystemExit(f'Expected rejection for {name}: {rejected.stdout}{rejected.stderr}')
     if args.evidence:
-        evidence = {'report': report, 'rejected': ['missing bound', 'wrong Self result', 'erased receiver'],
+        evidence = {'report': report, 'rejected': ['missing bound', 'obsolete generic arity', 'wrong Self result', 'erased receiver'],
                     'sourceSha256': hashlib.sha256((here / 'Main.rvn').read_bytes()).hexdigest(),
                     'sha256': {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in artifacts.items()}}
         args.evidence.write_text(json.dumps(evidence, indent=2) + '\n')

@@ -123,9 +123,9 @@ No website build or publication was performed.
 
 ## Generic cloning follow-up (2026-09-30)
 
-The [Raven cloning probe](experiments/native-self/README.md) uses a separate
+The initial [Raven cloning probe](experiments/native-self/README.md) used a separate
 nongeneric application interface with `Clone() -> Self`. Its generic Copy function
-returns T for both a struct and a class. Existing System.Clonable<T> is unchanged.
+returns T for both a struct and a class. At that stage System.Clonable<T> was unchanged; the subsequent migration below replaces it.
 The bounded importer specializes closed static helpers with one exact application
 cloning bound, preserving native borrowed dispatch. It requires a direct concrete
 implementation and a single public abstract nongeneric Clone method; arbitrary
@@ -144,3 +144,35 @@ including original-slot mutation, virtual reference dispatch/reachability, two-o
 missing bounds, erased receivers and invalid receiver modes. The Raven compiler's
 three focused Self tests include generic instance binding/emission; the imported
 class/struct consumer passed execution and three compiler rejection cases.
+
+
+## System.Clonable migration (2026-09-30)
+
+The author selected Clonable as the next actual library migration. The Raven
+library now declares nongeneric `System.Clonable` with `func Clone() -> Self`.
+The reference marker, importer, API reference and generated native contract match.
+The existing struct/class consumer imports System.Clonable instead of declaring
+its own interface. Change Clonable<T> implementations and constraints to Clonable;
+Clone must return the implementing type. Rebuild matching artifacts. The archived
+Neo bootstrap's legacy generic contract and published artifacts are unchanged.
+
+.NET's shipped [ICloneable.Clone](https://learn.microsoft.com/dotnet/api/system.icloneable.clone)
+returns Object and permits either deep or shallow copying (reviewed 2026-09-30).
+Native Self removes result casts and redundant implementing-type arguments, but
+does not resolve that copying-policy ambiguity. Each implementation must document
+sharing and ownership. The cost of this narrower contract is losing Clone-to-another-
+type relationships; conversion/factory APIs should express those separately.
+Inheritance semantics remain a separate decision; the importer admits direct
+implementations. See the [API guide](../api-docs/cloning.md).
+
+The obsolete `Clonable<T>` bound currently reaches the checked importer and is
+rejected there. Earlier Raven generic-arity diagnostics are a deferred general
+compiler candidate, to validate independently before any integration outside the
+neoCLR branch. Missing bounds, wrong Self results and erased calls remain compiler
+rejections.
+
+Validation: all 13 native Self tests pass, including the generated System.Clonable
+contract with value/reference clones. The matching Raven consumer passes native
+verification/execution and all four rejection checks; [evidence](experiments/native-self/validation.json)
+records artifact hashes. The signature probe, regenerated library snapshot and
+refreshed API snapshot checks pass. No website build or fresh editor probe was run.

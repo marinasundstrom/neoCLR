@@ -18,7 +18,7 @@
   "System.Calendar",
   "System.Char",
   "System.Clock",
-  "System.Clonable`1",
+  "System.Clonable",
   "System.Closable`1",
   "System.Collections.ArrayList`1",
   "System.Collections.Collection`1",

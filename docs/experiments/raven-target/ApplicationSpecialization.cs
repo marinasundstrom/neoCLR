@@ -9,7 +9,7 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
     public bool IsBorrowedSelfLoad(Instruction instruction) => borrowedSelfLoads.Contains(instruction);
     static bool IsSelf(TypeReference type) => type.FullName == "System.Runtime.CompilerServices.Self" && RuntimeSignatures.IsCore(type.Scope);
     bool IsCloneContract(TypeReference type) => type.Resolve() is { IsInterface: true, HasGenericParameters: false, HasInterfaces: false } contract
-        && modules.Contains(contract.Module)
+        && (modules.Contains(contract.Module) || type.FullName == "System.Clonable" && RuntimeSignatures.IsCore(type.Scope))
         && contract.Methods.Count == 1 && contract.Methods[0] is { Name: "Clone", IsStatic: false, IsAbstract: true, IsPublic: true, HasGenericParameters: false } method
         && method.Parameters.Count == 0 && IsSelf(method.ReturnType);
     readonly Dictionary<Instruction, string> nativeSelfCalls = new();
@@ -80,7 +80,8 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                 || !RuntimeSignatures.IsCore(parameter.Constraints[0].ConstraintType.Scope)
                 || !actual.IsValueType || !NumberBindings.IsNumber(actual.FullName)
                 || actual.FullName != "System." + actual.MetadataType)
-                throw new InvalidDataException("Numeric specialization requires Number and a supported concrete numeric argument: " + call.FullName);
+                throw new InvalidDataException("Application specialization requires a supported nongeneric Self cloning or Number bound: "
+                    + string.Join(", ", parameter.Constraints.Select(constraint => constraint.ConstraintType.FullName)) + " in " + call.FullName);
             // CLI intrinsic signatures carry an element code, not a TypeRef scope.
             // Cecil may synthesize mscorlib for that code; bind it to supplied core storage.
             call.GenericArguments[index] = core.GetType(actual.FullName).Methods.Single(m => m.Name == "CompareTo").Parameters[0].ParameterType;
@@ -156,7 +157,7 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                     && m.Parameters.Count == 0 && MetadataIdentity.TypeKey(m.ReturnType) == MetadataIdentity.TypeKey(cloneType)).ToArray();
                 if (cloneCandidates.Length != 1) throw new InvalidDataException("Missing exact Self clone implementation.");
                 var cloneOwner = ApplicationTypes.Type(cloneType) ?? throw new InvalidDataException("Unsupported Self clone type.");
-                var contract = ApplicationTypes.Type(cloneCall.DeclaringType) ?? throw new InvalidDataException("Unsupported Self clone contract.");
+                var contract = ApplicationTypes.Type(cloneCall.DeclaringType) ?? InterfaceBindings.Type(cloneCall.DeclaringType) ?? throw new InvalidDataException("Unsupported Self clone contract.");
                 nativeSelfCalls[cloneInstruction] = $"callself borrow {cloneOwner} = instance {contract}::Clone()";
                 prefix.OpCode = cloneType.IsValueType ? OpCodes.Nop : OpCodes.Ldobj;
                 prefix.Operand = cloneType.IsValueType ? null : cloneType;

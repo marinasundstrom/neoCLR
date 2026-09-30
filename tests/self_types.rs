@@ -491,3 +491,26 @@ ret
             .any(|f| f.target.name == "Derived.Read")
     );
 }
+
+#[test]
+fn system_clonable_uses_native_self_for_value_and_reference_clones() {
+    let source = GENERIC_CLONE
+        .replace(
+            ".interface Clonable\n.method instance Clone() -> Self\n.end\n.end",
+            include_str!("../runtime/raven/generated/Clonable.methods.neoil"),
+        )
+        .replace(".implements Clonable", ".implements System.Clonable")
+        .replace(".constraint T Clonable", ".constraint T System.Clonable")
+        .replace(
+            "instance Clonable::Clone()",
+            "instance System.Clonable::Clone()",
+        );
+    assert_eq!(
+        prepare(&source)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+}

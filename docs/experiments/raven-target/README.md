@@ -1671,3 +1671,12 @@ types. The subsequent [generic cloning probe](../native-self/README.md) adds
 bounded direct application Clone implementations for structs and classes. Its
 constrained receiver becomes native `callself borrow`. The importer still rejects
 arbitrary instance Self contracts and inherited cloning conformances.
+
+
+The 2026-09-30 Clonable follow-up migrates the actual Raven System.Clonable<T>
+library API to nongeneric System.Clonable with Clone() -> Self. Runtime Contract
+settings are unchanged. The cloning probe now uses that core interface and the
+signature probe checks zero arity, exact Self result and erased-call rejection.
+Rebuild matching core references, library snapshots and consumers together. The
+archived Neo bootstrap still owns its older generic contract. Copy depth remains
+implementation-defined; see the [API guide](../../../api-docs/cloning.md).

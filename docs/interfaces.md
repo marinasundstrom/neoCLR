@@ -37,8 +37,9 @@ is used for calls; its managed array backing storage is traced by the GC.
 
 [System.EquatableTo<T>](equality.md) supplies typed Equals(T) dispatch for primitives,
 type descriptors and user-defined records through the same managed views.
-[System.Clonable<T>](cloning.md) supplies explicit Clone() dispatch with a byref
-receiver, independently of ordinary value copying.
+[System.Clonable](../api-docs/cloning.md) supplies explicit Clone() -> Self
+dispatch in the development Raven profile, independently of ordinary value copying.
+The [archived Neo bootstrap](cloning.md) retains Clonable<T> and its byref receiver.
 [System.Disposable and System.Closable<E>](disposal.md) use byref receivers for
 explicit release and fallible completion; they do not enable automatic destruction.
 

@@ -1600,8 +1600,8 @@
     <member name="T:System.ComparableTo`1"><summary>Compares a value with another value of the declared type.</summary></member>
     <member name="M:System.ComparableTo`1.CompareTo(`0)"><summary>Compares this value with the other value; returns a negative integer, zero or a positive integer for less than, equal to or greater than.</summary><param name="other">The other value to compare.</param></member>
 
-    <member name="T:System.Clonable`1"><summary>Produces a clone using the implementation-defined copying contract.</summary></member>
-    <member name="M:System.Clonable`1.Clone"><summary>Returns a clone according to the implementing type’s copying contract.</summary></member>
+    <member name="T:System.Clonable"><summary>Development implementing-type cloning contract with no generic parameter.</summary><remarks>Clone returns native Self, the concrete implementing type. Replace former Clonable&lt;T&gt; conformances and bounds with Clonable and rebuild matching references and applications. Copy depth and sharing remain implementation-defined; this is not an automatic deep-copy facility. Erased interface receivers cannot call Self-dependent members.</remarks></member>
+    <member name="M:System.Clonable.Clone"><summary>Returns a clone of the implementing Self type.</summary><returns>A value of the concrete implementing type, according to its documented copying contract.</returns><remarks>Implementations must document copy depth, shared references and resource ownership. Generic callers retain T through a Clonable bound. The native borrowed receiver preserves value storage or loads a class reference without boxing; null class receivers fault. The current application importer admits direct class/struct implementations.</remarks></member>
 
     <member name="T:System.Closable`1"><summary>Closes a resource and reports an expected failure through Result.</summary></member>
     <member name="M:System.Closable`1.Close"><summary>Closes the resource and returns either a unit success or the declared expected error.</summary></member>

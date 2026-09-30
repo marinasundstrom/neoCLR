@@ -112,7 +112,7 @@ static class SignatureProbe
         Reject("Array signedness mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Ldelem_I1, "Byte", null));
         Reject("Array token mismatch", () => ManagedArrayBindings.CheckElement(Mono.Cecil.Cil.Code.Stelem_Any, "Int32", "Double"));
         InterfaceBindings.Validate(module);
-        foreach (var contractName in new[]{"EquatableTo", "ComparableTo", "ConvertibleInto", "Clonable", "Closable"}) {
+        foreach (var contractName in new[]{"EquatableTo", "ComparableTo", "ConvertibleInto", "Closable"}) {
             var contract = module.GetType("System." + contractName + "`1");
             var closed = new GenericInstanceType(contract); closed.GenericArguments.Add(module.TypeSystem.Int32);
             var member = contract.Methods.Single();
@@ -120,6 +120,13 @@ static class SignatureProbe
             var mismatch = Reference(member, closed); mismatch.ReturnType = module.TypeSystem.String;
             Reject(contractName + " mismatched result", () => InterfaceBindings.Bind(mismatch, member));
         }
+        var clone = module.GetType("System.Clonable");
+        Check("Clonable native Self signature", clone.GenericParameters.Count == 0
+            && clone.Methods.Single().ReturnType.FullName == "System.Runtime.CompilerServices.Self");
+        Reject("Clonable erased receiver call", () => InterfaceBindings.Bind(clone.Methods.Single(), clone.Methods.Single()));
+        clone.Methods.Single().ReturnType = module.TypeSystem.Object;
+        Reject("Clonable erased result", () => InterfaceBindings.Validate(module));
+        clone.Methods.Single().ReturnType = module.GetType("System.Runtime.CompilerServices.Self");
         var comparableParameter = module.GetType("System.ComparableTo`1").GenericParameters[0];
         comparableParameter.Attributes = GenericParameterAttributes.Covariant;
         Reject("ComparableTo invariance", () => InterfaceBindings.Validate(module));

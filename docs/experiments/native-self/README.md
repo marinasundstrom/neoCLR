@@ -1,16 +1,17 @@
 # Generic native Self cloning (development)
 
-`Main.rvn` declares a nongeneric application Clonable contract and calls
+`Main.rvn` uses the actual nongeneric System.Clonable library contract and calls
 `Copy<T>(value: T) -> T where T: Clonable` for both Cell and Box. Mutating the
-original Box after cloning leaves the copied Box unchanged. This is a separate
-consumer; it does not replace the existing System.Clonable<T> library API.
+original Box after cloning leaves the copied Box unchanged. This consumer now
+validates the migration of System.Clonable<T> to Clonable.
 
 The Raven Runtime Self Contract settings match the numeric probe. The importer
 admits this bounded shape: closed static generic helpers, one exact cloning bound,
-a nongeneric application interface with one public abstract Clone method returning
-Self, and direct public class/struct implementations returning their own type.
+System.Clonable (or the bounded equivalent application interface) with one public
+abstract Clone method returning Self, and direct public class/struct implementations returning their own type.
 It retains `callself borrow` in native code. Ordinary CLR execution is not claimed.
-Erased receiver calls, missing bounds and wrong result implementations are rejected.
+Erased receiver calls, missing bounds, the obsolete generic arity and wrong result
+implementations are rejected.
 Inherited conformances, default clone bodies and general Self method shapes remain
 outside this importer slice. Runtime receiver rules are in [native Self](../../self-types.md).
 
@@ -27,5 +28,6 @@ python3 docs/experiments/native-self/verify.py \
 ```
 
 [Validation evidence](validation.json) records the successful class/struct consumer
-and compiler rejection cases on 2026-09-30. Native tests separately prove slot
+and rejection cases on 2026-09-30. The obsolete generic bound is rejected by the
+checked importer; missing bounds, wrong results and erased calls are compiler diagnostics. Native tests separately prove slot
 mutation, null rejection, no boxing and readonly receiver restrictions.

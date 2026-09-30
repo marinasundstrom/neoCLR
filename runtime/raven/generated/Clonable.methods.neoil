@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/Clonable.rvn. Regenerate with build_runtime_library.py.
-.interface System.Clonable<T0>
-.method instance Clone() -> T0
+.interface System.Clonable
+.method instance Clone() -> Self
 .end
 .end

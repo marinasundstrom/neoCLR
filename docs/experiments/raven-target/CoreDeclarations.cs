@@ -33,7 +33,7 @@ static class CoreDeclarations
         {
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
             var module = image.MainModule;
-            if (collectionProbe) NumberBindings.Project(module);
+            if (collectionProbe) { NumberBindings.Project(module); InterfaceBindings.ProjectSelf(module); }
             CalendarBindings.ProjectLayout(module);
             HashCodeBindings.ProjectLayout(module);
             if (collectionProbe) {

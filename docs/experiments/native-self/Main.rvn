@@ -1,9 +1,5 @@
 import System.*
 
-interface Clonable {
-    func Clone() -> Self
-}
-
 struct Cell : Clonable {
     var Value: int
 
