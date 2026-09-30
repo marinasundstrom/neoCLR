@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add Int32 local declarations, method-owned local handles and raw Ldloc/Stloc operands
+  to the experimental metadata API, with CLI local signatures and native local lists.
+  Reject bad owners/indices, stack underflow and loads before stores. ClearBody retains
+  locals. Older producer artifacts remain readable; older experimental host readers
+  may reject the new local list. Raven now emits initialized locals and assignments
+  through both bounded backends; the runtime's existing local support is reused.
+
 - Integrate Raven's compiler-lowered bodies into the bounded native metadata emitter,
   sharing implicit Int32 returns and simple named calls with .NET emission. Keep the
   independent metadata API, binary format and runtime unchanged. Record the author-led

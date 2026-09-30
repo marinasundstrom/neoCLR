@@ -17,7 +17,11 @@ public enum OpCode
     /// <summary>Calls a typed method reference; requires a supported method operand.</summary>
     Call,
     /// <summary>Returns with the method's declared stack shape.</summary>
-    Ret
+    Ret,
+    /// <summary>Loads an Int32 local; requires a slot index or owned local.</summary>
+    Ldloc,
+    /// <summary>Stores an Int32 local; requires a slot index or owned local.</summary>
+    Stloc
 }
 
 public sealed partial class MethodBuilder
@@ -33,14 +37,15 @@ public sealed partial class MethodBuilder
             _ => throw OperandError(opCode)
         }));
 
-    /// <summary>Appends an Int32 constant or argument-index instruction.</summary>
-    /// <param name="opCode">Ldc_I4 or Ldarg.</param>
-    /// <param name="operand">Signed constant, or zero-based argument index validated against the signature when writing.</param>
+    /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
+    /// <param name="opCode">Ldc_I4, Ldarg, Ldloc or Stloc.</param>
+    /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, int operand)
         => Append(new(opCode switch {
-            OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument", _ => throw OperandError(opCode)
+            OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument",
+            OpCode.Ldloc => "local.load", OpCode.Stloc => "local.store", _ => throw OperandError(opCode)
         }, operand));
 
     /// <summary>Appends a call to a local or external builder method.</summary>

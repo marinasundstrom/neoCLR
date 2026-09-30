@@ -21,7 +21,8 @@ backends compiler-lowered bodies, including implicit value returns. The first ca
 backend handles. Shared source callable plans separate native source validation from
 builder creation. Shared public nongeneric static-type plans now drive backend type
 builders; broader type/field references and full declaration traversal remain next,
-followed by paired compiler/metadata body capabilities;
+and the first paired body capability now supports initialized Int32 locals/assignments.
+Comparisons/control flow are next;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

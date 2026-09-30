@@ -149,6 +149,8 @@ public sealed partial class AssemblyBuilder
                 {
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "local.load": code.WriteByte(0xfe); code.WriteByte(0x0c); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "local.store": code.WriteByte(0xfe); code.WriteByte(0x0e); code.WriteUInt16((ushort)instruction.Value); break;
                     case "add": code.WriteByte(0x58); break;
                     case "subtract": code.WriteByte(0x59); break;
                     case "multiply": code.WriteByte(0x5a); break;
@@ -157,7 +159,16 @@ public sealed partial class AssemblyBuilder
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
                 }
             }
-            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack);
+            StandaloneSignatureHandle locals = default;
+            if (!referenceOnly && method.Locals.Count != 0)
+            {
+                var signature = new BlobBuilder();
+                var variables = new BlobEncoder(signature).LocalVariableSignature(method.Locals.Count);
+                foreach (var local in method.Locals) variables.AddVariable().Type().Int32();
+                locals = metadata.AddStandaloneSignature(metadata.GetOrAddBlob(signature));
+            }
+            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack,
+                localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.Name), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
@@ -270,7 +281,7 @@ public sealed partial class MethodBuilder
     public void Call(NativeFunctionDefinition target) => Emit(OpCode.Call, target);
     /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
     public void Return() => Emit(OpCode.Ret);
-    /// <summary>Clears the body for editing before another Write.</summary>
+    /// <summary>Clears instructions for editing before another Write; local declarations and handles are retained.</summary>
     public void ClearBody() => Instructions.Clear();
     private void Append(Operation operation)
     {
@@ -280,6 +291,7 @@ public sealed partial class MethodBuilder
     internal void Validate()
     {
         int stack = 0; MaxStack = 0;
+        var assigned = new bool[locals.Count];
         if (Instructions.Count == 0 || Instructions[^1].Op != "return") throw new InvalidDataException("method requires final return");
         for (int i = 0; i < Instructions.Count; i++)
         {
@@ -292,6 +304,15 @@ public sealed partial class MethodBuilder
                 case "argument":
                     if (instruction.Value < 0 || instruction.Value >= ParameterCount) throw new InvalidDataException("argument outside signature");
                     push = 1; break;
+                case "local.load": case "local.store":
+                    if (instruction.Value < 0 || instruction.Value >= locals.Count) throw new InvalidDataException("local outside declarations");
+                    if (instruction.Op == "local.load")
+                    {
+                        if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store");
+                        push = 1;
+                    }
+                    else { pop = 1; assigned[instruction.Value] = true; }
+                    break;
                 case "add": case "subtract": case "multiply": pop = 2; push = 1; break;
                 case "native.call":
                     if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out pop)) throw new InvalidDataException("invalid native call");

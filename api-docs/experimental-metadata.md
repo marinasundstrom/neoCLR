@@ -18,6 +18,7 @@ and guest Introspection assembly loading remain pending.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
 - [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
 - [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
@@ -1135,7 +1136,7 @@ replacement without changing signature/ownership.
 Write checks argument indices, Int32 stack effects, call parameter/result contracts,
 a final return with the exact declared stack shape, and no earlier return. It derives
 max stack and rejects underflow, extra results or missing return. Loops, branches,
-locals, exceptions and arbitrary raw IL are intentionally absent. Runtime overflow
+general local types, exceptions and arbitrary raw IL are intentionally absent. Int32 locals are documented below. Runtime overflow
 behavior remains that of the selected target/bridge; this slice does not reconcile
 all CLR versus neoCLR arithmetic policies.
 
@@ -1581,7 +1582,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1612,7 +1613,7 @@ operand is accepted.
 
 LoadConstant, LoadArgument, Add, Subtract, Multiply, all Call overloads and Return now
 call Emit. Their supported semantics are unchanged. WriteConsoleLine remains a native
-convenience expansion; general string operands, local variables, branches, exception
+convenience expansion; general string operands, non-Int32 local variables, branches, exception
 regions and editable instruction collections are unsupported. Future ILProcessor-like
 editing must define instruction ownership and branch/exception target repair separately.
 
@@ -1629,3 +1630,45 @@ main.Emit(OpCode.Ret);
 arithmetic/call entry point to 42, and checks imported/native operands and failures.
 Raven's native emitter now uses this surface; native runtime and translated-System
 integration remain its executable consumer evidence.
+
+## Int32 local slots (development, 2026-10-01)
+
+The host-only `NeoCLR.Metadata.Experimental.Model` API adds:
+
+```csharp
+public sealed class LocalDefinition {
+    public MethodBuilder Method { get; }
+    public int Index { get; }
+}
+public sealed partial class MethodBuilder {
+    public IReadOnlyList<LocalDefinition> Locals { get; }
+    public LocalDefinition DeclareInt32Local();
+    public void LoadLocal(LocalDefinition local);
+    public void StoreLocal(LocalDefinition local);
+    public void Emit(OpCode opCode, LocalDefinition local);
+}
+```
+
+`DeclareInt32Local` allocates a stable zero-based slot, at most 256 per method;
+exceeding that bound throws `InvalidDataException`. `Locals` is a read-only ordered
+view. `ClearBody` clears instructions and retains locals/handles; rebuilding the method
+is required to discard its declarations. The typed Emit overload accepts only `Ldloc`
+and `Stloc`. Null throws `ArgumentNullException`, a different method owner or incorrect
+opcode throws `ArgumentException`, and the existing instruction bound throws
+`InvalidDataException`. Rejected instructions do not alter the body.
+
+The existing `Emit(OpCode, int)` overload also accepts raw `Ldloc`/`Stloc` slot indices.
+Writes reject out-of-range slots, stack underflow and loads before a store in the linear
+body with `InvalidDataException`. Each write recomputes initialization; a previous body
+or successful write does not initialize a rebuilt body. CLI emission writes Int32 local
+signatures and init-locals method headers; native emission writes format-5 `locals` and
+native local instructions. The reader accepts absent locals in older producer artifacts
+and validates declared Int32 local lists; reference projections still omit executable
+body details. Older experimental readers may reject the added `locals` field.
+
+Unlike unrestricted Cecil bodies, this bounded API enforces initialization and stack
+contracts when writing. Typed owner handles prevent accidental cross-method use; raw
+indices support assembler consumers. General local types, address-taking, branching and
+scope/debug metadata remain outside this slice. The compiled C# `LocalChecks` consumer
+executes CLI locals and checks native roundtrips and rejected contracts; Raven's local
+assignment probe additionally verifies and executes the binary artifact in neoCLR.

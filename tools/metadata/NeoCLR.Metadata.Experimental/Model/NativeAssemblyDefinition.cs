@@ -81,7 +81,7 @@ public sealed class NativeAssemblyDefinition
             var seenMethods = new HashSet<(int Owner, string Name, int Count)>();
             foreach (var method in Array(root, "functions", 4096))
             {
-                Shape(method, "name", "owner", "parameters", "returns", "no_result", "origin", "body");
+                Shape(method, "name", "owner", "parameters", "returns", "no_result", "origin", "body", "locals");
                 var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
                 var owner = method.GetProperty("owner"); int ownerIndex = -1;
@@ -92,6 +92,8 @@ public sealed class NativeAssemblyDefinition
                 }
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
+                if (method.TryGetProperty("locals", out _))
+                    Require(Array(method, "locals", 256).All(l => l.GetString() == "Int32"), "unsupported native local");
                 var parameters = Array(method, "parameters", 256); Require(parameters.All(p => p.GetString() == "Int32"), "unsupported native parameter");
                 var noResult = method.GetProperty("no_result").GetBoolean();
                 Require(Text(method, "returns") == (noResult ? "Void" : "Int32"), "unsupported native result");
