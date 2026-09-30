@@ -1680,3 +1680,14 @@ signature probe checks zero arity, exact Self result and erased-call rejection.
 Rebuild matching core references, library snapshots and consumers together. The
 archived Neo bootstrap still owns its older generic contract. Copy depth remains
 implementation-defined; see the [API guide](../../../api-docs/cloning.md).
+
+Self inheritance remains an isolated neoCLR experiment, separate from the compiler
+boundary/multi-target refactor. Self is anchored to the class declaring conformance:
+Derived inheriting Base : Clonable retains Base-returning Clone, but does not
+satisfy a native Self bound as Derived. Redeclaring Clonable requires a matching
+Derived result. An explicit `func Clonable.Clone() -> Self` implementation can
+coexist with the inherited Base method; virtual overrides keep the Base signature.
+Explicit and inferred generic calls validate this rule under the configured Self
+Runtime Contract, with no additional target option. Metadata retains the declared
+return types and explicit interface mapping. These are bounded feature changes;
+broader neoCLR target integration follows the separate multi-target refactor.

@@ -18,7 +18,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reject null, incompatible receiver modes and erased Self calls.
   System.Clonable<T> is now also migrated to nongeneric Clonable with Clone() -> Self;
   update conformances/bounds and rebuild matching artifacts. Copy depth remains
-  implementation-defined. The archived Neo bootstrap is unchanged. See
+  implementation-defined. Anchor inherited Self at the class declaring conformance;
+  derived generic Self bounds require redeclaration and an exact derived result.
+  Support explicit native derived interface mappings while preserving base virtual
+  contracts. Add bounded Raven diagnostics/import support; broader integration
+  awaits its multi-target refactor. The archived Neo bootstrap is unchanged. See
   [the contract and boundaries](docs/self-types.md).
 
 - Prepare and validate a local Function types toolchain, SDK and isolated VS Code

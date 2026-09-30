@@ -514,3 +514,115 @@ fn system_clonable_uses_native_self_for_value_and_reference_clones() {
         Value::Int32(42)
     );
 }
+
+const INHERITED_CLONE: &str = r#"
+.module InheritedClone
+.entry Main
+.interface Clonable
+.method instance Clone() -> Self
+.end
+.end
+.type class Base
+.implements Clonable
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance virtual Clone() -> Base
+newobj instance Base::.ctor()
+ret
+.end
+.method instance virtual Read() -> Int32
+ldc.i4 20
+ret
+.end
+.end
+.type class Derived
+.extends Base
+.method instance .ctor() -> noresult
+ldarg this
+call instance Base::.ctor()
+ret
+.end
+.method instance override Read() -> Int32
+ldc.i4 42
+ret
+.end
+.end
+.function Copy<T>(T value) -> T
+.constraint T Clonable
+ldarga value
+callself borrow T = instance Clonable::Clone()
+ret
+.end
+.function Main() -> Int32
+newobj instance Derived::.ctor()
+call Copy<Base>(Base)
+callvirt instance Base::Read()
+ret
+.end
+"#;
+
+#[test]
+fn inherited_self_keeps_base_result_and_virtual_override_contract() {
+    assert_eq!(
+        prepare(INHERITED_CLONE)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(20)
+    );
+    let overridden = INHERITED_CLONE.replace(".method instance override Read()", ".method instance override Clone() -> Base\nnewobj instance Derived::.ctor()\nret\n.end\n.method instance override Read()");
+    assert_eq!(
+        prepare(&overridden)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+}
+
+#[test]
+fn inherited_self_does_not_satisfy_derived_generic_bound_or_direct_dispatch() {
+    let invalid = INHERITED_CLONE.replace("call Copy<Base>(Base)", "call Copy<Derived>(Derived)");
+    assert!(
+        prepare(&invalid)
+            .unwrap_err()
+            .to_string()
+            .contains("constraint")
+    );
+    let invalid = INHERITED_CLONE.replace("newobj instance Derived::.ctor()\ncall Copy<Base>(Base)", ".local Derived value\nnewobj instance Derived::.ctor()\nstloc value\nldloca value\ncallself borrow Derived = instance Clonable::Clone()");
+    assert!(
+        prepare(&invalid)
+            .unwrap_err()
+            .to_string()
+            .contains("conformance declared")
+    );
+}
+
+#[test]
+fn derived_self_requires_redeclaration_and_exact_derived_result() {
+    let redeclared =
+        INHERITED_CLONE.replace(".extends Base", ".extends Base\n.implements Clonable");
+    assert!(prepare(&redeclared).is_err());
+    let valid = redeclared.replace(".method instance override Read()", ".method private instance DerivedClone() -> Derived\n.override instance Clonable::Clone()\nnewobj instance Derived::.ctor()\nret\n.end\n.method instance override Read()")
+        .replace("call Copy<Base>(Base)", "call Copy<Derived>(Derived)");
+    assert_eq!(
+        prepare(&valid)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+    let base_view = valid.replace("call Copy<Derived>(Derived)", "call Copy<Base>(Base)");
+    assert_eq!(
+        prepare(&base_view)
+            .unwrap()
+            .run(Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(20)
+    );
+}

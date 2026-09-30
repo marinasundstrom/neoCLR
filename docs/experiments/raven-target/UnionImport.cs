@@ -869,11 +869,14 @@ static class UnionImport
                             {
                                 ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                                 if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
-                                if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType && !InternalLibraryAccess(targetMethod, method) && !(targetMethod.IsAssembly && targetMethod.Module == method.Module)
+                                // A validated constrained Self call dispatches through its public contract,
+                                // even when specialization uses a private MethodImpl for signature checking.
+                                if (!targetMethod.IsPublic && !(applicationSpecialization.NativeSelfCall(instruction) is not null && ApplicationTypes.IsExplicitApplicationImplementation(targetMethod))
+                                    && targetMethod.DeclaringType != method.DeclaringType && !InternalLibraryAccess(targetMethod, method) && !(targetMethod.IsAssembly && targetMethod.Module == method.Module)
                                     && !((DescriptorLibrary.IsBaseConstructor(targetMethod) || targetMethod.IsFamily && targetMethod.IsConstructor)
                                         && instruction.OpCode.Code == Code.Call && method.IsConstructor
                                         && method.DeclaringType.BaseType?.Resolve() == targetMethod.DeclaringType))
-                                    throw new InvalidDataException("Nonpublic cross-type call unsupported.");
+                                    throw new InvalidDataException("Nonpublic cross-type call unsupported: " + reference.FullName + " from " + method.FullName);
                                 if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();

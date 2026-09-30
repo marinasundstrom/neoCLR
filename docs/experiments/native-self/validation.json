@@ -4,12 +4,14 @@
     "missing bound",
     "obsolete generic arity",
     "wrong Self result",
-    "erased receiver"
+    "erased receiver",
+    "inherited derived bound",
+    "redeclared base result"
   ],
-  "sourceSha256": "86b1a94ddcc193bb56e7bace1573f1b53a9163f38021e5f473aa5db1cb3f3476",
+  "sourceSha256": "c596c56dfa9dbb8d04f2336544d19b1bafc6ecea437781b67416aa1d4391506b",
   "sha256": {
-    "runtime": "380dbdd28aaa4841b7bd7b5a7c81b7d8ca26178b5b28d5329ae646efdaa25d0e",
-    "bridge": "f7183ee4c85857d6cde74839876b46ed298d8a591195f19848d7e39e6fba148d",
+    "runtime": "4d9fe67b5d007478d2fb0ca5b25a88fe728471dc586d490eb0855ef066d7082a",
+    "bridge": "8ff910bd1391473c3448bb4c80d0cb963a7438eb3deca388d078e05917c90cb5",
     "system": "f2b2eef4daf7c67537099836a7e0790ce174b25ed9a137ed969f16ba49eaea69",
     "reference": "2f06599cc96f9f2d6c95364c5afbf883fcf620b4146630002a0fca4e4c5be0f2"
   }

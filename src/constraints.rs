@@ -161,6 +161,8 @@ pub(crate) fn check(
                 if definition.representation == crate::metadata::Representation::Interface {
                     !crate::interfaces::closure(module, concrete)
                         .is_ok_and(|types| types.contains(bound))
+                        || !crate::interfaces::satisfies_self_bound(module, concrete, bound)
+                            .unwrap_or(false)
                 } else {
                     crate::inheritance::require_base(module, concrete, bound).is_err()
                 }

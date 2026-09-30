@@ -9244,3 +9244,32 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   earlier generic-arity diagnostics remain a deferred general compiler candidate.
   The neoCLR and Raven feature branches contain the implementation/integration
   documentation; inherited Self and cloning policy remain explicit open boundaries.
+
+### 2026-09-30 — Self inheritance follow-up
+
+- **Author:** asked what to do next, then directed “Continue”.
+- **Assistant proposal/action:** anchor Self to the conformance-declaring class,
+  retain inherited Base-returning clones, and require redeclaration plus an exact
+  derived result for derived generic bounds. Implemented runtime bound/dispatch
+  checks and prototyped matching Raven diagnostics on the existing feature branches.
+- **Scope refinement:** ordinary native method hiding remains unsupported; explicit
+  derived interface implementations preserve the base public/virtual contract.
+  Covariant virtual returns and general default Self bodies are not adopted.
+- **Author correction:** “We will add proper support for Self and other neoclr
+  features once our Raven refactor (meant to allow multiple target) has been done.”
+- **Adjusted action:** removed the uncommitted Raven compiler and importer
+  prototypes and source-consumer extension. Continue only native runtime
+  validation and contract documentation. Existing committed Raven experiments
+  remain unchanged; further integration awaits the multi-target refactor.
+- **Author clarification:** “You may add what you need for this feature to work.”
+  The assistant resumed only the bounded Raven diagnostics, explicit Clonable
+  importer support and executable consumer needed for this feature. General
+  target architecture and broader neoCLR integration still await the refactor.
+- **Author separation:** a separate activity is establishing Raven compiler
+  boundaries; Self work remains separate. The assistant kept this work in
+  Raven-self-type on codex/neoclr-native-self and made no architectural refactor
+  or edits in the other Raven checkout.
+- **Outcome/evidence:** 64 selected native tests pass, including 16 Self tests;
+  12 Raven Self tests and 17 nearby compiler regressions pass. The expanded
+  [Clonable consumer](experiments/native-self/README.md) passes native execution
+  and six rejection checks. Signature and API/runtime snapshot checks pass.

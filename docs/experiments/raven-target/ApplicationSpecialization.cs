@@ -153,7 +153,8 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
             {
                 if (cloneInstruction.OpCode.Code != Code.Callvirt || cloneCall.Name != "Clone" || cloneCall.Parameters.Count != 0 || !IsSelf(cloneCall.ReturnType))
                     throw new InvalidDataException("Invalid constrained Self clone call.");
-                var cloneCandidates = cloneType.Resolve().Methods.Where(m => m.Name == "Clone" && m.IsPublic && !m.IsStatic && !m.HasGenericParameters
+                var cloneCandidates = cloneType.Resolve().Methods.Where(m => (m.Name == "Clone" && m.IsPublic || ApplicationTypes.IsExplicitApplicationImplementation(m)
+                    && m.Overrides.Any(o => InterfaceBindings.IsSelfClone(o) && MetadataIdentity.TypeKey(o.DeclaringType) == MetadataIdentity.TypeKey(cloneCall.DeclaringType))) && !m.IsStatic && !m.HasGenericParameters
                     && m.Parameters.Count == 0 && MetadataIdentity.TypeKey(m.ReturnType) == MetadataIdentity.TypeKey(cloneType)).ToArray();
                 if (cloneCandidates.Length != 1) throw new InvalidDataException("Missing exact Self clone implementation.");
                 var cloneOwner = ApplicationTypes.Type(cloneType) ?? throw new InvalidDataException("Unsupported Self clone type.");

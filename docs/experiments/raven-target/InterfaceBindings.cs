@@ -68,6 +68,11 @@ static class InterfaceBindings
         return new(owner + "::" + reference.Name, new[]{owner}.Concat(args).ToArray(), result,
             Instruction: $"callvirt instance {owner}::{reference.Name}({string.Join(',',args)})");
     }
+    public static bool IsSelfClone(MethodReference method) => method.DeclaringType.FullName == "System.Clonable"
+        && RuntimeSignatures.IsCore(method.DeclaringType.Scope) && method.Name == "Clone" && method.HasThis
+        && !method.HasGenericParameters && method.Parameters.Count == 0
+        && method.ReturnType.FullName == "System.Runtime.CompilerServices.Self" && RuntimeSignatures.IsCore(method.ReturnType.Scope);
+
     public static void ProjectSelf(ModuleDefinition module)
     {
         // The C# bootstrap uses Object only until the native transport marker exists.

@@ -221,12 +221,12 @@ static class ApplicationTypes
                     foreach (var declaration in method.Overrides)
                     {
                         var contract = declaration.Resolve();
-                        CheckMethod(declaration);
-                        if (contract is null || !IsModule(contract.Module) || !contract.DeclaringType.IsInterface
+                        if (!InterfaceBindings.IsSelfClone(declaration)) CheckMethod(declaration);
+                        if (contract is null || !(IsModule(contract.Module) || InterfaceBindings.IsSelfClone(declaration)) || !contract.DeclaringType.IsInterface
                             || !contract.IsPublic || !contract.IsVirtual || !contract.HasThis
                             || !Matches(declaration, contract)
                             || !declaration.Parameters.Select(p => map(p.ParameterType, false)).SequenceEqual(method.Parameters.Select(p => map(p.ParameterType, false)))
-                            || map(declaration.ReturnType, true) != map(method.ReturnType, true)
+                            || map(InterfaceBindings.IsSelfClone(declaration) ? method.DeclaringType : declaration.ReturnType, true) != map(method.ReturnType, true)
                             || !contract.Parameters.Select(p => p.IsOut).SequenceEqual(method.Parameters.Select(p => p.IsOut)))
                             throw new InvalidDataException("Unsupported explicit application interface mapping: " + method.FullName);
                         CheckAccess(declaration.DeclaringType, method.Module);

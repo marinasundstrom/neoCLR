@@ -12,6 +12,11 @@ based on `neoclr`, and replace Number's explicit type parameter. Keep the spelli
 now includes borrowed generic instance dispatch and a class/struct cloning
 consumer and migration of the actual Clonable library contract, as described in [the Self contract](self-types.md); it does not reprioritize the
 remaining Web API work or adopt the broader generic-relationships proposal.
+The subsequent Self inheritance follow-up establishes native runtime rules with
+bounded experimental Raven integration. The author
+directed that proper Self and other neoCLR integration in Raven follow its
+multi-target refactor; only compiler/importer changes needed for this feature
+proceed under the author’s subsequent clarification. Broader integration remains deferred.
 
 **Author-directed release — Preview 11 (2026-09-27).**
 The current bounded surface is qualified for release with macOS arm64 Raven tools

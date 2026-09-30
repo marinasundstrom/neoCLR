@@ -15,7 +15,12 @@ It represents the implementing type, not a value to construct. The native receiv
 contract borrows a struct slot or loads a class reference from its slot without
 boxing. Null class receivers fault; erased Clonable values cannot invoke Clone.
 Current application import supports direct class/struct implementations through
-bounded closed generic helpers. Inherited Self conformances are not established.
+bounded closed generic helpers. An inherited conformance keeps the base class as Self. A derived type must
+redeclare Clonable and supply its own result contract before satisfying T: Clonable.
+Native explicit interface mappings preserve the inherited public clone method;
+virtual overrides retain the base result signature. The experimental Raven
+compiler/importer supports this bounded inheritance contract. Broader target
+integration awaits Raven’s multi-target refactor.
 
 Clonable guarantees the result type, not deep copying. Implementations must describe
 which state is copied or shared and how resource ownership is handled. The tested

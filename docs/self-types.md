@@ -176,3 +176,42 @@ contract with value/reference clones. The matching Raven consumer passes native
 verification/execution and all four rejection checks; [evidence](experiments/native-self/validation.json)
 records artifact hashes. The signature probe, regenerated library snapshot and
 refreshed API snapshot checks pass. No website build or fresh editor probe was run.
+
+## Class inheritance and Self (2026-09-30)
+
+Self is anchored to the class declaring the interface conformance. If Base declares
+Clonable, Derived inherits the ordinary Base-returning Clone member, but it does
+not thereby satisfy `T: Clonable` with T = Derived. `Copy<Base>(derived)` retains
+Base as its result type. Virtual overrides preserve the exact Base signature;
+returning a derived instance does not change that static promise.
+
+Derived can redeclare Clonable and supply a matching Derived-returning implementation.
+Native metadata supports an explicit interface mapping to a method returning Derived
+for this purpose. This leaves the inherited public Clone and its
+virtual slot intact. Ordinary method hiding and covariant virtual return contracts
+remain outside this slice. Interface inheritance can carry the conformance; the
+implementing class must still declare it at its own level to promise its own Self.
+The runtime enforces the distinction for concrete generic bounds and direct
+callself operations. The experimental Raven compiler/importer supports this bounded
+contract, including explicit `func Clonable.Clone() -> Self` implementations.
+Broader neoCLR target integration awaits Raven’s multi-target refactor.
+
+Comparison: [C# interface mapping and reimplementation](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/interfaces#1967-interface-re-implementation)
+(reviewed 2026-09-30) preserve inherited mappings until reimplementation; virtual
+methods can change execution without changing the interface's declared signature.
+The .NET encoding `IClonable<Base>` likewise does not imply `IClonable<Derived>`.
+neoCLR retains that distinction without requiring a source type parameter. A
+late-bound Self that automatically changes on every subclass would require stronger
+override/result guarantees; accepting an inherited Base clone as Derived would be
+unsound. Requiring all cloneable classes to be sealed would be simpler but would
+exclude ordinary inheritance. Anchoring conformance costs an explicit redeclaration
+and implementation where a derived-result promise is wanted. No speed improvement
+is claimed, and ordinary CLR execution of native Self remains unsupported.
+
+Inheritance validation: 16 native Self tests and 48 related native tests pass
+(class/interface inheritance, explicit mappings, arrays and generic constraints).
+Raven passes 12 focused Self tests and 17 nearby declaration/constraint regressions.
+The [actual Clonable consumer](experiments/native-self/README.md) passes native
+verification/execution and six rejection checks; its artifact hashes are recorded.
+The bridge signature probe and API/runtime snapshot checks pass. No website build
+or new LSP validation was required for this slice.

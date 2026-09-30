@@ -82,6 +82,15 @@ pub(crate) fn implementation(
     if !crate::interfaces::is_contract(module, &contract) {
         return Err(Fault::new("callself requires an interface declaration"));
     }
+    if !crate::interfaces::satisfies_self_bound(
+        module,
+        self_type,
+        contract.owner.as_ref().unwrap(),
+    )? {
+        return Err(Fault::new(
+            "callself requires Self conformance declared on the implementing type",
+        ));
+    }
     crate::interfaces::implementation(
         module,
         self_type,

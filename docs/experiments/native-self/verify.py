@@ -39,6 +39,8 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-self-') as directory:
         raise SystemExit('Missing clone success marker')
     source = (here / 'Main.rvn').read_text()
     for name, changed in (
+        ('inherited-bound', source.replace('Copy<BaseClone>(InheritedClone())', 'Copy<InheritedClone>(InheritedClone())')),
+        ('redeclared-base-result', source.replace('class InheritedClone : BaseClone {}', 'class InheritedClone : BaseClone, Clonable {}')),
         ('missing-bound', source.replace(' where T: Clonable', '')),
         ('obsolete-arity', source.replace('where T: Clonable', 'where T: Clonable<T>')),
         ('wrong-result', source.replace('func Clone() -> Self => Cell(Value)', 'func Clone() -> int => Value')),
@@ -52,7 +54,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-native-self-') as directory:
         if rejected.returncode == 0 or expected not in rejected.stdout + rejected.stderr:
             raise SystemExit(f'Expected rejection for {name}: {rejected.stdout}{rejected.stderr}')
     if args.evidence:
-        evidence = {'report': report, 'rejected': ['missing bound', 'obsolete generic arity', 'wrong Self result', 'erased receiver'],
+        evidence = {'report': report, 'rejected': ['missing bound', 'obsolete generic arity', 'wrong Self result', 'erased receiver', 'inherited derived bound', 'redeclared base result'],
                     'sourceSha256': hashlib.sha256((here / 'Main.rvn').read_bytes()).hexdigest(),
                     'sha256': {name: hashlib.sha256(path.read_bytes()).hexdigest() for name, path in artifacts.items()}}
         args.evidence.write_text(json.dumps(evidence, indent=2) + '\n')
