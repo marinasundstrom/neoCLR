@@ -25,6 +25,28 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Existing Raven samples and a future neoil assembly producer
+
+- **Author:** “We will create a proper neoil assembler that can produce the assemblies.”
+  Also asks to explore translating and running the output of existing Raven tests and
+  samples, then directs work to continue.
+- **Assistant:** Adds an experiment using the current Raven CLI bridge, comparing
+  neoil, JSON and translated binary application outputs with established expectations.
+  Keeps this distinct from direct native compiler emission and the future assembler.
+- **Finding:** The matching Raven collection-profile System is larger than bundled
+  System and exceeds the binary profile's input/item bounds. Retains the guards and
+  explicitly uses the same JSON System to isolate application transport results.
+- **Fixture correction:** Replaces obsolete Option carrier construction in the existing
+  positional-pattern test with idiomatic cases; updates its separate wrong-arity
+  diagnostic expectation. No compiler semantics change.
+- **Outcome:** Fourteen applications pass binary execution against matching JSON
+  System; six expected compiler rejections hold. FloatingMath passes source/JSON but
+  exposes schema 2's unsupported UInt64 double-bit operands. This is a transport gap,
+  not an observed floating arithmetic regression.
+- **Evidence and remaining work:** [Sample experiment](experiments/extended-cli-metadata/raven-sample-translation.md).
+  A proper neoil binary producer, larger-library representation and direct Raven
+  class-library source emission remain separate follow-up work.
+
 ## 2026-09-30: Translated class-library artifacts as a compiler baseline
 
 - **Author:** Proposes translating the current JSON into neoCLR assemblies, then

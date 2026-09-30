@@ -302,3 +302,14 @@ mapping or production target registration changes in this slice. These envelopes
 cannot be loaded as .NET compiler references. Direct Raven source compilation and
 broader symbol projection/native import remain the next compiler work. Translated
 artifacts provide a regression baseline, not independent correctness proof.
+
+
+## Existing Raven application translation experiment — 2026-09-30
+
+The legacy bridge's sample outputs are now inputs to the independent binary translation
+experiment. Compiler Runtime Contract configuration and the CLI projection remain the
+existing collection-profile contracts; the native JSON values are preserved through
+NEOX. The matching 417-type/4,090-function System profile exceeds current binary bounds,
+so application comparisons explicitly retain JSON System. This is not the same artifact
+as the smaller bundled System translated previously. No compiler target capabilities
+are broadened by this test. [Evidence and limitations](experiments/extended-cli-metadata/raven-sample-translation.md).

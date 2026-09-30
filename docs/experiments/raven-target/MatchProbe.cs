@@ -15,7 +15,19 @@ static class MatchProbe
         var cases = new Dictionary<string, string> {
             ["Forms"] = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "samples/library-match.rvn")),
             ["CaseImports"] = "import System.Result.*\nfunc Pick(value: int) -> int { return match Math.Abs(value) { Ok(let amount) => amount; Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",
-            ["OptionPositional"] = "func Pick(value: Option<int>) -> int { return match value { .Some(let amount) => amount; .None => -1 } } func Main() { WriteLine(Pick(Option<int>(Option.Some<int>(42)))); WriteLine(Pick(Option<int>(Option.None()))) }",
+            ["OptionPositional"] = """
+                import System.Option.*
+                func Pick(value: Option<int>) -> int {
+                    return match value {
+                        .Some(let amount) => amount
+                        .None => -1
+                    }
+                }
+                func Main() {
+                    WriteLine(Pick(Some(42)))
+                    WriteLine(Pick(None()))
+                }
+                """,
             ["PositionalSingleEvaluation"] = "func Observe() -> Result<int, OverflowError> { WriteLine(7); return Math.Abs(-42) } func Main() { WriteLine(match Observe() { .Ok(let amount) => amount; .Error(_) => -1 }) }",
             ["PositionalWrongArity"] = "func Main() { match Math.Abs(-42) { .Ok(let a, let b) => WriteLine(a); .Error(_) => WriteLine(-1) } }",
             ["Positional"] = "func Pick(value: int) -> int { return match Math.Abs(value) { .Ok(let amount) => amount; .Error(_) => -1 } } func Main() { WriteLine(Pick(-42)); WriteLine(Pick(-2147483648)) }",

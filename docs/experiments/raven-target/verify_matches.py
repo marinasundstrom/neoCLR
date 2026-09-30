@@ -23,7 +23,7 @@ accepted = {
     'VoidOutput': '42\nSaved\nCompleted\nOverflow\n',
     'ExpressionBlockReturn': '42\n',
 }
-rejected = {'PositionalWrongArity': 'RAV1610',
+rejected = {'PositionalWrongArity': 'RAV2106',
             'StatementReturn': 'RAV1503', 'MissingExpression': 'RAV2100',
             'MissingStatement': 'RAV2100', 'UnreachableArm': 'RAV2101', 'WrongCase': 'RAV2102'}
 if set(results) != set(accepted) | set(rejected):

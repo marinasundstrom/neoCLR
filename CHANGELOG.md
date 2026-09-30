@@ -38,6 +38,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validate 28 C# groups and 15 focused Rust/CLI tests. This transport has no CLI
   projection; direct Raven class-library compilation and compiler symbol import remain
   next steps, using translated artifacts as regression baselines.
+  Add a reproducible translation experiment for existing Raven match/library samples,
+  comparing neoil, JSON and binary application behavior with established expected output.
+  Record the larger Raven collection-profile System's binary input/item-limit failures
+  separately; application tests use the same matching JSON System. Correct obsolete
+  Option carrier construction and the wrong-arity diagnostic expectation in existing
+  match fixtures, without changing compiler semantics. Floating-math source/JSON runs
+  expose an additional schema-2 gap: negative Double operands carry UInt64 bit patterns
+  above Int64.MaxValue and translation rejects them. Fourteen of fifteen application
+  cases pass binary execution with JSON System; six expected compiler rejections hold.
+  Record the author's future neoil assembly-producer direction; direct binary assembly output is not implemented.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

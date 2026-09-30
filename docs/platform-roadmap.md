@@ -30,6 +30,14 @@ and production registration remain unimplemented.
 [Binary profile](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30)
 and [measured phases](experiments/extended-cli-metadata/binary-loading.md).
 
+**Author-directed consumer exploration:** Exercise translation of the existing Raven
+CLI bridge's test/sample output before expanding direct compiler emission. A proper
+neoil assembler producing native assemblies is a future producer. The Raven collection
+library profile exceeds the current binary transport bounds; retain that explicit gap
+while isolating application translations with matching JSON System. Floating-point
+operand tests additionally expose the need for full UInt64 bit-pattern encoding.
+[Experiment and reproducible checks](experiments/extended-cli-metadata/raven-sample-translation.md).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

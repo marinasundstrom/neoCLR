@@ -1,0 +1,287 @@
+{
+  "pipeline": "Raven source -> legacy CLI bridge -> neoil -> JSON -> NEOX",
+  "directNativeCompilerEmission": false,
+  "tools": {
+    "bridge": "13ef2e4503701302ca562c25e3ceed5620d33dfcdb710c0a282f2bfe9364bc93",
+    "compiler": "709524057b7e8a5ae1fa469cb7b4fc744a66f17269d2551d6e9ab9a6a53f01bf",
+    "translator": "ceb0ea35cc9ecaf2c239ce201384eb197a7e4bd7c5912f77b657874db455b501",
+    "metadata": "8125c252e80787509f9441e8f421a22a0c461113a59389350e9f79c3ae29fcab",
+    "runtime": "13cfa90312546971a42daa78189dfecd1543dfbbb41a5853a207a09aaa73e836"
+  },
+  "system": {
+    "profile": "raven-collections",
+    "types": 417,
+    "functions": 4090,
+    "compactJsonBytes": 7104628,
+    "jsonBytes": 15017185,
+    "jsonSha256": "e02cda3e864e36f74d97b6ca31f647137c2a8ba7eec0b3265346274e3468a39f",
+    "failedPhase": "translation/verification",
+    "error": "1: native JSON exceeds 4 MiB limit\n",
+    "applicationTestsUseJsonSystem": true
+  },
+  "matchCompilation": {
+    "Forms": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "CaseImports": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "OptionPositional": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "PositionalSingleEvaluation": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "PositionalWrongArity": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2106",
+          "Severity": "Error",
+          "Message": "error RAV2106: Case 'Ok' expects 1 argument(s) but received 2"
+        }
+      ]
+    },
+    "Positional": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "StatementReturn": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV1503",
+          "Severity": "Error",
+          "Message": "error RAV1503: Cannot convert from '()' to 'int'"
+        },
+        {
+          "Id": "RAV1503",
+          "Severity": "Error",
+          "Message": "error RAV1503: Cannot convert from '()' to 'int'"
+        }
+      ]
+    },
+    "Guard": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "StatementTail": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "SingleEvaluation": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "NominalDeconstruction": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "MissingExpression": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2100",
+          "Severity": "Error",
+          "Message": "error RAV2100: Missing match case: 'Error'."
+        }
+      ]
+    },
+    "MissingStatement": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2100",
+          "Severity": "Error",
+          "Message": "error RAV2100: Missing match case: 'Error'."
+        }
+      ]
+    },
+    "UnreachableArm": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2101",
+          "Severity": "Error",
+          "Message": "error RAV2101: This match arm can never run (a previous arm matches first)."
+        }
+      ]
+    },
+    "WrongCase": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2102",
+          "Severity": "Error",
+          "Message": "error RAV2102: Pattern for type 'None' is not valid for scrutinee of type 'Result<int, OverflowError>'"
+        }
+      ]
+    },
+    "VoidOutput": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "ExpressionBlockReturn": {
+      "Stage": "imported",
+      "Diagnostics": []
+    }
+  },
+  "expectedMatchRejections": 6,
+  "cases": {
+    "Positional": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\n",
+      "jsonBytes": 519498,
+      "binaryBytes": 223698,
+      "binarySha256": "39798d108686225996bcea0a23de26d790246f3b7559a3bb0c19f46b4bc959c1"
+    },
+    "NominalDeconstruction": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n",
+      "jsonBytes": 519160,
+      "binaryBytes": 222009,
+      "binarySha256": "439ad7003d6bf7665d1bb1b05592f870973368f4cf0c8eea020f41e3d52ca5fb"
+    },
+    "CaseImports": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\n",
+      "jsonBytes": 519515,
+      "binaryBytes": 223715,
+      "binarySha256": "aa1ccf348b6f8257e01cd6837f7fc9bb52f4aa7b7781f38389cc6973666bfe20"
+    },
+    "OptionPositional": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\n",
+      "jsonBytes": 522345,
+      "binaryBytes": 225446,
+      "binarySha256": "e845cc10376625f559cf9352bf62a6f76ebe770cbdb8e5965bd706a84f372e88"
+    },
+    "PositionalSingleEvaluation": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "7\n42\n",
+      "jsonBytes": 520224,
+      "binaryBytes": 223948,
+      "binarySha256": "384ff53e5c915ba04899482c3fe96991e92272977db59a9b75567b5dea16a02b"
+    },
+    "Forms": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\nPresent\nAbsent\n42\nOverflow\n",
+      "jsonBytes": 555554,
+      "binaryBytes": 238623,
+      "binarySha256": "ecaec366f297373c07b1db583122ac109672107dffcb029811abf1d6b61a2df1"
+    },
+    "Guard": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "1\n2\n3\n",
+      "jsonBytes": 522723,
+      "binaryBytes": 224947,
+      "binarySha256": "5357b7b293b76a154ad528040aad6ee095e155f2e5715202e792145bfb427dff"
+    },
+    "StatementTail": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\n",
+      "jsonBytes": 517834,
+      "binaryBytes": 223169,
+      "binarySha256": "962077912eb1619fb3b06fc13aed2e772b0f28fc2879a886f6939f9c34616f4c"
+    },
+    "SingleEvaluation": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "7\n42\n",
+      "jsonBytes": 518363,
+      "binaryBytes": 223215,
+      "binarySha256": "18f884205ee59c6c5bdd58eeb606e5cd077c7ae7bbb18abce09497d632383a74"
+    },
+    "VoidOutput": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\nSaved\nCompleted\nOverflow\n",
+      "jsonBytes": 550048,
+      "binaryBytes": 236896,
+      "binarySha256": "613c0e036460451c0df093fcdd07acd2fad16f093511a4836f2308df476eb005"
+    },
+    "ExpressionBlockReturn": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n",
+      "jsonBytes": 510767,
+      "binaryBytes": 220294,
+      "binarySha256": "c9af0a2c464207e965a55c0f400632feedb014890f7d113dec139473efdf47f6"
+    },
+    "Basics": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n1\n0\nLibrary calls from Raven\n",
+      "jsonBytes": 502655,
+      "binaryBytes": 216800,
+      "binarySha256": "35b72f0c8c80abf74610830fd3c4d853d0be282d5845e846d5f4897354e93dbb"
+    },
+    "Strings": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "Hello, v\u00e4rld!\n14\nyes\nno\nyes\nno\nyes\nyes\nyes\nno\n-1\n0\n1\n",
+      "jsonBytes": 521055,
+      "binaryBytes": 226925,
+      "binarySha256": "698c29e96e81cd6626bc635df11d86975f0e5c8d9668d6eb6d3de7a67975a649"
+    },
+    "FloatingMath": {
+      "source": true,
+      "json": true,
+      "failedPhase": "translation",
+      "error": "1: schema 2 requires signed 64-bit integers\n"
+    },
+    "ValueCopy": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n7\n",
+      "jsonBytes": 516244,
+      "binaryBytes": 223166,
+      "binarySha256": "9c512260896f69ec845a19f45d5fec5bb1e96ed4d17634de11089c2a9260090a"
+    }
+  },
+  "passed": 14,
+  "failed": 1,
+  "evidence": "Combined unchanged match results with the focused library-sample rerun after correcting the project iteration contract.",
+  "ravenRevision": "1ba9eaa8b9d7d9101ed5408bead1299c17043b94",
+  "runtimeRevision": "6e1ad1df"
+}

@@ -1668,3 +1668,13 @@ on feature/function-types. Earlier revision/branch notes above are historical.
 The current props and Self/numeric probes select RavenTargetPlatform=NeoCLR.
 Inhabited unit-result transport is required by this nominal delegate ABI too.
 See [the bridge contract](../../raven-cli-bridge.md) for ownership and replacement.
+
+
+## Native metadata translation of existing samples
+
+`verify_metadata_translation.py` compiles existing match/project samples through this
+bridge, assembles their output and compares source/JSON/native-binary execution against
+existing expected outputs. It records library-size failures separately and keeps the
+same matching JSON System when library translation exceeds bounds. It does not select
+the new direct compiler emitter or alter Runtime Contract settings.
+[Commands, limits and results](../extended-cli-metadata/raven-sample-translation.md).
