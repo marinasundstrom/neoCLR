@@ -64,8 +64,12 @@ be required; container readability does not imply CLR execution compatibility.
 An isolated experimental codec now exercises framing, structural signatures and
 synthesized member descriptions.
 A bounded PE container probe retains ordinary metadata readability, but standard
-rewriting can discard the extension. Production loading, runtime support and Raven
-integration remain pending; this is not a published platform format.
+rewriting can discard the extension. A development .NET model now emits a bounded
+Int32 subset as PE or existing native assemblies. Native output includes functions
+outside types and has a direct neoCLR load/run test. Next comes ordinary metadata
+coverage for the refactored compiler, then compiler integration, then structural
+extensions. Production NEOX loading and structural runtime support remain pending;
+this is not a published platform format.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 

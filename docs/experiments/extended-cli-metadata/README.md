@@ -676,3 +676,26 @@ The core writer supports static classes, Int32 parameters/results or CLI no-resu
 linear constants/argument loads/arithmetic/calls/return. Read-snapshot rewriting,
 fields, richer signatures/IL, direct structural execution and Raven compiler adapters
 are still pending. This is an executable integration baseline, not full Cecil parity.
+
+## Direct native assembly acceptance
+
+The public .NET model now also writes the runtime's current native format 5. This
+avoids requiring the CLI bridge for the basic producer/consumer acceptance gate:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --native-integration target/debug/neoclr target/metadata-native-proof
+```
+
+Use a fresh output directory. The test builds an application and a separate function
+library, emits both via `WriteNativeAssembly`, and invokes native verify/run directly.
+Expected result is 42; missing/wrong-revision dependencies must fail with appropriate
+diagnostics. It covers top-level functions, type-owned methods, parameter loads,
+no-result returns and arithmetic. [native-validation.json](native-validation.json)
+records hashes of the tool and artifacts from the successful run. No application JSON
+is manually authored or patched for the positive test. The negative revision fixture
+is deliberately modified after emission.
+
+The format-5 backend is separate from experimental NEOX and does not imply direct PE
+or structural runtime support. The author-directed next sequence is ordinary metadata
+read/write readiness, refactored Raven compiler integration, then structural extensions.

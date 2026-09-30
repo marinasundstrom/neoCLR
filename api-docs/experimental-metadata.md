@@ -874,13 +874,13 @@ System.Reflection.Metadata. This executable returns nonzero on any failure; it i
 a `dotnet test` discovery project.
 
 
-## Controlled PE construction and editing
+## Controlled PE and native assembly construction
 
 Namespace: `NeoCLR.Metadata.Experimental.Model`. These builders are the first writer
 part of the primary compiler abstraction. They construct new assemblies and allow body
 editing before another write; they do **not** rewrite arbitrary read snapshots or claim
-full Cecil compatibility. The current executable subset is public static classes and
-methods with Int32 parameters and either Int32 or CLI no-result return. This is a
+full Cecil compatibility. The current executable subset is top-level functions, public
+static classes and methods with Int32 parameters and either Int32 or CLI no-result return. This is a
 compiler integration proof, not a complete language backend.
 
 ### AssemblyBuilder
@@ -892,9 +892,13 @@ public sealed class AssemblyBuilder
     public AssemblyIdentity Identity { get; }
     public AssemblyIdentity CoreLibrary { get; }
     public IReadOnlyList<TypeBuilder> Types { get; }
+    public IReadOnlyList<MethodBuilder> Functions { get; }
+    public MethodBuilder AddFunction(string name, int parameterCount = 0,
+                                     bool returnsValue = true);
     public MethodBuilder? EntryPoint { get; set; }
     public TypeBuilder AddType(string @namespace, string name);
     public byte[] Write();
+    public byte[] WriteNativeAssembly();
 }
 ```
 
@@ -902,13 +906,19 @@ The constructor requires explicit output and core-library identities. Null raise
 ArgumentNullException; output identities with a key token or flags raise
 ArgumentException because signing/flagged output is unsupported. No host core library
 is inferred. The core supplies the System.Object base reference. Types is a read-only
-view of this mutable graph. Do not mutate any participating graph during Write.
+view of this mutable graph. Functions is its separate read-only view of top-level
+functions. Do not mutate participating graphs during either write operation.
 
 AddType adds a public abstract sealed class with a unique namespace/name pair. Namespace
 may be empty; name must be nonempty and not `<Module>`. Combined length is at most 1024
 characters and the assembly admits at most 256 types. Invalid/duplicate inputs raise
 ArgumentException. EntryPoint may be null for a library or a local parameterless
 Int32-returning method; it is checked at Write.
+
+AddFunction creates an assembly-owned function with no declaring type. Names must be
+nonempty and at most 1024 characters, parameter counts 0–256, and an assembly admits
+at most 256 top-level functions. Duplicate name/parameter-count pairs raise
+ArgumentException. Function and type-method name scopes are independent.
 
 Write validates every local body, assigns physical tokens/RVAs, imports foreign call
 references, and emits an owned unsigned IL-only PE32 image. Bounds: 4096 total methods,
@@ -917,6 +927,10 @@ calls require the same core identity; an external dependency with the same ident
 the output is rejected. Invalid bodies, entry points, incompatible imports or exceeded
 limits raise InvalidDataException. Call targets are typed builder methods; output
 references include exact assembly identity, nominal type name and method signature.
+Top-level functions are emitted as CLI global methods on the physical `<Module>` row;
+that row is a transport detail, not a declaring TypeBuilder. Local calls and global
+entry points are supported. Cross-assembly top-level calls currently raise
+InvalidDataException in PE emission; use native emission for that case.
 
 Unchanged repeated writes of the same graph are byte-identical. Each builder has a
 fresh MVID, stable over its edits; equivalent independently constructed graphs need not
@@ -924,6 +938,27 @@ have identical bytes. PE content IDs/timestamps are derived deterministically.
 No strong-name signing, resource/debug data, #Neo attachment or conventional-image
 rewriting is implemented by Write. The writer cannot silently discard such data because
 it accepts only its explicitly constructed subset, not an arbitrary loaded image.
+
+WriteNativeAssembly validates the same local graph and emits owned UTF-8 bytes in
+neoCLR's existing JSON assembly format 5. Save as `.neo.json` and pass dependencies
+explicitly with `--module`; no PE importer, subprocess or runtime loading occurs inside
+the writer. Native top-level functions have no type owner. Type-owned methods retain
+an explicit owner. Both local and cross-assembly calls are supported; no-result returns
+remain distinct from inhabited Void.
+
+Native output contains assembly/module/type/method origin metadata, scoped tokens,
+parameter-row absence (zero tokens), and exact dependency revisions. The transport
+module name uses SHA-256 of a canonical JSON identity tuple; member names encode UTF-8
+bytes with ownership separators. This is deterministic binding, not authentication.
+The descriptive assembly identity retains name/version/culture/token/flags in that
+canonical tuple. Different dependency builder objects sharing one identity are rejected.
+Names used as native descriptions must be nonblank, free of control characters and
+well-formed Unicode; failures raise InvalidDataException. Output is bounded to 4 MiB.
+Native emission carries no MVID (format 5 has no such field), and does not attach NEOX
+structural sections or promise arbitrary CLR/PE compatibility. The explicit core identity
+is checked between builder call targets, but no core assembly is loaded for this
+primitive-only subset. This format-specific backend is provisional and will evolve
+with the native metadata format.
 
 ### TypeBuilder
 
@@ -951,7 +986,8 @@ Generic methods, fields, instance receivers and signature variants are future wo
 ```csharp
 public sealed class MethodBuilder
 {
-    public TypeBuilder DeclaringType { get; }
+    public AssemblyBuilder Assembly { get; }
+    public TypeBuilder? DeclaringType { get; }
     public string Name { get; }
     public int ParameterCount { get; }
     public bool ReturnsValue { get; }
@@ -966,7 +1002,8 @@ public sealed class MethodBuilder
 }
 ```
 
-Created only by AddMethod. Body operations append conventional IL: Int32 constants,
+Created by AddMethod or AddFunction. Assembly always identifies its owning builder;
+DeclaringType is null for a top-level function. Body operations append conventional IL: Int32 constants,
 zero-based argument loads, arithmetic, static calls and return. Call accepts a method
 from this graph or another builder; null raises ArgumentNullException. Each append
 rejects more than 4096 instructions with InvalidDataException. ClearBody permits
@@ -981,7 +1018,7 @@ all CLR versus neoCLR arithmetic policies.
 
 The C# writer consumer builds a dependency's `Twice(Int32) -> Int32` and an application
 that calls it with 20, adds 2 and returns 42. It tests repeat writes, body edits, imported
-TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Fourteen
+TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Fifteen
 standalone C# contract groups pass, including earlier identity/reference tests.
 
 ### neoCLR acceptance test
@@ -1003,3 +1040,19 @@ artifact/tool hashes. It is a test CLI, not a library API. The bridge converts o
 CLI signatures and bodies into the current native format; it does not enable native
 #Neo semantics. Direct PE/#Neo runtime loading and general compiler coverage remain
 separate work.
+
+### Direct native acceptance test
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --native-integration /path/to/neoclr /fresh/output/directory
+```
+
+The C# test emits a top-level `Twice` function in one assembly and a top-level entry
+function in another. It also exercises a no-result function, a type-owned method,
+argument loads and all three arithmetic operations. neoCLR directly verifies/loads
+these API-produced files and returns 42. Missing dependencies and incorrect revisions
+are rejected with the corresponding diagnostics. The runner preserves the artifacts
+and a hash report. This requires only the metadata test executable and native runtime,
+with its bundled System library; no Raven bridge or hand-authored application JSON is
+involved. See [recorded evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/native-validation.json).

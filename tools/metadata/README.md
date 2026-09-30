@@ -83,7 +83,7 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Me
 ```
 
 This is an executable test runner (nonzero exit on failure), not a dotnet-test discovery
-project. Its 14 contract groups generate PE metadata in C#, exercise exact identities and resolver
+project. Its 15 contract groups generate PE metadata in C#, exercise exact identities and resolver
 contracts, and cover invalid inputs, limits and ownership. It uses only .NET platform
 libraries and the project under test.
 
@@ -108,3 +108,22 @@ or JSON is substituted. This establishes the existing Raven bridge route, not di
 PE/#Neo runtime loading. The writer's deliberately bounded subset and every public
 member are described in the API reference. General rewriting and wider codegen remain
 pending rather than silently dropping unsupported metadata.
+
+## Direct native producer and top-level functions
+
+`AssemblyBuilder.AddFunction` creates a function with no declaring type.
+`WriteNativeAssembly()` emits the current native format-5 assembly directly, including
+cross-assembly top-level calls. `Write()` still emits PE; local globals map to CLI
+`<Module>` methods, while cross-assembly global calls are explicitly unsupported there.
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --native-integration target/debug/neoclr target/metadata-native-proof
+```
+
+Use a fresh output directory. This C# test directly loads the API-produced native
+application and library, verifies them and executes to 42; it also rejects missing and
+wrong-revision dependencies. No bridge is used. See the [API reference](../../api-docs/experimental-metadata.md#controlled-pe-and-native-assembly-construction)
+for ownership, limits and transport details. The 15 contract groups additionally check
+CLI global-method rows and native ownership. This is a compiler/backend baseline for
+the bounded Int32 subset, not complete NEOX structural execution or Raven integration.

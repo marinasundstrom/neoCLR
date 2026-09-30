@@ -7,8 +7,12 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 **Author-directed metadata exploration (2026-09-30).** Begin extended CLI metadata
 on `codex/extended-cli-metadata`, based on main, with later Raven integration.
-Structural types are an explicit design requirement, including arrays, tuples,
-Function types, unions/intersections and synthesized members. The
+**Latest sequencing clarification:** establish a working metadata format and its APIs,
+then integrate the refactored compiler, then add improvements such as structural types.
+The direct native producer/load test below is the bounded acceptance baseline;
+ordinary compiler-required metadata coverage is next. Structural types remain a future
+design requirement (arrays, tuples, Function types, unions/intersections and synthesized
+members), not a prerequisite for that first compiler integration. The
 [design and staged acceptance plan](design/extended-cli-metadata.md) is exploratory;
 an isolated codec/inspector now validates experimental framing and structural
 signatures, host-catalog nominal resolution and synthesized-member references with
@@ -25,15 +29,17 @@ artifact recognition/extraction passes 50 shared cases (44 rejections). Followin
 author’s Cecil suggestion, the [provisional API direction](design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
 places assembly/module/reference/definition objects above these codecs. An initial
 read-only model now reads real assembly/module/TypeDef declarations, with generic/nested
-Unicode and snapshot-scoped reference consumer checks. Next is assembly-reference
-identity and explicit nominal dependency resolution. AssemblyRef identity and explicit
+Unicode and snapshot-scoped reference consumer checks. AssemblyRef identity and explicit
 host resolution now pass 11 standalone C# contract tests. The author selects the
 Cecil-like model as the primary compiler abstraction for metadata/PE manipulation,
 with adaptations as needed. Physical TypeRef resolution and a controlled static-Int32
 PE writer now support an end-to-end producer baseline. API-produced application and
 library PEs execute in neoCLR through the existing CLI bridge and matching native
 library, returning 42. Broader IL/signature coverage, general rewriting, Raven codegen
-integration and direct native #Neo loading remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+integration and direct native #Neo loading remain pending. The author also requires
+functions outside types: the model now exposes assembly-owned functions and emits
+native format-5 assemblies directly, with a cross-assembly function test returning 42
+in neoCLR without the CLI bridge ([evidence](experiments/extended-cli-metadata/native-validation.json)). Production NEOX loading and structural runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The author further clarifies that the .NET API should support later Raven compiler

@@ -33,7 +33,7 @@ internal static class RuntimeIntegration
         Console.WriteLine("PASS API-produced PE application and dependency imported, assembled, loaded, verified and executed by neoCLR: 42");
     }
     private static string Hash(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant();
-    private static async Task<string> Command(string file, int expected, params string[] arguments)
+    internal static async Task<string> Command(string file, int expected, params string[] arguments)
     {
         var start = new ProcessStartInfo(file) { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
         foreach (var argument in arguments) start.ArgumentList.Add(argument);

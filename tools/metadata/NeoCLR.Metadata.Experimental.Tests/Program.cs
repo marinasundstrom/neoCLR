@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--native-integration")
+{
+    await NativeWriterChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 6 && args[0] == "--runtime-integration")
 {
     await RuntimeIntegration.Run(args[1], args[2], args[3], args[4], args[5]);
@@ -19,6 +25,7 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Native emission and top-level functions", NativeWriterChecks.Run),
     ("Writer construction editing imports and validation", WriterChecks.Run),
     ("Resolves physical top-level and nested TypeRefs", () =>
     {

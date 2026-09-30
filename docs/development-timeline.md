@@ -9135,3 +9135,22 @@ remote synchronization does not publish a runtime bundle or website.
 - **Scope:** this proves a bounded static Int32 compiler producer route; it is not full
   Raven codegen integration, arbitrary PE rewriting or native structural execution.
   [Design and scope](design/extended-cli-metadata.md#end-to-end-compiler-producer-baseline-2026-09-30).
+
+## 2026-09-30 — Native functions and metadata-first compiler sequencing
+
+- **Author correction:** “NeoCLR metadata will support functions outside of types.”
+  The author then directed a working metadata format first, integrations in the
+  refactored compiler second, and improvements such as structural types afterward.
+- **Assistant response/action:** made top-level functions first-class assembly-owned
+  declarations with nullable type ownership. Added direct native format-5 emission from
+  the same model, alongside PE output. Local globals have a CLI representation; native
+  emission also supports cross-assembly top-level calls. Preserved earlier structural
+  experiments as future-facing evidence rather than a gate for compiler integration.
+- **Observed outcome:** the C# API produced two native assemblies that neoCLR loaded,
+  verified and executed directly, without the CLI importer, returning 42. The same
+  runner confirms missing/wrong-revision dependency rejection. Fifteen C# contract
+  groups pass. [Design and evidence](design/extended-cli-metadata.md#top-level-functions-and-direct-native-emission-2026-09-30).
+- **Open:** expand ordinary metadata coverage to the refactored compiler's actual
+  requirements and then implement its adapters. Structural runtime integration,
+  direct PE/#Neo loading and the Raven port remain separate later work. This result
+  establishes the bounded acceptance baseline, not a complete general compiler backend.

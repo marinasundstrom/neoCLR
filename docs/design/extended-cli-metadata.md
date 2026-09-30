@@ -618,3 +618,53 @@ contracts. Native build on this host required SDKROOT pointing to MacOSX26.5.sdk
 the default 27.0 SDK was incompatible with the installed linker. This is environment
 configuration, not a runtime source change. The bridge build had 11 existing nullable
 warnings; the metadata library and C# tests build cleanly.
+
+## Top-level functions and direct native emission (2026-09-30)
+
+The author clarified that neoCLR metadata supports functions outside types. The author
+then selected this sequence: establish a working metadata format; build integrations
+in the refactored compiler; subsequently improve the format, including structural types.
+Structural signatures remain a future requirement and existing codec evidence remains
+useful, but structural runtime work is not the next prerequisite for compiler integration.
+A top-level function declaration is separate from a structural Function signature.
+
+The model now has `AssemblyBuilder.Functions` / `AddFunction`, using the same body and
+signature builder as type-owned methods. Every callable has an Assembly; DeclaringType
+is nullable. This single-module builder's ownership can later move below ModuleBuilder
+without making a synthetic user class part of native semantics. PE emission represents
+local global functions using the physical `<Module>` row, while direct native emission
+has no synthetic type and supports cross-assembly top-level function calls.
+
+**Comparison:** .NET already exposes type-independent static global methods through
+[ModuleBuilder.DefineGlobalMethod](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.modulebuilder.defineglobalmethod?view=net-10.0)
+and completes them with CreateGlobalFunctions (Microsoft documentation, retrieved
+2026-09-30). This is a metadata/library capability, distinct from a language's syntax.
+We retain a familiar shared callable builder but make nullable ownership explicit.
+The benefit is that compiler clients do not invent carrier types for native functions;
+the cost is target-specific PE import rules and more ownership cases for consumers.
+Cross-assembly global calls are currently rejected by the PE writer, not declared
+impossible in CLI. Their eventual PE mapping needs separate interop validation.
+
+`WriteNativeAssembly()` emits the runtime's **existing format-5 JSON assembly**, without
+invoking the bridge or reading a generated PE. This is a second target for the same
+bounded graph, not a new NEOX payload hidden in PE. Reusing the installed native schema
+provides direct loader/verifier/VM evidence now; the tradeoff is an explicit provisional
+backend tied to that schema, with no native MVID field and no structural NEOX sections.
+Runtime primitive operations supply the Int32 semantics. References use deterministic
+identity-derived module names and exact revisions; no implicit probing is introduced.
+Assembly/type/method origin metadata is preserved for the existing descriptive catalog.
+This does not implement the future guest Metadata Introspection reader/writer library.
+
+The C# direct acceptance test writes both native assemblies through the public API,
+then asks neoCLR to verify and execute them. It exercises top-level and type-owned
+calls, a cross-assembly function, no-result returns, parameters and arithmetic, producing
+42. Missing dependency and wrong-revision cases fail with matching diagnostics.
+[Evidence](../experiments/extended-cli-metadata/native-validation.json) records output
+and binary hashes. Fifteen C# contract groups pass, including physical global-method
+row ownership and entry tokens. Neither test requires hand-authored application JSON.
+
+The acceptance baseline is now met for this subset. The next readiness work is a
+compiler-driven inventory of required ordinary declarations, signatures, imports and
+bodies, followed by reader/writer coverage and refactored-compiler adapters. Do not
+claim general Raven readiness from an Int32 test. Structural extensions come after
+that integration, following the author's clarified sequence.
