@@ -118,7 +118,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   optional compiler-owned native emitter API with explicit dependency bindings,
   source-located diagnostics and validation before output writes. C# contract checks
   and neoCLR execution to 42 cover the extracted adapter; the metadata project stays
-  independent and ordinary .NET compilation remains unchanged.
+  independent and ordinary .NET compilation remains unchanged. The adapter now emits
+  multiple source files with cross-file calls; both input orders verify/run to 42,
+  and rejected later-file operations retain their source location without output.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

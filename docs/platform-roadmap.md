@@ -443,3 +443,7 @@ Compiler adapter checkpoint (2026-09-30): the Raven consumer now calls an option
 compiler-owned emitter API with explicit contracts and diagnostics. Native verification
 still returns 42; [integration scope](raven-cli-bridge.md#compiler-owned-native-adapter-checkpoint--2026-09-30)
 retains the .NET input bootstrap and leaves native loading/target composition pending.
+
+Multi-file adapter checkpoint (2026-09-30): cross-file function calls now execute
+in both source-tree orders, with correct later-file diagnostics and no partial output
+on validation failure. The native provider and production composition are still pending.
