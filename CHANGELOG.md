@@ -12,6 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   sharing implicit Int32 returns and simple named calls with .NET emission. Keep the
   independent metadata API, binary format and runtime unchanged. Record the author-led
   codegen abstraction plan and defer native symbol loading to its later slice.
+  Add shared per-emission callable identity resolution in Raven with backend-owned
+  handles and native definition registration before body emission; preserve overloads,
+  owners and explicit dependency policies.
 
 ### 2026-09-30
 

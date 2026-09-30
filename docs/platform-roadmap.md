@@ -17,8 +17,9 @@ ordinary compiler-required metadata coverage is next.
 
 **Architecture follow-up (2026-10-01):** after reviewing Reflection dependencies, the
 author directed a staged codegen refactor. The first slice now feeds both bounded
-backends compiler-lowered bodies, including implicit value returns. Typed references/
-declaration handles are next, followed by paired compiler/metadata body capabilities;
+backends compiler-lowered bodies, including implicit value returns. The first callable reference table now shares symbol identity resolution with typed
+backend handles; broader type/field references and declaration traversal remain next,
+followed by paired compiler/metadata body capabilities;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

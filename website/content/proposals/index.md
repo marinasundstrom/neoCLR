@@ -115,7 +115,9 @@ produces them directly with `--format neox`, verified against the separate .NET 
 and existing Raven sample behavior.
 
 The 2026-10-01 metadata experiment now reuses Raven's compiler-lowered bodies for its
-bounded .NET/neoCLR emission path, including implicit Int32 returns. General codegen
+bounded .NET/neoCLR emission path, including implicit Int32 returns. Both bounded backends
+also share per-emission callable identity resolution, preserving overloads and owners.
+General codegen
 portability and metadata importer work remain development tasks on the feature branches.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
