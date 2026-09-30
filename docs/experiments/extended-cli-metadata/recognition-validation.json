@@ -1,0 +1,34 @@
+{
+  "date": "2026-09-30",
+  "scope": "experimental metadata consistency, no authentication or execution",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "reader_versions": {
+    "Runtime": ".NET 10.0.0",
+    "SrmVersion": "10.0.0.0",
+    "CecilVersion": "0.11.6.0"
+  },
+  "ordinary_reader_snapshots_equal": true,
+  "cecil_preserves_marker_but_strips_neo": true,
+  "explicit_expected_profile_rejects_all_markers_removed": true,
+  "automatic_classification_cannot_recover_erased_provenance": true,
+  "recomputed_digest_is_not_authentication_or_metadata_validation": true,
+  "rejections": {
+    "ordinary-when-extended-expected": "marker and #Neo missing",
+    "unmarked-transport": "unmarked #Neo",
+    "stripped-stream": "required #Neo stream missing",
+    "changed-Strings": "metadata binding mismatch",
+    "changed-Neo": "metadata binding mismatch",
+    "unsupported-profile": "unsupported extended artifact recognition version",
+    "invalid-digest": "invalid metadata binding digest",
+    "wrong-digest": "metadata binding mismatch",
+    "both-markers-stripped": "marker and #Neo missing",
+    "cecil-stripped-extension": "required #Neo stream missing",
+    "unknown-required-feature": "unsupported required section"
+  },
+  "artifacts": {
+    "baseline.dll": "61dc32f84c6e38cfd050d0ae0766e78728753864475a7a33caf1b3d5d86e6c5b",
+    "marked.dll": "fc8eacddc4b44aeb01fdacc80ed2824f0ddc71f8abadeb71b58cb8db745e18dd",
+    "cecil-rewritten.dll": "e5693a8216168ea9373c4f20ab5bbc5f254ae8ecfe87d187d711ad0bdd58ded9",
+    "unknown-required.dll": "46dc248d8cd523402852fb0c3957ed28cadf3ba1a58cb71f1cf3fa5e39f5d957"
+  }
+}

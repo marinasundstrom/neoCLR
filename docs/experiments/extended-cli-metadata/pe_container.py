@@ -153,7 +153,7 @@ def build_metadata(prefix, values):
     return bytes(directory + payload)
 
 
-def embed(image, neox):
+def embed(image, neox, *, recognized=False):
     # Validate payload separately; this function transports bytes, including negative fixtures.
     if len(neox) > 1024 * 1024:
         raise FormatError('extension too large')
@@ -162,6 +162,8 @@ def embed(image, neox):
     if '#Neo' in values:
         raise FormatError('image already contains #Neo')
     values['#Neo'] = neox + b'\0' * (align(len(neox), 4) - len(neox))
+    if recognized:
+        prefix = marked_prefix(prefix, values)
     metadata = build_metadata(prefix, values)
     slot = info['table'] + info['count'] * 40
     if slot + 40 > info['headers_size'] or any(take(image, slot, 40)):
@@ -195,3 +197,56 @@ def extract(image):
     if size < 16 or size > len(payload) or len(payload) - size > 3 or any(payload[size:]):
         raise FormatError('invalid #Neo padding/length')
     return payload[:size]
+
+
+RECOGNITION_PREFIX = b'neoCLR.NEOX.0.1;sha256='
+
+
+def metadata_digest(values):
+    """Bind exact stream names/bytes; consistency, not authenticity or IL verification."""
+    import hashlib
+    digest = hashlib.sha256(b'neoCLR experimental metadata binding 0.1\0')
+    for name, value in sorted(values.items()):
+        name = name.encode('ascii')
+        digest.update(struct.pack('<H', len(name)))
+        digest.update(name)
+        digest.update(struct.pack('<I', len(value)))
+        digest.update(value)
+    return digest.hexdigest().encode('ascii')
+
+
+def marked_prefix(prefix, values):
+    version = RECOGNITION_PREFIX + metadata_digest(values) + b'\0'
+    version += b'\0' * (align(len(version), 4) - len(version))
+    return prefix[:12] + struct.pack('<I', len(version)) + version + prefix[-2:]
+
+
+def recognize(image, *, expected_extended=False):
+    """Classify current bytes; callers expecting native input must opt out of fallback."""
+    info = layout(image)
+    metadata = info['metadata']
+    _, values = streams(metadata)
+    length = u32(metadata, 12)
+    version = bytes(take(metadata, 16, length))
+    marked = version.startswith(b'neoCLR.')
+    has_stream = '#Neo' in values
+    if not marked and not has_stream:
+        if expected_extended:
+            raise FormatError('expected recognized extended artifact; marker and #Neo missing')
+        return 'ordinary-cli'
+    if not marked:
+        raise FormatError('unmarked #Neo transport image is not a recognized artifact')
+    if not has_stream:
+        raise FormatError('required #Neo stream missing from marked artifact')
+    if b'\0' not in version or any(version[version.index(b'\0'):]):
+        raise FormatError('invalid recognition marker termination')
+    content = version[:version.index(b'\0')]
+    if not content.startswith(RECOGNITION_PREFIX):
+        raise FormatError('unsupported extended artifact recognition version')
+    claimed = content[len(RECOGNITION_PREFIX):]
+    if len(claimed) != 64 or any(c not in b'0123456789abcdef' for c in claimed):
+        raise FormatError('invalid metadata binding digest')
+    if claimed != metadata_digest(values):
+        raise FormatError('metadata binding mismatch; an aware rewrite is required')
+    extract(image)  # validate the stream's transport length and padding as well
+    return 'extended-neox-0.1'

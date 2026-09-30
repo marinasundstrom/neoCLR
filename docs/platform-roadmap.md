@@ -14,8 +14,9 @@ an isolated codec/inspector now validates experimental framing and structural
 signatures, host-catalog nominal resolution and synthesized-member references with
 30 focused tests. Differently numbered fixture references resolve to equal structural
 type/member keys. A bounded PE32 #Neo probe preserves conventional metadata for
-.NET/Cecil inspection; Cecil rewriting strips the extension. Fail-closed artifact
-recognition is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+.NET/Cecil inspection; Cecil rewriting strips the extension. An experimental marker/digest and explicit expected-input profile now reject
+stripped/changed metadata in 11 recognition cases. The first .NET reader/writer
+library slice is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)

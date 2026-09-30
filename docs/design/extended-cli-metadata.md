@@ -188,6 +188,13 @@ strategy before shipping. Until then, artifacts are experimental neoCLR inputs o
 do not market them as safe dual-target binaries. Rewriters must preserve and remap
 extension references or refuse semantic rewriting, never silently strip required data.
 
+The [marked recognition experiment](../experiments/extended-cli-metadata/README.md#marked-artifact-recognition-2026-09-30)
+now exercises a metadata-root discriminator and digest over exact stream contents.
+Cecil preserves the discriminator while stripping #Neo, yielding deterministic refusal
+by the aware inspector. Explicit expected-extended input is also required to reject an
+image after both indicators disappear. This is a provisional consistency contract,
+not authentication, method-body verification or an unaware CLR execution gate.
+
 Keep the current bridge profile separate from the future native profile. Native output
 must not fall back to nominal Func/Tuple carriers when a consumer lacks structural
 support. Downgrade is an explicit, potentially lossy export with documented limits.

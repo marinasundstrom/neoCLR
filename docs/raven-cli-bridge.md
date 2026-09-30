@@ -40,3 +40,9 @@ The [reader/writer architecture](design/extended-cli-metadata.md#reader-and-writ
 plans a .NET-hosted metadata library for Raven and corresponding support on neoCLR,
 including a guest-accessible library. Format codecs, semantic resolution and Raven
 symbol/emission adapters remain separate; the current bridge is not that library.
+
+The [provisional recognition contract](experiments/extended-cli-metadata/README.md#marked-artifact-recognition-2026-09-30)
+requires an explicit expected-extended input profile, a metadata-root marker and a
+matching stream digest. Future Raven native-metadata loading must reject failures
+without falling back to carrier/ordinary CLI interpretation; ordinary .NET targeting
+remains separate. This is a Python probe contract, not an implemented Raven loader.

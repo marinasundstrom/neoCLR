@@ -375,3 +375,74 @@ Next bounded task: define and test a fail-closed artifact-recognition contract t
 can detect stripped required extension data before native semantic loading. Then
 connect actual PE declaration/heap references, rather than extending the host-catalog
 fixture scheme into a production identity format. Raven integration remains later.
+
+## Marked artifact recognition (2026-09-30)
+
+A subsequent bounded experiment adds explicit recognition on top of raw #Neo transport.
+`embed(..., recognized=True)` writes the metadata-root version string as ASCII
+`neoCLR.NEOX.0.1;sha256=` followed by a 64-character lowercase hexadecimal digest,
+a NUL terminator and zero padding to four bytes. Root framing and ordinary stream
+contents otherwise follow the preceding probe. This is a private experimental marker,
+not an allocated CLR runtime version or a finalized production artifact contract.
+The earlier unmarked images remain raw transport fixtures.
+
+The binding digest is SHA-256 over:
+
+1. ASCII domain `neoCLR experimental metadata binding 0.1` followed by NUL.
+2. Each stream in ordinal ASCII name order: little-endian u16 name byte length,
+   name bytes, little-endian u32 data length, then exact stream data bytes.
+
+All streams, including #Neo and its stream padding, participate. Directory order and
+physical offsets do not. A conventional table/heap rewrite requires aware validation,
+reference remapping and recomputation, rather than copying a stale stream. The digest
+does not authenticate a producer, bind method bodies or validate metadata semantics.
+A deliberately recomputed digest over malformed ordinary data still passes this
+consistency layer; subsequent readers/verifiers retain their responsibilities.
+
+`recognize(image, expected_extended=True)` requires the supported marker, #Neo,
+correct digest and valid extension length/padding. The inspector then checks NEOX
+versions, required sections, signatures and member shapes as before. Recognition alone
+does not resolve dependencies, check all ordinary tables or authorize execution.
+Diagnostics distinguish an absent marker/stream, unsupported marker version, malformed
+digest and changed stream contents. No marked failure falls back to ordinary CLI.
+
+Without the explicit expected-profile requirement, `recognize` can classify an image
+containing neither indicator as ordinary CLI. It cannot reconstruct erased provenance.
+If a tool removes both the root marker and #Neo, only a caller's external expectation
+can prevent that image from being treated as ordinary input. Thus Raven's future native
+target loader and neoCLR's native metadata-loading path must carry their selected
+input profile through the read operation. File extensions alone are not that contract.
+Ordinary .NET targeting remains separately selected.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_recognition.py
+python3 docs/experiments/extended-cli-metadata/codec.py --recognized-pe target/extended-cli-metadata/recognition/marked.dll
+```
+
+`--recognized-pe` requires extended recognition before interpreting the payload.
+The earlier `--pe` switch deliberately remains raw-transport inspection and reports
+`artifact_recognition: not-requested`; it is not an alternative native-loader path.
+The switches are mutually exclusive. Neither mode executes emitted methods.
+
+[recognition-validation.json](recognition-validation.json) records .NET 10.0.0,
+System.Reflection.Metadata 10.0.0.0, Mono.Cecil 0.11.6.0 and the exact build/artifact
+versions. Both ordinary reader snapshots are unchanged by the supported marker.
+Cecil preserves that marker on rewrite but removes #Neo, and the aware inspector
+rejects the result. Eleven negative cases pass through process-level inspection:
+ordinary input when extended is expected, unmarked transport, missing stream,
+changed #Strings/#Neo, unknown marker version, malformed/wrong digests, both indicators
+removed, Cecil stripping and an unknown required feature under a valid binding.
+The 30 standalone codec tests also pass.
+
+This reuses the earlier ECMA metadata-root and measured reader behavior evidence.
+The benefit is deterministic refusal after the demonstrated lossy rewrite; the costs
+are explicit caller policy, hashing all metadata streams and an aware emission step.
+No performance claim, signed-identity claim, loader protection on an unaware runtime,
+or broad .NET/CLI version-marker compatibility is established. Final marker placement
+and compatibility policy remain open until actual library consumers exercise them.
+
+Next bounded task: move this minimal container/envelope contract into an experimental
+.NET reader/writer library with an executable consumer and shared conformance vectors.
+That library will serve Raven's symbol loader/code generator adapters; the matching
+neoCLR library still needs Introspection-backed assembly loading and assembly emission.
+Actual PE declaration binding and guest execution remain separately tracked gaps.

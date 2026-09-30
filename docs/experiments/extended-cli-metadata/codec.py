@@ -95,15 +95,21 @@ def read_image(path, limit=MAX_SIZE):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("image", type=Path)
-    parser.add_argument('--pe', action='store_true', help='extract #Neo from a supported PE32 test image')
+    inputs = parser.add_mutually_exclusive_group()
+    inputs.add_argument('--pe', action='store_true', help='inspect raw #Neo transport; no artifact recognition')
+    inputs.add_argument('--recognized-pe', action='store_true', help='require marked and bound extended metadata')
     args = parser.parse_args()
     try:
         from signatures import SECTION_KIND, SCHEMA, decode_signature
         from references import REFERENCE_SECTION, SIGNATURE_SECTION, read_profile
         from members import SECTION_KIND as MEMBER_SECTION, SCHEMA as MEMBER_SCHEMA, read_members
-        if args.pe:
-            from pe_container import MAX_IMAGE, extract
-            data = extract(read_image(args.image, MAX_IMAGE))
+        recognition = "not-requested"
+        if args.pe or args.recognized_pe:
+            from pe_container import MAX_IMAGE, extract, recognize
+            image = read_image(args.image, MAX_IMAGE)
+            if args.recognized_pe:
+                recognition = recognize(image, expected_extended=True)
+            data = extract(image)
         else:
             data = read_image(args.image)
         sections = decode(data, {SECTION_KIND: SCHEMA,
@@ -125,7 +131,7 @@ def main():
                 item.update(members=[asdict(member) for member in members],
                             owner_shape_validated=True, resolved=False)
             inspected.append(item)
-        print(json.dumps({"profile": "NEOX 0.1", "executable": False, "sections": inspected}, indent=2))
+        print(json.dumps({"profile": "NEOX 0.1", "executable": False, "artifact_recognition": recognition, "sections": inspected}, indent=2))
     except (OSError, FormatError) as error:
         print(f"metadata: {error}", file=sys.stderr)
         return 1

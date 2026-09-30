@@ -23,7 +23,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Cecil rewriting strips #Neo. The aware inspector rejects unknown required data
   that ordinary readers ignore; 15 malformed/unsupported container cases pass.
   This is inspection evidence, not an execution or semantics-preserving rewrite
-  guarantee. Production recognition/loading, real CLI dependency resolution,
+  guarantee. Add provisional marked-artifact recognition: a metadata-root marker,
+  stream digest and explicit expected-extended input reject stripped/changed metadata
+  in 11 process-level cases, including Cecil's lossy rewrite. This is consistency
+  checking, not authentication or an unaware-runtime execution guard. The 30 codec
+  tests still pass. Production recognition/loading, real CLI dependency resolution,
   compiled cross-module evidence and Raven compiler changes remain pending.
   Record the author-directed plan for reader/writer libraries on both .NET and
   neoCLR, including native versus guest-accessible support and cross-platform
