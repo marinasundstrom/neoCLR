@@ -74,7 +74,9 @@ successful neoCLR run. Calls can now be imported from read-only definitions with
 retaining the producer builder graph. An optional Raven adapter now exposes explicit
 configuration and compiler diagnostics; a cross-file call executes in either file
 order. A bounded native declaration reader now feeds that .NET-based input provider
-through a reference-only PE projection; execution uses the original native artifact. Native target adapters
+through a reference-only PE projection; execution uses the original native artifact.
+The end-to-end case now compiles both a Raven library and its consuming application,
+including overload selection and a library-local call. Native target adapters
 and broader ordinary metadata coverage come next, followed by structural extensions. Production NEOX loading and structural runtime support remain pending;
 this is not a published platform format.
 

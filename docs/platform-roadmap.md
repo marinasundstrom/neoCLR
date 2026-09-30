@@ -453,3 +453,9 @@ a temporary reference-only PE into Raven's existing semantic provider. The origi
 native dependency runs with all three emitted application variants to 42. See
 [scope and replacement plan](raven-cli-bridge.md#native-dependency-input-through-a-reference-projection--2026-09-30);
 a native symbol provider and production registration remain pending.
+
+Raven-to-Raven dependency checkpoint (2026-09-30): the end-to-end producer is now a
+Raven library, with a separately compiled Raven application consuming its native
+metadata through the temporary reference projection. Overload/helper calls execute
+to 42 and dependency failure cases are checked. Native symbol loading and wider
+source/visibility support remain staged follow-up work.

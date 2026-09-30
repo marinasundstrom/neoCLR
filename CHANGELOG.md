@@ -128,6 +128,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   All 23 C# contract groups pass; Raven binds the native dependency through this
   projection and all three applications run to 42 using the original native artifact.
   This temporary input bridge does not implement a native semantic-data provider.
+  Extend the case to a Raven-compiled library and separate Raven application,
+  including overload selection and a library-local helper call. All three application
+  variants return 42; unsupported library visibility and missing/wrong-version native
+  dependencies are rejected. The metadata API and native runtime format are unchanged.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
