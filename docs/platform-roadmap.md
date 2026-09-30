@@ -6,7 +6,10 @@ milestone sequencing and scope. Explicit author directions take precedence.
 ## Current work
 
 **Author-directed metadata exploration (2026-09-30).** Begin extended CLI metadata
-on `codex/extended-cli-metadata`, based on main, with later Raven integration.
+on `codex/extended-cli-metadata`, based on main, with later Raven integration. The
+author confirms the Cecil-style metadata API remains an independent project, consumed
+by Raven's neoCLR target through compiler-owned loader/emitter adapters; integration
+does not move the library into the compiler. [Project ownership](design/extended-cli-metadata.md#independent-metadata-project-raven-target-consumer-2026-09-30).
 **Latest sequencing clarification:** establish a working metadata format and its APIs,
 then integrate the refactored compiler, then add improvements such as structural types.
 The direct native producer/load test below is the bounded acceptance baseline;

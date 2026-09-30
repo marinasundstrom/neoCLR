@@ -753,3 +753,28 @@ Expand ordinary signatures/bodies when the consumer needs them. General runtime 
 full compiler coverage and the guest metadata-library port remain later. Compiler
 changes will need paired Raven/neoCLR contract documentation, changelogs and focused
 .NET regression checks. No Raven source was changed during this inspection.
+
+
+## Independent metadata project, Raven target consumer (2026-09-30)
+
+The author explicitly confirmed that the Cecil-style metadata API remains a separate
+project and is consumed by Raven for the neoCLR target. Integration means adding a
+consumer of the library, not moving its implementation into the compiler. The current
+`tools/metadata/NeoCLR.Metadata.Experimental` project already has that independent
+build boundary; its experimental naming and non-packable setting are unchanged. This
+decision does not select a new repository, package name or distribution mechanism.
+
+The dependency direction is Raven's neoCLR target adapters -> metadata library. The
+library owns format reading/writing, the declaration/reference model, resolution
+contracts and format validation. Raven owns conversion to compilation-local symbols,
+lowering from compiler representations, target capability diagnostics and integration
+with its semantic-loader/emitter services. Shared compiler code must not acquire a
+dependency on the library's concrete metadata objects. The library must not depend on
+Raven compiler symbols, syntax trees or compilation state.
+
+Modern .NET retains its existing default loader/emitter. The first end-to-end case in
+the selected refactoring activity should consume an explicitly pinned build of this
+independent project through the neoCLR target. Keep the library's standalone C# format
+and contract tests, and add compiler-side consumer tests for symbol import and emission
+plus native runtime acceptance. Packaging/versioning and the eventual Raven port can
+evolve separately; neither is implied complete by this boundary decision.

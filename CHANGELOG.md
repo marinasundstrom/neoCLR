@@ -100,7 +100,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   signature budget with MethodDefs. All 21 C# contract groups pass. Record the selected
   Raven refactoring activity and its inspected loader/emitter boundaries; the next
   planned consumer is a bounded compiler-to-runtime case that drives remaining format
-  support, rather than waiting for exhaustive metadata coverage.
+  support, rather than waiting for exhaustive metadata coverage. Clarify that the
+  Cecil-style API remains an independent library project consumed by Raven's neoCLR
+  target, with compiler-owned adapters and no reverse compiler dependency.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

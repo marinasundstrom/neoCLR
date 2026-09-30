@@ -5,14 +5,21 @@ future Raven symbol-loader and code-generation adapters. `MetadataConformance` i
 separate executable consumer. Both target .NET 10, are non-packable and depend only
 on the platform libraries; neither requires Raven or Mono.Cecil.
 
+The Cecil-style API remains an independent library project. Raven's neoCLR target
+will consume it through compiler-owned semantic-loader and emitter adapters. Format
+code and metadata objects stay here; compiler symbols, lowering and target diagnostics
+stay in Raven. The dependency is one-way, from that target to this library. The current
+.NET compiler provider remains the default. Package distribution and a possible
+repository split have not been selected.
+
 The current library covers NEOX 0.1 envelope framing, immutable section ownership
 and structural signature syntax/context validation, reference-table codecs and
 explicit-catalog structural identity and synthesized-member contracts. MetadataProfile
 provides typed Read/Create/Write entry points with owned documents and section-profile
-validation. Bounded PE32 recognition/extraction is implemented; actual
-explicit AssemblyRef resolution is implemented; physical TypeRef binding and compiler
-adapters remain pending. A read-only Model namespace
-now exposes real assembly/module/TypeDef declarations and definition-backed references. It is not the future neoCLR guest metadata/Introspection/Emit
+validation. Bounded PE32 recognition/extraction, explicit AssemblyRef/TypeRef binding
+and the emitted static-method MemberRef subset are implemented. The Model namespace
+exposes assembly, type and callable declarations, alongside controlled PE/native writers.
+Compiler adapters remain pending. It is not the future neoCLR guest metadata/Introspection/Emit
 library. Names and contracts are experimental.
 
 - [Complete API contract](../../api-docs/experimental-metadata.md)

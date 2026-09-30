@@ -9170,3 +9170,16 @@ remote synchronization does not publish a runtime bundle or website.
 - **Next:** use the named compiler activity for a bounded import/emission/runtime case
   and let its unsupported cases drive subsequent ordinary metadata work; structural
   extensions follow that integration. [Boundary inventory and proposed case](design/extended-cli-metadata.md#refactored-compiler-as-the-next-end-to-end-consumer-2026-09-30).
+
+
+## 2026-09-30 — Keep the metadata API independent of Raven
+
+- **Author clarification:** the Cecil-style metadata API stays a separate project;
+  Raven consumes it for the neoCLR target.
+- **Assistant response/action:** recorded a one-way dependency from Raven's target
+  adapters to the library. Format/model code remains library-owned; compiler symbol
+  projection, lowering and target diagnostics remain Raven-owned. Updated the roadmap
+  and library documentation to make this boundary explicit.
+- **Outcome:** the existing independent .NET project already matches this ownership.
+  No code relocation or compiler change was needed. Package distribution, any repository
+  split and actual adapter implementation remain open. [Ownership decision](design/extended-cli-metadata.md#independent-metadata-project-raven-target-consumer-2026-09-30).
