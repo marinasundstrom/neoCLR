@@ -9063,3 +9063,21 @@ that inhabited unit-result transport is independently required by the nominal
 Func ABI; that compatibility rule stays shared. Structural metadata and complete
 compiler support remain deferred. Validation evidence accompanies the integration;
 remote synchronization does not publish a runtime bundle or website.
+
+
+## 2026-09-30 — .NET metadata API and potential Raven foundation
+
+- **Author:** “We should have a good enough API for .NET so we can later integrate it
+  with the Raven compiler.” The author also said the pending Metadata Introspection
+  API would potentially be built on a Raven port of the Metadata Reader and Writer API.
+- **Assistant proposal/action:** continued the .NET library with a typed reference-profile
+  facade: Read/Create/Write, owned decoded documents, local section/use validation and
+  explicit catalog resolution. Recorded compiler-readiness criteria and the potential
+  Raven port/projection boundary in the [design](design/extended-cli-metadata.md#net-api-direction-and-potential-raven-port-2026-09-30).
+- **Outcome:** the focused .NET consumer passes 36 shared profile cases, including 29
+  rejections, and independent emission/ownership checks. This implements an experimental
+  one-root metadata profile, not complete assembly IO or Raven compiler integration.
+  [Evidence](experiments/extended-cli-metadata/dotnet-profiles-validation.json).
+- **Open:** physical CLI binding, compiler adapter validation, complete assembly writer
+  coverage and the Raven port/Metadata Introspection API remain pending. “Potentially”
+  is retained as an option; no port language/API implementation is inferred as complete.

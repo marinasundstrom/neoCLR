@@ -374,3 +374,47 @@ execution as four separate results. The present PE probe proves only the bounded
 category plus transport to the Python extension inspector. It does not complete either
 platform's reader/writer library. This direction does not move structural runtime work
 to main or change Raven's ordinary .NET target.
+
+
+## .NET API direction and potential Raven port (2026-09-30)
+
+**Author clarification:** establish a good enough .NET reader/writer API for later
+Raven compiler integration. A pending Metadata Introspection API may be built on a
+Raven port of that reader/writer API. The port is a potential implementation route,
+not a completed decision or a claim that guest APIs exist.
+
+The .NET reference-profile facade now gives callers Read, Create and Write entry
+points and an owned typed document. It enforces section composition before exposing
+syntax, bindings and member references, then leaves catalog resolution explicit.
+This is a compiler-facing foundation; the bounded one-root experiment is not yet a
+complete assembly reader/writer. [Conformance evidence](../experiments/extended-cli-metadata/dotnet-profiles-validation.json)
+covers 36 profile vectors plus independent typed construction and ownership checks.
+
+Compared with the .NET layers discussed in the existing research, raw metadata
+reading/building belongs below compiler symbols and reflection-style objects. Our
+facade adds neoCLR profile validation and explicit structural contracts at that lower
+layer. Owned data avoids reader-lifetime coupling for the current small bounded
+format, at the cost of copying payloads; no performance advantage is claimed. The
+separation allows Raven symbols and Metadata Introspection to project the same decoded
+model without making either model the wire format.
+
+Before calling the .NET API ready for Raven integration, demonstrate:
+
+1. Recognized artifact input and actual CLI declaration/dependency binding, with
+   diagnostics that preserve useful failure context and no silent semantic fallback.
+2. Assembly-level declaration/signature coverage required by a bounded compiler
+   consumer; stable handles and explicit remapping/fixups for writer construction.
+3. A tested Raven importer/emitter adapter using those contracts, with ordinary .NET
+   targeting unchanged and structural experiments still isolated on feature branches.
+4. Loss/unknown-data policy and deterministic output tests for the supported editing
+   workflow. Byte-preserving round-trip alone is not semantics-preserving rewriting.
+
+These are readiness criteria, not implemented features or a new public package promise.
+For a potential Raven port, preserve the shared wire vectors, limits, validation
+phases, ownership semantics and catalog contracts. Map .NET spans/collections/errors
+to tested Raven equivalents and neoCLR UTF-8 contracts; do not mechanically import
+host reflection types or assume .NET API spellings are available in the guest.
+Metadata Introspection would sit above that port as a projection/provider, while
+assembly emission would consume the writer. The exact public Raven surface, port
+strategy and native boundary remain open. Next bounded .NET work is artifact
+recognition/extraction before physical CLI binding.

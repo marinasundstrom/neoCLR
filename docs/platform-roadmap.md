@@ -19,11 +19,15 @@ stripped/changed metadata in 11 recognition cases. The first .NET reader/writer 
 fixtures and 49 cross-reader rejection cases. Its structural signature codec now passes
 14 cross-reader vectors and 103 rejection cases. .NET reference tables and explicit-catalog
 structural identity pass 95 shared vectors (69 rejections). .NET synthesized-member
-contracts now pass 49 shared vectors (30 rejections). The next bounded slice is
-.NET envelope profile composition/validation; PE recognition and real CLI binding remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+contracts now pass 49 shared vectors (30 rejections). A typed .NET reference-profile
+Read/Create/Write facade passes 36 shared vectors (29 rejections). The next bounded
+slice is .NET artifact recognition/extraction; real CLI binding remains pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
-neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
+neoCLR. The author further clarifies that the .NET API should support later Raven compiler
+integration, with a potential Raven port beneath the pending Metadata Introspection API;
+[readiness criteria and open choices](design/extended-cli-metadata.md#net-api-direction-and-potential-raven-port-2026-09-30)
+keep this distinct from completed integration. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
 separates shared format/conformance contracts, .NET tooling, native support and an
 actual neoCLR guest library. Concrete consumers are Raven’s symbol loader/code
 generation and neoCLR assembly loading into Introspection/assembly emission; these

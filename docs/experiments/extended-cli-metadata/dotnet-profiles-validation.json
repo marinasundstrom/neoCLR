@@ -1,0 +1,155 @@
+{
+  "date": "2026-09-30",
+  "scope": "reference-profile document composition; no PE loading or compiler integration",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "target_framework": "net10.0",
+  "shared_vectors": 36,
+  "rejection_vectors": 29,
+  "independent_emission_creation_and_ownership_checks": "passed",
+  "cases": [
+    {
+      "name": "references-a",
+      "rejected": false
+    },
+    {
+      "name": "references-b",
+      "rejected": false
+    },
+    {
+      "name": "tuple-fixture",
+      "rejected": false
+    },
+    {
+      "name": "reverse-directory",
+      "rejected": false
+    },
+    {
+      "name": "empty-members",
+      "rejected": false
+    },
+    {
+      "name": "opaque-extension",
+      "rejected": false
+    },
+    {
+      "name": "opaque-future-member-schema",
+      "rejected": false
+    },
+    {
+      "name": "empty",
+      "rejected": true
+    },
+    {
+      "name": "missing-signature",
+      "rejected": true
+    },
+    {
+      "name": "missing-references",
+      "rejected": true
+    },
+    {
+      "name": "local-only",
+      "rejected": true
+    },
+    {
+      "name": "mixed-local",
+      "rejected": true
+    },
+    {
+      "name": "member-only",
+      "rejected": true
+    },
+    {
+      "name": "optional-references",
+      "rejected": true
+    },
+    {
+      "name": "optional-signature",
+      "rejected": true
+    },
+    {
+      "name": "optional-members",
+      "rejected": true
+    },
+    {
+      "name": "future-required",
+      "rejected": true
+    },
+    {
+      "name": "future-required-member",
+      "rejected": true
+    },
+    {
+      "name": "future-optional-references",
+      "rejected": true
+    },
+    {
+      "name": "future-optional-signature",
+      "rejected": true
+    },
+    {
+      "name": "bad-reference-payload",
+      "rejected": true
+    },
+    {
+      "name": "bad-signature-payload",
+      "rejected": true
+    },
+    {
+      "name": "bad-member-payload",
+      "rejected": true
+    },
+    {
+      "name": "wrong-member-owner-shape",
+      "rejected": true
+    },
+    {
+      "name": "tuple-ordinal",
+      "rejected": true
+    },
+    {
+      "name": "unbound-nominal",
+      "rejected": true
+    },
+    {
+      "name": "missing-type-owner",
+      "rejected": true
+    },
+    {
+      "name": "missing-method-owner",
+      "rejected": true
+    },
+    {
+      "name": "missing-self-owner",
+      "rejected": true
+    },
+    {
+      "name": "nominal-method-token",
+      "rejected": true
+    },
+    {
+      "name": "truncation-0",
+      "rejected": true
+    },
+    {
+      "name": "truncation-15",
+      "rejected": true
+    },
+    {
+      "name": "truncation-16",
+      "rejected": true
+    },
+    {
+      "name": "truncation-31",
+      "rejected": true
+    },
+    {
+      "name": "truncation-107",
+      "rejected": true
+    },
+    {
+      "name": "trailing-byte",
+      "rejected": true
+    }
+  ]
+}

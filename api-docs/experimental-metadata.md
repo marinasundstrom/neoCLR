@@ -11,6 +11,8 @@ Introspection assembly loading or assembly emission is implemented by this libra
 
 ## Namespace and types
 
+- [MetadataProfile](#metadataprofile): reference-profile reader and writer entry points.
+- [MetadataProfileDocument](#metadataprofiledocument): owned typed view and explicit catalog resolution.
 - [MetadataSection](#metadatasection): immutable, owned opaque payload and section metadata.
 - [MetadataEnvelope](#metadataenvelope): bounded envelope read/write operations.
 - [TypeExpression](#typeexpression): immutable raw signature syntax tree.
@@ -457,3 +459,108 @@ and reader ownership checks also pass.
 ```sh
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_members.py
 ```
+
+
+## MetadataProfile
+
+```csharp
+public static class MetadataProfile
+{
+    public static MetadataProfileDocument Read(ReadOnlySpan<byte> image);
+    public static MetadataProfileDocument Create(TypeExpression root,
+        SignatureContext context, ReferenceBindings bindings,
+        IReadOnlyList<StructuralMemberReference>? members = null,
+        IReadOnlyList<MetadataSection>? optionalSections = null);
+    public static byte[] Write(MetadataProfileDocument document);
+}
+```
+
+These are the typed entry points for the **reference profile**, not a general CLI
+assembly API. Read requires mandatory schema-1 sections 2 and 3. Section 1 is rejected
+in any version, including when optional. A schema-1 section 4 must be mandatory when
+present. Unknown required kinds/versions fail; unknown optional payloads are retained
+opaquely, including future optional section-4 versions. Unsupported optional versions
+of sections 2 or 3 cannot satisfy the mandatory reference-profile requirements.
+A local-only, empty or incomplete envelope fails instead of producing a partial view.
+
+Read performs envelope validation, signature/table decoding, local nominal index/kind
+checks, generic/Self owner presence checks, and member shape/ordinal validation. It
+owns the resulting data independently of the input buffer. It does not consult a
+catalog: nominal arity, declaring method ownership and Self interface requirements
+are checked later by the document's Resolve methods. Do not mutate input during a call.
+Malformed or unsupported input raises InvalidDataException.
+
+Create accepts typed syntax, explicit local bindings and optional members. It copies
+through the codecs and performs the same local validation as Read. Null root/context/
+bindings raises ArgumentNullException. Null members omits section 4; an empty list
+emits a supported mandatory empty table. OptionalSections accepts only non-null,
+optional sections with kinds greater than 4. Duplicate kinds, required extensions,
+reserved kinds 1–4, invalid shapes/references or exceeded bounds raise
+InvalidDataException. Output order is 2, 3, optional 4, then supplied extensions.
+All existing envelope/signature/table resource bounds apply.
+
+Write accepts only a document returned by Read/Create and returns a fresh array.
+Null document raises ArgumentNullException. Read/Write preserves original order and
+all bytes, including opaque optional sections. Semantic editing is explicit: construct
+a new document and supply consistently remapped indices. Create does not copy unknown
+extensions automatically or claim their meaning survives changes. In particular, an
+unknown future optional section-4 payload can be round-tripped but cannot be attached
+to a newly constructed schema-1 document through optionalSections.
+
+## MetadataProfileDocument
+
+```csharp
+public sealed class MetadataProfileDocument
+{
+    public IReadOnlyList<MetadataSection> Sections { get; }
+    public TypeExpression Root { get; }
+    public SignatureContext Context { get; }
+    public ReferenceBindings Bindings { get; }
+    public IReadOnlyList<StructuralMemberReference> Members { get; }
+    public bool HasMemberTable { get; }
+    public IReadOnlyList<MetadataSection> UnknownOptionalSections { get; }
+    public ResolvedTypeIdentity ResolveType(
+        IReadOnlyDictionary<MetadataReference, MetadataDefinition> catalog);
+    public IReadOnlyList<StructuralMemberDescriptor> ResolveMembers(
+        IReadOnlyDictionary<MetadataReference, MetadataDefinition> catalog);
+}
+```
+
+No public constructor or setters. Sections contains all owned immutable sections;
+Root/Context/Bindings expose decoded syntax and owners. Members contains supported
+schema-1 rows. HasMemberTable distinguishes an absent/unsupported table from a present
+empty schema-1 table. UnknownOptionalSections exposes unrecognized sections without
+claiming to understand them; callers must inspect it when their own workflow needs
+additional semantics.
+
+ResolveType returns full catalog-scoped identity. ResolveMembers validates the owner
+even when Members is empty, then derives supported contracts in table order. Both
+require a non-null authoritative catalog (ArgumentNullException otherwise); unresolved
+or incompatible declarations raise InvalidDataException. These methods do not cache
+or retain the catalog; do not mutate it during a call. No assembly loading or runtime
+object construction occurs.
+
+This independently emitted example is compiled by the conformance consumer and matches
+the shared Python tuple-member fixture:
+
+```csharp
+var document = MetadataProfile.Create(
+    new TypeExpression("tuple", [new("int32"), new("string")]),
+    new SignatureContext(), new ReferenceBindings([]),
+    [new("tuple_element", Element: 1), new("tuple_deconstruct")]);
+var bytes = MetadataProfile.Write(document);
+var imported = MetadataProfile.Read(bytes);
+var contracts = imported.ResolveMembers(
+    new Dictionary<MetadataReference, MetadataDefinition>());
+```
+
+The focused consumer covers 36 shared profile vectors (29 rejections), independent
+creation/emission, owned data, optional preservation and explicit resolution failure.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_profiles.py
+```
+
+The future Raven adapter and potential Raven implementation for Metadata Introspection
+are still planned. This one-root reference profile is not yet sufficient to represent
+complete assemblies, their declarations, IL bodies or all compiler signatures.

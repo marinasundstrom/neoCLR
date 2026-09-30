@@ -553,3 +553,26 @@ are versioned with the implementation.
 Next bounded task: a .NET profile reader/writer that enforces section composition and
 mandatory schemas before exposing decoded structural metadata. PE marker recognition,
 physical CLI binding and Raven/guest Introspection/Emit adapters remain separate work.
+
+
+## .NET typed reference-profile facade (2026-09-30)
+
+MetadataProfile.Read/Create/Write and MetadataProfileDocument now compose the payload
+codecs into a locally validated reference-profile API. Mandatory schema-1 sections
+2/3, optional supported mandatory section 4, local index/binder checks and member owner
+shapes are validated before exposing a typed view. Catalog resolution remains explicit.
+Unknown optional payloads and section order survive an unchanged read/write round-trip;
+new construction requires caller-managed references and explicit optional extensions.
+
+`verify_dotnet_profiles.py` validates 36 shared cases (29 rejections), plus independent
+.NET typed emission matching the tuple fixture, ownership, absent versus empty member
+tables, writer extension rules and explicit catalog resolution failures. The build has
+zero warnings/errors; [evidence](dotnet-profiles-validation.json) records the cases.
+The [complete API reference](../../../api-docs/experimental-metadata.md#metadataprofile)
+documents the two added host types. Guest API snapshots remain unchanged.
+
+The author clarified the intended quality bar: a .NET API suitable for eventual Raven
+compiler integration, and potentially a Raven port under Metadata Introspection.
+The [design/readiness criteria](../../design/extended-cli-metadata.md#net-api-direction-and-potential-raven-port-2026-09-30)
+record that direction without treating this one-root profile as complete assembly IO.
+Next bounded work: .NET artifact recognition/extraction, followed by actual CLI binding.

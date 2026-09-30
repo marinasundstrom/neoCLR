@@ -51,7 +51,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   49 shared vectors pass (14 contracts, five identity comparisons, 30 rejections),
   plus independent golden emission, writer validation and reader ownership checks.
   Document four new host types; descriptors preserve native unsigned array length
-  and Function modes/no-result without granting runtime invocation.
+  and Function modes/no-result without granting runtime invocation. Add a typed .NET
+  reference-profile Read/Create/Write API with owned documents, local validation,
+  opaque optional preservation and explicit catalog resolution. All 36 shared profile
+  cases pass (29 rejections), plus independent construction/emission and ownership
+  checks. Document both new host types and the author’s direction toward a Raven-ready
+  .NET API and potential Raven port beneath Metadata Introspection; complete assembly
+  IO, compiler integration and the port remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

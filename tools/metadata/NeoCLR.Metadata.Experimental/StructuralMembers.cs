@@ -111,15 +111,7 @@ public static class StructuralMembers
         var result = new List<StructuralMemberDescriptor>();
         foreach (var member in members)
         {
-            bool valid = member.Operation switch
-            {
-                "array_length" => root.Kind is "array" or "array_ref",
-                "tuple_element" => root.Kind == "tuple" && member.Element < children.Length,
-                "tuple_deconstruct" => root.Kind == "tuple",
-                "function_invoke" => root.Kind == "function",
-                _ => false
-            };
-            if (!valid) throw new InvalidDataException("structural operation is incompatible with owner shape or tuple ordinal");
+            ValidateShape(member, root);
             var identity = new ResolvedMemberIdentity(owner, member.Operation, member.Element);
             result.Add(member.Operation switch
             {
@@ -130,6 +122,19 @@ public static class StructuralMembers
             });
         }
         return result.AsReadOnly();
+    }
+
+    internal static void ValidateShape(StructuralMemberReference member, TypeExpression root)
+    {
+        bool valid = member.Operation switch
+        {
+            "array_length" => root.Kind is "array" or "array_ref",
+            "tuple_element" => root.Kind == "tuple" && member.Element < root.Children.Count,
+            "tuple_deconstruct" => root.Kind == "tuple",
+            "function_invoke" => root.Kind == "function",
+            _ => false
+        };
+        if (!valid) throw new InvalidDataException("structural operation is incompatible with owner shape or tuple ordinal");
     }
 
     private static void Validate(IReadOnlyList<StructuralMemberReference> members)
