@@ -98,7 +98,10 @@ def main():
     args = parser.parse_args()
     try:
         from signatures import SECTION_KIND, SCHEMA, decode_signature
-        sections = decode(read_image(args.image), {SECTION_KIND: SCHEMA})
+        from references import REFERENCE_SECTION, SIGNATURE_SECTION, read_profile
+        sections = decode(read_image(args.image), {SECTION_KIND: SCHEMA,
+                          REFERENCE_SECTION: 1, SIGNATURE_SECTION: 1})
+        profile = read_profile(sections)
         inspected = []
         for section in sections:
             item = {"kind": section.kind, "version": section.version,
@@ -106,6 +109,10 @@ def main():
             if (section.kind, section.version) == (SECTION_KIND, SCHEMA):
                 root, context = decode_signature(section.payload)
                 item.update(signature=asdict(root), context=asdict(context))
+            if profile is not None and section.kind == SIGNATURE_SECTION:
+                root, context, bindings = profile
+                item.update(signature=asdict(root), context=asdict(context),
+                            reference_count=len(bindings.references), resolved=False)
             inspected.append(item)
         print(json.dumps({"profile": "NEOX 0.1", "executable": False, "sections": inspected}, indent=2))
     except (OSError, FormatError) as error:

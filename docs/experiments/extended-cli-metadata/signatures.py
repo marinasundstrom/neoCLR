@@ -12,7 +12,7 @@ MAX_ARITY = 256
 TAGS = {"int32": 1, "string": 2, "bool": 3, "unit": 4,
         "type_parameter": 5, "method_parameter": 6, "self": 7,
         "array": 8, "tuple": 9, "function": 10, "union": 11,
-        "intersection": 12, "nullable": 13, "array_ref": 14}
+        "intersection": 12, "nullable": 13, "array_ref": 14, "nominal": 15}
 KINDS = {value: key for key, value in TAGS.items()}
 MODES = {"value": 0, "ref": 1, "readonly_ref": 2, "out": 3, "out_when_true": 4}
 MODE_NAMES = {value: key for key, value in MODES.items()}
@@ -42,7 +42,7 @@ def validate_context(context):
         raise FormatError("invalid Self context flag")
 
 
-def encode_signature(root, context=Context()):
+def encode_signature(root, context=Context(), *, references=False):
     validate_context(context)
     remaining = MAX_NODES
 
@@ -54,6 +54,8 @@ def encode_signature(root, context=Context()):
         if not isinstance(value, Node) or value.kind not in TAGS:
             raise FormatError("unknown signature kind")
         kind = value.kind
+        if kind == "nominal" and not references:
+            raise FormatError("nominal node requires reference profile")
         if type(value.no_result) is not bool or (kind != "function" and value.no_result):
             raise FormatError("invalid no-result flag")
         children = value.children
@@ -61,7 +63,7 @@ def encode_signature(root, context=Context()):
             raise FormatError("signature arity limit")
         if kind != "function" and value.modes:
             raise FormatError("unexpected parameter modes")
-        if kind not in ("type_parameter", "method_parameter") and value.index != 0:
+        if kind not in ("type_parameter", "method_parameter", "nominal") and value.index != 0:
             raise FormatError("unexpected index")
         payload = bytearray()
         if kind in ("type_parameter", "method_parameter"):
@@ -80,6 +82,12 @@ def encode_signature(root, context=Context()):
             if not minimum <= len(children) <= MAX_ARITY:
                 raise FormatError("invalid compound arity")
             payload.extend(struct.pack("<H", len(children)))
+            for child in children:
+                payload.extend(node(child, depth + 1))
+        elif kind == "nominal":
+            if type(value.index) is not int or not 1 <= value.index <= 256 or len(children) > MAX_ARITY:
+                raise FormatError("invalid nominal reference or arity")
+            payload.extend(struct.pack("<HH", value.index, len(children)))
             for child in children:
                 payload.extend(node(child, depth + 1))
         elif kind == "function":
@@ -104,7 +112,7 @@ def encode_signature(root, context=Context()):
                        int(context.self_allowed)) + node(root, 0)
 
 
-def decode_signature(data):
+def decode_signature(data, *, references=False):
     if len(data) < 5 or len(data) > 1024 * 1024:
         raise FormatError("invalid signature size")
     types, methods, self_flag = struct.unpack_from("<HHB", data)
@@ -155,6 +163,14 @@ def decode_signature(data):
                 raise FormatError("signature arity limit")
             for _ in range(count):
                 child()
+        elif kind == "nominal":
+            if not references:
+                raise FormatError("nominal node requires reference profile")
+            index, count = take("HH")
+            if count > MAX_ARITY:
+                raise FormatError("signature arity limit")
+            for _ in range(count):
+                child()
         elif kind == "function":
             convention, flags, count = take("BBH")
             if flags not in (0, 1):
@@ -177,6 +193,6 @@ def decode_signature(data):
     if end != len(data):
         raise FormatError("trailing signature bytes")
     # Apply the same shape/context rules on both paths, including leaf payloads.
-    if encode_signature(root, context) != data:
+    if encode_signature(root, context, references=references) != data:
         raise FormatError("noncanonical signature encoding")
     return root, context

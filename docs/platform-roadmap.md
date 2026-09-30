@@ -11,8 +11,9 @@ Structural types are an explicit design requirement, including arrays, tuples,
 Function types, unions/intersections and synthesized members. The
 [design and staged acceptance plan](design/extended-cli-metadata.md) is exploratory;
 an isolated codec/inspector now validates experimental framing and structural
-signatures with 14 focused tests. Nominal reference resolution, CLI embedding and
-runtime support remain unimplemented. This scopes the requested exploration
+signatures and host-catalog nominal resolution with 22 focused tests. Differently
+numbered fixture references resolve to equal structural keys. Synthesized-member
+references are next; actual CLI embedding and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**

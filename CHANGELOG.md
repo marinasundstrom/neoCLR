@@ -16,7 +16,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend it with structural signature payloads and a checked-in nested fixture;
   all 14 focused tests pass. Reuse structural-branch Function no-result/output
   contracts and the owned/reference array distinction. Keep binder contexts local;
-  cross-module identity and nominal reference validation remain pending.
+  add a separate reference profile with catalog-scoped nominal identities and
+  declaring-owner generic/Self contexts. All 22 focused tests pass, including
+  independently numbered fixture references, bounded union/intersection keys and
+  rejection of unresolved definitions, wrong kinds and arity/owner mismatches.
+  Real CLI dependency resolution and compiled cross-module evidence remain pending.
   CLI embedding, runtime support and Raven compiler changes remain unimplemented.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
