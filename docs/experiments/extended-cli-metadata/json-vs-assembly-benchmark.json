@@ -1,0 +1,320 @@
+{
+  "runtime_revision": "116be40e65f86a84c1e4acc39614edef93085bc4",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "processor": "arm",
+  "samples": 9,
+  "runtime_sha256": "929b169bab427e67d18c052cabe130cab14b651d72e64c0d25da49ae90586150",
+  "phase_benchmark_sha256": "6c26a3a0a136dce3fa11979043ad7eb796b3623b6d3f301d1b54b12f153102e5",
+  "phases": {
+    "cases": [
+      {
+        "bytes": {
+          "assembly": 5542303,
+          "json_compact": 7104628,
+          "json_pretty": 15017185
+        },
+        "decode_and_drop": {
+          "assembly_schema3": {
+            "iterations_per_sample": 2,
+            "max_us": 55621.3125,
+            "median_us": 52795.95849999999,
+            "min_us": 51453.292,
+            "samples_us": [
+              55621.3125,
+              54476.479,
+              52181.9375,
+              52641.354,
+              54218.021,
+              52795.95849999999,
+              52449.229,
+              51453.292,
+              53784.5205
+            ]
+          },
+          "json_current_compact": {
+            "iterations_per_sample": 2,
+            "max_us": 65398.3125,
+            "median_us": 62779.41650000001,
+            "min_us": 57971.333,
+            "samples_us": [
+              57971.333,
+              63663.4165,
+              60437.229,
+              62382.4165,
+              65398.3125,
+              62875.35399999999,
+              62779.41650000001,
+              61469.8335,
+              64882.729
+            ]
+          },
+          "json_current_pretty": {
+            "iterations_per_sample": 2,
+            "max_us": 68513.7705,
+            "median_us": 65970.396,
+            "min_us": 64993.06250000001,
+            "samples_us": [
+              67613.1665,
+              65319.1875,
+              65804.8125,
+              67081.604,
+              65785.75,
+              64993.06250000001,
+              65970.396,
+              67039.70850000001,
+              68513.7705
+            ]
+          },
+          "json_direct_typed_diagnostic": {
+            "iterations_per_sample": 2,
+            "max_us": 62372.29150000001,
+            "median_us": 28417.917,
+            "min_us": 26727.854499999998,
+            "samples_us": [
+              62372.29150000001,
+              26919.25,
+              29041.979,
+              28196.083,
+              28682.2085,
+              26727.854499999998,
+              30040.646,
+              28417.917,
+              26792.625
+            ]
+          }
+        },
+        "name": "System",
+        "sha256": {
+          "assembly": "a19756e92fdc1357a71840db67b83361330887e93dada37a779230d4a62a86ec",
+          "json": "e02cda3e864e36f74d97b6ca31f647137c2a8ba7eec0b3265346274e3468a39f"
+        }
+      },
+      {
+        "bytes": {
+          "assembly": 238988,
+          "json_compact": 301495,
+          "json_pretty": 535539
+        },
+        "decode_and_drop": {
+          "assembly_schema3": {
+            "iterations_per_sample": 10,
+            "max_us": 1886.5291999999997,
+            "median_us": 1849.925,
+            "min_us": 1834.7207999999998,
+            "samples_us": [
+              1850.0959000000003,
+              1854.6666999999998,
+              1834.7207999999998,
+              1841.0540999999998,
+              1846.0542,
+              1839.4082999999998,
+              1867.5625,
+              1886.5291999999997,
+              1849.925
+            ]
+          },
+          "json_current_compact": {
+            "iterations_per_sample": 10,
+            "max_us": 2099.5208000000002,
+            "median_us": 1809.8416999999997,
+            "min_us": 1775.3084,
+            "samples_us": [
+              1824.25,
+              1850.4083999999998,
+              1787.4792000000002,
+              1801.5875,
+              1775.3084,
+              1809.8416999999997,
+              2099.5208000000002,
+              1815.7666000000002,
+              1778.3957999999998
+            ]
+          },
+          "json_current_pretty": {
+            "iterations_per_sample": 10,
+            "max_us": 2094.8917,
+            "median_us": 1927.5667,
+            "min_us": 1916.3540999999998,
+            "samples_us": [
+              1928.175,
+              1918.6208,
+              1936.4958000000001,
+              2094.8917,
+              1916.3540999999998,
+              1927.3582999999999,
+              1941.3333000000002,
+              1927.5667,
+              1921.8333000000002
+            ]
+          },
+          "json_direct_typed_diagnostic": {
+            "iterations_per_sample": 10,
+            "max_us": 778.9082999999999,
+            "median_us": 766.3083,
+            "min_us": 761.8875,
+            "samples_us": [
+              764.1417,
+              778.9082999999999,
+              776.8707999999999,
+              761.8875,
+              777.4125,
+              764.6333,
+              767.2875,
+              766.3083,
+              766.2542
+            ]
+          }
+        },
+        "name": "FloatingMath",
+        "sha256": {
+          "assembly": "2dc83d8fd20696d7dd7624c603ca6419757feed2a06376b881f5478bc2037c31",
+          "json": "ba9a2c166172764909ae789ecc27bb8111bec78aaf6d91be52b04625ce51790a"
+        }
+      }
+    ],
+    "common_phases": {
+      "execute_prepared": {
+        "iterations_per_sample": 1,
+        "max_us": 2906.0840000000003,
+        "median_us": 2152.166,
+        "min_us": 1943.167,
+        "samples_us": [
+          1973.3749999999998,
+          1987.667,
+          2178.4590000000003,
+          2249.167,
+          1962.75,
+          1943.167,
+          2906.0840000000003,
+          2454.542,
+          2152.166
+        ]
+      },
+      "link_prepare_from_decoded": {
+        "iterations_per_sample": 1,
+        "max_us": 1449672.417,
+        "median_us": 1333998.375,
+        "min_us": 1313230.25,
+        "samples_us": [
+          1335343.125,
+          1329469.292,
+          1313230.25,
+          1341403.375,
+          1333998.375,
+          1337463.1670000001,
+          1324037.9170000001,
+          1323232.084,
+          1449672.417
+        ]
+      },
+      "verify_prepared": {
+        "iterations_per_sample": 1,
+        "max_us": 717638.459,
+        "median_us": 699190.833,
+        "min_us": 616348.791,
+        "samples_us": [
+          616348.791,
+          649689.083,
+          660657.834,
+          699190.833,
+          717638.459,
+          709552.4589999999,
+          714050.0,
+          716853.791,
+          680099.542
+        ]
+      }
+    },
+    "decode_includes": [
+      "deserialization",
+      "allocation",
+      "schema guard for binary",
+      "dropping decoded module"
+    ],
+    "decode_order": "rotate first path each sample",
+    "direct_typed_json_is_diagnostic_only": true,
+    "excluded": [
+      "file IO",
+      "process startup",
+      "assembly/compilation",
+      "cold filesystem cache"
+    ],
+    "metadata_and_output_equal": true,
+    "platform": {
+      "arch": "aarch64",
+      "os": "macos"
+    },
+    "profile": "release",
+    "samples": 9,
+    "units": "microseconds per iteration"
+  },
+  "fresh_process": {
+    "json": {
+      "samples_ms": [
+        3463.5739589999944,
+        3454.805292000003,
+        3549.044459000001,
+        3676.0947089999972,
+        3344.6851670000015,
+        3310.3688749999947,
+        3414.861541999997,
+        3380.107042000006,
+        3466.569750000005
+      ],
+      "median_ms": 3454.805292000003,
+      "min_ms": 3310.3688749999947,
+      "max_ms": 3676.0947089999972
+    },
+    "assembly": {
+      "samples_ms": [
+        3377.9837090000055,
+        3484.205207999999,
+        3635.0363749999988,
+        3587.0040830000034,
+        3449.1532920000054,
+        3439.2457089999907,
+        3440.3412079999925,
+        3303.0196659999974,
+        3333.572750000002
+      ],
+      "median_ms": 3440.3412079999925,
+      "min_ms": 3303.0196659999974,
+      "max_ms": 3635.0363749999988
+    }
+  },
+  "fresh_process_includes": [
+    "process launch",
+    "warm-cache file reads",
+    "decode",
+    "System admission",
+    "module-set validation and linking",
+    "preparation",
+    "execution",
+    "captured console output",
+    "shutdown"
+  ],
+  "limitations": [
+    "one machine/run",
+    "no cold-disk measurement",
+    "no memory/peak-RSS measurement",
+    "microbenchmarks include object destruction",
+    "phase totals are not CLI totals",
+    "direct-typed JSON is an unshipped diagnostic, not the current loader"
+  ],
+  "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+  "cpu": "Apple M1",
+  "paired_json_minus_assembly_ms": {
+    "samples": [
+      85.59024999998883,
+      -29.399915999995756,
+      -85.99191599999767,
+      89.09062599999379,
+      -104.46812500000397,
+      -128.87683399999605,
+      -25.479665999995632,
+      77.08737600000859,
+      132.99700000000303
+    ],
+    "median": -25.479665999995632
+  }
+}

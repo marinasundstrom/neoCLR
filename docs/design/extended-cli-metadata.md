@@ -1203,3 +1203,20 @@ historical evidence, not a claim that all cases were rerun with schema 3.
 The proper neoil binary producer, direct native Raven class-library compiler and broader
 compiler symbol loading remain subsequent work. These are runtime assemblies without
 a CLI projection, not inputs to the existing .NET semantic metadata provider.
+
+
+### JSON/native assembly performance checkpoint — 2026-09-30
+
+The author's requested [release benchmark](../experiments/extended-cli-metadata/json-vs-assembly-benchmark.md)
+compares the real Raven collection System and FloatingMath artifacts, with complete
+metadata equality and expected execution output. Native System is 63% smaller than
+pretty JSON and current native decoding takes about 20% less time. The full CLI run does not
+show a meaningful improvement; linking/admission remains dominant. Direct typed JSON
+without the existing intermediate Value tree is substantially faster in the diagnostic.
+
+This supports a concrete space benefit and a bounded current-decoder improvement,
+not an inherent claim that binary encoding or this CBOR implementation is faster than
+all JSON readers. Keep indexed metadata design and compiler interoperability decisions
+separate from codec microbenchmarks. Profile linking and the binary validation/typed
+deserialization passes before choosing optimizations; a JSON decoder change needs
+malformed-input/version/diagnostic compatibility checks. No such change is included here.

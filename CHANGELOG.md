@@ -63,6 +63,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Validate 21 focused Rust tests plus four complete-value C# reader comparisons; full
   Raven collection System and three applications assemble directly and run successfully.
   This is the existing neoil subset, not complete ILAsm parity or native Raven source emission.
+  Add the requested JSON-versus-native-assembly release benchmark with nine raw samples,
+  interleaved decoder/process paths, matching metadata/output and artifact hashes.
+  On one Apple M1 run, System is 63% smaller and takes about 20% less time to decode than current
+  pretty JSON, but full start/run time remains about 3.45 seconds with no meaningful
+  improvement. Linking/admission dominates; direct-typed JSON is a faster diagnostic
+  candidate. The author accepts the size improvement and defers runtime optimization.
+  No production optimization, cold-disk or memory-performance claim is made.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

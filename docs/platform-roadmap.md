@@ -48,6 +48,15 @@ default. The full Raven collection System and three sample applications pass ind
 .NET metadata comparisons and native execution. Direct Raven class-library source emission
 and native compiler symbol import remain next. [Producer evidence](experiments/extended-cli-metadata/direct-assembly.md).
 
+**Author-requested performance evidence:** A release comparison finds the full Raven
+System assembly 63% smaller and about 20% lower decode time than current pretty JSON,
+but no meaningful complete-startup/run improvement (about 3.45 seconds). Linking and
+admission dominate; direct-typed JSON is a faster diagnostic alternative to both current
+decoders. The author explicitly accepts smaller files as an improvement and defers
+runtime optimization to the future. Retain this baseline and continue metadata/compiler
+integration; the benchmark does not reprioritize runtime optimization.
+[Method and limits](experiments/extended-cli-metadata/json-vs-assembly-benchmark.md).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

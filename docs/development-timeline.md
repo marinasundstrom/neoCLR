@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Measuring JSON versus native assemblies
+
+- **Author:** “We will have to benchmark this. JSON vs Assembly”.
+- **Assistant:** Commits the direct assembler first (`116be40e`), then measures
+  release-mode decoding separately from common runtime phases and alternating
+  fresh-process runs, with matching metadata/output and a warm filesystem cache.
+- **Outcome:** On one Apple M1 run, System's native assembly is 63% smaller than
+  pretty JSON and takes about 20% less time to decode through current paths. Full process time
+  remains about 3.45 seconds with no meaningful observed improvement; linking/admission
+  dominates. A direct-typed JSON diagnostic is faster than the current native decoder,
+  identifying intermediate-tree removal as a candidate rather than claiming inherent
+  binary-format superiority.
+- **Author follow-up:** “Smaller files is an improvement. We will optimize the runtime
+  in the future.” The assistant retains the size reduction as the demonstrated benefit,
+  saves the benchmark baseline and leaves runtime optimization for later; metadata and
+  compiler integration remain the next focus.
+- **Limits:** Nine samples, two real artifacts, one machine; no cold-disk or memory
+  claim. No decoder optimization was performed in this slice. [Raw evidence and method](experiments/extended-cli-metadata/json-vs-assembly-benchmark.md).
+
 ## 2026-09-30: Existing Raven samples and a future neoil assembly producer
 
 - **Author:** “We will create a proper neoil assembler that can produce the assemblies.”
