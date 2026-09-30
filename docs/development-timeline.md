@@ -9471,3 +9471,21 @@ remote synchronization does not publish a runtime bundle or website.
   translated-System probe passes API binding/execution but the driver rejects a host-bound
   Math call with NEOMETA001. No importer change or assembly-identity workaround was made.
   That issue remains explicit for the author-directed metadata-loading follow-up.
+
+## 2026-10-01 — codegen architecture review and first migration slice
+
+- **Author:** Asked to pause and investigate abstractions required for the neoCLR target,
+  then asked for a plan and directed continuation. These exchanges preceded this entry;
+  no separate dates are assigned to the individual messages.
+- **Assistant assessment:** Small callable/type wrappers leave Reflection types and
+  members throughout general codegen. The native source-operation traversal risks
+  duplicating the existing lowered-bound pipeline. Proposed incremental typed references,
+  declarations, shared body emission, target policies and coherent target composition.
+- **Action:** Deferred the uncommitted static-type prototype and replaced the shared
+  source-operation traversal with compiler-lowered body consumption. Added observable
+  implicit-return regression coverage. This is an initial bounded migration, not complete
+  portability of the general generator.
+- **Open:** Reference/declaration contracts, broader instructions and eventual target
+  composition remain. The independent metadata library stays separate. Metadata loading
+  and the known translated-System driver collision remain deferred as previously directed.
+  See [the implemented scope](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).

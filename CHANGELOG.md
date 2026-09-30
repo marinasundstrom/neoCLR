@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-01
+
+- Integrate Raven's compiler-lowered bodies into the bounded native metadata emitter,
+  sharing implicit Int32 returns and simple named calls with .NET emission. Keep the
+  independent metadata API, binary format and runtime unchanged. Record the author-led
+  codegen abstraction plan and defer native symbol loading to its later slice.
+
 ### 2026-09-30
 
 - Add direct runtime PE/#Neo loading to the extended metadata experiment: required

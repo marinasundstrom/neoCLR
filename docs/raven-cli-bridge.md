@@ -52,7 +52,7 @@ remains separate. This is a Python probe contract, not an implemented Raven load
 Raven's `codex/metadata-consumer` at `7e18edb66` adds an opt-in
 `tools/NeoClrMetadataProbe` consumer of the independent metadata library. The frontend
 uses the existing .NET provider and default runtime contract to bind primitive Int32
-source and an API-produced PE library. A compiler-side public-operations adapter emits
+source and an API-produced PE library. A compiler-side adapter (now consuming shared lowered bodies) emits
 the application as native format-5 JSON through the metadata API. The dependency is
 also emitted natively by that API. neoCLR loads/verifies both and returns 42.
 The application does not go through the existing CLI import bridge.
@@ -719,3 +719,32 @@ without host CoreLib leakage, and PDB preservation. Existing same-compilation .N
 Hello/helper cases and rvnc runtime checks validate the two concrete declaration adapters.
 This compiler refactor remains a general shared-line candidate pending consumer-branch
 reconciliation; native policy stays in the optional adapter.
+
+## Compiler-lowered native bodies — 2026-10-01
+
+The shared linear instruction planner now consumes `BoundTreeView.Lowered`, replacing
+its source `IOperation` traversal. Both eligible release .NET methods and the optional
+native backend use the existing compiler Lowerer before backend instruction encoding.
+Implicit Int32 returns now work without a second return-rewriting implementation;
+simple named calls whose lowered arguments fit the subset also work. Static qualified
+calls treat a bound type receiver as a qualifier, not a runtime value.
+
+Runtime Contract selection, semantic binding and the temporary CLI reference projection
+are unchanged. .NET retains its carrier types and Reflection.Emit adapter; neoCLR emits
+assembly-owned functions through the separate metadata API and loads PE/#Neo directly.
+The format and runtime need no changes for this slice. Native debug output, general
+signatures, locals/control flow and synthesized bodies remain unsupported; .NET debug,
+PDB and unsupported bodies keep general codegen. Console permission/identity checks
+remain target-owned. Metadata importer work and the known System driver collision stay
+deferred. This internal refactor is pending shared-line reconciliation.
+
+Validation: 19 focused C# compiler tests cover execution, implicit returns, named Unit
+calls, fallback, PDB preservation and selected core identity. The metadata probe covers
+same-compilation .NET/native Hello/helper/Unit execution and implicit Int32 returns,
+plus native verification/loading, dependency failures, diagnostics and rvnc behavior.
+
+[Recorded binary/runtime probe evidence](experiments/extended-cli-metadata/lowered-bodies-validation.json).
+
+Tested Raven revision: `9660933cb` on `codex/metadata-consumer`; runtime remains the
+previously tested metadata runtime build (its SHA-256 is recorded in the evidence).
+The native integration remains on `codex/extended-cli-metadata`, not main.

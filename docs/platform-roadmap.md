@@ -1,6 +1,6 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-30.** This is the authoritative default for work priorities,
+**Updated 2026-10-01.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
@@ -14,6 +14,12 @@ does not move the library into the compiler. [Project ownership](design/extended
 then integrate the refactored compiler, then add improvements such as structural types.
 The direct native producer/load test below is the bounded acceptance baseline;
 ordinary compiler-required metadata coverage is next.
+
+**Architecture follow-up (2026-10-01):** after reviewing Reflection dependencies, the
+author directed a staged codegen refactor. The first slice now feeds both bounded
+backends compiler-lowered bodies, including implicit value returns. Typed references/
+declaration handles are next, followed by paired compiler/metadata body capabilities;
+metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in
 `Compilation.Emit`; rvnc and API wrappers share compiler setup and target validation.
