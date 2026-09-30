@@ -19,7 +19,8 @@ ordinary compiler-required metadata coverage is next.
 author directed a staged codegen refactor. The first slice now feeds both bounded
 backends compiler-lowered bodies, including implicit value returns. The first callable reference table now shares symbol identity resolution with typed
 backend handles. Shared source callable plans separate native source validation from
-builder creation; broader type/field references and full declaration traversal remain next,
+builder creation. Shared public nongeneric static-type plans now drive backend type
+builders; broader type/field references and full declaration traversal remain next,
 followed by paired compiler/metadata body capabilities;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 

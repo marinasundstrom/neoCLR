@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   handles and native definition registration before body emission; preserve overloads,
   owners and explicit dependency policies. Shared source callable plans now separate
   native source collection/validation from builder creation, preserving assembly-owned
-  functions and empty static types while .NET retains its CLI carriers.
+  functions and empty static types while .NET retains its CLI carriers. Shared static
+  source-type plans now drive typed builders in both backends, retaining symbol ownership
+  and namespace identity; broader type/field references remain pending.
 
 ### 2026-09-30
 
