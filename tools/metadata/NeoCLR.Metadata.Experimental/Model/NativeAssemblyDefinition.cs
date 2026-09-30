@@ -109,7 +109,7 @@ public sealed class NativeAssemblyDefinition
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Count == 0 && methods[p.index].ReturnsValue).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Count == 0).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());

@@ -17,6 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Admit local parameterless no-result entry points in the metadata writer and native
+  declaration reader; Raven Unit Main now emits, verifies/runs and exits zero through
+  API and rvnc paths. Ordinary CLI output also preserves and executes void entry points.
+  Existing no-result encoding is reused; foreign/parameterized entries and invalid stacks
+  still fail. This removes the experimental Int32-only entry restriction.
   Add an owned native library/function inventory and explicit partial static Int32
   reference views. Raven reuses its existing semantic importer for selected translated
   System callables, then emits their native identities through a new MethodBuilder.Call

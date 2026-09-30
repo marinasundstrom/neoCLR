@@ -1028,7 +1028,13 @@ AddType adds a public abstract sealed class with a unique namespace/name pair. N
 may be empty; name must be nonempty and not `<Module>`. Combined length is at most 1024
 characters and the assembly admits at most 256 types. Invalid/duplicate inputs raise
 ArgumentException. EntryPoint may be null for a library or a local parameterless
-Int32-returning method; it is checked at Write.
+Int32-returning or no-result method; it is checked at Write/WriteNativeAssembly.
+A no-result entry uses CLI void for ordinary PE output and native `Void` with
+`no_result: true` for format 5. Reference-only projections still have no CLI entry.
+The native declaration reader accepts both supported results. Parameterized/foreign
+entries remain invalid, and no-result bodies must return with an empty stack.
+`EntryPointChecks.cs` verifies both global and type-owned entries, CLI invocation,
+native container roundtrips and failures; Raven's consumer also verifies native zero exit.
 
 AddFunction creates an assembly-owned function with no declaring type. Names must be
 nonempty and at most 1024 characters, parameter counts 0–256, and an assembly admits

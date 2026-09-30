@@ -53,12 +53,12 @@ public sealed partial class AssemblyBuilder
             instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("assembly string literal limit exceeded");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || !EntryPoint.ReturnsValue))
-            throw new InvalidDataException("entry point must be a local parameterless Int32 method");
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0))
+            throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var method in methods) method.Validate();
         return methods;
     }
-    /// <summary>Gets or sets a local parameterless Int32 entry point; null writes a library.</summary>
+    /// <summary>Gets or sets a local parameterless Int32 or no-result entry point; null writes a library.</summary>
     public MethodBuilder? EntryPoint { get; set; }
     /// <summary>Adds a unique public static class.</summary>
     /// <param name="namespace">Namespace, possibly empty.</param>

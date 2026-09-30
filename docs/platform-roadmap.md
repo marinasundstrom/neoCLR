@@ -83,6 +83,13 @@ then a separate provider as needed, and removing Reflection.Emit from .NET in th
 A common instruction/operand model and later ILProcessor-like editing are recorded future
 metadata API directions. [Scope and architecture](raven-cli-bridge.md#translated-system-callable-import--2026-09-30).
 
+**Native entry contract:** Raven now emits parameterless Unit Main as a no-result
+native entry, including global/static ownership and helper calls, and neoCLR exits zero.
+The metadata reader/writer reuse format 5's existing no-result encoding. This removes
+an artificial compiler restriction while keeping metadata support and target integration
+as the main objective. Full System import and richer callable/body coverage remain next.
+[Entry contract and evidence](raven-cli-bridge.md#unit-entry-points--2026-09-30).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

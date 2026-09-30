@@ -83,7 +83,7 @@ and broader ordinary metadata coverage come next, followed by structural extensi
 in neoCLR and runs the Raven two-library case to 42. Initial Hello World examples
 also run directly and through an entry-point function call. The Raven adapter now
 supports Unit-returning helpers and imported static library methods, verified by
-compiling a library and its consumer separately; entry points still return Int32.
+compiling a library and its consumer separately; parameterless entry points now support both Int32 and Unit, with Unit applications exiting zero.
 An opt-in `rvnc neoclr` command now emits native assemblies from source files and
 writer-produced native library references. Loading compiler symbols from translated
 System now has a first explicit static Int32 callable import: Math.Min binds from
