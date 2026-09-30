@@ -10,10 +10,10 @@ public sealed class AssemblyDefinition
 {
     private readonly byte[] image;
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
-        IReadOnlyList<TypeRow> rows, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
+        IReadOnlyList<TypeRow> rows, IReadOnlyList<MethodRow> methods, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
     {
         Identity = identity; Profile = profile; this.image = image; EntryPointToken = entryPointToken;
-        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, references, typeReferences);
+        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, methods, references, typeReferences);
     }
     /// <summary>Gets the assembly's simple name, not a complete binding identity.</summary>
     public string Name => Identity.Name;
@@ -28,17 +28,19 @@ public sealed class AssemblyDefinition
 
     /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
     public uint EntryPointToken { get; }
+    /// <summary>Gets the owned entry-point definition, or null for a library.</summary>
+    public MethodDefinition? EntryPoint => MainModule.GetMethodDefinition(EntryPointToken);
     /// <summary>Returns a new byte-for-byte copy of this unchanged read snapshot.</summary>
     /// <returns>Owned original PE bytes, preserving all validated and opaque data.</returns>
     /// <remarks>This is preservation, not rebuilding or applying edits. Use AssemblyBuilder for controlled new output.</remarks>
     public byte[] Write() => (byte[])image.Clone();
 
-    /// <summary>Recognizes bounded PE input and snapshots its assembly/module/TypeDef declarations.</summary>
+    /// <summary>Recognizes bounded PE input and snapshots its assembly, type and callable declarations.</summary>
     /// <param name="image">Complete image; do not mutate during the call.</param>
     /// <param name="expectedExtended">Require the neoCLR marker/profile by default; false admits ordinary CLI input.</param>
     /// <returns>An owned snapshot with no open stream or loaded runtime assembly.</returns>
     /// <exception cref="InvalidDataException">Invalid/unsupported artifact, missing assembly metadata, malformed declarations/identities, exceeded row limits or excessive decoded names/key data.</exception>
-    /// <remarks>Reads AssemblyRef identities but does not automatically resolve dependencies, physical TypeRef/TypeSpec rows, member signatures or emit assemblies.</remarks>
+    /// <remarks>Reads physical nominal references and callable signature blobs without automatically resolving dependencies. General signature decoding, bodies and TypeSpec interpretation remain separate.</remarks>
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image, bool expectedExtended = true)
     {
         if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("image exceeds limit");
@@ -51,6 +53,7 @@ public sealed class AssemblyDefinition
             var reader = pe.GetMetadataReader();
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
             if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
+            if (reader.MethodDefinitions.Count > 4096) throw new InvalidDataException("too many method definitions");
             if (reader.TypeReferences.Count > 4096) throw new InvalidDataException("too many type references");
             if (reader.AssemblyReferences.Count > 256) throw new InvalidDataException("too many assembly references");
             int keyBytes = 0;
@@ -127,13 +130,33 @@ public sealed class AssemblyDefinition
                     if (!seen.Add(token) || !parents.TryGetValue(token, out token)) throw new InvalidDataException("invalid or cyclic declaring type");
                 }
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, references, typeReferences, artifact.Profile, owned, entryPointToken);
+            int signatureBytes = 0;
+            var methods = new List<MethodRow>();
+            var typeRows = rows.ToDictionary(row => row.Token);
+            foreach (var handle in reader.MethodDefinitions)
+            {
+                var method = reader.GetMethodDefinition(handle);
+                uint declaring = (uint)MetadataTokens.GetToken(method.GetDeclaringType());
+                if (!typeRows.TryGetValue(declaring, out var owner)) throw new InvalidDataException("method has no declaring definition");
+                bool global = owner.Token == 0x02000001 && owner.Name == "<Module>" && owner.Namespace.Length == 0 && owner.DeclaringToken == 0;
+                if (global && (method.Attributes & System.Reflection.MethodAttributes.Static) == 0)
+                    throw new InvalidDataException("global function must be static");
+                int length = method.Signature.IsNil ? 0 : reader.GetBlobReader(method.Signature).Length;
+                if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
+                    throw new InvalidDataException("missing or excessive method signature data");
+                signatureBytes += length;
+                methods.Add(new((uint)MetadataTokens.GetToken(handle), global ? 0 : declaring, ReadName(method.Name),
+                    (ushort)method.Attributes, (ushort)method.ImplAttributes, method.GetGenericParameters().Count,
+                    reader.GetBlobBytes(method.Signature)));
+            }
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, references, typeReferences, artifact.Profile, owned, entryPointToken);
         }
         catch (BadImageFormatException error)
         {
             throw new InvalidDataException("malformed CLI declaration metadata", error);
         }
     }
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken);
@@ -143,13 +166,22 @@ public sealed class AssemblyDefinition
 public sealed class ModuleDefinition
 {
     private readonly Dictionary<uint, TypeDefinition> definitions;
+    private readonly Dictionary<uint, MethodDefinition> methods;
+    private readonly Dictionary<uint, IReadOnlyList<MethodDefinition>> declaredMethods;
     internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows,
-        IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
+        IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
         Types = Array.AsReadOnly(types);
         definitions = types.ToDictionary(type => type.MetadataToken);
+        var callables = methodRows.Select(row => new MethodDefinition(this, row)).ToArray();
+        Methods = Array.AsReadOnly(callables);
+        methods = callables.ToDictionary(method => method.MetadataToken);
+        Functions = Array.AsReadOnly(callables.Where(method => method.DeclaringType is null).ToArray());
+        declaredMethods = callables.Where(method => method.DeclaringType is not null)
+            .GroupBy(method => method.DeclaringType!.MetadataToken)
+            .ToDictionary(group => group.Key, group => (IReadOnlyList<MethodDefinition>)Array.AsReadOnly(group.ToArray()));
         AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
         TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
     }
@@ -161,6 +193,15 @@ public sealed class ModuleDefinition
     public Guid Mvid { get; }
     /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
     public IReadOnlyList<TypeDefinition> Types { get; }
+    /// <summary>Gets all callable definitions in physical MethodDef order, including global functions.</summary>
+    public IReadOnlyList<MethodDefinition> Methods { get; }
+    /// <summary>Gets top-level functions with no declaring type, in metadata order.</summary>
+    public IReadOnlyList<MethodDefinition> Functions { get; }
+    /// <summary>Looks up an owned MethodDef token; other kinds or absent rows return null.</summary>
+    /// <param name="metadataToken">Physical MethodDef token in this snapshot.</param>
+    /// <returns>The owned callable or null.</returns>
+    public MethodDefinition? GetMethodDefinition(uint metadataToken) => methods.GetValueOrDefault(metadataToken);
+    internal IReadOnlyList<MethodDefinition> GetDeclaredMethods(uint token) => declaredMethods.GetValueOrDefault(token) ?? Array.Empty<MethodDefinition>();
     /// <summary>Gets physical AssemblyRef rows in metadata order, without resolving dependencies.</summary>
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     /// <summary>Gets physical nominal TypeRef rows in metadata order.</summary>
@@ -192,6 +233,8 @@ public sealed class TypeDefinition
     public int GenericArity { get; }
     /// <summary>Gets the enclosing definition, or null for a top-level type.</summary>
     public TypeDefinition? DeclaringType => Module.GetTypeDefinition(declaringToken);
+    /// <summary>Gets methods declared directly by this type; global functions belong to Module.Functions.</summary>
+    public IReadOnlyList<MethodDefinition> Methods => Module.GetDeclaredMethods(MetadataToken);
     /// <summary>Creates a nominal reference scoped to this module snapshot.</summary>
     /// <returns>A reference that resolves to this exact owned definition.</returns>
     public TypeReference ToReference() => new(this);

@@ -668,3 +668,25 @@ compiler-driven inventory of required ordinary declarations, signatures, imports
 bodies, followed by reader/writer coverage and refactored-compiler adapters. Do not
 claim general Raven readiness from an Int32 test. Structural extensions come after
 that integration, following the author's clarified sequence.
+
+
+## Callable declaration reader baseline (2026-09-30)
+
+The next bounded ordinary-metadata slice closes a producer/reader gap: PE methods and
+globals emitted by the API are now available as owned MethodDefinition objects. The
+entry point, module token lookup and declaring-type collections share those objects.
+Physical `<Module>` globals become model functions with no type owner, following the
+already selected native-function contract. The physical pseudo-type stays visible in
+the flat TypeDef collection; it does not duplicate global functions in its Methods.
+
+This reuses the CLI/Cecil comparison above: MethodDef flags, row tokens and signature
+blobs remain physical metadata, while the public ownership model follows native intent.
+A narrow `TryGetStaticInt32Signature` recognizes the existing writer subset. The
+alternative of rejecting all other signatures would break nominal inspection of ordinary
+assemblies; silently mapping them to Int32 would corrupt symbol loading. Retaining owned
+opaque bytes keeps that information but deliberately postpones general type resolution.
+This reader is not an IL or general signature verifier. Dedicated C# cases cover opaque
+unsupported/malformed encodings, canonical compressed counts, snapshot isolation and
+row/decoded-blob limits. Eighteen C# contract groups pass. General signature decoding,
+MemberRef resolution and body import remain the next compiler-readiness gaps; structural
+extensions remain after compiler integration as directed.

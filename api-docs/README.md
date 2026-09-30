@@ -429,7 +429,7 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 `MetadataProfile`, `MetadataProfileDocument`, `MetadataArtifactReader` and
 `MetadataArtifact`, plus `NeoCLR.Metadata.Experimental.Model.AssemblyDefinition`,
 `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
-`AssemblyReference`, `IAssemblyResolver`, `AssemblyBuilder` (including native emission
+`AssemblyReference`, `IAssemblyResolver`, `MethodDefinition`, `AssemblyBuilder` (including native emission
 and top-level functions), `TypeBuilder` and
 `MethodBuilder` in that Model namespace,
 are .NET-host-only types in

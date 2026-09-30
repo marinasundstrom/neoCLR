@@ -1,0 +1,67 @@
+namespace NeoCLR.Metadata.Experimental.Model;
+
+/// <summary>An owned physical MethodDef declaration, including type-independent global functions.</summary>
+/// <remarks>Signature bytes preserve CLI encodings; general signatures are opaque until a decoder supports them.
+/// No body is decoded and no runtime assembly is loaded.</remarks>
+public sealed class MethodDefinition
+{
+    private readonly byte[] signature;
+    private readonly uint declaringToken;
+    internal MethodDefinition(ModuleDefinition module, AssemblyDefinition.MethodRow row)
+    {
+        Module = module;
+        MetadataToken = row.Token;
+        Name = row.Name;
+        Attributes = row.Attributes;
+        ImplementationAttributes = row.ImplementationAttributes;
+        GenericArity = row.Arity;
+        declaringToken = row.DeclaringToken;
+        signature = row.Signature;
+    }
+    /// <summary>Gets the owning module snapshot.</summary>
+    public ModuleDefinition Module { get; }
+    /// <summary>Gets the owned declaring type, or null for a global function.</summary>
+    public TypeDefinition? DeclaringType => Module.GetTypeDefinition(declaringToken);
+    /// <summary>Gets the physical MethodDef token, meaningful only within this module.</summary>
+    public uint MetadataToken { get; }
+    /// <summary>Gets the declared metadata name.</summary>
+    public string Name { get; }
+    /// <summary>Gets raw CLI MethodAttributes bits, without target-specific reinterpretation.</summary>
+    public ushort Attributes { get; }
+    /// <summary>Gets raw CLI MethodImplAttributes bits.</summary>
+    public ushort ImplementationAttributes { get; }
+    /// <summary>Gets the number of declared method GenericParam rows.</summary>
+    public int GenericArity { get; }
+    /// <summary>Gets whether the MethodAttributes.Static bit is set.</summary>
+    public bool IsStatic => (Attributes & 0x10) != 0;
+    /// <summary>Copies the CLI signature blob without resolving its type references.</summary>
+    /// <returns>New owned bytes; unsupported encodings remain opaque rather than being simplified.</returns>
+    public byte[] GetSignature() => (byte[])signature.Clone();
+
+    /// <summary>Recognizes the writer's static, nongeneric Int32 parameter/result or no-result signature subset.</summary>
+    /// <param name="parameterCount">On success, Int32 parameter count (0–256); otherwise zero.</param>
+    /// <param name="returnsValue">On success, true for Int32 and false for CLI void; otherwise false.</param>
+    /// <returns>True only for the exact supported encoding; false for other or malformed signatures.</returns>
+    /// <remarks>Does not treat CLI void as an inhabited value. Recognition is not body verification or general CLI signature validation.</remarks>
+    public bool TryGetStaticInt32Signature(out int parameterCount, out bool returnsValue)
+    {
+        parameterCount = 0;
+        returnsValue = false;
+        if (!IsStatic || GenericArity != 0 || signature.Length < 3 || signature[0] != 0) return false;
+        int position = 1;
+        int count = signature[position++];
+        if ((count & 0x80) != 0)
+        {
+            if ((count & 0xc0) != 0x80 || position >= signature.Length) return false;
+            count = ((count & 0x3f) << 8) | signature[position++];
+            if (count < 128) return false;
+        }
+        if (count > 256 || position >= signature.Length) return false;
+        byte result = signature[position++];
+        if (result is not (0x01 or 0x08) || signature.Length - position != count) return false;
+        for (; position < signature.Length; position++) if (signature[position] != 0x08) return false;
+        parameterCount = count;
+        returnsValue = result == 0x08;
+        return true;
+    }
+}

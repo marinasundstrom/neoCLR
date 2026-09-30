@@ -90,6 +90,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native emission; direct PE/#Neo runtime loading remains pending. Record the author's
   sequence: working metadata/APIs, refactored compiler integration, then structural
   improvements; the structural codec experiment is not a prerequisite for integration.
+  Add owned callable declarations to the PE reader: top-level functions, type methods,
+  entry-point/token lookup, CLI flags and copied signature blobs. Recognize the writer's
+  static Int32/no-result signature subset without simplifying unsupported encodings.
+  Bound method rows and repeated-signature decoding; 18 C# contract groups pass.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

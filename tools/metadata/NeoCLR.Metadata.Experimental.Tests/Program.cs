@@ -25,6 +25,9 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Callable declaration roundtrip and ownership", CallableChecks.RoundTrip),
+    ("Callable signature recognition and opaque preservation", CallableChecks.SignatureRecognition),
+    ("Callable reader resource limits", CallableChecks.Limits),
     ("Native emission and top-level functions", NativeWriterChecks.Run),
     ("Writer construction editing imports and validation", WriterChecks.Run),
     ("Resolves physical top-level and nested TypeRefs", () =>

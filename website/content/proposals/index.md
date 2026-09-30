@@ -66,7 +66,8 @@ synthesized member descriptions.
 A bounded PE container probe retains ordinary metadata readability, but standard
 rewriting can discard the extension. A development .NET model now emits a bounded
 Int32 subset as PE or existing native assemblies. Native output includes functions
-outside types and has a direct neoCLR load/run test. Next comes ordinary metadata
+outside types and has a direct neoCLR load/run test. The PE reader recovers callable
+declarations with explicit signature limits. Next comes ordinary metadata
 coverage for the refactored compiler, then compiler integration, then structural
 extensions. Production NEOX loading and structural runtime support remain pending;
 this is not a published platform format.

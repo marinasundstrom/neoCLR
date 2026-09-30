@@ -666,6 +666,7 @@ public sealed class AssemblyDefinition
     public ModuleDefinition MainModule { get; }
     public MetadataProfileDocument? Profile { get; }
     public uint EntryPointToken { get; }
+    public MethodDefinition? EntryPoint { get; }
     public byte[] Write();
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image,
                                                   bool expectedExtended = true);
@@ -679,6 +680,7 @@ identity. CLR binding redirects, unification and trust policy are not implemente
 MainModule is the owned manifest module; Profile is attached structural metadata, or
 null for explicitly admitted ordinary CLI input. EntryPointToken is a managed MethodDef
 token or zero for a library; nonzero tokens are checked against the method table.
+EntryPoint returns that same owned MethodDefinition instance, or null for a library.
 Write returns a fresh byte-for-byte copy of the original immutable snapshot, including
 opaque data. It does not rebuild declarations or apply edits. Use AssemblyBuilder for
 new controlled output.
@@ -687,10 +689,15 @@ ReadAssembly first applies MetadataArtifactReader's existing 4 MiB, unsigned IL-
 PE32, stream and required-profile rules. The default requires extended metadata;
 expectedExtended false permits ordinary CLI assemblies. The method then reads the
 assembly and module rows, TypeDef names/namespaces, generic parameter counts and
-NestedClass ownership, plus AssemblyRef identities. It accepts at most 256 AssemblyRefs,
+NestedClass ownership, AssemblyRef identities, and MethodDef names, ownership, flags,
+generic arities and owned signature blobs. It accepts at most 256 AssemblyRefs,
 a cumulative 4 MiB of key/token blobs, and at most 4096 TypeDefs and a cumulative 4 Mi UTF-16
 code units of decoded declaration names/namespaces (counting repeated uses). It rejects missing/invalid
-or cyclic declaring-type relationships. Missing assembly manifests (netmodules),
+or cyclic declaring-type relationships. MethodDefs are limited to 4096 and copied
+signature bytes to a cumulative 4 MiB (including repeated references to one blob).
+Missing/empty method signatures and instance global functions are rejected. Nonempty
+signatures outside the supported decoder remain opaque and are not generally validated.
+Missing assembly manifests (netmodules),
 invalid/unsupported artifacts and malformed inspected metadata raise
 InvalidDataException; underlying BadImageFormatException is retained as InnerException
 when converted. Callers must not mutate the span during reading.
@@ -710,6 +717,9 @@ public sealed class ModuleDefinition
     public string Name { get; }
     public Guid Mvid { get; }
     public IReadOnlyList<TypeDefinition> Types { get; }
+    public IReadOnlyList<MethodDefinition> Methods { get; }
+    public IReadOnlyList<MethodDefinition> Functions { get; }
+    public MethodDefinition? GetMethodDefinition(uint metadataToken);
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     public IReadOnlyList<TypeReference> TypeReferences { get; }
     public TypeDefinition? GetTypeDefinition(uint metadataToken);
@@ -723,6 +733,13 @@ and `<Module>`**. This intentionally exposes a flat table view in the initial sl
 it does not promise Cecil's exact collection organization. AssemblyReferences is an
 owned read-only list of physical AssemblyRef rows in metadata order; reading it performs
 no resolver calls.
+
+Methods contains all physical MethodDef declarations in row order. Functions contains
+those physically owned by the first, top-level, empty-namespace `<Module>` row. In the
+model these have null DeclaringType and the pseudo-type's Methods collection is empty.
+Other definitions retain their actual type owner. GetMethodDefinition returns the same
+snapshot object as these collections, or null for absent and non-MethodDef tokens.
+No overload selection or dependency lookup is implied.
 
 GetTypeDefinition performs local physical TypeDef-token lookup and returns the same
 owned definition instance. Zero, other token kinds and absent rows return null. It
@@ -741,6 +758,7 @@ public sealed class TypeDefinition
     public string Name { get; }
     public int GenericArity { get; }
     public TypeDefinition? DeclaringType { get; }
+    public IReadOnlyList<MethodDefinition> Methods { get; }
     public TypeReference ToReference();
 }
 ```
@@ -751,8 +769,51 @@ suffix; display names are not identity. GenericArity counts owned GenericParam r
 including captured outer parameters if encoded; it does not expose or validate the
 full generic constraint contract. DeclaringType links to the same graph's enclosing
 definition, or null for top-level types. ToReference creates a new definition-backed
-reference that resolves to this exact object. Fields, methods, attributes, base types
-and interfaces are not exposed by this slice.
+reference that resolves to this exact object. Methods exposes directly declared
+callables. Fields, custom attributes, base types and interfaces remain outside this slice.
+
+### MethodDefinition
+
+```csharp
+public sealed class MethodDefinition
+{
+    public ModuleDefinition Module { get; }
+    public TypeDefinition? DeclaringType { get; }
+    public uint MetadataToken { get; }
+    public string Name { get; }
+    public ushort Attributes { get; }
+    public ushort ImplementationAttributes { get; }
+    public int GenericArity { get; }
+    public bool IsStatic { get; }
+    public byte[] GetSignature();
+    public bool TryGetStaticInt32Signature(out int parameterCount, out bool returnsValue);
+}
+```
+
+No public constructor or mutation. Module and DeclaringType refer to the same owned
+snapshot; null DeclaringType means a global function. TypeDefinition.Methods contains
+only its directly declared methods, not inherited or nested-type methods. MetadataToken
+is a physical MethodDef token, not cross-module identity. Name is the stored name;
+Attributes/ImplementationAttributes retain CLI flag bits and IsStatic tests bit 0x10.
+GenericArity counts method GenericParam rows without interpreting their constraints.
+
+GetSignature returns a fresh copy of the CLI signature blob. It preserves unsupported
+encodings and never simplifies them into a supported signature. Returned bytes and
+original input bytes can be modified without changing the snapshot. No body, parameter
+names, attributes, constraints, MemberRef resolution or signature type resolution is
+provided by this slice.
+
+TryGetStaticInt32Signature recognizes only the current writer contract: static,
+nongeneric, default calling convention, 0–256 Int32 parameters, and Int32 or absent
+CLI void result. Success sets parameterCount and returnsValue; false resets them to
+zero/false. Instance/generic/vararg headers, other types, noncanonical count encodings,
+truncation and trailing data return false. False means the narrow decoder cannot accept
+the signature; it does not distinguish a valid unsupported signature from malformed
+opaque data. ReadAssembly is not a general signature or execution verifier.
+
+The C# consumer reads an emitted entry point, globals and overloaded type-owned methods,
+checks shared object identity and copy isolation, and covers counts 0/1/127/128/256,
+no-result returns, unsupported signatures, 4096/4097 rows and repeated-blob amplification.
 
 ### TypeReference
 
@@ -1018,7 +1079,7 @@ all CLR versus neoCLR arithmetic policies.
 
 The C# writer consumer builds a dependency's `Twice(Int32) -> Int32` and an application
 that calls it with 20, adds 2 and returns 42. It tests repeat writes, body edits, imported
-TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Fifteen
+TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Eighteen
 standalone C# contract groups pass, including earlier identity/reference tests.
 
 ### neoCLR acceptance test
