@@ -1,8 +1,9 @@
 # Extended metadata codec experiment
 
 This standalone Python standard-library experiment implements **NEOX 0.1 framing**.
-It is not a PE image, a CLI signature extension, a #Neo stream implementation or an
-executable format. Codes below belong only to this experiment. The
+The standalone envelope is not a PE image, CLI signature extension or executable
+format. A later container probe embeds it as an experimental #Neo stream, described
+below; this does not implement native CLI type signatures or runtime loading. Codes below belong only to this experiment. The
 [design](../../design/extended-cli-metadata.md) owns the intended integration path.
 
 ## Envelope schema
@@ -44,8 +45,8 @@ independently of the writer. Six focused tests pass on 2026-09-30, including eve
 truncation of the golden image, required schema negotiation, duplicate kinds, invalid
 ranges/flags/versions, size limits and byte-preserving re-encoding.
 
-Structural signature payloads are implemented below. PE embedding, ordinary CLI reader
-compatibility, native runtime execution and Raven integration remain unimplemented.
+Structural signature payloads are implemented below. Native runtime execution and Raven integration remain unimplemented. The later
+PE probe records bounded container and ordinary-reader inspection evidence.
 No public runtime/library API or reference snapshot changes are involved.
 
 ## Structural signature schema 1
@@ -287,3 +288,90 @@ Next bounded task: a PE/CLI container and reader-compatibility probe for an expe
 start checking the main unresolved container assumption before expanding conformance
 records. Preserve conventional CLI streams and test ordinary metadata inspection
 separately from semantic decoding. Do not treat success as execution compatibility.
+
+## PE/CLI container probe (2026-09-30)
+
+The standalone envelope now has a **test-only PE32 embedding**. It is not an adopted
+production format or general-purpose binary editor. `pe-probe/Program.cs` uses
+PersistedAssemblyBuilder and ManagedPEBuilder to generate a small managed library
+with an integer-returning method, a user-string method, a generic identity method
+and a static string field. It reserves header space using 4 KiB file alignment.
+No generated method is invoked during qualification.
+
+`pe_container.py` copies the existing metadata root into a new read-only initialized
+`.neometa` PE section and adds a `#Neo` stream containing the existing NEOX payload.
+The CLI metadata directory points to the new root. Conventional streams retain their
+exact bytes; stream offsets, section count, initialized-data size and image size are
+updated. Original method bodies/RVAs are unchanged. The old root remains inert in
+its original section. The editor never modifies a file in place.
+
+The `#Neo` stream is padded to four bytes; its envelope's total-length field identifies
+the actual payload. Extraction accepts at most three zero pad bytes. NEOX signature
+nodes still live only inside the experiment: this does **not** extend ordinary CLI
+signature blobs, connect nominal fixture references to PE rows, or introduce CLI tokens
+for structural members. That distinction is essential when assessing reader results.
+
+The editor accepts only bounded unsigned IL-only PE32 fixtures, at most 4 MiB and 16
+existing sections, with supported alignments, file-backed metadata and an unused
+section-header slot. It rejects overlays, occupied header slots, duplicate #Neo,
+strong-name/native forms, certificate directories, checksums, PE32+, malformed ranges
+and overlapping sections/streams. It does not validate every PE/CLI rule or repair
+arbitrary images. Signed binaries, production loaders, debug relocation, symbols,
+resource rewriting and execution qualification remain outside this probe.
+
+Primary sources consulted 2026-09-30:
+
+- [ECMA-335 sixth edition, II.24.2](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
+  supplies metadata root/stream framing. #Neo is an experimental extension, not a
+  newly standardized CLI stream.
+- [Microsoft PE format](https://learn.microsoft.com/en-us/windows/win32/debug/pe-format)
+  supplies section, alignment and data-directory conventions used in relocation.
+- [ManagedPEBuilder](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.portableexecutable.managedpebuilder.-ctor)
+  supplies the initial managed-image construction; the generated .NET 10 image is
+  qualified here, not every combination of that API's options.
+- [Mono.Cecil ImageReader at 0.11.6](https://github.com/jbevain/cecil/blob/0.11.6/Mono.Cecil.PE/ImageReader.cs)
+  is the independent reader comparison. The results below come from the actual
+  package-backed probe, not an assumption based only on source.
+
+Run from the repository root:
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_pe.py
+python3 docs/experiments/extended-cli-metadata/codec.py --pe target/extended-cli-metadata/extended.dll
+```
+
+The verifier builds the .NET 10 probe (Mono.Cecil pinned to 0.11.6), generates input
+and output artifacts under `target/extended-cli-metadata`, compares both readers,
+checks extension extraction and runs 15 negative container cases. It updates
+[pe-validation.json](pe-validation.json) with exact tool versions and artifact hashes.
+Generated MVIDs/timestamps can differ on a rerun; those hashes identify this recorded
+run, not a promise of reproducible builds. The older checked-in NEOX fixture remains
+byte-stable and unchanged.
+
+## PE evidence and consequences
+
+On macOS arm64, .NET runtime 10.0.0, System.Reflection.Metadata 10.0.0.0 and Mono.Cecil
+0.11.6.0, the probe passes. SDK 11.0.100-rc.1.26425.128 builds the net10.0 project;
+Python is 3.9.6. The 30 standalone codec tests also still pass.
+
+| Check | Observed result | Meaning |
+| --- | --- | --- |
+| Baseline versus extended reader snapshots | Identical per reader | Names, tokens, signatures, generic parameters, method RVAs/IL and Cecil-decoded user strings survive this embedding |
+| Conventional streams | #~, #Strings, #US, #GUID and #Blob byte-identical | No conventional table/heap encoding changed |
+| #Neo extraction and aware inspection | Exact payload; tuple member shape validates | Container transport reaches the existing experimental decoder |
+| Unknown required NEOX section | Both ordinary readers still inspect; aware inspector rejects | Unknown required semantics are not enforced by unaware tooling |
+| Cecil read/write | Rewritten image remains ordinarily readable but #Neo is gone | General Cecil rewriting cannot be used as a semantics-preserving pipeline |
+| Malformed/unsupported fixtures | 15 targeted cases rejected | Evidence for the bounded editor, not a full PE verifier |
+
+This supports retaining the CLI container while separating ordinary inspection from
+semantic loading. It also supplies counterevidence to assuming that adding an unknown
+stream makes a safe toolchain. A rewriting pipeline must explicitly preserve/remap
+extension data or refuse the operation. The aware inspector rejects missing #Neo when
+asked to inspect an extended image; an unaware consumer cannot infer what was stripped.
+No CLR execution test was run, so do not claim the extension prevents or permits CLR
+execution. There is still no safe dual-target artifact contract.
+
+Next bounded task: define and test a fail-closed artifact-recognition contract that
+can detect stripped required extension data before native semantic loading. Then
+connect actual PE declaration/heap references, rather than extending the host-catalog
+fixture scheme into a production identity format. Raven integration remains later.

@@ -83,11 +83,11 @@ def encode(sections, supported=None):
     return result
 
 
-def read_image(path):
+def read_image(path, limit=MAX_SIZE):
     # Limit reads before allocating arbitrary input sizes.
     with path.open("rb") as stream:
-        data = stream.read(MAX_SIZE + 1)
-    if len(data) > MAX_SIZE:
+        data = stream.read(limit + 1)
+    if len(data) > limit:
         raise FormatError("image too large")
     return data
 
@@ -95,12 +95,18 @@ def read_image(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("image", type=Path)
+    parser.add_argument('--pe', action='store_true', help='extract #Neo from a supported PE32 test image')
     args = parser.parse_args()
     try:
         from signatures import SECTION_KIND, SCHEMA, decode_signature
         from references import REFERENCE_SECTION, SIGNATURE_SECTION, read_profile
         from members import SECTION_KIND as MEMBER_SECTION, SCHEMA as MEMBER_SCHEMA, read_members
-        sections = decode(read_image(args.image), {SECTION_KIND: SCHEMA,
+        if args.pe:
+            from pe_container import MAX_IMAGE, extract
+            data = extract(read_image(args.image, MAX_IMAGE))
+        else:
+            data = read_image(args.image)
+        sections = decode(data, {SECTION_KIND: SCHEMA,
                           REFERENCE_SECTION: 1, SIGNATURE_SECTION: 1, MEMBER_SECTION: MEMBER_SCHEMA})
         profile = read_profile(sections)
         members = read_members(sections, profile)

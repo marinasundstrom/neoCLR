@@ -18,8 +18,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   keys within a catalog. All 30 focused tests pass, including golden byte vectors,
   malformed input, resource limits, identity and inspector process checks.
   Update the design, compatibility limits and staged Raven integration plan.
-  Real CLI dependency resolution, PE embedding, compiled cross-module evidence,
-  runtime support and Raven compiler changes remain unimplemented.
+  Add a bounded unsigned PE32 #Neo embedding/extraction probe: .NET 10 metadata and
+  Mono.Cecil 0.11.6 read unchanged conventional streams/signatures/bodies, while
+  Cecil rewriting strips #Neo. The aware inspector rejects unknown required data
+  that ordinary readers ignore; 15 malformed/unsupported container cases pass.
+  This is inspection evidence, not an execution or semantics-preserving rewrite
+  guarantee. Production recognition/loading, real CLI dependency resolution,
+  compiled cross-module evidence and Raven compiler changes remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

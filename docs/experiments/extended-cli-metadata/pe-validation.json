@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-30",
+  "scope": "PE32 fixture metadata inspection, no execution",
+  "python": "3.9.6",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "dotnet_runtime": ".NET 10.0.0",
+  "srm_version": "10.0.0.0",
+  "cecil_version": "0.11.6.0",
+  "ordinary_reader_snapshots_equal": true,
+  "conventional_streams_byte_identical": [
+    "#~",
+    "#Strings",
+    "#US",
+    "#GUID",
+    "#Blob"
+  ],
+  "extension_roundtrip": true,
+  "aware_member_inspection": true,
+  "unknown_required_ordinary_readers": "accepted for inspection",
+  "unknown_required_aware_inspector": "rejected",
+  "cecil_rewrite": "#Neo stripped; rewritten image must not be accepted as preserving neoCLR semantics",
+  "negative_cases": {
+    "bad-pe-signature": "rejected",
+    "pe32-plus-unsupported": "rejected",
+    "bad-section-count": "rejected",
+    "bad-alignment": "rejected",
+    "certificate-directory": "rejected",
+    "strong-name-flag": "rejected",
+    "metadata-rva-outside-image": "rejected",
+    "metadata-size-outside-image": "rejected",
+    "truncated_image": "rejected",
+    "duplicate_extension": "rejected",
+    "overlay": "rejected",
+    "occupied_section_slot": "rejected",
+    "stream_in_directory": "rejected",
+    "overlapping_streams": "rejected",
+    "nonzero_extension_padding": "rejected"
+  },
+  "artifacts": {
+    "baseline.dll": "7c2b5ffaba21c0dae1df37860d509e00ad1bc0df843d50af87b866f88d203396",
+    "extended.dll": "8250fa24aec3fe2e7ff379ecc4dbb42ab83ccc06f51cb580ff51535c4e4fb006",
+    "unknown-required.dll": "e5752f1ceda0654052b293b3052e658727a67fbda14a9df5e2cddd2898dbc0a9",
+    "rewritten.dll": "d916c997f10898fd8662ef4e71c7b95985a0b4c4a80051c1232b100b2bddec1a"
+  }
+}

@@ -63,8 +63,9 @@ signatures preserve neoCLR identity. New readers and explicit capability checks 
 be required; container readability does not imply CLR execution compatibility.
 An isolated experimental codec now exercises framing, structural signatures and
 synthesized member descriptions.
-CLI embedding, runtime support and Raven integration remain pending; this is not a
-published platform format.
+A bounded PE container probe retains ordinary metadata readability, but standard
+rewriting can discard the extension. Production loading, runtime support and Raven
+integration remain pending; this is not a published platform format.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 

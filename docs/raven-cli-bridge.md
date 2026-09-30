@@ -29,5 +29,9 @@ propagation and typeof encodings remain described in Raven's
 The [extended CLI metadata design](design/extended-cli-metadata.md) starts on
 `codex/extended-cli-metadata` from main. It includes structural type identity,
 synthesized members, explicit capabilities and a staged Raven importer/emitter path.
-This is planning; current marker/carrier behavior and Runtime Contract configuration
-remain as described above. No native-format artifact or Raven bundle is validated yet.
+The [standalone codec and bounded PE probe](experiments/extended-cli-metadata/README.md)
+now transport #Neo for inspection. .NET and Cecil read conventional metadata unchanged,
+but Cecil rewriting strips the stream. Do not route native metadata through an ordinary
+Cecil rewrite without preservation/remapping support. Current marker/carrier behavior
+and Runtime Contract configuration remain as described above. No native runtime-loaded
+artifact or Raven compiler bundle is validated by this experiment.

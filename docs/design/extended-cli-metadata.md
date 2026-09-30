@@ -4,8 +4,9 @@
 `codex/extended-cli-metadata`, based on main `3ac2ae7c5c8434d743d1b866d87e6b21f48e4de0`.
 This document starts format development. A standalone
 [framing experiment](../experiments/extended-cli-metadata/README.md) now has a reader,
-writer and inspector. No CLI embedding, runtime feature or Raven integration is
-implemented. Production numeric encodings remain unassigned.
+writer and inspector. A bounded [PE/CLI container probe](../experiments/extended-cli-metadata/README.md#pecli-container-probe-2026-09-30)
+now transports #Neo and tests ordinary reader behavior. No production format, runtime
+feature or Raven integration is implemented. Production numeric encodings remain unassigned.
 
 ## Purpose and inputs
 
@@ -55,8 +56,9 @@ Primary references checked 2026-09-30:
   semantics. This is useful framing experience, but required neoCLR semantics cannot
   safely be treated as ignorable annotations.
 
-A pinned .NET reader/runtime compatibility experiment and independent .NET metadata
-library comparison remain evidence gaps. Do not claim universal reader compatibility,
+A bounded [.NET reader and Cecil comparison](../experiments/extended-cli-metadata/pe-validation.json)
+now validates fixture inspection and exposes Cecil stream stripping on rewrite.
+Runtime execution and broader reader compatibility remain evidence gaps. Do not claim universal reader compatibility,
 CLR execution compatibility, smaller files or faster loading from this design review.
 
 ## Provisional architecture
@@ -197,7 +199,7 @@ literal transport needs its own explicit contract.
 | Step | Deliverable and exit evidence | Status |
 | --- | --- | --- |
 | 0 | Main-based branch, proposal inventory, structural requirements and compatibility questions | This document |
-| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing and structural payloads implemented](../experiments/extended-cli-metadata/README.md); CLI references/embedding pending |
+| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing and structural payloads implemented](../experiments/extended-cli-metadata/README.md); bounded PE embedding/reader probe passes; real CLI reference resolution pending |
 | 2 | Structural identity/resolution tests across independently emitted modules; synthesized-member and conformance references | [Reference/identity and structural-member fixtures pass](../experiments/extended-cli-metadata/README.md#structural-member-evidence); actual compiler modules and conformance pending |
 | 3 | One native consumer slice using Self and structural Function signatures; verifier, invocation, GC and introspection evidence | Planned; depends on explicit runtime feature work |
 | 4 | Raven reader/symbol adapter, then writer/backend integration through target capabilities | Later integration |
@@ -212,7 +214,8 @@ actual behavior of pinned System.Reflection.Metadata and the bridge's reader sep
 Record tool versions and artifact hashes. The isolated codec now has
 [30 passing focused tests](../experiments/extended-cli-metadata/README.md#structural-member-evidence);
 Standalone fixtures now check consumer-local reference renumbering against a host catalog;
-actual CLI-reference, conventional-reader and compiled cross-module checks remain planned.
+the bounded PE probe now covers two conventional readers. Actual CLI-reference
+resolution and compiled cross-module checks remain planned.
 
 Before production encoding, resolve normalization and position rules, capability/version
 negotiation, unsafe downgrade prevention and cross-module reference identity. Later

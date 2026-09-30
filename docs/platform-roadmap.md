@@ -13,8 +13,9 @@ Function types, unions/intersections and synthesized members. The
 an isolated codec/inspector now validates experimental framing and structural
 signatures, host-catalog nominal resolution and synthesized-member references with
 30 focused tests. Differently numbered fixture references resolve to equal structural
-type/member keys. A PE/CLI extension-stream compatibility probe is next; actual CLI
-embedding and runtime support remain unimplemented. This scopes the requested exploration
+type/member keys. A bounded PE32 #Neo probe preserves conventional metadata for
+.NET/Cecil inspection; Cecil rewriting strips the extension. Fail-closed artifact
+recognition is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
