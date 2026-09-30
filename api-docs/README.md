@@ -429,7 +429,8 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 `MetadataProfile`, `MetadataProfileDocument`, `MetadataArtifactReader` and
 `MetadataArtifact`, plus `NeoCLR.Metadata.Experimental.Model.AssemblyDefinition`,
 `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
-`AssemblyReference` and `IAssemblyResolver` in that Model namespace,
+`AssemblyReference`, `IAssemblyResolver`, `AssemblyBuilder`, `TypeBuilder` and
+`MethodBuilder` in that Model namespace,
 are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type

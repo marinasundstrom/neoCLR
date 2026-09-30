@@ -9113,3 +9113,25 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** physical type-reference resolution, import, mutation/builders, PE writing,
   full Raven compiler integration and a possible Raven port remain pending. Selecting
   the primary API does not imply these operations are already implemented.
+
+
+## 2026-09-30 — API-produced assembly must execute in neoCLR
+
+- **Author direction:** “Continue implementing until you have something more or less
+  complete.” The author then clarified: “It's not complete until you can load something
+  that has been produced by the API - something that conforms to the assembly and
+  metadata format - into neoCLR.” They identify that as the proof for Raven integration.
+- **Assistant response/action:** made actual runtime acceptance the gate rather than
+  another .NET-only codec round-trip. Added physical nominal references, controlled PE
+  assembly/type/method builders, imported calls and C# producer/validation tests.
+  Clarified that today's runtime accepts native artifacts and the supported Raven route
+  uses the CLI bridge; direct #Neo runtime loading is still missing.
+- **Observed outcome:** an API-produced PE application calling an API-produced PE library
+  was imported through the matching bridge, verified by neoCLR and executed with
+  `=> Int32(42)` and exit code 42. A C# runner automates PE production, bridge import,
+  native serialization and runtime load/verification/execution. Initial stale-bundle
+  attempts failed on entry/core contracts; matching bridge/core/System inputs resolved
+  them. The macOS build required an explicit compatible SDK path.
+- **Scope:** this proves a bounded static Int32 compiler producer route; it is not full
+  Raven codegen integration, arbitrary PE rewriting or native structural execution.
+  [Design and scope](design/extended-cli-metadata.md#end-to-end-compiler-producer-baseline-2026-09-30).

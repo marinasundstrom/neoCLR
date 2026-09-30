@@ -642,3 +642,37 @@ and resolver exception propagation. The prior CLI model consumer still passes.
 The [API reference](../../../api-docs/experimental-metadata.md#assemblyidentity) covers
 three added model types, new properties and all limits. Physical TypeRef resolution
 is next; import, editing/builders, full PE emission and Raven integration are pending.
+
+
+## PE producer and neoCLR runtime acceptance (2026-09-30)
+
+The primary model now resolves physical TypeRefs and constructs real ordinary CLI PE
+assemblies through controlled AssemblyBuilder/TypeBuilder/MethodBuilder objects. A C#
+producer emits a static Int32 application calling a separately emitted library. Body
+validation catches stack/argument/return errors before writing; imports preserve exact
+dependency identities. Fourteen C# contract groups pass.
+
+The runtime test uses the existing Raven bridge, assembles its generated IL into native
+JSON, and loads/verifies/executes the serialized artifact in neoCLR. The expected and
+observed result is 42. This meets the bounded producer-to-runtime proof requested by
+the author through the current supported Raven route; it is not direct PE/#Neo loading.
+No application IL/JSON is hand-written for the test.
+
+Reproduction prerequisites from the repository root:
+
+```sh
+dotnet build docs/experiments/raven-target/Probe.csproj -p:RavenRoot=/path/to/Raven -o target/extended-cli-metadata/runtime-bridge
+cargo build --locked --bin neoclr
+```
+
+Use `api-docs/reference/NeoCLR.CoreProbe.dll` with this bridge and generate the composed
+System library via `collection_library.build(runtime/System.neoil)` from the existing
+Raven target tools. Then run the C# integration command in the metadata tooling README.
+The output directory must be fresh. On the tested macOS host, cargo required
+`SDKROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX26.5.sdk` due to an installed
+linker/default-SDK mismatch. No machine configuration was changed.
+
+The core writer supports static classes, Int32 parameters/results or CLI no-result,
+linear constants/argument loads/arithmetic/calls/return. Read-snapshot rewriting,
+fields, richer signatures/IL, direct structural execution and Raven compiler adapters
+are still pending. This is an executable integration baseline, not full Cecil parity.

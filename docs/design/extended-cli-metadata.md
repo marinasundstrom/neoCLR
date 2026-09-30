@@ -577,3 +577,44 @@ identity fields, ECMA key/token normalization, explicit resolver behavior and fa
 input ownership, malformed metadata and the 256/257 boundary. The existing generated
 model consumer still passes. Tests return a failing process status on any failed case;
 framework discovery/CI wiring can evolve separately. No performance claims are made.
+
+
+## End-to-end compiler producer baseline (2026-09-30)
+
+**Author completion criterion:** keep implementing until there is a more-or-less
+complete usable baseline, and do not call it complete without loading an assembly
+produced by this API into neoCLR. The author identifies this as the proof needed for
+Raven integration. A .NET re-read alone does not meet that criterion.
+
+The next implementation adds physical nominal TypeRef resolution (local, assembly and
+nested scopes) with explicit dependency matching, and controlled AssemblyBuilder /
+TypeBuilder / MethodBuilder graph construction. The writer emits real ordinary CLI
+PE32 images, including MethodDef bodies, entry tokens, imported AssemblyRef/TypeRef/
+MemberRef rows and correct call signatures. It validates its bounded Int32 stack model
+before emission and supports body replacement and repeated writes. These builders are
+part of the primary metadata model, below future Raven symbol/codegen adapters.
+
+This is intentionally a supported compiler subset: static classes, static Int32
+parameter/result or no-result methods, linear constants/argument loads/arithmetic/calls/
+return. It does not rewrite arbitrary loaded images. That avoids pretending to preserve
+unsupported fields, attributes, generics, IL or debug data. Full reference import,
+mutable declaration rewriting, richer signatures/IL and native structural emission
+remain work. Existing reference-profile codecs still describe structural semantics;
+main's runtime does not yet consume #Neo directly.
+
+The acceptance route matches the current Raven target: C# producer -> API-emitted PE
+application plus PE library -> existing CLI import bridge -> serialized native assembly
+-> neoCLR load/verification/execution. It deliberately tests an imported cross-assembly
+call rather than only an empty image. The program computes `20 * 2 + 2` and exits 42.
+The C# integration runner persists all outputs and tool/artifact hashes. Direct PE or
+#Neo runtime loading is not claimed by this proof.
+
+The manual run verified 4126 IL functions against the composed Raven System library,
+then reported `=> Int32(42)` with process exit code 42. An automated C# runner performs
+the complete production/import/serialization/load sequence. Use the matching checked-in
+core reference and the collection-library composition, not a stale published bundle
+or the minimal embedded System library: the bridge emits helpers with matching union
+contracts. Native build on this host required SDKROOT pointing to MacOSX26.5.sdk because
+the default 27.0 SDK was incompatible with the installed linker. This is environment
+configuration, not a runtime source change. The bridge build had 11 existing nullable
+warnings; the metadata library and C# tests build cleanly.

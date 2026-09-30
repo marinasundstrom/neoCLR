@@ -74,7 +74,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with mismatch rejection and bounded key/reference decoding. Eleven standalone C#
   contract tests pass using generated PE fixtures; the prior model consumer also passes.
   Document three new model types and new identity/reference properties. Import,
-  mutation/builders, PE writing and full Raven integration remain pending.
+  full Raven integration remains pending. Add physical nominal TypeRef resolution
+  with bounded nesting and explicit dependencies, plus controlled assembly/type/method
+  builders for static Int32 CLI PE production, body editing and imported calls.
+  Fourteen C# contract groups pass. API-produced application/library PEs pass the
+  existing CLI bridge and execute in neoCLR with result/exit code 42 using a matching
+  System library. The C# runtime gate also serializes and reloads the native artifact.
+  This is the existing Raven bridge route, not direct PE/#Neo loading; arbitrary
+  rewriting and wider signature/IL coverage remain unsupported.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

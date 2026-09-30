@@ -29,8 +29,11 @@ Unicode and snapshot-scoped reference consumer checks. Next is assembly-referenc
 identity and explicit nominal dependency resolution. AssemblyRef identity and explicit
 host resolution now pass 11 standalone C# contract tests. The author selects the
 Cecil-like model as the primary compiler abstraction for metadata/PE manipulation,
-with adaptations as needed. Next is physical TypeRef resolution; full binding and
-assembly emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+with adaptations as needed. Physical TypeRef resolution and a controlled static-Int32
+PE writer now support an end-to-end producer baseline. API-produced application and
+library PEs execute in neoCLR through the existing CLI bridge and matching native
+library, returning 42. Broader IL/signature coverage, general rewriting, Raven codegen
+integration and direct native #Neo loading remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The author further clarifies that the .NET API should support later Raven compiler

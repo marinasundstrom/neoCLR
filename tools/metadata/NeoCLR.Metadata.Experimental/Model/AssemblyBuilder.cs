@@ -1,0 +1,235 @@
+using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
+
+namespace NeoCLR.Metadata.Experimental.Model;
+
+/// <summary>A controlled editable assembly graph for the initial static Int32 compiler subset.</summary>
+/// <remarks>Produces ordinary unsigned CLI PE32. Structural/native #Neo emission and arbitrary assembly rewriting are not supported.</remarks>
+public sealed class AssemblyBuilder
+{
+    private readonly List<TypeBuilder> types = [];
+    private readonly Guid mvid = Guid.NewGuid();
+    /// <summary>Creates an assembly builder with explicit core-library identity.</summary>
+    /// <param name="identity">Unsigned assembly identity with no flags.</param>
+    /// <param name="coreLibrary">Core assembly supplying System.Object; no host core library is inferred.</param>
+    /// <exception cref="ArgumentNullException">Either identity is null.</exception>
+    /// <exception cref="ArgumentException">Output identity requires signing or flags.</exception>
+    public AssemblyBuilder(AssemblyIdentity identity, AssemblyIdentity coreLibrary)
+    {
+        ArgumentNullException.ThrowIfNull(identity); ArgumentNullException.ThrowIfNull(coreLibrary);
+        if (identity.PublicKeyToken.Length != 0 || identity.Flags != 0) throw new ArgumentException("writer supports unsigned unflagged identities");
+        Identity = identity; CoreLibrary = coreLibrary;
+    }
+    /// <summary>Gets the output identity.</summary>
+    public AssemblyIdentity Identity { get; }
+    /// <summary>Gets the explicit core-library identity.</summary>
+    public AssemblyIdentity CoreLibrary { get; }
+    /// <summary>Gets the current owned type definitions.</summary>
+    public IReadOnlyList<TypeBuilder> Types => types.AsReadOnly();
+    /// <summary>Gets or sets a local parameterless Int32 entry point; null writes a library.</summary>
+    public MethodBuilder? EntryPoint { get; set; }
+    /// <summary>Adds a unique public static class.</summary>
+    /// <param name="namespace">Namespace, possibly empty.</param>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <returns>A type owned by this builder.</returns>
+    /// <exception cref="ArgumentException">Null/invalid names, duplicate type or more than 256 types.</exception>
+    public TypeBuilder AddType(string @namespace, string name)
+    {
+        if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
+            types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
+        var type = new TypeBuilder(this, @namespace, name); types.Add(type); return type;
+    }
+    /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
+    /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
+    /// <exception cref="InvalidDataException">Invalid body, entry point, dependency identity or resource limit.</exception>
+    /// <remarks>No image is loaded. Cross-assembly calls import exact assembly/type/member references. Repeated writes have a fixed MVID and timestamp for reproducibility.</remarks>
+    public byte[] Write()
+    {
+        var methods = types.SelectMany(t => t.Methods).ToArray();
+        if (methods.Sum(method => (long)method.Instructions.Count) > 131072) throw new InvalidDataException("assembly instruction limit exceeded");
+        if (methods.Length > 4096) throw new InvalidDataException("too many methods");
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || !EntryPoint.ReturnsValue))
+            throw new InvalidDataException("entry point must be a local parameterless Int32 method");
+        foreach (var method in methods) method.Validate();
+        var metadata = new MetadataBuilder();
+        // A stable per-builder MVID preserves snapshot scope; PE content IDs/timestamps are deterministic.
+        metadata.AddModule(0, metadata.GetOrAddString(Identity.Name + ".dll"), metadata.GetOrAddGuid(mvid), default, default);
+        metadata.AddAssembly(metadata.GetOrAddString(Identity.Name), Identity.Version, metadata.GetOrAddString(Identity.Culture), default, 0, AssemblyHashAlgorithm.None);
+        var assemblyRefs = new Dictionary<AssemblyIdentity, AssemblyReferenceHandle>();
+        AssemblyReferenceHandle ImportAssembly(AssemblyIdentity identity)
+        {
+            if (identity.Equals(Identity)) throw new InvalidDataException("external assembly identity collides with output identity");
+            if (!assemblyRefs.TryGetValue(identity, out var handle))
+            {
+                if (assemblyRefs.Count >= 256) throw new InvalidDataException("too many imported assemblies");
+                handle = metadata.AddAssemblyReference(metadata.GetOrAddString(identity.Name), identity.Version, metadata.GetOrAddString(identity.Culture),
+                    metadata.GetOrAddBlob(Convert.FromHexString(identity.PublicKeyToken)), (AssemblyFlags)identity.Flags, default);
+                assemblyRefs.Add(identity, handle);
+            }
+            return handle;
+        }
+        var objectType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Object"));
+        var handles = methods.Select((method, index) => (method, handle: MetadataTokens.MethodDefinitionHandle(index + 1))).ToDictionary(pair => pair.method, pair => pair.handle);
+        var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
+        var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
+        BlobHandle Signature(MethodBuilder method)
+        {
+            var signature = new BlobBuilder();
+            new BlobEncoder(signature).MethodSignature().Parameters(method.ParameterCount,
+                result => { if (method.ReturnsValue) result.Type().Int32(); else result.Void(); },
+                parameters => { for (int i = 0; i < method.ParameterCount; i++) parameters.AddParameter().Type().Int32(); });
+            return metadata.GetOrAddBlob(signature);
+        }
+        int ImportMethod(MethodBuilder method)
+        {
+            if (handles.TryGetValue(method, out var local)) return MetadataTokens.GetToken(local);
+            if (!CoreLibrary.Equals(method.DeclaringType.Assembly.CoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
+            if (!importedMethods.TryGetValue(method, out var handle))
+            {
+                var owner = method.DeclaringType;
+                if (!importedTypes.TryGetValue(owner, out var type))
+                {
+                    type = metadata.AddTypeReference(ImportAssembly(owner.Assembly.Identity), metadata.GetOrAddString(owner.Namespace), metadata.GetOrAddString(owner.Name));
+                    importedTypes.Add(owner, type);
+                }
+                handle = metadata.AddMemberReference(type, metadata.GetOrAddString(method.Name), Signature(method));
+                importedMethods.Add(method, handle);
+            }
+            return MetadataTokens.GetToken(handle);
+        }
+        var bodies = new BlobBuilder();
+        var bodyEncoder = new MethodBodyStreamEncoder(bodies);
+        metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
+            MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
+        int nextMethod = 1;
+        foreach (var type in types)
+        {
+            metadata.AddTypeDefinition(TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
+                MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(nextMethod));
+            foreach (var method in type.Methods)
+            {
+                var code = new BlobBuilder();
+                foreach (var instruction in method.Instructions)
+                {
+                    switch (instruction.Op)
+                    {
+                        case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
+                        case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
+                        case "add": code.WriteByte(0x58); break;
+                        case "subtract": code.WriteByte(0x59); break;
+                        case "multiply": code.WriteByte(0x5a); break;
+                        case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                        case "return": code.WriteByte(0x2a); break;
+                    }
+                }
+                int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: method.MaxStack);
+                metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
+                    MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.Name), Signature(method), body, MetadataTokens.ParameterHandle(1));
+                nextMethod++;
+            }
+        }
+        var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
+                imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),
+            new MetadataRootBuilder(metadata), bodies, entryPoint: EntryPoint is null ? default : handles[EntryPoint],
+            strongNameSignatureSize: 0, deterministicIdProvider: blobs => BlobContentId.FromHash(System.Security.Cryptography.SHA256.HashData(blobs.SelectMany(blob => blob.GetBytes()).ToArray())));
+        var image = new BlobBuilder(); builder.Serialize(image);
+        if (image.Count > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
+        return image.ToArray();
+    }
+}
+
+/// <summary>An editable public static class owned by an AssemblyBuilder.</summary>
+public sealed class TypeBuilder
+{
+    private readonly List<MethodBuilder> methods = [];
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name) { Assembly = assembly; Namespace = @namespace; Name = name; }
+    /// <summary>Gets the owning assembly.</summary>
+    public AssemblyBuilder Assembly { get; }
+    /// <summary>Gets the declared namespace.</summary>
+    public string Namespace { get; }
+    /// <summary>Gets the declared name.</summary>
+    public string Name { get; }
+    /// <summary>Gets owned methods in declaration order.</summary>
+    public IReadOnlyList<MethodBuilder> Methods => methods.AsReadOnly();
+    /// <summary>Adds a public static method with Int32 parameters and Int32 or absent result.</summary>
+    /// <param name="name">Nonempty method name, unique by name/parameter count.</param>
+    /// <param name="parameterCount">Number of Int32 parameters, 0–256.</param>
+    /// <param name="returnsValue">True for Int32, false for CLI void/no-result.</param>
+    /// <returns>A mutable body builder.</returns>
+    /// <exception cref="ArgumentException">Invalid or duplicate signature or more than 256 methods.</exception>
+    public MethodBuilder AddMethod(string name, int parameterCount = 0, bool returnsValue = true)
+    {
+        if (string.IsNullOrEmpty(name) || name.Length > 1024 || parameterCount is < 0 or > 256 || methods.Count >= 256 ||
+            methods.Any(m => m.Name == name && m.ParameterCount == parameterCount)) throw new ArgumentException("invalid or duplicate method");
+        var method = new MethodBuilder(this, name, parameterCount, returnsValue); methods.Add(method); return method;
+    }
+}
+
+/// <summary>Linear, typed Int32 body construction; invalid stack contracts fail before emission.</summary>
+public sealed class MethodBuilder
+{
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null);
+    internal List<Operation> Instructions { get; } = [];
+    internal int MaxStack { get; private set; }
+    internal MethodBuilder(TypeBuilder owner, string name, int count, bool result) { DeclaringType = owner; Name = name; ParameterCount = count; ReturnsValue = result; }
+    /// <summary>Gets the declaring type.</summary>
+    public TypeBuilder DeclaringType { get; }
+    /// <summary>Gets the method name.</summary>
+    public string Name { get; }
+    /// <summary>Gets the Int32 parameter count.</summary>
+    public int ParameterCount { get; }
+    /// <summary>Gets whether the method returns Int32 rather than no result.</summary>
+    public bool ReturnsValue { get; }
+    /// <summary>Appends an Int32 constant.</summary>
+    /// <param name="value">Constant value.</param>
+    public void LoadConstant(int value) => Append(new("constant", value));
+    /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
+    /// <param name="index">Zero-based parameter index.</param>
+    public void LoadArgument(int index) => Append(new("argument", index));
+    /// <summary>Appends Int32 addition.</summary>
+    public void Add() => Append(new("add"));
+    /// <summary>Appends Int32 subtraction.</summary>
+    public void Subtract() => Append(new("subtract"));
+    /// <summary>Appends Int32 multiplication.</summary>
+    public void Multiply() => Append(new("multiply"));
+    /// <summary>Appends a call; foreign methods are imported during Write.</summary>
+    /// <param name="target">Local or external builder method.</param>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    public void Call(MethodBuilder target) { ArgumentNullException.ThrowIfNull(target); Append(new("call", Target: target)); }
+    /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
+    public void Return() => Append(new("return"));
+    /// <summary>Clears the body for editing before another Write.</summary>
+    public void ClearBody() => Instructions.Clear();
+    private void Append(Operation operation)
+    {
+        if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");
+        Instructions.Add(operation);
+    }
+    internal void Validate()
+    {
+        int stack = 0; MaxStack = 0;
+        if (Instructions.Count == 0 || Instructions[^1].Op != "return") throw new InvalidDataException("method requires final return");
+        for (int i = 0; i < Instructions.Count; i++)
+        {
+            var instruction = Instructions[i];
+            int pop = 0, push = 0;
+            switch (instruction.Op)
+            {
+                case "constant": push = 1; break;
+                case "argument":
+                    if (instruction.Value < 0 || instruction.Value >= ParameterCount) throw new InvalidDataException("argument outside signature");
+                    push = 1; break;
+                case "add": case "subtract": case "multiply": pop = 2; push = 1; break;
+                case "call": pop = instruction.Target!.ParameterCount; push = instruction.Target.ReturnsValue ? 1 : 0; break;
+                case "return":
+                    if (i != Instructions.Count - 1 || stack != (ReturnsValue ? 1 : 0)) throw new InvalidDataException("invalid return stack");
+                    pop = stack; break;
+            }
+            if (stack < pop) throw new InvalidDataException("evaluation stack underflow");
+            stack = stack - pop + push; MaxStack = Math.Max(MaxStack, stack);
+        }
+    }
+}

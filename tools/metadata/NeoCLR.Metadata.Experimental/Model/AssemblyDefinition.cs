@@ -8,11 +8,12 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An owned read-only assembly view, separate from runtime reflection and mutable emission.</summary>
 public sealed class AssemblyDefinition
 {
+    private readonly byte[] image;
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
-        IReadOnlyList<TypeRow> rows, IReadOnlyList<ReferenceRow> references, MetadataProfileDocument? profile)
+        IReadOnlyList<TypeRow> rows, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
     {
-        Identity = identity; Profile = profile;
-        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, references);
+        Identity = identity; Profile = profile; this.image = image; EntryPointToken = entryPointToken;
+        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, references, typeReferences);
     }
     /// <summary>Gets the assembly's simple name, not a complete binding identity.</summary>
     public string Name => Identity.Name;
@@ -24,6 +25,13 @@ public sealed class AssemblyDefinition
     public ModuleDefinition MainModule { get; }
     /// <summary>Gets locally validated extended metadata, or null for explicitly admitted ordinary input.</summary>
     public MetadataProfileDocument? Profile { get; }
+
+    /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
+    public uint EntryPointToken { get; }
+    /// <summary>Returns a new byte-for-byte copy of this unchanged read snapshot.</summary>
+    /// <returns>Owned original PE bytes, preserving all validated and opaque data.</returns>
+    /// <remarks>This is preservation, not rebuilding or applying edits. Use AssemblyBuilder for controlled new output.</remarks>
+    public byte[] Write() => (byte[])image.Clone();
 
     /// <summary>Recognizes bounded PE input and snapshots its assembly/module/TypeDef declarations.</summary>
     /// <param name="image">Complete image; do not mutate during the call.</param>
@@ -43,6 +51,7 @@ public sealed class AssemblyDefinition
             var reader = pe.GetMetadataReader();
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
             if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
+            if (reader.TypeReferences.Count > 4096) throw new InvalidDataException("too many type references");
             if (reader.AssemblyReferences.Count > 256) throw new InvalidDataException("too many assembly references");
             int keyBytes = 0;
             int nameCharacters = 0;
@@ -69,6 +78,9 @@ public sealed class AssemblyDefinition
             }
             var assembly = reader.GetAssemblyDefinition();
             var module = reader.GetModuleDefinition();
+            uint entryPointToken = (uint)pe.PEHeaders.CorHeader!.EntryPointTokenOrRelativeVirtualAddress;
+            if (entryPointToken != 0 && (entryPointToken >> 24 != 6 || (entryPointToken & 0xffffff) == 0 ||
+                (entryPointToken & 0xffffff) > reader.MethodDefinitions.Count)) throw new InvalidDataException("invalid managed entry token");
             var identity = ReadIdentity(assembly.Name, assembly.Version, assembly.Culture, assembly.PublicKey, (uint)assembly.Flags, true);
             var references = new List<ReferenceRow>();
             foreach (var handle in reader.AssemblyReferences)
@@ -76,6 +88,26 @@ public sealed class AssemblyDefinition
                 var reference = reader.GetAssemblyReference(handle);
                 references.Add(new((uint)MetadataTokens.GetToken(handle), ReadIdentity(reference.Name, reference.Version,
                     reference.Culture, reference.PublicKeyOrToken, (uint)reference.Flags, false)));
+            }
+            var typeReferences = new List<TypeReferenceRow>();
+            foreach (var handle in reader.TypeReferences)
+            {
+                var reference = reader.GetTypeReference(handle);
+                typeReferences.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(reference.Namespace), ReadName(reference.Name),
+                    reference.ResolutionScope.IsNil ? 0 : (uint)MetadataTokens.GetToken(reference.ResolutionScope)));
+            }
+            var referenceScopes = typeReferences.ToDictionary(row => row.Token, row => row.Scope);
+            foreach (var row in typeReferences)
+            {
+                var seen = new HashSet<uint>();
+                uint scope = row.Token;
+                while (scope >> 24 == 1)
+                {
+                    if (seen.Count >= 32 || !seen.Add(scope) || !referenceScopes.TryGetValue(scope, out scope))
+                        throw new InvalidDataException("invalid, cyclic or excessive nested TypeRef scope");
+                }
+                if (scope >> 24 == 0x23 && !references.Any(reference => reference.Token == scope))
+                    throw new InvalidDataException("TypeRef assembly scope outside table");
             }
             var rows = new List<TypeRow>();
             foreach (var handle in reader.TypeDefinitions)
@@ -95,13 +127,14 @@ public sealed class AssemblyDefinition
                     if (!seen.Add(token) || !parents.TryGetValue(token, out token)) throw new InvalidDataException("invalid or cyclic declaring type");
                 }
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, references, artifact.Profile);
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, references, typeReferences, artifact.Profile, owned, entryPointToken);
         }
         catch (BadImageFormatException error)
         {
             throw new InvalidDataException("malformed CLI declaration metadata", error);
         }
     }
+    internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken);
 }
@@ -111,13 +144,14 @@ public sealed class ModuleDefinition
 {
     private readonly Dictionary<uint, TypeDefinition> definitions;
     internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows,
-        IReadOnlyList<AssemblyDefinition.ReferenceRow> references)
+        IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
         Types = Array.AsReadOnly(types);
         definitions = types.ToDictionary(type => type.MetadataToken);
         AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
+        TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
     }
     /// <summary>Gets the owning assembly snapshot.</summary>
     public AssemblyDefinition Assembly { get; }
@@ -129,6 +163,8 @@ public sealed class ModuleDefinition
     public IReadOnlyList<TypeDefinition> Types { get; }
     /// <summary>Gets physical AssemblyRef rows in metadata order, without resolving dependencies.</summary>
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
+    /// <summary>Gets physical nominal TypeRef rows in metadata order.</summary>
+    public IReadOnlyList<TypeReference> TypeReferences { get; }
     /// <summary>Looks up a module-local TypeDef without loading any dependencies.</summary>
     /// <param name="metadataToken">A physical TypeDef token; other kinds and absent rows return null.</param>
     /// <returns>The owned definition, or null if this snapshot has no such TypeDef.</returns>
@@ -161,16 +197,59 @@ public sealed class TypeDefinition
     public TypeReference ToReference() => new(this);
 }
 
-/// <summary>A definition-backed nominal reference scoped to one module snapshot.</summary>
-/// <remarks>Not yet a physical CLI TypeRef/TypeSpec or cross-module imported reference. Object equality is reference equality.</remarks>
+/// <summary>A nominal reference backed by a TypeDef or a physical TypeRef row.</summary>
+/// <remarks>Object equality is reference equality. Structural expressions and TypeSpec decoding are separate.</remarks>
 public sealed class TypeReference
 {
-    internal TypeReference(TypeDefinition definition) { Module = definition.Module; MetadataToken = definition.MetadataToken; }
-    /// <summary>Gets the target module snapshot; no implicit dependency search occurs.</summary>
+    private readonly bool definitionBacked;
+    internal TypeReference(TypeDefinition definition)
+    {
+        Module = definition.Module; MetadataToken = definition.MetadataToken;
+        Namespace = definition.Namespace; Name = definition.Name; definitionBacked = true;
+    }
+    internal TypeReference(ModuleDefinition module, AssemblyDefinition.TypeReferenceRow row)
+    { Module = module; MetadataToken = row.Token; Namespace = row.Namespace; Name = row.Name; ResolutionScopeToken = row.Scope; }
+    /// <summary>Gets the owning module snapshot; for a physical TypeRef this is the consuming module.</summary>
     public ModuleDefinition Module { get; }
-    /// <summary>Gets the target TypeDef token within Module.</summary>
+    /// <summary>Gets the TypeDef or physical TypeRef token within Module.</summary>
     public uint MetadataToken { get; }
-    /// <summary>Resolves within the immutable target module.</summary>
-    /// <returns>The original TypeDefinition object.</returns>
-    public TypeDefinition Resolve() => Module.GetTypeDefinition(MetadataToken)!;
+    /// <summary>Gets the stored namespace.</summary>
+    public string Namespace { get; }
+    /// <summary>Gets the stored metadata name.</summary>
+    public string Name { get; }
+    /// <summary>Gets a physical resolution-scope token; zero for definition-backed references or a nil scope.</summary>
+    public uint ResolutionScopeToken { get; }
+    /// <summary>Resolves a nominal reference through its local module or explicit assembly resolver.</summary>
+    /// <param name="resolver">Required for assembly-scoped references; unused for local definitions.</param>
+    /// <returns>The unique matching owned definition.</returns>
+    /// <exception cref="InvalidDataException">Missing/mismatched dependency, absent/ambiguous type, nil or unsupported multi-module scope.</exception>
+    /// <remarks>Does not follow exported-type forwarders or bind constructed generic TypeSpecs.</remarks>
+    public TypeDefinition Resolve(IAssemblyResolver? resolver = null)
+    {
+        if (definitionBacked) return Module.GetTypeDefinition(MetadataToken)!;
+        ModuleDefinition target;
+        TypeDefinition? parent = null;
+        switch (ResolutionScopeToken >> 24)
+        {
+            case 0 when ResolutionScopeToken == 1:
+                target = Module;
+                break;
+            case 0x23:
+                if (resolver is null) throw new InvalidDataException("assembly resolver required for TypeRef");
+                var assembly = Module.AssemblyReferences.SingleOrDefault(reference => reference.MetadataToken == ResolutionScopeToken)
+                    ?? throw new InvalidDataException("missing AssemblyRef scope");
+                target = assembly.Resolve(resolver).MainModule;
+                break;
+            case 1:
+                var outer = Module.TypeReferences.SingleOrDefault(reference => reference.MetadataToken == ResolutionScopeToken)
+                    ?? throw new InvalidDataException("missing declaring TypeRef scope");
+                parent = outer.Resolve(resolver);
+                target = parent.Module;
+                break;
+            default: throw new InvalidDataException("unsupported or nil nominal resolution scope");
+        }
+        var matches = target.Types.Where(type => type.Name == Name && type.Namespace == Namespace && ReferenceEquals(type.DeclaringType, parent)).Take(2).ToArray();
+        if (matches.Length != 1) throw new InvalidDataException("nominal type missing or ambiguous: " + Namespace + "." + Name);
+        return matches[0];
+    }
 }

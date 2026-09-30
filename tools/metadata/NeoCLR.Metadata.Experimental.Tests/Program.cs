@@ -4,9 +4,40 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 6 && args[0] == "--runtime-integration")
+{
+    await RuntimeIntegration.Run(args[1], args[2], args[3], args[4], args[5]);
+    return 0;
+}
+
+if (args.Length == 3 && args[0] == "--emit-runtime-probe")
+{
+    WriterChecks.Emit(args[1], AssemblyDefinition.ReadAssembly(File.ReadAllBytes(args[2]), false).Identity);
+    return 0;
+}
+
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Writer construction editing imports and validation", WriterChecks.Run),
+    ("Resolves physical top-level and nested TypeRefs", () =>
+    {
+        var dependency = Read(Image("Dependency", culture: "fr"));
+        var consumer = Read(Image("Consumer", references: 1, typeReferences: true));
+        var resolver = new Resolver(dependency);
+        var outer = consumer.MainModule.TypeReferences[0].Resolve(resolver);
+        var nested = consumer.MainModule.TypeReferences[1].Resolve(resolver);
+        Check(outer.Name == "Widget" && ReferenceEquals(nested.DeclaringType, outer), "physical reference resolution");
+        Check(ReferenceEquals(consumer.MainModule.TypeReferences[0].Module, consumer.MainModule), "consuming scope");
+        Throws<InvalidDataException>(() => consumer.MainModule.TypeReferences[0].Resolve(), "resolver required");
+        Throws<InvalidDataException>(() => consumer.MainModule.TypeReferences[0].Resolve(new Resolver(null)), "not found");
+    }),
+    ("Rejects missing nominal type and cyclic TypeRef", () =>
+    {
+        var consumer = Read(Image("Consumer", references: 1, typeReferences: true, missingType: true));
+        Throws<InvalidDataException>(() => consumer.MainModule.TypeReferences[0].Resolve(new Resolver(Read(Image("Dependency", culture: "fr")))), "missing or ambiguous");
+        Throws<InvalidDataException>(() => Read(Image("Consumer", references: 1, typeReferences: true, cyclic: true)), "cyclic");
+    }),
     ("Reads identity and AssemblyRef ownership", () =>
     {
         var consumer = Read(Image("Consumer", references: 1));
@@ -117,7 +148,7 @@ static void Throws<T>(Action action, string? message = null) where T : Exception
     throw new Exception("expected " + typeof(T).Name);
 }
 static byte[] Image(string name, Version? version = null, string culture = "", byte[]? key = null,
-    AssemblyFlags flags = 0, int references = 0, byte[]? referenceKey = null, AssemblyFlags referenceFlags = 0)
+    AssemblyFlags flags = 0, int references = 0, byte[]? referenceKey = null, AssemblyFlags referenceFlags = 0, bool typeReferences = false, bool missingType = false, bool cyclic = false)
 {
     var metadata = new System.Reflection.Metadata.Ecma335.MetadataBuilder();
     metadata.AddModule(0, metadata.GetOrAddString(name + ".dll"), metadata.GetOrAddGuid(Guid.NewGuid()), default, default);
@@ -126,6 +157,18 @@ static byte[] Image(string name, Version? version = null, string culture = "", b
     metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
         System.Reflection.Metadata.Ecma335.MetadataTokens.FieldDefinitionHandle(1),
         System.Reflection.Metadata.Ecma335.MetadataTokens.MethodDefinitionHandle(1));
+    var widget = metadata.AddTypeDefinition(TypeAttributes.Public, metadata.GetOrAddString("Example"), metadata.GetOrAddString("Widget"), default,
+        System.Reflection.Metadata.Ecma335.MetadataTokens.FieldDefinitionHandle(1), System.Reflection.Metadata.Ecma335.MetadataTokens.MethodDefinitionHandle(1));
+    var nested = metadata.AddTypeDefinition(TypeAttributes.NestedPublic, default, metadata.GetOrAddString("Inner"), default,
+        System.Reflection.Metadata.Ecma335.MetadataTokens.FieldDefinitionHandle(1), System.Reflection.Metadata.Ecma335.MetadataTokens.MethodDefinitionHandle(1));
+    metadata.AddNestedType(nested, widget);
+    if (typeReferences)
+    {
+        EntityHandle scope = cyclic ? System.Reflection.Metadata.Ecma335.MetadataTokens.TypeReferenceHandle(2) :
+            System.Reflection.Metadata.Ecma335.MetadataTokens.AssemblyReferenceHandle(1);
+        var outer = metadata.AddTypeReference(scope, metadata.GetOrAddString("Example"), metadata.GetOrAddString(missingType ? "Missing" : "Widget"));
+        metadata.AddTypeReference(outer, default, metadata.GetOrAddString("Inner"));
+    }
     for (int index = 0; index < references; index++)
         metadata.AddAssemblyReference(metadata.GetOrAddString(index == 0 ? "Dependency" : "Dependency" + index), V(),
             metadata.GetOrAddString("fr"), metadata.GetOrAddBlob(referenceKey ?? []), referenceFlags, default);

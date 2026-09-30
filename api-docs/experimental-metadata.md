@@ -7,8 +7,9 @@ This is the first reusable reader/writer slice intended for Raven's future symbo
 loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
 and derives structural identities/member contracts against an explicitly supplied host catalog.
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
-explicit AssemblyRef dependency matching is implemented; physical TypeRef binding,
-Introspection assembly loading and assembly emission remain pending.
+explicit AssemblyRef and nominal TypeRef resolution are implemented. A controlled
+static-Int32 builder writes ordinary CLI PE assemblies. General rewriting, native #Neo
+execution and Introspection assembly loading remain pending.
 
 ## Namespace and types
 
@@ -664,6 +665,8 @@ public sealed class AssemblyDefinition
     public AssemblyIdentity Identity { get; }
     public ModuleDefinition MainModule { get; }
     public MetadataProfileDocument? Profile { get; }
+    public uint EntryPointToken { get; }
+    public byte[] Write();
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image,
                                                   bool expectedExtended = true);
 }
@@ -674,7 +677,11 @@ manifest version. Identity adds culture, normalized public-key token and retaine
 flags for exact explicit dependency matching (see below). MVID is not an assembly
 identity. CLR binding redirects, unification and trust policy are not implemented.
 MainModule is the owned manifest module; Profile is attached structural metadata, or
-null for explicitly admitted ordinary CLI input.
+null for explicitly admitted ordinary CLI input. EntryPointToken is a managed MethodDef
+token or zero for a library; nonzero tokens are checked against the method table.
+Write returns a fresh byte-for-byte copy of the original immutable snapshot, including
+opaque data. It does not rebuild declarations or apply edits. Use AssemblyBuilder for
+new controlled output.
 
 ReadAssembly first applies MetadataArtifactReader's existing 4 MiB, unsigned IL-only
 PE32, stream and required-profile rules. The default requires extended metadata;
@@ -704,6 +711,7 @@ public sealed class ModuleDefinition
     public Guid Mvid { get; }
     public IReadOnlyList<TypeDefinition> Types { get; }
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
+    public IReadOnlyList<TypeReference> TypeReferences { get; }
     public TypeDefinition? GetTypeDefinition(uint metadataToken);
 }
 ```
@@ -718,7 +726,9 @@ no resolver calls.
 
 GetTypeDefinition performs local physical TypeDef-token lookup and returns the same
 owned definition instance. Zero, other token kinds and absent rows return null. It
-does not follow exports, physical TypeRef/TypeSpec rows or dependencies.
+does not follow exports or dependencies; TypeReferences exposes physical TypeRef rows
+for explicit resolution. At most 4096 TypeRefs and 32 enclosing TypeRef scopes are
+admitted; missing/cyclic parent and out-of-range AssemblyRef scopes are rejected.
 
 ### TypeDefinition
 
@@ -751,33 +761,29 @@ public sealed class TypeReference
 {
     public ModuleDefinition Module { get; }
     public uint MetadataToken { get; }
-    public TypeDefinition Resolve();
+    public string Namespace { get; }
+    public string Name { get; }
+    public uint ResolutionScopeToken { get; }
+    public TypeDefinition Resolve(IAssemblyResolver? resolver = null);
 }
 ```
 
-Created only by TypeDefinition.ToReference. Module and MetadataToken address the target
-definition in one immutable snapshot. Resolve performs no dependency search and returns
-the exact original TypeDefinition. This is a **definition-backed nominal reference**,
-not yet a physical TypeRef/TypeSpec, imported reference or structural type expression.
+Created from TypeDefinition.ToReference or a physical TypeRef row. Module is the target
+module for a definition-backed reference and the consuming module for a physical row.
+MetadataToken identifies that TypeDef/TypeRef in Module; Name/Namespace preserve stored
+metadata strings. ResolutionScopeToken is the physical scope, or zero for a
+definition-backed reference/nil scope.
 
-All four model classes use ordinary reference equality. Independent reads produce
-distinct graphs even when bytes/tokens/MVIDs match. Do not use token alone to compare
-types across modules or snapshots. Structural identity remains available separately
-through the validated Profile and explicit catalogs.
+Resolve returns the same owned TypeDefinition for a definition-backed reference. For
+physical references it supports local Module scope, exact AssemblyRef dependencies
+through the supplied resolver, and nested TypeRef scopes. Names/namespaces and nesting
+must identify exactly one target definition; missing or ambiguous targets, missing
+resolvers, nil/multi-module scopes or mismatched dependencies raise InvalidDataException.
+Host resolver exceptions propagate. Exported-type forwarders and TypeSpec/generic
+instantiation resolution are not supported. No implicit IO or assembly loading occurs.
 
-The compiled consumer checks assembly/module fields, Unicode names, nested/generic
-TypeDefs, local lookup, graph ownership, snapshot separation, default extended-input
-requirements and rejection of corrupt CLI tables despite a valid binding digest.
-System.Reflection.Metadata and Cecil snapshots agree before and after embedding.
-
-```sh
-python3 docs/experiments/extended-cli-metadata/verify_dotnet_model.py
-```
-
-This implements the navigation foundation only. Cross-module import/resolution,
-runtime binding policy, mutable graph/builders, member signatures and assembly
-writing remain pending; the potential Raven port has not been implemented.
-
+All read-model classes use ordinary reference equality. Independent reads yield
+distinct graphs even when tokens/MVIDs match. Structural identity remains separate.
 
 ### AssemblyIdentity
 
@@ -837,7 +843,7 @@ matching snapshot unchanged. Null resolver raises ArgumentNullException; missing
 wrong identity raises InvalidDataException. Host resolver exceptions propagate without
 being disguised as malformed metadata. Calls are not cached; dependency search, IO,
 cache ownership and lifetime are explicit host policy. No runtime assembly is loaded by
-the reference itself. Physical TypeRef/TypeSpec lookup remains pending.
+the reference itself. Nominal TypeRef lookup uses this resolver; constructed TypeSpec/forwarder binding remains pending.
 
 ### IAssemblyResolver
 
@@ -860,9 +866,140 @@ Run the standalone C# contract suite directly (no Python or test packages requir
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Metadata.Experimental.Tests.csproj --no-launch-profile
 ```
 
-All 11 tests pass: physical AssemblyRef ownership, explicit resolution and repeat calls,
+The original 11 identity/resolution groups (now part of a 14-group suite) pass: physical AssemblyRef ownership, explicit resolution and repeat calls,
 missing/mismatched candidates, exact identity/hash rules, ECMA full-key/token golden
 normalization, constructor and wire validation, 256/257-reference boundary, owned data
 and exception propagation. Fixtures are real PE metadata images built in C# with
 System.Reflection.Metadata. This executable returns nonzero on any failure; it is not
 a `dotnet test` discovery project.
+
+
+## Controlled PE construction and editing
+
+Namespace: `NeoCLR.Metadata.Experimental.Model`. These builders are the first writer
+part of the primary compiler abstraction. They construct new assemblies and allow body
+editing before another write; they do **not** rewrite arbitrary read snapshots or claim
+full Cecil compatibility. The current executable subset is public static classes and
+methods with Int32 parameters and either Int32 or CLI no-result return. This is a
+compiler integration proof, not a complete language backend.
+
+### AssemblyBuilder
+
+```csharp
+public sealed class AssemblyBuilder
+{
+    public AssemblyBuilder(AssemblyIdentity identity, AssemblyIdentity coreLibrary);
+    public AssemblyIdentity Identity { get; }
+    public AssemblyIdentity CoreLibrary { get; }
+    public IReadOnlyList<TypeBuilder> Types { get; }
+    public MethodBuilder? EntryPoint { get; set; }
+    public TypeBuilder AddType(string @namespace, string name);
+    public byte[] Write();
+}
+```
+
+The constructor requires explicit output and core-library identities. Null raises
+ArgumentNullException; output identities with a key token or flags raise
+ArgumentException because signing/flagged output is unsupported. No host core library
+is inferred. The core supplies the System.Object base reference. Types is a read-only
+view of this mutable graph. Do not mutate any participating graph during Write.
+
+AddType adds a public abstract sealed class with a unique namespace/name pair. Namespace
+may be empty; name must be nonempty and not `<Module>`. Combined length is at most 1024
+characters and the assembly admits at most 256 types. Invalid/duplicate inputs raise
+ArgumentException. EntryPoint may be null for a library or a local parameterless
+Int32-returning method; it is checked at Write.
+
+Write validates every local body, assigns physical tokens/RVAs, imports foreign call
+references, and emits an owned unsigned IL-only PE32 image. Bounds: 4096 total methods,
+131072 total instructions, 256 imported assembly identities and 4 MiB output. Foreign
+calls require the same core identity; an external dependency with the same identity as
+the output is rejected. Invalid bodies, entry points, incompatible imports or exceeded
+limits raise InvalidDataException. Call targets are typed builder methods; output
+references include exact assembly identity, nominal type name and method signature.
+
+Unchanged repeated writes of the same graph are byte-identical. Each builder has a
+fresh MVID, stable over its edits; equivalent independently constructed graphs need not
+have identical bytes. PE content IDs/timestamps are derived deterministically.
+No strong-name signing, resource/debug data, #Neo attachment or conventional-image
+rewriting is implemented by Write. The writer cannot silently discard such data because
+it accepts only its explicitly constructed subset, not an arbitrary loaded image.
+
+### TypeBuilder
+
+```csharp
+public sealed class TypeBuilder
+{
+    public AssemblyBuilder Assembly { get; }
+    public string Namespace { get; }
+    public string Name { get; }
+    public IReadOnlyList<MethodBuilder> Methods { get; }
+    public MethodBuilder AddMethod(string name, int parameterCount = 0,
+                                   bool returnsValue = true);
+}
+```
+
+Created only by AddType. Methods is a read-only view of owned methods in declaration
+order. AddMethod adds a public static hide-by-signature method. All parameters are
+Int32; returnsValue selects Int32 or CLI void/no-result. Names must be nonempty and at
+most 1024 characters; parameter counts are 0–256; a type admits at most 256 methods.
+Duplicate name/parameter-count pairs and invalid inputs raise ArgumentException.
+Generic methods, fields, instance receivers and signature variants are future work.
+
+### MethodBuilder
+
+```csharp
+public sealed class MethodBuilder
+{
+    public TypeBuilder DeclaringType { get; }
+    public string Name { get; }
+    public int ParameterCount { get; }
+    public bool ReturnsValue { get; }
+    public void LoadConstant(int value);
+    public void LoadArgument(int index);
+    public void Add();
+    public void Subtract();
+    public void Multiply();
+    public void Call(MethodBuilder target);
+    public void Return();
+    public void ClearBody();
+}
+```
+
+Created only by AddMethod. Body operations append conventional IL: Int32 constants,
+zero-based argument loads, arithmetic, static calls and return. Call accepts a method
+from this graph or another builder; null raises ArgumentNullException. Each append
+rejects more than 4096 instructions with InvalidDataException. ClearBody permits
+replacement without changing signature/ownership.
+
+Write checks argument indices, Int32 stack effects, call parameter/result contracts,
+a final return with the exact declared stack shape, and no earlier return. It derives
+max stack and rejects underflow, extra results or missing return. Loops, branches,
+locals, exceptions and arbitrary raw IL are intentionally absent. Runtime overflow
+behavior remains that of the selected target/bridge; this slice does not reconcile
+all CLR versus neoCLR arithmetic policies.
+
+The C# writer consumer builds a dependency's `Twice(Int32) -> Int32` and an application
+that calls it with 20, adds 2 and returns 42. It tests repeat writes, body edits, imported
+TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Fourteen
+standalone C# contract groups pass, including earlier identity/reference tests.
+
+### neoCLR acceptance test
+
+The C# integration runner creates both PEs through the public builder API, invokes the
+existing Raven CLI bridge, assembles its output into a native `.neo.json` artifact,
+then asks neoCLR to load/verify and run that artifact. Expected result and process exit
+code are 42. No application IL or JSON is hand-authored for this test.
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --runtime-integration /path/to/neoclr /path/to/Probe.dll \
+  /path/to/NeoCLR.CoreProbe.dll /path/to/System.neoil /fresh/output/directory
+```
+
+Inputs must be a matching runtime, bridge, core reference and composed Raven System
+library. The runner refuses an existing output directory and writes a report with
+artifact/tool hashes. It is a test CLI, not a library API. The bridge converts ordinary
+CLI signatures and bodies into the current native format; it does not enable native
+#Neo semantics. Direct PE/#Neo runtime loading and general compiler coverage remain
+separate work.

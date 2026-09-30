@@ -55,25 +55,25 @@ and no-result. Descriptors have no runtime invocation or dispatch capability.
 
 The profile consumer covers 36 shared cases (29 rejections), independent typed
 emission, optional preservation, ownership and explicit catalog failures. The facade
-is a foundation for a later Raven compiler adapter; complete assembly IO is pending.
+is a foundation for a later Raven compiler adapter; general assembly IO is pending.
 A Raven port may underpin Metadata Introspection, with shared conformance contracts.
 
 The artifact reader requires recognized extended input by default, with explicit
 ordinary classification available. Fifty shared cases pass, including 44 rejections.
 Support is bounded unsigned IL-only PE32, not a general loader or verifier.
 The [Cecil-inspired object model direction](../../docs/design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
-is provisional; the existing profile/codec APIs remain lower layers.
+is now the selected primary compiler abstraction; the existing profile/codec APIs remain lower layers.
 
 The model consumer reads a generated generic/nested Unicode fixture through owned
 AssemblyDefinition/ModuleDefinition/TypeDefinition/TypeReference objects. It checks
 snapshot-local resolution, absence of input/reader lifetime coupling, and malformed
-CLI tables even with valid extension binding. Cross-module resolution and assembly
-writing remain pending.
+CLI tables even with valid extension binding. Nominal cross-module resolution and controlled new-assembly writing now exist; general
+rewriting remains pending.
 
 
 The Cecil-like model is the selected primary compiler abstraction for metadata and PE
-manipulation. Reading and explicit AssemblyRef resolution exist; import, mutation and
-assembly writing are still pending. Adaptations to neoCLR are intentional, not a
+manipulation. Reading, explicit nominal resolution and a bounded editable PE producer
+exist; general import, declaration mutation and arbitrary rewriting remain pending. Adaptations to neoCLR are intentional, not a
 promise of Cecil source compatibility.
 
 Run the dedicated C# contract tests independently of the Python conformance drivers:
@@ -83,6 +83,28 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Me
 ```
 
 This is an executable test runner (nonzero exit on failure), not a dotnet-test discovery
-project. Its 11 tests generate PE metadata in C#, exercise exact identities and resolver
+project. Its 14 contract groups generate PE metadata in C#, exercise exact identities and resolver
 contracts, and cover invalid inputs, limits and ownership. It uses only .NET platform
 libraries and the project under test.
+
+
+## Compiler producer baseline
+
+Physical TypeRef resolution supports local, assembly and nested scopes. Controlled
+AssemblyBuilder/TypeBuilder/MethodBuilder objects emit new ordinary CLI PE assemblies
+with static Int32 methods, validated linear bodies and imported cross-assembly calls.
+Fourteen C# contract groups cover the model and writer. The runtime integration runner
+emits an application/library pair and requires neoCLR verification plus exit code 42:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --runtime-integration /path/to/neoclr /path/to/Probe.dll \
+  /path/to/NeoCLR.CoreProbe.dll /path/to/System.neoil /fresh/output
+```
+
+Use matching bridge/core and composed Raven System inputs. The test serializes the
+bridge output to native JSON and loads it in neoCLR; no hand-authored application IL
+or JSON is substituted. This establishes the existing Raven bridge route, not direct
+PE/#Neo runtime loading. The writer's deliberately bounded subset and every public
+member are described in the API reference. General rewriting and wider codegen remain
+pending rather than silently dropping unsupported metadata.
