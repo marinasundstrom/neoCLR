@@ -81,7 +81,9 @@ chain loads and runs in neoCLR, with missing and wrong-revision transitive depen
 rejected. Native target adapters
 and broader ordinary metadata coverage come next, followed by structural extensions. An initial feature-branch PE/#Neo execution profile now loads native metadata directly
 in neoCLR and runs the Raven two-library case to 42. Initial Hello World examples
-also run directly and through an entry-point function call. Its initial JSON payload remains supported; a bounded binary profile now avoids
+also run directly and through an entry-point function call. The Raven adapter now
+supports Unit-returning helpers and imported static library methods, verified by
+compiling a library and its consumer separately; entry points still return Int32. Its initial JSON payload remains supported; a bounded binary profile now avoids
 JSON parsing during runtime loading. Production integration and structural runtime
 support remain pending;
 this is not a published platform format.

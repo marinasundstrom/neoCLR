@@ -57,6 +57,13 @@ runtime optimization to the future. Retain this baseline and continue metadata/c
 integration; the benchmark does not reprioritize runtime optimization.
 [Method and limits](experiments/extended-cli-metadata/json-vs-assembly-benchmark.md).
 
+**Raven continuation:** The author selects continued Raven work after the size benchmark.
+The native compiler adapter now emits Unit-returning helpers and static library methods,
+reimports their CLI no-result projections and runs a separate application against the
+binary library. This removes the artificial Int32 return from side-effecting helpers;
+entry points remain Int32. Wider signatures, native symbols and actual runtime class-library
+source compilation remain next. [Compiler contract](raven-cli-bridge.md#unit-returning-native-helpers-and-library-methods--2026-09-30).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

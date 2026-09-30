@@ -9351,3 +9351,17 @@ remote synchronization does not publish a runtime bundle or website.
   generics, signatures, attributes and body encodings rather than silently dropping them.
   See [binary design](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30)
   and [measurements](experiments/extended-cli-metadata/binary-loading.md).
+
+
+### 2026-09-30 — Continue Raven after the metadata size benchmark
+
+- **Author direction:** “Next step should be continuing work on Raven.” This follows
+  acceptance of smaller assembly files and deferral of runtime optimization.
+- **Assistant action:** Continued on `codex/metadata-consumer`, extending the native
+  compiler adapter to Unit-returning helpers and static library methods. The separate
+  metadata project already supports no-result methods; no format change was needed.
+- **Validation:** C# checks compile/reimport a Raven library and execute Unit and Int32
+  overloads from PE/#Neo in neoCLR. Explicit/implicit returns and rejected calls are
+  covered. See [the contract](raven-cli-bridge.md#unit-returning-native-helpers-and-library-methods--2026-09-30).
+- **Open:** Wider compiler metadata contracts, the native symbol provider and runtime
+  class-library source compilation. This bounded slice does not complete those goals.

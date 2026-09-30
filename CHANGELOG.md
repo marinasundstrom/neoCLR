@@ -17,6 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Extend the Raven feature-branch consumer to Unit-returning helpers and imported
+  static library methods. A separately emitted library is reimported into Raven and
+  both no-result/Int32 overloads execute from binary PE/#Neo; explicit/implicit returns
+  and rejected calls are checked in C#. Entry points remain Int32; runtime encoding
+  and ordinary .NET compiler behavior are unchanged.
   Add native-only bounded console literal emission and the author's Hello World
   acceptance cases: direct output and an entry-point function call both print one
   line and exit zero from Raven-produced PE/#Neo files. C# literal/Unicode/bounds
