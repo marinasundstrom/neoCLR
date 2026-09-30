@@ -14,7 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   codegen abstraction plan and defer native symbol loading to its later slice.
   Add shared per-emission callable identity resolution in Raven with backend-owned
   handles and native definition registration before body emission; preserve overloads,
-  owners and explicit dependency policies.
+  owners and explicit dependency policies. Shared source callable plans now separate
+  native source collection/validation from builder creation, preserving assembly-owned
+  functions and empty static types while .NET retains its CLI carriers.
 
 ### 2026-09-30
 

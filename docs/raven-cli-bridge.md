@@ -778,3 +778,36 @@ contracts. Native symbol loading and its known driver collision remain deferred.
 Validation: 20 focused C# tests passed; [runtime and driver evidence](experiments/extended-cli-metadata/callable-identities-validation.json).
 
 Tested Raven revision: `d76a85701` on `codex/metadata-consumer`; native metadata integration remains on `codex/extended-cli-metadata`. The runtime binary hash is recorded in the evidence; no runtime or format change was needed.
+
+## Shared source callable plans — 2026-10-01
+
+`SourceCallablePlan` now carries the supported source method symbol, declaration/body,
+logical owner, metadata name and Int32/Unit signature. Both .NET method declaration and
+bounded body emission consume that plan; native codegen consumes it for definition and
+body emission too. An assembly-level function has no logical type owner even though its
+CLI symbol may belong to a compiler-generated carrier. The .NET adapter retains its
+chosen emitted name, owner, attributes and target-aware type resolver.
+
+Native emission now collects and validates all supported source declarations first,
+then creates type/callable definitions, registers references, and emits bodies. Empty
+static types remain declarations even when they have no callable plans. The native
+syntax/capability validator remains adapter-owned; it still rejects unsupported attributes,
+visibility, namespace functions and richer type contracts rather than dropping metadata.
+
+Compared with the previous inline builder creation, the plan separates source semantics
+from backend lifetime/ownership and gives both adapters one callable definition/body
+contract. The cost is an additional immutable source-plan object per eligible callable.
+This does not unify the general .NET declaration traversal: synthesized methods,
+accessors, state machines and unsupported signatures retain their established path.
+General type/field handles and traversal remain later work. Runtime Contract and semantic
+binding selection, binary format and the native runtime are unchanged. The public
+metadata API remains a separate project, with no new public API in this slice.
+
+Focused C# coverage checks source ownership and executable .NET output. The native probe
+inspects actual metadata ownership, preserves an empty static type, and verifies/runs
+the mixed assembly-function/type-method program. Existing overload, forward-call,
+core-reference, diagnostic, PDB and rvnc cases remain part of focused validation.
+
+Validation: 21 focused C# tests passed; [native metadata/runtime and driver evidence](experiments/extended-cli-metadata/source-plans-validation.json).
+
+Tested Raven revision: `0f555a52b` on `codex/metadata-consumer`. Native integration remains on `codex/extended-cli-metadata`; the unchanged runtime binary is identified by SHA-256 in the evidence.
