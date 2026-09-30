@@ -197,7 +197,9 @@ target/debug/neoclr verify target/System.neox
 target/debug/neoclr run examples/hello.neoil --system target/System.neox
 ```
 
-The translator creates a new output file and refuses overwrites. It uses the independent
+The translator now emits required standalone schema 3 (32 MiB JSON / 8 MiB binary,
+full UInt64 operands); older schema-2-only runtimes reject it. The C# WriteBinary API
+remains available for schema-2 compatibility. The translator creates a new output file and refuses overwrites. It uses the independent
 NativeModuleContainer API; runtime validation is a separate required step. These are
 standalone native containers, not PE references. The checked-in `runtime/raven/generated/*.json`
 files are bootstrap manifests, not format-5 executable modules, and are rejected.

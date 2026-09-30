@@ -189,6 +189,10 @@ fn validate_layout(image: &[u8]) -> Result<(), Fault> {
 }
 
 fn execution_payload(envelope: &[u8]) -> Result<(u16, &[u8]), Fault> {
+    execution_payload_profile(envelope, false)
+}
+
+fn execution_payload_profile(envelope: &[u8], library: bool) -> Result<(u16, &[u8]), Fault> {
     if bytes(envelope, 0, 4)? != b"NEOX" || u16_at(envelope, 4)? != 0 || u16_at(envelope, 6)? != 1 {
         return Err(invalid("unsupported envelope version"));
     }
@@ -212,14 +216,12 @@ fn execution_payload(envelope: &[u8]) -> Result<(u16, &[u8]), Fault> {
         }
         let payload = bytes(envelope, offset, length)?;
         end += length;
-        if flags == 1 && (kind != 256 || !matches!(version, 1 | 2)) {
+        if flags == 1 && (kind != 256 || !(matches!(version, 1 | 2) || library && version == 3)) {
             return Err(invalid("unsupported required section"));
         }
         if kind == 256 {
-            if flags != 1 || !matches!(version, 1 | 2) {
-                return Err(invalid(
-                    "native execution section must be required schema 1 or 2",
-                ));
+            if flags != 1 || !(matches!(version, 1 | 2) || library && version == 3) {
+                return Err(invalid("unsupported or optional native execution schema"));
             }
             execution = Some((version, payload));
         }
@@ -228,6 +230,9 @@ fn execution_payload(envelope: &[u8]) -> Result<(u16, &[u8]), Fault> {
         return Err(invalid("trailing envelope bytes"));
     }
     let (version, bytes) = execution.ok_or_else(|| invalid("native execution section missing"))?;
+    if version != 3 && envelope.len() > 1024 * 1024 {
+        return Err(invalid("legacy envelope exceeds 1 MiB limit"));
+    }
     if version == 1 {
         std::str::from_utf8(bytes).map_err(|_| invalid("native payload must be UTF-8"))?;
     }
@@ -252,10 +257,10 @@ pub fn decode(image: &[u8]) -> Result<Module, Fault> {
 /// Decode a standalone NEOX native module without a CLI projection or PE binding.
 /// The same runtime validation and dependency rules apply after decoding.
 pub fn decode_envelope(image: &[u8]) -> Result<Module, Fault> {
-    if image.len() > 1024 * 1024 {
-        return Err(invalid("envelope exceeds 1 MiB limit"));
+    if image.len() > 8 * 1024 * 1024 {
+        return Err(invalid("envelope exceeds 8 MiB limit"));
     }
-    decode_payload(execution_payload(image)?)
+    decode_payload(execution_payload_profile(image, true)?)
 }
 
 /// Decode a standalone native envelope and apply legacy bundled-System validation.
@@ -266,8 +271,8 @@ pub fn load_envelope(image: &[u8]) -> Result<Module, Fault> {
 }
 
 fn decode_payload((version, bytes): (u16, &[u8])) -> Result<Module, Fault> {
-    if version == 2 {
-        crate::native_binary::decode(bytes)
+    if matches!(version, 2 | 3) {
+        crate::native_binary::decode(bytes, version == 3)
     } else {
         crate::decode_module(std::str::from_utf8(bytes).map_err(|_| invalid("invalid UTF-8"))?)
     }

@@ -4,6 +4,18 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--library-json-check")
+{
+    LibraryBinaryChecks.RoundTripFile(args[1]);
+    return 0;
+}
+
+if (args.Length == 2 && args[0] == "--emit-library-fixture")
+{
+    LibraryBinaryChecks.EmitFixture(args[1]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--module-integration")
 {
     await NativeModuleChecks.RunRuntime(args[1], args[2]);
@@ -37,6 +49,7 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Library binary profile and UInt64 bounds", LibraryBinaryChecks.Run),
     ("Existing native module transport", NativeModuleChecks.Run),
     ("Binary CBOR profile and container roundtrips", BinaryEncodingChecks.Run),
     ("Native console literal emission and bounds", ConsoleWriterChecks.Run),

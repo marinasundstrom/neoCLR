@@ -1419,6 +1419,7 @@ Public static host class in `NeoCLR.Metadata.Experimental`:
 ```csharp
 byte[] NativeModuleContainer.WriteBinary(ReadOnlySpan<byte> nativeImage);
 byte[] NativeModuleContainer.Read(ReadOnlySpan<byte> image);
+byte[] NativeModuleContainer.WriteLibraryBinary(ReadOnlySpan<byte> nativeImage);
 ```
 
 `WriteBinary` translates existing format-5 JSON values to a standalone NEOX envelope
@@ -1432,9 +1433,9 @@ preserved as values. No tokens or references are remapped. Unknown optional enve
 sections are accepted but omitted from the returned JSON; retain original bytes if
 opaque section preservation is required.
 
-Both calls throw InvalidDataException for malformed headers, framing, unsupported
-binary values or exceeded limits. Input JSON is limited to 4 MiB, the envelope to
-1 MiB; the same integer-only, Unicode, depth and item limits as the PE binary profile
+All calls throw InvalidDataException for malformed headers, framing, unsupported
+binary values or exceeded limits. WriteBinary retains schema 2: input JSON is limited
+to 4 MiB, the envelope to 1 MiB; the same integer-only, Unicode, depth and item limits as the PE binary profile
 apply. Lexical JSON spellings are not preserved. There is no CLI stream binding digest
 in this standalone form and no authenticity guarantee. It cannot be passed to Raven's
 .NET MetadataReference loader.
@@ -1445,9 +1446,27 @@ File.WriteAllBytes("System.neox", image);
 ```
 
 Rust `metadata_container::decode_envelope(&[u8]) -> Result<Module, Fault>` accepts a
-standalone execution envelope (schema 1 or 2), deserializes the native model and rejects
+standalone execution envelope (schema 1, 2 or 3), deserializes the native model and rejects
 invalid framing/required schemas. `load_envelope` additionally applies legacy validation,
 including bundled-System linking for non-System modules. `ModuleInput::NativeEnvelope`
 uses decode for explicit dependency sets. The CLI detects NEOX magic for the root,
 `--module` and `--system`; existing PE and JSON handling is unchanged. No embedded
 source text is available to the debugger.
+
+
+`WriteLibraryBinary` emits required execution schema 3 in a standalone envelope.
+It accepts negative Int64 values and nonnegative UInt64 values; Double operands retain
+their exact unsigned IEEE-754 bits, including negative zero and NaN payloads. CBOR
+floating-point values themselves remain unsupported. Input/reconstructed JSON is limited
+to 32 MiB, the envelope to 8 MiB, and item count (including map keys) to 2,097,152.
+Depth remains 64. `Read` accepts schema 2 with its original limits and schema 3 with
+these larger budgets. The general MetadataEnvelope/MetadataSection public APIs retain
+their 1 MiB limits; the larger envelope is scoped to NativeModuleContainer. The PE
+RuntimeAssemblyContainer APIs continue to support schemas 1/2 only.
+
+Older runtimes reject required schema 3; choose WriteBinary when the old profile's
+bounds and signed-only numbers suffice. The translator tool now emits schema 3 by
+default. This is an explicit compatibility change for that experimental tool, not a
+silent relaxation of schema 2. Semantic admission, linking and verification remain
+runtime responsibilities. Larger budgets increase possible memory/CPU costs; they
+are finite limits, not streaming or lazy-loading guarantees.

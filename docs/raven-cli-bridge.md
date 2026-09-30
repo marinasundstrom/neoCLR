@@ -313,3 +313,15 @@ NEOX. The matching 417-type/4,090-function System profile exceeds current binary
 so application comparisons explicitly retain JSON System. This is not the same artifact
 as the smaller bundled System translated previously. No compiler target capabilities
 are broadened by this test. [Evidence and limitations](experiments/extended-cli-metadata/raven-sample-translation.md).
+
+
+## Larger native library profile — 2026-09-30
+
+Standalone schema 3 now transports the complete matching Raven collection System and
+UInt64 instruction operands. FloatingMath, OptionPositional and ValueCopy execute with
+binary application and binary System artifacts. Compiler Runtime Contracts, the legacy
+CLI bridge's semantic mappings and .NET defaults do not change. The metadata library
+owns the versioned encoding; neoCLR owns admission/execution. No CLI projection or native
+compiler symbol provider is added. PE/#Neo remains on schema 1/2; the translator's new
+schema-3 default requires the matching runtime feature branch.
+[Contract and tested consumer](design/extended-cli-metadata.md#library-execution-profile-3--2026-09-30).

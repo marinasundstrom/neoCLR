@@ -3,19 +3,21 @@ using System.Text.Json;
 
 namespace NeoCLR.Metadata.Experimental;
 
-// NEOX execution schema 2: bounded CBOR, definite containers, text keys, signed Int64,
+// NEOX execution schemas 2/3: bounded CBOR, definite containers, text keys, Int64;
+// library schema 3 additionally admits UInt64 and larger explicit budgets.
 // booleans/null; no tags, byte strings, floating point or indefinite lengths.
 internal static class NativeBinaryCodec
 {
     private static readonly UTF8Encoding Utf8 = new(false, true);
-    internal static byte[] Encode(ReadOnlySpan<byte> json)
+    internal static byte[] Encode(ReadOnlySpan<byte> json, bool library = false)
     {
-        try { return EncodeCore(json); }
+        if (json.Length > (library ? 32 * 1024 * 1024 : 4 * 1024 * 1024)) throw Invalid("native JSON exceeds limit");
+        try { return EncodeCore(json, library); }
         catch (Exception error) when (error is JsonException or InvalidOperationException or EncoderFallbackException)
         { throw new InvalidDataException("invalid native binary input", error); }
     }
 
-    private static byte[] EncodeCore(ReadOnlySpan<byte> json)
+    private static byte[] EncodeCore(ReadOnlySpan<byte> json, bool library)
     {
         using var document = JsonDocument.Parse(json.ToArray(), new JsonDocumentOptions { MaxDepth = 64 });
         using var stream = new MemoryStream();
@@ -46,25 +48,26 @@ internal static class NativeBinaryCodec
                     Head(4, (ulong)value.GetArrayLength()); foreach (var item in value.EnumerateArray()) Value(item); break;
                 case JsonValueKind.String: Text(value.GetString()!); break;
                 case JsonValueKind.Number:
-                    if (!value.TryGetInt64(out long integer)) throw Invalid("schema 2 requires signed 64-bit integers");
+                    if (library && value.TryGetUInt64(out ulong unsigned)) { Head(0, unsigned); break; }
+                    if (!value.TryGetInt64(out long integer)) throw Invalid("unsupported integer range or non-integer number");
                     Head(integer >= 0 ? 0 : 1, (ulong)(integer >= 0 ? integer : -(integer + 1))); break;
                 case JsonValueKind.True: stream.WriteByte(0xf5); break;
                 case JsonValueKind.False: stream.WriteByte(0xf4); break;
                 case JsonValueKind.Null: stream.WriteByte(0xf6); break;
                 default: throw Invalid("unsupported value");
             }
-            if (stream.Length > MetadataEnvelope.MaxImageSize - 32) throw Invalid("binary payload exceeds envelope limit");
+            if (stream.Length > (library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
         }
         Value(document.RootElement);
         var result = stream.ToArray();
         // Apply the same node/depth limits as consumers before publishing bytes.
-        _ = Decode(result);
+        _ = Decode(result, library);
         return result;
     }
 
-    internal static byte[] Decode(ReadOnlySpan<byte> input)
+    internal static byte[] Decode(ReadOnlySpan<byte> input, bool library = false)
     {
-        if (input.Length > MetadataEnvelope.MaxImageSize - 32) throw Invalid("binary payload exceeds envelope limit");
+        if (input.Length > (library ? 8 * 1024 * 1024 : MetadataEnvelope.MaxImageSize) - 32) throw Invalid("binary payload exceeds envelope limit");
         var data = input.ToArray(); int position = 0, nodes = 0;
         using var stream = new MemoryStream();
         using var json = new Utf8JsonWriter(stream);
@@ -95,13 +98,14 @@ internal static class NativeBinaryCodec
         }
         void Count(int depth)
         {
-            if (depth > 64 || ++nodes > 262144) throw Invalid("binary depth/node limit exceeded");
+            if (depth > 64 || ++nodes > (library ? 2097152 : 262144)) throw Invalid("binary depth/node limit exceeded");
         }
         void Value(int depth)
         {
             Count(depth); var (major, argument) = Head();
             switch (major)
             {
+                case 0 when library: json.WriteNumberValue(argument); break;
                 case 0: case 1:
                     if (argument > long.MaxValue) throw Invalid("integer outside Int64 range");
                     json.WriteNumberValue(major == 0 ? (long)argument : -1 - (long)argument); break;
@@ -131,7 +135,7 @@ internal static class NativeBinaryCodec
         Value(0);
         if (position != data.Length) throw Invalid("trailing binary bytes");
         json.Flush();
-        if (stream.Length > MetadataArtifactReader.MaxImageSize) throw Invalid("decoded JSON exceeds limit");
+        if (stream.Length > (library ? 32 * 1024 * 1024 : MetadataArtifactReader.MaxImageSize)) throw Invalid("decoded JSON exceeds limit");
         return stream.ToArray();
     }
     private static InvalidDataException Invalid(string message) => new(message);

@@ -84,8 +84,10 @@ fn binary_and_json_containers_decode_to_identical_runtime_metadata() {
 #[test]
 fn translated_native_envelope_preserves_generic_library_metadata() {
     let image = include_bytes!("fixtures/metadata-container/models.neox");
-    let expected =
-        serde_json::from_str::<neoclr::Module>(include_str!("fixtures/metadata-container/models.neo.json")).unwrap();
+    let expected = serde_json::from_str::<neoclr::Module>(include_str!(
+        "fixtures/metadata-container/models.neo.json"
+    ))
+    .unwrap();
     let actual = metadata_container::decode_envelope(image).unwrap();
     assert_eq!(
         serde_json::to_value(expected).unwrap(),
@@ -111,10 +113,33 @@ fn translated_native_envelope_preserves_generic_library_metadata() {
     overlay.push(0);
     assert!(metadata_container::decode_envelope(&overlay).is_err());
     let mut schema = image.to_vec();
-    schema[18] = 3;
+    schema[18] = 4;
     assert!(metadata_container::decode_envelope(&schema).is_err());
     let mut optional = image.to_vec();
     optional[20] = 0;
     assert!(metadata_container::decode_envelope(&optional).is_err());
     assert!(metadata_container::decode_envelope(&vec![0; 1024 * 1024 + 1]).is_err());
+}
+
+#[test]
+fn csharp_library_container_preserves_double_operand_bits() {
+    let image = include_bytes!("fixtures/metadata-container/floating-bits.neox");
+    let module = metadata_container::load_envelope(image).unwrap();
+    let value = serde_json::to_value(&module).unwrap();
+    for (index, bits) in [0x8000000000000000u64, 0xfff8000000000001, u64::MAX]
+        .iter()
+        .enumerate()
+    {
+        assert_eq!(
+            value["functions"][index]["body"][0]["arg"]["bits"].as_u64(),
+            Some(*bits)
+        );
+    }
+    LoadedProgram::new(&module).unwrap().verify().unwrap();
+    let mut legacy = image.to_vec();
+    legacy[18] = 2;
+    assert!(metadata_container::decode_envelope(&legacy).is_err());
+    for length in 0..image.len() {
+        assert!(metadata_container::decode_envelope(&image[..length]).is_err());
+    }
 }

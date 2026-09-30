@@ -1,0 +1,167 @@
+{
+  "pipeline": "Raven source -> legacy CLI bridge -> neoil -> JSON -> NEOX",
+  "directNativeCompilerEmission": false,
+  "cases": {
+    "OptionPositional": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n-1\n",
+      "jsonBytes": 522345,
+      "binaryBytes": 225446,
+      "binarySha256": "007686d37e4c5b95b8dd89f2fb56b058496d0224108e1a6ce045516e8532739f"
+    },
+    "FloatingMath": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n-1\n",
+      "jsonBytes": 535539,
+      "binaryBytes": 238988,
+      "binarySha256": "2dc83d8fd20696d7dd7624c603ca6419757feed2a06376b881f5478bc2037c31"
+    },
+    "ValueCopy": {
+      "source": true,
+      "json": true,
+      "translation": true,
+      "binary": true,
+      "stdout": "42\n7\n",
+      "jsonBytes": 516244,
+      "binaryBytes": 223166,
+      "binarySha256": "29df465c9ddd6d2be8a4f54166809d6845be47c8fa9a75072f7469d127092ff7"
+    }
+  },
+  "tools": {
+    "bridge": "13ef2e4503701302ca562c25e3ceed5620d33dfcdb710c0a282f2bfe9364bc93",
+    "compiler": "709524057b7e8a5ae1fa469cb7b4fc744a66f17269d2551d6e9ab9a6a53f01bf",
+    "translator": "5b89bad2ee8a008a58c4c7fc0cfb69d4dc25122e86a9924d1ecdc79670079ae5",
+    "metadata": "c29d7f2591064e24d9751ba699067bb372dcbc8e10abdfd6b07d3cd444cd0082",
+    "runtime": "ecdb5e0f00c3638a78e52a7953c0c1be09a6ef26f37f3f06e4bb77c0c05d97f5"
+  },
+  "system": {
+    "profile": "raven-collections",
+    "types": 417,
+    "functions": 4090,
+    "compactJsonBytes": 7104628,
+    "jsonBytes": 15017185,
+    "jsonSha256": "e02cda3e864e36f74d97b6ca31f647137c2a8ba7eec0b3265346274e3468a39f",
+    "binaryBytes": 5542303,
+    "binarySha256": "a19756e92fdc1357a71840db67b83361330887e93dada37a779230d4a62a86ec"
+  },
+  "matchCompilation": {
+    "Forms": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "CaseImports": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "OptionPositional": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "PositionalSingleEvaluation": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "PositionalWrongArity": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2106",
+          "Severity": "Error",
+          "Message": "error RAV2106: Case 'Ok' expects 1 argument(s) but received 2"
+        }
+      ]
+    },
+    "Positional": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "StatementReturn": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV1503",
+          "Severity": "Error",
+          "Message": "error RAV1503: Cannot convert from '()' to 'int'"
+        },
+        {
+          "Id": "RAV1503",
+          "Severity": "Error",
+          "Message": "error RAV1503: Cannot convert from '()' to 'int'"
+        }
+      ]
+    },
+    "Guard": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "StatementTail": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "SingleEvaluation": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "NominalDeconstruction": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "MissingExpression": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2100",
+          "Severity": "Error",
+          "Message": "error RAV2100: Missing match case: 'Error'."
+        }
+      ]
+    },
+    "MissingStatement": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2100",
+          "Severity": "Error",
+          "Message": "error RAV2100: Missing match case: 'Error'."
+        }
+      ]
+    },
+    "UnreachableArm": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2101",
+          "Severity": "Error",
+          "Message": "error RAV2101: This match arm can never run (a previous arm matches first)."
+        }
+      ]
+    },
+    "WrongCase": {
+      "Stage": "compile-rejected",
+      "Diagnostics": [
+        {
+          "Id": "RAV2102",
+          "Severity": "Error",
+          "Message": "error RAV2102: Pattern for type 'None' is not valid for scrutinee of type 'Result<int, OverflowError>'"
+        }
+      ]
+    },
+    "VoidOutput": {
+      "Stage": "imported",
+      "Diagnostics": []
+    },
+    "ExpressionBlockReturn": {
+      "Stage": "imported",
+      "Diagnostics": []
+    }
+  },
+  "expectedMatchRejections": 6,
+  "passed": 3,
+  "failed": 0
+}

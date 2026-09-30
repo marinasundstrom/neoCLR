@@ -12,10 +12,13 @@ public sealed class MetadataSection
     /// <param name="payload">Bytes copied into private storage, limited to MaxImageSize.</param>
     /// <exception cref="ArgumentOutOfRangeException">Kind/version is zero or payload exceeds the size limit.</exception>
     public MetadataSection(ushort kind, ushort version, bool required, ReadOnlySpan<byte> payload)
+        : this(kind, version, required, payload, MetadataEnvelope.MaxImageSize) { }
+
+    internal MetadataSection(ushort kind, ushort version, bool required, ReadOnlySpan<byte> payload, int maxImageSize)
     {
         if (kind == 0) throw new ArgumentOutOfRangeException(nameof(kind));
         if (version == 0) throw new ArgumentOutOfRangeException(nameof(version));
-        if (payload.Length > MetadataEnvelope.MaxImageSize) throw new ArgumentOutOfRangeException(nameof(payload));
+        if (payload.Length > maxImageSize) throw new ArgumentOutOfRangeException(nameof(payload));
         Kind = kind;
         Version = version;
         Required = required;

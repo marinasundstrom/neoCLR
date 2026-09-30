@@ -1,4 +1,4 @@
-//! NEOX native execution schema 2: bounded definite-length CBOR object data.
+//! NEOX native execution schemas 2/3: bounded definite-length CBOR object data.
 use crate::{Fault, Module};
 use std::collections::HashSet;
 
@@ -6,8 +6,8 @@ fn invalid(message: impl std::fmt::Display) -> Fault {
     Fault::new(format!("invalid binary native metadata: {message}"))
 }
 
-pub(crate) fn decode(data: &[u8]) -> Result<Module, Fault> {
-    validate(data)?;
+pub(crate) fn decode(data: &[u8], library: bool) -> Result<Module, Fault> {
+    validate_profile(data, library)?;
     // Deserialize into the runtime model, without a JSON string or serde_json::Value tree.
     let module: Module = ciborium::from_reader(data).map_err(invalid)?;
     if module.format != 5 {
@@ -16,14 +16,26 @@ pub(crate) fn decode(data: &[u8]) -> Result<Module, Fault> {
     Ok(module)
 }
 
+#[cfg(test)]
 fn validate(data: &[u8]) -> Result<(), Fault> {
-    if data.len() > 1024 * 1024 - 32 {
+    validate_profile(data, false)
+}
+
+fn validate_profile(data: &[u8], library: bool) -> Result<(), Fault> {
+    if data.len()
+        > (if library {
+            8 * 1024 * 1024
+        } else {
+            1024 * 1024
+        }) - 32
+    {
         return Err(invalid("payload exceeds envelope limit"));
     }
     let mut reader = Reader {
         data,
         position: 0,
         nodes: 0,
+        library,
     };
     reader.value(0)?;
     if reader.position != data.len() {
@@ -35,6 +47,7 @@ struct Reader<'a> {
     data: &'a [u8],
     position: usize,
     nodes: usize,
+    library: bool,
 }
 impl<'a> Reader<'a> {
     fn take(&mut self, size: usize) -> Result<&'a [u8], Fault> {
@@ -86,7 +99,7 @@ impl<'a> Reader<'a> {
     }
     fn count(&mut self, depth: usize) -> Result<(), Fault> {
         self.nodes += 1;
-        if depth > 64 || self.nodes > 262144 {
+        if depth > 64 || self.nodes > if self.library { 2097152 } else { 262144 } {
             return Err(invalid("depth/node limit exceeded"));
         }
         Ok(())
@@ -95,6 +108,7 @@ impl<'a> Reader<'a> {
         self.count(depth)?;
         let (major, arg) = self.head()?;
         match major {
+            0 if self.library => (),
             0 | 1 if arg <= i64::MAX as u64 => (),
             3 => {
                 self.text(arg)?;
@@ -133,6 +147,52 @@ impl<'a> Reader<'a> {
 mod tests {
     use super::*;
     #[test]
+    fn library_profile_preserves_unsigned_bits_and_separate_budgets() {
+        let unsigned = [0x1b, 255, 255, 255, 255, 255, 255, 255, 255];
+        validate_profile(&unsigned, true).unwrap();
+        assert!(validate(&unsigned).is_err());
+        let mut negative = unsigned;
+        negative[0] = 0x3b;
+        assert!(validate_profile(&negative, true).is_err());
+        let mut nodes = vec![0x9a, 0, 0x1f, 255, 255];
+        nodes.resize(2097156, 0);
+        validate_profile(&nodes, true).unwrap();
+        assert!(validate(&nodes).is_err());
+        nodes[2] = 0x20;
+        nodes[3] = 0;
+        nodes[4] = 0;
+        nodes.push(0);
+        assert!(validate_profile(&nodes, true).is_err());
+        let mut largest = vec![b'x'; 8 * 1024 * 1024 - 32];
+        largest[0] = 0x7a;
+        let length = (largest.len() - 5) as u32;
+        largest[1..5].copy_from_slice(&length.to_be_bytes());
+        validate_profile(&largest, true).unwrap();
+        assert!(validate_profile(&vec![0; 8 * 1024 * 1024 - 31], true).is_err());
+        assert!(validate_profile(&[vec![0x81; 65], vec![0]].concat(), true).is_err());
+        // Native Float64 operands use exact UInt64 bits, including negative zero and NaNs.
+        for bits in [
+            0x8000000000000000u64,
+            0xbff0000000000000,
+            0xfff8000000000001,
+            u64::MAX,
+        ] {
+            let json = format!(
+                r#"{{"format":5,"name":"Bits","functions":[{{"name":"Main","parameters":[],"returns":"Double","locals":[],"body":[{{"op":"ldc.r8","arg":{{"bits":{bits}}}}},{{"op":"ret"}}]}}]}}"#
+            );
+            let module: Module = serde_json::from_str(&json).unwrap();
+            let mut binary = Vec::new();
+            ciborium::into_writer(&module, &mut binary).unwrap();
+            let decoded = decode(&binary, true).unwrap();
+            assert_eq!(
+                serde_json::to_value(module).unwrap(),
+                serde_json::to_value(decoded).unwrap()
+            );
+            assert!(decode(&binary, false).is_err());
+        }
+    }
+
+    #[test]
     fn profile_bounds_and_unsupported_encodings() {
         for bytes in [
             vec![0xbf, 0xff],
@@ -149,6 +209,9 @@ mod tests {
             [vec![0x81; 65], vec![0]].concat(),
         ] {
             assert!(validate(&bytes).is_err(), "{bytes:?}");
+            if bytes != [0x1b, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff] {
+                assert!(validate_profile(&bytes, true).is_err(), "{bytes:?}");
+            }
         }
         let mut excessive_nodes = vec![0x9a, 0, 4, 0, 1];
         excessive_nodes.resize(262150, 0);

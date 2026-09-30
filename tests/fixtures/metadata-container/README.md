@@ -24,3 +24,15 @@ JSON extraction deliberately fails for schema 2, so consumers use decode/load.
 in tools/metadata/README.md; copy `models.neo.json` and `models.neo.neox` from its
 output directory. The C# translator preserves all JSON values. Rust compares the
 complete deserialized models and verifies/runs the mixed source/binary dependency chain.
+
+
+`floating-bits.neox` is a C#-produced schema-3 fixture preserving negative-zero,
+negative-NaN and UInt64.MaxValue double operand bit patterns. Regenerate with:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --emit-library-fixture tests/fixtures/metadata-container/floating-bits.neox
+```
+
+Rust compares exact decoded operand bits, verifies the methods and rejects a schema-2
+downgrade. This tests metadata preservation, not NaN arithmetic canonicalization.

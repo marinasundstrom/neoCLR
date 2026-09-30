@@ -48,6 +48,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   above Int64.MaxValue and translation rejects them. Fourteen of fifteen application
   cases pass binary execution with JSON System; six expected compiler rejections hold.
   Record the author's future neoil assembly-producer direction; direct binary assembly output is not implemented.
+  Add standalone execution schema 3 for Int64/UInt64 operands and larger libraries:
+  32 MiB JSON, 8 MiB envelopes, 2,097,152 items and depth 64. Preserve schema-2/PE limits.
+  NativeModuleContainer.WriteLibraryBinary and the translator emit the new profile;
+  old runtimes reject it explicitly. Full Raven collection System values roundtrip,
+  and FloatingMath, OptionPositional and ValueCopy verify/run with binary System.
+  Validate 29 C# groups and 18 focused Rust boundary/runtime tests, including exact
+  unsigned floating operand bits. Refresh the API source fingerprint after regenerating
+  the unchanged reference assembly with the corrected match fixture. Native compiler
+  symbol import remains pending.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

@@ -22,9 +22,13 @@ public static class MetadataEnvelope
     /// <remarks>Admission does not validate a schema's payload, resolve references or authorize execution.</remarks>
     public static IReadOnlyList<MetadataSection> Read(
         ReadOnlySpan<byte> image, IReadOnlyDictionary<ushort, ushort> supportedSchemas)
+        => ReadCore(image, supportedSchemas, MaxImageSize);
+
+    internal static IReadOnlyList<MetadataSection> ReadCore(ReadOnlySpan<byte> image,
+        IReadOnlyDictionary<ushort, ushort> supportedSchemas, int maxImageSize)
     {
         ArgumentNullException.ThrowIfNull(supportedSchemas);
-        if (image.Length < HeaderSize || image.Length > MaxImageSize) throw Invalid("invalid image size");
+        if (image.Length < HeaderSize || image.Length > maxImageSize) throw Invalid("invalid image size");
         if (!image[..4].SequenceEqual("NEOX"u8) || U16(image, 4) != 0 || U16(image, 6) != 1)
             throw Invalid("unsupported envelope version or magic");
         uint count = U32(image, 8);
@@ -44,7 +48,7 @@ public static class MetadataEnvelope
             bool required = (flags & 1) != 0;
             if (required && (!supportedSchemas.TryGetValue(kind, out ushort supported) || supported != version))
                 throw Invalid($"unsupported required section {kind} schema {version}");
-            sections.Add(new MetadataSection(kind, version, required, image.Slice(end, (int)length)));
+            sections.Add(new MetadataSection(kind, version, required, image.Slice(end, (int)length), maxImageSize));
             end += (int)length;
         }
         if (end != image.Length) throw Invalid("trailing bytes");
@@ -60,6 +64,10 @@ public static class MetadataEnvelope
     /// <remarks>The caller owns payload validation and reference remapping. Opaque preservation is not semantic rewriting.</remarks>
     public static byte[] Write(
         IReadOnlyList<MetadataSection> sections, IReadOnlyDictionary<ushort, ushort> supportedSchemas)
+        => WriteCore(sections, supportedSchemas, MaxImageSize);
+
+    internal static byte[] WriteCore(IReadOnlyList<MetadataSection> sections,
+        IReadOnlyDictionary<ushort, ushort> supportedSchemas, int maxImageSize)
     {
         ArgumentNullException.ThrowIfNull(sections);
         ArgumentNullException.ThrowIfNull(supportedSchemas);
@@ -72,7 +80,7 @@ public static class MetadataEnvelope
             if (!seen.Add(section.Kind)) throw Invalid("duplicate section kind");
             if (section.Required && (!supportedSchemas.TryGetValue(section.Kind, out ushort version) || version != section.Version))
                 throw Invalid("unsupported required section");
-            if (section.PayloadLength > MaxImageSize - size) throw Invalid("image too large");
+            if (section.PayloadLength > maxImageSize - size) throw Invalid("image too large");
             size += section.PayloadLength;
         }
         byte[] result = new byte[size];

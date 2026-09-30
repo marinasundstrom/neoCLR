@@ -1158,3 +1158,48 @@ identities, declarations, signatures, dependencies and execution outcomes; raw b
 identity is inappropriate where token/MVID ordering differs. The baseline inherits
 legacy compiler/importer assumptions and is not independent proof. Direct compilation,
 Raven symbol import and a native semantic provider remain unimplemented by this slice.
+
+
+### Library execution profile 3 — 2026-09-30
+
+The sample experiment exposed two concrete schema-2 limits: the Raven collection
+System (417 types / 4,090 functions) exceeds input/item bounds, and negative Double
+literals use UInt64 bit operands above Int64.MaxValue. Required execution schema 3
+addresses these in standalone NEOX assemblies. NativeModuleContainer.WriteLibraryBinary
+emits it; Read and the native runtime admit it. Existing schema-1/2 admission and public
+1 MiB envelope primitives retain their bounds. PE/#Neo remains schema 1/2.
+
+Schema 3 uses the same definite-length CBOR map/array/text representation and strict
+validation as schema 2. CBOR major 0 admits UInt64.MaxValue; major 1 still stops at
+Int64.MinValue. No tags, byte strings, floating CBOR values, indefinite lengths,
+duplicated keys, nonminimal integers or trailing bytes are admitted. Float instruction
+bits are integers, preserving signed zero and NaN payloads without JSON floating
+conversion. Reference names, tokens, signatures and instruction semantics do not change.
+
+Budgets are 32 MiB input/reconstructed JSON, 8 MiB envelope, 2,097,152 items including
+keys, depth 64. The observed library needs 15,017,185 JSON bytes, 5,542,303 binary bytes
+and 846,454 items. This provides bounded headroom; it does not establish a production
+maximum assembly size. Costs include greater possible allocation and validation work.
+The runtime still deserializes the entire native model; no lazy/indexed loading or
+speedup is claimed.
+
+Compared with the ECMA-335 indexed-table baseline and the RFC 8949 analysis above,
+this preserves existing native bit operands and reuses the codec with explicit limits.
+Silently widening schema 2 would make its advertised compatibility misleading; wrapping
+unsigned values as negative integers would change native operand meaning. Indexed tables
+may reduce repetition but remain a larger design change. A new required schema makes
+old readers fail explicitly, while keeping supported old images readable. The translator
+CLI now writes schema 3; callers needing schema 2 can still use WriteBinary.
+
+Validation covers .NET/Rust integer endpoints, exact payload/item limits and one-past
+rejection, depth, malformed encodings, legacy rejection and C#-produced floating-bit
+fixtures. Complete System JSON values roundtrip through the host API. A focused Raven
+run verifies and executes FloatingMath, OptionPositional and ValueCopy with **binary
+System and binary applications**. Their expected outputs match; six compiler-negative
+cases remain rejected. The previous full matrix's successful JSON-System results remain
+historical evidence, not a claim that all cases were rerun with schema 3.
+[Consumer evidence](../experiments/extended-cli-metadata/raven-library-profile3.json).
+
+The proper neoil binary producer, direct native Raven class-library compiler and broader
+compiler symbol loading remain subsequent work. These are runtime assemblies without
+a CLI projection, not inputs to the existing .NET semantic metadata provider.

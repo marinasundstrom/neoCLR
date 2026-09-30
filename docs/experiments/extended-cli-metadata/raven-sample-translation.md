@@ -102,3 +102,15 @@ The next format work is explicit capacity and UInt64 coverage with cross-reader 
 the future neoil producer and direct class-library compiler should reuse that contract.
 The wider Raven sample suite, arrays/delegates/async workloads and native symbol import
 remain untested by this bounded matrix.
+
+
+## Follow-up: schema 3 closes the observed transport gaps
+
+Required standalone execution schema 3 now admits full UInt64 operands and explicit
+larger library budgets. The translator defaults to schema 3; the original failures
+above remain the historical schema-2 baseline. [Focused follow-up evidence](raven-library-profile3.json)
+records FloatingMath, OptionPositional and ValueCopy passing with binary applications
+and binary Raven collection System (5,542,303 bytes), with no JSON-System fallback.
+C# also compares all original/reconstructed System values. Reproduce using the same
+harness with `--only FloatingMath OptionPositional ValueCopy` and a fresh directory.
+See [profile contract and costs](../../design/extended-cli-metadata.md#library-execution-profile-3--2026-09-30).

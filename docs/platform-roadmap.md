@@ -36,6 +36,10 @@ neoil assembler producing native assemblies is a future producer. The Raven coll
 library profile exceeds the current binary transport bounds; retain that explicit gap
 while isolating application translations with matching JSON System. Floating-point
 operand tests additionally expose the need for full UInt64 bit-pattern encoding.
+**Follow-up implemented:** standalone schema 3 adds that encoding and bounded larger
+library capacity; FloatingMath, OptionPositional and ValueCopy now run against binary
+Raven System. The neoil binary producer and direct native compiler/symbol import remain
+next work. [Profile and validation](design/extended-cli-metadata.md#library-execution-profile-3--2026-09-30).
 [Experiment and reproducible checks](experiments/extended-cli-metadata/raven-sample-translation.md).
 
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
