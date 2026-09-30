@@ -8,10 +8,11 @@
   "typeOwnedMethods": true,
   "crossAssemblyCall": true,
   "noResult": true,
+  "importedReadOnlyDependency": true,
   "missingDependencyRejected": true,
   "wrongRevisionRejected": true,
   "runtimeSha256": "3f0f65f00fdeb6020eb9fc43ff14e7b41788ea04b306848a11961b2ff6504bf8",
-  "libraryApiSha256": "66a86decd3b6cc034e8ccee128297332c5a2d1645a665e16c4dff4a108d05ead",
+  "libraryApiSha256": "c7da9107defb82d42171059659e44b6d6bb67d706c6b44d5fcdb9bddbe1f53ab",
   "appSha256": "d07a7f5012ddc45eacf0cc5f3b171a4a57500085bd80e9a65a5bfeb9f0257db6",
   "dependencySha256": "6dd0f6ac7c1592970e229374e95be8e85af2f752b64688167157218ec177b763"
 }

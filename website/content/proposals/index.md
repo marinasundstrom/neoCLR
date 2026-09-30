@@ -70,7 +70,8 @@ outside types and has a direct neoCLR load/run test. The PE reader recovers call
 declarations and resolves the emitted method-reference subset through explicit
 dependencies, with documented signature limits. A first opt-in Raven consumer now
 binds a small program and emits native output through the separate library, with a
-successful neoCLR run. Its input provider is still .NET-based. Native target adapters
+successful neoCLR run. Calls can now be imported from read-only definitions without
+retaining the producer builder graph. Its input provider is still .NET-based. Native target adapters
 and broader ordinary metadata coverage come next, followed by structural extensions. Production NEOX loading and structural runtime support remain pending;
 this is not a published platform format.
 

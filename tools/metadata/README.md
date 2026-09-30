@@ -157,3 +157,6 @@ This is an independent compiler-side consumer, not Raven code moved into this li
 It is not yet an installed native loader/emitter target. Production target composition,
 native metadata symbol loading and wider signatures remain staged follow-ups. The
 consumer also checks unsupported operators and compiler binding failures.
+
+Read-only callable imports now let compiler consumers emit PE/native calls without
+the dependency builder graph. See the [host API reference](../../api-docs/experimental-metadata.md#importing-a-read-only-callable-development).

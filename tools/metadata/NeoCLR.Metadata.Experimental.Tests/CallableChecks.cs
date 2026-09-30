@@ -55,10 +55,21 @@ internal static class CallableChecks
         {
             var method = AssemblyDefinition.ReadAssembly(Image(1, signature), false).MainModule.Functions.Single();
             Check(!method.TryGetStaticInt32Signature(out var count, out var result) && count == 0 && !result, "unsupported signature cannot masquerade as Int32");
+            var consumer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
+            try { consumer.ImportReference(method, consumer.CoreLibrary); throw new Exception("unsupported signature imported"); }
+            catch (InvalidDataException) { }
             Check(method.GetSignature().SequenceEqual(signature), "opaque signature preserved exactly");
         }
         var instance = AssemblyDefinition.ReadAssembly(Image(1, [0, 0, 8], global: false, isStatic: false), false).MainModule.Methods.Single();
         Check(!instance.TryGetStaticInt32Signature(out _, out _), "attributes checked as well as signature");
+        var output = new AssemblyBuilder(new("Output", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
+        foreach (var unsupported in new[] { instance,
+            AssemblyDefinition.ReadAssembly(Image(1, [0, 0, 8], global: false, nested: true), false).MainModule.Methods.Single(),
+            AssemblyDefinition.ReadAssembly(Image(1, [0, 0, 8], global: false, genericOwner: true), false).MainModule.Methods.Single() })
+        {
+            try { output.ImportReference(unsupported, output.CoreLibrary); throw new Exception("unsupported owner/instance imported"); }
+            catch (InvalidDataException) { }
+        }
     }
     internal static void Limits()
     {
@@ -68,13 +79,22 @@ internal static class CallableChecks
         Reject(Image(4096, new byte[1025]), "missing or excessive method signature");
         Reject(Image(1, [0, 0, 8], isStatic: false), "global function must be static");
     }
-    private static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true)
+    private static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true, bool nested = false, bool genericOwner = false)
     {
         var metadata = new MetadataBuilder();
         metadata.AddModule(0, metadata.GetOrAddString("Fixture.dll"), metadata.GetOrAddGuid(Guid.NewGuid()), default, default);
         metadata.AddAssembly(metadata.GetOrAddString("Fixture"), new(1, 0, 0, 0), default, default, 0, AssemblyHashAlgorithm.None);
         metadata.AddTypeDefinition(0, default, metadata.GetOrAddString("<Module>"), default, MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
-        if (!global) metadata.AddTypeDefinition(TypeAttributes.Public, default, metadata.GetOrAddString("Owner"), default, MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
+        if (!global)
+        {
+            var owner = metadata.AddTypeDefinition(TypeAttributes.Public, default, metadata.GetOrAddString("Owner"), default, MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
+            if (genericOwner) metadata.AddGenericParameter(owner, 0, metadata.GetOrAddString("T"), 0);
+            if (nested)
+            {
+                var child = metadata.AddTypeDefinition(TypeAttributes.NestedPublic, default, metadata.GetOrAddString("Child"), default, MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
+                metadata.AddNestedType(child, owner);
+            }
+        }
         for (int i = 0; i < count; i++)
             metadata.AddMethodDefinition(MethodAttributes.Public | (isStatic ? MethodAttributes.Static : 0), 0,
                 metadata.GetOrAddString("Method"), metadata.GetOrAddBlob(signature), -1, MetadataTokens.ParameterHandle(1));

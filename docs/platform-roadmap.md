@@ -433,3 +433,8 @@ At the author's request, structural Function work continues on
 `codex/structural-types` with this Self-integrated main as its base. The former
 `feature/function-types` name is retired after validation and synchronization.
 The branch organization does not enable structural types on main.
+
+Read-only callable import checkpoint (2026-09-30): Raven emission now consumes a
+metadata definition snapshot without the producer builder graph. C# and Raven native
+consumers return 42; [integration scope](raven-cli-bridge.md#read-only-call-imports--2026-09-30)
+still excludes native symbol loading and production target registration.

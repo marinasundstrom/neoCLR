@@ -1167,3 +1167,63 @@ are rejected with the corresponding diagnostics. The runner preserves the artifa
 and a hash report. This requires only the metadata test executable and native runtime,
 with its bundled System library; no Raven bridge or hand-authored application JSON is
 involved. See [recorded evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/native-validation.json).
+
+### Importing a read-only callable (development)
+
+```csharp
+ImportedMethodReference AssemblyBuilder.ImportReference(
+    MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary);
+void MethodBuilder.Call(ImportedMethodReference target);
+
+public sealed class ImportedMethodReference
+{
+    public AssemblyBuilder Owner { get; }
+    public AssemblyIdentity AssemblyIdentity { get; }
+    public string? Namespace { get; }
+    public string? DeclaringTypeName { get; }
+    public string Name { get; }
+    public int ParameterCount { get; }
+    public bool ReturnsValue { get; }
+}
+```
+
+`ImportReference` copies a static, nongeneric Int32 signature from an external
+read-only definition. No producer builder, body, runtime load or resolver is needed.
+`Owner` is the consuming builder; `AssemblyIdentity` is the exact dependency identity.
+The namespace and type name are null for a global function. `ReturnsValue` is false
+for no result. References expose no body editing or signature mutation.
+
+The caller must supply the dependency's core-library contract explicitly; it must
+equal the consuming builder's `CoreLibrary`. This is a host assertion, not a deduction
+from CLI primitive bytes or a verification of the dependency's implementation. Native
+dependencies must be separately supplied and use this writer's format-5 naming
+contract. PE output uses ordinary AssemblyRef/TypeRef/MemberRef rows for type-owned
+methods. Cross-assembly globals remain native-only. Access checks are not performed.
+
+Nested/generic owners, instance/generic/other signatures, signed or flagged dependency
+identities and imports of the output identity throw `InvalidDataException`. A single
+builder admits at most 256 imported assembly identities and 4096 imported methods.
+Different module MVIDs under one identity, or differing callable contracts under one
+MVID/token, are rejected. Repeated compatible imports return the same reference;
+MVID consistency is not content authentication. Null arguments throw
+`ArgumentNullException`. `Call` rejects references from another consumer with
+`ArgumentException`; stack validation still occurs at emission. A null literal passed
+to the overloaded `Call` now requires a cast to the intended target type.
+
+```csharp
+var dependency = AssemblyDefinition.ReadAssembly(dependencyPe, expectedExtended: false);
+var method = dependency.MainModule.Types.Single(t => t.Name == "Math").Methods.Single();
+var reference = output.ImportReference(method, dependencyCoreIdentity);
+var main = output.AddFunction("Main");
+main.LoadConstant(21);
+main.Call(reference);
+main.Return();
+output.EntryPoint = main;
+var nativeImage = output.WriteNativeAssembly();
+```
+
+Twenty-two C# contract groups now pass. They cover owned imports after producer/input
+mutation, exact PE method resolution, native global no-result calls, owner/core/identity
+rejections, opaque unsupported signatures and stack errors. The native C# gate imports
+its cross-assembly global from a PE snapshot and returns 42. The Raven consumer also
+imports from the read-only snapshot and returns 42 in neoCLR.

@@ -109,6 +109,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native target composition is still pending. The case drove general Raven fixes for
   binary-operation facts, invocation receivers and signature-only required parameters;
   87 focused compiler tests pass and those fixes are on local Raven main.
+  Import bounded static Int32 callable references from read-only definitions into
+  the independent metadata writer. Explicit core-contract assertions, consuming
+  ownership and conflicting module/contract checks guard PE/native emission.
+  The Raven probe no longer requires the dependency builder graph. C# contracts
+  and native top-level/Raven consumers pass, returning 42; native symbol loading
+  and production target installation remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

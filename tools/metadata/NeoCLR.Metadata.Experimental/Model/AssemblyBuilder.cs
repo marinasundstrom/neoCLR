@@ -225,6 +225,16 @@ public sealed class MethodBuilder
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     public void Call(MethodBuilder target) { ArgumentNullException.ThrowIfNull(target); Append(new("call", Target: target)); }
+    /// <summary>Appends a call to an imported read-only method contract.</summary>
+    /// <param name="target">Reference imported by this method's assembly builder.</param>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    /// <exception cref="ArgumentException">Reference belongs to another output builder.</exception>
+    public void Call(ImportedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (!ReferenceEquals(target.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(target));
+        Append(new("call", Target: target.Target));
+    }
     /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
     public void Return() => Append(new("return"));
     /// <summary>Clears the body for editing before another Write.</summary>

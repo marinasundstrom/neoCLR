@@ -17,7 +17,7 @@ internal static class NativeWriterChecks
         var plusTwo = app.AddType("Example", "Math").AddMethod("PlusTwo", 1);
         plusTwo.LoadArgument(0); plusTwo.LoadConstant(2); plusTwo.Add(); plusTwo.Return();
         var main = app.AddFunction("Main");
-        main.Call(noResult); main.LoadConstant(21); main.Call(twice); main.Call(plusTwo);
+        main.Call(noResult); main.LoadConstant(21); main.Call(app.ImportReference(NeoCLR.Metadata.Experimental.Model.AssemblyDefinition.ReadAssembly(library.Write(), false).MainModule.Functions.Single(), core)); main.Call(plusTwo);
         main.LoadConstant(2); main.Subtract(); main.Return();
         app.EntryPoint = main;
         return (app, library);
@@ -83,6 +83,7 @@ internal static class NativeWriterChecks
             date = "2026-09-30", scope = "Public .NET model -> native format-5 bytes -> neoCLR loader/verifier/VM; no CLI bridge",
             result = 42, directNativeLoading = true, directPeLoading = false,
             topLevelFunctions = true, typeOwnedMethods = true, crossAssemblyCall = true, noResult = true,
+            importedReadOnlyDependency = true,
             missingDependencyRejected = true, wrongRevisionRejected = true,
             runtimeSha256 = Hash(runtime), libraryApiSha256 = apiHash, appSha256 = Hash(appPath), dependencySha256 = Hash(libraryPath)
         }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
