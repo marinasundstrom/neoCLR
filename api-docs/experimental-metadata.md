@@ -1105,6 +1105,7 @@ public sealed class MethodBuilder
     public int ParameterCount { get; }
     public bool ReturnsValue { get; }
     public void LoadConstant(int value);
+    public void WriteConsoleLine(string text);
     public void LoadArgument(int index);
     public void Add();
     public void Subtract();
@@ -1356,3 +1357,22 @@ explicit module sets; `LoadedProgram` remains responsible for linking and execut
 There is no guest loader API yet. CLI bodies are throwing reference stubs, never
 executed by neoCLR. The payload still uses JSON; direct loading does not yet eliminate
 text parsing or establish a speedup. See the [profile/design](../docs/design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
+
+### Native console literal output
+
+`MethodBuilder.WriteConsoleLine(string text)` appends native console output without
+changing the surrounding Int32 stack. Text is limited to 64 KiB of valid UTF-8; null
+throws ArgumentNullException, unpaired UTF-16 surrogates and exceeded literal bounds
+throw ArgumentException. The assembly's aggregate console-literal bytes are limited
+to 4 MiB before serialization (InvalidDataException); encoded output/container limits
+still apply. `WriteNativeAssembly` lowers the operation to `ldstr`,
+`System.Console.WriteLine(String)` and `pop` for the bundled System's Void-valued result.
+System is the runtime's implicit platform dependency. CLI `Write()` rejects this
+native-only operation with InvalidDataException; reference-only projections preserve
+declarations and continue emitting throwing stubs. General string signatures and
+Console overload import are not introduced.
+
+The compiled Raven acceptance case prints Hello World directly from Main, then from
+a separate Greet function called by Main. Both emitted containers load/verify/run
+in neoCLR and exit zero. The API remains independent of Raven; compiler-side mapping
+requires an explicit registered Console reference and only accepts string literals.

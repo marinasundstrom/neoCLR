@@ -9248,3 +9248,16 @@ remote synchronization does not publish a runtime bundle or website.
   loading/emission, wider signatures and structural runtime semantics remain open.
   See the [format/tradeoffs](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30)
   and [tested compiler/runtime hashes](experiments/extended-cli-metadata/raven-compiler-validation.json).
+
+### First acceptance programs
+
+- **Author:** “I believe. Hello World is good first target, then calling another
+  function from the entry point.”
+- **Assistant:** Kept the existing arithmetic/dependency regression case and added
+  the requested simpler sequence: direct console output, then Main calling Greet
+  to print. Added a bounded, explicitly authorized Console-reference mapping.
+- **Outcome:** Both Raven programs compile into PE/#Neo, verify/load/run in neoCLR,
+  print exactly Hello World and exit zero. Validation exposed the native System
+  Console method's Void-valued result; the emitted statement now discards it.
+  String signatures, other Console overloads, a native symbol provider and binary
+  payload performance work remain open. See the runtime/compiler validation report.

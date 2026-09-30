@@ -17,6 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 3 focused Rust tests. The payload remains JSON: binary encoding,
   faster parsing, structural runtime support and production target registration remain
   pending. This is feature-branch support, not a published format or a general CIL loader.
+  Add native-only bounded console literal emission and the author's Hello World
+  acceptance cases: direct output and an entry-point function call both print one
+  line and exit zero from Raven-produced PE/#Neo files. C# literal/Unicode/bounds
+  checks pass; ordinary CLI emission rejects this native-only operation.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

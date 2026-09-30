@@ -474,3 +474,9 @@ profile carries format-5 JSON inside section 256/schema 1; it does not yet remov
 parsing or claim faster loading. Next evaluate binary native encoding and separate
 load/link/verify timings, while staging the native compiler symbol provider. See the
 [implementation and limits](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
+
+Author-selected first acceptance programs (2026-09-30): Hello World directly in
+the entry point, then through an entry-point call to another function. Both now
+compile to PE/#Neo, load/verify/run in neoCLR, print exactly one line and exit zero.
+The bounded Console string-literal bridge uses an explicit compiler reference
+contract; general string signatures and no-result source entry points remain staged.

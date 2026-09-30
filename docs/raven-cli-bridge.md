@@ -265,3 +265,12 @@ Both module orders return 42; malformed/unsupported containers and dependency fa
 are checked. [Format and validation](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
 Feature branches and hashes are retained in the compiler validation report; this is
 not published/main runtime support or a guest Introspection loader.
+
+The Hello World acceptance slice adds explicit `NeoClrEmitOptions.ConsoleReference`
+in Raven. Only the exact registered assembly symbol's System.Console.WriteLine with
+a non-null string literal is mapped. The independent API's `WriteConsoleLine` emits
+ldstr/call/pop; the pop consumes the existing native System method's Void value.
+Direct Main output and Main calling Greet both print Hello World and exit zero through
+PE/#Neo. Int32 entry/helper results remain the bounded source contract. General
+Console/string signature import and native platform-call contracts remain future
+replacement work; the ordinary .NET target is unchanged.

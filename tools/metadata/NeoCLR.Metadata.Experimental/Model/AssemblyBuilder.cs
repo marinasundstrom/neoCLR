@@ -49,6 +49,9 @@ public sealed partial class AssemblyBuilder
     {
         var methods = functions.Concat(types.SelectMany(t => t.Methods)).ToArray();
         if (methods.Sum(method => (long)method.Instructions.Count) > 131072) throw new InvalidDataException("assembly instruction limit exceeded");
+        if (methods.SelectMany(method => method.Instructions).Sum(instruction =>
+            instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
+            throw new InvalidDataException("assembly string literal limit exceeded");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || !EntryPoint.ReturnsValue))
             throw new InvalidDataException("entry point must be a local parameterless Int32 method");
@@ -151,6 +154,7 @@ public sealed partial class AssemblyBuilder
                     case "multiply": code.WriteByte(0x5a); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
+                    default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
                 }
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack);
@@ -206,7 +210,7 @@ public sealed class TypeBuilder
 /// <summary>Linear, typed Int32 body construction; invalid stack contracts fail before emission.</summary>
 public sealed class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result) { Assembly = assembly; DeclaringType = owner; Name = name; ParameterCount = count; ReturnsValue = result; }
@@ -223,6 +227,22 @@ public sealed class MethodBuilder
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
     public void LoadConstant(int value) => Append(new("constant", value));
+    /// <summary>Appends a native System.Console.WriteLine call with a constant UTF-8 string.</summary>
+    /// <param name="text">Unicode text, at most 64 KiB when UTF-8 encoded.</param>
+    /// <exception cref="ArgumentNullException">Text is null.</exception>
+    /// <exception cref="ArgumentException">Invalid Unicode or text exceeds the limit.</exception>
+    /// <remarks>Native emission only; ordinary CLI Write rejects this operation. Does not alter the Int32 stack.</remarks>
+    public void WriteConsoleLine(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        try
+        {
+            if (new System.Text.UTF8Encoding(false, true).GetByteCount(text) > 65536)
+                throw new ArgumentException("console literal exceeds 64 KiB", nameof(text));
+        }
+        catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid Unicode", nameof(text), error); }
+        Append(new("console.line", Text: text));
+    }
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Zero-based parameter index.</param>
     public void LoadArgument(int index) => Append(new("argument", index));
@@ -265,6 +285,7 @@ public sealed class MethodBuilder
             int pop = 0, push = 0;
             switch (instruction.Op)
             {
+                case "console.line": break; // Temporary native string operand is consumed by Console.WriteLine.
                 case "constant": push = 1; break;
                 case "argument":
                     if (instruction.Value < 0 || instruction.Value >= ParameterCount) throw new InvalidDataException("argument outside signature");

@@ -1022,3 +1022,18 @@ module order, missing dependencies and revision mismatches checked. See
 The feature branches remain `codex/extended-cli-metadata` and `codex/metadata-consumer`.
 Production target registration, a native Raven symbol provider, guest Introspection
 loading/emission APIs, broad signatures and structural execution remain open.
+
+### Hello World, then an entry-point call
+
+The author selects these as the initial acceptance sequence. Both are now compiled
+from Raven and executed by neoCLR from PE/#Neo containers. Main returns Int32 zero;
+in the second program it returns Greet(), which prints the line and returns zero.
+The explicit compiler Console reference maps only the resolved static string-literal
+WriteLine overload. Compared with .NET's Console overload surface, this is a deliberately
+smaller bridge over neoCLR's existing UTF-8 String/System output contract, not an API
+improvement or a general CLR import. The native writer emits ldstr/call/pop, preserving
+the bundled System's current Void-valued return convention. The cost is a temporary
+platform-specific builder convenience, `WriteConsoleLine`; a broader native callable
+contract should eventually represent string parameters/results without special cases.
+C# checks cover literal Unicode/bounds, native-only emission, explicit compiler
+bindings, unchanged failed output and both exact stdout/exit-code runtime results.

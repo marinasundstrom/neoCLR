@@ -80,7 +80,8 @@ including overload selection and a library-local call. A three-assembly dependen
 chain loads and runs in neoCLR, with missing and wrong-revision transitive dependencies
 rejected. Native target adapters
 and broader ordinary metadata coverage come next, followed by structural extensions. An initial feature-branch PE/#Neo execution profile now loads native metadata directly
-in neoCLR and runs the Raven two-library case to 42. Its payload still uses JSON;
+in neoCLR and runs the Raven two-library case to 42. Initial Hello World examples
+also run directly and through an entry-point function call. Its payload still uses JSON;
 binary encoding, production integration and structural runtime support remain pending;
 this is not a published platform format.
 

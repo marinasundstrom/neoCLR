@@ -9,7 +9,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Emits a native neoCLR format-5 assembly directly from this graph.</summary>
     /// <returns>Owned UTF-8 JSON bytes accepted by the native assembly loader.</returns>
     /// <exception cref="InvalidDataException">Invalid graph, unsupported descriptive names, identity collision, incompatible core contract or output limit.</exception>
-    /// <remarks>Supports the same linear Int32 bodies as PE emission, including cross-assembly top-level functions.
+    /// <remarks>Supports linear Int32 bodies, cross-assembly top-level functions and native-only constant console output.
     /// Dependencies must be emitted separately and supplied explicitly to the runtime. No PE conversion or external process runs.
     /// This is the current native JSON format, not the experimental NEOX PE transport.</remarks>
     public byte[] WriteNativeAssembly()
@@ -61,6 +61,16 @@ public sealed partial class AssemblyBuilder
             "return" => new { op = "ret" },
             _ => throw new InvalidDataException("unsupported instruction")
         };
+        IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)
+        {
+            if (instruction.Op == "console.line")
+                return new object[] {
+                    new { op = "ldstr", arg = instruction.Text! },
+                    new { op = "call", arg = new { name = "System.Console.WriteLine", owner = new { Named = "System.Console" }, parameters = new[] { "String" } } },
+                    new { op = "pop" } // Bundled System returns the Void value; statement discards it.
+                };
+            return new[] { Instruction(instruction) };
+        }
         foreach (var type in types) CheckText(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name);
         var artifact = new
         {
@@ -77,7 +87,7 @@ public sealed partial class AssemblyBuilder
             functions = methods.Select((method, index) => new {
                 name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
                 returns = method.ReturnsValue ? "Int32" : "Void", no_result = !method.ReturnsValue,
-                origin = Origin(method.Name, 0x06000001 + index, method), body = method.Instructions.Select(Instruction).ToArray()
+                origin = Origin(method.Name, 0x06000001 + index, method), body = method.Instructions.SelectMany(NativeInstructions).ToArray()
             }).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
