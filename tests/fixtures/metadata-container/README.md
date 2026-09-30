@@ -6,9 +6,14 @@
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
   --container-integration target/debug/neoclr target/extended-cli-metadata/container
 cp target/extended-cli-metadata/container/Valid.dll tests/fixtures/metadata-container/constant42.pe
+cp target/extended-cli-metadata/container/Binary.dll tests/fixtures/metadata-container/constant42-binary.pe
 ```
 
 It contains a native top-level `Main` returning 42. Its CLI declarations have the
 reference-only attribute and throwing bodies; the runtime executes the required
 NEOX section 256 schema 1. The projection uses a fresh MVID when regenerated, so
 compare decoded behavior rather than expecting identical whole-file bytes.
+
+`constant42-binary.pe` contains the identical native module in execution schema 2
+(bounded CBOR). Rust tests compare complete decoded metadata and execute both forms;
+JSON extraction deliberately fails for schema 2, so consumers use decode/load.

@@ -1,0 +1,71 @@
+{
+  "benchmark": "bounded native container admission",
+  "cases": [
+    {
+      "bytes": {
+        "binary_pe": 16384,
+        "json": 894,
+        "json_pe": 16384
+      },
+      "case": "constant42",
+      "decode_iterations_per_sample": 2000,
+      "load_iterations_per_sample": 5,
+      "median_microseconds": {
+        "binary_pe_binding_and_decode": 8.7519795,
+        "binary_pe_load_with_system_link_validation": 24319.95,
+        "json_load_with_system_link_validation": 28187.4,
+        "json_pe_binding_and_decode": 8.655354,
+        "json_pe_load_with_system_link_validation": 28750.3084,
+        "link_prepare_warm_system": 24292.180666666667,
+        "run_prepared_program": 162.34733333333332,
+        "verify_prepared_program": 6223.486333333333
+      }
+    },
+    {
+      "bytes": {
+        "binary_pe": 139264,
+        "json": 184352,
+        "json_pe": 200704
+      },
+      "case": "65_functions",
+      "decode_iterations_per_sample": 100,
+      "load_iterations_per_sample": 5,
+      "median_microseconds": {
+        "binary_pe_binding_and_decode": 2084.63625,
+        "binary_pe_load_with_system_link_validation": 27631.9,
+        "json_load_with_system_link_validation": 28086.966600000003,
+        "json_pe_binding_and_decode": 2426.07416,
+        "json_pe_load_with_system_link_validation": 28415.475,
+        "link_prepare_warm_system": 25382.041666666668,
+        "run_prepared_program": 176.09733333333335,
+        "verify_prepared_program": 7944.764
+      }
+    }
+  ],
+  "excluded": [
+    "file IO",
+    "process startup",
+    "one-time System parsing",
+    "compiler emission"
+  ],
+  "platform": {
+    "arch": "aarch64",
+    "os": "macos"
+  },
+  "profile": "release",
+  "samples": 7,
+  "statistic": "median per-iteration microseconds",
+  "date": "2026-09-30",
+  "fixture_sha256": {
+    "Module.neo.json": "762c2088e6f6b456f6c5efd19d005e2f6a7539109a94c1821e74f94a241027b2",
+    "Valid.dll": "04176fd8f41a30843585385e2019cc390f22d000a98b393f8402eed867226dd1",
+    "Binary.dll": "f5c581ed62eef16ec6ba559b05a0de391e1905326d87dcdc23dacaad0dd89a36",
+    "Large.neo.json": "756c6d753995dd5976b80a6730e04c5d00ddbf0d14f5a515709ac6440f8e7946",
+    "LargeJson.dll": "31a7f2c624774163825419bee7da87b969e2e5295777cadc2247a7ab265bf272",
+    "LargeBinary.dll": "cd30b23cd809d65da202dd89c750a86fc3eb56e6ad38571b601ed1a6a249e14f"
+  },
+  "benchmark_executable_sha256": "d01fdd48986731c0529702aabb50a9e28ba177b79e683aa5e5966122a1a6f756",
+  "sdk": "Xcode MacOSX26.2.sdk (matching compiler; system default SDK did not link)",
+  "rustc": "1.95.0 (59807616e 2026-04-14)",
+  "cpu": "Apple M1"
+}

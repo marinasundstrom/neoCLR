@@ -9,18 +9,28 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-30
 
 - Add direct runtime PE/#Neo loading to the extended metadata experiment: required
-  execution section 256/schema 1 carries native format-5 metadata and bodies. The
-  separate .NET API writes containers and reads owned native bytes/CLI projections;
+  execution section 256 carries native format-5 metadata and bodies (schema 1 JSON,
+  schema 2 binary). The separate .NET API writes containers and reads owned native bytes/CLI projections;
   Raven can use the same library files as compiler references and runtime modules.
   Reject missing/altered binding, unsupported required schemas and malformed containers;
-  preserve runtime dependency and body checks. Validate 25 C# groups, 10 runtime
-  process cases and 3 focused Rust tests. The payload remains JSON: binary encoding,
-  faster parsing, structural runtime support and production target registration remain
-  pending. This is feature-branch support, not a published format or a general CIL loader.
+  preserve runtime dependency and body checks. Validate 27 C# groups, 18 runtime
+  process cases and 16 focused Rust/CLI tests. Structural runtime support and
+  production target registration remain pending. This is feature-branch support,
+  not a published format or a general CIL loader.
   Add native-only bounded console literal emission and the author's Hello World
   acceptance cases: direct output and an entry-point function call both print one
   line and exit zero from Raven-produced PE/#Neo files. C# literal/Unicode/bounds
   checks pass; ordinary CLI emission rejects this native-only operation.
+  Add required execution schema 2 using bounded CBOR, direct runtime deserialization
+  without JSON parsing, and .NET WriteBinary/dual-schema inspection. Keep schema-1
+  compatibility; unsupported binary forms, duplicate keys and resource-limit failures
+  are rejected. In one local release comparison, the 65-function PE is about 31%
+  smaller and binding/decoding about 14% faster; the tiny case is unchanged and
+  shared System linking/preparation dominates. This is not a general startup or
+  execution-speed claim. Binary Hello World, function-call and dependency cases pass.
+  Add a release-mode phase comparison;
+  record class-library JSON translation and Raven symbol loading as the next bootstrap
+  direction, not completed general translation or native symbol-provider support.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

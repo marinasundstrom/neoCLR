@@ -48,9 +48,9 @@ pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<
         .iter()
         .map(|input| match input {
             ModuleInput::Source(source) => parse_parts(source),
-            ModuleInput::MetadataPe(image) => crate::metadata_container::native_json(image)
-                .and_then(crate::decode_module)
-                .map(|module| (module, vec![])),
+            ModuleInput::MetadataPe(image) => {
+                crate::metadata_container::decode(image).map(|module| (module, vec![]))
+            }
             ModuleInput::Json(json) => crate::decode_module(json).map(|module| (module, vec![])),
         })
         .collect::<Result<Vec<_>, _>>()?;

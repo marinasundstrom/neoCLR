@@ -20,12 +20,28 @@ public static class RuntimeAssemblyContainer
     /// <exception cref="InvalidDataException">Unsupported declarations, exceeded bounds or invalid container.</exception>
     /// <exception cref="ArgumentNullException">Core identity is null.</exception>
     public static byte[] Write(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary)
+        => WriteCore(nativeImage, coreLibrary, binary: false);
+
+    /// <summary>Builds a PE/#Neo container with schema-2 binary native metadata (bounded CBOR).</summary>
+    /// <param name="nativeImage">API-produced format-5 JSON used only during host emission.</param>
+    /// <param name="coreLibrary">Explicit .NET reference core identity.</param>
+    /// <returns>Owned PE bytes; runtime decoding requires no JSON parsing.</returns>
+    /// <exception cref="ArgumentNullException">Core identity is null.</exception>
+    /// <exception cref="InvalidDataException">Unsupported input, non-integer numeric data or exceeded limits.</exception>
+    /// <remarks>Schema 1 remains supported by Read. Schema 2 is a provisional binary object encoding, not indexed CLI tables.</remarks>
+    public static byte[] WriteBinary(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary)
+        => WriteCore(nativeImage, coreLibrary, binary: true);
+
+    private static byte[] WriteCore(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary, bool binary)
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
-        if (nativeImage.Length > MetadataEnvelope.MaxImageSize - 32)
+        if (!binary && nativeImage.Length > MetadataEnvelope.MaxImageSize - 32)
             throw new InvalidDataException("native payload exceeds execution envelope limit");
         var definition = NativeAssemblyDefinition.ReadAssembly(nativeImage);
-        var envelope = MetadataEnvelope.Write([new MetadataSection(256, 1, true, nativeImage)], Schemas);
+        ushort schema = binary ? (ushort)2 : (ushort)1;
+        byte[] payloadBytes = binary ? NativeBinaryCodec.Encode(nativeImage) : nativeImage.ToArray();
+        var envelope = MetadataEnvelope.Write([new MetadataSection(256, schema, true, payloadBytes)],
+            new Dictionary<ushort, ushort> { [256] = schema });
         var image = definition.CreateReferenceAssembly(coreLibrary);
         using var pe = new PEReader(new MemoryStream(image, writable: false));
         var headers = pe.PEHeaders;
@@ -90,16 +106,20 @@ public static class RuntimeAssemblyContainer
 
     /// <summary>Validates the PE, recognition digest, envelope and supported native declarations.</summary>
     /// <param name="image">Complete unsigned PE32 image, at most 4 MiB.</param>
-    /// <returns>An owned copy of authoritative native format-5 bytes.</returns>
+    /// <returns>Owned native format-5 JSON: original schema-1 bytes or reconstructed schema-2 values.</returns>
     /// <exception cref="InvalidDataException">Missing/changed binding, malformed container or unsupported required schema/declarations.</exception>
-    /// <remarks>Does not execute, resolve dependencies, compare CLI declarations or verify native bodies.</remarks>
+    /// <remarks>Accepts schema-1 JSON and schema-2 bounded CBOR. Does not execute, resolve dependencies, compare CLI declarations or verify native bodies.</remarks>
     public static byte[] Read(ReadOnlySpan<byte> image)
     {
-        var sections = MetadataEnvelope.Read(MetadataArtifactReader.ReadEnvelope(image)!, Schemas);
+        var envelope = MetadataArtifactReader.ReadEnvelope(image)!;
+        IReadOnlyList<MetadataSection> sections;
+        try { sections = MetadataEnvelope.Read(envelope, Schemas); }
+        catch (InvalidDataException)
+        { sections = MetadataEnvelope.Read(envelope, new Dictionary<ushort, ushort> { [256] = 2 }); }
         var execution = sections.SingleOrDefault(s => s.Kind == 256);
-        if (execution is null || !execution.Required || execution.Version != 1)
+        if (execution is null || !execution.Required || execution.Version is not (1 or 2))
             throw new InvalidDataException("required native execution section missing or unsupported");
-        var native = execution.GetPayload();
+        var native = execution.Version == 1 ? execution.GetPayload() : NativeBinaryCodec.Decode(execution.Payload);
         _ = NativeAssemblyDefinition.ReadAssembly(native);
         return native;
     }

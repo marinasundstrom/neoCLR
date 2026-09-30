@@ -9261,3 +9261,32 @@ remote synchronization does not publish a runtime bundle or website.
   Console method's Void-valued result; the emitted statement now discards it.
   String signatures, other Console overloads, a native symbol provider and binary
   payload performance work remain open. See the runtime/compiler validation report.
+
+## 2026-09-30 — Binary payloads and class-library bootstrapping
+
+- **Author:** Continued implementation after the Hello World/runtime-loading gate.
+  Earlier highlighted JSON parsing overhead as a reason to build an effective runtime.
+- **Assistant action:** Added a bounded binary execution schema and direct runtime
+  decoding, retaining schema-1 compatibility. Hello World/function-call and the
+  transitive Raven library cases pass with binary containers. The experiment uses
+  CBOR of existing native fields rather than claiming a final indexed metadata layout.
+  A focused release-mode load comparison separates container decoding, legacy load
+  validation/linking, preparation, verification and execution.
+- **Author direction:** Emphasized compiling the runtime class library and using its
+  metadata to load symbols into Raven. Present similarity to .NET metadata can be
+  used now, while allowing native metadata to diverge later.
+- **Author proposal:** “One option would be to translate the current JSON into neoCLR
+  assemblies.”
+- **Assistant response:** Proposed that translation as a bootstrap path: preserve
+  identities, declarations, signatures and bodies, reject unsupported information,
+  and temporarily supply .NET-compatible reference projections for Raven. Native
+  metadata remains authoritative. This does not require the full compiler backend
+  to emit the new representation before class-library symbol-loading tests can begin.
+- **Status/open work:** Binary runtime decoding is implemented; the general class-library
+  JSON translator and native Raven symbol provider are not. The current C# declaration
+  model only admits the bounded writer subset and cannot represent the complete
+  runtime/raven/System.Runtime.rvnproj surface yet. The author's proposed translation
+  path should drive the next concrete class-library slice and reveal required fields,
+  generics, signatures, attributes and body encodings rather than silently dropping them.
+  See [binary design](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30)
+  and [measurements](experiments/extended-cli-metadata/binary-loading.md).

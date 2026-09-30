@@ -1037,3 +1037,81 @@ platform-specific builder convenience, `WriteConsoleLine`; a broader native call
 contract should eventually represent string parameters/results without special cases.
 C# checks cover literal Unicode/bounds, native-only emission, explicit compiler
 bindings, unchanged failed output and both exact stdout/exit-code runtime results.
+
+## Binary native execution profile — 2026-09-30
+
+Execution section 256 now admits **schema 2**, a bounded CBOR encoding of the current
+format-5 object model. Schema 1 remains UTF-8 JSON and remains readable. The independent
+host library adds `RuntimeAssemblyContainer.WriteBinary`; Raven's experimental
+`EmitMetadataAssembly` now emits schema 2. Old schema-1-only runtimes reject it as an
+unknown required schema rather than misreading it. No published target/format changes.
+The CLI keeps PE bytes until native decoding: schema 2 goes directly through the binary
+deserializer to `Module`, then existing validation/linking/verification. It does not
+serialize CBOR to JSON or build a serde_json Value tree. Compiler-host emission and
+reference projection still use the existing native JSON intermediate; this is a runtime
+loading step, not completion of the future native object/reader/writer libraries.
+
+The [CBOR standard, RFC 8949](https://www.rfc-editor.org/rfc/rfc8949.html) specifies
+binary integer, text, array and map representations, with application choices for
+key handling and accepted forms. This profile uses definite lengths, shortest integer/
+length encodings, signed Int64 values, valid UTF-8 strings, arrays, text-keyed maps,
+booleans and null. Duplicate keys, indefinite values, byte strings, tags, floats,
+nonminimal arguments, trailing bytes and unsupported integers are rejected. The root
+is semantic module format 5; existing declaration/instruction readers reject unsupported
+shapes. Limits: 1 MiB envelope, depth 64 (root depth zero), 262,144 items including map
+keys, and lengths/counts bounded by remaining bytes before allocation. Map order is
+preserved by the writer but is not prescribed; this is not a canonical-CBOR claim.
+The native format still has repeated names and descriptive identity strings; it is
+not an indexed metadata table/heap format.
+
+**Comparison and decision.** .NET CLI uses indexed metadata tables/heaps and method
+bodies rather than a general binary object representation (see the ECMA-335 baseline
+already linked above). Designing native tables now could remove repeated strings and
+reduce allocation, but would couple this small compiler milestone to a broader stable
+schema. Leaving JSON in the execution section preserves compatibility but retains
+text parsing. Bounded CBOR reuses current fields and Serde semantics while removing
+JSON parsing at the runtime boundary; its cost is repeated field names, allocated
+runtime objects and an extra validation traversal. Rust uses pinned
+[ciborium 0.2.2](https://docs.rs/ciborium/0.2.2/ciborium/) for direct Serde decoding,
+preceded by the strict profile guard; the independent C# library implements only the
+small specified subset and adds no package dependency. Primary sources reviewed
+2026-09-30. This is provisional until load/size evidence and wider compiler cases
+justify retaining it or replacing it with native indexed tables.
+
+Hello World, Main calling Greet, both source-file orders and the two-library dependency
+chain all load/run as binary PE/#Neo. The runtime continues to accept schema-1 PEs and
+mixed inputs. A C#-produced binary fixture decodes to the same complete native model
+as its JSON counterpart. Shared rejection vectors cover bounds, UTF-8, duplicate keys,
+unsupported kinds and truncation. The C# host's Read reconstructs JSON for its existing
+metadata reader; JSON whitespace and numeric lexical spelling are not preserved for
+schema 2. `native_json` on the Rust host explicitly rejects binary containers;
+`metadata_container::decode`/`load` are the format-independent APIs.
+
+The [load comparison](../experiments/extended-cli-metadata/binary-loading.md) separates
+in-memory binding/decoding from legacy load validation (which includes System linking),
+warm-System preparation, typed verification and
+prepared-program execution. No cold-start, general-runtime or execution-throughput
+claim follows from a change in metadata decoding alone.
+
+### Class-library JSON translation as a bootstrap
+
+The author emphasizes compiling the runtime class library and importing its symbols
+into Raven, and proposes translating existing JSON to neoCLR assemblies first. This
+can reuse the current pipeline's metadata before direct native compiler emission
+covers the whole class library. The first consumer should be a real bounded slice of
+`runtime/raven/System.Runtime.rvnproj`, not another unrelated arithmetic fixture.
+
+The existing C# WriteBinary input is restricted to the controlled writer's declaration
+shape; it is not a general class-library translator. A translation tool needs to admit
+real origins, complete declared signatures and member contracts, preserve bodies and
+explicit dependencies, report unsupported shapes, and produce both native metadata
+and an appropriately limited reference projection. CBOR schema 2 also currently
+excludes floating-point values and larger images; those limits must be assessed on
+real library artifacts rather than silently widening the profile.
+
+Raven may initially bind the CLI projection because the present metadata models are
+similar. That projection belongs behind the compiler's loader contract; native metadata
+remains authoritative as semantics diverge. It must eventually be replaceable by
+a native ISemanticDataLoader adapter without rewriting the runtime metadata library.
+Class-library translation, direct compiler emission and the native symbol provider
+are distinct milestones; success at one must not be presented as all three.

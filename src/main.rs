@@ -15,17 +15,43 @@ const USAGE: &str = "Usage:
   neoclr verify <input> [--module <input>]... [--system <input>]
 Inputs: .neo is the high-level subset, .neoil is IL source, PE/#Neo containers carry native metadata; otherwise JSON artifacts.";
 
-fn read(path: &str) -> Result<String, String> {
+enum Input {
+    Text(String),
+    MetadataPe(Vec<u8>),
+}
+impl Input {
+    fn text(&self) -> Result<&str, String> {
+        match self {
+            Self::Text(text) => Ok(text),
+            Self::MetadataPe(_) => Err("expected source text, found metadata PE".into()),
+        }
+    }
+    fn load(&self) -> Result<neoclr::Module, neoclr::Fault> {
+        match self {
+            Self::Text(text) => load(text),
+            Self::MetadataPe(image) => neoclr::metadata_container::load(image),
+        }
+    }
+    fn module_input(&self, source: bool) -> Result<neoclr::assembler::ModuleInput<'_>, String> {
+        if source {
+            return Ok(neoclr::assembler::ModuleInput::Source(self.text()?));
+        }
+        Ok(match self {
+            Self::Text(text) => neoclr::assembler::ModuleInput::Json(text),
+            Self::MetadataPe(image) => neoclr::assembler::ModuleInput::MetadataPe(image),
+        })
+    }
+}
+fn read(path: &str) -> Result<Input, String> {
     if path.ends_with(".neoil") {
-        neoclr::source::read_source(path)
+        neoclr::source::read_source(path).map(Input::Text)
     } else {
         fs::read(path).and_then(|bytes| {
             if bytes.starts_with(b"MZ") {
-                neoclr::metadata_container::native_json(&bytes)
-                    .map(str::to_owned)
-                    .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error.to_string()))
+                Ok(Input::MetadataPe(bytes))
             } else {
                 String::from_utf8(bytes)
+                    .map(Input::Text)
                     .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
             }
         })
@@ -42,7 +68,8 @@ fn emit_il(args: &[String]) -> Result<Vec<String>, String> {
             "emit-il requires one Neo source and an optional output path\n{USAGE}"
         ));
     }
-    let source = read(&args[1])?;
+    let input = read(&args[1])?;
+    let source = input.text()?;
     let il = neoclr::frontend::lower_to_il_named(&source, &args[1]).map_err(|e| e.to_string())?;
     // Match ordinary Neo compilation, but retain the original textual lowering.
     // Validate before writing; emission never runs the guest program.
@@ -122,11 +149,11 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let (modules, program) = if paths.len() == 1 && system_path.is_none() {
         // Preserve standalone System assembly/analysis and existing single-input behavior.
         let module = if paths[0].ends_with(".neo") {
-            neoclr::frontend::compile_named(&texts[0], paths[0])
+            neoclr::frontend::compile_named(texts[0].text()?, paths[0])
         } else if command == "assemble" || paths[0].ends_with(".neoil") {
-            assemble(&texts[0])
+            assemble(texts[0].text()?)
         } else {
-            load(&texts[0])
+            texts[0].load()
         }
         .map_err(|e| e.to_string())?;
         let program = neoclr::LoadedProgram::new(&module).map_err(|e| e.to_string())?;
@@ -135,9 +162,9 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         let system = if let Some(path) = system_path {
             let text = read(path)?;
             if path.ends_with(".neoil") {
-                assemble(&text)
+                assemble(text.text()?)
             } else {
-                load(&text)
+                text.load()
             }
             .map_err(|e| e.to_string())?
         } else {
@@ -148,14 +175,12 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         let inputs: Vec<_> = texts
             .iter()
             .enumerate()
-            .map(|(index, text)| {
-                if (command == "assemble" && index == 0) || paths[index].ends_with(".neoil") {
-                    neoclr::assembler::ModuleInput::Source(text)
-                } else {
-                    neoclr::assembler::ModuleInput::Json(text)
-                }
+            .map(|(index, input)| {
+                input.module_input(
+                    (command == "assemble" && index == 0) || paths[index].ends_with(".neoil"),
+                )
             })
-            .collect();
+            .collect::<Result<Vec<_>, _>>()?;
         let modules =
             neoclr::assembler::read_modules(&inputs, &system).map_err(|e| e.to_string())?;
         let program = neoclr::LoadedProgram::with_modules(&modules[0], &system, &modules[1..])
@@ -164,7 +189,12 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     };
     let module = &modules[0];
     match command {
-        "debug" => debug_terminal::run(program, paths[0], &texts[0], guest_arguments),
+        "debug" => debug_terminal::run(
+            program,
+            paths[0],
+            texts[0].text().unwrap_or(""),
+            guest_arguments,
+        ),
         "assemble" => {
             let output = &args[2];
             let json = serde_json::to_string_pretty(module).map_err(|e| e.to_string())?;

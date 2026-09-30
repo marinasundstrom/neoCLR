@@ -13,7 +13,20 @@ does not move the library into the compiler. [Project ownership](design/extended
 **Latest sequencing clarification:** establish a working metadata format and its APIs,
 then integrate the refactored compiler, then add improvements such as structural types.
 The direct native producer/load test below is the bounded acceptance baseline;
-ordinary compiler-required metadata coverage is next. The PE reader now recovers
+ordinary compiler-required metadata coverage is next.
+
+**Latest acceptance:** Raven's opt-in emitter now writes binary PE/#Neo assemblies;
+neoCLR decodes their native metadata directly. Hello World, an entry-point call to
+Greet, both source-file orders and the two-library chain all verify/run successfully.
+Schema-1 JSON containers remain readable. The separate Cecil-style API still supplies
+CLI reference projections to Raven's existing .NET semantic provider. The author
+identifies class-library compilation and Raven symbol loading as the next consumer,
+with existing JSON-to-assembly translation as a proposed bootstrap. General translation,
+a native symbol provider and production registration are not yet implemented.
+[Binary profile](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30)
+and [measured phases](experiments/extended-cli-metadata/binary-loading.md).
+
+**Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and
 explicit MemberRef resolution for the emitted nominal static method subset. General
@@ -480,3 +493,20 @@ the entry point, then through an entry-point call to another function. Both now
 compile to PE/#Neo, load/verify/run in neoCLR, print exactly one line and exit zero.
 The bounded Console string-literal bridge uses an explicit compiler reference
 contract; general string signatures and no-result source entry points remain staged.
+
+Binary-loading checkpoint (2026-09-30): execution schema 2 now carries bounded CBOR
+and decodes directly into the runtime module model without a JSON intermediate.
+Schema 1 remains readable; the experimental Raven PE emitter selects schema 2.
+Hello World/function-call and the two-library cases pass. Native indexed tables, a
+compiler-native symbol provider and broader signatures remain staged work. Compare
+[measured loading phases](experiments/extended-cli-metadata/binary-loading.md) before
+inferring performance gains; metadata loading and execution are separate costs.
+
+Class-library consumer direction (author clarification, 2026-09-30): compile the
+neoCLR runtime class library and load its symbols into Raven. Reuse present .NET-like
+metadata through an explicit temporary projection while allowing native contracts
+to diverge. The author proposes translating existing JSON into neoCLR assemblies as
+a bootstrap; next test a bounded real class-library slice through that translation
+and Raven reference loading. General translation is not implemented by the current
+static-Int32 writer. Preserve unsupported information by rejecting it, then grow
+coverage from the actual library instead of encoding permanent .NET restrictions.

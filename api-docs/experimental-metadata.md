@@ -10,8 +10,8 @@ Bounded PE32 recognition and a read-only manifest-module/TypeDef model are imple
 explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
 implemented. A controlled static-Int32 builder writes ordinary CLI PE and native
 format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading now uses a transitional native execution section
-with a reference-only CLI projection. General rewriting, binary native payloads and
-guest Introspection assembly loading remain pending.
+with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
+and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
@@ -1311,6 +1311,7 @@ Development-only host type in `NeoCLR.Metadata.Experimental`:
 public static class RuntimeAssemblyContainer
 {
     public static byte[] Write(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary);
+    public static byte[] WriteBinary(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary);
     public static byte[] Read(ReadOnlySpan<byte> image);
     public static AssemblyDefinition ReadCliProjection(ReadOnlySpan<byte> image);
 }
@@ -1351,8 +1352,7 @@ var nativeDeclarations = NativeAssemblyDefinition.ReadAssembly(RuntimeAssemblyCo
 neoCLR `verify Program.dll` / `run Program.dll` accepts this container, including
 `--module Library.dll` dependencies. The Rust host API is
 `metadata_container::native_json(&[u8]) -> Result<&str, Fault>` for borrowed transport
-extraction and `metadata_container::load(&[u8]) -> Result<Module, Fault>` for native
-module-local validation. `assembler::ModuleInput::MetadataPe(&[u8])` supports mixed
+extraction and `metadata_container::load(&[u8]) -> Result<Module, Fault>` for legacy validation, including bundled System linking. `assembler::ModuleInput::MetadataPe(&[u8])` supports mixed
 explicit module sets; `LoadedProgram` remains responsible for linking and execution.
 There is no guest loader API yet. CLI bodies are throwing reference stubs, never
 executed by neoCLR. The payload still uses JSON; direct loading does not yet eliminate
@@ -1376,3 +1376,36 @@ The compiled Raven acceptance case prints Hello World directly from Main, then f
 a separate Greet function called by Main. Both emitted containers load/verify/run
 in neoCLR and exit zero. The API remains independent of Raven; compiler-side mapping
 requires an explicit registered Console reference and only accepts string literals.
+
+### Binary execution payloads (schema 2)
+
+```csharp
+public static byte[] RuntimeAssemblyContainer.WriteBinary(
+    ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary);
+```
+
+`WriteBinary` accepts the bounded writer's format-5 JSON (at most 4 MiB) as a host-side
+intermediate and writes section 256/schema 2 using a definite-length CBOR profile.
+The binary payload plus its 32-byte directory must fit 1 MiB; the PE still fits 4 MiB.
+It has the same core/reference projection, ownership and null-core contract as Write.
+InvalidDataException covers unsupported declarations, non-integer numbers, invalid
+encoding, duplicate fields and exceeded bounds. Only signed Int64 numbers, valid UTF-8
+text, arrays, text-keyed maps, booleans and null are encoded; tags, bytes and floats
+are not part of this profile. Decode is limited to depth 64 and 262,144 items (including
+keys), and rejects duplicate keys, nonminimal encodings and trailing bytes.
+
+`Read` and `ReadCliProjection` now accept schemas 1 and 2. For schema 1, Read returns
+the original JSON bytes; for schema 2 it reconstructs owned format-5 JSON with equivalent
+values for the existing host reader. Original whitespace/numeric spelling are not
+preserved. Reconstructed JSON remains bounded to 4 MiB. Snapshot Write still preserves
+the full original PE byte-for-byte. The writer continues to use fresh projection MVIDs.
+The original `RuntimeAssemblyContainer.Write` keeps emitting schema 1 for compatibility.
+
+Rust `metadata_container::decode(&[u8]) -> Result<Module, Fault>` validates the container
+and decodes either payload without linking; `load` applies the legacy validation,
+including bundled System linking. Use ModuleInput::MetadataPe for explicit dependency sets.
+Schema 2 is deserialized directly to the runtime model, with no JSON roundtrip.
+`native_json` remains a borrowed schema-1-only extractor and faults for schema 2.
+The CLI and ModuleInput::MetadataPe use decode/load and accept both encodings.
+Binary containers have no embedded text for the debugger's source pane.
+See the [binary profile and tradeoffs](../docs/design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).

@@ -25,10 +25,19 @@ fn u32_at(data: &[u8], offset: usize) -> Result<usize, Fault> {
     Ok(u32::from_le_bytes(bytes(data, offset, 4)?.try_into().unwrap()) as usize)
 }
 
-/// Validate the bounded PE/#Neo framing and extract authoritative native format-5 JSON.
-/// This checks transport, not declarations, bodies, dependency closure or authenticity.
-/// Unknown required sections fail closed; optional sections can be ignored.
+/// Extract a schema-1 JSON payload. Binary containers deliberately return an error;
+/// use decode/load for runtime admission instead of converting binary data back to text.
 pub fn native_json(image: &[u8]) -> Result<&str, Fault> {
+    let (version, bytes) = payload(image)?;
+    if version != 1 {
+        return Err(invalid(
+            "binary payload has no borrowed JSON representation",
+        ));
+    }
+    std::str::from_utf8(bytes).map_err(|_| invalid("native payload must be UTF-8"))
+}
+
+fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
     if image.len() > 4 * 1024 * 1024 {
         return Err(invalid("image exceeds 4 MiB limit"));
     }
@@ -179,7 +188,7 @@ fn validate_layout(image: &[u8]) -> Result<(), Fault> {
     Ok(())
 }
 
-fn execution_payload(envelope: &[u8]) -> Result<&str, Fault> {
+fn execution_payload(envelope: &[u8]) -> Result<(u16, &[u8]), Fault> {
     if bytes(envelope, 0, 4)? != b"NEOX" || u16_at(envelope, 4)? != 0 || u16_at(envelope, 6)? != 1 {
         return Err(invalid("unsupported envelope version"));
     }
@@ -203,29 +212,46 @@ fn execution_payload(envelope: &[u8]) -> Result<&str, Fault> {
         }
         let payload = bytes(envelope, offset, length)?;
         end += length;
-        if flags == 1 && (kind != 256 || version != 1) {
+        if flags == 1 && (kind != 256 || !matches!(version, 1 | 2)) {
             return Err(invalid("unsupported required section"));
         }
         if kind == 256 {
-            if flags != 1 || version != 1 {
+            if flags != 1 || !matches!(version, 1 | 2) {
                 return Err(invalid(
-                    "native execution section must be required schema 1",
+                    "native execution section must be required schema 1 or 2",
                 ));
             }
-            execution = Some(payload);
+            execution = Some((version, payload));
         }
     }
     if end != envelope.len() {
         return Err(invalid("trailing envelope bytes"));
     }
-    std::str::from_utf8(execution.ok_or_else(|| invalid("native execution section missing"))?)
-        .map_err(|_| invalid("native payload must be UTF-8"))
+    let (version, bytes) = execution.ok_or_else(|| invalid("native execution section missing"))?;
+    if version == 1 {
+        std::str::from_utf8(bytes).map_err(|_| invalid("native payload must be UTF-8"))?;
+    }
+    Ok((version, bytes))
 }
 
-/// Load native metadata and validate module-local contracts. Dependency admission and
-/// typed verification are performed by LoadedProgram, just as for format-5 JSON input.
+/// Decode and apply the legacy load validation, including bundled System linking.
+/// Use ModuleInput::MetadataPe for explicit dependency sets; LoadedProgram handles
+/// their admission, preparation and typed verification.
 pub fn load(image: &[u8]) -> Result<Module, Fault> {
-    crate::load(native_json(image)?)
+    let module = decode(image)?;
+    crate::vm::validate(&module)?;
+    Ok(module)
+}
+
+/// Decode a recognized container into the native module model. Schema 2 uses direct
+/// binary deserialization; schema 1 remains compatible. Does not link or verify bodies.
+pub fn decode(image: &[u8]) -> Result<Module, Fault> {
+    let (version, bytes) = payload(image)?;
+    if version == 2 {
+        crate::native_binary::decode(bytes)
+    } else {
+        crate::decode_module(std::str::from_utf8(bytes).map_err(|_| invalid("invalid UTF-8"))?)
+    }
 }
 
 #[cfg(test)]
@@ -248,14 +274,14 @@ mod tests {
     #[test]
     fn required_execution_schema_and_bounds() {
         let valid = envelope();
-        assert_eq!(execution_payload(&valid).unwrap(), "{}");
+        assert_eq!(execution_payload(&valid).unwrap(), (1, b"{}".as_slice()));
         for (offset, value) in [
             (4, 1),
             (6, 2),
             (8, 65),
             (12, 33),
             (16, 1),
-            (18, 2),
+            (18, 3),
             (20, 0),
             (20, 2),
             (24, 31),

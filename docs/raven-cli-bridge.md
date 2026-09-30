@@ -274,3 +274,18 @@ Direct Main output and Main calling Greet both print Hello World and exit zero t
 PE/#Neo. Int32 entry/helper results remain the bounded source contract. General
 Console/string signature import and native platform-call contracts remain future
 replacement work; the ordinary .NET target is unchanged.
+
+## Binary execution encoding — 2026-09-30
+
+Raven's opt-in EmitMetadataAssembly now chooses execution schema 2, bounded CBOR,
+through the independent WriteBinary API. The .NET primitive/Console reference contracts
+and reference-only CLI projection are unchanged. This replaces JSON at the native
+loading boundary: neoCLR preserves PE bytes and directly decodes the binary payload
+to its module model. Compiler-host emission still uses JSON as an intermediate.
+Schema 1 remains supported; older schema-1-only runtimes reject required schema 2.
+Both versions are feature-branch experiments and are not production target contracts.
+
+Owners remain Raven (semantic mapping), the metadata library (encoding/projection)
+and neoCLR (admission/linking/verification/execution). Structural schemas and guest
+Introspection APIs remain absent. Indexed native tables may replace this provisional
+object encoding. [Profile, compatibility and evidence](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).

@@ -48,3 +48,35 @@ fn truncated_and_changed_metadata_fail_before_admission() {
     overlay.push(0);
     assert!(metadata_container::native_json(&overlay).is_err());
 }
+
+#[test]
+fn binary_and_json_containers_decode_to_identical_runtime_metadata() {
+    let binary = include_bytes!("fixtures/metadata-container/constant42-binary.pe");
+    assert!(
+        metadata_container::native_json(binary)
+            .unwrap_err()
+            .to_string()
+            .contains("binary payload")
+    );
+    let json = metadata_container::load(IMAGE).unwrap();
+    let decoded = metadata_container::load(binary).unwrap();
+    assert_eq!(
+        serde_json::to_value(&decoded).unwrap(),
+        serde_json::to_value(&json).unwrap()
+    );
+    let program = LoadedProgram::new(&decoded).unwrap();
+    program.verify().unwrap();
+    assert!(matches!(
+        program.run(ExecutionOptions::default()).unwrap().value,
+        Value::Int32(42)
+    ));
+    let modules = assembler::read_modules(
+        &[assembler::ModuleInput::MetadataPe(binary)],
+        neoclr::library::system().unwrap(),
+    )
+    .unwrap();
+    assert_eq!(modules[0].entry, decoded.entry);
+    for length in 0..binary.len() {
+        assert!(metadata_container::decode(&binary[..length]).is_err());
+    }
+}

@@ -35,7 +35,7 @@ internal static class RuntimeContainerChecks
     internal static IEnumerable<(string Name, byte[] Image)> MalformedEnvelopes(byte[] image)
     {
         foreach (var change in new (string Name, int Offset, byte Value)[] {
-            ("UnknownRequired", 16, 1), ("WrongSchema", 18, 2), ("OptionalExecution", 20, 0),
+            ("UnknownRequired", 16, 1), ("WrongSchema", 18, 3), ("OptionalExecution", 20, 0),
             ("BadRange", 24, 31), ("BadVersion", 6, 2) })
         {
             var mutated = image.ToArray();
@@ -79,10 +79,26 @@ internal static class RuntimeContainerChecks
         var main = graph.AddFunction("Main"); main.LoadConstant(42); main.Return(); graph.EntryPoint = main;
         var image = RuntimeAssemblyContainer.Write(graph.WriteNativeAssembly(), core);
         await Check("Valid", image, 0, "verify"); await Check("Run", image, 42, "run");
+        var binary = RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), core);
+        File.WriteAllBytes(Path.Combine(directory, "Module.neo.json"), graph.WriteNativeAssembly());
+        await Check("Binary", binary, 0, "verify"); await Check("BinaryRun", binary, 42, "run");
+        foreach (var pair in MalformedEnvelopes(binary)) await Check("Binary" + pair.Name, pair.Image, 1, "verify");
+        // A larger bounded fixture for the load-only comparison; unused methods keep execution constant.
+        for (int i = 0; i < 64; i++)
+        {
+            var method = graph.AddFunction("Extra" + i); method.LoadConstant(0);
+            for (int j = 0; j < 64; j++) { method.LoadConstant(j); method.Add(); }
+            method.Return();
+        }
+        var largeNative = graph.WriteNativeAssembly();
+        File.WriteAllBytes(Path.Combine(directory, "Large.neo.json"), largeNative);
+        File.WriteAllBytes(Path.Combine(directory, "LargeJson.dll"), RuntimeAssemblyContainer.Write(largeNative, core));
+        File.WriteAllBytes(Path.Combine(directory, "LargeBinary.dll"), RuntimeAssemblyContainer.WriteBinary(largeNative, core));
         await Check("Ordinary", graph.Write(), 1, "verify");
         var invalidBody = System.Text.Json.Nodes.JsonNode.Parse(graph.WriteNativeAssembly())!;
         invalidBody["functions"]![0]!["body"] = new System.Text.Json.Nodes.JsonArray(
             new System.Text.Json.Nodes.JsonObject { ["op"] = "future.op" });
+        await Check("InvalidBinaryBody", RuntimeAssemblyContainer.WriteBinary(Encoding.UTF8.GetBytes(invalidBody.ToJsonString()), core), 1, "verify");
         await Check("InvalidNativeBody", RuntimeAssemblyContainer.Write(Encoding.UTF8.GetBytes(invalidBody.ToJsonString()), core), 1, "verify");
         var damaged = image.ToArray();
         // A payload-specific damage always changes a bound stream, not arbitrary PE padding.

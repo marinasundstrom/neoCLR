@@ -7,4 +7,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="NeoCLR.Metadata.Experimental.Tests" />
+  </ItemGroup>
 </Project>

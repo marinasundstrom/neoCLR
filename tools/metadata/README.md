@@ -171,7 +171,10 @@ See the host API reference for strict bounds and the temporary input bridge cont
 format-5 payload in a required PE/#Neo execution section. `Read` retrieves owned native
 bytes; `ReadCliProjection` supplies a Cecil-style snapshot of the reference declarations.
 The same PE file can be a Raven compiler reference and a neoCLR runtime input.
-Schema 1 still contains JSON; binary encoding and faster parsing remain future work.
+Schema 1 contains JSON. `WriteBinary` selects schema 2 (bounded CBOR), which the
+runtime decodes directly without JSON parsing. Read/ReadCliProjection accept both.
+See the [load comparison](../../docs/experiments/extended-cli-metadata/binary-loading.md);
+indexed tables and broader signature coverage remain future work.
 
 ```sh
 cargo build
