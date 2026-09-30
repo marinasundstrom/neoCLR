@@ -253,7 +253,9 @@ Raven source/configuration and has no tested Raven bundle revision.
 for both .NET and neoCLR. This is a shared format/tooling requirement, not merely an
 import path from Raven to the current runtime. Exact package names and implementation
 languages remain provisional. The Python codec is a research harness, not the proposed
-shipping library on either platform.
+shipping library on either platform. The first [.NET library slice](../../tools/metadata/README.md)
+now covers framing and owned sections; structural semantics, Raven adapters and neoCLR
+guest library support remain pending.
 
 The author clarifies the concrete library consumers:
 

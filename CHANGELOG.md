@@ -33,7 +33,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   neoCLR, including native versus guest-accessible support and cross-platform
   conformance. Clarify their consumers: Raven symbol loading/code generation and
   neoCLR assembly loading into Introspection/assembly emission. Package/API names
-  and implementation sharing remain undecided.
+  and implementation sharing remain undecided. Begin an experimental net10.0
+  envelope reader/writer library with immutable owned sections and a separate
+  conformance consumer. Four fixtures round-trip identically, independent .NET/Python
+  emission agrees, and both readers reject 49 malformed vectors. Document all host
+  types/members manually on the API site and in generated XML; guest snapshots stay
+  unchanged. Structural payload decoding and Raven/neoCLR consumers remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

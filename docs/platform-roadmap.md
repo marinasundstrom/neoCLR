@@ -15,15 +15,15 @@ signatures, host-catalog nominal resolution and synthesized-member references wi
 30 focused tests. Differently numbered fixture references resolve to equal structural
 type/member keys. A bounded PE32 #Neo probe preserves conventional metadata for
 .NET/Cecil inspection; Cecil rewriting strips the extension. An experimental marker/digest and explicit expected-input profile now reject
-stripped/changed metadata in 11 recognition cases. The first .NET reader/writer
-library slice is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+stripped/changed metadata in 11 recognition cases. The first .NET reader/writer library now covers envelope framing, with four shared
+fixtures and 49 cross-reader rejection cases; .NET structural signature codecs are next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)
 separates shared format/conformance contracts, .NET tooling, native support and an
 actual neoCLR guest library. Concrete consumers are Raven’s symbol loader/code
 generation and neoCLR assembly loading into Introspection/assembly emission; these
-libraries remain planned.
+full library consumers remain planned; the .NET framing foundation is implemented.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
 After the bounded main backport below, put the structural Function experiment on

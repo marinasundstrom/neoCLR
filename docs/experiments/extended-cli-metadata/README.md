@@ -446,3 +446,31 @@ Next bounded task: move this minimal container/envelope contract into an experim
 That library will serve Raven's symbol loader/code generator adapters; the matching
 neoCLR library still needs Introspection-backed assembly loading and assembly emission.
 Actual PE declaration binding and guest execution remain separately tracked gaps.
+
+## First .NET reader/writer library slice (2026-09-30)
+
+`tools/metadata/NeoCLR.Metadata.Experimental` now implements the NEOX 0.1 envelope
+reader/writer as an independent net10.0 library. The separate `MetadataConformance`
+consumer references it without Raven or Cecil. Section payloads have owned immutable
+storage; framing checks match the Python experiment, including required schema
+admission and opaque optional preservation. The complete host API is documented in
+[the manual reference](../../../api-docs/experimental-metadata.md).
+
+Run `python3 docs/experiments/extended-cli-metadata/verify_dotnet.py` from the repository
+root. [dotnet-validation.json](dotnet-validation.json) records four byte-identical
+shared-fixture round trips, independent .NET emission read and reproduced by Python,
+49 shared malformed vectors rejected by both readers, and consumer checks for buffer
+ownership, writer limits, schema mismatch and optional preservation. The .NET build
+passes with zero warnings/errors and the guest API snapshot check passes unchanged.
+This is the first cross-language **framing** result, not neoCLR runtime conformance.
+
+The library's supported-schema dictionary admits a section for higher-level handling;
+it does not validate that section's payload. The current .NET consumer deliberately
+round-trips opaque structural fixtures. It cannot yet load them into Raven symbols,
+Introspection or executable metadata. PE extraction/recognition, structural codecs and
+real declaration resolution remain in the Python harness. Production reader/writer
+and neoCLR guest assembly loading/emission still require further slices.
+
+Next bounded task: .NET structural signature decoding/encoding and rejection tests
+against the same independent vectors. Keep PE recognition and real declaration binding
+as separate adapters rather than conflating framing success with semantic acceptance.

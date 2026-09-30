@@ -4,6 +4,9 @@ toc: false
 ---
 # API documentation
 
+[Experimental .NET metadata tooling](experimental-metadata.md) documents the
+feature-branch host library for future Raven adapters; it is not a guest API or release.
+
 [Value tuples](tuples.md) are a development addition after Preview 11, using
 `System.Tuple<T1,...,TN>` as the value-type family.
 

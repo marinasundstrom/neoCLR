@@ -415,3 +415,18 @@ using the fieldless Self transport marker for implementing-type signatures.
 These APIs require matching Raven neoCLR target settings and the updated runtime.
 Structural Function metadata remains excluded from main. The snapshot is rebuilt
 from the nominal main-based bridge, not copied from the Function feature branch.
+
+## Experimental .NET metadata tooling (2026-09-30)
+
+`NeoCLR.Metadata.Experimental.MetadataEnvelope` and
+`NeoCLR.Metadata.Experimental.MetadataSection` are .NET-host-only types in
+`tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
+Raven guest library. They therefore cannot be added to that assembly's RavenDoc type
+selection or refreshed from a guest compiler bridge. Their complete signatures,
+parameters, ownership, limits, failures and compiled-consumer example are maintained
+in [the manual host reference](experimental-metadata.md), linked from `/docs/`.
+This is an explicit host/guest assembly boundary, not a RavenDoc rendering defect or
+an undocumented public-type exclusion. The separate project generates XML docs with
+warnings treated as errors. The existing guest API snapshot remains unchanged and
+must still pass `scripts/build-api-docs.py --check`. When native/guest metadata APIs
+are introduced, add those actual types and members to the matching guest reference.
