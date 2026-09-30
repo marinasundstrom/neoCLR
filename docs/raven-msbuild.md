@@ -180,3 +180,11 @@ Result/Option/Void, generic arrays, paths containing spaces, changed source, dia
 unsupported inputs, stale-output invalidation and recovery, including dependency
 changes/failures, Release configuration and mismatched reference packs. Successful artifacts are
 executed separately to check behavior. This is not a full MSBuild or .NET SDK release gate.
+
+### Self target selection
+
+Shared props select `RavenTargetPlatform=NeoCLR` and configure the native Self
+marker. Self is unsupported on .NET; RAVT003 rejects accidental marker opt-in on
+that target. Native structural Function types remain feature-branch work.
+Runtime-library descriptor slices intentionally clear all three typeof properties
+when building the contract types themselves; this disables the preset mapping.

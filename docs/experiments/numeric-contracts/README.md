@@ -38,3 +38,7 @@ verification script also requires native `callself` in imported code, and reject
 Boolean numeric arguments and extra constraints. See
 [native Self validation](native-self-validation.json) and the
 [contract and migration](../../self-types.md).
+
+The shared Self integration runs this consumer on the nominal main-based runtime,
+with `RavenTargetPlatform=NeoCLR`. It does not depend on structural Function types.
+Refresh `native-self-validation.json` from matching rebuilt artifacts.

@@ -1,61 +1,33 @@
-# Raven CLI bridge: temporary behavior and native replacement
+# Raven CLI bridge
 
-Direction reaffirmed by the author, 2026-09-30: replace the neoCLR bridge with a
-true neoCLR metadata/semantic-data layer supporting the runtime's features and
-semantics. A compatible native code generator must also remove the output bridge.
-The shared Raven semantic model remains authoritative; CLI shape limitations must
-not become permanent neoCLR language restrictions.
+## Self integration on nominal main (2026-09-30)
 
-The compiler-side inventory is `docs/compiler/neoclr-cli-bridge.md` in Raven.
-Document every bridge behavior there with native intent, temporary CLI encoding,
-loss/restriction, owner, validation and its replacement capability. Update the
-corresponding runtime document here. Current examples include:
+Self is integrated independently of `feature/function-types`. Raven projects must
+select `RavenTargetPlatform=NeoCLR` and configure the fieldless
+`System.Runtime.CompilerServices.Self` marker in `NeoCLR.CoreProbe`. The shared
+props do this. Raven's .NET target rejects that configuration with RAVT003.
 
-- [Void](void-semantics.md): inhabited unit in value/generic positions versus a
-  no-result call convention. Named System.Void and CLI VOID encode distinct things.
-- [Functions](function-types.md): structural function signatures transported through
-  CLI delegate shapes. Native support is on `feature/function-types`, inherited by
-  `codex/native-self`, and absent from neoCLR main at `e4f6fe41`.
-- Tuples: value-type System.Tuple reference transport maps to Raven's historical
-  ValueTuple special-type identifiers; do not infer .NET reference tuple semantics.
-- [Signature projection](raven-signature-projection.md): generic substitution and
-  API catalogs with path-specific admission restrictions. Bridge rejection does not
-  by itself establish a runtime restriction.
-- [Application identities](raven-import-identities.md): temporary encoded names,
-  CLI tokens and sidecar maps should be replaced by structured native identities.
-- [Self](self-types.md): native semantics and separate Raven feature work must be
-  distinguished from the profile's baseline contracts. The main-line preset does
-  not implement Self or configure record-equatability/hash mappings.
+The importer replaces the marker with native Self and admits bounded Number and
+Clonable generic dispatch, including borrowed receivers. See
+[self contracts](self-types.md) and [the consumer](experiments/native-self/README.md)
+for inheritance and current importer restrictions. A real neoCLR metadata layer
+must replace marker recognition with native contract identity/signatures; it must
+preserve conformance ownership, substitution and unsupported-use diagnostics.
+Compiler binding/diagnostics belong to Raven; CLI translation is owned by
+`docs/experiments/raven-target` and native validation/dispatch by `src/self_types.rs`.
 
-Iteration, propagation, typeof handles, characters, async state, terminal Fault and
-nullability also need this classification. Separate platform semantics from
-reference-exporter projection, compiler lowering/emission and application-importer
-workarounds. Require explicit unsupported-use diagnostics until the necessary
-native symbol/contract/backend support exists; never silently erase information.
+The nominal delegate ABI still uses Func with an inhabited Void result. This is
+required even without structural Functions; Raven retains that bridge encoding.
+Structural identity, Function introspection and structural assignability remain on
+feature branches in both repositories. Do not use a Function-branch bundle as
+acceptance evidence for this integration. General core, unit, tuple, iteration,
+propagation and typeof encodings remain described in Raven's
+`docs/compiler/neoclr-cli-bridge.md`; this CLI bridge is not a native metadata loader.
 
-## Feature scope and exploratory evidence
+## Structural experiment branch
 
-The author confirmed native Function types are deferred until neoCLR has its
-metadata layer and complete compiler support. An exploratory run of Raven 9a58e1356
-against the installed Function-types feature bundle compiled, imported, verified
-and executed a small consumer with output 42, 7, True. It was not run on neoCLR main.
-The bundle's recorded runtime source is 19c6725f, bundle revision 4d1e7506; its four
-principal artifact hashes matched the manifest. No complete support claim follows.
-
-The proposed Function-dependent smoke gate and props migration were withdrawn
-before commit. Existing runtime props, installed bundles and applications remain
-unchanged. The local exploratory record is /tmp/raven-neoclr-profile-slice39/evidence.json
-on the validation host, not an acceptance gate for supported neoCLR-main behavior.
-
-The recommended path is to retain compiler-side target plumbing and experimental
-CLI handling on shared Raven main while preserving .NET defaults. Do not conflate
-Raven function syntax/.NET delegate support with neoCLR native structural Function
-semantics. The latter requires native metadata/symbol support, conversion and
-assignability rules, capabilities and a validated codegen path before promotion.
-There is no need for another permanent compiler branch split while those parts are
-implemented. Classify and gate unsupported operations without a blanket syntax ban.
-
-The next design slice should specify native structured identities, type forms and
-constraints, semantic relationships/flags, symbol ownership/lazy loading, malformed
-metadata diagnostics and matching output representation. An input loader alone
-cannot remove the CLI output importer or establish full feature support.
+This checkout is `codex/structural-types`, based on the Self-integrated main.
+Its existing structural Function implementation and API are retained, independently
+of main's nominal delegates. Function identity/metadata work is still experimental;
+Self support is inherited from main. Use this branch's matching generated core,
+bridge and native library, not a nominal main bundle.

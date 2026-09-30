@@ -186,3 +186,22 @@ was updated for Function reference identity. Full bootstrap regeneration, source
 inventory, coverage audit and API snapshot checks pass. All 18 publisher tests pass;
 the website build checks 1,797 pages including the structural-family API browser.
 The site is served locally for review; it has not been published.
+
+## Main synchronization — 2026-09-30
+
+The experiment now lives on `codex/structural-types`, preserving the former
+Function branch history and building on Self-integrated main. Its structural
+runtime implementation remains isolated; main keeps nominal delegates. The
+consumer project explicitly selects Raven's NeoCLR target. Native metadata and
+complete Raven structural semantics remain future requirements.
+
+Synchronization checks pass 80 native Function/Self/constraint tests, the bridge
+build, API fingerprints and runtime API inventory/coverage audit. Regenerating the
+library leaves native method bodies identical to the prior structural Self branch;
+only provenance manifests change. A NeoCLR-targeted unit callback imports as
+`function.bind` and runs with output 42. [Artifact evidence](main-sync-validation.json)
+records this scope; this is not a rerun of the complete Function consumer matrix.
+
+The actual class/struct Self cloning consumer also verifies and runs on this
+structural bundle, with all six rejection checks passing. Its separate
+[validation manifest](../native-self/validation.json) records the matching artifacts.

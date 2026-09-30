@@ -9,6 +9,7 @@
     <NeoCLRSystemPath>$(NeoCLRRoot)/lib/System.neoil</NeoCLRSystemPath>
     <NeoCLRRuntimePath>$(NeoCLRRoot)/bin/neoclr</NeoCLRRuntimePath>
     <NeoCLRImporterPath>$(NeoCLRRoot)/tools/bridge/Probe.dll</NeoCLRImporterPath>
+    <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
     <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>
     <RavenUnitAssemblyName>NeoCLR.CoreProbe</RavenUnitAssemblyName>

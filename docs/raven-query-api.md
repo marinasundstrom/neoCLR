@@ -6,7 +6,7 @@ methods over `System.Collections.Iterable<T>` and, after Preview 5, vector array
 | Method | Result | Evaluation |
 | --- | --- | --- |
 | `Filter<T>(Iterable<T>, Func<T, bool>)` | `Iterable<T>` | Predicate runs while advancing an iterator |
-| `OfType<T, U>(Iterable<T>)` | `Iterable<U>` | Lazily skips null and incompatible elements; narrows each match |
+| `OfType<T, U>(Iterable<T>)` | `Iterable<U>` | Lazily retains non-null compatible values in source order |
 | `Map<T, U>(Iterable<T>, Func<T, U>)` | `Iterable<U>` | Selector runs once per produced element |
 | `Any<T>(Iterable<T>)` / `Any<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first element / first match |
 | `All<T>(Iterable<T>, Func<T, bool>)` | `bool` | Stops at the first failure; true for empty input |
@@ -524,45 +524,50 @@ non-positive and excessive bounds, callback counts, nested and early disposal,
 re-enumeration, reference payloads and folds with different state/element types.
 The Int32 overflow guard is reviewed but a 2-billion-element stress run is not claimed.
 
-## Runtime type filtering — 2026-09-28 development
 
-The author requested `module.GetTypes().OfType<NominalType>()` during the Function
-reflection work. The implemented descriptor name is NominalTypeInfo:
+## Runtime type filtering — 2026-09-30 backport
 
-```raven
-import System.Linq.*
-for type in module.GetTypes().OfType<NominalTypeInfo>() {
-    Console.WriteLine(type.Name)
-}
-```
+Import `System.Linq.*` and call `source.OfType<U>()`. The source element type is
+inferred. The query lazily skips null and incompatible elements, narrows each match,
+preserves order and performs no numeric coercion. Each enumeration acquires a fresh
+source iterator. Exhaustion and explicit disposal release it once; early-ending
+queries such as Take propagate disposal. Current faults outside an active match.
 
-OfType extends Iterable, so arrays and collection/query results participate. Its
-source element type is inferred; the explicit type argument selects the result.
-The query preserves order, skips null and incompatible values, and performs no
-numeric coercion. Query construction does not enumerate. Each GetIterator creates
-a fresh source iterator; exhaustion and explicit disposal dispose it once, including
-when a terminal or Take ends enumeration early. Current follows the existing query
-iterator fault contract outside an active match.
+This follows [.NET Enumerable.OfType](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.oftype?view=net-10.0)
+filtering semantics, using neoCLR's generic Iterable receiver rather than .NET's
+nongeneric IEnumerable entry point. A dedicated iterator avoids requiring users to
+compose a type-test callback and a cast callback. It allocates query/iterator state
+and may box value inputs; no performance improvement is claimed. It uses the existing
+Object conversion/type-test contracts, including their unsupported representations.
 
-This follows the shipped [.NET Enumerable.OfType contract](https://learn.microsoft.com/en-us/dotnet/api/system.linq.enumerable.oftype?view=net-10.0)
-(primary API documentation checked 2026-09-28): deferred filtering of non-null,
-compatible elements. neoCLR uses generic Iterable rather than .NET's nongeneric
-IEnumerable entry point. A Filter-plus-Map composition would require two callbacks and
-force callers to spell the cast; eager materialization would change query timing and
-storage costs. A dedicated library iterator reuses runtime type tests and existing
-Object conversions, adding no VM instruction. It allocates query/iterator state and
-may box value inputs; no performance improvement is claimed. Function Object views can now be filtered by their exact shape; other unsupported
-Object representations remain limits. Existing
-cross-platform query research above applies; this is a conventional library operator,
-not a new type conversion system.
+The [executable sample](experiments/raven-target/samples/library-oftype.rvn) checks
+mixed/null/boxed values, descriptor narrowing through MemberInfo, module type queries,
+empty input, value inputs, numeric non-coercion, laziness, repeated enumeration and
+disposal. verify_queries.py also checks invalid Current access. This backport keeps
+main's TypeInfo/MemberInfo model and nominal delegate representation. NominalTypeInfo,
+FunctionTypeInfo and structural Function runtime changes remain on their feature branch.
 
-The [executable consumer](experiments/function-types/OfType.rvn) checks descriptor
-narrowing, module discovery, mixed/null/boxed inputs, order, laziness, repeated
-enumeration and disposal after early termination and exhaustion.
+The providers retain explicit private fields, matching existing imported query
+providers; the feature-branch experiment rejected private var/val storage for this
+helper. Revisit this implementation spelling when the importer admits it.
 
-The generic query providers intentionally retain explicit private fields, matching
-the existing iterator storage convention. Switching their storage to private var/val
-currently fails bridge admission with `Unsupported private library dependency:
-System.Linq.OfTypeSequence` (2026-09-28 probe). Revisit the spelling when the importer
-admits that storage form; the rejection cause is not diagnosed, and this is not a
-public API constraint.
+Runtime callbacks now use `(T) -> U` source syntax, including unit callbacks and
+nested callback collections. The matching compiler maps these to the existing
+Func metadata contract on main. The syntax cleanup does not change callable
+identity, serialized artifacts, or the DelegateComparer API names.
+
+
+Validation for the independent main-based backport: full bootstrap regeneration,
+source/hash checks and API reference checks pass. All 62 query outcomes match their
+expected result (37 successful executions, 18 expected faults and seven rejected
+programs); see the [recorded results](experiments/raven-target/query-backport-validation.json).
+The native delegates (26),
+query_terminals (5) and tasks (7) suites pass. Five compiled consumers cover all
+callback arities and unit callbacks, compatibility with explicit Func annotations,
+async suspension, DelegateComparer/DelegateEqualityComparer, task outcomes and
+cancellation. RavenDoc builds and link-checks 1,800 pages, including the OfType member.
+
+Regeneration also refreshed the source inventory. The backported audit indexes
+service calls in generated method bodies as well as adapters, and records source
+provenance for generated slices. Provenance is not execution evidence; behavioral
+validation remains the focused native and compiled consumers above.

@@ -113,7 +113,7 @@ The `Check` helper faults if a condition fails. Equal text has equal hashes, whi
 case and normalization differences remain distinct. Ordinal ordering follows UTF-8
 bytes/Unicode scalar values, which differs from .NET UTF-16 ordering for some characters.
 
-Use `FunctionEqualityComparer<T>` or `FunctionComparer<T>` to adapt callbacks, or
+Use `DelegateEqualityComparer<T>` or `DelegateComparer<T>` to adapt callbacks, or
 implement the interfaces for a named policy. Policy behavior and keys must remain
 stable while stored; callbacks must not reenter the same map. No universal default or
 culture policy is supplied. `StringComparer.OrdinalIgnoreCase` additionally uses
@@ -138,10 +138,11 @@ through seven components. Raven tuple syntax uses this family; copying a tuple
 copies its fields while retaining the identity of referenced objects. See the
 [value-tuple API guide](/docs/tuples.html) for construction, fields and limitations.
 
+
 ### Development: type filtering
 
 Import `System.Linq.*` and use `source.OfType<ResultType>()` to lazily retain
-non-null compatible values in source order. For type discovery,
-`module.GetTypes().OfType<NominalTypeInfo>()` produces descriptors with declaration
-names. The query narrows matching values and skips others; it does not perform
-numeric conversions. See the [query API reference](xref:System.Linq.Operators).
+non-null compatible values in source order. The source type is inferred; matching
+values are narrowed to the requested type without numeric conversions. Each
+iteration is independent, and completing or disposing the iterator releases its
+source. See the [OfType member reference](xref:System.Linq.Operators.OfType).

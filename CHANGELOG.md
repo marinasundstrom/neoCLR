@@ -8,121 +8,44 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
-- Document Raven main's experimental `CompilationOptions.NeoCLR` and project
-  preset, temporary bridge behavior and native metadata replacement requirements.
-  Retain compiler groundwork separately from deferred native Function semantics;
-  feature-bundle experiments do not qualify neoCLR main. Runtime props, installed
-  artifacts and feature availability are unchanged.
+- Continue the structural Function experiment as `codex/structural-types` on top
+  of shared main. Retain structural signatures/objects and Function introspection
+  alongside main's integrated Self; the experiment remains outside main. Resolve
+  nominal-versus-structural merge conflicts in favor of this branch's Function ABI
+  and regenerate matching library and API artifacts. Validate 80 focused native
+  tests, identical regenerated native bodies, metadata/audit checks and a structural
+  unit callback executing through function.bind. Self cloning and all six negative
+  consumer cases also pass on the structural bundle.
 
-- Add native `Self` interface signatures and typed `callself` dispatch, with runtime
-  conformance and generic-bound checks. Keep `Self` distinct from Raven's `self`
-  value. Migrate development `System.Number<T>` to non-generic `System.Number`
-  using Self operands/results and `ComparableTo<Self>`, with an opt-in Raven
-  target contract. This changes Number's arity: rebuild reference, library and
-  applications together. Add borrowed generic instance Self dispatch and a tested
-  Raven class/struct cloning consumer, preserving receiver slots without boxing;
-  reject null, incompatible receiver modes and erased Self calls.
-  System.Clonable<T> is now also migrated to nongeneric Clonable with Clone() -> Self;
-  update conformances/bounds and rebuild matching artifacts. Copy depth remains
-  implementation-defined. Anchor inherited Self at the class declaring conformance;
-  derived generic Self bounds require redeclaration and an exact derived result.
-  Support explicit native derived interface mappings while preserving base virtual
-  contracts. Add bounded Raven diagnostics/import support; broader integration
-  awaits its multi-target refactor. Verify inherited/explicit clone reachability
-  and result types after artifact reload, and reject forged derived Self bounds
-  without a compiler or an explicit verifier call. Synchronize the Raven Self
-  branch with neoclr checkpoint `080e2cfef`, preserving target-owned marker
-  validation. The archived Neo bootstrap is unchanged. See
-  [the contract and boundaries](docs/self-types.md).
+- Integrate native Self independently of structural Function types: nongeneric
+  Number and Clonable contracts, conformance-owned inheritance, checked generic
+  Self dispatch and borrowed receiver support. Preserve main's nominal delegates.
+  Raven integration now selects TargetPlatform.NeoCLR explicitly and transports
+  Self through a fieldless marker until a native metadata loader is available.
+  Rebuild references and libraries together; the former generic contracts are
+  incompatible. Structural types remain on feature/function-types. Validate 98
+  native tests, rebuilt library/API snapshots, and class/struct cloning with six
+  rejected programs; nominal unit callbacks still execute through delegate.bind.
+  Numeric Self/parsing verification and both negative cases pass; update the stale
+  importer diagnostic expectation and record matching artifact hashes.
 
-- Prepare and validate a local Function types toolchain, SDK and isolated VS Code
-  extension installation (`0.1.12-neoclr.20260929.functions1`). Include an editable
-  playground and callback, introspection and OfType projects with matching Build/Run
-  tasks. Record installed artifact hashes, four successful MSBuild consumers and
-  language-server completion/hover checks. Existing local installations are preserved;
-  this is a development snapshot, not a published release.
-
-### 2026-09-29
-
-- Complete Function target inspection for ordinary instance bindings: preserve the
-  actual method rather than an unnecessary forwarding wrapper, and expose absent
-  module/token metadata for generated adapters without a source declaration.
-  Add callback coverage for target discovery and unit adapters; update the internal
-  GC probe for Function reference identity. Regenerate library and API snapshots. Add Array,
-  Function, Tuple, Union and Intersection family entries to RavenDoc's API browser,
-  with member references and explicit current/proposed distinctions. These labels
-  do not introduce nominal runtime types; existing Tuple/union declarations remain
-  nominal. Frame the website feature as Function types—delegates evolved—using
-  implemented signature and binding behavior, with proposal-only directions kept
-  off the feature page. Record nominal-style structural type/member pages as
-  deferred RavenDoc work; authored family guides remain interim. Local site serving
-  is for review, not publication.
+- Backport Raven function type syntax for library callback annotations and lazy
+  `Iterable<T>.OfType<U>()` filtering from the Function feature branch. OfType skips
+  null/incompatible elements, preserves order, narrows matches without numeric
+  coercion and disposes its source on completion or explicit disposal. Keep main's
+  existing nominal Func/delegate runtime, artifact formats, comparer names and
+  TypeInfo/MemberInfo contracts. Regenerate the matching library and public API
+  reference; document and test the independent query contract. Also backport the
+  source-coverage audit fix that includes generated method-body service callers
+  and records generated slice provenance without treating it as execution evidence.
+  Refresh stale query reflection expectations and union/fault fixtures, including
+  the callback sample's Option pattern. Carry the Delegates evolved and Callable
+  interface documents as open proposals, explicitly unimplemented on main; link
+  them from the earlier exploration and website proposal overview. Record the
+  author's subsequent direction to hold the Function experiment and focus next on
+  Raven's neoCLR target support; compiler tasks remain to be selected.
 
 ### 2026-09-28
-
-- Implement structural Function types and objects with native
-  signature metadata and identity, generic substitution, checked binding and Invoke,
-  artifact round trips and retained receiver tracing. Add focused shape, signature,
-  capture-lifetime and collection tests. The native host surface now uses Function
-  and Value::Function in place of Delegate and Value::Delegate; consumers must
-  update those names. Native binding metadata is now BindFunction with a function_type
-  operand, and reachability exposes function_invocations. Reject legacy delegate
-  declarations, binding instructions, serialized representations and operand aliases;
-  rebuild older artifacts. Migrate the archived Neo frontend and callback tests to
-  structural shapes.
-  Raven library callbacks now use function syntax, and the importer maps CLI callback
-  transport to structural fn signatures and function.bind. Remove runtime Func
-  declarations and their generated slice; migrate native service callback signatures.
-  The isolated Raven target uses inhabited unit-result function transport consistently
-  with generic unit-result functions. Fix named generic parameter binding inside
-  Function shapes and unit storage when specializing application helpers. Integrate
-  an independently tested Raven fix for silently omitted generic constructors with
-  function type arguments, exposed by the async Promise callback list.
-  Split Raven TypeInfo from MemberInfo: NominalTypeInfo exposes declaration metadata,
-  and TypeInfo adds IsNominalType and DisplayName. Clients must narrow to NominalTypeInfo
-  for Name/Namespace/FullName/module/token/attribute access. Regenerate descriptor,
-  Object display and parameter-hash implementations with matching reference contracts.
-  Preserve common member queries: structural types may have members and extensions
-  without declared names; record RavenDoc structural-family documentation direction.
-  Record the direction and migration plan: structural
-  callable shapes, replacement/removal of delegates, and a NominalTypeInfo split
-  with TypeInfo.IsNominalType. Preserve named function types as a possible future
-  addition with undecided identity rules. Document Function Invoke and extensions in
-  a structural-family API page; explicitly exclude CLI transport scaffolds from
-  generated nominal pages. Validate synchronous/extension and async consumers;
-  refresh the source coverage audit after removing the Func slice, including
-  service callers in generated method bodies. Rename callback comparer adapters to
-  FunctionComparer and FunctionEqualityComparer. Preserve target/receiver equality,
-  fix bound class-receiver identity comparison, and report NullReference on null
-  Function invocation. Keep constructor Function fields explicitly initialized.
-  Add TypeInfo.IsFunctionType and FunctionTypeInfo.Parameters, ReturnType and
-  InvokeMethod; GetMethods discovers the same synthesized public instance Invoke
-  with signature parameters and ordinary binding-flag filtering. Make MemberInfo/ParameterInfo Module and MetadataToken,
-  and MethodInfo.DefinitionIndex, optional so synthetic members expose no invented
-  declaration metadata. Migrate reflection consumers and refresh reference docs.
-  Enforce Function value equality and signature identity with regression coverage;
-  synthesize read-only Function: MethodInfo for bound-target inspection, with
-  GetProperties/GetMethods discovery and closed target descriptor identity.
-  Preserve ownerless module targets without inventing a DeclaringType. Add a
-  dedicated website feature page, distinguish structural compatibility from
-  delegate-like binding, and record common callable contracts, future FunctionInfo
-  and structural introspection factories as open design work.
-  Function types inherit Object while remaining structural; support Object views,
-  exact-shape cast-back, GetType and virtual value equality/hash overrides.
-  ToString reports the source-qualified target and closed signature without
-  inspecting captures. Copies preserve reference identity; independently created
-  equal bindings remain distinct for ReferenceEquals. This does not generalize
-  Object inheritance to other structural families.
-  Dynamic reflection invocation of synthetic Invoke,
-  general structural member enumeration and named Function types remain future work.
-  Matching signatures will not erase future nominal-function identity; structural
-  inheritance requires explicit eligibility and is not implemented.
-
-- Add lazy Iterable.OfType<T>() in System.Linq, inferring the source element type
-  and retaining non-null elements compatible with the requested result type.
-  Preserve order and iterator disposal; use it to narrow module type queries to
-  NominalTypeInfo. Include public API documentation and executable mixed-value,
-  descriptor, laziness and disposal coverage.
 
 - Add development System.Tuple value types with one through seven components,
   mutable Item fields and positional constructors. Integrate Raven tuple syntax,

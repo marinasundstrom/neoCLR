@@ -36,3 +36,11 @@ and rejection cases on 2026-09-30. The obsolete generic bound is rejected by the
 checked importer; missing bounds, wrong results, erased calls, inherited-only
 derived bounds and redeclared base results are compiler diagnostics. Native tests separately prove slot
 mutation, null rejection, no boxing and readonly receiver restrictions.
+
+## Integration baseline
+
+This consumer is now qualified against a Self-only extraction on neoCLR main,
+with nominal delegates retained. Its project explicitly selects the NeoCLR target.
+The paired compiler rejects Self configuration on .NET. Rebuild all artifacts
+from this line; a structural Function feature bundle is not interchangeable.
+The validation JSON records artifact hashes from this integration run.

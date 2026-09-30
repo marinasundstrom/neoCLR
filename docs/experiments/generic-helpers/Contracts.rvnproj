@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
+    <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
     <OutputType>Exe</OutputType>
     <RavenMetadataCoreAssemblyName>NeoCLR.CoreProbe</RavenMetadataCoreAssemblyName>
     <RavenTargetCoreAssemblyName>NeoCLR.CoreProbe</RavenTargetCoreAssemblyName>

@@ -4,6 +4,15 @@
 
 **Extension proposal**
 
+**Open proposal — not implemented on main (2026-09-30).** This document
+explores a possible contract, not completed work or a release commitment. Main's
+callback annotations use Raven function type syntax while retaining the existing
+nominal Func/delegate runtime. Structural Function types, nominal specializations
+and the Callable interface described here are not part of this backport. Example
+syntax below is illustrative proposal notation; current Raven callback types use
+`(T) -> R`.
+
+
 This proposal introduces `Callable`, a common interface for neoCLR values that represent exactly one callable signature.
 
 `Callable` complements structural Function types and nominal delegates by providing a shared abstraction similar to the role `System.Delegate` serves in .NET, without requiring callable types to share a common base class.

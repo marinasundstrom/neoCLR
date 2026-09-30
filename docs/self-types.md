@@ -223,3 +223,23 @@ call that supplies Derived to an inherited-only Self bound is rejected by the
 load/execution validation path without invoking the compiler or explicitly calling
 `verify()`. This strengthens regression evidence; no additional runtime behavior
 or Raven compiler integration was needed.
+
+## Shared-main integration validation (2026-09-30)
+
+Self is extracted from the structural Function branch onto nominal neoCLR main.
+The paired Raven compiler is `647239cc5` with an explicit NeoCLR-only gate; the
+shared props configure the marker. Structural Function metadata/runtime behavior
+is not required or promoted. All 98 selected native tests pass (Self, delegates,
+nominal delegates, constraints, static contracts, inheritance and reachability).
+The regenerated library and API fingerprints pass. The cloning consumer verifies
+and runs with six rejected invalid programs; its validation JSON contains current
+artifact hashes. A source `(int) -> System.Void` callback imports as nominal
+`delegate.bind` and executes with output `42` against the same runtime/library.
+
+The numeric consumer also verifies/runs all supported primitive Number contracts
+and concrete parsing, rejects Boolean Number and unsupported extra constraints,
+and records current hashes in its validation JSON. Its stale expected importer
+message was updated to the Self-aware diagnostic before the successful rerun.
+Raven's integration gate passes 315 compiler, 73 core and 256 LSP tests (three
+existing skips), plus 107 focused Self/target/project tests. No website publication
+or installed SDK replacement is included in this integration.

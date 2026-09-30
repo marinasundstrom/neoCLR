@@ -1,22 +1,14 @@
 # Raven targeting neoCLR
 
-## Function and nominal descriptor migration (2026-09-28)
+## Callback syntax and OfType backport (2026-09-30)
 
-The feature branch has native structural Function metadata, checked binding and
-Invoke, with higher-order/generic, lifetime and no-result tests. Callback
-library/import migration and removal of native delegate admission are complete.
-The [Function plan](../../function-types.md) and
-[consumer evidence](../function-types/README.md) distinguish the completed native
-implementation from its remaining Object and general structural-type limits.
-
-The updated reference and Raven-authored descriptors split TypeInfo from MemberInfo.
-Use TypeInfo.DisplayName for diagnostics; test/cast to NominalTypeInfo for Name,
-Namespace, FullName, module/token and attribute information. IsNominalType agrees
-with that capability, including through object discovery. Arrays use the structural
-provider; declared generic tuples and unions remain nominal. Runtime typeof contract
-settings are unchanged and still return TypeInfo. Matching regenerated artifacts
-are required. The evidence also records a deferred source-order compiler candidate;
-no Raven compiler implementation change is included in this checkpoint.
+Raven-authored library callback annotations now use function type syntax while the
+main bridge retains its existing nominal Func/delegate representation. OfType adds
+an exact two-generic-argument query declaration/binding; its library iterator uses
+existing boxing, type tests and casts. Runtime Contract options, source TypeInfo
+and serialized delegate behavior are unchanged. Match regenerated library and
+reference artifacts when using OfType. The query sample and validation are linked
+from [the query API record](../../raven-query-api.md#runtime-type-filtering--2026-09-30-backport).
 
 ## Task.Run integration (2026-09-27)
 
@@ -1616,39 +1608,6 @@ worktree contains target-only identity policy commit `79a5d7ffc`. Rebuild the br
 against it and refresh the Tuple slice and consumer reference together. Existing
 installed SDKs and published Preview 11 artifacts do not gain these APIs from a
 source edit; packaging and installation require separate qualification.
-
-The Function migration now maps CLI callback transport to structural `fn<...>`
-signatures and emits `function.bind`; it emits no runtime Func declarations.
-Raven callback source uses function notation. The isolated compiler's unit-function
-policy is recorded in Raven commit `09f4c91bd` and
-[the migration evidence](../function-types/README.md). CLI Func/Action/Delegate
-metadata is reference transport, explicitly excluded from nominal API pages;
-[Function family documentation](../../../api-docs/functions.md) covers the runtime
-Invoke/extension contract. Legacy native declaration admission is still transitional.
-
-### Function descriptors and type filtering (2026-09-28)
-
-Matching references now expose FunctionTypeInfo.InvokeMethod, TypeInfo.IsFunctionType
-and synthetic Invoke through GetMethods. MemberInfo and ParameterInfo module/token
-properties are optional, as is MethodInfo.DefinitionIndex. The bootstrap snapshot
-retains empty declaration data for synthetic methods without inventing a module.
-Runtime typeof configuration remains unchanged. OfType<U>() extends Iterable<T>
-and narrows module queries to NominalTypeInfo using existing type-test/boxing rules.
-The bridge validates its inferred source and explicit result type arguments.
-
-Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
-InvokeMethod remains the member-reflection view; no generalized function-info
-interface is introduced.
-
-The concise `InvokeMethod => GetMethods()[0]` form initially emitted a null body
-on the current target compiler; an explicit getter using a local service result
-emits and executes correctly. Record this with the existing deferred getter-emission
-candidate for independent Raven diagnosis; no compiler fix or broader target claim
-is made. Generic pattern binding also encountered the importer's definite-assignment
-restriction; OfType uses an explicit type test and checked cast after matching.
-See the Function consumer evidence for the completed source/runtime checks.
-
-
 ## Native Self integration (2026-09-30 development)
 
 Use Raven commit `764c22789` on `codex/neoclr-native-self`, based on `neoclr`,
@@ -1700,3 +1659,12 @@ does not move Self into a new backend or modify the separate neoclr checkout.
 Validation: the merged compiler builds; 137 selected Self, target configuration,
 emission and incremental-reuse tests pass. The actual Clonable consumer passes
 native verification/execution and all six rejection cases.
+
+### Shared Self integration on nominal main
+
+The current integration extracts Self onto neoCLR main and uses Raven's explicit
+NeoCLR platform with a configured Self marker. Structural Function types remain
+on feature/function-types. Earlier revision/branch notes above are historical.
+The current props and Self/numeric probes select RavenTargetPlatform=NeoCLR.
+Inhabited unit-result transport is required by this nominal delegate ABI too.
+See [the bridge contract](../../raven-cli-bridge.md) for ownership and replacement.

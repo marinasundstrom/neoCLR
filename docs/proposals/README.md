@@ -38,3 +38,16 @@ The author requested source porting before API alignment on 2026-09-19. Differen
 between these proposals and the current library remain explicit follow-up work.
 Consult the [conversation record](../development-timeline.md) for directions and
 corrections, and the [changelog](../../CHANGELOG.md) for implemented slices.
+
+## Function type proposals
+
+These later proposals remain open and **are not implemented on main**. The
+independent callback syntax and OfType backport does not implement their runtime
+or introspection contracts.
+
+- [Delegates evolved](delegates-evolved.md): structural function signatures with
+  possible nominal specializations of the callable model.
+- [Callable interface](callable-interface.md): a proposed common abstraction for
+  values with one authoritative callable signature.
+- [Earlier function types and objects exploration](function-types-and-objects.md):
+  preserved design history, including alternatives to the later proposals.

@@ -39,22 +39,20 @@ help offline tools, but requires explicit resolution, identity and lifetime rule
 
 [Introspection design](https://github.com/marinasundstrom/neoCLR/blob/main/docs/introspection-design.md)
 
-### Function types and nominal type information
+## Function types: delegates evolved
 
-[Function types](../features/functions/) now describe structural signatures, with
-value objects binding methods and receivers. The transitional Function property
-returns MethodInfo. The shared FunctionInfo interface, possibly covering MethodInfo
-and module ModuleFunctionInfo, is deferred.
+Two open proposals explore function types as structural signatures while retaining
+familiar callable bindings to a method and optional receiver or captured environment.
+Possible nominal specializations would preserve explicit type identity. A proposed
+Callable interface could accept different signatures through a common contract,
+similar to the role of .NET Delegate. This adds identity, conversion and introspection
+contracts that still need evaluation.
 
-Open questions include a common base/interface for “any callable” (including inferred
-request handlers), whether function objects should represent functions beyond a
-signature and binding, and introspection factories for arrays, functions, tuples,
-unions and intersections. Named nominal Function types could inherit an explicitly
-eligible Function shape; equal signatures would not erase nominal identity.
-Structural types are not generally inheritable. Structural-family RavenDoc pages
-can describe members without inventing names for individual shapes.
+These proposals are **not implemented on main**. Its development callback syntax
+continues to use the existing nominal Func/delegate runtime.
 
-[Design, .NET comparison and open questions](https://github.com/marinasundstrom/neoCLR/blob/main/docs/function-types.md#bound-target-inspection-and-open-object-model-questions)
+[Delegates evolved proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/delegates-evolved.md)
+· [Callable interface proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/callable-interface.md)
 
 ## Collections
 

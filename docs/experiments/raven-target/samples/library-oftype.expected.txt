@@ -1,0 +1,1 @@
+OfType query contracts passed

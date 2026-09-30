@@ -1,22 +1,27 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-28.** This is the authoritative default for work priorities,
+**Updated 2026-09-30.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
-**Author-directed capability — native Self (2026-09-30).** Implement the
-implementing-type relationship in the runtime, surface it in Raven on a branch
-based on `neoclr`, and replace Number's explicit type parameter. Keep the spelling
-`Self`, distinct from the `self` receiver value. This bounded author-selected work
-now includes borrowed generic instance dispatch and a class/struct cloning
-consumer and migration of the actual Clonable library contract, as described in [the Self contract](self-types.md); it does not reprioritize the
-remaining Web API work or adopt the broader generic-relationships proposal.
-The subsequent Self inheritance follow-up establishes native runtime rules with
-bounded experimental Raven integration. The author
-directed that proper Self and other neoCLR integration in Raven follow its
-multi-target refactor; only compiler/importer changes needed for this feature
-proceed under the author’s subsequent clarification. Broader integration remains deferred.
+**Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
+After the bounded main backport below, put the structural Function experiment on
+hold and work in Raven to improve neoCLR target support. The Function runtime
+branch remains isolated; its proposals are open, not completed on main. Specific
+acceptance now includes integrating target-gated Self in Raven and neoCLR while
+keeping structural types on feature branches in both repositories. This author
+direction supersedes the earlier restriction on Raven main integration; a native
+metadata layer and replacement backend remain future work. General compiler fixes
+still require independent validation.
+The earlier Web API direction below remains recorded for later resumption.
+
+**Author-directed library backport (2026-09-30).** Bring Raven callback function
+syntax and lazy OfType filtering to main independently of the structural Function
+runtime branch. This bounded library change keeps the existing callable and
+introspection models. It is complete; the subsequent author direction above selects
+the next focus. See the
+[query contract and evidence](raven-query-api.md#runtime-type-filtering--2026-09-30-backport).
 
 **Author-directed release — Preview 11 (2026-09-27).**
 The current bounded surface is qualified for release with macOS arm64 Raven tools
@@ -27,7 +32,7 @@ Raven SDK/bridge qualification remains separate. The full Linux suite passes; a
 validator-only exit-code correction has independent archive-smoke evidence.
 This closes release preparation without adding optional Web API capabilities.
 
-**Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
+**Preceding direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
 route parser used within an existing HttpServer handler, including named and typed
 parameters. This later author direction defers the earlier separate WebApplication
@@ -151,20 +156,6 @@ This is a bounded author-directed addition; it does not replace the Web API dire
 The [runtime tracker](tracking/runtime-language.md#value-tuples--2026-09-28) owns status.
 
 ## Theme trackers
-
-The author selected [Function types and Function objects](function-types.md) on
-2026-09-28: structural callable shapes and their instances will replace delegates,
-with `NominalTypeInfo` and `TypeInfo.IsNominalType` beginning a nominal/structural
-split. A future nominal function type may inherit an explicitly eligible structural
-Function shape while retaining distinct nominal identity. This does not introduce
-general inheritance of non-nominal types. A native structural binding foundation is implemented on
-the feature branch, including the TypeInfo/NominalTypeInfo descriptor split and
-structural Raven callback transport, FunctionTypeInfo.InvokeMethod, IsFunctionType
-and synthesized Invoke discovery through GetMethods. Native legacy delegate admission is removed;
-focused migration validation passes; bounded limitations are tracked below.
-This does not permanently change the Web API priority. The
-[runtime tracker](tracking/runtime-language.md#function-types-and-objects--2026-09-28)
-owns implementation status.
 
 Each work item has one status owner. Use that tracker for its status, remaining
 scope, next evidence and linked design. Cross-theme dependencies link to their
@@ -371,3 +362,10 @@ parenthesized union of LocalDateTime and ZonedDateTime following the author's
 clarification. Time wraps, civil addition carries the date, and elapsed Instant
 addition checks overflow. The bounded 1900–2099 named-zone range and pinned 2025b
 database are provisional. Broader rules/providers, parsing and scheduling remain open.
+
+### Structural branch organization (2026-09-30)
+
+At the author's request, preserve the Function/structural experiment on
+`codex/structural-types` with the integrated main as an ancestor. This replaces the
+old `feature/function-types` branch name; it does not promote structural semantics
+to main or alter the native metadata prerequisites.

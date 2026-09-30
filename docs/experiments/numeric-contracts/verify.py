@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-number-contract-') as directory:
         raise SystemExit('Missing success marker')
     for name, source, diagnostic in (
         ('boolean', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number => x + T.One\nfunc Main() { Calculate<bool>(true) }', 'constraint'),
-        ('extra-constraint', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number, struct => x + T.One\nfunc Main() { Calculate<int>(1) }', 'Numeric specialization requires'),
+        ('extra-constraint', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number, struct => x + T.One\nfunc Main() { Calculate<int>(1) }', 'Application specialization requires a supported nongeneric Self cloning or Number bound'),
     ):
         (work / 'Main.rvn').write_text(source + '\n')
         rejected = subprocess.run(['dotnet', str(artifacts['bridge']), '--project', str(work / 'Contracts.rvnproj'), str(work / name)], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

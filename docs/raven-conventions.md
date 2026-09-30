@@ -241,7 +241,7 @@ Use Raven's extension syntax for APIs intended to be called as extensions:
 
 ```raven
 public extension OptionOperators<T> for Option<T> {
-    func Map<U>(mapper: Func<T, U>) -> Option<U> {
+    func Map<U>(mapper: (T) -> U) -> Option<U> {
         return self match {
             Some(let value) => Some(mapper(value))
             None => None
@@ -256,6 +256,12 @@ bootstrap declaration alone to turn an ordinary runtime static class into an
 extension API. See [supported extension boundaries](raven-extension-methods.md).
 
 ## Lambda signatures
+
+Spell callback types with Raven function syntax: `(T) -> U` or `() -> Void`,
+including callback fields and generic type arguments. Let the receiving contract
+supply lambda parameter types where possible. On main this source spelling still
+uses the existing Func/delegate runtime representation; it does not introduce
+structural runtime type identity.
 
 Prefer inferred callback types when the receiving method supplies enough context:
 

@@ -4,6 +4,15 @@
 
 **Proposal**
 
+**Open proposal — not implemented on main (2026-09-30).** This document
+explores a possible contract, not completed work or a release commitment. Main's
+callback annotations use Raven function type syntax while retaining the existing
+nominal Func/delegate runtime. Structural Function types, nominal specializations
+and the Callable interface described here are not part of this backport. Example
+syntax below is illustrative proposal notation; current Raven callback types use
+`(T) -> R`.
+
+
 This proposal defines neoCLR's evolved delegate model.
 
 neoCLR retains the fundamental CLR model of a callable object that references executable code and optionally carries a receiver or captured environment. The major change is that callable signatures become structural types in their own right.
