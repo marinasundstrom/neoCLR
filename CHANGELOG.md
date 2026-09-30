@@ -16,6 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   tests, identical regenerated native bodies, metadata/audit checks and a structural
   unit callback executing through function.bind. Self cloning and all six negative
   consumer cases also pass on the structural bundle.
+- Preserve the deferred Function/structural experiment as `codex/structural-types`
+  on top of the Self-integrated main. Retire the previous branch name after
+  synchronization; this organizational change does not enable structural types on main.
 
 - Integrate native Self independently of structural Function types: nongeneric
   Number and Clonable contracts, conformance-owned inheritance, checked generic

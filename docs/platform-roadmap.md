@@ -363,9 +363,9 @@ clarification. Time wraps, civil addition carries the date, and elapsed Instant
 addition checks overflow. The bounded 1900–2099 named-zone range and pinned 2025b
 database are provisional. Broader rules/providers, parsing and scheduling remain open.
 
-### Structural branch organization (2026-09-30)
+### Feature branch organization (2026-09-30)
 
-At the author's request, preserve the Function/structural experiment on
-`codex/structural-types` with the integrated main as an ancestor. This replaces the
-old `feature/function-types` branch name; it does not promote structural semantics
-to main or alter the native metadata prerequisites.
+At the author's request, structural Function work continues on
+`codex/structural-types` with this Self-integrated main as its base. The former
+`feature/function-types` name is retired after validation and synchronization.
+The branch organization does not enable structural types on main.
