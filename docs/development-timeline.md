@@ -9431,3 +9431,22 @@ remote synchronization does not publish a runtime bundle or website.
   collection, insertion, branches or exception-region editing has been implemented.
   This advances metadata/target integration without treating the future editing API
   as complete. See the [emission contract](raven-cli-bridge.md#opcode-based-metadata-emission--2026-09-30).
+
+## 2026-09-30 — Shared compiler pipeline and builder abstractions
+
+- **Author:** Asked to continue until integration works, authorizing codegen refactoring
+  or redesign so .NET and neoCLR do not require entirely separate implementations.
+  Clarified that common traits should be reused and differences abstracted, specifically
+  Reflection.Emit type builders versus the independent neoCLR metadata builders.
+- **Assistant:** Inspected the existing emitter and builder dependencies. Proposed first
+  sharing compilation setup/validation through explicit backend selection, then extracting
+  type/method handles and common lowering incrementally. Reflection.Emit's `Type`,
+  `MemberInfo` and builders currently reach deep into general codegen; renaming the
+  emitter interface alone would not remove that coupling.
+- **Action:** Added an explicit artifact backend contract to Raven's `Compilation.Emit`;
+  the native adapter and rvnc now use it. The independent metadata project and native
+  format remain unchanged. Backend selection does not alter semantic target contracts.
+- **Open:** The type/method builder boundary and broader common lowering still require
+  extraction. Full native System import, class-library compilation and general signature/
+  instruction support are not implied by the initial integration. See the
+  [implemented boundary and focused validation](raven-cli-bridge.md#shared-emission-pipeline--2026-09-30).

@@ -15,6 +15,12 @@ then integrate the refactored compiler, then add improvements such as structural
 The direct native producer/load test below is the bounded acceptance baseline;
 ordinary compiler-required metadata coverage is next.
 
+**Shared compiler pipeline:** Raven's explicit native backend now participates in
+`Compilation.Emit`; rvnc and API wrappers share compiler setup and target validation.
+The author directs reuse of common .NET/neoCLR lowering with backend abstractions for
+builder differences. This first boundary does not yet abstract Reflection.Emit type/
+method handles. [Integration boundary](raven-cli-bridge.md#shared-emission-pipeline--2026-09-30).
+
 **Latest acceptance:** Raven's opt-in emitter now writes binary PE/#Neo assemblies;
 neoCLR decodes their native metadata directly. Hello World, an entry-point call to
 Greet, both source-file orders and the two-library chain all verify/run successfully.

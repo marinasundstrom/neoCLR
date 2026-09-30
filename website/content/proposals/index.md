@@ -88,7 +88,9 @@ An opt-in `rvnc neoclr` command now emits native assemblies from source files an
 writer-produced native library references. Loading compiler symbols from translated
 System now has a first explicit static Int32 callable import: Math.Min binds from
 translated metadata and executes against that binary library. Full System symbol loading
-remains pending; the command still uses host primitives for binding.
+remains pending; the command still uses host primitives for binding. Native emission now
+uses Raven’s shared Compilation.Emit validation pipeline through an explicit backend;
+shared type/method builder abstractions remain a follow-up.
 The metadata builder also exposes typed opcode Emit overloads for its current linear
 subset, consumed by Raven; broader instructions and editable bodies remain future work.
 Namespaced static library types also retain their identity through compiler reimport

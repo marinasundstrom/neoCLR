@@ -17,6 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Raven now selects the independent native backend through its shared Compilation.Emit
+  pipeline; rvnc and compatibility APIs reuse compiler setup/contract validation.
+  Default .NET emission remains unchanged. Native debug output and CLI core rewriting
+  reject before output; deeper shared type/method builder abstractions remain pending.
   Add MethodBuilder.Emit overloads for supported logical opcodes, Int32 operands and
   builder/imported/native call references. Helpers delegate to the same validated path;
   invalid opcode/operand pairs reject before mutation. Raven's native emitter consumes
