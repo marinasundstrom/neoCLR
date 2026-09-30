@@ -86,6 +86,12 @@ JSON parsing during runtime loading. Production integration and structural runti
 support remain pending;
 this is not a published platform format.
 
+The metadata feature branch also translates the complete current assembled System
+library from JSON to standalone native binary containers. Runtime verification and
+Hello/generic dependency consumers pass. This is a load-format regression baseline;
+direct Raven class-library source compilation and broad compiler symbol import remain
+next steps. These native-only containers have no .NET reference projection.
+
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 
 ## Collections

@@ -18,6 +18,7 @@ and guest Introspection assembly loading remain pending.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
 - [RuntimeAssemblyContainer](#runtimeassemblycontainer): direct PE/#Neo native execution transport.
 - [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
 - [MetadataArtifact](#metadataartifact): ordinary classification or owned extended profile.
@@ -1409,3 +1410,44 @@ Schema 2 is deserialized directly to the runtime model, with no JSON roundtrip.
 The CLI and ModuleInput::MetadataPe use decode/load and accept both encodings.
 Binary containers have no embedded text for the debugger's source pane.
 See the [binary profile and tradeoffs](../docs/design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).
+
+
+## NativeModuleContainer
+
+Public static host class in `NeoCLR.Metadata.Experimental`:
+
+```csharp
+byte[] NativeModuleContainer.WriteBinary(ReadOnlySpan<byte> nativeImage);
+byte[] NativeModuleContainer.Read(ReadOnlySpan<byte> image);
+```
+
+`WriteBinary` translates existing format-5 JSON values to a standalone NEOX envelope
+with required section 256/schema 2. Unlike RuntimeAssemblyContainer it does not require
+canonical API-writer declaration names and does not construct a PE or CLI projection.
+`Read` reconstructs equivalent owned JSON values. Neither call checks full declaration
+schemas, resolves references or verifies bodies; the runtime performs those checks.
+Header validation requires numeric format 5, nonempty module name and a functions array.
+Members, origins, identities, native names, dependencies and instruction operands are
+preserved as values. No tokens or references are remapped. Unknown optional envelope
+sections are accepted but omitted from the returned JSON; retain original bytes if
+opaque section preservation is required.
+
+Both calls throw InvalidDataException for malformed headers, framing, unsupported
+binary values or exceeded limits. Input JSON is limited to 4 MiB, the envelope to
+1 MiB; the same integer-only, Unicode, depth and item limits as the PE binary profile
+apply. Lexical JSON spellings are not preserved. There is no CLI stream binding digest
+in this standalone form and no authenticity guarantee. It cannot be passed to Raven's
+.NET MetadataReference loader.
+
+```csharp
+var image = NativeModuleContainer.WriteBinary(File.ReadAllBytes("System.neo.json"));
+File.WriteAllBytes("System.neox", image);
+```
+
+Rust `metadata_container::decode_envelope(&[u8]) -> Result<Module, Fault>` accepts a
+standalone execution envelope (schema 1 or 2), deserializes the native model and rejects
+invalid framing/required schemas. `load_envelope` additionally applies legacy validation,
+including bundled-System linking for non-System modules. `ModuleInput::NativeEnvelope`
+uses decode for explicit dependency sets. The CLI detects NEOX magic for the root,
+`--module` and `--system`; existing PE and JSON handling is unchanged. No embedded
+source text is available to the debugger.

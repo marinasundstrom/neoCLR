@@ -21,8 +21,12 @@ Greet, both source-file orders and the two-library chain all verify/run successf
 Schema-1 JSON containers remain readable. The separate Cecil-style API still supplies
 CLI reference projections to Raven's existing .NET semantic provider. The author
 identifies class-library compilation and Raven symbol loading as the next consumer,
-with existing JSON-to-assembly translation as a proposed bootstrap. General translation,
-a native symbol provider and production registration are not yet implemented.
+with existing JSON-to-assembly translation as a bootstrap. The complete current System
+JSON now translates to a standalone binary native envelope, verifies all 641 IL functions
+and runs both Hello cases and a generic dependency chain. This has no CLI reference
+projection. Next: compile the runtime class library from Raven source and compare
+against these translated artifacts; broad symbol import, a native symbol provider
+and production registration remain unimplemented.
 [Binary profile](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30)
 and [measured phases](experiments/extended-cli-metadata/binary-loading.md).
 

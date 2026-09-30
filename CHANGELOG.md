@@ -31,6 +31,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add a release-mode phase comparison;
   record class-library JSON translation and Raven symbol loading as the next bootstrap
   direction, not completed general translation or native symbol-provider support.
+  Add NativeModuleContainer and a no-overwrite .NET translator for existing format-5
+  JSON, with standalone NEOX loading for root, dependency and System inputs. The full
+  assembled System library preserves 117 types/743 functions; 641 IL functions verify.
+  Both Hello examples and a translated generic module chain run using binary System.
+  Validate 28 C# groups and 15 focused Rust/CLI tests. This transport has no CLI
+  projection; direct Raven class-library compilation and compiler symbol import remain
+  next steps, using translated artifacts as regression baselines.
   Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.

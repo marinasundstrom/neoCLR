@@ -246,7 +246,26 @@ pub fn load(image: &[u8]) -> Result<Module, Fault> {
 /// Decode a recognized container into the native module model. Schema 2 uses direct
 /// binary deserialization; schema 1 remains compatible. Does not link or verify bodies.
 pub fn decode(image: &[u8]) -> Result<Module, Fault> {
-    let (version, bytes) = payload(image)?;
+    decode_payload(payload(image)?)
+}
+
+/// Decode a standalone NEOX native module without a CLI projection or PE binding.
+/// The same runtime validation and dependency rules apply after decoding.
+pub fn decode_envelope(image: &[u8]) -> Result<Module, Fault> {
+    if image.len() > 1024 * 1024 {
+        return Err(invalid("envelope exceeds 1 MiB limit"));
+    }
+    decode_payload(execution_payload(image)?)
+}
+
+/// Decode a standalone native envelope and apply legacy bundled-System validation.
+pub fn load_envelope(image: &[u8]) -> Result<Module, Fault> {
+    let module = decode_envelope(image)?;
+    crate::vm::validate(&module)?;
+    Ok(module)
+}
+
+fn decode_payload((version, bytes): (u16, &[u8])) -> Result<Module, Fault> {
     if version == 2 {
         crate::native_binary::decode(bytes)
     } else {

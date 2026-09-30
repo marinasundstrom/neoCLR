@@ -1,0 +1,109 @@
+{
+  "assemblies": [
+    {
+      "name": "Models",
+      "full_name": "Models",
+      "modules": [
+        "Models"
+      ],
+      "references": []
+    }
+  ],
+  "format": 5,
+  "name": "Models",
+  "references": [],
+  "entry": "",
+  "types": [
+    {
+      "definition": {
+        "module": "Models",
+        "index": 0
+      },
+      "name": "Box",
+      "fields": [
+        {
+          "name": "Value",
+          "ty": {
+            "TypeParameter": 0
+          }
+        }
+      ],
+      "is_abstract": false,
+      "representation": "Record",
+      "generic_parameters": [
+        "T"
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "definition": {
+        "module": "Models",
+        "index": 0
+      },
+      "name": "Box.Create",
+      "owner": {
+        "Constructed": {
+          "definition": "Box",
+          "arguments": [
+            {
+              "TypeParameter": 0
+            }
+          ]
+        }
+      },
+      "instance": false,
+      "parameters": [
+        {
+          "TypeParameter": 0
+        }
+      ],
+      "parameter_names": [
+        "value"
+      ],
+      "receiver_byref": false,
+      "receiver_readonly": false,
+      "is_virtual": false,
+      "is_override": false,
+      "is_abstract": false,
+      "returns": {
+        "Scoped": {
+          "module": "Models",
+          "name": "Box",
+          "arguments": [
+            {
+              "TypeParameter": 0
+            }
+          ]
+        }
+      },
+      "locals": [],
+      "local_names": [],
+      "impl_flags": 0,
+      "pinvoke": null,
+      "body": [
+        {
+          "op": "ldarg",
+          "arg": 0
+        },
+        {
+          "op": "newobj",
+          "arg": {
+            "Scoped": {
+              "module": "Models",
+              "name": "Box",
+              "arguments": [
+                {
+                  "TypeParameter": 0
+                }
+              ]
+            }
+          }
+        },
+        {
+          "op": "ret"
+        }
+      ]
+    }
+  ]
+}

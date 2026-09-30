@@ -289,3 +289,16 @@ Owners remain Raven (semantic mapping), the metadata library (encoding/projectio
 and neoCLR (admission/linking/verification/execution). Structural schemas and guest
 Introspection APIs remain absent. Indexed native tables may replace this provisional
 object encoding. [Profile, compatibility and evidence](design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).
+
+
+## Existing class-library transport baseline — 2026-09-30
+
+NativeModuleContainer now translates the current assembled System JSON into standalone
+binary NEOX, preserving native values and bypassing the restricted CLI projection.
+Both Hello examples and the generic module chain execute using translated System;
+all 641 IL functions verify. The independent metadata project owns transport encoding;
+neoCLR owns admission and execution. No Raven Runtime Contract setting, semantic
+mapping or production target registration changes in this slice. These envelopes
+cannot be loaded as .NET compiler references. Direct Raven source compilation and
+broader symbol projection/native import remain the next compiler work. Translated
+artifacts provide a regression baseline, not independent correctness proof.

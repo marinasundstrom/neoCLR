@@ -13,16 +13,18 @@ const USAGE: &str = "Usage:
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
-Inputs: .neo is the high-level subset, .neoil is IL source, PE/#Neo containers carry native metadata; otherwise JSON artifacts.";
+Inputs: .neo is the high-level subset, .neoil is IL source, PE/#Neo and standalone NEOX containers carry native metadata; otherwise JSON artifacts.";
 
 enum Input {
     Text(String),
     MetadataPe(Vec<u8>),
+    NativeEnvelope(Vec<u8>),
 }
 impl Input {
     fn text(&self) -> Result<&str, String> {
         match self {
             Self::Text(text) => Ok(text),
+            Self::NativeEnvelope(_) => Err("expected source text, found native envelope".into()),
             Self::MetadataPe(_) => Err("expected source text, found metadata PE".into()),
         }
     }
@@ -30,6 +32,7 @@ impl Input {
         match self {
             Self::Text(text) => load(text),
             Self::MetadataPe(image) => neoclr::metadata_container::load(image),
+            Self::NativeEnvelope(image) => neoclr::metadata_container::load_envelope(image),
         }
     }
     fn module_input(&self, source: bool) -> Result<neoclr::assembler::ModuleInput<'_>, String> {
@@ -39,6 +42,7 @@ impl Input {
         Ok(match self {
             Self::Text(text) => neoclr::assembler::ModuleInput::Json(text),
             Self::MetadataPe(image) => neoclr::assembler::ModuleInput::MetadataPe(image),
+            Self::NativeEnvelope(image) => neoclr::assembler::ModuleInput::NativeEnvelope(image),
         })
     }
 }
@@ -49,6 +53,8 @@ fn read(path: &str) -> Result<Input, String> {
         fs::read(path).and_then(|bytes| {
             if bytes.starts_with(b"MZ") {
                 Ok(Input::MetadataPe(bytes))
+            } else if bytes.starts_with(b"NEOX") {
+                Ok(Input::NativeEnvelope(bytes))
             } else {
                 String::from_utf8(bytes)
                     .map(Input::Text)

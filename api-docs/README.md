@@ -427,7 +427,7 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 `StructuralIdentity`, `ResolvedTypeIdentity`, `StructuralMemberReference`,
 `ResolvedMemberIdentity`, `StructuralMemberDescriptor`, `StructuralMembers`,
 `MetadataProfile`, `MetadataProfileDocument`, `MetadataArtifactReader` and
-`MetadataArtifact`, `RuntimeAssemblyContainer`, plus `NeoCLR.Metadata.Experimental.Model.AssemblyDefinition`,
+`MetadataArtifact`, `RuntimeAssemblyContainer`, `NativeModuleContainer`, plus `NeoCLR.Metadata.Experimental.Model.AssemblyDefinition`,
 `NativeAssemblyDefinition`, `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
 `AssemblyReference`, `IAssemblyResolver`, `MethodDefinition`, `MemberReference`, `ImportedMethodReference`, `AssemblyBuilder` (including native emission
 and top-level functions), `TypeBuilder` and

@@ -80,3 +80,41 @@ fn binary_and_json_containers_decode_to_identical_runtime_metadata() {
         assert!(metadata_container::decode(&binary[..length]).is_err());
     }
 }
+
+#[test]
+fn translated_native_envelope_preserves_generic_library_metadata() {
+    let image = include_bytes!("fixtures/metadata-container/models.neox");
+    let expected =
+        serde_json::from_str::<neoclr::Module>(include_str!("fixtures/metadata-container/models.neo.json")).unwrap();
+    let actual = metadata_container::decode_envelope(image).unwrap();
+    assert_eq!(
+        serde_json::to_value(expected).unwrap(),
+        serde_json::to_value(actual).unwrap()
+    );
+    let system = neoclr::library::system().unwrap();
+    let modules = assembler::read_modules(
+        &[
+            assembler::ModuleInput::Source(include_str!("../examples/modules/app.neoil")),
+            assembler::ModuleInput::Source(include_str!("../examples/modules/operations.neoil")),
+            assembler::ModuleInput::NativeEnvelope(image),
+        ],
+        system,
+    )
+    .unwrap();
+    let program = LoadedProgram::with_modules(&modules[0], system, &modules[1..]).unwrap();
+    program.verify().unwrap();
+    program.run(ExecutionOptions::default()).unwrap();
+    for length in 0..image.len() {
+        assert!(metadata_container::decode_envelope(&image[..length]).is_err());
+    }
+    let mut overlay = image.to_vec();
+    overlay.push(0);
+    assert!(metadata_container::decode_envelope(&overlay).is_err());
+    let mut schema = image.to_vec();
+    schema[18] = 3;
+    assert!(metadata_container::decode_envelope(&schema).is_err());
+    let mut optional = image.to_vec();
+    optional[20] = 0;
+    assert!(metadata_container::decode_envelope(&optional).is_err());
+    assert!(metadata_container::decode_envelope(&vec![0; 1024 * 1024 + 1]).is_err());
+}

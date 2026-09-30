@@ -25,6 +25,26 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Translated class-library artifacts as a compiler baseline
+
+- **Author:** Proposes translating the current JSON into neoCLR assemblies, then
+  clarifies: “We will have to work a way to compile the runtime class library from
+  source, after this.” Translation is “a useful test. Of what the runtime can load”.
+- **Assistant:** Distinguishes generated build manifests from executable format-5
+  JSON; implements a native-only translation path preserving broader library metadata
+  without inventing incomplete CLI declarations.
+- **Outcome:** The whole current assembled System library translates, loads and
+  verifies (117 types, 743 functions, 641 IL functions). Both Hello cases and a
+  translated generic dependency chain execute against translated System. These are
+  current-pipeline artifacts, not new Raven source compilation.
+- **Author:** “We can use these translated assemblies to check whether the compiler
+  is correct when compiling the source code”.
+- **Assistant:** Agrees to use normalized metadata and behavioral comparisons as a
+  regression baseline; token/MVID byte equality is not required. Notes that the
+  baseline inherits the legacy path's assumptions and is not independent proof.
+- **Open:** Direct Raven class-library source emission and broader symbol import.
+  [Implemented transport and validation](design/extended-cli-metadata.md#existing-class-library-translation-checkpoint--2026-09-30).
+
 ## 2026-09-30: Metadata tooling on both platforms
 
 - **Author:** “We eventually need to figure out how to build neoCLR metadata reader

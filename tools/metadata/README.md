@@ -185,3 +185,31 @@ cargo test --test metadata_container
 
 The compiler-side `EmitMetadataAssembly` and the two-library acceptance case live on
 Raven's `codex/metadata-consumer`. See the [public API contract](../../api-docs/experimental-metadata.md#runtimeassemblycontainer).
+
+
+### Existing native JSON bootstrap
+
+```sh
+# Assemble the current source manifest (including checked-in generated Raven IL).
+target/debug/neoclr assemble runtime/System.neoil target/System.neo.json
+dotnet run --project tools/metadata/NeoCLR.Metadata.Translate -- target/System.neo.json target/System.neox
+target/debug/neoclr verify target/System.neox
+target/debug/neoclr run examples/hello.neoil --system target/System.neox
+```
+
+The translator creates a new output file and refuses overwrites. It uses the independent
+NativeModuleContainer API; runtime validation is a separate required step. These are
+standalone native containers, not PE references. The checked-in `runtime/raven/generated/*.json`
+files are bootstrap manifests, not format-5 executable modules, and are rejected.
+
+Run the C# full-library and generic dependency consumer check from the repository root
+with a fresh output directory (the assembler refuses overwriting artifacts):
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --module-integration target/debug/neoclr target/extended-cli-metadata/native-module-bootstrap
+```
+
+Direct Raven source compilation through the new emitter and broad compiler symbol
+import are subsequent milestones. Translation preserves the existing pipeline output
+as a regression baseline for those compiler changes, not independent proof of its semantics.

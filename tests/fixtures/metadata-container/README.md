@@ -17,3 +17,10 @@ compare decoded behavior rather than expecting identical whole-file bytes.
 `constant42-binary.pe` contains the identical native module in execution schema 2
 (bounded CBOR). Rust tests compare complete decoded metadata and execute both forms;
 JSON extraction deliberately fails for schema 2, so consumers use decode/load.
+
+
+`models.neo.json` and `models.neox` preserve the generic Box<T> library from
+`examples/modules/models.neoil`. Regenerate with the `--module-integration` command
+in tools/metadata/README.md; copy `models.neo.json` and `models.neo.neox` from its
+output directory. The C# translator preserves all JSON values. Rust compares the
+complete deserialized models and verifies/runs the mixed source/binary dependency chain.

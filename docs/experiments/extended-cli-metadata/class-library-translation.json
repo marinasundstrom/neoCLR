@@ -1,0 +1,17 @@
+{
+  "producer": "current runtime/System.neoil manifest and existing generated IL",
+  "directRavenSourceEmission": false,
+  "cliReferenceProjection": false,
+  "systemTypes": 117,
+  "systemFunctions": 743,
+  "jsonBytes": 1182678,
+  "binaryBytes": 466240,
+  "jsonSha256": "c22e1b9fd7d2c9d8cae93e39b0b466f9c339564c3581d51a8547f0ad4f824259",
+  "binarySha256": "13a59bf6becfb9158561fec8f06309c5f5ba19869ab34ea497020902de89ae11",
+  "completeJsonValuesPreserved": true,
+  "systemVerification": true,
+  "helloWorld": true,
+  "helloFunctionCall": true,
+  "genericBinaryDependencyChain": true,
+  "unknownBodyRejected": true
+}

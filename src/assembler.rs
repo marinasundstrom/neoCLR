@@ -35,6 +35,8 @@ pub enum ModuleInput<'a> {
     Json(&'a str),
     /// Experimental recognized PE/#Neo native metadata container.
     MetadataPe(&'a [u8]),
+    /// Standalone NEOX native module, without a CLI reference projection.
+    NativeEnvelope(&'a [u8]),
 }
 
 /// Parse and validate a mixed module set against a supplied System artifact.
@@ -50,6 +52,9 @@ pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<
             ModuleInput::Source(source) => parse_parts(source),
             ModuleInput::MetadataPe(image) => {
                 crate::metadata_container::decode(image).map(|module| (module, vec![]))
+            }
+            ModuleInput::NativeEnvelope(image) => {
+                crate::metadata_container::decode_envelope(image).map(|module| (module, vec![]))
             }
             ModuleInput::Json(json) => crate::decode_module(json).map(|module| (module, vec![])),
         })

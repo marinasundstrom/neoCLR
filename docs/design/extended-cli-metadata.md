@@ -1115,3 +1115,46 @@ remains authoritative as semantics diverge. It must eventually be replaceable by
 a native ISemanticDataLoader adapter without rewriting the runtime metadata library.
 Class-library translation, direct compiler emission and the native symbol provider
 are distinct milestones; success at one must not be presented as all three.
+
+
+### Existing class-library translation checkpoint — 2026-09-30
+
+The first translation test now covers the **entire current assembled System library**:
+117 types, 743 functions (641 IL functions verified), 1,182,678 bytes of JSON to
+466,240 bytes of binary NEOX. This assembles `runtime/System.neoil`, including existing
+Raven-generated IL; it does not compile Raven source through the new metadata emitter.
+The checked-in generated `.json` files are build manifests and cannot be translated
+as executable modules.
+
+The independent C# NativeModuleContainer transport preserves all native JSON values,
+including fields, generics, origins, dependencies and bodies, without applying the
+small Cecil-style writer's declaration restrictions. Runtime admission remains responsible
+for semantic validity. The native envelope uses the existing execution schema 2 and
+limits, no new semantic schema. The CLI admits it as root, dependency or explicit System.
+The existing PE/#Neo APIs and reference projections retain their stricter admission.
+
+Compared with the ECMA-335 PE/CLI and .NET reference-assembly baseline described above,
+this standalone transport exercises the broader existing runtime model immediately,
+without claiming a complete CLI projection. The cost is no .NET MetadataReference
+compatibility, no PE stream-binding digest, and no new editable member model. Adding
+a caller-supplied CLI view now could conceal declaration mismatches; expanding the
+projection and compiler loader remains a separate next step. This is a provisional
+bootstrap, not a format-performance claim or a replacement for the Cecil-style API.
+
+C# checks compare complete JSON values before/after translation; native verification
+covers System and both Hello examples. Both examples produce identical output with
+JSON and binary System. A generic Box<T> library, a calling dependency and their
+application all run as translated binaries with binary System and print 42. An unknown
+body opcode is rejected by native loading. Rust additionally compares a C#-produced
+fixture's entire decoded model, executes its consumer and rejects truncation, overlays,
+optional execution and unsupported schemas. See the [reproduction instructions](../../tools/metadata/README.md#existing-native-json-bootstrap).
+
+The [machine-readable result](../experiments/extended-cli-metadata/class-library-translation.json)
+records complete-artifact hashes and consumer outcomes for reproducing this baseline.
+
+The author clarifies the next milestone: compile the runtime class library from Raven
+source, and use translated artifacts to check the compiler. Compare normalized
+identities, declarations, signatures, dependencies and execution outcomes; raw byte
+identity is inappropriate where token/MVID ordering differs. The baseline inherits
+legacy compiler/importer assumptions and is not independent proof. Direct compilation,
+Raven symbol import and a native semantic provider remain unimplemented by this slice.
