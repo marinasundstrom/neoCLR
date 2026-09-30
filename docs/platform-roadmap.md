@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Author-directed metadata exploration (2026-09-30).** Begin extended CLI metadata
+on `codex/extended-cli-metadata`, based on main, with later Raven integration.
+Structural types are an explicit design requirement, including arrays, tuples,
+Function types, unions/intersections and synthesized members. The
+[design and staged acceptance plan](design/extended-cli-metadata.md) is exploratory;
+its next bounded task is an isolated codec/inspector prototype. No format or runtime
+support is implemented by the design slice. This scopes the requested exploration
+without promoting all proposals or merging the structural runtime experiment.
+
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
 After the bounded main backport below, put the structural Function experiment on
 hold and work in Raven to improve neoCLR target support. The Function runtime

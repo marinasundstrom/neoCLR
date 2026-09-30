@@ -51,3 +51,10 @@ or introspection contracts.
   values with one authoritative callable signature.
 - [Earlier function types and objects exploration](function-types-and-objects.md):
   preserved design history, including alternatives to the later proposals.
+
+## Metadata and structural types
+
+The [metadata proposal](metadata-format.md) now has a maintained
+[extended CLI metadata design](../design/extended-cli-metadata.md), including structural
+types and staged Raven integration. This is feature-branch exploration, not implemented
+format support. Original proposal texts remain inputs rather than final specifications.

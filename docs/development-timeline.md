@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Begin extended CLI metadata design
+
+- **Author:** asks to start developing an extended CLI metadata format suitable for
+  neoCLR proposal semantics, on a feature branch based on main, for later Raven integration.
+  Clarifies: “We need to take into account structural types support.”
+- **Assistant:** proposes retaining CLI declarations and adding versioned extension
+  relationships and native type expressions. Includes structural arrays, tuples,
+  Function types, unions/intersections, synthesized members and independent Object
+  compatibility; distinguishes inspection from semantic and execution compatibility.
+- **Action/outcome:** creates `codex/extended-cli-metadata` from main `3ac2ae7c`
+  in a separate worktree, preserving the author's uncommitted structural-types draft.
+  Writes the [design and acceptance sequence](design/extended-cli-metadata.md), updates
+  roadmap/bridge/proposal context and records preliminary primary-source comparisons.
+- **Open:** byte assignments, codec/reader experiments, structural semantic decisions,
+  runtime execution and later Raven integration. No implementation or format approval
+  is inferred from this exchange; no permanent broader reprioritization is inferred.
+
 ## 2026-09-30: Independent library backport from Function work
 
 - **Author:** asks to backport useful changes to main, specifically function type

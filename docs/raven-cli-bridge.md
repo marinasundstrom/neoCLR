@@ -23,3 +23,11 @@ feature branches in both repositories. Do not use a Function-branch bundle as
 acceptance evidence for this integration. General core, unit, tuple, iteration,
 propagation and typeof encodings remain described in Raven's
 `docs/compiler/neoclr-cli-bridge.md`; this CLI bridge is not a native metadata loader.
+
+## Native metadata exploration (2026-09-30)
+
+The [extended CLI metadata design](design/extended-cli-metadata.md) starts on
+`codex/extended-cli-metadata` from main. It includes structural type identity,
+synthesized members, explicit capabilities and a staged Raven importer/emitter path.
+This is planning; current marker/carrier behavior and Runtime Contract configuration
+remain as described above. No native-format artifact or Raven bundle is validated yet.

@@ -54,6 +54,17 @@ continues to use the existing nominal Func/delegate runtime.
 [Delegates evolved proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/delegates-evolved.md)
 · [Callable interface proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/callable-interface.md)
 
+## Extended CLI metadata and structural types
+
+Feature-branch exploration considers a CLI-derived format for structural arrays,
+tuples, Function types, unions/intersections and synthesized members, with later Raven
+integration. Reusing ordinary declarations could retain useful tooling while native
+signatures preserve neoCLR identity. New readers and explicit capability checks would
+be required; container readability does not imply CLR execution compatibility.
+This remains design work, not an implemented format or published capability.
+
+[Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
+
 ## Collections
 
 [Sequence, MutableSequence and List](../features/collections/) distinguish reading,

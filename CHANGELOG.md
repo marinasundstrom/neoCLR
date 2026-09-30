@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
+- Start extended CLI metadata design on a main-based feature branch, covering
+  structural types, synthesized member identity, capabilities, compatibility limits
+  and a staged Raven integration plan. Record research and planned codec acceptance;
+  no binary format, runtime support or Raven compiler change is implemented yet.
+
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
   synchronization; this organizational change does not enable structural types on main.
