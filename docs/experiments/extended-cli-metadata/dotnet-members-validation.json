@@ -1,0 +1,209 @@
+{
+  "date": "2026-09-30",
+  "scope": "section-4 tables and catalog-scoped derived contracts; no invocation or assembly loading",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "target_framework": "net10.0",
+  "shared_vectors": 49,
+  "contract_vectors": 14,
+  "identity_vectors": 5,
+  "rejection_vectors": 30,
+  "independent_golden_emission_writer_and_ownership_checks": "passed",
+  "cases": [
+    {
+      "name": "empty",
+      "result": "valid"
+    },
+    {
+      "name": "array",
+      "result": "valid"
+    },
+    {
+      "name": "array_ref",
+      "result": "valid"
+    },
+    {
+      "name": "tuple",
+      "result": "valid"
+    },
+    {
+      "name": "maximum-tuple",
+      "result": "valid"
+    },
+    {
+      "name": "maximum-deconstruct",
+      "result": "valid"
+    },
+    {
+      "name": "function-value",
+      "result": "valid"
+    },
+    {
+      "name": "function-ref",
+      "result": "valid"
+    },
+    {
+      "name": "function-readonly_ref",
+      "result": "valid"
+    },
+    {
+      "name": "function-out",
+      "result": "valid"
+    },
+    {
+      "name": "function-out_when_true",
+      "result": "valid"
+    },
+    {
+      "name": "no-result-False",
+      "result": "valid"
+    },
+    {
+      "name": "no-result-True",
+      "result": "valid"
+    },
+    {
+      "name": "reference-owner",
+      "result": "valid"
+    },
+    {
+      "name": "reference-renumbering",
+      "result": "equal"
+    },
+    {
+      "name": "array-storage",
+      "result": "different"
+    },
+    {
+      "name": "no-result-identity",
+      "result": "different"
+    },
+    {
+      "name": "function-mode-identity",
+      "result": "different"
+    },
+    {
+      "name": "normalized-owner",
+      "result": "equal"
+    },
+    {
+      "name": "length-scalar",
+      "result": "reject"
+    },
+    {
+      "name": "element-array",
+      "result": "reject"
+    },
+    {
+      "name": "element-range",
+      "result": "reject"
+    },
+    {
+      "name": "invoke-tuple",
+      "result": "reject"
+    },
+    {
+      "name": "deconstruct-function",
+      "result": "reject"
+    },
+    {
+      "name": "unresolved-owner",
+      "result": "reject"
+    },
+    {
+      "name": "empty-unresolved-owner",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-0",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-1",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-2",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-3",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-4",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-5",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-6",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-7",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-8",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-9",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-10",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-11",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-12",
+      "result": "reject"
+    },
+    {
+      "name": "truncated-13",
+      "result": "reject"
+    },
+    {
+      "name": "trailing",
+      "result": "reject"
+    },
+    {
+      "name": "duplicate",
+      "result": "reject"
+    },
+    {
+      "name": "count",
+      "result": "reject"
+    },
+    {
+      "name": "owner-zero",
+      "result": "reject"
+    },
+    {
+      "name": "owner-range",
+      "result": "reject"
+    },
+    {
+      "name": "operation",
+      "result": "reject"
+    },
+    {
+      "name": "flags",
+      "result": "reject"
+    },
+    {
+      "name": "operand",
+      "result": "reject"
+    },
+    {
+      "name": "element-limit",
+      "result": "reject"
+    }
+  ]
+}

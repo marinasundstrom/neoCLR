@@ -424,7 +424,9 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 `NeoCLR.Metadata.Experimental.SignatureContext` and
 `NeoCLR.Metadata.Experimental.StructuralSignature`, plus the same namespace’s
 `MetadataReference`, `MetadataDefinition`, `ReferenceBindings`, `ReferenceTable`,
-`StructuralIdentity` and `ResolvedTypeIdentity`, are .NET-host-only types in
+`StructuralIdentity`, `ResolvedTypeIdentity`, `StructuralMemberReference`,
+`ResolvedMemberIdentity`, `StructuralMemberDescriptor` and `StructuralMembers`,
+are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type
 selection or refreshed from a guest compiler bridge. Their complete signatures,

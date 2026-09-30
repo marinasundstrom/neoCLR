@@ -4,8 +4,8 @@
 Assembly and namespace: `NeoCLR.Metadata.Experimental`. Target: .NET 10.
 Source project: `tools/metadata/NeoCLR.Metadata.Experimental`.
 This is the first reusable reader/writer slice intended for Raven's future symbol
-loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures and reference tables**,
-and resolves structural equality against an explicitly supplied host catalog.
+loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
+and derives structural identities/member contracts against an explicitly supplied host catalog.
 No PE/CLI loading, artifact recognition, physical CLI declaration resolution,
 Introspection assembly loading or assembly emission is implemented by this library yet.
 
@@ -21,6 +21,10 @@ Introspection assembly loading or assembly emission is implemented by this libra
 - [ReferenceTable](#referencetable): reference payload read/write operations.
 - [StructuralIdentity](#structuralidentity): catalog validation and normalized equality.
 - [ResolvedTypeIdentity](#resolvedtypeidentity): immutable resolved equality key.
+- [StructuralMemberReference](#structuralmemberreference): operation and local owner/ordinal.
+- [ResolvedMemberIdentity](#resolvedmemberidentity): resolved owner/operation identity.
+- [StructuralMemberDescriptor](#structuralmemberdescriptor): immutable derived contract.
+- [StructuralMembers](#structuralmembers): member table codec and contract resolver.
 
 These .NET-host-only types have this complete manual reference because the site's
 RavenDoc source is the neoCLR guest compiler-reference assembly. They are not omitted
@@ -349,3 +353,107 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_references.py
 All 95 shared vectors pass: 22 equality/distinction cases, four table round-trips and
 69 rejections. Independent C# golden UUID emission/reading, writer validation and list
 ownership checks also pass. The test-only JSON transport is not a library API.
+
+
+## StructuralMemberReference
+
+```csharp
+public sealed record StructuralMemberReference(string Operation, int Owner = 1,
+                                               int Element = 0);
+```
+
+The constructor and matching init properties retain values without validation.
+The record supplies value equality, hashes, deconstruction, printable representation
+and `with` copies. StructuralMembers validates before reading/writing/resolving:
+Operation must be `array_length`, `tuple_element`, `tuple_deconstruct` or
+`function_invoke`; Owner must be 1 (the section-3 root); Element is 0–255 and must be
+zero except for a zero-based tuple element. A reference is not a MethodDef token.
+
+## ResolvedMemberIdentity
+
+```csharp
+public sealed record ResolvedMemberIdentity(ResolvedTypeIdentity Owner,
+                                            string Operation, int Element);
+```
+
+A schema-1 identity comprising a resolved owner, operation and ordinal. Positional
+constructor/init properties and generated record equality/hash/deconstruction/`with`
+behave as value operations. The resolver returns validated identities; constructing
+one directly performs no validation and grants no capability. Equality compares full
+resolved owner identity, so local reference numbering is irrelevant but declaration
+scopes, array storage, Function modes/no-result and tuple ordinals remain significant.
+Hashes are process-local and neither identity nor its string form is a persistence API.
+
+## StructuralMemberDescriptor
+
+```csharp
+public sealed class StructuralMemberDescriptor
+{
+    public ResolvedMemberIdentity Identity { get; }
+    public IReadOnlyList<ResolvedTypeIdentity> Parameters { get; }
+    public IReadOnlyList<string> Modes { get; }
+    public ResolvedTypeIdentity Result { get; }
+    public bool NoResult { get; }
+}
+```
+
+Created only by StructuralMembers.Resolve, with copied read-only parameter/mode lists.
+Parameters exclude the receiver; modes correspond one-to-one in order. Result is unit
+when NoResult is true; a unit result with NoResult false is distinct. Descriptor object
+equality is ordinary reference equality; compare Identity for member identity and
+properties for contract content. No method body, dispatch target or invocation API exists.
+
+## StructuralMembers
+
+```csharp
+public static class StructuralMembers
+{
+    public static ResolvedTypeIdentity NativeUnsignedResult { get; }
+    public static IReadOnlyList<StructuralMemberReference> Read(ReadOnlySpan<byte> payload);
+    public static byte[] Write(IReadOnlyList<StructuralMemberReference> members);
+    public static IReadOnlyList<StructuralMemberDescriptor> Resolve(
+        IReadOnlyList<StructuralMemberReference> members, TypeExpression root,
+        SignatureContext context, ReferenceBindings bindings,
+        IReadOnlyDictionary<MetadataReference, MetadataDefinition> catalog);
+}
+```
+
+Read/Write encode section 4, schema 1: little-endian u16 count followed by six-byte
+rows (u16 owner, u8 operation, u8 zero flags, u16 operand). Operation codes 1–4 follow
+the order listed above. At most 256 unique rows are permitted, including an empty table.
+Read returns owned read-only rows; Write returns a fresh byte array. Table operations
+validate counts, exact lengths, operations, flags, owners, operands and duplicates,
+but do not validate owner shapes. Invalid data or null rows raises InvalidDataException;
+a null writer list raises ArgumentNullException.
+
+Resolve validates the entire owner using StructuralIdentity.Resolve, even for an empty
+member list, then checks each operation's owner shape and derives these contracts:
+
+| Operation | Owner | Parameters/modes | Result |
+| --- | --- | --- | --- |
+| array_length | Array or ArrayRef | None | NativeUnsignedResult; NoResult false |
+| tuple_element | Tuple; ordinal within arity | None | Selected element; NoResult false |
+| tuple_deconstruct | Tuple | All elements, each `out` | Unit; NoResult true |
+| function_invoke | Function | Declared parameters and modes | Declared result and NoResult |
+
+NativeUnsignedResult is an intrinsic descriptor identity for native unsigned/UIntPtr,
+matching the experimental runtime ArrayLength contract. It adds no serializable
+signature opcode and does not claim ordinary .NET Array.Length's Int32 contract.
+Compare result identities with Equals. Resolve returns owned read-only descriptors in
+input order. Null arguments raise ArgumentNullException; invalid tables, unresolved
+catalog declarations, incompatible shapes or out-of-range tuple ordinals raise
+InvalidDataException. Callers must not mutate input lists/catalogs during operations.
+
+Envelope composition remains the caller's responsibility: this member profile needs
+mandatory schema-1 sections 2, 3 and 4, with no local section-1 signature. These APIs do
+not perform artifact recognition, PE loading, assembly emission or runtime invocation.
+
+The compiled consumer validates all public operations with 49 Python/.NET shared cases:
+14 contract vectors, five identity comparisons and 30 rejections. Coverage includes
+256 tuple elements/deconstruction outputs, empty tables, all Function modes, reference
+renumbering and malformed framing. Independent C# golden emission, writer rejection
+and reader ownership checks also pass.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_members.py
+```

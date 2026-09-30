@@ -46,7 +46,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   vectors pass, including 22 equality/distinction cases and 69 rejections; independent
   UUID byte-order emission, writer validation and ownership checks pass. Document
   all six new host API types. Physical CLI binding and Raven/neoCLR consumers remain
-  pending; host scope UUIDs are not production assembly identities.
+  pending; host scope UUIDs are not production assembly identities. Add .NET
+  synthesized-member table read/write and derived array, tuple and Function contracts:
+  49 shared vectors pass (14 contracts, five identity comparisons, 30 rejections),
+  plus independent golden emission, writer validation and reader ownership checks.
+  Document four new host types; descriptors preserve native unsigned array length
+  and Function modes/no-result without granting runtime invocation.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

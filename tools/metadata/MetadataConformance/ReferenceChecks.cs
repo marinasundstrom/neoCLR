@@ -56,7 +56,13 @@ internal static class ReferenceChecks
         Console.WriteLine($"{document.RootElement.GetArrayLength()} shared reference/identity vectors and writer ownership checks passed");
     }
 
-    private static ResolvedTypeIdentity Resolve(JsonElement specification)
+    internal static ResolvedTypeIdentity Resolve(JsonElement specification)
+    {
+        var (root, context, bindings, catalog) = Profile(specification);
+        return StructuralIdentity.Resolve(root, context, bindings, catalog);
+    }
+
+    internal static (TypeExpression, SignatureContext, ReferenceBindings, Dictionary<MetadataReference, MetadataDefinition>) Profile(JsonElement specification)
     {
         var signature = StructuralSignature.Read(Convert.FromBase64String(specification.GetProperty("signature").GetString()!), true);
         var bindings = ReferenceTable.Read(Convert.FromBase64String(specification.GetProperty("bindings").GetString()!));
@@ -68,7 +74,7 @@ internal static class ReferenceChecks
                 entry.GetProperty("kind").GetString()!, entry.GetProperty("arity").GetInt32(),
                 owner.ValueKind == JsonValueKind.Null ? null : Reference(owner)));
         }
-        return StructuralIdentity.Resolve(signature.Root, signature.Context, bindings, catalog);
+        return (signature.Root, signature.Context, bindings, catalog);
     }
 
     private static MetadataReference Reference(JsonElement element) => new(

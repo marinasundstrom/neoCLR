@@ -529,3 +529,27 @@ emission or runtime execution is established by equality conformance.
 Next bounded task: port synthesized structural-member references/contracts into the
 .NET library using the shared member fixtures. Keep actual PE binding and Raven/guest
 integration as separately validated adapters.
+
+
+## .NET synthesized-member tables and contracts (2026-09-30)
+
+The host library now reads/writes section-4/schema-1 references and derives array
+length, tuple element/deconstruction and Function invocation contracts. Descriptors
+use resolved owner identity and operation/ordinal, preserving reference renumbering
+while retaining declaring scopes, Function modes/no-result and array storage.
+Array length has the native unsigned/UIntPtr descriptor established by the Python
+prototype; this is not a new signature opcode. No descriptor grants invocation.
+
+`verify_dotnet_members.py` validates 49 shared cases: 14 contract vectors, five identity
+comparisons and 30 rejections. Coverage includes maximum tuple arity/member count,
+all Function modes, unit versus no-result, normalized structural owners, renumbered
+nominal references, malformed tables and incompatible owner shapes. Independent C#
+golden emission, writer validation and owned reader data also pass. Build succeeds
+without warnings/errors; the guest API snapshot check remains unchanged.
+[Evidence](dotnet-members-validation.json) and the
+[complete four-type API reference](../../../api-docs/experimental-metadata.md#structuralmemberreference)
+are versioned with the implementation.
+
+Next bounded task: a .NET profile reader/writer that enforces section composition and
+mandatory schemas before exposing decoded structural metadata. PE marker recognition,
+physical CLI binding and Raven/guest Introspection/Emit adapters remain separate work.

@@ -102,6 +102,9 @@ public static class StructuralIdentity
         return new ResolvedTypeIdentity(Build(root).Bytes);
     }
 
+    internal static ResolvedTypeIdentity NativeUnsignedResult() =>
+        new(new KeyNode("intrinsic_native_uint", [], null, 0, [], false).Bytes);
+
     // Private canonical equality representation, intentionally not a serialization API.
     private sealed class KeyNode
     {

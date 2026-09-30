@@ -7,7 +7,7 @@ on the platform libraries; neither requires Raven or Mono.Cecil.
 
 The current library covers NEOX 0.1 envelope framing, immutable section ownership
 and structural signature syntax/context validation, reference-table codecs and
-explicit-catalog structural identity. PE transport/recognition, actual
+explicit-catalog structural identity and synthesized-member contracts. PE transport/recognition, actual
 declaration resolution and compiler adapters remain pending. It is not the future neoCLR guest metadata/Introspection/Emit
 library. Names and contracts are experimental.
 
@@ -21,6 +21,7 @@ From the repository root:
 python3 docs/experiments/extended-cli-metadata/verify_dotnet.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_signatures.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_references.py
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_members.py
 ```
 
 The verifier builds the library/consumer, runs ownership and writer checks, cross-reads
@@ -37,5 +38,10 @@ it is not the eventual Raven symbol model or resolved neoCLR type identity.
 The reference consumer compares 95 shared table/identity vectors, including 69
 rejections. Catalog scopes are host-assigned, not physical CLI assembly identities.
 Reference numbering is erased from resolved equality; declaring owners, Function
-contracts and array storage remain significant. PE/profile adapters, synthesized
-member support and actual CLI declaration loading remain separate work.
+contracts and array storage remain significant. PE/profile adapters and actual CLI
+declaration loading remain separate work.
+
+The member consumer compares 49 shared vectors: 14 derived contracts, five identity
+comparisons and 30 rejections. Array length returns native unsigned, tuple projection/
+deconstruction preserve element contracts, and Function invocation preserves modes
+and no-result. Descriptors have no runtime invocation or dispatch capability.

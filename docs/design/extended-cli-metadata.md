@@ -255,7 +255,7 @@ import path from Raven to the current runtime. Exact package names and implement
 languages remain provisional. The Python codec is a research harness, not the proposed
 shipping library on either platform. The first [.NET library slice](../../tools/metadata/README.md)
 now covers framing, owned sections, structural signature syntax/context validation,
-reference tables and explicit-catalog structural identity. Physical CLI declaration
+reference tables, explicit-catalog structural identity and synthesized-member contracts. Physical CLI declaration
 resolution, Raven adapters and neoCLR guest library support remain pending.
 The catalog resolver reuses the provisional identity rules above: unlike a CLI token
 local to one module, its resolved key carries host-assigned assembly/module scope and
@@ -264,6 +264,15 @@ at the cost of requiring authoritative, compatible host catalogs. The UUID scope
 are not a replacement for production CLI assembly identity.
 [95 shared vectors](../experiments/extended-cli-metadata/dotnet-references-validation.json)
 validate this bounded model; no execution, performance or production loader claim is made.
+
+The .NET synthesized-member layer now reproduces the Python contracts in
+[49 shared vectors](../experiments/extended-cli-metadata/dotnet-members-validation.json).
+Unlike ordinary CLR reflection members backed by declaration metadata, these descriptors
+derive from structural owners and carry no MethodDef or dispatch target. This keeps
+reference renumbering out of identity and avoids invented carrier methods, at the cost
+of a separate compiler/runtime lowering contract. Array length uses the already-tested
+structural branch’s native unsigned/UIntPtr result, not .NET Array.Length’s Int32.
+No runtime semantics change is introduced by porting this existing prototype.
 
 The author clarifies the concrete library consumers:
 
