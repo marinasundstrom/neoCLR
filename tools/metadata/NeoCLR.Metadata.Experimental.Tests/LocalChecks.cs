@@ -7,6 +7,13 @@ internal static class LocalChecks
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, host.CultureName ?? "", Convert.ToHexString(host.GetPublicKeyToken() ?? []));
+        var legacy = new AssemblyBuilder(new("LegacyLocals", new Version(1, 0, 0, 0)), core);
+        var legacyMain = legacy.AddFunction("Main"); legacyMain.LoadConstant(42); legacyMain.Return(); legacy.EntryPoint = legacyMain;
+        var legacyJson = System.Text.Json.Nodes.JsonNode.Parse(legacy.WriteNativeAssembly())!;
+        foreach (var function in legacyJson["functions"]!.AsArray()) function!.AsObject().Remove("locals");
+        var legacyBytes = System.Text.Encoding.UTF8.GetBytes(legacyJson.ToJsonString());
+        _ = NativeAssemblyDefinition.ReadAssembly(legacyBytes);
+        _ = RuntimeAssemblyContainer.Read(RuntimeAssemblyContainer.WriteBinary(legacyBytes, core));
         var assembly = new AssemblyBuilder(new("Locals", new Version(1, 0, 0, 0)), core);
         var main = assembly.AddFunction("Main"); assembly.EntryPoint = main;
         var local = main.DeclareInt32Local();

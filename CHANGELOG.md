@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to the experimental metadata API, with CLI local signatures and native local lists.
   Reject bad owners/indices, stack underflow and loads before stores. ClearBody retains
   locals. Older producer artifacts remain readable; older experimental host readers
-  may reject the new local list. Raven now emits initialized locals and assignments
+  may reject the new local list. Lock backward reading with an explicit pre-locals
+  fixture; optional local lists must not become required by exact object-shape checks.
+  Raven now emits initialized locals and assignments
   through both bounded backends; the runtime's existing local support is reused.
   Add owned branch labels, signed comparisons and Boolean/branch Emit overloads with
   typed control-flow stack/initialization validation. Compute CLI/native destinations
