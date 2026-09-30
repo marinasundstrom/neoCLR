@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
+- Document Raven main's experimental `CompilationOptions.NeoCLR` and project
+  platform preset, its explicit reference/core/unit requirements and existing CLI
+  contract defaults. Current runtime props and artifacts are unchanged; Self and
+  record mappings, caller migration and matching runtime validation remain separate.
+
 - Add native `Self` interface signatures and typed `callself` dispatch, with runtime
   conformance and generic-bound checks. Keep `Self` distinct from Raven's `self`
   value. Migrate development `System.Number<T>` to non-generic `System.Number`

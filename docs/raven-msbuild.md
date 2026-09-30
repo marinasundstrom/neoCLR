@@ -5,6 +5,32 @@ standalone MSBuild props/targets. It does not import `Microsoft.NET.Sdk`, declar
 .NET target framework, or require a new Raven compiler build. It uses the installed
 experimental .14 compiler and the matching runtime bundle.
 
+## Raven main development profile (2026-09-30)
+
+Raven main now provides `CompilationOptions.NeoCLR` and the project selector
+`<RavenTargetPlatform>NeoCLR</RavenTargetPlatform>` for the experimental CLI bridge.
+This is a compiler development API, not a change to the published bundles below.
+It configures explicit `NeoCLR.CoreProbe` metadata/emission cores, `System.Void`
+unit, iteration/propagation/introspection contracts, grapheme characters, heap
+async state with cancellation, and no captured async exceptions. Array covariance
+and source nullable values default off. Reference assemblies must still be supplied.
+
+Core/unit contradictions diagnose before loading/output; project overrides inherit
+unspecified profile fields. No native loader/backend or complete capability matrix
+is supplied. Self and record mappings are excluded. In particular, the current
+`build/NeoCLR.Raven.props` includes the separate Self experiment and cannot be
+replaced wholesale by this preset. It remains unchanged; migration and matching
+runtime execution validation are pending. Legacy assembly-name settings still work.
+
+The author has moved shared compiler/.NET/neoCLR development onto Raven main and
+retained feature branches for Self and intersections; this supersedes the older
+integration-separation direction for this compiler work.
+
+Raven implementation: `9a58e1356` on shared main. Validation passed 109 focused
+configuration/project/compatibility tests on .NET 11 and compiler builds for
+.NET 10/11. No matching local `demo/NeoCLR.CoreProbe.dll` was present; the new
+profile has not been qualified through native neoCLR execution in this slice.
+
 ## Current local setup
 
 For the installed 26 September SDK, configured VS Code launcher and HTTP/JSON
