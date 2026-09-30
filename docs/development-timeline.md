@@ -9205,3 +9205,21 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** native metadata provider, production emitter/target configuration and wider
   ordinary metadata support. The prototype is not advertised as full target support.
   No code or messages were sent to another thread, and no remote push was performed.
+
+## 2026-09-30 — Runtime loading remains the metadata acceptance gate
+
+- **Author reminder:** "Don't forget neoCLR runtime support for loading the assemblies with the metadata format."
+- **Assistant response:** retained actual native loading, verification and execution
+  as the acceptance gate. Distinguished the format-5 runtime artifact from the
+  temporary reference-only PE used for Raven binding, and stated that direct PE/#Neo
+  loading remains unimplemented.
+- **Action:** extended the source-to-native case to a Raven application and two Raven
+  libraries; added an owned direct-reference list to the native metadata reader.
+  The application binds only the outer library; the host supplies both native runtime
+  dependencies explicitly. No inference of a permanent change in roadmap priorities.
+- **Observed outcome:** all three application variants execute to 42, as does reversed
+  runtime module order. Native verification rejects missing and wrong-revision direct
+  and transitive dependencies. All 24 C# metadata contract groups pass. The existing
+  runtime already handles this graph, so no runtime code change was needed.
+- **Open:** direct PE/#Neo loading, structural metadata semantics, native compiler
+  symbol loading and production target composition. [Scope and evidence](raven-cli-bridge.md#transitive-native-runtime-acceptance--2026-09-30).

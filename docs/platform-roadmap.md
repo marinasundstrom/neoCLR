@@ -459,3 +459,9 @@ Raven library, with a separately compiled Raven application consuming its native
 metadata through the temporary reference projection. Overload/helper calls execute
 to 42 and dependency failure cases are checked. Native symbol loading and wider
 source/visibility support remain staged follow-up work.
+
+Transitive runtime checkpoint (2026-09-30): three Raven-compiled native assemblies
+load/verify/execute as a dependency chain to 42, in either supplied module order.
+The native reader exposes direct exact references; missing and wrong-revision
+transitive dependencies fail runtime verification. Runtime acceptance remains required;
+direct PE/#Neo loading and a native compiler symbol provider remain open.

@@ -131,7 +131,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Extend the case to a Raven-compiled library and separate Raven application,
   including overload selection and a library-local helper call. All three application
   variants return 42; unsupported library visibility and missing/wrong-version native
-  dependencies are rejected. The metadata API and native runtime format are unchanged.
+  dependencies are rejected. The native runtime format is unchanged. Extend runtime
+  acceptance to a transitive chain of three Raven-compiled native assemblies, with
+  both module orders, missing transitive modules and wrong revisions checked. Expose
+  owned exact direct dependency identities through NativeAssemblyDefinition.References;
+  implementation-only dependencies remain outside primitive PE projections. All 24
+  C# metadata contract groups pass; the existing native loader/verifier/VM runs the
+  chain to 42 without runtime implementation changes.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

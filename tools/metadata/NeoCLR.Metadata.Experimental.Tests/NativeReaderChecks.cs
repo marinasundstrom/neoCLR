@@ -73,6 +73,30 @@ internal static class NativeReaderChecks
         opaqueBody["functions"]![1]!["body"] = new JsonArray(new JsonObject { ["op"] = "future.op" });
         Check(NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(opaqueBody.ToJsonString())).Identity.Equals(read.Identity), "body inspection is explicitly outside metadata reader");
     }
+    internal static void References()
+    {
+        var core = new AssemblyIdentity("Core", new Version(1, 0, 0, 0));
+        var first = new AssemblyBuilder(new("Leaf", new Version(1, 0, 0, 0), "fr"), core);
+        var second = new AssemblyBuilder(new("Leaf", new Version(2, 0, 0, 0), "fr"), core);
+        var one = first.AddFunction("One", returnsValue: false); one.Return();
+        var two = second.AddFunction("Two", returnsValue: false); two.Return();
+        var outer = new AssemblyBuilder(new("Outer", new Version(1, 0, 0, 0)), core);
+        var method = outer.AddFunction("Call", returnsValue: false); method.Call(two); method.Call(one); method.Call(two); method.Return();
+        var bytes = outer.WriteNativeAssembly();
+        var snapshot = NativeAssemblyDefinition.ReadAssembly(bytes);
+        Array.Clear(bytes);
+        Check(snapshot.References.Count == 2 && snapshot.References[0].Equals(second.Identity) && snapshot.References[1].Equals(first.Identity), "exact direct identities in manifest order, repeated calls deduplicated");
+        Check(!AssemblyDefinition.ReadAssembly(snapshot.CreateReferenceAssembly(core), false).MainModule.AssemblyReferences.Any(r => r.Identity.Name == "Leaf"), "implementation-only references stay outside primitive reference projection");
+        try { ((IList<AssemblyIdentity>)snapshot.References)[0] = first.Identity; throw new Exception("mutable native references"); }
+        catch (NotSupportedException) { }
+        var wrong = JsonNode.Parse(outer.WriteNativeAssembly())!;
+        wrong["references"]![0]!["revision"] = "3.0.0.0";
+        Reject(Encoding.UTF8.GetBytes(wrong.ToJsonString()));
+        var duplicate = JsonNode.Parse(outer.WriteNativeAssembly())!;
+        duplicate["references"]!.AsArray().Add(duplicate["references"]![0]!.DeepClone());
+        duplicate["assemblies"]![0]!["references"]!.AsArray().Add(duplicate["assemblies"]![0]!["references"]![0]!.DeepClone());
+        Reject(Encoding.UTF8.GetBytes(duplicate.ToJsonString()));
+    }
     private static void Reject(byte[] bytes)
     {
         try { NativeAssemblyDefinition.ReadAssembly(bytes); } catch (InvalidDataException) { return; }

@@ -13,10 +13,13 @@ public sealed class NativeAssemblyDefinition
     private sealed record MethodRow(string Name, int Owner, int Count, bool ReturnsValue);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods)
-    { Identity = identity; this.types = types; this.methods = methods; }
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, AssemblyIdentity[] references)
+    { Identity = identity; this.types = types; this.methods = methods; References = System.Array.AsReadOnly(references); }
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
+    /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
+    /// <remarks>Includes implementation dependencies omitted from primitive-only PE projections. No dependencies are resolved or loaded.</remarks>
+    public IReadOnlyList<AssemblyIdentity> References { get; }
 
     /// <summary>Copies the supported declarations from native UTF-8 JSON without executing code.</summary>
     /// <param name="image">At most 4 MiB of API-produced format-5 JSON.</param>
@@ -47,11 +50,13 @@ public sealed class NativeAssemblyDefinition
             var references = Array(root, "references", 256);
             Require(referenceNames.Length == references.Length, "native reference count mismatch");
             var seenReferences = new HashSet<AssemblyIdentity>();
+            var referenceIdentities = new List<AssemblyIdentity>();
             for (int i = 0; i < references.Length; i++)
             {
                 var reference = ReadIdentity(referenceNames[i]); Shape(references[i], "name", "revision");
                 Require(!reference.Equals(identity) && seenReferences.Add(reference), "duplicate or self native reference");
                 Require(Text(references[i], "name") == ModuleName(referenceNames[i]) && Text(references[i], "revision") == reference.Version.ToString(), "native reference identity mismatch");
+                referenceIdentities.Add(reference);
             }
             var typeElements = Array(root, "types", 256);
             var types = new List<TypeRow>();
@@ -107,7 +112,7 @@ public sealed class NativeAssemblyDefinition
                 var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Count == 0 && methods[p.index].ReturnsValue).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
-            return new(identity, types.ToArray(), methods.ToArray());
+            return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }

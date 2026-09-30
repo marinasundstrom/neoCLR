@@ -1235,6 +1235,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeAssemblyDefinition
 {
     public AssemblyIdentity Identity { get; }
+    public IReadOnlyList<AssemblyIdentity> References { get; }
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image);
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary);
 }
@@ -1242,6 +1243,12 @@ public sealed class NativeAssemblyDefinition
 
 `ReadAssembly` copies an owned declaration snapshot from the bounded writer's native
 format-5 UTF-8 JSON. `Identity` retains the exact unsigned assembly identity.
+`References` retains exact direct native dependency identities in manifest order,
+including implementation-only references omitted from the PE projection. The list is
+owned and read-only; identities include version/culture/key/flags. It is bounded to
+256 entries, performs no resolution or file/runtime loading, and is not a transitive
+closure. Hosts must supply the required native dependency graph to the runtime.
+
 This is a metadata reader, not a native verifier, arbitrary format-5 reader, or body
 translator. Bodies remain opaque; the original native artifact must pass neoCLR's
 verifier before execution. Disposing JSON parsing state or changing the input buffer
@@ -1282,8 +1289,13 @@ bridge adds a projection and cannot preserve arbitrary native semantics; a nativ
 semantic-data provider should replace it. See Microsoft's
 [reference assembly contract](https://learn.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies).
 
-Twenty-three C# contract groups pass, including native Unicode/global/no-result
+Twenty-four C# contract groups pass, including native Unicode/global/no-result
 roundtrips, input ownership, malformed/unsupported metadata and count limits, reference
 marker inspection, and .NET execution-load rejection with BadImageFormatException.
 The Raven consumer starts from the native dependency, binds the projected declarations,
 and emits applications that neoCLR executes with the original dependency to 42.
+
+Native reference tests additionally cover exact same-name/different-version identities,
+manifest order, repeated-call deduplication, collection immutability, source-buffer
+ownership, omission of implementation-only PE references, and inconsistent/duplicate
+native references. The compiler consumer now executes a three-assembly chain in neoCLR.
