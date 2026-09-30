@@ -1694,8 +1694,10 @@ repeated marks and incompatible opcodes throw `ArgumentException` without changi
 instructions. Instruction-limit violations throw `InvalidDataException`. `ClearBody`
 retains handles but removes marks, so reused destinations must be marked again.
 
-Operand-free `Ceq`, `Clt` and `Cgt` pop two Int32 values and push Boolean. `Clt`/`Cgt`
-are signed comparisons. Conditional branches pop Boolean, not Int32; conditions may
+Operand-free `Ceq` pops two matching Int32 or Boolean values and pushes Boolean;
+mixed operand types reject. `Clt` and `Cgt` pop two Int32 values and push Boolean,
+using signed comparisons. Boolean equality permits logical negation (`false; ceq`)
+without treating native Boolean as Int32. Conditional branches pop Boolean, not Int32; conditions may
 also use `Ldc_Bool`. General Boolean locals/signatures are not introduced here.
 
 Writing computes typed stack states and definitely stored locals over the control-flow

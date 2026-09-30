@@ -22,7 +22,7 @@ public enum OpCode
     Ldloc,
     /// <summary>Stores an Int32 local; requires a slot index or owned local.</summary>
     Stloc,
-    /// <summary>Compares two Int32 values for equality, pushing Boolean.</summary>
+    /// <summary>Compares matching Int32 or Boolean values for equality, pushing Boolean.</summary>
     Ceq,
     /// <summary>Compares two signed Int32 values for less-than, pushing Boolean.</summary>
     Clt,

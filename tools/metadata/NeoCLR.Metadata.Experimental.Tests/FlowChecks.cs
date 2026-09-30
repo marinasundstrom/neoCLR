@@ -17,6 +17,12 @@ internal static class FlowChecks
         if (!Equals(System.Reflection.Assembly.Load(assembly.Write()).EntryPoint!.Invoke(null, null), 42)) throw new Exception("CLI loop execution");
         _ = assembly.WriteNativeAssembly();
         Reject<ArgumentException>(() => main.MarkLabel(done));
+        main.ClearBody();
+        main.Emit(OpCode.Ldc_Bool, false); main.Emit(OpCode.Ldc_Bool, false); main.Emit(OpCode.Ceq);
+        main.Emit(OpCode.Brtrue, done); main.LoadConstant(0); main.Return();
+        main.MarkLabel(done); main.LoadConstant(42); main.Return();
+        if (!Equals(System.Reflection.Assembly.Load(assembly.Write()).EntryPoint!.Invoke(null, null), 42)) throw new Exception("Boolean equality execution");
+        _ = assembly.WriteNativeAssembly();
         var other = assembly.AddFunction("Other"); other.LoadConstant(0); other.Return();
         Reject<ArgumentException>(() => other.Emit(OpCode.Br, done));
         main.ClearBody(); main.Emit(OpCode.Br, done); main.Return();

@@ -92,7 +92,10 @@ public sealed partial class MethodBuilder
                     stack.Add(false); break;
                 case "local.store": Pop(); assigned[instruction.Value] = true; break;
                 case "add": case "subtract": case "multiply": Pop(); Pop(); stack.Add(false); break;
-                case "equal": case "less": case "greater": Pop(); Pop(); stack.Add(true); break;
+                case "equal":
+                    if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
+                    var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(true); break;
+                case "less": case "greater": Pop(); Pop(); stack.Add(true); break;
                 case "call":
                     for (int i = 0; i < instruction.Target!.ParameterCount; i++) Pop();
                     if (instruction.Target.ReturnsValue) stack.Add(false);

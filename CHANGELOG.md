@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   through both bounded backends; the runtime's existing local support is reused.
   Add owned branch labels, signed comparisons and Boolean/branch Emit overloads with
   typed control-flow stack/initialization validation. Compute CLI/native destinations
-  after layout; Raven if/else and lowered loops reuse the shared body path.
+  after layout; Raven if/else and lowered loops reuse the shared body path. Extend Ceq
+  to matching Boolean operands so Raven negation and !=/<=/>= preserve native Boolean
+  semantics; validate combined break/continue execution.
 
 - Integrate Raven's compiler-lowered bodies into the bounded native metadata emitter,
   sharing implicit Int32 returns and simple named calls with .NET emission. Keep the

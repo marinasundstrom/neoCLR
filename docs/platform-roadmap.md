@@ -22,7 +22,7 @@ backend handles. Shared source callable plans separate native source validation 
 builder creation. Shared public nongeneric static-type plans now drive backend type
 builders; broader type/field references and full declaration traversal remain next,
 and the first paired body capability now supports initialized Int32 locals/assignments.
-Initial comparisons, if/else and lowered loop branches now execute on both runtimes;
+Comparisons (including negated forms), if/else and lowered loops with break/continue now execute on both runtimes;
 broader signatures and type/field references remain next;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 

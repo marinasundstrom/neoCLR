@@ -120,7 +120,7 @@ also share per-emission callable identity resolution and source callable plans,
 preserving overloads and assembly/type ownership. Public nongeneric static-type
 identity/naming plans also feed separate .NET and native type builders. Initialized
 Int32 locals and assignments now pass through the shared body path and metadata writer;
-initial signed comparisons, if/else and while-loop branches now run on both runtimes.
+signed/negated comparisons, if/else and while loops with break/continue now run on both runtimes.
 Broader value types and exception regions remain development work.
 General codegen
 portability and metadata importer work remain development tasks on the feature branches.
