@@ -13,6 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and a staged Raven integration plan. Record research and planned codec acceptance;
   add an isolated NEOX 0.1 framing codec/inspector with a golden vector and six
   focused tests for bounds, malformed directories and required schema negotiation.
+  Extend it with structural signature payloads and a checked-in nested fixture;
+  all 14 focused tests pass. Reuse structural-branch Function no-result/output
+  contracts and the owned/reference array distinction. Keep binder contexts local;
+  cross-module identity and nominal reference validation remain pending.
   CLI embedding, runtime support and Raven compiler changes remain unimplemented.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`

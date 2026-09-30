@@ -38,7 +38,13 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   in a separate worktree, preserving the author's uncommitted structural-types draft.
   Writes the [design and acceptance sequence](design/extended-cli-metadata.md), updates
   roadmap/bridge/proposal context and records preliminary primary-source comparisons.
-- **Open:** byte assignments, codec/reader experiments, structural semantic decisions,
+- **Author follow-up:** directs “Continue. Commit each slice”, then explicitly permits
+  building on `codex/structural-types`.
+- **Assistant action:** commits the design and standalone framing codec separately;
+  adds structural signature payloads using that branch's Function no-result/output
+  contracts and owned/reference array distinction. Fourteen focused tests and the
+  fixture inspector pass; no runtime commits are merged or Raven behavior changed.
+- **Open:** production byte assignments, CLI embedding, structural semantic decisions,
   runtime execution and later Raven integration. No implementation or format approval
   is inferred from this exchange; no permanent broader reprioritization is inferred.
 

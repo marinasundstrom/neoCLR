@@ -61,7 +61,9 @@ tuples, Function types, unions/intersections and synthesized members, with later
 integration. Reusing ordinary declarations could retain useful tooling while native
 signatures preserve neoCLR identity. New readers and explicit capability checks would
 be required; container readability does not imply CLR execution compatibility.
-This remains design work, not an implemented format or published capability.
+An isolated experimental codec now exercises framing and structural signatures.
+CLI embedding, runtime support and Raven integration remain pending; this is not a
+published platform format.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 

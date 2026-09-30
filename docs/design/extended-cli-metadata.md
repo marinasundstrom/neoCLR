@@ -197,7 +197,7 @@ literal transport needs its own explicit contract.
 | Step | Deliverable and exit evidence | Status |
 | --- | --- | --- |
 | 0 | Main-based branch, proposal inventory, structural requirements and compatibility questions | This document |
-| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing implemented](../experiments/extended-cli-metadata/README.md); structural payloads next |
+| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing and structural payloads implemented](../experiments/extended-cli-metadata/README.md); CLI references/embedding pending |
 | 2 | Structural identity/resolution tests across independently emitted modules; synthesized-member and conformance references | Planned |
 | 3 | One native consumer slice using Self and structural Function signatures; verifier, invocation, GC and introspection evidence | Planned; depends on explicit runtime feature work |
 | 4 | Raven reader/symbol adapter, then writer/backend integration through target capabilities | Later integration |
@@ -209,7 +209,9 @@ wrong token kinds, out-of-range heaps, invalid generic binders, duplicate record
 unknown signature forms and resource limits. Include conventional CLI fixtures unchanged.
 Use at least two differently numbered modules for identity tests in step 2; compare
 actual behavior of pinned System.Reflection.Metadata and the bridge's reader separately.
-Record tool versions and artifact hashes. These are planned tests, not passing evidence.
+Record tool versions and artifact hashes. The isolated codec now has
+[14 passing focused tests](../experiments/extended-cli-metadata/README.md#signature-evidence-2026-09-30);
+CLI-reference, conventional-reader and cross-module identity checks remain planned.
 
 Before production encoding, resolve normalization and position rules, capability/version
 negotiation, unsafe downgrade prevention and cross-module reference identity. Later

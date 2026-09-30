@@ -1,6 +1,6 @@
 """Standalone experimental metadata framing; not a PE/CLI reader or runtime loader."""
 import argparse
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 import json
 from pathlib import Path
 import struct
@@ -97,11 +97,17 @@ def main():
     parser.add_argument("image", type=Path)
     args = parser.parse_args()
     try:
-        sections = decode(read_image(args.image))
-        print(json.dumps({"profile": "NEOX 0.1", "executable": False, "sections": [
-            {"kind": s.kind, "version": s.version, "required": s.required,
-             "payload_hex": s.payload.hex()} for s in sections
-        ]}, indent=2))
+        from signatures import SECTION_KIND, SCHEMA, decode_signature
+        sections = decode(read_image(args.image), {SECTION_KIND: SCHEMA})
+        inspected = []
+        for section in sections:
+            item = {"kind": section.kind, "version": section.version,
+                    "required": section.required, "payload_hex": section.payload.hex()}
+            if (section.kind, section.version) == (SECTION_KIND, SCHEMA):
+                root, context = decode_signature(section.payload)
+                item.update(signature=asdict(root), context=asdict(context))
+            inspected.append(item)
+        print(json.dumps({"profile": "NEOX 0.1", "executable": False, "sections": inspected}, indent=2))
     except (OSError, FormatError) as error:
         print(f"metadata: {error}", file=sys.stderr)
         return 1
@@ -109,4 +115,5 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    from codec import main as inspect_main
+    sys.exit(inspect_main())
