@@ -194,5 +194,6 @@ proposals. [Discuss on GitHub](https://github.com/marinasundstrom/neoCLR/issues)
 or browse the [original proposals](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/README.md).
 
 Development on the metadata branches also preserves Boolean parameters/results across
-Raven declarations, native reference projections and imported overloads. Int32/no-result
+Raven declarations, native reference projections and imported overloads. Typed Boolean
+locals, assignment and equality now share the same body path. Int32/no-result
 entrypoints and the existing System bootstrap limits remain unchanged.

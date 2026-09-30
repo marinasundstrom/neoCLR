@@ -201,7 +201,11 @@ public sealed partial class AssemblyBuilder
             {
                 var signature = new BlobBuilder();
                 var variables = new BlobEncoder(signature).LocalVariableSignature(method.Locals.Count);
-                foreach (var local in method.Locals) variables.AddVariable().Type().Int32();
+                foreach (var local in method.Locals)
+                {
+                    if (local.Type == PrimitiveType.Boolean) variables.AddVariable().Type().Boolean();
+                    else variables.AddVariable().Type().Int32();
+                }
                 locals = metadata.AddStandaloneSignature(metadata.GetOrAddBlob(signature));
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack,

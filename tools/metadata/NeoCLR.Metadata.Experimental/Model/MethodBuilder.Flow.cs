@@ -90,8 +90,8 @@ public sealed partial class MethodBuilder
                 case "boolean": stack.Add(true); break;
                 case "local.load":
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
-                    stack.Add(false); break;
-                case "local.store": Pop(); assigned[instruction.Value] = true; break;
+                    stack.Add(locals[instruction.Value].Type == PrimitiveType.Boolean); break;
+                case "local.store": Pop(locals[instruction.Value].Type == PrimitiveType.Boolean); assigned[instruction.Value] = true; break;
                 case "add": case "subtract": case "multiply": Pop(); Pop(); stack.Add(false); break;
                 case "equal":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");

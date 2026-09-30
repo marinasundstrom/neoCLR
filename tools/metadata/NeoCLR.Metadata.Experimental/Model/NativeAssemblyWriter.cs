@@ -115,7 +115,7 @@ public sealed partial class AssemblyBuilder
             }).ToArray(),
             functions = methods.Select((method, index) => new {
                 name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
-                locals = Enumerable.Repeat("Int32", method.Locals.Count).ToArray(),
+                locals = method.Locals.Select(local => local.Type.ToString()).ToArray(),
                 returns = method.Signature.ReturnType.ToString(), no_result = !method.ReturnsValue,
                 origin = Origin(method.Name, 0x06000001 + index, method), body = NativeBody(method)
             }).ToArray()

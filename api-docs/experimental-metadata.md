@@ -1616,7 +1616,7 @@ operand is accepted.
 
 LoadConstant, LoadArgument, Add, Subtract, Multiply, all Call overloads and Return now
 call Emit. Their supported semantics are unchanged. WriteConsoleLine remains a native
-convenience expansion; general string operands, non-Int32 local variables, exception
+convenience expansion; general string operands, non-primitive local variables, exception
 regions and editable instruction collections are unsupported. Future ILProcessor-like
 editing must define instruction ownership and branch/exception target repair separately.
 
@@ -1666,7 +1666,7 @@ body with `InvalidDataException`. Each write recomputes initialization; a previo
 or successful write does not initialize a rebuilt body. CLI emission writes Int32 local
 signatures and init-locals method headers; native emission writes format-5 `locals` and
 native local instructions. The reader accepts absent locals in older producer artifacts
-and validates declared Int32 local lists; reference projections still omit executable
+and validates declared Int32/Boolean local lists; reference projections still omit executable
 body details. Older experimental readers may reject the added `locals` field.
 
 Unlike unrestricted Cecil bodies, this bounded API enforces initialization and stack
@@ -1767,7 +1767,7 @@ identity, core-contract and snapshot checks remain in force.
 
 Native writers, readers and reference-only projections preserve these types without
 a format/schema change. Older experimental readers may reject Boolean declarations.
-Local declarations remain Int32-only; selected System inventory imports remain the
+Local declarations support Int32 and Boolean; selected System inventory imports remain the
 separate Int32-only contract. Native bodies are still verified by neoCLR.
 
 ```csharp
@@ -1783,3 +1783,28 @@ C# contract tests cover mixed arguments, overloads, CLI execution, native projec
 MemberRef resolution, immutable signatures and invalid calls. Raven's integration
 probe also executes the emitted Boolean calls in neoCLR, including a separately
 compiled library referenced through its CLI declaration projection.
+
+
+### Typed local declarations (development, 2026-10-01)
+
+```csharp
+LocalDefinition MethodBuilder.DeclareLocal(PrimitiveType type);
+PrimitiveType LocalDefinition.Type { get; }
+```
+
+DeclareLocal accepts Int32 or Boolean, returning a stable method-owned slot with an
+immutable Type. Void and unknown enum values throw ArgumentException; the shared
+256-local limit throws InvalidDataException. DeclareInt32Local remains shorthand for
+DeclareLocal(PrimitiveType.Int32). ClearBody preserves the slot and type, but resets
+body-derived initialization: a load must follow stores on all reachable paths.
+
+StoreLocal and raw Stloc require the value's type to match the slot, including Boolean;
+LoadLocal/Ldloc push that type. Wrong types reject before either writer emits an image.
+CLI local signatures and native local lists retain the type. Native declaration reading
+accepts both primitive local types, including old artifacts with no local-list field.
+Reference-only projections omit native executable bodies and locals as before.
+
+The C# local contracts execute Boolean locals in CLI, inspect their reflected type,
+roundtrip native projections and reject cross-type stores and uninitialized loads.
+Raven's shared planner now carries local types to each backend and validates a program
+that stores a predicate result, reassigns it and compares Boolean locals on both runtimes.

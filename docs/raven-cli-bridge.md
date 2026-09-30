@@ -951,3 +951,30 @@ candidates on the consumer branch until independently integrated.
 Tested Raven consumer revision: `85077a3c8` on `codex/metadata-consumer`.
 [Recorded executable evidence](experiments/extended-cli-metadata/primitive-signatures-validation.json).
 The metadata API remains on `codex/extended-cli-metadata`; these are not main-line release claims.
+
+## Typed primitive locals — 2026-10-01
+
+The shared lowered-body plan now carries each local's primitive type. .NET resolves
+its selected core Int32/Boolean type; neoCLR declares the matching typed metadata
+slot. Boolean predicate results can be stored, reassigned, loaded and compared for
+equality/inequality. Both backends share source lowering and instruction planning.
+
+The existing Runtime Contract and CLI symbol projection remain unchanged. Compared
+with CLI's integer evaluation-stack representation, the native writer enforces a
+separate Boolean stack type; stores must match their declared local type. The cost is
+explicit type validation. No implicit conversion, uninitialized local, disposal,
+nonprimitive local or new System inventory contract is introduced. The .NET general
+fallback remains in place. Native metadata/backend replacement of the temporary
+symbol projection is still pending.
+
+Validation adds a predicate-local program on both runtimes, C# Release/Debug coverage,
+and metadata contracts for reflected CLI local types, native projection and invalid
+cross-type stores. All 35 metadata groups and 33 focused compiler tests pass.
+
+This consumer also exposed the assignment parser bypassing logical negation on its
+right-hand side. General fix `762bebad0` restores full expression parsing and retains
+right-associative chains; 480 parser/assignment tests pass. This fix is independently
+validated for the shared line, not a native representation workaround.
+
+Tested Raven consumer revision `5a1da7135` on `codex/metadata-consumer`;
+[executable evidence](experiments/extended-cli-metadata/boolean-locals-validation.json).

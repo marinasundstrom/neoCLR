@@ -13,7 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference projections. Keep Int32-only convenience/recognition contracts and
   parameterless Int32/no-result entrypoints. Raven shares these signatures across
   both backends, including imported overloads; older experimental readers may reject
-  Boolean declarations.
+  Boolean declarations. Extend the same primitive type contract to local slots,
+  including DeclareLocal/LocalDefinition.Type, CLI/native local signatures and typed
+  store validation. Raven supports Boolean local initialization, assignment and equality.
+  This consumer also exposed a general Raven assignment-RHS parser defect; the
+  consumer branch fixes it with independent parser/assignment tests.
 
 - Add Int32 local declarations, method-owned local handles and raw Ldloc/Stloc operands
   to the experimental metadata API, with CLI local signatures and native local lists.
