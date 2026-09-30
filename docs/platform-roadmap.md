@@ -19,7 +19,8 @@ ordinary compiler-required metadata coverage is next.
 `Compilation.Emit`; rvnc and API wrappers share compiler setup and target validation.
 The author directs reuse of common .NET/neoCLR lowering with backend abstractions for
 builder differences. The shared linear-body model now feeds .NET/native method-builder adapters and
-executes one compilation on both runtimes. Type/signature builders, generics and
+executes the same Int32 and Unit Hello/helper compilations on both runtimes, including
+assembly functions, explicit/implicit returns and an empty Unit entry. Type/signature builders, generics and
 control flow remain subsequent boundaries. The author asks to avoid large workarounds
 and prioritize the Hello/helper end-to-end case. Shared metadata loading is deferred;
 the optional System driver has exposed a host/projection type collision and explicitly

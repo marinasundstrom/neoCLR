@@ -91,6 +91,7 @@ translated metadata and executes against that binary library. Full System symbol
 remains pending; the command still uses host primitives for binding. Native emission now
 uses Raven’s shared Compilation.Emit validation pipeline through an explicit backend;
 shared linear-body lowering now feeds .NET and native method-builder adapters.
+The same Int32 and Unit Hello/helper programs execute through both backends.
 Type/signature builders and broader instruction coverage remain follow-ups.
 The selected-System driver still has a host/projection type collision to resolve; the
 same-compilation Hello/helper case is the current codegen acceptance target.

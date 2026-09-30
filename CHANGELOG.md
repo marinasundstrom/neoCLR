@@ -23,7 +23,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reject before output; deeper shared type/method builder abstractions remain pending.
   Extract shared Raven linear-body lowering consumed by .NET and native method-builder
   adapters. Eligible release .NET methods reuse it; general/debug/PDB paths are retained.
-  A single compilation prints and returns 42 on both runtimes. Type/signature builder,
+  A single compilation prints and returns 42 on both runtimes. Extend shared .NET lowering
+  to assembly functions and Unit static methods with void CLI signatures; the same Unit
+  Main/helper, explicit-return and empty-entry programs now exercise both backends. Type/signature builder,
   generic and control-flow abstractions remain open; the native source subset is unchanged.
   Record a translated-System driver type-selection failure (host CoreLib collision);
   direct API execution passes. Metadata loading is an author-deferred follow-up.
