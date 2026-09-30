@@ -362,3 +362,10 @@ parenthesized union of LocalDateTime and ZonedDateTime following the author's
 clarification. Time wraps, civil addition carries the date, and elapsed Instant
 addition checks overflow. The bounded 1900–2099 named-zone range and pinned 2025b
 database are provisional. Broader rules/providers, parsing and scheduling remain open.
+
+### Feature branch organization (2026-09-30)
+
+At the author's request, structural Function work continues on
+`codex/structural-types` with this Self-integrated main as its base. The former
+`feature/function-types` name is retired after validation and synchronization.
+The branch organization does not enable structural types on main.

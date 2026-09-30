@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
+- Preserve the deferred Function/structural experiment as `codex/structural-types`
+  on top of the Self-integrated main. Retire the previous branch name after
+  synchronization; this organizational change does not enable structural types on main.
+
 - Integrate native Self independently of structural Function types: nongeneric
   Number and Clonable contracts, conformance-owned inheritance, checked generic
   Self dispatch and borrowed receiver support. Preserve main's nominal delegates.

@@ -2,7 +2,7 @@
 
 ## Self integration on nominal main (2026-09-30)
 
-Self is integrated independently of `feature/function-types`. Raven projects must
+Self is integrated independently of `codex/structural-types`. Raven projects must
 select `RavenTargetPlatform=NeoCLR` and configure the fieldless
 `System.Runtime.CompilerServices.Self` marker in `NeoCLR.CoreProbe`. The shared
 props do this. Raven's .NET target rejects that configuration with RAVT003.
