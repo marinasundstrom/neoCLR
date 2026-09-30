@@ -26,8 +26,11 @@ author’s Cecil suggestion, the [provisional API direction](design/extended-cli
 places assembly/module/reference/definition objects above these codecs. An initial
 read-only model now reads real assembly/module/TypeDef declarations, with generic/nested
 Unicode and snapshot-scoped reference consumer checks. Next is assembly-reference
-identity and explicit nominal dependency resolution; complete binding and assembly
-emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+identity and explicit nominal dependency resolution. AssemblyRef identity and explicit
+host resolution now pass 11 standalone C# contract tests. The author selects the
+Cecil-like model as the primary compiler abstraction for metadata/PE manipulation,
+with adaptations as needed. Next is physical TypeRef resolution; full binding and
+assembly emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The author further clarifies that the .NET API should support later Raven compiler

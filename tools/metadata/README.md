@@ -10,7 +10,8 @@ and structural signature syntax/context validation, reference-table codecs and
 explicit-catalog structural identity and synthesized-member contracts. MetadataProfile
 provides typed Read/Create/Write entry points with owned documents and section-profile
 validation. Bounded PE32 recognition/extraction is implemented; actual
-dependency binding and compiler adapters remain pending. A read-only Model namespace
+explicit AssemblyRef resolution is implemented; physical TypeRef binding and compiler
+adapters remain pending. A read-only Model namespace
 now exposes real assembly/module/TypeDef declarations and definition-backed references. It is not the future neoCLR guest metadata/Introspection/Emit
 library. Names and contracts are experimental.
 
@@ -68,3 +69,20 @@ AssemblyDefinition/ModuleDefinition/TypeDefinition/TypeReference objects. It che
 snapshot-local resolution, absence of input/reader lifetime coupling, and malformed
 CLI tables even with valid extension binding. Cross-module resolution and assembly
 writing remain pending.
+
+
+The Cecil-like model is the selected primary compiler abstraction for metadata and PE
+manipulation. Reading and explicit AssemblyRef resolution exist; import, mutation and
+assembly writing are still pending. Adaptations to neoCLR are intentional, not a
+promise of Cecil source compatibility.
+
+Run the dedicated C# contract tests independently of the Python conformance drivers:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Metadata.Experimental.Tests.csproj --no-launch-profile
+```
+
+This is an executable test runner (nonzero exit on failure), not a dotnet-test discovery
+project. Its 11 tests generate PE metadata in C#, exercise exact identities and resolver
+contracts, and cover invalid inputs, limits and ownership. It uses only .NET platform
+libraries and the project under test.

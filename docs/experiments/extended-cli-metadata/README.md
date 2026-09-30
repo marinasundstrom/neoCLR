@@ -624,3 +624,21 @@ record the supported subset. No runtime assembly is loaded or executed.
 Next bounded task: assembly-reference identity and explicit nominal dependency
 resolution. Mutable import/builders, full assembly emission and Raven integration are
 still separate validation work.
+
+
+## Assembly identity and explicit resolution; C# tests (2026-09-30)
+
+The author now selects the Cecil-like model as the primary compiler API for metadata
+and PE manipulation, allowing adaptations, and requests C# tests. The model reads
+AssemblyRef rows into owned identities and resolves them through an explicit host
+IAssemblyResolver. Exact name/version/culture/token/flag matching rejects missing or
+substituted dependencies. Full-key/token conversion follows the CLI convention; it
+is not signature verification or CLR binding policy. No automatic dependency IO occurs.
+
+The new `tools/metadata/NeoCLR.Metadata.Experimental.Tests` executable generates real
+PE metadata in C# and passes 11 direct contract tests, including golden ECMA key/token
+conversion, wrong identities, malformed key representations, 256/257 limits, ownership
+and resolver exception propagation. The prior CLI model consumer still passes.
+The [API reference](../../../api-docs/experimental-metadata.md#assemblyidentity) covers
+three added model types, new properties and all limits. Physical TypeRef resolution
+is next; import, editing/builders, full PE emission and Raven integration are pending.

@@ -9096,3 +9096,20 @@ remote synchronization does not publish a runtime bundle or website.
   cases, including 44 rejections. The higher-level Cecil-inspired model remains a
   proposed next prototype; no new dependency, compiler integration or Raven port is
   claimed. The earlier potential Metadata Introspection direction is preserved.
+
+
+## 2026-09-30 — Cecil-like API selected as the primary compiler abstraction
+
+- **Author:** “The Cecil-like API will be our primary abstraction for manipulating
+  metadata and especially PE assemblies - for the compiler.” The author allows
+  modifications as needed and explicitly asks for tests in C#.
+- **Assistant action:** recorded this as the selected direction, superseding the earlier
+  provisional orientation while preserving that history. Continued the object model
+  with AssemblyIdentity, physical AssemblyReference and explicit IAssemblyResolver;
+  added a standalone C# contract-test executable generating real PE metadata fixtures.
+- **Outcome:** 11 C# tests pass and the existing CLI model consumer passes. The model
+  now resolves assembly dependencies by exact metadata identity through host policy.
+  [Design and validation](design/extended-cli-metadata.md#primary-compiler-abstraction-and-c-contracts-2026-09-30).
+- **Open:** physical type-reference resolution, import, mutation/builders, PE writing,
+  full Raven compiler integration and a possible Raven port remain pending. Selecting
+  the primary API does not imply these operations are already implemented.

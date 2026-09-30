@@ -1,22 +1,25 @@
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using System.Security.Cryptography;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An owned read-only assembly view, separate from runtime reflection and mutable emission.</summary>
 public sealed class AssemblyDefinition
 {
-    private AssemblyDefinition(string name, Version version, string moduleName, Guid mvid,
-        IReadOnlyList<TypeRow> rows, MetadataProfileDocument? profile)
+    private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
+        IReadOnlyList<TypeRow> rows, IReadOnlyList<ReferenceRow> references, MetadataProfileDocument? profile)
     {
-        Name = name; Version = version; Profile = profile;
-        MainModule = new ModuleDefinition(this, moduleName, mvid, rows);
+        Identity = identity; Profile = profile;
+        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, references);
     }
     /// <summary>Gets the assembly's simple name, not a complete binding identity.</summary>
-    public string Name { get; }
+    public string Name => Identity.Name;
     /// <summary>Gets the declared assembly version.</summary>
-    public Version Version { get; }
+    public Version Version => Identity.Version;
+    /// <summary>Gets the exact metadata identity used for explicit dependency matching.</summary>
+    public AssemblyIdentity Identity { get; }
     /// <summary>Gets the manifest module; other modules are not loaded.</summary>
     public ModuleDefinition MainModule { get; }
     /// <summary>Gets locally validated extended metadata, or null for explicitly admitted ordinary input.</summary>
@@ -26,8 +29,8 @@ public sealed class AssemblyDefinition
     /// <param name="image">Complete image; do not mutate during the call.</param>
     /// <param name="expectedExtended">Require the neoCLR marker/profile by default; false admits ordinary CLI input.</param>
     /// <returns>An owned snapshot with no open stream or loaded runtime assembly.</returns>
-    /// <exception cref="InvalidDataException">Invalid/unsupported artifact, missing assembly metadata, malformed declarations more than 4096 TypeDefs, or excessive decoded names.</exception>
-    /// <remarks>Does not bind dependencies, interpret physical TypeRef/TypeSpec rows, decode member signatures or emit assemblies.</remarks>
+    /// <exception cref="InvalidDataException">Invalid/unsupported artifact, missing assembly metadata, malformed declarations/identities, exceeded row limits or excessive decoded names/key data.</exception>
+    /// <remarks>Reads AssemblyRef identities but does not automatically resolve dependencies, physical TypeRef/TypeSpec rows, member signatures or emit assemblies.</remarks>
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image, bool expectedExtended = true)
     {
         if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("image exceeds limit");
@@ -40,6 +43,8 @@ public sealed class AssemblyDefinition
             var reader = pe.GetMetadataReader();
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
             if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
+            if (reader.AssemblyReferences.Count > 256) throw new InvalidDataException("too many assembly references");
+            int keyBytes = 0;
             int nameCharacters = 0;
             string ReadName(StringHandle handle)
             {
@@ -49,8 +54,29 @@ public sealed class AssemblyDefinition
                 nameCharacters += value.Length;
                 return value;
             }
+            AssemblyIdentity ReadIdentity(StringHandle name, Version version, StringHandle culture, BlobHandle key, uint flags, bool definition)
+            {
+                int length = key.IsNil ? 0 : reader.GetBlobReader(key).Length;
+                if (length > MetadataArtifactReader.MaxImageSize - keyBytes) throw new InvalidDataException("assembly key data exceeds limit");
+                keyBytes += length;
+                bool fullKey = (flags & 1) != 0;
+                if ((fullKey && length == 0) || (!fullKey && (definition ? length != 0 : length != 0 && length != 8)))
+                    throw new InvalidDataException("invalid assembly key/token representation");
+                var bytes = reader.GetBlobBytes(key);
+                if (fullKey) bytes = SHA1.HashData(bytes)[^8..].Reverse().ToArray();
+                try { return new(ReadName(name), version, ReadName(culture), Convert.ToHexString(bytes), flags & ~1u); }
+                catch (ArgumentException error) { throw new InvalidDataException("invalid assembly identity", error); }
+            }
             var assembly = reader.GetAssemblyDefinition();
             var module = reader.GetModuleDefinition();
+            var identity = ReadIdentity(assembly.Name, assembly.Version, assembly.Culture, assembly.PublicKey, (uint)assembly.Flags, true);
+            var references = new List<ReferenceRow>();
+            foreach (var handle in reader.AssemblyReferences)
+            {
+                var reference = reader.GetAssemblyReference(handle);
+                references.Add(new((uint)MetadataTokens.GetToken(handle), ReadIdentity(reference.Name, reference.Version,
+                    reference.Culture, reference.PublicKeyOrToken, (uint)reference.Flags, false)));
+            }
             var rows = new List<TypeRow>();
             foreach (var handle in reader.TypeDefinitions)
             {
@@ -69,14 +95,14 @@ public sealed class AssemblyDefinition
                     if (!seen.Add(token) || !parents.TryGetValue(token, out token)) throw new InvalidDataException("invalid or cyclic declaring type");
                 }
             }
-            return new(ReadName(assembly.Name), assembly.Version, ReadName(module.Name),
-                reader.GetGuid(module.Mvid), rows, artifact.Profile);
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, references, artifact.Profile);
         }
         catch (BadImageFormatException error)
         {
             throw new InvalidDataException("malformed CLI declaration metadata", error);
         }
     }
+    internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken);
 }
 
@@ -84,12 +110,14 @@ public sealed class AssemblyDefinition
 public sealed class ModuleDefinition
 {
     private readonly Dictionary<uint, TypeDefinition> definitions;
-    internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows)
+    internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows,
+        IReadOnlyList<AssemblyDefinition.ReferenceRow> references)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
         Types = Array.AsReadOnly(types);
         definitions = types.ToDictionary(type => type.MetadataToken);
+        AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
     }
     /// <summary>Gets the owning assembly snapshot.</summary>
     public AssemblyDefinition Assembly { get; }
@@ -99,6 +127,8 @@ public sealed class ModuleDefinition
     public Guid Mvid { get; }
     /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
     public IReadOnlyList<TypeDefinition> Types { get; }
+    /// <summary>Gets physical AssemblyRef rows in metadata order, without resolving dependencies.</summary>
+    public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     /// <summary>Looks up a module-local TypeDef without loading any dependencies.</summary>
     /// <param name="metadataToken">A physical TypeDef token; other kinds and absent rows return null.</param>
     /// <returns>The owned definition, or null if this snapshot has no such TypeDef.</returns>

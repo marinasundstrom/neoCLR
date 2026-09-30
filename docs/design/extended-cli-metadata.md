@@ -533,3 +533,47 @@ resolution. Members, signature decoding, constraints, mutation/emission and depe
 resolution remain open. Next bounded task: complete assembly-reference identity and
 explicit dependency resolution for nominal references before import/remapping. The
 potential Raven implementation and Metadata Introspection projection remain plans.
+
+
+## Primary compiler abstraction and C# contracts (2026-09-30)
+
+**Author decision:** the Cecil-like API will be the primary abstraction for manipulating
+metadata, especially compiler PE assemblies; adapt it as neoCLR needs evolve. The author
+also explicitly requires tests in C#. This promotes the earlier provisional API
+orientation into the selected direction. It does not turn the currently read-only subset
+into a completed manipulation/writer API or require Cecil source compatibility.
+
+The assembly/module/reference/definition model is now the intended compiler-facing
+surface. Codecs and profile documents remain lower-level infrastructure. Plan import,
+mutation/builders, validation and PE emission through this primary model rather than
+requiring Raven callers to assemble raw sections. The possible Raven port beneath
+Metadata Introspection remains separate implementation work, with shared semantics.
+
+This slice adds exact AssemblyIdentity, physical AssemblyReference rows and an explicit
+IAssemblyResolver. Identity compares ordinal simple name/culture, four-part version,
+normalized public-key token and retained flags. Full keys normalize to the conventional
+token; key/token representation flags are excluded. Missing or mismatched candidates
+fail. No implicit directory search, runtime assembly loading or resolver cache occurs.
+
+Primary sources reviewed 2026-09-30: [.NET 10 AssemblyReference metadata fields](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.metadata.assemblyreference?view=net-10.0)
+and [AssemblyName public-key tokens](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.assemblyname.getpublickeytoken?view=net-10.0),
+alongside the pinned Cecil sources above. This adopts conventional CLI identity data
+but deliberately does not reproduce CLR binding policy. Exact matching avoids silent
+version/key substitution; its cost is rejecting candidates a more permissive binder
+might select. Ordinal name/culture and retained flag equality are provisional policy
+choices, not permanent claims about optimal CLR compatibility. Retargeting, redirects,
+unification and cryptographic verification remain unsupported. Token hashing uses the
+CLI identity convention, not an authentication algorithm chosen for this platform.
+
+The reader bounds AssemblyRefs to 256 and cumulative key/token input to 4 MiB, in
+addition to existing declaration-name and image limits. It preserves owned identity
+values but does not yet retain full keys/hash blobs as an assembly-writing model.
+The next bounded slice is physical nominal TypeRef resolution through explicit
+assembly dependencies, before reference import and the first supported writer path.
+
+A dedicated C# executable contract-test project generates real PE metadata in memory
+and exercises all APIs without a Python driver or new test packages. Eleven tests cover
+identity fields, ECMA key/token normalization, explicit resolver behavior and failures,
+input ownership, malformed metadata and the 256/257 boundary. The existing generated
+model consumer still passes. Tests return a failing process status on any failed case;
+framework discovery/CI wiring can evolve separately. No performance claims are made.

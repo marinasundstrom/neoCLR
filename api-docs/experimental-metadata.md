@@ -7,7 +7,8 @@ This is the first reusable reader/writer slice intended for Raven's future symbo
 loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
 and derives structural identities/member contracts against an explicitly supplied host catalog.
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
-dependency binding, Introspection assembly loading and assembly emission remain pending.
+explicit AssemblyRef dependency matching is implemented; physical TypeRef binding,
+Introspection assembly loading and assembly emission remain pending.
 
 ## Namespace and types
 
@@ -660,6 +661,7 @@ public sealed class AssemblyDefinition
 {
     public string Name { get; }
     public Version Version { get; }
+    public AssemblyIdentity Identity { get; }
     public ModuleDefinition MainModule { get; }
     public MetadataProfileDocument? Profile { get; }
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image,
@@ -668,8 +670,9 @@ public sealed class AssemblyDefinition
 ```
 
 No public constructor or setters. Name is the simple assembly name and Version is the
-manifest version. Neither these fields nor MVID form a complete assembly binding
-identity. Culture, public key and assembly-reference policy are not modeled yet.
+manifest version. Identity adds culture, normalized public-key token and retained
+flags for exact explicit dependency matching (see below). MVID is not an assembly
+identity. CLR binding redirects, unification and trust policy are not implemented.
 MainModule is the owned manifest module; Profile is attached structural metadata, or
 null for explicitly admitted ordinary CLI input.
 
@@ -677,7 +680,8 @@ ReadAssembly first applies MetadataArtifactReader's existing 4 MiB, unsigned IL-
 PE32, stream and required-profile rules. The default requires extended metadata;
 expectedExtended false permits ordinary CLI assemblies. The method then reads the
 assembly and module rows, TypeDef names/namespaces, generic parameter counts and
-NestedClass ownership. It accepts at most 4096 TypeDefs and a cumulative 4 Mi UTF-16
+NestedClass ownership, plus AssemblyRef identities. It accepts at most 256 AssemblyRefs,
+a cumulative 4 MiB of key/token blobs, and at most 4096 TypeDefs and a cumulative 4 Mi UTF-16
 code units of decoded declaration names/namespaces (counting repeated uses). It rejects missing/invalid
 or cyclic declaring-type relationships. Missing assembly manifests (netmodules),
 invalid/unsupported artifacts and malformed inspected metadata raise
@@ -699,6 +703,7 @@ public sealed class ModuleDefinition
     public string Name { get; }
     public Guid Mvid { get; }
     public IReadOnlyList<TypeDefinition> Types { get; }
+    public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     public TypeDefinition? GetTypeDefinition(uint metadataToken);
 }
 ```
@@ -707,7 +712,9 @@ No public constructor. Assembly points back to the owning snapshot. Name/Mvid ar
 stored module values; Mvid is not an experimental catalog module scope. Types is an
 owned read-only collection of every TypeDef in row order, **including nested types
 and `<Module>`**. This intentionally exposes a flat table view in the initial slice;
-it does not promise Cecil's exact collection organization.
+it does not promise Cecil's exact collection organization. AssemblyReferences is an
+owned read-only list of physical AssemblyRef rows in metadata order; reading it performs
+no resolver calls.
 
 GetTypeDefinition performs local physical TypeDef-token lookup and returns the same
 owned definition instance. Zero, other token kinds and absent rows return null. It
@@ -768,5 +775,94 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_model.py
 ```
 
 This implements the navigation foundation only. Cross-module import/resolution,
-complete assembly identities, mutable graph/builders, member signatures and assembly
+runtime binding policy, mutable graph/builders, member signatures and assembly
 writing remain pending; the potential Raven port has not been implemented.
+
+
+### AssemblyIdentity
+
+```csharp
+public sealed class AssemblyIdentity : IEquatable<AssemblyIdentity>
+{
+    public AssemblyIdentity(string name, Version version, string culture = "",
+                            string publicKeyToken = "", uint flags = 0);
+    public string Name { get; }
+    public Version Version { get; }
+    public string Culture { get; }
+    public string PublicKeyToken { get; }
+    public uint Flags { get; }
+    public bool Equals(AssemblyIdentity? other);
+    public override bool Equals(object? obj);
+    public override int GetHashCode();
+}
+```
+
+Immutable exact metadata-matching identity. Name is nonempty; Version has four
+components in 0–65535; Culture is the stored string (empty for neutral). PublicKeyToken
+is empty or 16 hexadecimal characters, normalized to lowercase. Flags retains metadata
+flags except PublicKey (bit 1), which expresses full-key versus token representation
+rather than identity. Null constructor inputs raise ArgumentNullException; invalid
+values or the PublicKey representation bit raise ArgumentException.
+
+Equals uses ordinal name/culture comparison, exact version/flags and normalized token.
+Null and other object types are unequal. Hashes are process-local and consistent with
+Equals; `==` is not overloaded. This intentionally conservative policy does not implement
+CLR case folding, redirects, version roll-forward or retargeting. Nonmatching flags,
+including retargetable flags, fail exact resolution until a deliberate policy exists.
+
+ReadAssembly converts a full public-key blob to the reversed final eight bytes of its
+SHA-1 hash, yielding the conventional key token. Assembly definitions require a full
+key with PublicKey set or an empty key with it clear; references permit a full nonempty
+key with the flag, or an empty/eight-byte token without it. Invalid representations
+raise InvalidDataException. Cryptographic key structure and signatures are not verified;
+token matching is identity comparison, not authenticity or execution permission.
+Original full keys, hash blobs and a complete writer representation are not exposed yet.
+
+### AssemblyReference
+
+```csharp
+public sealed class AssemblyReference
+{
+    public ModuleDefinition Module { get; }
+    public uint MetadataToken { get; }
+    public AssemblyIdentity Identity { get; }
+    public AssemblyDefinition Resolve(IAssemblyResolver resolver);
+}
+```
+
+No public constructor. Module is the **consuming** module, MetadataToken its physical
+AssemblyRef token (0x23), and Identity the requested dependency identity. Resolve calls
+the supplied resolver, rejects null/missing or mismatched candidates, and returns the
+matching snapshot unchanged. Null resolver raises ArgumentNullException; missing or
+wrong identity raises InvalidDataException. Host resolver exceptions propagate without
+being disguised as malformed metadata. Calls are not cached; dependency search, IO,
+cache ownership and lifetime are explicit host policy. No runtime assembly is loaded by
+the reference itself. Physical TypeRef/TypeSpec lookup remains pending.
+
+### IAssemblyResolver
+
+```csharp
+public interface IAssemblyResolver
+{
+    AssemblyDefinition? Resolve(AssemblyIdentity identity);
+}
+```
+
+The host receives the requested identity and returns a candidate metadata snapshot or
+null. It may choose how to obtain that candidate; AssemblyReference always rechecks
+exact identity. Implementations own their concurrency, cache and resource policy.
+Returning an arbitrary same-name assembly cannot bypass version/culture/key/flag checks.
+The C# tests include both a candidate resolver and a throwing resolver.
+
+Run the standalone C# contract suite directly (no Python or test packages required):
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Metadata.Experimental.Tests.csproj --no-launch-profile
+```
+
+All 11 tests pass: physical AssemblyRef ownership, explicit resolution and repeat calls,
+missing/mismatched candidates, exact identity/hash rules, ECMA full-key/token golden
+normalization, constructor and wire validation, 256/257-reference boundary, owned data
+and exception propagation. Fixtures are real PE metadata images built in C# with
+System.Reflection.Metadata. This executable returns nonzero on any failure; it is not
+a `dotnet test` discovery project.

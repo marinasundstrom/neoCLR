@@ -68,7 +68,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   checks cover Unicode, generics, nesting, ownership, local lookup and corrupt CLI
   tables under a valid digest, including decoded-name amplification rejection.
   Document four model types, their 4096-TypeDef and cumulative decoded-name limits;
-  dependency binding, physical TypeRef resolution and assembly writing remain pending.
+  physical TypeRef resolution and assembly writing remain pending. Record the author’s
+  selection of the Cecil-like model as the primary compiler metadata/PE abstraction.
+  Add exact assembly identities, physical AssemblyRef rows and explicit host resolution
+  with mismatch rejection and bounded key/reference decoding. Eleven standalone C#
+  contract tests pass using generated PE fixtures; the prior model consumer also passes.
+  Document three new model types and new identity/reference properties. Import,
+  mutation/builders, PE writing and full Raven integration remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
