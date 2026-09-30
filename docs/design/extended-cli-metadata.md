@@ -965,3 +965,60 @@ ownership and rejection checks; Raven adapter/library/multi-file contracts pass;
 runtime checks above pass. Reports include both native dependencies and both reference
 projection hashes. Compiler integration remains on codex/metadata-consumer and the
 independent metadata/runtime checkout on codex/extended-cli-metadata.
+
+## Direct runtime container checkpoint — 2026-09-30
+
+The initial end-to-end gate now includes runtime implementation: Raven's opt-in
+`EmitMetadataAssembly` produces a PE32 artifact through the independent Cecil-style
+metadata project; neoCLR reads its required #Neo execution section, admits native
+metadata, links explicitly supplied dependencies, verifies and runs it. The same
+library PE files supply Raven's compiler references and neoCLR's runtime modules.
+Top-level functions remain native assembly-owned declarations.
+
+This is a **transitional execution profile**, not the final binary metadata layout.
+NEOX 0.1 section **256, schema 1, required** contains UTF-8 native format-5 JSON,
+including declarations and bodies. The existing recognition marker and SHA-256
+binding cover every metadata stream. The native section is authoritative; CLI
+metadata is a reference-only projection with `ReferenceAssemblyAttribute`, throwing
+placeholder bodies and no CLI entry point. Runtime execution never consults CLI
+method bodies. Unknown required schemas, missing markers, altered stream bindings,
+malformed ranges and ordinary CLI PEs are rejected. Optional sections may be ignored.
+The envelope is limited to 1 MiB and the PE to 4 MiB. The Rust host reads any native
+format-5 module admitted by the existing runtime; the C# writer/reader intentionally
+supports only its bounded public static Int32/void declaration subset. Parsing and
+module-local validation are distinct from dependency admission and typed verification.
+
+Compared with .NET reference assemblies ([Microsoft's reference-assembly contract](https://learn.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies),
+reviewed 2026-09-30), the CLI surface serves the same compile-time purpose but the
+neoCLR artifact additionally carries a separate implementation. This reuses the
+already-tested reference projection and native runtime semantics. A full CLI table
+and CIL loader would instead need token resolution, signature decoding and execution
+translation; that is a larger compatibility commitment and does not supply native
+structural semantics. Separate JSON and reference PE files were the previous bridge;
+co-locating them removes that packaging mismatch from the tested producer path.
+The cost is duplicate declaration storage, fresh projection MVIDs, bounded extra
+copies, a hashing pass and continued JSON parsing. The digest detects modification,
+not authenticity or equivalence between arbitrary CLI/native declarations. Hosts must
+use the aware writer and consistent snapshots; arbitrary dual-view rewriting remains
+unsupported. `AssemblyDefinition.ReadAssembly` still means the older reference
+profile; `RuntimeAssemblyContainer.ReadCliProjection` is the explicit execution-profile
+entry point and preserves the whole container in its snapshot.
+
+The author highlighted parsing overhead as a reason to move metadata loading into
+the runtime. This checkpoint makes **no startup or execution speed claim**: schema 1
+still parses JSON after extracting the native section. Next evaluate a versioned
+binary native schema with explicit table/heap indexing and compare load/parse, linking,
+verification and execution timings separately against this baseline. Avoid treating
+container packaging as a parsing optimization. Structural schemas need native runtime
+contracts before becoming required sections; the earlier structural reference profile
+is not accepted by this execution loader.
+
+Validation: 25 C# metadata contract groups; 10 C#-driven runtime container checks
+(including invalid native bodies and correctly re-bound unknown required schemas);
+a Rust schema test and two Rust integration tests using a C#-produced fixture;
+Raven's two-library chain plus single/multi-file applications returns 42, with reversed
+module order, missing dependencies and revision mismatches checked. See
+[runtime/compiler evidence](../experiments/extended-cli-metadata/raven-compiler-validation.json).
+The feature branches remain `codex/extended-cli-metadata` and `codex/metadata-consumer`.
+Production target registration, a native Raven symbol provider, guest Introspection
+loading/emission APIs, broad signatures and structural execution remain open.

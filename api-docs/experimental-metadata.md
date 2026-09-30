@@ -9,14 +9,16 @@ and derives structural identities/member contracts against an explicitly supplie
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
 explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
 implemented. A controlled static-Int32 builder writes ordinary CLI PE and native
-format-5 assemblies, including native top-level functions. General rewriting, native #Neo
-execution and Introspection assembly loading remain pending.
+format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading now uses a transitional native execution section
+with a reference-only CLI projection. General rewriting, binary native payloads and
+guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [RuntimeAssemblyContainer](#runtimeassemblycontainer): direct PE/#Neo native execution transport.
 - [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
 - [MetadataArtifact](#metadataartifact): ordinary classification or owned extended profile.
 - [MetadataProfile](#metadataprofile): reference-profile reader and writer entry points.
@@ -1299,3 +1301,58 @@ Native reference tests additionally cover exact same-name/different-version iden
 manifest order, repeated-call deduplication, collection immutability, source-buffer
 ownership, omission of implementation-only PE references, and inconsistent/duplicate
 native references. The compiler consumer now executes a three-assembly chain in neoCLR.
+
+## RuntimeAssemblyContainer
+
+Development-only host type in `NeoCLR.Metadata.Experimental`:
+
+```csharp
+public static class RuntimeAssemblyContainer
+{
+    public static byte[] Write(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary);
+    public static byte[] Read(ReadOnlySpan<byte> image);
+    public static AssemblyDefinition ReadCliProjection(ReadOnlySpan<byte> image);
+}
+```
+
+`Write` accepts the bounded writer's native format-5 JSON and explicit core-library
+identity supplying Object and ReferenceAssemblyAttribute. It validates declarations,
+creates a reference-only CLI projection, then embeds a required NEOX execution section
+(kind 256, schema 1) in a new PE32 `.neometa` section. Both metadata views come from
+the same native snapshot. The native image plus its 32-byte envelope header/directory
+must fit 1 MiB; the PE must fit 4 MiB. Null core throws ArgumentNullException;
+unsupported declarations, exceeded bounds or malformed containers throw InvalidDataException.
+Each call creates a fresh projection MVID; whole-PE byte determinism is not promised.
+
+`Read` validates unsigned PE32 framing, recognition marker/digest, envelope and native
+declarations. It returns an owned copy of native UTF-8 JSON; mutation cannot affect
+the input or future reads. Ordinary PEs, unknown required schemas, optional/unsupported
+execution sections, missing/changed bindings and malformed data throw InvalidDataException.
+Optional unknown sections are ignored. Bodies are opaque to this host API: successful
+inspection is not runtime admission, dependency resolution or typed verification.
+
+`ReadCliProjection` performs the same checks and reads the physical CLI declarations
+as a Cecil-style `AssemblyDefinition`. Its `Profile` is null (no structural reference
+profile), `EntryPointToken` is zero and `Write()` preserves the complete original PE.
+It additionally rejects unsupported/malformed CLI metadata. The native payload is the
+runtime authority; this method does not prove semantic equality of arbitrary native
+and CLI views. Consumers should use the aware writer and keep their compiler-reference
+file and read snapshot identical. General rewriting and automatic resolution are absent.
+
+```csharp
+byte[] native = builder.WriteNativeAssembly();
+byte[] pe = RuntimeAssemblyContainer.Write(native, builder.CoreLibrary);
+File.WriteAllBytes("Program.dll", pe);
+var declarations = RuntimeAssemblyContainer.ReadCliProjection(pe);
+var nativeDeclarations = NativeAssemblyDefinition.ReadAssembly(RuntimeAssemblyContainer.Read(pe));
+```
+
+neoCLR `verify Program.dll` / `run Program.dll` accepts this container, including
+`--module Library.dll` dependencies. The Rust host API is
+`metadata_container::native_json(&[u8]) -> Result<&str, Fault>` for borrowed transport
+extraction and `metadata_container::load(&[u8]) -> Result<Module, Fault>` for native
+module-local validation. `assembler::ModuleInput::MetadataPe(&[u8])` supports mixed
+explicit module sets; `LoadedProgram` remains responsible for linking and execution.
+There is no guest loader API yet. CLI bodies are throwing reference stubs, never
+executed by neoCLR. The payload still uses JSON; direct loading does not yet eliminate
+text parsing or establish a speedup. See the [profile/design](../docs/design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).

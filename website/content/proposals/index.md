@@ -79,7 +79,9 @@ The end-to-end case now compiles both a Raven library and its consuming applicat
 including overload selection and a library-local call. A three-assembly dependency
 chain loads and runs in neoCLR, with missing and wrong-revision transitive dependencies
 rejected. Native target adapters
-and broader ordinary metadata coverage come next, followed by structural extensions. Production NEOX loading and structural runtime support remain pending;
+and broader ordinary metadata coverage come next, followed by structural extensions. An initial feature-branch PE/#Neo execution profile now loads native metadata directly
+in neoCLR and runs the Raven two-library case to 42. Its payload still uses JSON;
+binary encoding, production integration and structural runtime support remain pending;
 this is not a published platform format.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)

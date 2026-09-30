@@ -3,6 +3,7 @@ pub mod assembler;
 pub mod cil;
 mod constraints;
 mod enums;
+pub mod metadata_container;
 pub mod pe;
 mod runtime_lookup;
 mod self_types;

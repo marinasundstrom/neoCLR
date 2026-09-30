@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--container-integration")
+{
+    await RuntimeContainerChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--native-integration")
 {
     await NativeWriterChecks.RunRuntime(args[1], args[2]);
@@ -25,6 +31,7 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Runtime PE container and required execution schema", RuntimeContainerChecks.Run),
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),

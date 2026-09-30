@@ -33,6 +33,8 @@ pub fn assemble_modules(sources: &[&str]) -> Result<Vec<Module>, Fault> {
 pub enum ModuleInput<'a> {
     Source(&'a str),
     Json(&'a str),
+    /// Experimental recognized PE/#Neo native metadata container.
+    MetadataPe(&'a [u8]),
 }
 
 /// Parse and validate a mixed module set against a supplied System artifact.
@@ -46,6 +48,9 @@ pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<
         .iter()
         .map(|input| match input {
             ModuleInput::Source(source) => parse_parts(source),
+            ModuleInput::MetadataPe(image) => crate::metadata_container::native_json(image)
+                .and_then(crate::decode_module)
+                .map(|module| (module, vec![])),
             ModuleInput::Json(json) => crate::decode_module(json).map(|module| (module, vec![])),
         })
         .collect::<Result<Vec<_>, _>>()?;

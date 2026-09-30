@@ -42,10 +42,16 @@ public sealed class AssemblyDefinition
     /// <exception cref="InvalidDataException">Invalid/unsupported artifact, missing assembly metadata, malformed declarations/identities, exceeded row limits or excessive decoded names/key data.</exception>
     /// <remarks>Reads physical nominal references and callable signature blobs without automatically resolving dependencies. General signature decoding, bodies and TypeSpec interpretation remain separate.</remarks>
     public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image, bool expectedExtended = true)
+        => ReadCore(image, expectedExtended, runtimeProjection: false);
+
+    internal static AssemblyDefinition ReadRuntimeProjection(ReadOnlySpan<byte> image)
+        => ReadCore(image, expectedExtended: true, runtimeProjection: true);
+
+    private static AssemblyDefinition ReadCore(ReadOnlySpan<byte> image, bool expectedExtended, bool runtimeProjection)
     {
         if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
-        var artifact = MetadataArtifactReader.Read(owned, expectedExtended);
+        var artifact = runtimeProjection ? null : MetadataArtifactReader.Read(owned, expectedExtended);
         try
         {
             using var stream = new MemoryStream(owned, writable: false);
@@ -164,7 +170,7 @@ public sealed class AssemblyDefinition
                 signatureBytes += length;
                 memberReferences.Add(new((uint)MetadataTokens.GetToken(handle), parent, ReadName(member.Name), reader.GetBlobBytes(member.Signature)));
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, memberReferences, references, typeReferences, artifact.Profile, owned, entryPointToken);
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
         }
         catch (BadImageFormatException error)
         {

@@ -246,3 +246,22 @@ ownership and rejection checks; Raven adapter/library/multi-file contracts pass;
 runtime checks above pass. Reports include both native dependencies and both reference
 projection hashes. Compiler integration remains on codex/metadata-consumer and the
 independent metadata/runtime checkout on codex/extended-cli-metadata.
+
+## Direct PE/#Neo runtime bridge — 2026-09-30
+
+The optional Raven adapter now offers `EmitMetadataAssembly`, backed by the separate
+.NET metadata project. It requires the existing explicit .NET primitive bootstrap,
+output/core identities and registered dependency snapshots; no Runtime Contract
+configuration or default target behavior changes. Runtime-native declarations and
+bodies occupy required section 256/schema 1. CLI declarations remain a reference-only
+compiler projection; neoCLR reads the native section directly from the same PE files.
+Owners remain Raven for semantic mapping/diagnostics, the metadata project for encoding
+and projections, and neoCLR for admission/linking/verification/execution.
+
+This replaces separate PE/JSON packaging in the end-to-end case, but not JSON encoding
+inside the section. Native symbol loading, binary payload encoding and wider semantic
+coverage will replace the remaining bridge in stages. No performance gain is claimed.
+Both module orders return 42; malformed/unsupported containers and dependency failures
+are checked. [Format and validation](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
+Feature branches and hashes are retained in the compiler validation report; this is
+not published/main runtime support or a guest Introspection loader.

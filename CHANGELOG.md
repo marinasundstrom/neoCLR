@@ -8,7 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
-- Develop extended CLI metadata on a main-based feature branch, with an isolated
+- Add direct runtime PE/#Neo loading to the extended metadata experiment: required
+  execution section 256/schema 1 carries native format-5 metadata and bodies. The
+  separate .NET API writes containers and reads owned native bytes/CLI projections;
+  Raven can use the same library files as compiler references and runtime modules.
+  Reject missing/altered binding, unsupported required schemas and malformed containers;
+  preserve runtime dependency and body checks. Validate 25 C# groups, 10 runtime
+  process cases and 3 focused Rust tests. The payload remains JSON: binary encoding,
+  faster parsing, structural runtime support and production target registration remain
+  pending. This is feature-branch support, not a published format or a general CIL loader.
+  Earlier slices develop extended CLI metadata on a main-based feature branch, with an isolated
   NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
   structural-branch Function no-result/output contracts and owned/reference arrays.
   Add catalog-scoped nominal references and declaring-owner generic/Self contexts;

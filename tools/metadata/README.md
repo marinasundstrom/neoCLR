@@ -164,3 +164,21 @@ the dependency builder graph. See the [host API reference](../../api-docs/experi
 The native declaration reader now projects compiler-only PE references from the
 writer's format-5 output. Bodies stay opaque; execute only the original native artifact.
 See the host API reference for strict bounds and the temporary input bridge contract.
+
+## Direct native metadata containers
+
+`RuntimeAssemblyContainer.Write(nativeBytes, core)` embeds the authoritative native
+format-5 payload in a required PE/#Neo execution section. `Read` retrieves owned native
+bytes; `ReadCliProjection` supplies a Cecil-style snapshot of the reference declarations.
+The same PE file can be a Raven compiler reference and a neoCLR runtime input.
+Schema 1 still contains JSON; binary encoding and faster parsing remain future work.
+
+```sh
+cargo build
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --container-integration target/debug/neoclr target/extended-cli-metadata/container
+cargo test --test metadata_container
+```
+
+The compiler-side `EmitMetadataAssembly` and the two-library acceptance case live on
+Raven's `codex/metadata-consumer`. See the [public API contract](../../api-docs/experimental-metadata.md#runtimeassemblycontainer).

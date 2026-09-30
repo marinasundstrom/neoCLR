@@ -28,6 +28,12 @@ public static class MetadataArtifactReader
     /// <remarks>Digest checking is consistency, not authentication, IL verification, declaration binding or an execution guard. No image is loaded or executed.</remarks>
     public static MetadataArtifact Read(ReadOnlySpan<byte> image, bool expectedExtended = true)
     {
+        var envelope = ReadEnvelope(image, expectedExtended);
+        return new(envelope is null ? null : MetadataProfile.Read(envelope));
+    }
+
+    internal static byte[]? ReadEnvelope(ReadOnlySpan<byte> image, bool expectedExtended = true)
+    {
         if (image.Length > MaxImageSize) throw Invalid("image exceeds 4 MiB limit");
         var metadata = ContainerMetadata(image.ToArray());
         var data = new Bytes(metadata);
@@ -77,7 +83,7 @@ public static class MetadataArtifactReader
         if (!marked && !hasStream)
         {
             if (expectedExtended) throw Invalid("expected extended artifact; marker and #Neo missing");
-            return new(null);
+            return null;
         }
         if (!marked) throw Invalid("unmarked #Neo transport is not a recognized artifact");
         if (!hasStream) throw Invalid("required #Neo stream missing from marked artifact");
@@ -109,7 +115,7 @@ public static class MetadataArtifactReader
         long length = neo.U32(12);
         if (length < 16 || length > payload!.Length || payload.Length - length > 3 || Nonzero(neo.Take(length, payload.Length - length)))
             throw Invalid("invalid #Neo padding/length");
-        return new(MetadataProfile.Read(neo.Take(0, length)));
+        return neo.Take(0, length).ToArray();
     }
 
     private static byte[] ContainerMetadata(byte[] image)

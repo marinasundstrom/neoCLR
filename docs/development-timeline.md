@@ -9223,3 +9223,28 @@ remote synchronization does not publish a runtime bundle or website.
   runtime already handles this graph, so no runtime code change was needed.
 - **Open:** direct PE/#Neo loading, structural metadata semantics, native compiler
   symbol loading and production target composition. [Scope and evidence](raven-cli-bridge.md#transitive-native-runtime-acceptance--2026-09-30).
+
+## 2026-09-30 — Initial direct runtime container and parsing cost
+
+- **Author:** “Continue until we have an initial end-to-end integration with a neoclr
+  runtime that can load metadata.” This continued the runtime-loading acceptance
+  requirement; JSON-only compiler output was not treated as the final container gate.
+- **Assistant action:** Added an explicit PE/#Neo execution profile to the independent
+  .NET metadata API and the Rust runtime. Raven's opt-in adapter now writes this
+  container. The same library files are read for compiler symbols through CLI reference
+  declarations and loaded by neoCLR through the authoritative native section. The
+  two-library program and both source/module orders execute to 42; rejection checks
+  cover changed containers, unsupported required schemas and missing/wrong dependencies.
+- **Author:** Explained that avoiding JSON parsing is also about building an effective
+  runtime and reducing execution overhead.
+- **Assistant response:** Clarified that this initial profile still contains format-5
+  JSON, so direct PE loading does not remove text parsing or establish a speedup.
+  Proposed a versioned binary native encoding and separate load/parse, link, verify
+  and execution measurements as the next evaluation. This is proposed follow-up,
+  not an implemented binary decoder or measured performance result.
+- **Outcome/open work:** Initial direct loading works on the feature branches. The
+  metadata library remains separate; the .NET semantic bootstrap remains temporary.
+  Native compiler symbol loading, production target registration, guest Introspection
+  loading/emission, wider signatures and structural runtime semantics remain open.
+  See the [format/tradeoffs](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30)
+  and [tested compiler/runtime hashes](experiments/extended-cli-metadata/raven-compiler-validation.json).

@@ -464,4 +464,13 @@ Transitive runtime checkpoint (2026-09-30): three Raven-compiled native assembli
 load/verify/execute as a dependency chain to 42, in either supplied module order.
 The native reader exposes direct exact references; missing and wrong-revision
 transitive dependencies fail runtime verification. Runtime acceptance remains required;
-direct PE/#Neo loading and a native compiler symbol provider remain open.
+this checkpoint is superseded by the direct container gate below; a native compiler symbol provider remains open.
+
+Direct runtime metadata gate (2026-09-30): the same API-produced PE/#Neo library
+files now feed Raven reference binding and neoCLR runtime loading. The two-library
+chain and single/multi-file applications verify/run to 42. The runtime rejects missing
+or altered recognition data and unsupported required execution schemas. This initial
+profile carries format-5 JSON inside section 256/schema 1; it does not yet remove text
+parsing or claim faster loading. Next evaluate binary native encoding and separate
+load/link/verify timings, while staging the native compiler symbol provider. See the
+[implementation and limits](design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).

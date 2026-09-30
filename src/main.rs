@@ -13,13 +13,22 @@ const USAGE: &str = "Usage:
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
-Inputs: .neo is the high-level subset, .neoil is IL source, otherwise JSON artifacts.";
+Inputs: .neo is the high-level subset, .neoil is IL source, PE/#Neo containers carry native metadata; otherwise JSON artifacts.";
 
 fn read(path: &str) -> Result<String, String> {
     if path.ends_with(".neoil") {
         neoclr::source::read_source(path)
     } else {
-        fs::read_to_string(path)
+        fs::read(path).and_then(|bytes| {
+            if bytes.starts_with(b"MZ") {
+                neoclr::metadata_container::native_json(&bytes)
+                    .map(str::to_owned)
+                    .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error.to_string()))
+            } else {
+                String::from_utf8(bytes)
+                    .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+            }
+        })
     }
     .map_err(|e| format!("Cannot read {path}: {e}"))
 }
