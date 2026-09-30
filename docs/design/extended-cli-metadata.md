@@ -690,3 +690,66 @@ unsupported/malformed encodings, canonical compressed counts, snapshot isolation
 row/decoded-blob limits. Eighteen C# contract groups pass. General signature decoding,
 MemberRef resolution and body import remain the next compiler-readiness gaps; structural
 extensions remain after compiler integration as directed.
+
+
+## Explicit callable reference resolution (2026-09-30)
+
+The ordinary compiler baseline now reads owned MemberRef rows and resolves the nominal
+static Int32/no-result method subset emitted by the writer. The source Module owns the
+reference; resolution returns the dependency snapshot's MethodDefinition through the
+existing exact-identity assembly resolver. Local TypeDef and TypeRef parents work too.
+The matching contract includes the return result, while builder overload declarations
+still distinguish name/parameter count. Multiple matches are rejected rather than
+selected by row order. Runtime access checks are not replaced by metadata resolution.
+
+This extends the existing CLI/Cecil reference comparison, retaining physical parent
+and signature data while keeping host dependency policy explicit. Matching raw blobs
+would incorrectly treat module-local nominal type tokens as global identity. The chosen
+bounded decoder instead compares primitive contracts and rejects signatures it cannot
+interpret. This supplies a usable import case without falsely claiming general generic,
+instance, inherited or field binding. The cost is another explicit unsupported boundary;
+general signature decoding must precede widening it. Opaque blobs remain readable.
+
+All 21 C# contract groups pass, including emitted cross-assembly overload/no-result
+calls, host-policy failures, absent/ambiguous/mismatched targets, unsupported parents,
+physical row limits and a signature budget shared with MethodDefs. The existing PE
+model consumer remains relevant for mixed conventional metadata. Structural extensions
+remain later than ordinary compiler integration under the author's selected sequence.
+
+## Refactored compiler as the next end-to-end consumer (2026-09-30)
+
+The author selected activity `01a0f154-2448-7df3-8536-c837097b46c2`, **Refactor Raven
+for platform targets**, for integration once this foundation is sufficient. The author
+clarified the purpose: obtain an end-to-end case that drives testing and implementation
+of the remaining metadata support. This refines the gate: do not wait for exhaustive
+metadata coverage before attempting a bounded compiler adapter.
+
+Read-only inspection of Raven's main-stability checkout at
+`89ba7ecc9ddbe952cde21d6c2b425b499a2c47b3` found these actual boundaries:
+
+- `Metadata/ISemanticDataLoader.LoadReference` returns symbols belonging to the current
+  compilation. The metadata reader and indexes must remain private to the provider.
+- `Metadata/IImportedAssemblySymbol` provides semantic type discovery; it must not leak
+  this library's physical tokens or PE objects into shared binding.
+- `Targets/ICompilationEmitter.Emit` owns backend output after shared semantic and
+  target-contract validation. Streams remain caller-owned; generators are per call.
+- `Targets/DotNetCompilationTarget` still composes the .NET emitter and reflection
+  metadata services, including for the existing neoCLR CLI profile. It is not already
+  a native metadata provider. A native adapter needs explicit composition and capability
+  handling; changing a flag alone would not establish integration.
+
+**Proposed first consumer:** compile a small Raven program with Int32 arguments,
+arithmetic, static calls and an entry function; import an API-produced ordinary PE
+library through the metadata provider, emit native format-5 output through the builder,
+and load/verify/run the output in neoCLR. Include missing/wrong-identity references and
+an unsupported-signature diagnostic. The test should exercise both symbol loading and
+code generation, with the runtime result as its acceptance gate. A producer-only C# test
+or copying a precompiled image would not establish those compiler boundaries.
+
+This is the next integration experiment, not completed work. Keep modern .NET behavior
+and its default provider unchanged, use an explicit experimental target path, and keep
+unsupported constructs diagnostic. Do not require structural types for the first case.
+Expand ordinary signatures/bodies when the consumer needs them. General runtime APIs,
+full compiler coverage and the guest metadata-library port remain later. Compiler
+changes will need paired Raven/neoCLR contract documentation, changelogs and focused
+.NET regression checks. No Raven source was changed during this inspection.

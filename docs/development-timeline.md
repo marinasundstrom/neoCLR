@@ -9154,3 +9154,19 @@ remote synchronization does not publish a runtime bundle or website.
   requirements and then implement its adapters. Structural runtime integration,
   direct PE/#Neo loading and the Raven port remain separate later work. This result
   establishes the bounded acceptance baseline, not a complete general compiler backend.
+
+## 2026-09-30 — Use the refactored compiler as the metadata integration consumer
+
+- **Author direction:** integrate with activity `01a0f154-2448-7df3-8536-c837097b46c2`
+  once the metadata work is far enough. The author explained that this supplies an
+  end-to-end case for testing and implementing the rest of the format's support.
+- **Assistant response/action:** read **Refactor Raven for platform targets** and
+  inspected its current semantic-loader, imported-assembly and emitter boundaries.
+  Recorded a small compiler-to-native-runtime consumer as the next integration
+  experiment, rather than making complete metadata coverage a prerequisite.
+- **Current outcome:** member-reference resolution passes 21 C# contract groups, and
+  the earlier native producer/load proof remains available. Raven's composition is
+  still .NET-owned; native adapters are not yet installed. Inspection was read-only.
+- **Next:** use the named compiler activity for a bounded import/emission/runtime case
+  and let its unsupported cases drive subsequent ordinary metadata work; structural
+  extensions follow that integration. [Boundary inventory and proposed case](design/extended-cli-metadata.md#refactored-compiler-as-the-next-end-to-end-consumer-2026-09-30).

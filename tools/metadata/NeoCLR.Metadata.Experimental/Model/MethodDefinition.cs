@@ -47,7 +47,14 @@ public sealed class MethodDefinition
     {
         parameterCount = 0;
         returnsValue = false;
-        if (!IsStatic || GenericArity != 0 || signature.Length < 3 || signature[0] != 0) return false;
+        if (!IsStatic || GenericArity != 0) return false;
+        return TryDecodeStaticInt32Signature(signature, out parameterCount, out returnsValue);
+    }
+    internal static bool TryDecodeStaticInt32Signature(ReadOnlySpan<byte> signature, out int parameterCount, out bool returnsValue)
+    {
+        parameterCount = 0;
+        returnsValue = false;
+        if (signature.Length < 3 || signature[0] != 0) return false;
         int position = 1;
         int count = signature[position++];
         if ((count & 0x80) != 0)

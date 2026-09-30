@@ -93,7 +93,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add owned callable declarations to the PE reader: top-level functions, type methods,
   entry-point/token lookup, CLI flags and copied signature blobs. Recognize the writer's
   static Int32/no-result signature subset without simplifying unsupported encodings.
-  Bound method rows and repeated-signature decoding; 18 C# contract groups pass.
+  Bound method rows and repeated-signature decoding. Add owned physical MemberRef
+  lookup and explicit nominal method resolution for the emitted static Int32/no-result
+  subset, with overload/return matching and ambiguity rejection. Preserve unsupported
+  reference signatures as opaque data; validate parent rows and share the decoded
+  signature budget with MethodDefs. All 21 C# contract groups pass. Record the selected
+  Raven refactoring activity and its inspected loader/emitter boundaries; the next
+  planned consumer is a bounded compiler-to-runtime case that drives remaining format
+  support, rather than waiting for exhaustive metadata coverage.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

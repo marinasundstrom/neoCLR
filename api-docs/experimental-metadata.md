@@ -7,13 +7,16 @@ This is the first reusable reader/writer slice intended for Raven's future symbo
 loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
 and derives structural identities/member contracts against an explicitly supplied host catalog.
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
-explicit AssemblyRef and nominal TypeRef resolution are implemented. A controlled
-static-Int32 builder writes ordinary CLI PE assemblies. General rewriting, native #Neo
+explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
+implemented. A controlled static-Int32 builder writes ordinary CLI PE and native
+format-5 assemblies, including native top-level functions. General rewriting, native #Neo
 execution and Introspection assembly loading remain pending.
 
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
+- [MemberReference](#memberreference): physical references and explicit method resolution.
 - [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
 - [MetadataArtifact](#metadataartifact): ordinary classification or owned extended profile.
 - [MetadataProfile](#metadataprofile): reference-profile reader and writer entry points.
@@ -694,7 +697,9 @@ generic arities and owned signature blobs. It accepts at most 256 AssemblyRefs,
 a cumulative 4 MiB of key/token blobs, and at most 4096 TypeDefs and a cumulative 4 Mi UTF-16
 code units of decoded declaration names/namespaces (counting repeated uses). It rejects missing/invalid
 or cyclic declaring-type relationships. MethodDefs are limited to 4096 and copied
-signature bytes to a cumulative 4 MiB (including repeated references to one blob).
+signature bytes to a cumulative 4 MiB shared with MemberRef blobs (including repeated
+references to one blob). MemberRefs are limited to 4096, require nonempty signature
+blobs, and have their parent table kind and row bounds checked.
 Missing/empty method signatures and instance global functions are rejected. Nonempty
 signatures outside the supported decoder remain opaque and are not generally validated.
 Missing assembly manifests (netmodules),
@@ -720,6 +725,8 @@ public sealed class ModuleDefinition
     public IReadOnlyList<MethodDefinition> Methods { get; }
     public IReadOnlyList<MethodDefinition> Functions { get; }
     public MethodDefinition? GetMethodDefinition(uint metadataToken);
+    public IReadOnlyList<MemberReference> MemberReferences { get; }
+    public MemberReference? GetMemberReference(uint metadataToken);
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     public IReadOnlyList<TypeReference> TypeReferences { get; }
     public TypeDefinition? GetTypeDefinition(uint metadataToken);
@@ -739,7 +746,10 @@ those physically owned by the first, top-level, empty-namespace `<Module>` row. 
 model these have null DeclaringType and the pseudo-type's Methods collection is empty.
 Other definitions retain their actual type owner. GetMethodDefinition returns the same
 snapshot object as these collections, or null for absent and non-MethodDef tokens.
-No overload selection or dependency lookup is implied.
+No overload selection or dependency lookup is implied. MemberReferences contains all
+physical MemberRefs in row order, including field/general signatures that this model
+cannot yet resolve. GetMemberReference returns the owned row or null for missing/wrong
+kinds; neither operation resolves a dependency.
 
 GetTypeDefinition performs local physical TypeDef-token lookup and returns the same
 owned definition instance. Zero, other token kinds and absent rows return null. It
@@ -800,8 +810,8 @@ GenericArity counts method GenericParam rows without interpreting their constrai
 GetSignature returns a fresh copy of the CLI signature blob. It preserves unsupported
 encodings and never simplifies them into a supported signature. Returned bytes and
 original input bytes can be modified without changing the snapshot. No body, parameter
-names, attributes, constraints, MemberRef resolution or signature type resolution is
-provided by this slice.
+names, custom attributes, constraints or general signature type resolution is provided
+by MethodDefinition. Use MemberReference for the supported reference-resolution subset.
 
 TryGetStaticInt32Signature recognizes only the current writer contract: static,
 nongeneric, default calling convention, 0–256 Int32 parameters, and Int32 or absent
@@ -814,6 +824,46 @@ opaque data. ReadAssembly is not a general signature or execution verifier.
 The C# consumer reads an emitted entry point, globals and overloaded type-owned methods,
 checks shared object identity and copy isolation, and covers counts 0/1/127/128/256,
 no-result returns, unsupported signatures, 4096/4097 rows and repeated-blob amplification.
+
+### MemberReference
+
+```csharp
+public sealed class MemberReference
+{
+    public ModuleDefinition Module { get; }
+    public uint MetadataToken { get; }
+    public uint ParentToken { get; }
+    public string Name { get; }
+    public byte[] GetSignature();
+    public MethodDefinition ResolveMethod(IAssemblyResolver? resolver = null);
+}
+```
+
+The snapshot owns these rows; there is no public constructor or mutation. Module is
+the consuming module. MetadataToken is its physical MemberRef token; ParentToken is
+the physical MemberRefParent token, and Name is the referenced name. GetSignature
+returns a fresh copy, including opaque field or unsupported method signatures.
+
+ResolveMethod supports the writer's static, nongeneric default-convention Int32
+parameters (0–256) and Int32/no-result contract. It resolves a local TypeDef or nominal
+TypeRef parent, requiring the explicit resolver for external scopes. It then selects
+exactly one directly declared method by ordinal name and decoded parameter/result
+contract, returning that target snapshot's owned MethodDefinition. There is no implicit
+filesystem probing, binding cache or access-policy decision. Resolver errors propagate;
+missing/wrong-identity dependencies, unsupported contracts/parents, and absent/ambiguous
+matches raise InvalidDataException. A return-contract mismatch cannot select a method.
+
+Field, instance/generic/vararg and nominal signature types remain opaque. ModuleRef,
+TypeSpec and MethodDef parents are range-checked on read but unsupported for resolution.
+Global MemberRefs and inherited method lookup are also unsupported. Local global calls
+emitted by the writer use MethodDef tokens and remain available through method lookup.
+Resolution never compares module-relative nominal signature tokens as cross-module
+identity; general type-aware signature comparison remains future work.
+
+C# tests resolve writer-emitted cross-assembly overloads and no-result methods, and
+exercise local TypeDef/TypeRef parents, copy isolation, missing/mismatched dependencies,
+return mismatches, ambiguity, host failures, unsupported signatures, invalid parents,
+4096/4097 rows and the shared decoded-signature budget.
 
 ### TypeReference
 
@@ -1079,7 +1129,7 @@ all CLR versus neoCLR arithmetic policies.
 
 The C# writer consumer builds a dependency's `Twice(Int32) -> Int32` and an application
 that calls it with 20, adds 2 and returns 42. It tests repeat writes, body edits, imported
-TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Eighteen
+TypeRef/MemberRef resolution, entry-point ownership and invalid-stack rejection. Twenty-one
 standalone C# contract groups pass, including earlier identity/reference tests.
 
 ### neoCLR acceptance test

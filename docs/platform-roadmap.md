@@ -12,8 +12,14 @@ then integrate the refactored compiler, then add improvements such as structural
 The direct native producer/load test below is the bounded acceptance baseline;
 ordinary compiler-required metadata coverage is next. The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
-18 C# contract groups cover ownership, unsupported signatures and decoding limits.
-General signatures, body import and MemberRef resolution remain readiness gaps. Structural types remain a future
+21 C# contract groups cover ownership, unsupported signatures, decoding limits and
+explicit MemberRef resolution for the emitted nominal static method subset. General
+signatures, broader member contracts and body import remain readiness gaps. The author
+now selects **Refactor Raven for platform targets** (activity
+`01a0f154-2448-7df3-8536-c837097b46c2`) as the integration consumer: attempt a bounded
+compiler import/emission/runtime case once this subset suffices, then drive remaining
+metadata support from that case rather than waiting for exhaustive coverage. See the
+[inspected compiler boundaries and next case](design/extended-cli-metadata.md#refactored-compiler-as-the-next-end-to-end-consumer-2026-09-30). Structural types remain a future
 design requirement (arrays, tuples, Function types, unions/intersections and synthesized
 members), not a prerequisite for that first compiler integration. The
 [design and staged acceptance plan](design/extended-cli-metadata.md) is exploratory;

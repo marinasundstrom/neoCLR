@@ -83,7 +83,7 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests/NeoCLR.Me
 ```
 
 This is an executable test runner (nonzero exit on failure), not a dotnet-test discovery
-project. Its 18 contract groups generate PE metadata in C#, exercise exact identities and resolver
+project. Its 21 contract groups generate PE metadata in C#, exercise exact identities and resolver
 contracts, and cover invalid inputs, limits and ownership. It uses only .NET platform
 libraries and the project under test.
 
@@ -124,7 +124,7 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
 Use a fresh output directory. This C# test directly loads the API-produced native
 application and library, verifies them and executes to 42; it also rejects missing and
 wrong-revision dependencies. No bridge is used. See the [API reference](../../api-docs/experimental-metadata.md#controlled-pe-and-native-assembly-construction)
-for ownership, limits and transport details. The 18 contract groups additionally check
+for ownership, limits and transport details. The 21 contract groups additionally check
 CLI global-method rows and native ownership. This is a compiler/backend baseline for
 the bounded Int32 subset, not complete NEOX structural execution or Raven integration.
 
@@ -132,5 +132,6 @@ The PE reader exposes `ModuleDefinition.Methods` (all rows), `Functions` (top-le
 functions), `TypeDefinition.Methods`, `GetMethodDefinition` and `AssemblyDefinition.EntryPoint`.
 `MethodDefinition` retains flags and owned CLI signature bytes, with explicit recognition
 of the emitted static Int32/no-result subset. General signatures remain opaque; bodies
-and MemberRef import/resolution are still pending. See the manual API reference for
+and general signature/member import remain pending. Physical MemberRefs now resolve
+the writer's static Int32/no-result method subset through explicit dependencies. See the manual API reference for
 ownership and reader resource bounds.

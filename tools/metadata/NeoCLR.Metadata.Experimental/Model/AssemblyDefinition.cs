@@ -10,10 +10,10 @@ public sealed class AssemblyDefinition
 {
     private readonly byte[] image;
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
-        IReadOnlyList<TypeRow> rows, IReadOnlyList<MethodRow> methods, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
+        IReadOnlyList<TypeRow> rows, IReadOnlyList<MethodRow> methods, IReadOnlyList<MemberReferenceRow> memberReferences, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
     {
         Identity = identity; Profile = profile; this.image = image; EntryPointToken = entryPointToken;
-        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, methods, references, typeReferences);
+        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, methods, memberReferences, references, typeReferences);
     }
     /// <summary>Gets the assembly's simple name, not a complete binding identity.</summary>
     public string Name => Identity.Name;
@@ -53,6 +53,7 @@ public sealed class AssemblyDefinition
             var reader = pe.GetMetadataReader();
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
             if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
+            if (reader.MemberReferences.Count > 4096) throw new InvalidDataException("too many member references");
             if (reader.MethodDefinitions.Count > 4096) throw new InvalidDataException("too many method definitions");
             if (reader.TypeReferences.Count > 4096) throw new InvalidDataException("too many type references");
             if (reader.AssemblyReferences.Count > 256) throw new InvalidDataException("too many assembly references");
@@ -149,13 +150,28 @@ public sealed class AssemblyDefinition
                     (ushort)method.Attributes, (ushort)method.ImplAttributes, method.GetGenericParameters().Count,
                     reader.GetBlobBytes(method.Signature)));
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, references, typeReferences, artifact.Profile, owned, entryPointToken);
+            var memberReferences = new List<MemberReferenceRow>();
+            foreach (var handle in reader.MemberReferences)
+            {
+                var member = reader.GetMemberReference(handle);
+                uint parent = (uint)MetadataTokens.GetToken(member.Parent);
+                int table = (int)(parent >> 24), row = (int)(parent & 0xffffff);
+                if (table is not (0x01 or 0x02 or 0x06 or 0x1a or 0x1b) || row == 0 || row > reader.GetTableRowCount((TableIndex)table))
+                    throw new InvalidDataException("member reference parent outside supported metadata tables");
+                int length = member.Signature.IsNil ? 0 : reader.GetBlobReader(member.Signature).Length;
+                if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
+                    throw new InvalidDataException("missing or excessive member signature data");
+                signatureBytes += length;
+                memberReferences.Add(new((uint)MetadataTokens.GetToken(handle), parent, ReadName(member.Name), reader.GetBlobBytes(member.Signature)));
+            }
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, memberReferences, references, typeReferences, artifact.Profile, owned, entryPointToken);
         }
         catch (BadImageFormatException error)
         {
             throw new InvalidDataException("malformed CLI declaration metadata", error);
         }
     }
+    internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
@@ -169,7 +185,7 @@ public sealed class ModuleDefinition
     private readonly Dictionary<uint, MethodDefinition> methods;
     private readonly Dictionary<uint, IReadOnlyList<MethodDefinition>> declaredMethods;
     internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows,
-        IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
+        IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.MemberReferenceRow> memberReferenceRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
@@ -184,6 +200,7 @@ public sealed class ModuleDefinition
             .ToDictionary(group => group.Key, group => (IReadOnlyList<MethodDefinition>)Array.AsReadOnly(group.ToArray()));
         AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
         TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
+        MemberReferences = Array.AsReadOnly(memberReferenceRows.Select(row => new MemberReference(this, row)).ToArray());
     }
     /// <summary>Gets the owning assembly snapshot.</summary>
     public AssemblyDefinition Assembly { get; }
@@ -202,6 +219,12 @@ public sealed class ModuleDefinition
     /// <returns>The owned callable or null.</returns>
     public MethodDefinition? GetMethodDefinition(uint metadataToken) => methods.GetValueOrDefault(metadataToken);
     internal IReadOnlyList<MethodDefinition> GetDeclaredMethods(uint token) => declaredMethods.GetValueOrDefault(token) ?? Array.Empty<MethodDefinition>();
+    /// <summary>Gets physical MemberRef rows, including opaque field or unsupported method references.</summary>
+    public IReadOnlyList<MemberReference> MemberReferences { get; }
+    /// <summary>Looks up a physical MemberRef token in this snapshot.</summary>
+    /// <param name="metadataToken">Physical MemberRef token; other kinds and missing rows return null.</param>
+    /// <returns>The owned reference or null.</returns>
+    public MemberReference? GetMemberReference(uint metadataToken) => MemberReferences.FirstOrDefault(member => member.MetadataToken == metadataToken);
     /// <summary>Gets physical AssemblyRef rows in metadata order, without resolving dependencies.</summary>
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
     /// <summary>Gets physical nominal TypeRef rows in metadata order.</summary>
