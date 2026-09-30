@@ -9,9 +9,11 @@ milestone sequencing and scope. Explicit author directions take precedence.
 After the bounded main backport below, put the structural Function experiment on
 hold and work in Raven to improve neoCLR target support. The Function runtime
 branch remains isolated; its proposals are open, not completed on main. Specific
-compiler tasks and acceptance criteria remain to be selected. This does not
-approve a replacement backend or integration of neoCLR-specific policies into
-Raven main. General compiler fixes continue to require independent validation.
+acceptance now includes integrating target-gated Self in Raven and neoCLR while
+keeping structural types on feature branches in both repositories. This author
+direction supersedes the earlier restriction on Raven main integration; a native
+metadata layer and replacement backend remain future work. General compiler fixes
+still require independent validation.
 The earlier Web API direction below remains recorded for later resumption.
 
 **Author-directed library backport (2026-09-30).** Bring Raven callback function

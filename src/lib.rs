@@ -5,6 +5,7 @@ mod constraints;
 mod enums;
 pub mod pe;
 mod runtime_lookup;
+mod self_types;
 pub use assembler::assemble;
 mod access;
 mod clock;

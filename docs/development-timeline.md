@@ -9004,3 +9004,15 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   The broader source-ownership audit has two reproduced pre-existing failures;
   an eight-element tuple probe fails at emission rather than with a specific arity
   diagnostic. Both are recorded as open limitations, not passing checks.
+
+## 2026-09-30 — Separate Self integration from structural types
+
+The author directed integration of Self into Raven and neoCLR while retaining
+structural/function-type work on feature branches in both repositories, then
+requested branch cleanup and remote synchronization. The assistant extracted the
+Self delta onto neoCLR main rather than merging Function ancestry, and added an
+explicit neoCLR-only compiler gate. Rebuilding main's nominal callbacks showed
+that inhabited unit-result transport is independently required by the nominal
+Func ABI; that compatibility rule stays shared. Structural metadata and complete
+compiler support remain deferred. Validation evidence accompanies the integration;
+remote synchronization does not publish a runtime bundle or website.

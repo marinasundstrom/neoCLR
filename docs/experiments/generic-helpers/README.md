@@ -19,13 +19,13 @@ The bound remains static methods on nongeneric owners, one to four method type p
 no exception handlers, and at most 128 specializations. Arguments must be closed and
 supported by ordinary import. Open arguments, byref arguments, instance methods,
 generic declaring types and unsupported constraints remain rejected. Existing exact
-Number<T> constraint admission and constrained numeric dispatch are preserved.
+Number constraint admission and constrained numeric dispatch are preserved.
 This is not a claim of arbitrary CLI generic support or reflective construction of
 open generic methods.
 
 The consumer covers nested calls with int, string and bool, two method type parameters,
 shared application-object and vector identity, a generic ArrayList reader, and existing
-Number<int>/Number<double> arithmetic. Metadata checks cover distinct signatures,
+Number-constrained int/double arithmetic. Metadata checks cover distinct signatures,
 cache reuse, same-named arguments from distinct assemblies, retained visibility/debug
 origin and unsupported open/byref/constraint/instance shapes. `verify.py` also retains
 source checks for additional Number constraints and a class constraint.

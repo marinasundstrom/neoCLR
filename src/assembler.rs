@@ -591,6 +591,18 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
+                        "callself" => {
+                            let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
+                                Fault::new("expected callself Type = Target(...)")
+                            })?;
+                            let (borrowed, ty) = ty
+                                .trim()
+                                .strip_prefix("borrow ")
+                                .map_or((false, ty.trim()), |ty| (true, ty));
+                            Some(
+                                serde_json::json!({"borrowed": borrowed, "self_type": parse_type(ty)?, "target": parse_function_ref(target.trim())?}),
+                            )
+                        }
                         "delegate.bind" => {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
                                 Fault::new("expected delegate.bind Type = Target(...)")

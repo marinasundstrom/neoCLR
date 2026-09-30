@@ -70,7 +70,7 @@ pub(crate) fn bounds(constraints: &[GenericConstraint]) -> impl Iterator<Item = 
 
 fn symbolic(ty: &Type) -> bool {
     match ty {
-        Type::TypeParameter(_) | Type::MethodTypeParameter(_) => true,
+        Type::TypeParameter(_) | Type::MethodTypeParameter(_) | Type::SelfType => true,
         Type::Constructed { arguments, .. } | Type::Scoped { arguments, .. } => {
             arguments.iter().any(symbolic)
         }
@@ -160,6 +160,8 @@ pub(crate) fn check(
                 if definition.representation == crate::metadata::Representation::Interface {
                     !crate::interfaces::closure(module, concrete)
                         .is_ok_and(|types| types.contains(bound))
+                        || !crate::interfaces::satisfies_self_bound(module, concrete, bound)
+                            .unwrap_or(false)
                 } else {
                     crate::inheritance::require_base(module, concrete, bound).is_err()
                 }
@@ -286,7 +288,11 @@ pub(crate) fn permits_view(
             return false;
         };
         if interface {
-            crate::interfaces::closure(module, bound).is_ok_and(|types| types.contains(target))
+            crate::interfaces::closure(module, bound).is_ok_and(|types| {
+                types
+                    .iter()
+                    .any(|ty| ty.substitute_self(source).is_ok_and(|ty| &ty == target))
+            })
         } else {
             crate::inheritance::require_base(module, bound, target).is_ok()
         }

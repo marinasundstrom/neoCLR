@@ -1,0 +1,64 @@
+import System.*
+
+struct Cell : Clonable {
+    var Value: int
+
+    init(value: int) {
+        Value = value
+    }
+
+    func Clone() -> Self => Cell(Value)
+}
+
+class Box : Clonable {
+    var Value: int
+
+    init(value: int) {
+        Value = value
+    }
+
+    func Clone() -> Self => Box(Value)
+}
+
+open class BaseClone : Clonable {
+    virtual func Clone() -> Self => BaseClone()
+    virtual func Read() -> int => 20
+}
+
+class InheritedClone : BaseClone {}
+
+class OverrideClone : BaseClone {
+    override func Clone() -> BaseClone => OverrideClone()
+    override func Read() -> int => 42
+}
+
+class ReboundClone : BaseClone, Clonable {
+    func Clonable.Clone() -> Self => ReboundClone()
+    override func Read() -> int => 60
+}
+
+func Copy<T>(value: T) -> T where T: Clonable => value.Clone()
+
+func Main() {
+    let cell = Cell(20)
+    let copiedCell = Copy<Cell>(cell)
+    let box = Box(22)
+    let copiedBox = Copy<Box>(box)
+    box.Value = 99
+    if copiedCell.Value + copiedBox.Value != 42 {
+        System.Fault("Self cloning did not preserve independent values")
+    }
+    if InheritedClone().Clone().Read() != 20 {
+        System.Fault("Inherited clone changed its base result contract")
+    }
+    if Copy<BaseClone>(InheritedClone()).Read() != 20 {
+        System.Fault("Base Self clone failed")
+    }
+    if Copy<BaseClone>(OverrideClone()).Read() != 42 {
+        System.Fault("Base Self clone lost virtual dispatch")
+    }
+    if Copy<ReboundClone>(ReboundClone()).Read() != 60 {
+        System.Fault("Explicit derived Self clone failed")
+    }
+    Console.WriteLine("Generic Self cloning passed")
+}

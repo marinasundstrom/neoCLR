@@ -34,6 +34,8 @@ pub enum Type {
     },
     /// Indexed parameter of the declaring type (CLI VAR-like signature).
     TypeParameter(u16),
+    /// Implementing type of a native interface contract; never a storage type.
+    SelfType,
     /// Indexed method parameter (CLI MVAR), independent of its owner.
     MethodTypeParameter(u16),
     Constructed {
@@ -58,6 +60,7 @@ impl Type {
     /// Primitive spellings are signature aliases for canonical System type identities.
     pub fn from_name(name: &str) -> Self {
         match name {
+            "Self" => Self::SelfType,
             "Void" | "void" | "System.Void" => Self::Void,
             "Single" | "single" | "float32" | "System.Single" => Self::Single,
             "Double" | "double" | "float64" | "System.Double" => Self::Double,
@@ -758,6 +761,15 @@ pub enum Instruction {
     BorrowInterface(Type),
     #[serde(rename = "callvirt")]
     CallVirtual(FunctionRef),
+    /// Dispatch an interface contract with an explicit, statically known Self.
+    #[serde(rename = "callself")]
+    CallSelf {
+        /// Adapt a managed receiver slot to the concrete implementation without boxing.
+        #[serde(default)]
+        borrowed: bool,
+        self_type: Type,
+        target: FunctionRef,
+    },
     #[serde(rename = "value.is")]
     IsValue(Type),
     #[serde(rename = "value.unpack")]
@@ -938,22 +950,53 @@ impl Type {
     pub fn substitute_method_parameters(&self, arguments: &[Type]) -> Result<Type, crate::Fault> {
         self.substitute_parameters(None, Some(arguments))
     }
+    pub fn substitute_self(&self, implementing_type: &Type) -> Result<Type, crate::Fault> {
+        self.substitute_with_self(None, None, Some(implementing_type))
+    }
+
+    pub fn contains_self(&self) -> bool {
+        match self {
+            Self::SelfType => true,
+            Self::Constructed { arguments, .. } | Self::Scoped { arguments, .. } => {
+                arguments.iter().any(Self::contains_self)
+            }
+            Self::ByRef(t)
+            | Self::ReadOnlyByRef(t)
+            | Self::Array(t)
+            | Self::ArrayRef(t)
+            | Self::Ptr(t)
+            | Self::InterfaceRef(t) => t.contains_self(),
+            _ => false,
+        }
+    }
+
     pub(crate) fn substitute_parameters(
         &self,
         types: Option<&[Type]>,
         methods: Option<&[Type]>,
     ) -> Result<Type, crate::Fault> {
+        self.substitute_with_self(types, methods, None)
+    }
+
+    fn substitute_with_self(
+        &self,
+        types: Option<&[Type]>,
+        methods: Option<&[Type]>,
+        implementing_type: Option<&Type>,
+    ) -> Result<Type, crate::Fault> {
         fn substitute(
             ty: &Type,
             types: Option<&[Type]>,
             methods: Option<&[Type]>,
+            implementing_type: Option<&Type>,
             depth: usize,
         ) -> Result<Type, crate::Fault> {
             if depth > 32 {
                 return Err(crate::Fault::new("type substitution nesting exceeds 32"));
             }
-            let nested = |ty: &Type| substitute(ty, types, methods, depth + 1);
+            let nested = |ty: &Type| substitute(ty, types, methods, implementing_type, depth + 1);
             Ok(match ty {
+                Type::SelfType if implementing_type.is_some() => implementing_type.unwrap().clone(),
                 Type::TypeParameter(index) if types.is_some() => types
                     .unwrap()
                     .get(*index as usize)
@@ -989,7 +1032,7 @@ impl Type {
                 other => other.clone(),
             })
         }
-        substitute(self, types, methods, 0)
+        substitute(self, types, methods, implementing_type, 0)
     }
 }
 
@@ -1062,6 +1105,21 @@ impl Function {
             match op {
                 Instruction::BindDelegate { delegate, target } => {
                     *delegate = map(delegate)?;
+                    if let Some(owner) = &mut target.owner {
+                        *owner = map(owner)?;
+                    }
+                    for ty in target
+                        .parameters
+                        .iter_mut()
+                        .chain(&mut target.generic_arguments)
+                    {
+                        *ty = map(ty)?;
+                    }
+                }
+                Instruction::CallSelf {
+                    self_type, target, ..
+                } => {
+                    *self_type = map(self_type)?;
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }

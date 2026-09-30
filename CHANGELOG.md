@@ -8,6 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
+- Integrate native Self independently of structural Function types: nongeneric
+  Number and Clonable contracts, conformance-owned inheritance, checked generic
+  Self dispatch and borrowed receiver support. Preserve main's nominal delegates.
+  Raven integration now selects TargetPlatform.NeoCLR explicitly and transports
+  Self through a fieldless marker until a native metadata loader is available.
+  Rebuild references and libraries together; the former generic contracts are
+  incompatible. Structural types remain on feature/function-types. Validate 98
+  native tests, rebuilt library/API snapshots, and class/struct cloning with six
+  rejected programs; nominal unit callbacks still execute through delegate.bind.
+  Numeric Self/parsing verification and both negative cases pass; update the stale
+  importer diagnostic expectation and record matching artifact hashes.
+
 - Backport Raven function type syntax for library callback annotations and lazy
   `Iterable<T>.OfType<U>()` filtering from the Function feature branch. OfType skips
   null/incompatible elements, preserves order, narrows matches without numeric

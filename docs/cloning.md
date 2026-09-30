@@ -1,5 +1,15 @@
 # Explicit cloning
 
+The development Raven library now exposes nongeneric `System.Clonable` with
+`Clone() -> Self`. See the [current API guide](../api-docs/cloning.md) and
+[tested class/struct consumer](experiments/native-self/README.md). Remove the former
+type argument and rebuild matching artifacts when migrating.
+
+The remainder of this page documents the archived Neo bootstrap contract and its
+existing sample/tests, which retain `Clonable<T>`.
+
+## Archived Neo bootstrap contract
+
 System.Clonable<T> is an ordinary generic interface implemented in the System library:
 
 ```text

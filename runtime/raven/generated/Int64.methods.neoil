@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Int64.rvn. Regenerate with build_runtime_library.py.
 .type System.Int64
 .sealed
-.implements System.Number<Int64>
+.implements System.Number
 .implements System.ComparableTo<Int64>
 .property static MinValue() -> Int64
 .get System.Int64::get_MinValue()

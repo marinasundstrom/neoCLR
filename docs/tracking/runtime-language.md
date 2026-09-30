@@ -110,7 +110,7 @@ for alternatives and costs. These are candidate questions, not implementation pr
 | [#17 GC helper](https://github.com/marinasundstrom/neoCLR/issues/17) | Select a diagnostics consumer and invocation/heap contract; a collection request is not deterministic resource cleanup. |
 | [#19 Raven bootstrapping](https://github.com/marinasundstrom/neoCLR/issues/19) | Inventory dependencies and run one compiler component before claiming self-hosting; no HTTP release dependency. |
 | [#20 tuple structs](https://github.com/marinasundstrom/neoCLR/issues/20) | Clarify syntax versus nominal/structural representation, then test layout, identity and reflection on one pair-valued API. |
-| [#21 Self](https://github.com/marinasundstrom/neoCLR/issues/21), [#22 generic math](https://github.com/marinasundstrom/neoCLR/issues/22) | Exercise one algorithm and static interface-member dispatch; Self syntax is not automatically required. |
+| [#21 Self](https://github.com/marinasundstrom/neoCLR/issues/21), [#22 generic math](https://github.com/marinasundstrom/neoCLR/issues/22) | Author selects native Self on 2026-09-30; see [contract, Number migration and evidence](../self-types.md). Raven integration stays on a neoclr-based feature branch. |
 | [#23 function types/objects](https://github.com/marinasundstrom/neoCLR/issues/23) | Compare nominal delegates, syntax lowering and a runtime callable representation on capture/escape/invocation/GC cases. Replacement remains proposed. |
 
 ## Boundaries and evidence

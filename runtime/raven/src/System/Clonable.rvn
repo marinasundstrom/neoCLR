@@ -1,5 +1,5 @@
 namespace System
 
-public interface Clonable<T> {
-    func Clone() -> T
+public interface Clonable {
+    func Clone() -> Self
 }

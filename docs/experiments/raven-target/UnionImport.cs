@@ -456,7 +456,7 @@ static class UnionImport
                         throw new InvalidDataException("Unsupported runtime field write.");
                     case Code.Ldobj:
                         var copiedToken = (TypeReference)instruction.Operand;
-                        if (!copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !(TupleBindings.Type(copiedToken) is not null || ApplicationTypes.IsLibrary(copiedToken) || ApplicationTypes.IsModule(copiedToken.Resolve().Module)))
+                        if (!applicationSpecialization.IsBorrowedSelfLoad(instruction) && (!copiedToken.IsValueType || copiedToken.Resolve()?.IsValueType != true || !(TupleBindings.Type(copiedToken) is not null || ApplicationTypes.IsLibrary(copiedToken) || ApplicationTypes.IsModule(copiedToken.Resolve().Module))))
                             throw new InvalidDataException("Only matched library value loads are admitted.");
                         var copiedType = ProfileType(copiedToken);
                         if (LibraryImplementation.IsByValueReceiver(method) && GenericUnionLibrary.IsMatched(method.DeclaringType)
@@ -467,7 +467,10 @@ static class UnionImport
                         var copiedAddress = Expect(copiedType + "&");
                         if (copiedAddress.Local >= 0 && !assigned[copiedAddress.Local])
                             throw new InvalidDataException("Read through uninitialized value address.");
-                        Push(new(copiedType)); code.AppendLine("ldobj " + copiedType); break;
+                        Push(new(copiedType));
+                        // The native call consumes the original receiver slot; only the Cecil validation view loads the class value.
+                        if (!applicationSpecialization.IsBorrowedSelfLoad(instruction)) code.AppendLine("ldobj " + copiedType);
+                        break;
                     case Code.Stobj:
                         var storedOutput = ProfileType((TypeReference)instruction.Operand);
                         ConvertTop(storedOutput);
@@ -856,11 +859,14 @@ static class UnionImport
                             {
                                 ApplicationTypes.CheckMethod(reference); ApplicationTypes.CheckMethod(targetMethod);
                                 if (reference.HasThis != targetMethod.HasThis || instruction.OpCode.Code == Code.Callvirt && targetMethod.IsStatic) throw new InvalidDataException("Invalid application call receiver.");
-                                if (!targetMethod.IsPublic && targetMethod.DeclaringType != method.DeclaringType && !InternalLibraryAccess(targetMethod, method) && !(targetMethod.IsAssembly && targetMethod.Module == method.Module)
+                                // A validated constrained Self call dispatches through its public contract,
+                                // even when specialization uses a private MethodImpl for signature checking.
+                                if (!targetMethod.IsPublic && !(applicationSpecialization.NativeSelfCall(instruction) is not null && ApplicationTypes.IsExplicitApplicationImplementation(targetMethod))
+                                    && targetMethod.DeclaringType != method.DeclaringType && !InternalLibraryAccess(targetMethod, method) && !(targetMethod.IsAssembly && targetMethod.Module == method.Module)
                                     && !((DescriptorLibrary.IsBaseConstructor(targetMethod) || targetMethod.IsFamily && targetMethod.IsConstructor)
                                         && instruction.OpCode.Code == Code.Call && method.IsConstructor
                                         && method.DeclaringType.BaseType?.Resolve() == targetMethod.DeclaringType))
-                                    throw new InvalidDataException("Nonpublic cross-type call unsupported.");
+                                    throw new InvalidDataException("Nonpublic cross-type call unsupported: " + reference.FullName + " from " + method.FullName);
                                 if (!ApplicationTypes.Matches(reference, targetMethod)) throw new InvalidDataException("Resolved signature mismatch.");
                                 if (!targetMethod.IsAbstract) pending.Enqueue(targetMethod);
                                 var parameters = reference.Parameters.Select(p => ProfileType(ApplicationTypes.Close(p.ParameterType, reference.DeclaringType))).ToArray();
@@ -971,7 +977,7 @@ static class UnionImport
                         }
                         if (call.Result != "noresult") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
                         call = Coerce(call, actualArguments, preserveAccess: !targetMethod.IsPublic);
-                        code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
+                        code.AppendLine(applicationSpecialization.NativeSelfCall(instruction) ?? call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
                         // Conditional-out results must reach their branch directly so the runtime
                         // verifier retains the relationship between success and assignment.
                         if (call.Result == "Boolean" && conditionalOut < 0) code.Append(BooleanBindings.Convert("Boolean", "Int32"));

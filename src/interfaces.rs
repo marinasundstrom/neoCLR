@@ -77,6 +77,7 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         ty: &Type,
         path: &mut Vec<String>,
         result: &mut Vec<Type>,
+        implementing_type: &Type,
     ) -> Result<(), Fault> {
         let definition = module
             .type_definition(ty)
@@ -98,13 +99,15 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         }
         path.push(name);
         for base in &definition.implements {
-            let base = base.substitute_type_parameters(arguments(ty))?;
+            let base = base
+                .substitute_type_parameters(arguments(ty))?
+                .substitute_self(implementing_type)?;
             interface_definition(module, &base)?;
-            visit(module, &base, path, result)?;
+            visit(module, &base, path, result, implementing_type)?;
         }
         if definition.representation == Representation::Record {
             if let Some(base) = crate::inheritance::base(module, ty)? {
-                visit(module, &base, path, result)?;
+                visit(module, &base, path, result, &base)?;
             }
         }
         path.pop();
@@ -124,7 +127,12 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         }
     }
     let mut result = Vec::new();
-    visit(module, ty, &mut Vec::new(), &mut result)?;
+    let implementing_type = if interface_definition(module, ty).is_ok() {
+        &Type::SelfType
+    } else {
+        ty
+    };
+    visit(module, ty, &mut Vec::new(), &mut result, implementing_type)?;
     Ok(result)
 }
 
@@ -138,11 +146,7 @@ fn declared(module: &Module, concrete: &Type, interface: &Type) -> Result<(), Fa
     Ok(())
 }
 
-fn member(
-    module: &Module,
-    concrete: &Type,
-    contract: &Function,
-) -> Result<Option<Function>, Fault> {
+fn conformance_owner(module: &Module, concrete: &Type, interface: &Type) -> Result<Type, Fault> {
     // An inherited mapping is anchored at the class that declares conformance.
     // A repeated declaration remaps from that class, including inherited members.
     let chain = if module
@@ -153,10 +157,6 @@ fn member(
     } else {
         vec![concrete.clone()]
     };
-    let interface = contract
-        .owner
-        .as_ref()
-        .ok_or_else(|| Fault::new("interface contract requires owner"))?;
     let mut anchor = None;
     for (index, owner) in chain.iter().enumerate() {
         let definition = module
@@ -164,7 +164,10 @@ fn member(
             .ok_or_else(|| Fault::new("unknown implementation owner"))?;
         for declared in &definition.implements {
             let declared = declared.substitute_type_parameters(arguments(owner))?;
-            if closure(module, &declared)?.contains(interface) {
+            if closure(module, &declared)?
+                .iter()
+                .any(|ty| ty.substitute_self(owner).is_ok_and(|ty| &ty == interface))
+            {
                 anchor = Some(index);
                 break;
             }
@@ -173,7 +176,60 @@ fn member(
             break;
         }
     }
-    let anchor = anchor.ok_or_else(|| Fault::new("missing interface mapping declaration"))?;
+    anchor
+        .map(|index| chain[index].clone())
+        .ok_or_else(|| Fault::new("missing interface mapping declaration"))
+}
+
+/// An inherited nominal interface does not promise Self = the derived type.
+pub(crate) fn satisfies_self_bound(
+    module: &Module,
+    concrete: &Type,
+    interface: &Type,
+) -> Result<bool, Fault> {
+    Ok(!has_self_contract(module, interface)?
+        || conformance_owner(module, concrete, interface)? == *concrete)
+}
+
+fn has_self_contract(module: &Module, interface: &Type) -> Result<bool, Fault> {
+    let interfaces = closure(module, interface)?;
+    Ok(interfaces.iter().any(Type::contains_self)
+        || module.functions.iter().any(|method| {
+            method.owner.as_ref().is_some_and(|owner| {
+                interfaces.iter().any(|ty| {
+                    module
+                        .type_definition(owner)
+                        .zip(module.type_definition(ty))
+                        .is_some_and(|(left, right)| std::ptr::eq(left, right))
+                })
+            }) && crate::self_types::signature_has_self(method)
+        }))
+}
+
+fn member(
+    module: &Module,
+    concrete: &Type,
+    contract: &Function,
+) -> Result<Option<Function>, Fault> {
+    let owner = conformance_owner(
+        module,
+        concrete,
+        contract
+            .owner
+            .as_ref()
+            .ok_or_else(|| Fault::new("interface contract requires owner"))?,
+    )?;
+    let specialized = contract.map_types(|ty| ty.substitute_self(&owner))?;
+    let contract = &specialized;
+    let chain = if module
+        .type_definition(concrete)
+        .is_some_and(|d| d.representation == Representation::Record)
+    {
+        crate::inheritance::lineage(module, concrete)?
+    } else {
+        vec![concrete.clone()]
+    };
+    let anchor = chain.iter().position(|ty| ty == &owner).unwrap();
     let name = contract
         .name
         .rsplit('.')
@@ -304,7 +360,13 @@ pub(crate) fn ensure_implementation(
     if interface_definition(module, concrete).is_ok() {
         return Ok(());
     }
+    let owner = if has_self_contract(module, interface)? {
+        conformance_owner(module, concrete, interface)?
+    } else {
+        concrete.clone()
+    };
     for inherited in closure(module, interface)? {
+        let inherited = inherited.substitute_self(&owner)?;
         let definition = interface_definition(module, &inherited)?;
         for method in &module.functions {
             if method
@@ -541,7 +603,12 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             )) {
                 return Err(Fault::new("duplicate explicit interface mapping"));
             }
-            check_signature(module, body, &contract, true)?;
+            check_signature(
+                module,
+                body,
+                &contract.map_types(|ty| ty.substitute_self(owner))?,
+                true,
+            )?;
         }
     }
     for definition in &module.types {

@@ -84,7 +84,8 @@ from private instance helpers, explicit replacements and static virtual defaults
 
 The current numeric slice requires Raven neoCLR commit `617efd444` or later,
 including independently integrated authored-static-interface, inherited-constraint
-and target-metadata emission fixes. No Runtime Contract setting changed. Number<T>
+and target-metadata emission fixes. The subsequent native Self migration adds the
+Runtime Contract settings described below. Number
 and all concrete numeric parsers use matching development references; parsing
 returns the shared NumberParseError. See [numeric scope and evidence](../numeric-contracts/README.md)
 and [broader interface direction](../../tracking/runtime-language.md#interfaces-as-a-platform-capability).
@@ -1607,3 +1608,63 @@ worktree contains target-only identity policy commit `79a5d7ffc`. Rebuild the br
 against it and refresh the Tuple slice and consumer reference together. Existing
 installed SDKs and published Preview 11 artifacts do not gain these APIs from a
 source edit; packaging and installation require separate qualification.
+## Native Self integration (2026-09-30 development)
+
+Use Raven commit `764c22789` on `codex/neoclr-native-self`, based on `neoclr`,
+with this bridge.
+The shared props and numeric probes set `RavenSelfAssemblyName=NeoCLR.CoreProbe`
+and `RavenSelfType=System.Runtime.CompilerServices.Self`. The fieldless public
+reference marker transports native Self through compiler metadata; it is never a
+hidden generic parameter or a constructible native value. Ordinary CLR compilation
+does not enable this contract. See [native Self](../../self-types.md).
+
+The actual Raven `System.Number` interface is now nongeneric. Its arithmetic
+operands/results and Zero/One use Self; it inherits `ComparableTo<Self>`. Primitive
+implementations inherit `ComparableTo<primitive>` and Number. Rebuild references,
+runtime snapshots and consumers together: old Number<T> references are incompatible.
+The application importer still specializes its bounded closed numeric helpers,
+but emits native `callself` for Number members. Native validation and dispatch
+resolve the implementing type and check the substituted signature. The numeric
+verification script checks retained native dispatch and exercises ten primitive
+types. The subsequent [generic cloning probe](../native-self/README.md) adds
+bounded direct application Clone implementations for structs and classes. Its
+constrained receiver becomes native `callself borrow`. The importer still rejects
+arbitrary instance Self contracts and inherited cloning conformances.
+
+
+The 2026-09-30 Clonable follow-up migrates the actual Raven System.Clonable<T>
+library API to nongeneric System.Clonable with Clone() -> Self. Runtime Contract
+settings are unchanged. The cloning probe now uses that core interface and the
+signature probe checks zero arity, exact Self result and erased-call rejection.
+Rebuild matching core references, library snapshots and consumers together. The
+archived Neo bootstrap still owns its older generic contract. Copy depth remains
+implementation-defined; see the [API guide](../../../api-docs/cloning.md).
+
+Self inheritance remains an isolated neoCLR experiment, separate from the compiler
+boundary/multi-target refactor. Self is anchored to the class declaring conformance:
+Derived inheriting Base : Clonable retains Base-returning Clone, but does not
+satisfy a native Self bound as Derived. Redeclaring Clonable requires a matching
+Derived result. An explicit `func Clonable.Clone() -> Self` implementation can
+coexist with the inherited Base method; virtual overrides keep the Base signature.
+Explicit and inferred generic calls validate this rule under the configured Self
+Runtime Contract, with no additional target option. Metadata retains the declared
+return types and explicit interface mapping. These are bounded feature changes;
+broader neoCLR target integration follows the separate multi-target refactor.
+
+The Self feature branch also incorporates Raven neoclr checkpoint `080e2cfef`
+(2026-09-30), including the target-boundary extraction. Self marker validation
+now participates in DotNetRuntimeContract resolved checks; existing Runtime Self
+Contract settings and RAVT003 rejection behavior are preserved. This synchronization
+does not move Self into a new backend or modify the separate neoclr checkout.
+Validation: the merged compiler builds; 137 selected Self, target configuration,
+emission and incremental-reuse tests pass. The actual Clonable consumer passes
+native verification/execution and all six rejection cases.
+
+### Shared Self integration on nominal main
+
+The current integration extracts Self onto neoCLR main and uses Raven's explicit
+NeoCLR platform with a configured Self marker. Structural Function types remain
+on feature/function-types. Earlier revision/branch notes above are historical.
+The current props and Self/numeric probes select RavenTargetPlatform=NeoCLR.
+Inhabited unit-result transport is required by this nominal delegate ABI too.
+See [the bridge contract](../../raven-cli-bridge.md) for ownership and replacement.

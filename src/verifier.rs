@@ -298,6 +298,7 @@ fn analyze_function(
     let arity = crate::vm::SignatureContext {
         types: arity,
         methods: function.generic_parameters.len(),
+        allow_self: false,
     };
     let mut states: Vec<Option<State>> = vec![None; function.body.len()];
     states[0] = Some(State {
@@ -459,7 +460,11 @@ fn analyze_function(
             return Err(fault(pc, "cannot write through readonly reference"));
         }
         let mut conditional_outputs = vec![];
-        if let Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) = op {
+        if let Op::Call(target)
+        | Op::CallVirtual(target)
+        | Op::Construct(target)
+        | Op::CallSelf { target, .. } = op
+        {
             let callee = crate::vm::resolve(module, target).map_err(|e| fault(pc, &e.message))?;
             let offset = inputs.len().saturating_sub(callee.parameters.len());
             for (argument, input) in inputs.iter().enumerate() {
@@ -667,7 +672,7 @@ fn effect(
         StoreArrayElement(_) => (3, 0),
         New(ty) => (crate::vm::record_fields(module, ty, arity)?.len(), 1),
         BindDelegate { target, .. } => (usize::from(target.instance), 1),
-        Call(target) | CallVirtual(target) => (
+        Call(target) | CallVirtual(target) | CallSelf { target, .. } => (
             target.parameters.len() + usize::from(target.instance),
             usize::from(!crate::vm::resolve(module, target)?.no_result),
         ),
@@ -1107,6 +1112,22 @@ fn typed_effect(
                 )?;
             }
             one(delegate.clone())
+        }
+        CallSelf {
+            self_type,
+            target,
+            borrowed,
+        } => {
+            let callee =
+                crate::self_types::signature(module, function, self_type, target, *borrowed)?;
+            for (value, ty) in values.iter().zip(callee.argument_types()) {
+                stored(module, value, &ty)?;
+            }
+            Ok(if callee.no_result {
+                vec![]
+            } else {
+                vec![loaded(&callee.returns)]
+            })
         }
         CallVirtual(target) => {
             let callee = crate::vm::resolve(module, target)?;

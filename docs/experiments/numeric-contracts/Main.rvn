@@ -7,11 +7,11 @@ public func Check(value: bool, message: string) {
     }
 }
 
-public func Calculate<T>(left: T, right: T) -> T where T: Number<T> {
+public func Calculate<T>(left: T, right: T) -> T where T: Number {
     return ((left + right) * (right + T.One) - left + T.Zero) / right
 }
 
-public func CheckNumber<T>(left: T, right: T, expected: T) where T: Number<T> {
+public func CheckNumber<T>(left: T, right: T, expected: T) where T: Number {
     let actual = Calculate<T>(left, right)
     Check(actual.CompareTo(expected) == 0, "generic numeric result")
 }

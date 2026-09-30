@@ -8,14 +8,16 @@ static class InterfaceBindings
         #nullable restore annotations
         public interface ComparableTo<T> { int CompareTo(T other); }
         public interface ConvertibleInto<T> { T Convert(); }
-        public interface Clonable<T> { T Clone(); }
+        public interface Clonable { object Clone(); }
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
-    static readonly HashSet<string> Contracts = new() { "System.Number", "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
-    public static bool IsInterface(string type) => type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    static readonly HashSet<string> Contracts = new() { "System.Number", "System.EquatableTo", "System.ComparableTo", "System.Closable", "System.ConvertibleInto" };
+    public static bool IsInterface(string type) => type is "System.Number" or "System.Clonable" || type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
+        if (type.FullName == "System.Runtime.CompilerServices.Self") return "Self";
+        if (type.FullName is "System.Number" or "System.Clonable") return type.FullName;
         if (StandardUnionLibrary.ProtocolType(type) is { } protocol) return protocol;
         if ((HttpBindings.IsContract(type.FullName) || ReaderBindings.IsContract(type.FullName) || type.FullName == "System.Clock" || StorageItemBindings.IsName(type.FullName) || StreamBindings.IsCapability(type.FullName) || StorageProviderBindings.IsName(type.FullName)) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";
@@ -49,13 +51,14 @@ static class InterfaceBindings
             return new(owner + "::get_Value", [owner], result,
                 Instruction: $"callvirt instance {owner}::get_Value()");
         }
+        if (owner is "System.Clonable" or "System.Number")
+            throw new InvalidDataException("Native Self members require a known implementing type and callself dispatch.");
         var element = owner[(owner.IndexOf('<')+1)..^1];
         var name = owner[..owner.IndexOf('<')];
         var expected = name switch {
             "System.EquatableTo" => ("Equals", element, "Boolean"),
             "System.ComparableTo" => ("CompareTo", element, "Int32"),
             "System.ConvertibleInto" => ("Convert", "", element),
-            "System.Clonable" => ("Clone", "", element),
             "System.Closable" => ("Close", "", "System.Result<Void," + element + ">"),
             _ => throw new InvalidDataException("Unsupported interface")
         };
@@ -65,9 +68,26 @@ static class InterfaceBindings
         return new(owner + "::" + reference.Name, new[]{owner}.Concat(args).ToArray(), result,
             Instruction: $"callvirt instance {owner}::{reference.Name}({string.Join(',',args)})");
     }
+    public static bool IsSelfClone(MethodReference method) => method.DeclaringType.FullName == "System.Clonable"
+        && RuntimeSignatures.IsCore(method.DeclaringType.Scope) && method.Name == "Clone" && method.HasThis
+        && !method.HasGenericParameters && method.Parameters.Count == 0
+        && method.ReturnType.FullName == "System.Runtime.CompilerServices.Self" && RuntimeSignatures.IsCore(method.ReturnType.Scope);
+
+    public static void ProjectSelf(ModuleDefinition module)
+    {
+        // The C# bootstrap uses Object only until the native transport marker exists.
+        module.GetType("System.Clonable").Methods.Single().ReturnType = module.GetType("System.Runtime.CompilerServices.Self");
+    }
     public static void Validate(ModuleDefinition module)
     {
         NumberBindings.Validate(module);
+        var clonable = module.GetType("System.Clonable");
+        if (clonable is null || !clonable.IsPublic || !clonable.IsInterface || clonable.HasGenericParameters
+            || clonable.HasInterfaces || clonable.HasFields || clonable.Methods.Count != 1
+            || clonable.Methods[0] is not { Name: "Clone", IsPublic: true, IsAbstract: true, IsVirtual: true, IsNewSlot: true, IsStatic: false, HasBody: false, HasGenericParameters: false } clone
+            || clone.Parameters.Count != 0 || clone.ReturnType.FullName != "System.Runtime.CompilerServices.Self"
+            || !RuntimeSignatures.IsCore(clone.ReturnType.Scope))
+            throw new InvalidDataException("Invalid native Clonable contract.");
         ComparerBindings.Validate(module);
         StreamBindings.ValidateCapabilities(module);
         StorageProviderBindings.Validate(module);

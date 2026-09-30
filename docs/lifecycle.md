@@ -173,7 +173,7 @@ explicit resource protocols. Clonable is not an implicit substitute for value co
 | Operation | Contract |
 | --- | --- |
 | Ordinary value copy | Copy the value, automatically preserving the lifetime of embedded managed references |
-| Clonable<T>.Clone() | Explicitly produce a clone under the type's documented duplication/sharing policy |
+| Clonable.Clone() -> Self (Raven development; archived Neo uses Clonable<T>) | Explicitly produce a clone under the type's documented duplication/sharing policy |
 | Disposable.Dispose() | Explicitly release resources or discard state, leaving a valid disposed value; repeated disposal is harmless |
 | Closable<E>.Close() | Complete a resource-specific operation with System.Result<Void,E> for expected failure |
 | Destruction | Runtime-triggered end-of-lifetime cleanup under declared destruction metadata |

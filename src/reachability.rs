@@ -138,6 +138,19 @@ pub(crate) fn analyze(
                             Ok(vec![callee])
                         }
                     }),
+                Instruction::CallSelf {
+                    self_type,
+                    target,
+                    borrowed,
+                } => crate::self_types::implementation(module, self_type, target).and_then(
+                    |callee| {
+                        if *borrowed && module.is_reference_type(self_type) && callee.is_virtual {
+                            crate::inheritance::dispatch_targets(module, &callee)
+                        } else {
+                            Ok(vec![callee])
+                        }
+                    },
+                ),
                 Instruction::CallVirtual(target) => {
                     crate::vm::resolve(module, target).and_then(|contract| {
                         if crate::interfaces::is_contract(module, &contract) {

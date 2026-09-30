@@ -407,3 +407,11 @@ All seven System.Tuple arities, constructors and fields have XML documentation a
 automatic public type selection. [The guide](tuples.md) records the bounded surface
 and naming difference from .NET. TupleElementNamesAttribute is a compiler-reference
 scaffold with an exact exclusion, not an executable guest API.
+
+## Native Self integration
+
+The development reference exposes nongeneric System.Number and System.Clonable,
+using the fieldless Self transport marker for implementing-type signatures.
+These APIs require matching Raven neoCLR target settings and the updated runtime.
+Structural Function metadata remains excluded from main. The snapshot is rebuilt
+from the nominal main-based bridge, not copied from the Function feature branch.

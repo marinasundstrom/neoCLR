@@ -83,6 +83,7 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
 
 pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
+        Type::SelfType => "Self".into(),
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),

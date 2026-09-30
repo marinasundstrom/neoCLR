@@ -81,7 +81,7 @@ instance byref receiver receives a reference value as `this`.
 Passing T by value does not promise a deep copy of everything reachable from T.
 Managed-reference fields retain their targets; pointer fields retain their addresses.
 Document such sharing, especially in resource-owning descriptors. Ordinary copying
-never implicitly calls `Clonable<T>.Clone`.
+never implicitly calls `Clonable.Clone` (the archived Neo profile spells it `Clonable<T>.Clone`).
 
 Choose reference contracts for semantics first. A large value may justify an explicit
 reference input to avoid copying, but today's writable `T&` is not a readonly borrow.
@@ -192,7 +192,7 @@ mutation, GC retention/reclamation, invalid frame escapes and automatic Neo acce
 | --- | --- |
 | `Collections.List<T>` / `ArrayList<T>` | Managed-reference receivers and managed T[]& backing storage; value/reference elements follow T; no Free |
 | Native-buffer `Array<T>` | Explicit pointer-containing descriptor with value receivers and caller-managed Free; review together with native-buffer naming and ownership, separately from managed arrays |
-| `Disposable`, `Closable<E>`, `Clonable<T>` | Already use byref receivers; retain these contracts. Clone explicitly returns T; Close returns `Result<Void,E>` |
+| `Disposable`, `Closable<E>`, `Clonable` | Explicit receiver access; Close returns `Result<Void,E>`. Development Raven Clone returns native Self; archived Neo retains Clonable<T>. See [cloning](../api-docs/cloning.md) |
 | `EquatableTo<T>` | Readonly managed receiver and T input, aligned with ComparableTo. Preserve value equality, not reference identity; see [migration](equality.md). A separate reference-input comparison strategy remains future work |
 | `Option<T>` / `Result<T,E>` and case accessors | Constructors and extraction use values; keep independent extraction semantics. Review predicate receiver copying separately. Existing TryGet output contracts remain authoritative |
 | Numeric operations, Math, parsing | Scalar/value inputs and typed value results remain appropriate; parsing failure is an ordinary Result |

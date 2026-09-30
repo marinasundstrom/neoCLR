@@ -261,7 +261,8 @@ impl Query {
                     | Type::InterfaceRef(_)
                     | Type::Ptr(_)
                     | Type::TypeParameter(_)
-                    | Type::MethodTypeParameter(_) => false,
+                    | Type::MethodTypeParameter(_)
+                    | Type::SelfType => false,
                 },
                 11 => publicly_visible(module, &ty),
                 0 => matches!(ty, Type::Array(_) | Type::ArrayRef(_)),

@@ -14,15 +14,12 @@
 
 ## Raven integration work
 
-- Keep work in the Raven repository isolated on a feature branch. Verify its branch
-  before editing; do not make experiment changes on Raven's `main` branch.
-- General fixes benefiting Raven, including .NET Framework and NanoFramework targets,
-  belong on Raven `main` even when discovered through neoCLR: extract
-  and test them independently, then integrate them. Keep neoCLR-specific policies
-  and target experiments on their feature branch; never merge that branch wholesale.
-- Do not integrate neoCLR-specific code, configuration or tests into Raven main yet.
-  General fixes must stand independently on CLI metadata contracts. Reconsidering
-  emission architecture or another backend is future evaluation, not this stabilization scope.
+- Develop shared Raven compiler fixes and target contracts on the shared line.
+  Native Self integration is authorized. Keep structural Function experiments on
+  feature branches in both repositories until native metadata/compiler support is ready.
+- Keep target-specific mappings and capability checks behind explicit contracts;
+  ordinary .NET behavior remains the default. Document temporary bridge encoding,
+  its limitations, validation and eventual native metadata/backend replacement.
 - Document compiler-affecting integration changes in both Raven's compiler docs and
   neoCLR's integration docs, with changelog updates in both repositories. Include
   Runtime Contract configuration, semantic/emission effects, limitations and validation.

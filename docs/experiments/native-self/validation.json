@@ -1,0 +1,18 @@
+{
+  "report": "Generic Self cloning passed",
+  "rejected": [
+    "missing bound",
+    "obsolete generic arity",
+    "wrong Self result",
+    "erased receiver",
+    "inherited derived bound",
+    "redeclared base result"
+  ],
+  "sourceSha256": "c596c56dfa9dbb8d04f2336544d19b1bafc6ecea437781b67416aa1d4391506b",
+  "sha256": {
+    "runtime": "b558436b46c885012edf0313a8a32e5eca46f229c87b8ed49821f37dbb7e07ec",
+    "bridge": "88caf80237e69347256e4f148b1bfcd1a332ea5d210ac0f2431094ff77438726",
+    "system": "92c2b7018ec9638d5c8bfdc1aab9562ee5236cb099e8ee40751024834181baba",
+    "reference": "48480eab560ad928f0b92f7914cc403904b89f045357d2a8ae6ac2c53ef02063"
+  }
+}

@@ -3,7 +3,7 @@ using Mono.Cecil;
 // Exact development numeric surface; no general parsing interface or external math hierarchy.
 static class NumberBindings
 {
-    public const string Contract = "System.Number`1";
+    public const string Contract = "System.Number";
     public static readonly string[] Types = ["SByte", "Byte", "Int16", "UInt16", "Int32", "UInt32", "Int64", "UInt64", "Single", "Double"];
     public static readonly string[] Operators = ["op_Addition", "op_Subtraction", "op_Multiply", "op_Division"];
     public static bool IsNumber(string name) => Types.Contains(name.Replace("System.", ""));
@@ -11,10 +11,11 @@ static class NumberBindings
 
     public static void Project(ModuleDefinition module)
     {
-        var contract = new TypeDefinition("System", "Number`1", TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract);
+        var contract = new TypeDefinition("System", "Number", TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract);
         module.Types.Add(contract);
-        var parameter = new GenericParameter("T", contract);
-        contract.GenericParameters.Add(parameter);
+        var parameter = new TypeDefinition("System.Runtime.CompilerServices", "Self", TypeAttributes.Public | TypeAttributes.Sealed,
+            module.TypeSystem.Object);
+        module.Types.Add(parameter);
         var comparable = new GenericInstanceType(module.GetType("System.ComparableTo`1"));
         comparable.GenericArguments.Add(parameter);
         contract.Interfaces.Add(new InterfaceImplementation(comparable));
@@ -23,9 +24,7 @@ static class NumberBindings
         {
             var type = module.GetType("System." + name);
             var scalar = type.Methods.Single(m => m.Name == "CompareTo").Parameters[0].ParameterType;
-            var number = new GenericInstanceType(contract);
-            number.GenericArguments.Add(scalar);
-            type.Interfaces.Add(new InterfaceImplementation(number));
+            type.Interfaces.Add(new InterfaceImplementation(contract));
             AddMembers(type, scalar, false);
         }
     }
@@ -53,20 +52,19 @@ static class NumberBindings
     {
         var type = module.GetType(Contract);
         if (type is null || !type.IsPublic || !type.IsInterface || !type.IsAbstract || type.HasFields || type.HasEvents
-            || type.GenericParameters.Count != 1 || type.GenericParameters[0].HasConstraints
-            || type.GenericParameters[0].Attributes != GenericParameterAttributes.NonVariant
-            || type.Interfaces.Count != 1 || type.Interfaces[0].InterfaceType.FullName != "System.ComparableTo`1<T>"
+            || type.HasGenericParameters
+            || type.Interfaces.Count != 1 || type.Interfaces[0].InterfaceType.FullName != "System.ComparableTo`1<System.Runtime.CompilerServices.Self>"
             || type.Methods.Count != 6 || type.Methods.Select(m => m.Name).Distinct().Count() != 6
             || type.Properties.Count != 2 || !type.Properties.Select(p => p.Name).Order().SequenceEqual(new[] { "One", "Zero" })
-            || type.Properties.Any(p => p.SetMethod is not null || p.GetMethod != type.Methods.SingleOrDefault(m => m.Name == "get_" + p.Name) || p.PropertyType != type.GenericParameters[0]))
+            || type.Properties.Any(p => p.SetMethod is not null || p.GetMethod != type.Methods.SingleOrDefault(m => m.Name == "get_" + p.Name) || p.PropertyType.FullName != "System.Runtime.CompilerServices.Self"))
             throw new InvalidDataException("Invalid Number contract.");
         foreach (var method in type.Methods)
         {
             var arity = Operators.Contains(method.Name) ? 2 : method.Name is "get_Zero" or "get_One" ? 0 : -1;
             if (!method.IsStatic || !method.IsAbstract || !method.IsVirtual || !method.IsPublic || !method.IsNewSlot
                 || method.HasBody || method.HasGenericParameters || method.HasOverrides || method.ExplicitThis
-                || method.Parameters.Count != arity || method.ReturnType != type.GenericParameters[0]
-                || method.Parameters.Any(p => p.ParameterType != type.GenericParameters[0] || p.IsOut))
+                || method.Parameters.Count != arity || method.ReturnType.FullName != "System.Runtime.CompilerServices.Self"
+                || method.Parameters.Any(p => p.ParameterType.FullName != "System.Runtime.CompilerServices.Self" || p.IsOut))
                 throw new InvalidDataException("Invalid Number member.");
         }
     }
