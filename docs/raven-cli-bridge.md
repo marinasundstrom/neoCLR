@@ -551,3 +551,37 @@ compiler integration probe (including rvnc Unit entry execution), 31 C# metadata
 groups and the API snapshot check pass. [Evidence](experiments/extended-cli-metadata/unit-entry-validation.json)
 records the tested runtime/compiler/library and output hashes. No guest API snapshot or
 runtime source change was needed.
+
+### Opcode-based metadata emission — 2026-09-30
+
+Raven's bounded native operation emitter now writes its linear bodies through the
+independent metadata library's `MethodBuilder.Emit` overloads. Supported logical
+opcodes are Ldc_I4, Ldarg, Add, Sub, Mul, Call and Ret. Integer operands and typed
+builder/imported/native call operands use separate overloads; unsupported opcode/operand
+pairs fail before mutation. Native System calls retain their selected native identity.
+Existing LoadConstant/LoadArgument/arithmetic/Call/Return helpers delegate to the same
+path, with unchanged stack, ownership, backend and resource validation.
+
+This provides low-level construction for the currently implemented subset, not arbitrary
+CLI bytes or all neoIL opcodes. Console literal emission remains its explicit native
+convenience operation; there is no general string operand yet. Branches, locals,
+exception regions, public instruction objects and ILProcessor-like body insertion remain
+future work. The underlying body representation is still internal. Enum numeric values
+are not serialized opcode values and do not define an on-disk ABI.
+
+The .NET comparison is typed Emit overload ergonomics without taking a dependency on
+Reflection.Emit. The independent metadata writer still chooses native/CLI encoding and
+validates the complete body. This creates a compiler-facing emission surface that can
+grow toward backend reuse; it does not yet replace Raven's general .NET code generator.
+Target/runtime configuration and existing temporary reference projections are unchanged.
+C# checks compare helper/Emit artifacts, execute ordinary CLI output to 42, reject bad
+operands without body mutation, and cover imported/native calls. Raven's existing native
+compiler/runtime cases and selected translated-System calls validate its actual use.
+
+Validation: Raven `1dcd9071c` on `codex/metadata-consumer` with the accompanying
+metadata API slice, release neoCLR runtime built at `116be40e`, and the translated
+collection System. All 32 C# metadata groups pass. The
+[compiler integration](experiments/extended-cli-metadata/opcode-compiler-validation.json)
+and [translated-System integration](experiments/extended-cli-metadata/opcode-system-validation.json)
+record passing runtime results and artifact/tool hashes. The host API documentation
+snapshot check passes; runtime code and guest reference metadata are unchanged.

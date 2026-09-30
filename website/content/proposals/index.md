@@ -89,6 +89,8 @@ writer-produced native library references. Loading compiler symbols from transla
 System now has a first explicit static Int32 callable import: Math.Min binds from
 translated metadata and executes against that binary library. Full System symbol loading
 remains pending; the command still uses host primitives for binding.
+The metadata builder also exposes typed opcode Emit overloads for its current linear
+subset, consumed by Raven; broader instructions and editable bodies remain future work.
 Namespaced static library types also retain their identity through compiler reimport
 and native execution. Namespace-owned free functions remain a separate metadata gap. Its initial JSON payload remains supported; a bounded binary profile now avoids
 JSON parsing during runtime loading. Production integration and structural runtime

@@ -9419,3 +9419,15 @@ remote synchronization does not publish a runtime bundle or website.
 - **Assistant proposal:** Future body editing with instruction objects, insertion,
   replacement/removal and instruction references for branch targets. No public raw Emit
   or ILProcessor-like editing has been implemented in this slice.
+
+
+### 2026-09-30 — Opcode API follow-up
+
+- **Earlier author question:** Asked for raw opcode/operand emission alongside typed
+  metadata helpers and suggested Cecil ILProcessor-style insertion as future work.
+- **Implemented follow-up:** A bounded OpCode enum and typed Emit overloads now share
+  the helper validation/emission path. Raven's native operation emitter consumes them.
+- **Remaining scope:** The instruction representation is internal; no public body
+  collection, insertion, branches or exception-region editing has been implemented.
+  This advances metadata/target integration without treating the future editing API
+  as complete. See the [emission contract](raven-cli-bridge.md#opcode-based-metadata-emission--2026-09-30).

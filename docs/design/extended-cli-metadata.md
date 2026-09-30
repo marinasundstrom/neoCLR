@@ -1236,3 +1236,12 @@ to today's builder it adds editing and backend reuse, with costs in ownership, e
 regions, branch repair, invalid intermediate states and serializer validation. API design,
 branch/exception semantics and validation are open; no broad opcode or Cecil parity is
 claimed. Defer body editing while advancing native assembly import/emission.
+
+
+### First opcode surface — implemented 2026-09-30
+
+A bounded OpCode enum and typed MethodBuilder.Emit overloads now construct the existing
+linear instruction set, with helpers delegating to that path. Raven's native emitter
+consumes it. This implements opcode-based construction from the preceding direction;
+public instruction objects, body collections, branches and insertion/editing remain
+planned. The internal operation model is not yet the proposed common editable body.

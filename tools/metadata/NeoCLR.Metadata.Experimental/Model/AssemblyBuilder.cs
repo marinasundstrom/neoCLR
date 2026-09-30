@@ -208,7 +208,7 @@ public sealed class TypeBuilder
 }
 
 /// <summary>Linear, typed Int32 body construction; invalid stack contracts fail before emission.</summary>
-public sealed class MethodBuilder
+public sealed partial class MethodBuilder
 {
     internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null);
     internal List<Operation> Instructions { get; } = [];
@@ -226,7 +226,7 @@ public sealed class MethodBuilder
     public bool ReturnsValue { get; }
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
-    public void LoadConstant(int value) => Append(new("constant", value));
+    public void LoadConstant(int value) => Emit(OpCode.Ldc_I4, value);
     /// <summary>Appends a native System.Console.WriteLine call with a constant UTF-8 string.</summary>
     /// <param name="text">Unicode text, at most 64 KiB when UTF-8 encoded.</param>
     /// <exception cref="ArgumentNullException">Text is null.</exception>
@@ -245,42 +245,31 @@ public sealed class MethodBuilder
     }
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Zero-based parameter index.</param>
-    public void LoadArgument(int index) => Append(new("argument", index));
+    public void LoadArgument(int index) => Emit(OpCode.Ldarg, index);
     /// <summary>Appends Int32 addition.</summary>
-    public void Add() => Append(new("add"));
+    public void Add() => Emit(OpCode.Add);
     /// <summary>Appends Int32 subtraction.</summary>
-    public void Subtract() => Append(new("subtract"));
+    public void Subtract() => Emit(OpCode.Sub);
     /// <summary>Appends Int32 multiplication.</summary>
-    public void Multiply() => Append(new("multiply"));
+    public void Multiply() => Emit(OpCode.Mul);
     /// <summary>Appends a call; foreign methods are imported during Write.</summary>
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
-    public void Call(MethodBuilder target) { ArgumentNullException.ThrowIfNull(target); Append(new("call", Target: target)); }
+    public void Call(MethodBuilder target) => Emit(OpCode.Call, target);
     /// <summary>Appends a call to an imported read-only method contract.</summary>
     /// <param name="target">Reference imported by this method's assembly builder.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Reference belongs to another output builder.</exception>
-    public void Call(ImportedMethodReference target)
-    {
-        ArgumentNullException.ThrowIfNull(target);
-        if (!ReferenceEquals(target.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(target));
-        Append(new("call", Target: target.Target));
-    }
+    public void Call(ImportedMethodReference target) => Emit(OpCode.Call, target);
     /// <summary>Calls a static Int32 function selected from an explicitly loaded native System inventory.</summary>
     /// <param name="target">Owned System function whose parameters and result are Int32.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="InvalidDataException">Module is not System or the callable signature is unsupported.</exception>
     /// <remarks>Native-only bootstrap. The host must supply the matching System assembly to neoCLR;
     /// no assembly revision or image digest is encoded. Ordinary CLI output rejects this operation.</remarks>
-    public void Call(NativeFunctionDefinition target)
-    {
-        ArgumentNullException.ThrowIfNull(target);
-        if (target.Library.ModuleName != "System" || !target.TryGetStaticInt32Signature(out _))
-            throw new InvalidDataException("native call requires a static Int32 System function");
-        Append(new("native.call", NativeTarget: target));
-    }
+    public void Call(NativeFunctionDefinition target) => Emit(OpCode.Call, target);
     /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
-    public void Return() => Append(new("return"));
+    public void Return() => Emit(OpCode.Ret);
     /// <summary>Clears the body for editing before another Write.</summary>
     public void ClearBody() => Instructions.Clear();
     private void Append(Operation operation)

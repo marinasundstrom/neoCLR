@@ -17,6 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Add MethodBuilder.Emit overloads for supported logical opcodes, Int32 operands and
+  builder/imported/native call references. Helpers delegate to the same validated path;
+  invalid opcode/operand pairs reject before mutation. Raven's native emitter consumes
+  this API. C# helper/Emit equivalence, CLI execution and native integration pass;
+  broader opcodes and ILProcessor-style editing remain future work.
   Admit local parameterless no-result entry points in the metadata writer and native
   declaration reader; Raven Unit Main now emits, verifies/runs and exits zero through
   API and rvnc paths. Ordinary CLI output also preserves and executes void entry points.

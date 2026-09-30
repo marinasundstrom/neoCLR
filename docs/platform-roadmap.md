@@ -90,6 +90,13 @@ an artificial compiler restriction while keeping metadata support and target int
 as the main objective. Full System import and richer callable/body coverage remain next.
 [Entry contract and evidence](raven-cli-bridge.md#unit-entry-points--2026-09-30).
 
+**Compiler-facing opcode surface:** The independent metadata API now exposes bounded
+Emit overloads for typed opcode/operand construction, and Raven's native emitter uses
+them. Convenience helpers share the same path. This advances target code generation;
+it does not claim full opcode coverage or ILProcessor-style editing. Broader metadata,
+System symbol import and native source coverage remain the objective.
+[Contract](raven-cli-bridge.md#opcode-based-metadata-emission--2026-09-30).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

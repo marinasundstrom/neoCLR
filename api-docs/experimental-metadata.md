@@ -18,6 +18,7 @@ and guest Introspection assembly loading remain pending.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
 - [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
 - [RuntimeAssemblyContainer](#runtimeassemblycontainer): direct PE/#Neo native execution transport.
@@ -1569,6 +1570,62 @@ that implicit System dependency; this is a bootstrap limit to replace with a gen
 native assembly binding contract.
 
 Compiled examples and failures: `NativeLibrarySymbolChecks.cs` in the metadata C# tests
-and Raven's `SystemSymbolChecks.cs` consumer. The current builder still has no public
-raw opcode/operand Emit API or editable instruction collection; these helpers are not
-full Cecil body-editing support.
+and Raven's `SystemSymbolChecks.cs` consumer. The builder now provides the bounded opcode/operand Emit API below. An editable
+instruction collection and full Cecil body-editing support remain future work.
+
+
+## OpCode and MethodBuilder.Emit
+
+Development APIs in `NeoCLR.Metadata.Experimental.Model`. The enum describes logical
+instructions supported by both writer backends; its numeric values are **not** physical
+CLI or native opcode bytes.
+
+```csharp
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret }
+public sealed partial class MethodBuilder {
+    public void Emit(OpCode opCode);
+    public void Emit(OpCode opCode, int operand);
+    public void Emit(OpCode opCode, MethodBuilder operand);
+    public void Emit(OpCode opCode, ImportedMethodReference operand);
+    public void Emit(OpCode opCode, NativeFunctionDefinition operand);
+}
+```
+
+| Opcode | Operand | Contract |
+| --- | --- | --- |
+| Ldc_I4 | int | Push a signed Int32 constant. |
+| Ldarg | int | Load the zero-based Int32 argument; bounds checked when writing. |
+| Add, Sub, Mul | none | Consume two Int32 values and push the arithmetic result. |
+| Call | MethodBuilder | Use the target signature; external core/identity constraints checked when writing. |
+| Call | ImportedMethodReference | Must belong to the consuming assembly builder. |
+| Call | NativeFunctionDefinition | Native-only static Int32 System callable; matching System must be supplied at runtime. |
+| Ret | none | Must finish the body with its exact declared return stack. |
+
+Unknown enum values, missing/unexpected operands and wrong opcode/operand overloads
+raise ArgumentException before appending. Null call operands raise ArgumentNullException;
+foreign imported references raise ArgumentException. Unsupported native module/signature
+raises InvalidDataException, as does exceeding the existing 4096-instruction method limit.
+Failed Emit calls leave the body unchanged. Stack/argument/return validation remains
+at Write/WriteNativeAssembly; raw emission does not bypass it. Ordinary CLI writing still
+rejects native System calls. No caller-supplied object, byte array or metadata token
+operand is accepted.
+
+LoadConstant, LoadArgument, Add, Subtract, Multiply, all Call overloads and Return now
+call Emit. Their supported semantics are unchanged. WriteConsoleLine remains a native
+convenience expansion; general string operands, local variables, branches, exception
+regions and editable instruction collections are unsupported. Future ILProcessor-like
+editing must define instruction ownership and branch/exception target repair separately.
+
+Example from the C# consumer, used with an Int32 method and a two-parameter Int32 helper:
+
+```csharp
+main.Emit(OpCode.Ldc_I4, 10);
+main.Emit(OpCode.Ldc_I4, 4);
+main.Emit(OpCode.Call, helper);
+main.Emit(OpCode.Ret);
+```
+
+`EmitChecks.cs` proves helper/raw byte equivalence on the same graph, executes a CLI
+arithmetic/call entry point to 42, and checks imported/native operands and failures.
+Raven's native emitter now uses this surface; native runtime and translated-System
+integration remain its executable consumer evidence.
