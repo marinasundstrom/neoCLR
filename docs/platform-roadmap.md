@@ -61,7 +61,9 @@ integration; the benchmark does not reprioritize runtime optimization.
 The native compiler adapter now emits Unit-returning helpers and static library methods,
 reimports their CLI no-result projections and runs a separate application against the
 binary library. This removes the artificial Int32 return from side-effecting helpers;
-entry points remain Int32. Wider signatures, native symbols and actual runtime class-library
+entry points remain Int32. Namespaced static classes now preserve identity through
+compiler reimport and native calls, including same-name types in different namespaces
+and both source orders. Wider signatures, native symbols and actual runtime class-library
 source compilation remain next. [Compiler contract](raven-cli-bridge.md#unit-returning-native-helpers-and-library-methods--2026-09-30).
 
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers

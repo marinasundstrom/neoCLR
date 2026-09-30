@@ -9365,3 +9365,17 @@ remote synchronization does not publish a runtime bundle or website.
   covered. See [the contract](raven-cli-bridge.md#unit-returning-native-helpers-and-library-methods--2026-09-30).
 - **Open:** Wider compiler metadata contracts, the native symbol provider and runtime
   class-library source compilation. This bounded slice does not complete those goals.
+
+
+### 2026-09-30 — Native Raven output is the directive
+
+- **Author clarification:** “Our directive is to make Raven emit code for the new
+  assemblies” and format adaptations such as assembly-level functions should happen
+  now when possible, otherwise later.
+- **Assistant response:** Prioritize a usable native assembly emission path rather
+  than waiting for complete format adaptation. Existing assembly-owned functions
+  remain supported. Namespace-owned function semantics still need a metadata contract.
+- **Completed slice:** Namespaced static library emission/reimport and runtime calls
+  pass in both source orders at Raven `0c13e890b`; no format changes were required.
+- **Next action:** Move native emission beyond the hard-coded probe. Broader source
+  coverage and production target composition remain open.

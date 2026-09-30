@@ -17,6 +17,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Preserve namespaced Raven static library types through emission, reference reimport
+  and native calls; same-name types in different namespaces execute correctly in both
+  source orders. Namespace-owned functions and nested types remain rejected without
+  writing output. This compiler-only extension does not change the native format.
   Extend the Raven feature-branch consumer to Unit-returning helpers and imported
   static library methods. A separately emitted library is reimported into Raven and
   both no-result/Int32 overloads execute from binary PE/#Neo; explicit/implicit returns
