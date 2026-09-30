@@ -6,11 +6,13 @@ Source project: `tools/metadata/NeoCLR.Metadata.Experimental`.
 This is the first reusable reader/writer slice intended for Raven's future symbol
 loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
 and derives structural identities/member contracts against an explicitly supplied host catalog.
-No PE/CLI loading, artifact recognition, physical CLI declaration resolution,
-Introspection assembly loading or assembly emission is implemented by this library yet.
+Bounded PE32 artifact recognition is implemented; physical CLI declaration resolution,
+Introspection assembly loading and assembly emission remain pending.
 
 ## Namespace and types
 
+- [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
+- [MetadataArtifact](#metadataartifact): ordinary classification or owned extended profile.
 - [MetadataProfile](#metadataprofile): reference-profile reader and writer entry points.
 - [MetadataProfileDocument](#metadataprofiledocument): owned typed view and explicit catalog resolution.
 - [MetadataSection](#metadatasection): immutable, owned opaque payload and section metadata.
@@ -564,3 +566,78 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_profiles.py
 The future Raven adapter and potential Raven implementation for Metadata Introspection
 are still planned. This one-root reference profile is not yet sufficient to represent
 complete assemblies, their declarations, IL bodies or all compiler signatures.
+
+
+## MetadataArtifactReader
+
+```csharp
+public static class MetadataArtifactReader
+{
+    public const int MaxImageSize = 4 * 1024 * 1024;
+    public static MetadataArtifact Read(ReadOnlySpan<byte> image,
+                                        bool expectedExtended = true);
+}
+```
+
+Read consumes complete PE bytes without loading or executing the assembly. The default
+requires a recognized extension: it rejects ordinary input and input with both markers
+removed. With expectedExtended false, input having neither a `neoCLR.` version marker
+nor a #Neo stream returns an ordinary classification. An unmarked #Neo stream, a marked
+image missing #Neo, unknown marker versions or inconsistent bindings always fail,
+regardless of that option. Automatic classification cannot recover erased provenance.
+
+Supported input is deliberately restricted to the Python fixture transport contract:
+at most 4 MiB, 1–16 nonoverlapping sections, PE32 with a 224-byte optional header and
+16 directories, supported power-of-two file/section alignment (512–65536 for file
+alignment), no overlay, no certificate directory or checksum, and a 72-byte CLI header
+with flags exactly IL-only and no strong-name/native-header directory. PE32+, signed
+and other unsupported layouts fail. This is not general-purpose PE validation.
+
+The metadata root requires BSJB, an aligned version field of at most 256 bytes and at
+most 16 streams. Stream names must be nonempty, unique, ASCII, null-terminated within
+32 bytes and zero-padded to four bytes. Stream ranges must be aligned, file-backed,
+outside the directory and nonoverlapping. All length/range arithmetic is checked
+before accessing input; oversized and truncated values raise InvalidDataException.
+
+The recognized marker is `neoCLR.NEOX.0.1;sha256=` plus 64 lowercase hexadecimal
+characters and zero termination/padding. SHA-256 binds the domain separator and all
+exact stream names/data in ordinal name order, including #Neo padding. #Neo's declared
+envelope length must leave at most three zero padding bytes. The extracted envelope
+must then pass MetadataProfile.Read, so a valid digest cannot bypass required schemas
+or reference-profile validation. Local-only section-1 artifacts are not supported by
+this higher-level reader.
+
+All malformed, inconsistent or unsupported inputs raise InvalidDataException. Read
+copies data needed by its result; callers must not mutate the span during the call.
+The result does not depend on the input buffer or a retained stream lifetime. Only
+span input is currently exposed; path/stream options and typed diagnostics remain
+future API work.
+
+## MetadataArtifact
+
+```csharp
+public sealed class MetadataArtifact
+{
+    public bool IsExtended { get; }
+    public MetadataProfileDocument? Profile { get; }
+}
+```
+
+No public constructor or mutable state. IsExtended is true exactly when Profile is
+non-null: both recognition and local reference-profile validation passed. Ordinary
+classification has IsExtended false and Profile null. It does not expose ordinary
+CLI declarations or claim that conventional tables/signatures/bodies are valid.
+
+The digest is a consistency check, **not authentication, IL verification or an
+unaware-runtime execution guard**. A writer can recompute it around changed conventional
+metadata; the reader deliberately does not claim to resolve or verify those tables.
+Future compiler use still requires physical CLI binding and declaration validation.
+The reader is a lower layer beneath the proposed Cecil-inspired assembly object model.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_artifacts.py
+```
+
+The compiled consumer passes 50 shared Python/.NET cases (44 rejections), including
+Cecil's extension-stripping rewrite, marker erasure, rebinding, reordered streams,
+malformed ranges/names, wrong profiles, image-size limits and result ownership.

@@ -7,6 +7,9 @@ try
     if (args.Length == 0) throw new ArgumentException("selftest | emit path | roundtrip input output | reject input");
     switch (args[0])
     {
+        case "artifact-vectors":
+            ArtifactChecks.Run(Read(args[1]));
+            break;
         case "profile-vectors":
             ProfileChecks.Run(Read(args[1]));
             break;

@@ -576,3 +576,29 @@ compiler integration, and potentially a Raven port under Metadata Introspection.
 The [design/readiness criteria](../../design/extended-cli-metadata.md#net-api-direction-and-potential-raven-port-2026-09-30)
 record that direction without treating this one-root profile as complete assembly IO.
 Next bounded work: .NET artifact recognition/extraction, followed by actual CLI binding.
+
+
+## .NET artifact recognition and extraction (2026-09-30)
+
+MetadataArtifactReader now ports the bounded PE32 extraction/recognition contract to
+.NET and connects it to MetadataProfile.Read. Expected extended input is the default;
+ordinary classification requires an explicit opt-in. Neither missing markers nor an
+unmarked #Neo transport silently produces an extended profile. Returned profile data
+is owned. No conventional CLI declaration tables, IL bodies or runtime objects are
+resolved by this reader.
+
+`verify_dotnet_artifacts.py` independently generates managed input with the probe and
+compares 50 Python/.NET cases, including 44 rejections. Coverage includes Cecil's lossy
+rewrite, stripped/changed markers, unknown required payloads, invalid profiles,
+reordered streams, malformed names/ranges, overflow-sized offsets, image bounds and
+ownership. Rebound conventional metadata is accepted deliberately: digest matching
+is consistency, not authentication or conventional metadata verification. Build has
+zero warnings/errors. [Evidence](dotnet-artifacts-validation.json) records all cases;
+[API reference](../../../api-docs/experimental-metadata.md#metadataartifactreader)
+documents both new types and exact restrictions.
+
+This remains unsigned IL-only PE32 fixture support. The author suggested Cecil as an
+API model during this slice. The [provisional object-model direction](../../design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
+keeps recognition/codecs below assembly/module/reference/definition objects. Next
+bounded work is a compiler-facing object-model slice tied to real CLI declarations;
+complete assembly emission and Raven/guest integration are still pending.

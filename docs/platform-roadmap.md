@@ -20,8 +20,12 @@ fixtures and 49 cross-reader rejection cases. Its structural signature codec now
 14 cross-reader vectors and 103 rejection cases. .NET reference tables and explicit-catalog
 structural identity pass 95 shared vectors (69 rejections). .NET synthesized-member
 contracts now pass 49 shared vectors (30 rejections). A typed .NET reference-profile
-Read/Create/Write facade passes 36 shared vectors (29 rejections). The next bounded
-slice is .NET artifact recognition/extraction; real CLI binding remains pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+Read/Create/Write facade passes 36 shared vectors (29 rejections). Bounded .NET PE32
+artifact recognition/extraction passes 50 shared cases (44 rejections). Following the
+author’s Cecil suggestion, the [provisional API direction](design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
+places assembly/module/reference/definition objects above these codecs. Next is a
+bounded object-model prototype backed by actual CLI declarations; real binding and
+complete assembly emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The author further clarifies that the .NET API should support later Raven compiler

@@ -9081,3 +9081,18 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** physical CLI binding, compiler adapter validation, complete assembly writer
   coverage and the Raven port/Metadata Introspection API remain pending. “Potentially”
   is retained as an option; no port language/API implementation is inferred as complete.
+
+
+## 2026-09-30 — Cecil as a metadata API reference
+
+- **Author:** “We perhaps should model the metadata API:s on Cecil.” This was a
+  suggestion while the .NET artifact reader slice was underway, not an explicit
+  requirement to fork Cecil or reproduce every API.
+- **Assistant response/action:** reviewed pinned Cecil 0.11.6 assembly/module/type
+  reference sources, proposed a Cecil-inspired object-model layer over the existing
+  codecs, and recorded alternatives, structural-type differences, costs and open
+  mutation/lifetime choices in the [design](design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30).
+- **Outcome:** completed the separate bounded .NET artifact reader with 50 shared
+  cases, including 44 rejections. The higher-level Cecil-inspired model remains a
+  proposed next prototype; no new dependency, compiler integration or Raven port is
+  claimed. The earlier potential Metadata Introspection direction is preserved.

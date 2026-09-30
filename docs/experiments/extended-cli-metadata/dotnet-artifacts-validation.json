@@ -1,0 +1,261 @@
+{
+  "date": "2026-09-30",
+  "scope": "bounded unsigned IL-only PE32, consistency and reference-profile validation only",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "target_framework": "net10.0",
+  "shared_cases": 50,
+  "rejections": 44,
+  "size_and_ownership_checks": "passed",
+  "cases": [
+    {
+      "name": "ordinary-opt-in",
+      "expected_extended": false,
+      "result": "ordinary"
+    },
+    {
+      "name": "ordinary-default",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "marked",
+      "expected_extended": true,
+      "result": "extended"
+    },
+    {
+      "name": "marked-auto",
+      "expected_extended": false,
+      "result": "extended"
+    },
+    {
+      "name": "unmarked",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "unmarked-auto",
+      "expected_extended": false,
+      "result": "reject"
+    },
+    {
+      "name": "stripped-stream",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "all-marks-stripped",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "erased-opt-in",
+      "expected_extended": false,
+      "result": "ordinary"
+    },
+    {
+      "name": "reordered-streams",
+      "expected_extended": true,
+      "result": "extended"
+    },
+    {
+      "name": "changed-Strings",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "changed-Neo",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "unsupported-marker",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "bad-digest-character",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "wrong-digest",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "bad-marker-padding",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "unknown-required",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "empty-profile",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "bad-envelope",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "excess-neo-padding",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "nonzero-neo-padding",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "rebound-conventional-data",
+      "expected_extended": true,
+      "result": "extended"
+    },
+    {
+      "name": "cecil-lossy-rewrite",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "pe-signature",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "pe32-plus",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "section-count",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "alignment",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "certificate",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "checksum",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "cli-flags",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "metadata-rva",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "metadata-length",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "pe-pointer-overflow",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "version-length",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "stream-count",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "section-overlap",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "stream-offset",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "stream-size",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "empty-stream-name",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "non-ascii-stream-name",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "bad-name-padding",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "overlapping-streams",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "unterminated-stream-name",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-0",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-1",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-63",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-131",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-415",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "truncated-16383",
+      "expected_extended": true,
+      "result": "reject"
+    },
+    {
+      "name": "overlay",
+      "expected_extended": true,
+      "result": "reject"
+    }
+  ]
+}

@@ -418,3 +418,84 @@ Metadata Introspection would sit above that port as a projection/provider, while
 assembly emission would consume the writer. The exact public Raven surface, port
 strategy and native boundary remain open. Next bounded .NET work is artifact
 recognition/extraction before physical CLI binding.
+
+
+## Cecil-inspired object model direction (2026-09-30)
+
+**Author suggestion:** “We perhaps should model the metadata API:s on Cecil.”
+**Assistant assessment:** use Cecil as the provisional ergonomic model for the
+compiler-facing layer, retaining the tested byte codecs beneath it. This is an API
+direction to prototype, not an author commitment to source compatibility, a Cecil
+fork or a new dependency. No proposed types below are implemented in this slice.
+
+### Primary-source comparison
+
+Reviewed Cecil **0.11.6** (the version used by our probe), retrieved 2026-09-30:
+
+- [AssemblyDefinition](https://github.com/jbevain/cecil/blob/0.11.6/Mono.Cecil/AssemblyDefinition.cs)
+  exposes assembly identity, modules, entry point, creation, read and write operations.
+  This is a useful discovery path for importer/emitter users.
+- [ModuleDefinition](https://github.com/jbevain/cecil/blob/0.11.6/Mono.Cecil/ModuleDefinition.cs)
+  separates reader/writer parameters, supports resolver configuration and imports type,
+  field and method references into a destination module with a generic context.
+- [TypeReference](https://github.com/jbevain/cecil/blob/0.11.6/Mono.Cecil/TypeReference.cs)
+  carries scope/module information and delegates Resolve to its module, distinguishing
+  a use-site reference from its definition.
+- [.NET 10 MetadataReader](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.metadata.metadatareader?view=net-10.0)
+  provides the lower-level CLI metadata reading baseline. Raw metadata access and a
+  compiler-friendly editable object model solve different layers of the problem.
+
+Our existing [Cecil rewrite evidence](../experiments/extended-cli-metadata/recognition-validation.json)
+shows that stock 0.11.6 strips #Neo. Adopting its API organization does not establish
+that its writer can preserve neoCLR semantics. The new .NET artifact adapter passes
+[50 shared cases](../experiments/extended-cli-metadata/dotnet-artifacts-validation.json),
+but still inspects only a bounded unsigned IL-only PE32 layout and local profile.
+
+### Proposed layer and type mapping
+
+Names are illustrative design vocabulary, not public API promises:
+
+| Concern | Proposed approach | Existing implementation underneath |
+| --- | --- | --- |
+| Assembly and module model | AssemblyDefinition/ModuleDefinition with explicit ownership and read/create/write entry points | Artifact recognition plus profile codec; full declaration model absent |
+| Nominal types and members | Separate references and definitions; scoped identity; generic owners retained | Explicit catalog keys and resolver |
+| Reference import | Destination-module import with generic context and deliberate remapping | Currently caller-managed local indices |
+| Structural types | First-class tuple, Function, union/intersection, Array/ArrayRef and Self type-reference forms | TypeExpression syntax and resolved structural keys |
+| Synthesized operations | Structural member references/descriptors; no invented MethodDef | StructuralMembers codecs and derived contracts |
+| Reading/writing configuration | Explicit resolver, input profile, limits and unknown-data policy | Bounded readers and required-schema rejection |
+| Introspection | Projection/provider over metadata objects; runtime binding remains separate | Potential future Raven port; no guest implementation |
+
+Do not force structural types to acquire fictional nominal declarations, or make every
+structural Resolve return a TypeDefinition. Separate definition lookup from structural
+identity/contract resolution. The string-based TypeExpression prototype should be
+adapted behind typed object-model forms rather than copied directly into Raven symbols.
+Likewise physical tokens are serialization addresses, not cross-module object identity.
+
+### Tradeoffs and unresolved choices
+
+Cecil-like navigation and reference import should reduce compiler adapter boilerplate;
+this is a hypothesis to validate with an actual consumer. A mutable graph costs owner
+invariant maintenance, cache invalidation and write-time fixups. A provisional split is
+owned read views plus explicit editing/building that yields a validated snapshot; an
+exact Cecil-style mutable graph remains an alternative to compare in the prototype.
+No performance advantage is claimed, and deferred loading/lifetime behavior is not yet
+selected. Existing eagerly owned bounded documents remain valid low-level APIs.
+
+Alternatives: expose raw handles/codecs only (simpler core, more work for both Raven
+and Introspection), or wrap/fork Cecil (reuse conventional CLI support but additional
+extension-preservation, identity, licensing maintenance and port dependencies). Prefer
+an independent Cecil-inspired surface provisionally, with an internal conventional
+metadata adapter selected separately after real declaration tests. Do not change
+package dependencies merely because the names/navigation are familiar.
+
+For the potential Raven port, preserve semantic operations and shared fixtures while
+adapting collections, errors, lifetimes and strings to tested Raven/neoCLR UTF-8 APIs.
+Do not couple the portable object model to System.Reflection.Type or host assembly
+loading. .NET ergonomic familiarity does not require identical implementation layers.
+
+Next bounded prototype: assembly/module identity and nominal definition/reference
+navigation backed by actual CLI metadata, with explicit dependency resolution and a
+small importer consumer. Then validate destination-module reference import and one
+supported writer path before claiming Raven integration readiness. Larger mutation,
+resource ownership, diagnostics, multi-module and full assembly emit contracts remain
+open and need deeper consumer evidence before settling the public API.

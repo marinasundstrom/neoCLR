@@ -9,7 +9,7 @@ The current library covers NEOX 0.1 envelope framing, immutable section ownershi
 and structural signature syntax/context validation, reference-table codecs and
 explicit-catalog structural identity and synthesized-member contracts. MetadataProfile
 provides typed Read/Create/Write entry points with owned documents and section-profile
-validation. PE transport/recognition, actual
+validation. Bounded PE32 recognition/extraction is implemented; actual
 declaration resolution and compiler adapters remain pending. It is not the future neoCLR guest metadata/Introspection/Emit
 library. Names and contracts are experimental.
 
@@ -25,6 +25,7 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_signatures.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_references.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_members.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_profiles.py
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_artifacts.py
 ```
 
 The verifier builds the library/consumer, runs ownership and writer checks, cross-reads
@@ -41,7 +42,7 @@ it is not the eventual Raven symbol model or resolved neoCLR type identity.
 The reference consumer compares 95 shared table/identity vectors, including 69
 rejections. Catalog scopes are host-assigned, not physical CLI assembly identities.
 Reference numbering is erased from resolved equality; declaring owners, Function
-contracts and array storage remain significant. PE adapters and actual CLI
+contracts and array storage remain significant. General PE support and actual CLI
 declaration loading remain separate work.
 
 The member consumer compares 49 shared vectors: 14 derived contracts, five identity
@@ -53,3 +54,9 @@ The profile consumer covers 36 shared cases (29 rejections), independent typed
 emission, optional preservation, ownership and explicit catalog failures. The facade
 is a foundation for a later Raven compiler adapter; complete assembly IO is pending.
 A Raven port may underpin Metadata Introspection, with shared conformance contracts.
+
+The artifact reader requires recognized extended input by default, with explicit
+ordinary classification available. Fifty shared cases pass, including 44 rejections.
+Support is bounded unsigned IL-only PE32, not a general loader or verifier.
+The [Cecil-inspired object model direction](../../docs/design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
+is provisional; the existing profile/codec APIs remain lower layers.

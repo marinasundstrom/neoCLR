@@ -57,7 +57,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   cases pass (29 rejections), plus independent construction/emission and ownership
   checks. Document both new host types and the author’s direction toward a Raven-ready
   .NET API and potential Raven port beneath Metadata Introspection; complete assembly
-  IO, compiler integration and the port remain pending.
+  IO, compiler integration and the port remain pending. Add bounded .NET unsigned
+  IL-only PE32 recognition/extraction with expected-extended input by default, stream
+  binding checks and typed profile validation: 50 shared cases pass (44 rejections),
+  plus size/ownership checks. This is consistency checking, not authentication or
+  conventional CLI verification. Document both host API types and the author’s Cecil
+  suggestion, with a provisional object-model design above the existing codecs.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
