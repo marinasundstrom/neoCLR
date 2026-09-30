@@ -19,8 +19,8 @@ Core/unit contradictions diagnose before loading/output; project overrides inher
 unspecified profile fields. No native loader/backend or complete capability matrix
 is supplied. Self and record mappings are excluded. In particular, the current
 `build/NeoCLR.Raven.props` includes the separate Self experiment and cannot be
-replaced wholesale by this preset. It remains unchanged; migration and matching
-runtime execution validation are pending. Legacy assembly-name settings still work.
+replaced wholesale by this preset. Runtime props and installed bundles remain unchanged. Legacy assembly-name
+settings still work. Caller migration awaits a supported runtime/feature baseline.
 
 The author has moved shared compiler/.NET/neoCLR development onto Raven main and
 retained feature branches for Self and intersections; this supersedes the older
@@ -28,8 +28,12 @@ integration-separation direction for this compiler work.
 
 Raven implementation: `9a58e1356` on shared main. Validation passed 109 focused
 configuration/project/compatibility tests on .NET 11 and compiler builds for
-.NET 10/11. No matching local `demo/NeoCLR.CoreProbe.dll` was present; the new
-profile has not been qualified through native neoCLR execution in this slice.
+.NET 10/11. At that checkpoint no reference was present at the repository's demo path. A
+subsequent smoke check found and hash-verified the installed Function-types bundle:
+a temporary consumer compiled, imported, verified and ran, printing 42, 7, True.
+The proposed props migration and smoke gate were withdrawn after confirming native
+Function support remains deferred. This is exploratory evidence, not neoCLR-main qualification;
+see [bridge behavior and replacement](raven-cli-bridge.md).
 
 ## Current local setup
 

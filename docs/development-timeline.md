@@ -9273,3 +9273,32 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   12 Raven Self tests and 17 nearby compiler regressions pass. The expanded
   [Clonable consumer](experiments/native-self/README.md) passes native execution
   and six rejection checks. Signature and API/runtime snapshot checks pass.
+
+
+## 2026-09-30 — Native metadata destination and bridge documentation
+
+The author stated: “Our goal is to eventually replace the neoCLR bridge with a
+true neoCLR metadata layer that supports all of the new features and semantics,”
+and asked to document neoCLR bridge behavior. The assistant recorded a compiler-side
+inventory of temporary encodings, semantic distinctions, restrictions and native
+replacement obligations, with a runtime-side integration guide.
+
+The author then pointed out that native Function support remained on a separate
+feature branch. Repository ancestry confirmed feature/function-types and
+codex/native-self contain the tested runtime commits while main at e4f6fe41 does
+not. The assistant corrected the evidence scope explicitly: Raven main's compiler
+bridge support was tested against the installed Function-types development bundle,
+not neoCLR main. No runtime feature merge was performed.
+
+Exploratory consumers compiled, imported, verified and ran with output 42, 7, True.
+The author then confirmed Function types were intentionally deferred until the
+metadata layer and complete compiler support exist. The proposed smoke gate and
+runtime-props migration were withdrawn before committing.
+
+The author asked whether to retain compiler changes until neoCLR catches up. The
+assistant recommended keeping compiler-side groundwork and experimental bridge
+handling on shared main, preserving .NET behavior, while deferring native structural
+Function semantics. This is distinct from Raven function syntax/.NET delegates.
+Native metadata/codegen implementation, capability enforcement and caller migration
+remain pending; the narrow feature-bundle experiment is not feature acceptance.
+See [the bridge guide](raven-cli-bridge.md) for scope and reproduction.

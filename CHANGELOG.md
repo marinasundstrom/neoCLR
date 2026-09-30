@@ -9,9 +9,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-09-30
 
 - Document Raven main's experimental `CompilationOptions.NeoCLR` and project
-  platform preset, its explicit reference/core/unit requirements and existing CLI
-  contract defaults. Current runtime props and artifacts are unchanged; Self and
-  record mappings, caller migration and matching runtime validation remain separate.
+  preset, temporary bridge behavior and native metadata replacement requirements.
+  Retain compiler groundwork separately from deferred native Function semantics;
+  feature-bundle experiments do not qualify neoCLR main. Runtime props, installed
+  artifacts and feature availability are unchanged.
 
 - Add native `Self` interface signatures and typed `callself` dispatch, with runtime
   conformance and generic-bound checks. Keep `Self` distinct from Raven's `self`
