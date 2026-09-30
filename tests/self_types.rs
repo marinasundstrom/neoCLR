@@ -1,4 +1,7 @@
-use neoclr::{Limits, LoadedProgram, Value, assemble, metadata::Type};
+use neoclr::{
+    Limits, LoadedProgram, Value, assemble,
+    metadata::{Instruction, Type},
+};
 
 const PROGRAM: &str = r#"
 .module NativeSelf
@@ -562,6 +565,20 @@ ret
 .end
 "#;
 
+fn clone_graph(program: &LoadedProgram) -> Vec<(String, Type)> {
+    program
+        .analyze_reachability(
+            &[neoclr::assembler::parse_function_ref("Main()").unwrap()],
+            40,
+        )
+        .unwrap()
+        .functions
+        .into_iter()
+        .filter(|function| function.target.name.ends_with("Clone"))
+        .map(|function| (function.target.name, function.returns))
+        .collect()
+}
+
 #[test]
 fn inherited_self_keeps_base_result_and_virtual_override_contract() {
     assert_eq!(
@@ -573,14 +590,14 @@ fn inherited_self_keeps_base_result_and_virtual_override_contract() {
         Value::Int32(20)
     );
     let overridden = INHERITED_CLONE.replace(".method instance override Read()", ".method instance override Clone() -> Base\nnewobj instance Derived::.ctor()\nret\n.end\n.method instance override Read()");
+    let program = prepare(&overridden).unwrap();
     assert_eq!(
-        prepare(&overridden)
-            .unwrap()
-            .run(Limits::default())
-            .unwrap()
-            .value,
+        program.run(Limits::default()).unwrap().value,
         Value::Int32(42)
     );
+    let targets = clone_graph(&program);
+    assert!(targets.contains(&("Base.Clone".into(), Type::Named("Base".into()))));
+    assert!(targets.contains(&("Derived.Clone".into(), Type::Named("Base".into()))));
 }
 
 #[test]
@@ -616,7 +633,16 @@ fn derived_self_requires_redeclaration_and_exact_derived_result() {
             .value,
         Value::Int32(42)
     );
+    let targets = clone_graph(&prepare(&valid).unwrap());
+    assert_eq!(
+        targets,
+        vec![("Derived.DerivedClone".into(), Type::Named("Derived".into()))]
+    );
     let base_view = valid.replace("call Copy<Derived>(Derived)", "call Copy<Base>(Base)");
+    assert_eq!(
+        clone_graph(&prepare(&base_view).unwrap()),
+        vec![("Base.Clone".into(), Type::Named("Base".into()))]
+    );
     assert_eq!(
         prepare(&base_view)
             .unwrap()
@@ -625,4 +651,26 @@ fn derived_self_requires_redeclaration_and_exact_derived_result() {
             .value,
         Value::Int32(20)
     );
+}
+
+#[test]
+fn serialized_self_cannot_forge_a_derived_bound_without_verification() {
+    let mut module = assemble(INHERITED_CLONE).unwrap();
+    let main = module
+        .functions
+        .iter_mut()
+        .find(|function| function.name == "Main")
+        .unwrap();
+    let call = main
+        .body
+        .iter_mut()
+        .find(|op| matches!(op, Instruction::Call(target) if target.name == "Copy"))
+        .unwrap();
+    *call =
+        Instruction::Call(neoclr::assembler::parse_function_ref("Copy<Derived>(Derived)").unwrap());
+    let artifact = serde_json::to_string(&module).unwrap();
+    let result = neoclr::load(&artifact)
+        .and_then(|module| LoadedProgram::new(&module))
+        .and_then(|program| program.run(Limits::default()));
+    assert!(result.unwrap_err().to_string().contains("constraint"));
 }

@@ -215,3 +215,11 @@ The [actual Clonable consumer](experiments/native-self/README.md) passes native
 verification/execution and six rejection checks; its artifact hashes are recorded.
 The bridge signature probe and API/runtime snapshot checks pass. No website build
 or new LSP validation was required for this slice.
+
+The artifact/reachability follow-up passes all 17 Self tests. Reloaded modules
+retain Base-returning virtual clone targets; explicit derived mappings retain
+the Derived result and do not replace base-view cloning. A modified serialized
+call that supplies Derived to an inherited-only Self bound is rejected by the
+load/execution validation path without invoking the compiler or explicitly calling
+`verify()`. This strengthens regression evidence; no additional runtime behavior
+or Raven compiler integration was needed.
