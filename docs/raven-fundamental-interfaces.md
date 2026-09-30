@@ -48,7 +48,7 @@ return-directed overload rule. See [migration and design](common-interfaces.md#d
 
 ## Development Number integration — 2026-09-27
 
-Number<T> inherits ComparableTo<T>, with static abstract Zero/One and binary
+Number inherits ComparableTo<Self>, with static abstract Zero/One and binary
 arithmetic operators, implemented by eight fixed-width integers, Single and Double.
 Concrete Parse is separate; no parsing interface is selected. See
 [numeric contracts](design/numeric-contracts.md) and the

@@ -8,7 +8,7 @@ is checked as a dependent consumer. Native `numeric_parse::tests` cover every in
 full-input grammar precedence, floating special values/rounding/underflow and Boolean
 spellings. `static_number_contracts` checks runtime static conformance and rejection.
 
-The numeric importer specializes closed static application functions with Number<T>
+The numeric importer specializes closed static application functions with Number
 constraints and the ten supported primitive arguments. The subsequent
 [ordinary helper slice](../generic-helpers/README.md) also admits unconstrained
 closed static application methods. It retains the
@@ -30,3 +30,11 @@ parser checks and [210 exact signature checks](number-signatures.json). The
 [consumer evidence](validation.json) pins sources and artifacts. The updated
 [casing/Int64 consumer](../casing-integer/README.md) also validates the shared-error
 migration. No full suite or website build was run.
+
+
+On 2026-09-30 the native Self migration passed this consumer against the actual
+nongeneric System.Number and all ten generated numeric implementations. The
+verification script also requires native `callself` in imported code, and rejects
+Boolean numeric arguments and extra constraints. See
+[native Self validation](native-self-validation.json) and the
+[contract and migration](../../self-types.md).

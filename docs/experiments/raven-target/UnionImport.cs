@@ -981,7 +981,7 @@ static class UnionImport
                         }
                         if (call.Result != "noresult") Push(new(call.Result == "Boolean" && conditionalOut < 0 ? "Int32" : PrimitiveBindings.Stack(call.Result), ConditionalOut: conditionalOut));
                         call = Coerce(call, actualArguments, preserveAccess: !targetMethod.IsPublic);
-                        code.AppendLine(call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
+                        code.AppendLine(applicationSpecialization.NativeSelfCall(instruction) ?? call.Instruction ?? $"call {call.Name}({string.Join(',', call.Arguments)})");
                         // Conditional-out results must reach their branch directly so the runtime
                         // verifier retains the relationship between success and assignment.
                         if (call.Result == "Boolean" && conditionalOut < 0) code.Append(BooleanBindings.Convert("Boolean", "Int32"));

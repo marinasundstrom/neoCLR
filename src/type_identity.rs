@@ -91,6 +91,7 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
 
 pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
+        Type::SelfType => "Self".into(),
         Type::Function(shape) => {
             let mut parts = shape
                 .parameters

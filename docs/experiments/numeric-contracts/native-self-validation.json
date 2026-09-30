@@ -1,0 +1,19 @@
+{
+  "scope": "Number and concrete primitive parsing",
+  "runs": {
+    "report": "Number and concrete Parse contracts passed",
+    "rejected": [
+      "Boolean Number argument",
+      "additional constraints"
+    ]
+  },
+  "sourceSha256": {
+    "Main.rvn": "80b6f1a02bd359848b013f1f22e83c112daac9d8dfef9ec5aaf741ced4e2cbd2"
+  },
+  "sha256": {
+    "runtime": "a68ee6cea8f336bbe0ba07d72b2356e0e0723f1109954d9808ba26c27fe3acee",
+    "bridge": "138c59cb34cecf3844146953213fee3f1f385776942db228a34f80f64e42e45e",
+    "system": "41dd2a9d2288147fd6f5faf80a2d8970c7251436011469e97e2d982afa6644ae",
+    "reference": "8c4ac983ed15ac42ffa3b55c05f28bdb6a2ed459cd95351182b594a273aa6efc"
+  }
+}

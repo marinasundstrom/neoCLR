@@ -40,7 +40,7 @@ The executable report consumer is maintained in
 
 ## Number and concrete Parse (development)
 
-[Number&lt;T&gt;](xref:System.Number`1) supplies static `Zero`, `One`, the binary
+[Number](xref:System.Number) supplies static `Zero`, `One`, the binary
 `+`, `-`, `*`, `/` operators, and inherited `CompareTo`. Implementers are SByte,
 Byte, Int16, UInt16, Int32, UInt32, Int64, UInt64, Single and Double. Boolean and
 Char are not numbers. There is no Parsable interface; numeric-specific parsing
@@ -54,7 +54,7 @@ CompareTo orders NaN below finite numbers and compares NaNs equal, while operato
 retain their IEEE rules. Zero/One are properties, not compile-time constants.
 
 The current importer supports closed static application functions constrained solely
-by `Number<T>`, specialized for these ten concrete types. It does not yet admit
+by `Number`, specialized for these ten concrete types. It does not yet admit
 arbitrary user-defined numeric types, generic classes, additional constraints or
 open runtime generic dispatch. General static/default/access-controlled interface
 support is further platform work, not a restriction inherent in the API design.
@@ -75,3 +75,11 @@ formats; numeric grammar validation precedes range errors.
 These rules deliberately differ from default .NET parsing: they have typed Result
 errors, strict whole-text grammar and numeric floating overflow errors. No culture,
 style options, implicit byte decoding or general formatting interface is introduced.
+
+
+Development Number is nongeneric. Its displayed compiler-reference signatures use
+[the Self transport marker](xref:System.Runtime.CompilerServices.Self); Raven source
+writes `Self` for the concrete implementing type. This marker has no constructible
+runtime value. Change old `where T: Number<T>` constraints to `where T: Number` and
+rebuild against matching references. The numeric importer retains native Self
+dispatch while specializing its currently supported closed helper functions.

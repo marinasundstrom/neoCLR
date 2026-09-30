@@ -182,6 +182,7 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
             if let Instruction::Call(target)
             | Instruction::CallVirtual(target)
             | Instruction::Construct(target)
+            | Instruction::CallSelf { target, .. }
             | Instruction::BindFunction { target, .. } = instruction
             {
                 check_call(linked, source, target)?;

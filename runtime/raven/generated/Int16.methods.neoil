@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Int16.rvn. Regenerate with build_runtime_library.py.
 .type System.Int16
 .sealed
-.implements System.Number<Int16>
+.implements System.Number
 .implements System.ComparableTo<Int16>
 .property static Zero() -> Int16
 .get System.Int16::get_Zero()

@@ -35,14 +35,16 @@ with tempfile.TemporaryDirectory(prefix='neoclr-number-contract-') as directory:
     shutil.copyfile(artifacts['reference'], work / 'NeoCLR.CoreProbe.dll')
     run(['dotnet', artifacts['bridge'], '--project', work / 'Contracts.rvnproj', work / 'out'])
     app = work / 'out' / 'App.neoil'
+    if 'callself ' not in app.read_text() or 'System.Number::op_Addition(Self,Self)' not in app.read_text():
+        raise SystemExit('Numeric consumer lost native Self dispatch')
     run([artifacts['runtime'], 'verify', app, '--system', artifacts['system']])
     marker = 'Number and concrete Parse contracts passed'
     output = run([artifacts['runtime'], 'run', app, '--system', artifacts['system']])
     if marker not in output:
         raise SystemExit('Missing success marker')
     for name, source, diagnostic in (
-        ('boolean', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number<T> => x + T.One\nfunc Main() { Calculate<bool>(true) }', 'constraint'),
-        ('extra-constraint', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number<T>, struct => x + T.One\nfunc Main() { Calculate<int>(1) }', 'Numeric specialization requires'),
+        ('boolean', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number => x + T.One\nfunc Main() { Calculate<bool>(true) }', 'constraint'),
+        ('extra-constraint', 'import System.*\nfunc Calculate<T>(x: T) -> T where T: Number, struct => x + T.One\nfunc Main() { Calculate<int>(1) }', 'Numeric specialization requires'),
     ):
         (work / 'Main.rvn').write_text(source + '\n')
         rejected = subprocess.run(['dotnet', str(artifacts['bridge']), '--project', str(work / 'Contracts.rvnproj'), str(work / name)], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

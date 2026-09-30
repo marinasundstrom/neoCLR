@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Single.rvn. Regenerate with build_runtime_library.py.
 .type System.Single
 .sealed
-.implements System.Number<Single>
+.implements System.Number
 .implements System.ComparableTo<Single>
 .property static Zero() -> Single
 .get System.Single::get_Zero()

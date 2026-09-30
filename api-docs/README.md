@@ -435,3 +435,10 @@ define nominal runtime types. Their public callback signatures remain documented
 under their actual CLI IDs. Their target-only synthesized Function property is
 documented in the manual Function family page, including MethodInfo results and
 GetProperties/GetMethods discovery. This is distinct from omitting a runtime API.
+
+
+The development Number reference is nongeneric and uses the public fieldless
+`System.Runtime.CompilerServices.Self` transport marker. Both types are included
+in the inventory and XML documentation. RavenDoc displays that metadata marker;
+[text and numbers](text-numbers.md) explains Raven's `Self` spelling and migration.
+The marker is not an executable CLR API or a native value constructor.

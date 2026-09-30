@@ -297,7 +297,7 @@ static class LibraryImplementation
         }
         if (type.Interfaces.Count != contract.Interfaces.Count || type.Interfaces.Any(i =>
             contract.Interfaces.Count(c => MatchType(c.InterfaceType, i.InterfaceType)) != 1))
-            throw new InvalidDataException("Instance library interfaces do not match reference contract.");
+            throw new InvalidDataException("Instance library interfaces do not match reference contract: source [" + string.Join(", ", type.Interfaces.Select(i => i.InterfaceType.FullName)) + "] reference [" + string.Join(", ", contract.Interfaces.Select(i => i.InterfaceType.FullName)) + "].");
         bool MatchMethod(MethodDefinition left, MethodDefinition right) =>
             left.Name == right.Name && (!left.HasGenericParameters || JsonBindings.IsGenericSerializerMethod(left) && JsonBindings.IsGenericSerializerMethod(right)) && left.GenericParameters.Count == right.GenericParameters.Count && !left.ExplicitThis
             && (left.CallingConvention == MethodCallingConvention.Default || JsonBindings.IsGenericSerializerMethod(left)) && left.CallingConvention == right.CallingConvention && left.IsStatic == right.IsStatic && left.IsConstructor == right.IsConstructor

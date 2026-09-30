@@ -2,6 +2,7 @@ mod arrays;
 pub mod assembler;
 pub mod cil;
 mod constraints;
+mod self_types;
 mod enums;
 pub mod pe;
 mod runtime_lookup;

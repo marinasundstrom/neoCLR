@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Int32.rvn. Regenerate with build_runtime_library.py.
 .type System.Int32
 .sealed
-.implements System.Number<Int32>
+.implements System.Number
 .implements System.ComparableTo<Int32>
 .implements System.EquatableTo<Int32>
 .property static Zero() -> Int32

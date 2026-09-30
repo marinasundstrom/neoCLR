@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Double.rvn. Regenerate with build_runtime_library.py.
 .type System.Double
 .sealed
-.implements System.Number<Double>
+.implements System.Number
 .implements System.ComparableTo<Double>
 .property static Zero() -> Double
 .get System.Double::get_Zero()

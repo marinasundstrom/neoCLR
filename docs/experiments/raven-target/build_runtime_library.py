@@ -426,7 +426,7 @@ def fragments(text, name="Math", owner="System.Math", bootstrap=False):
         # The archived Neo profile has legacy carriers. New Result APIs belong
         # to the Raven library; do not add another manual carrier to that profile.
         methods = [re.sub(r'(?ms)^\.method static Parse\(.*?^\.end\n', '', body) if name != 'Int32' else body for body in methods]
-        methods = [re.sub(r'(?m)^\.implements System\.Number<([^>]+)>', '', body) for body in methods]
+        methods = [re.sub(r'(?m)^\.implements System\.Number(?:<[^>]+>)?$', '', body) for body in methods]
     if name == 'String' and bootstrap:
         # Object interpolation belongs to the Raven profile. The archived Neo
         # profile has no System.Object contract; prune its adapter transitively too.

@@ -8,7 +8,7 @@ selecting Number plus concrete Parse methods. A narrower ParsableNumber<T> is a
 future design candidate, not part of this implementation; it should remain separate
 from arithmetic conformance. The author subsequently selected NumberParseError for all numeric parsers.
 
-The Number<T> scope is basic arithmetic, ordering, Zero and One. It is not
+The Number scope is basic arithmetic, ordering, Zero and One. It is not
 a complete .NET generic-math hierarchy: native-sized integers, Decimal, transcendental
 functions, numeric conversion modes and culture-sensitive parsing are not selected.
 Char represents a grapheme and is not a numeric implementer.
@@ -29,9 +29,15 @@ The runtime validates exact nominal static conformance; Number is not a marker
 interface accepted by name alone. The [focused consumer and metadata checks](../experiments/numeric-contracts/README.md)
 cover the implemented development surface and its explicit admission limits.
 
+The 2026-09-30 development migration replaces the former `Number<T>` with
+nongeneric `Number`. Static operands, results and Zero/One use native `Self`,
+and ordering is inherited from `ComparableTo<Self>`. Existing `where T: Number<T>`
+consumers must change to `where T: Number`. See [native Self](../self-types.md)
+for the runtime representation, comparison with .NET and current limitations.
+
 ## Selected contracts and tradeoffs
 
-Number<T> inherits ComparableTo<T> and adds static Zero/One plus binary +, -, *, /.
+Number inherits ComparableTo<Self> and adds static Zero/One plus binary +, -, *, /.
 It deliberately omits parsing, conversion modes, transcendental functions and the
 large .NET generic-math interface hierarchy. The benefit is a small first arithmetic
 consumer; the cost is that algorithms cannot yet express finer capabilities such
@@ -66,7 +72,7 @@ and handle known numeric errors without repeating an error-type parameter.
 This is a proposal; the interface is still on hold and is not implemented.
 
 This capability is useful even when the generic method only parses: it establishes
-the available operation and its result contract. Number<T> alone intentionally
+the available operation and its result contract. Number alone intentionally
 does not promise parsing. Keeping the capability separate also lets arithmetic
 algorithms accept numeric types without requiring a text representation.
 
@@ -80,7 +86,7 @@ type ergonomically, not whether exceptions are required.
 
 Before implementation, validate constrained T.Parse calls and the relationship
 to Number<T> through Raven and the importer. The current specialization path admits
-only Number<T> constraints, so documenting this proposal does not establish target
+only Number constraints, so documenting this proposal does not establish target
 support for ParsableNumber<T>. A focused generic parsing consumer should prove
 successful parsing, shared error handling and rejection of missing implementations.
 
@@ -98,14 +104,16 @@ General Raven fixes are isolated and independently validated on the main-based
 `codex/static-interface-contracts` branch before integration into Raven main and
 its neoCLR branch. They cover authored static contracts, inherited constrained
 members, constrained methods/property reads/operators and metadata-only constraint
-classification. No Runtime Contract option is added.
+classification. The subsequent native Self integration is separately enabled by
+`RavenSelfAssemblyName` and `RavenSelfType`; see [native Self](../self-types.md).
 
 The current target integration specializes closed static application functions
-whose type parameters have exactly Number<T> as their constraint, for the ten selected
+whose type parameters have exactly Number as their constraint, for the ten selected
 primitive types. It retains the ordinary importer checks after closing the body;
 the runtime validates exact nominal static member conformance. This is bounded
-compile-time specialization (maximum 128 copies), not general runtime generic
-static dispatch. It trades duplicated bodies for a small verifiable first consumer.
+compile-time specialization (maximum 128 copies), the application import boundary remains bounded. Numeric calls now retain native
+`callself` dispatch against nongeneric Number; the runtime also supports open
+generic static Self dispatch independently of this importer restriction. It trades duplicated bodies for a small verifiable first consumer.
 Custom numeric types, additional constraints, generic classes and generic delegates
 remain unsupported by that path. No performance improvement is claimed.
 

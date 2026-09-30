@@ -159,6 +159,7 @@ fn resolve_candidates(
                     SignatureContext {
                         types: 65536,
                         methods: 65536,
+                        allow_self: true,
                     },
                     0,
                 )?;
@@ -196,10 +197,15 @@ fn resolve_candidates(
 pub(crate) struct SignatureContext {
     pub types: usize,
     pub methods: usize,
+    pub allow_self: bool,
 }
 impl From<usize> for SignatureContext {
     fn from(types: usize) -> Self {
-        Self { types, methods: 0 }
+        Self {
+            types,
+            methods: 0,
+            allow_self: false,
+        }
     }
 }
 
@@ -445,7 +451,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             check_type_context(base, module, def.generic_parameters.len(), 0)?;
         }
         for interface in &def.implements {
-            check_type_context(interface, module, def.generic_parameters.len(), 0)?;
+            check_type_context(
+                interface,
+                module,
+                SignatureContext {
+                    types: def.generic_parameters.len(),
+                    methods: 0,
+                    allow_self: def.representation == Representation::Interface,
+                },
+                0,
+            )?;
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
@@ -629,6 +644,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         let context = SignatureContext {
             types: arity,
             methods: function.generic_parameters.len(),
+            allow_self: false,
         };
         let check = |ty: &Type| check_type_context(ty, module, context, 0);
         crate::constraints::validate(
@@ -753,13 +769,35 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             .chain(&function.locals)
             .chain([&function.returns])
         {
-            check(ty)?;
+            let self_contract = crate::interfaces::is_contract(module, function)
+                && crate::interfaces::is_bodyless(module, function)
+                && function.interface_implementations.is_empty();
+            check_type_context(
+                ty,
+                module,
+                SignatureContext {
+                    allow_self: self_contract,
+                    ..context
+                },
+                0,
+            )?;
         }
         for target in &function.interface_implementations {
             if let Some(owner) = &target.owner {
                 check(owner)?;
             }
-            for ty in target.parameters.iter().chain(&target.generic_arguments) {
+            for ty in &target.parameters {
+                check_type_context(
+                    ty,
+                    module,
+                    SignatureContext {
+                        allow_self: true,
+                        ..context
+                    },
+                    0,
+                )?;
+            }
+            for ty in &target.generic_arguments {
                 check(ty)?;
             }
             let contract = resolve(module, target)?;
@@ -908,6 +946,28 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         target,
                     )?;
                 }
+                Op::CallSelf { self_type, target } => {
+                    check(self_type)?;
+                    if let Some(owner) = &target.owner {
+                        check(owner)?;
+                    }
+                    for ty in &target.parameters {
+                        check_type_context(
+                            ty,
+                            module,
+                            SignatureContext {
+                                allow_self: true,
+                                ..context
+                            },
+                            0,
+                        )?;
+                    }
+                    for ty in &target.generic_arguments {
+                        check(ty)?;
+                    }
+                    crate::self_types::signature(module, function, self_type, target)?;
+                    crate::access::check_call(module, Some(function), &resolve(module, target)?)?;
+                }
                 Op::Call(target) | Op::CallVirtual(target) | Op::Construct(target) => {
                     if let Some(owner) = &target.owner {
                         check(owner)?;
@@ -916,6 +976,11 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         check(ty)?;
                     }
                     let callee = resolve(module, target)?;
+                    if crate::self_types::signature_has_self(&callee) {
+                        return Err(Fault::new(
+                            "Self contract requires callself with an implementing type",
+                        ));
+                    }
                     if !matches!(op, Op::Construct(_))
                         && callee.name.ends_with("..ctor")
                         && callee
@@ -1063,9 +1128,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             {
                 return Err(Fault::new("invalid or duplicate property signature"));
             }
-            check_type_context(&property.ty, module, arity, 0)?;
+            let property_context = SignatureContext {
+                types: arity,
+                methods: 0,
+                allow_self: definition.representation == Representation::Interface,
+            };
+            check_type_context(&property.ty, module, property_context, 0)?;
             for parameter in &property.parameters {
-                check_type_context(parameter, module, arity, 0)?;
+                check_type_context(parameter, module, property_context, 0)?;
             }
             if property.getter.is_none() && property.setter.is_none() {
                 return Err(Fault::new("property requires an accessor"));
@@ -1216,6 +1286,9 @@ fn check_type_context_seen(
                 nested(parameter)?;
             }
             nested(&shape.returns)
+        }
+        Type::SelfType if !arity.allow_self => {
+            Err(Fault::new("Self requires an interface contract signature"))
         }
         Type::Scoped { .. } => Err(Fault::new("unresolved scoped type signature")),
         Type::TypeParameter(index) if *index as usize >= arity.types => {
@@ -2670,6 +2743,17 @@ fn interpret_instructions_with_dispatch(
                     callback.queue_callback = queue_callback;
                     frames.push(callback);
                 }
+                Op::CallSelf { self_type, target } => {
+                    let callee = crate::self_types::implementation(module, self_type, target)?;
+                    let args = frame.args(module, &callee.argument_types())?;
+                    if frames.len() >= limits.frames {
+                        return Err(Fault::coded(
+                            crate::FaultCode::StackOverflow,
+                            "frame limit exceeded",
+                        ));
+                    }
+                    frames.push(Frame::new(callee, args)?);
+                }
                 Op::CallVirtual(target) => {
                     let contract = resolve(module, target)?;
                     crate::access::check_call(module, Some(&function), &contract)?;
@@ -3267,7 +3351,16 @@ fn interpret_instructions_with_dispatch(
                     }
                     crate::access::check_call(module, Some(&function), &callee)?;
                     callee.map_types(|ty| {
-                        check_type(ty, module)?;
+                        check_type_context(
+                            ty,
+                            module,
+                            SignatureContext {
+                                types: 0,
+                                methods: 0,
+                                allow_self: true,
+                            },
+                            0,
+                        )?;
                         Ok(ty.clone())
                     })?;
                     if callee.receiver_byref && callee.name.ends_with("..ctor") {

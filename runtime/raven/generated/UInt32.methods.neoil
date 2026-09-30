@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/UInt32.rvn. Regenerate with build_runtime_library.py.
 .type System.UInt32
 .sealed
-.implements System.Number<UInt32>
+.implements System.Number
 .implements System.ComparableTo<UInt32>
 .property static Zero() -> UInt32
 .get System.UInt32::get_Zero()

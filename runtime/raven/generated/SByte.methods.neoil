@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/SByte.rvn. Regenerate with build_runtime_library.py.
 .type System.SByte
 .sealed
-.implements System.Number<SByte>
+.implements System.Number
 .implements System.ComparableTo<SByte>
 .property static Zero() -> SByte
 .get System.SByte::get_Zero()

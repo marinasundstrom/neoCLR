@@ -591,6 +591,14 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                             }
                             Some(serde_json::json!(targets))
                         }
+                        "callself" => {
+                            let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
+                                Fault::new("expected callself Type = Target(...)")
+                            })?;
+                            Some(
+                                serde_json::json!({"self_type": parse_type(ty.trim())?, "target": parse_function_ref(target.trim())?}),
+                            )
+                        }
                         "function.bind" => {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
                                 Fault::new("expected function.bind Type = Target(...)")

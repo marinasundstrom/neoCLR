@@ -325,7 +325,9 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
         | Op::StoreObject(..)
         | Op::FieldAddress(..)
         | Op::InitializeObject(..) => &[PointerMemory, SlotReferences],
-        Op::BorrowInterface(..) | Op::CallVirtual(..) => &[InterfaceDispatch, SlotReferences],
+        Op::BorrowInterface(..) | Op::CallVirtual(..) | Op::CallSelf { .. } => {
+            &[InterfaceDispatch, SlotReferences]
+        }
         Op::PointerFromInt(..)
         | Op::PointerAdd
         | Op::CopyObject(..)

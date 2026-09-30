@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/UInt64.rvn. Regenerate with build_runtime_library.py.
 .type System.UInt64
 .sealed
-.implements System.Number<UInt64>
+.implements System.Number
 .implements System.ComparableTo<UInt64>
 .property static Zero() -> UInt64
 .get System.UInt64::get_Zero()

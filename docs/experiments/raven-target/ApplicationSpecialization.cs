@@ -2,9 +2,12 @@ using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 // Close bounded static application helpers before the ordinary checked importer.
-// Number<T> algorithms additionally resolve their supported constrained calls.
+// Number algorithms additionally resolve their supported constrained calls.
 sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<ModuleDefinition> applications)
 {
+    readonly Dictionary<Instruction, string> nativeSelfCalls = new();
+    public string? NativeSelfCall(Instruction instruction) => nativeSelfCalls.GetValueOrDefault(instruction);
+
     readonly HashSet<ModuleDefinition> modules = applications.ToHashSet();
     readonly Dictionary<string, MethodDefinition> copies = new();
     readonly Dictionary<MethodDefinition, MethodDefinition> origins = new();
@@ -57,12 +60,11 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                 continue;
             }
             if (parameter.Attributes != GenericParameterAttributes.NonVariant || parameter.Constraints.Count != 1
-                || parameter.Constraints[0].ConstraintType is not GenericInstanceType requirement
-                || requirement.ElementType.FullName != NumberBindings.Contract || !RuntimeSignatures.IsCore(requirement.Scope)
-                || requirement.GenericArguments.Count != 1 || requirement.GenericArguments[0] != parameter
+                || parameter.Constraints[0].ConstraintType.FullName != NumberBindings.Contract
+                || !RuntimeSignatures.IsCore(parameter.Constraints[0].ConstraintType.Scope)
                 || !actual.IsValueType || !NumberBindings.IsNumber(actual.FullName)
                 || actual.FullName != "System." + actual.MetadataType)
-                throw new InvalidDataException("Numeric specialization requires Number<T> and a supported concrete numeric argument: " + call.FullName);
+                throw new InvalidDataException("Numeric specialization requires Number and a supported concrete numeric argument: " + call.FullName);
             // CLI intrinsic signatures carry an element code, not a TypeRef scope.
             // Cecil may synthesize mscorlib for that code; bind it to supplied core storage.
             call.GenericArguments[index] = core.GetType(actual.FullName).Methods.Single(m => m.Name == "CompareTo").Parameters[0].ParameterType;
@@ -132,16 +134,21 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                 || index + 1 >= copy.Body.Instructions.Count)
                 throw new InvalidDataException("Unsupported numeric constrained receiver.");
             var instruction = copy.Body.Instructions[index + 1];
+            if (instruction.Operand is MethodReference inherited && inherited.DeclaringType is GenericInstanceType selfOwner
+                && selfOwner.ElementType.FullName == "System.ComparableTo`1" && selfOwner.GenericArguments.Count == 1
+                && selfOwner.GenericArguments[0].FullName == "System.Runtime.CompilerServices.Self")
+                selfOwner.GenericArguments[0] = concrete;
             if (instruction.OpCode.Code is not (Code.Call or Code.Callvirt) || instruction.Operand is not MethodReference member
                 || !RuntimeSignatures.IsCore(member.DeclaringType.Scope)
-                || member.DeclaringType is not GenericInstanceType owner || owner.GenericArguments.Count != 1
-                || owner.GenericArguments[0].FullName != concrete.FullName
-                || owner.ElementType.FullName is not (NumberBindings.Contract or "System.ComparableTo`1"))
+                || !(member.DeclaringType.FullName == NumberBindings.Contract
+                    || member.DeclaringType is GenericInstanceType owner && owner.GenericArguments.Count == 1
+                        && owner.GenericArguments[0].FullName == concrete.FullName && owner.ElementType.FullName == "System.ComparableTo`1"))
                 throw new InvalidDataException("Unsupported numeric constrained member.");
             var expected = member.Resolve();
             if (!expected.IsAbstract || !expected.IsVirtual || !expected.IsPublic)
                 throw new InvalidDataException("Numeric dispatch requires an abstract interface contract.");
-            var shape = RuntimeSignatures.Match(member, expected, PrimitiveBindings.Type);
+            var nativeSelf = member.DeclaringType.FullName == NumberBindings.Contract;
+            var shape = RuntimeSignatures.Match(member, expected, t => nativeSelf && t.FullName == "System.Runtime.CompilerServices.Self" && RuntimeSignatures.IsCore(t.Scope) ? concrete.Name : PrimitiveBindings.Type(t));
             var concreteName = concrete.Name;
             if (shape.Args.Any(argument => argument != concreteName)
                 || shape.Result != (member.Name == "CompareTo" ? "Int32" : concreteName))
@@ -151,6 +158,8 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
                 && m.Parameters.All(p => p.ParameterType.FullName == concrete.FullName)
                 && m.ReturnType.FullName == (member.Name == "CompareTo" ? "System.Int32" : concrete.FullName)).ToArray();
             if (candidates.Length != 1) throw new InvalidDataException("Missing exact numeric implementation.");
+            if (nativeSelf)
+                nativeSelfCalls[instruction] = $"callself {concrete.Name} = System.Number::{member.Name}({string.Join(',', expected.Parameters.Select(_ => "Self"))})";
             prefix.OpCode = OpCodes.Nop;
             prefix.Operand = null;
             instruction.OpCode = OpCodes.Call;

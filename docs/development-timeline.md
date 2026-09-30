@@ -9168,3 +9168,43 @@ See [evidence and limitations](experiments/http-json/cpu-investigation-20260927.
   The broader source-ownership audit has two reproduced pre-existing failures;
   an eight-element tuple probe fails at emission rather than with a specific arity
   diagnostic. Both are recorded as open limitations, not passing checks.
+
+
+## 2026-09-30 — Native Self, Number and isolated target integration
+
+- **Author:** requested implementing-type `Self`, retaining the capital name to
+  distinguish it from the `self` instance value. Confirmed this means the concrete
+  implementing type, not an explicitly declared generic parameter named Self.
+- **Assistant proposal:** initially proposed compiler-supplied generic encoding
+  to reuse CLI metadata. No compiler implementation used that encoding.
+- **Author correction:** “we can add Self support directly into the platform and
+  Raven language can surface it”, closer to Rust. Reaffirmed native runtime
+  ownership. The assistant changed the approach to a native signature and typed
+  dispatch operation, with Raven metadata transport rather than hidden generics.
+- **Author acceptance criterion:** test Number, and replace its explicit TSelf
+  parameter with Self. The assistant's first passing native Number fixture was
+  not the real System.Number; on the author's follow-up the assistant explicitly
+  acknowledged this and extended the work to the actual library and consumer.
+- **Author isolation/delivery direction:** include Raven on a branch based on
+  `neoclr`, remove other branches created for this work, use a neoCLR feature
+  branch too, and commit/sync on completion. The unused Raven `codex/self-type`
+  and `codex/native-self` branches were deleted without feature commits. Work is
+  on Raven `codex/neoclr-native-self` and neoCLR `codex/native-self`; Raven main
+  and the pre-existing Raven checkout were not edited. The author's existing
+  structural-types proposal edit is outside these commits.
+- **Implementation/evidence:** [native Self contract](self-types.md),
+  [native tests](../tests/self_types.rs), [numeric consumer](experiments/numeric-contracts/Main.rvn)
+  and [Raven integration](experiments/raven-target/README.md). See those records
+  for the validated scope and remaining receiver/erasure boundaries. This is
+  development work after Preview 11, not a release or website publication.
+
+- **Validated outcome (2026-09-30):** the actual Number contract was migrated and
+  its ten-type Raven consumer passed verification and execution with native
+  `callself`; negative numeric constraints and the generic-helper consumer passed.
+  Focused runtime tests cover cloning as well as numeric Self. Open generic
+  instance receiver dispatch and general application-importer Self consumers
+  remain outside this slice. Matching library and API snapshots were refreshed.
+
+- **Delivery:** Raven implementation committed as `764c22789` on the isolated
+  `codex/neoclr-native-self` branch. neoCLR changes remain on `codex/native-self`
+  for the matching commit. No feature branch was merged into Raven main or neoclr.

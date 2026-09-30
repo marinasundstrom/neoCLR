@@ -1,5 +1,11 @@
 # NeoCLR Generics and Type Relationships — Proposal
 
+> **2026-09-30 author decision:** use capital `Self` and a native runtime
+> implementing-type contract, surfaced by Raven; do not alias the `self` instance
+> value or encode the relationship as a hidden TSelf parameter. The bounded
+> [implementation contract](../self-types.md) supersedes the lowercase spelling
+> below. The wider proposal and its other capabilities remain exploratory.
+
 ## 1. Motivation
 
 NeoCLR should treat generics as a fundamental mechanism for expressing relationships between types rather than merely as parameterized containers.

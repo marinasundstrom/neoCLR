@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Author-directed capability — native Self (2026-09-30).** Implement the
+implementing-type relationship in the runtime, surface it in Raven on a branch
+based on `neoclr`, and replace Number's explicit type parameter. Keep the spelling
+`Self`, distinct from the `self` receiver value. This bounded author-selected work
+is described in [the Self contract](self-types.md); it does not reprioritize the
+remaining Web API work or adopt the broader generic-relationships proposal.
+
 **Author-directed release — Preview 11 (2026-09-27).**
 The current bounded surface is qualified for release with macOS arm64 Raven tools
 and a Windows x64 native-runtime ZIP. See [release notes](preview-11-release-notes.md)

@@ -12,10 +12,12 @@ static class InterfaceBindings
         public interface Closable<E> { Result<PropagationUnit,E> Close(); }
         """;
     static readonly HashSet<string> Contracts = new() { "System.Number", "System.EquatableTo", "System.ComparableTo", "System.Clonable", "System.Closable", "System.ConvertibleInto" };
-    public static bool IsInterface(string type) => type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
+    public static bool IsInterface(string type) => type == "System.Number" || type == GlobalizationBindings.Provider || ComparerBindings.IsInterface(type) || type == StandardUnionLibrary.ProtocolName || (HttpBindings.IsContract(type) || ReaderBindings.IsContract(type) || type == "System.Clock" || StorageItemBindings.IsName(type) || StreamBindings.IsCapability(type) || StorageProviderBindings.IsName(type)) || Contracts.Any(c => type.StartsWith(c + "<", StringComparison.Ordinal));
     public static string? Type(TypeReference type, Func<TypeReference, string>? parameterMap = null)
     {
         if (!RuntimeSignatures.IsCore(type.Scope)) return null;
+        if (type.FullName == "System.Runtime.CompilerServices.Self") return "Self";
+        if (type.FullName == "System.Number") return "System.Number";
         if (StandardUnionLibrary.ProtocolType(type) is { } protocol) return protocol;
         if ((HttpBindings.IsContract(type.FullName) || ReaderBindings.IsContract(type.FullName) || type.FullName == "System.Clock" || StorageItemBindings.IsName(type.FullName) || StreamBindings.IsCapability(type.FullName) || StorageProviderBindings.IsName(type.FullName)) && !type.IsValueType) return type.FullName;
         if (type.FullName == "System.Object") return "System.Object";

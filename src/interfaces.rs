@@ -77,6 +77,7 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         ty: &Type,
         path: &mut Vec<String>,
         result: &mut Vec<Type>,
+        implementing_type: &Type,
     ) -> Result<(), Fault> {
         let definition = module
             .type_definition(ty)
@@ -98,13 +99,15 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         }
         path.push(name);
         for base in &definition.implements {
-            let base = base.substitute_type_parameters(arguments(ty))?;
+            let base = base
+                .substitute_type_parameters(arguments(ty))?
+                .substitute_self(implementing_type)?;
             interface_definition(module, &base)?;
-            visit(module, &base, path, result)?;
+            visit(module, &base, path, result, implementing_type)?;
         }
         if definition.representation == Representation::Record {
             if let Some(base) = crate::inheritance::base(module, ty)? {
-                visit(module, &base, path, result)?;
+                visit(module, &base, path, result, &base)?;
             }
         }
         path.pop();
@@ -124,7 +127,12 @@ pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
         }
     }
     let mut result = Vec::new();
-    visit(module, ty, &mut Vec::new(), &mut result)?;
+    let implementing_type = if interface_definition(module, ty).is_ok() {
+        &Type::SelfType
+    } else {
+        ty
+    };
+    visit(module, ty, &mut Vec::new(), &mut result, implementing_type)?;
     Ok(result)
 }
 
@@ -143,6 +151,8 @@ fn member(
     concrete: &Type,
     contract: &Function,
 ) -> Result<Option<Function>, Fault> {
+    let specialized = contract.map_types(|ty| ty.substitute_self(concrete))?;
+    let contract = &specialized;
     // An inherited mapping is anchored at the class that declares conformance.
     // A repeated declaration remaps from that class, including inherited members.
     let chain = if module
@@ -164,7 +174,10 @@ fn member(
             .ok_or_else(|| Fault::new("unknown implementation owner"))?;
         for declared in &definition.implements {
             let declared = declared.substitute_type_parameters(arguments(owner))?;
-            if closure(module, &declared)?.contains(interface) {
+            if closure(module, &declared)?
+                .iter()
+                .any(|ty| ty.substitute_self(owner).is_ok_and(|ty| &ty == interface))
+            {
                 anchor = Some(index);
                 break;
             }
@@ -305,6 +318,7 @@ pub(crate) fn ensure_implementation(
         return Ok(());
     }
     for inherited in closure(module, interface)? {
+        let inherited = inherited.substitute_self(concrete)?;
         let definition = interface_definition(module, &inherited)?;
         for method in &module.functions {
             if method
@@ -541,7 +555,12 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             )) {
                 return Err(Fault::new("duplicate explicit interface mapping"));
             }
-            check_signature(module, body, &contract, true)?;
+            check_signature(
+                module,
+                body,
+                &contract.map_types(|ty| ty.substitute_self(owner))?,
+                true,
+            )?;
         }
     }
     for definition in &module.types {

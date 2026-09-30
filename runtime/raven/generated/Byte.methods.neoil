@@ -1,7 +1,7 @@
 ; Generated from runtime/raven/src/System/Byte.rvn. Regenerate with build_runtime_library.py.
 .type System.Byte
 .sealed
-.implements System.Number<Byte>
+.implements System.Number
 .implements System.ComparableTo<Byte>
 .property static Zero() -> Byte
 .get System.Byte::get_Zero()

@@ -29,7 +29,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-generic-helpers-') as directory:
     assert run([artifacts['runtime'], 'run', app, '--system', artifacts['system']]) == 'Generic helpers passed\n'
     print('Generic helpers: execution and reference/array identity passed', flush=True)
     for name, source, diagnostic in (
-        ('number-extra-constraint', 'import System.*\nfunc Next<T>(x: T) -> T where T: Number<T>, struct => x + T.One\nfunc Main() { Next<int>(1) }', 'Numeric specialization requires'),
+        ('number-extra-constraint', 'import System.*\nfunc Next<T>(x: T) -> T where T: Number, struct => x + T.One\nfunc Main() { Next<int>(1) }', 'Numeric specialization requires'),
         ('reference-constraint', 'import System.*\nfunc Read<T>(x: T) -> T where T: class => x\nfunc Main() { Read<string>("text") }', 'Numeric specialization requires'),
     ):
         (root / 'Main.rvn').write_text(source + '\n')

@@ -92,7 +92,8 @@ from private instance helpers, explicit replacements and static virtual defaults
 
 The current numeric slice requires Raven neoCLR commit `617efd444` or later,
 including independently integrated authored-static-interface, inherited-constraint
-and target-metadata emission fixes. No Runtime Contract setting changed. Number<T>
+and target-metadata emission fixes. The subsequent native Self migration adds the
+Runtime Contract settings described below. Number
 and all concrete numeric parsers use matching development references; parsing
 returns the shared NumberParseError. See [numeric scope and evidence](../numeric-contracts/README.md)
 and [broader interface direction](../../tracking/runtime-language.md#interfaces-as-a-platform-capability).
@@ -1646,3 +1647,24 @@ candidate for independent Raven diagnosis; no compiler fix or broader target cla
 is made. Generic pattern binding also encountered the importer's definite-assignment
 restriction; OfType uses an explicit type test and checked cast after matching.
 See the Function consumer evidence for the completed source/runtime checks.
+
+
+## Native Self integration (2026-09-30 development)
+
+Use Raven commit `764c22789` on `codex/neoclr-native-self`, based on `neoclr`,
+with this bridge.
+The shared props and numeric probes set `RavenSelfAssemblyName=NeoCLR.CoreProbe`
+and `RavenSelfType=System.Runtime.CompilerServices.Self`. The fieldless public
+reference marker transports native Self through compiler metadata; it is never a
+hidden generic parameter or a constructible native value. Ordinary CLR compilation
+does not enable this contract. See [native Self](../../self-types.md).
+
+The actual Raven `System.Number` interface is now nongeneric. Its arithmetic
+operands/results and Zero/One use Self; it inherits `ComparableTo<Self>`. Primitive
+implementations inherit `ComparableTo<primitive>` and Number. Rebuild references,
+runtime snapshots and consumers together: old Number<T> references are incompatible.
+The application importer still specializes its bounded closed numeric helpers,
+but emits native `callself` for Number members. Native validation and dispatch
+resolve the implementing type and check the substituted signature. The numeric
+verification script checks retained native dispatch and exercises ten primitive
+types. This does not extend the importer to arbitrary instance Self consumers.

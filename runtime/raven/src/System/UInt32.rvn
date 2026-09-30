@@ -3,7 +3,7 @@ namespace System
 import System.Result.*
 import System.Runtime.CompilerServices.RuntimeServices
 
-public struct UInt32 : Number<uint> {
+public struct UInt32 : Number {
     // The runtime supplies intrinsic primitive storage.
     #pragma warning disable-next-line RAV9032
     private field m_value: uint

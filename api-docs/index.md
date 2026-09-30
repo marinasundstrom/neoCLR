@@ -14,6 +14,9 @@ callable family and its Invoke/extension-member contracts.
 [Value tuples](tuples.md) are a development addition after Preview 11, using
 `System.Tuple<T1,...,TN>` as the value-type family.
 
+[Native numeric Self](text-numbers.md) is a development addition after Preview 11:
+Number is nongeneric and uses the implementing type for its operands and results.
+
 **Preview 11 API.** Comparer policies, explicit String comparison modes and the
 HashMap policy constructor are included. Rebuild applications
 with matching compiler, references and runtime library artifacts.

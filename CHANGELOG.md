@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
+- Add native `Self` interface signatures and typed `callself` dispatch, with runtime
+  conformance and generic-bound checks. Keep `Self` distinct from Raven's `self`
+  value. Migrate development `System.Number<T>` to non-generic `System.Number`
+  using Self operands/results and `ComparableTo<Self>`, with an opt-in Raven
+  target contract. This changes Number's arity: rebuild reference, library and
+  applications together. See [the contract and boundaries](docs/self-types.md).
+
 - Prepare and validate a local Function types toolchain, SDK and isolated VS Code
   extension installation (`0.1.12-neoclr.20260929.functions1`). Include an editable
   playground and callback, introspection and OfType projects with matching Build/Run

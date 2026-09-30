@@ -140,6 +140,10 @@ pub(crate) fn analyze(
                             Ok(vec![callee])
                         }
                     }),
+                Instruction::CallSelf { self_type, target } => {
+                    crate::self_types::implementation(module, self_type, target)
+                        .map(|callee| vec![callee])
+                }
                 Instruction::CallVirtual(target) => {
                     crate::vm::resolve(module, target).and_then(|contract| {
                         if crate::interfaces::is_contract(module, &contract) {

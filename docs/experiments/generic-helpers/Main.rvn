@@ -10,7 +10,7 @@ func Forward<T>(value: T) -> T => Identity<T>(value)
 func Second<T, U>(first: T, second: U) -> U => Forward<U>(second)
 
 func First<T>(values: ArrayList<T>) -> T => values[0]
-func Increment<T>(value: T) -> T where T: Number<T> => value + T.One
+func Increment<T>(value: T) -> T where T: Number => value + T.One
 
 func Main() -> int {
     if Forward<int>(42) != 42 { return 1 }
