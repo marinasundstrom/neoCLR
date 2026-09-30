@@ -27,6 +27,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to assembly functions and Unit static methods with void CLI signatures; the same Unit
   Main/helper, explicit-return and empty-entry programs now exercise both backends. Type/signature builder,
   generic and control-flow abstractions remain open; the native source subset is unchanged.
+  Share Raven's Int32/Unit callable signature and typed declaration-builder contract across
+  Reflection.Emit and native adapters. Preserve .NET visibility, parameter names, generic
+  fallback and selected-core identities; preserve native assembly-function ownership.
   Record a translated-System driver type-selection failure (host CoreLib collision);
   direct API execution passes. Metadata loading is an author-deferred follow-up.
   Add MethodBuilder.Emit overloads for supported logical opcodes, Int32 operands and

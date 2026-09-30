@@ -20,7 +20,9 @@ ordinary compiler-required metadata coverage is next.
 The author directs reuse of common .NET/neoCLR lowering with backend abstractions for
 builder differences. The shared linear-body model now feeds .NET/native method-builder adapters and
 executes the same Int32 and Unit Hello/helper compilations on both runtimes, including
-assembly functions, explicit/implicit returns and an empty Unit entry. Type/signature builders, generics and
+assembly functions, explicit/implicit returns and an empty Unit entry. Supported callable
+signatures and declaration-builder contracts are now shared too; concrete adapters preserve
+CLI type-method and native assembly-function ownership. Type/signature builders, generics and
 control flow remain subsequent boundaries. The author asks to avoid large workarounds
 and prioritize the Hello/helper end-to-end case. Shared metadata loading is deferred;
 the optional System driver has exposed a host/projection type collision and explicitly
