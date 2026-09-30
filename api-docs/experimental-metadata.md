@@ -18,6 +18,7 @@ and guest Introspection assembly loading remain pending.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
 - [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
@@ -1582,7 +1583,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1613,7 +1614,7 @@ operand is accepted.
 
 LoadConstant, LoadArgument, Add, Subtract, Multiply, all Call overloads and Return now
 call Emit. Their supported semantics are unchanged. WriteConsoleLine remains a native
-convenience expansion; general string operands, non-Int32 local variables, branches, exception
+convenience expansion; general string operands, non-Int32 local variables, exception
 regions and editable instruction collections are unsupported. Future ILProcessor-like
 editing must define instruction ownership and branch/exception target repair separately.
 
@@ -1668,7 +1669,48 @@ body details. Older experimental readers may reject the added `locals` field.
 
 Unlike unrestricted Cecil bodies, this bounded API enforces initialization and stack
 contracts when writing. Typed owner handles prevent accidental cross-method use; raw
-indices support assembler consumers. General local types, address-taking, branching and
+indices support assembler consumers. General local types, address-taking and
 scope/debug metadata remain outside this slice. The compiled C# `LocalChecks` consumer
 executes CLI locals and checks native roundtrips and rejected contracts; Raven's local
 assignment probe additionally verifies and executes the binary artifact in neoCLR.
+
+## Branch labels and control flow (development, 2026-10-01)
+
+```csharp
+public sealed class BranchLabel { public MethodBuilder Method { get; } }
+public sealed partial class MethodBuilder {
+    public BranchLabel DefineLabel();
+    public void MarkLabel(BranchLabel label);
+    public void Emit(OpCode opCode, BranchLabel label);
+    public void Emit(OpCode opCode, bool operand);
+}
+```
+
+`DefineLabel` allocates a method-owned symbolic destination (maximum 4096;
+`InvalidDataException` beyond that). `MarkLabel` marks its current position once.
+The label Emit overload accepts `Br`, `Brtrue` and `Brfalse`; the Boolean overload
+accepts only `Ldc_Bool`. Null labels throw `ArgumentNullException`; wrong owners,
+repeated marks and incompatible opcodes throw `ArgumentException` without changing
+instructions. Instruction-limit violations throw `InvalidDataException`. `ClearBody`
+retains handles but removes marks, so reused destinations must be marked again.
+
+Operand-free `Ceq`, `Clt` and `Cgt` pop two Int32 values and push Boolean. `Clt`/`Cgt`
+are signed comparisons. Conditional branches pop Boolean, not Int32; conditions may
+also use `Ldc_Bool`. General Boolean locals/signatures are not introduced here.
+
+Writing computes typed stack states and definitely stored locals over the control-flow
+graph, including backward edges. Unmarked targets, incompatible stack joins, wrong
+operand types, uninitialized loads on any incoming path, reachable fallthrough and
+unreachable executable instructions fail with `InvalidDataException`. Return instructions
+may occur on multiple reachable paths, each with the declared result and no extra stack
+values. Labels emit no runtime instruction. Unused/unreachable label marks are harmless.
+The earlier linear-only validation contract is superseded for branch-capable bodies.
+
+CLI destinations become byte displacements; native destinations become instruction
+indices after convenience-operation expansion (including Console output). Labels do not
+encode byte offsets themselves, so backend layouts remain independent. The native
+runtime already supports these format-5 instructions; no binary schema changes are
+needed. Compared with Cecil's general ILProcessor, this supports forward/backward branches
+with owned labels and checked typed control flow, but still has no insertion/removal API,
+exception regions or arbitrary opcode surface. C# FlowChecks covers executable loops and
+invalid joins/initialization; Raven's executable consumer includes Console inside a loop.

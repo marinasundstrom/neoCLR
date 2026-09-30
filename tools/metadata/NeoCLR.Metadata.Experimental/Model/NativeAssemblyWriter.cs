@@ -52,6 +52,10 @@ public sealed partial class AssemblyBuilder
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = "Public", parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
+            "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
+            "equal" => new { op = "ceq" },
+            "less" => new { op = "clt" },
+            "greater" => new { op = "cgt" },
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
             "call" => new { op = "call", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), parameters = Parameters(instruction.Target!) } },
@@ -82,6 +86,20 @@ public sealed partial class AssemblyBuilder
                 };
             return new[] { Instruction(instruction) };
         }
+        object[] NativeBody(MethodBuilder method)
+        {
+            var offsets = new int[method.Instructions.Count + 1];
+            for (int i = 0; i < method.Instructions.Count; i++)
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, _ => 1 });
+            var labels = method.LabelPositions();
+            return method.Instructions.SelectMany(instruction => instruction.Op switch {
+                "label" => Array.Empty<object>(),
+                "branch" or "branch.true" or "branch.false" => new object[] {
+                    new { op = instruction.Op == "branch" ? "br" : instruction.Op == "branch.true" ? "brtrue" : "brfalse", arg = offsets[labels[instruction.Value]] }
+                },
+                _ => NativeInstructions(instruction)
+            }).ToArray();
+        }
         foreach (var type in types) CheckText(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name);
         var artifact = new
         {
@@ -99,7 +117,7 @@ public sealed partial class AssemblyBuilder
                 name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
                 locals = Enumerable.Repeat("Int32", method.Locals.Count).ToArray(),
                 returns = method.ReturnsValue ? "Int32" : "Void", no_result = !method.ReturnsValue,
-                origin = Origin(method.Name, 0x06000001 + index, method), body = method.Instructions.SelectMany(NativeInstructions).ToArray()
+                origin = Origin(method.Name, 0x06000001 + index, method), body = NativeBody(method)
             }).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);

@@ -142,11 +142,27 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var code = new BlobBuilder();
+            var offsets = new int[method.Instructions.Count + 1];
+            for (int i = 0; i < method.Instructions.Count; i++)
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
+                    "label" => 0, "constant" or "call" or "branch" or "branch.true" or "branch.false" => 5,
+                    "argument" or "local.load" or "local.store" => 4,
+                    "equal" or "less" or "greater" => 2, _ => 1
+                });
+            var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
             foreach (var instruction in referenceOnly ? [] : method.Instructions)
             {
                 switch (instruction.Op)
                 {
+                    case "label": break;
+                    case "boolean": code.WriteByte(instruction.Value == 0 ? (byte)0x16 : (byte)0x17); break;
+                    case "equal": code.WriteByte(0xfe); code.WriteByte(0x01); break;
+                    case "less": code.WriteByte(0xfe); code.WriteByte(0x04); break;
+                    case "greater": code.WriteByte(0xfe); code.WriteByte(0x02); break;
+                    case "branch": case "branch.true": case "branch.false":
+                        code.WriteByte(instruction.Op == "branch" ? (byte)0x38 : instruction.Op == "branch.true" ? (byte)0x3a : (byte)0x39);
+                        code.WriteInt32(offsets[labels[instruction.Value]] - (code.Count + 4)); break;
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.load": code.WriteByte(0xfe); code.WriteByte(0x0c); code.WriteUInt16((ushort)instruction.Value); break;
@@ -218,7 +234,7 @@ public sealed class TypeBuilder
     }
 }
 
-/// <summary>Linear, typed Int32 body construction; invalid stack contracts fail before emission.</summary>
+/// <summary>Typed Int32 body construction with Boolean conditions; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
     internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null);
@@ -279,7 +295,7 @@ public sealed partial class MethodBuilder
     /// <remarks>Native-only bootstrap. The host must supply the matching System assembly to neoCLR;
     /// no assembly revision or image digest is encoded. Ordinary CLI output rejects this operation.</remarks>
     public void Call(NativeFunctionDefinition target) => Emit(OpCode.Call, target);
-    /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
+    /// <summary>Appends return with the declared stack shape; no values may remain afterward.</summary>
     public void Return() => Emit(OpCode.Ret);
     /// <summary>Clears instructions for editing before another Write; local declarations and handles are retained.</summary>
     public void ClearBody() => Instructions.Clear();
@@ -287,43 +303,5 @@ public sealed partial class MethodBuilder
     {
         if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");
         Instructions.Add(operation);
-    }
-    internal void Validate()
-    {
-        int stack = 0; MaxStack = 0;
-        var assigned = new bool[locals.Count];
-        if (Instructions.Count == 0 || Instructions[^1].Op != "return") throw new InvalidDataException("method requires final return");
-        for (int i = 0; i < Instructions.Count; i++)
-        {
-            var instruction = Instructions[i];
-            int pop = 0, push = 0;
-            switch (instruction.Op)
-            {
-                case "console.line": break; // Temporary native string operand is consumed by Console.WriteLine.
-                case "constant": push = 1; break;
-                case "argument":
-                    if (instruction.Value < 0 || instruction.Value >= ParameterCount) throw new InvalidDataException("argument outside signature");
-                    push = 1; break;
-                case "local.load": case "local.store":
-                    if (instruction.Value < 0 || instruction.Value >= locals.Count) throw new InvalidDataException("local outside declarations");
-                    if (instruction.Op == "local.load")
-                    {
-                        if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store");
-                        push = 1;
-                    }
-                    else { pop = 1; assigned[instruction.Value] = true; }
-                    break;
-                case "add": case "subtract": case "multiply": pop = 2; push = 1; break;
-                case "native.call":
-                    if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out pop)) throw new InvalidDataException("invalid native call");
-                    push = 1; break;
-                case "call": pop = instruction.Target!.ParameterCount; push = instruction.Target.ReturnsValue ? 1 : 0; break;
-                case "return":
-                    if (i != Instructions.Count - 1 || stack != (ReturnsValue ? 1 : 0)) throw new InvalidDataException("invalid return stack");
-                    pop = stack; break;
-            }
-            if (stack < pop) throw new InvalidDataException("evaluation stack underflow");
-            stack = stack - pop + push; MaxStack = Math.Max(MaxStack, stack);
-        }
     }
 }

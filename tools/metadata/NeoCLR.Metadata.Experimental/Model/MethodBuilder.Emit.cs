@@ -21,18 +21,33 @@ public enum OpCode
     /// <summary>Loads an Int32 local; requires a slot index or owned local.</summary>
     Ldloc,
     /// <summary>Stores an Int32 local; requires a slot index or owned local.</summary>
-    Stloc
+    Stloc,
+    /// <summary>Compares two Int32 values for equality, pushing Boolean.</summary>
+    Ceq,
+    /// <summary>Compares two signed Int32 values for less-than, pushing Boolean.</summary>
+    Clt,
+    /// <summary>Compares two signed Int32 values for greater-than, pushing Boolean.</summary>
+    Cgt,
+    /// <summary>Branches unconditionally to a BranchLabel.</summary>
+    Br,
+    /// <summary>Consumes Boolean and branches when true.</summary>
+    Brtrue,
+    /// <summary>Consumes Boolean and branches when false.</summary>
+    Brfalse,
+    /// <summary>Pushes a Boolean constant; requires a Boolean operand.</summary>
+    Ldc_Bool
 }
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Appends an operand-free arithmetic or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul or Ret.</param>
+    /// <summary>Appends an operand-free arithmetic, comparison or return instruction.</summary>
+    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
+            OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));
@@ -89,6 +104,17 @@ public sealed partial class MethodBuilder
         if (operand.Library.ModuleName != "System" || !operand.TryGetStaticInt32Signature(out _))
             throw new InvalidDataException("native call requires a static Int32 System function");
         Append(new("native.call", NativeTarget: operand));
+    }
+
+    /// <summary>Pushes a Boolean constant for branch conditions.</summary>
+    /// <param name="opCode">Ldc_Bool.</param>
+    /// <param name="operand">The Boolean value.</param>
+    /// <exception cref="ArgumentException">Incorrect opcode.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void Emit(OpCode opCode, bool operand)
+    {
+        if (opCode != OpCode.Ldc_Bool) throw OperandError(opCode);
+        Append(new("boolean", operand ? 1 : 0));
     }
 
     private static ArgumentException OperandError(OpCode opCode)

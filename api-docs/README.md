@@ -431,7 +431,7 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 `NativeAssemblyDefinition`, `NativeLibraryDefinition`, `NativeFunctionDefinition`, `ModuleDefinition`, `TypeDefinition`, `TypeReference`, `AssemblyIdentity`,
 `AssemblyReference`, `IAssemblyResolver`, `MethodDefinition`, `MemberReference`, `ImportedMethodReference`, `AssemblyBuilder` (including native emission
 and top-level functions), `TypeBuilder` and
-`MethodBuilder`, `LocalDefinition` and `OpCode` in that Model namespace,
+`MethodBuilder`, `LocalDefinition`, `BranchLabel` and `OpCode` in that Model namespace,
 are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type

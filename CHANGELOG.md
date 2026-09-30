@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   locals. Older producer artifacts remain readable; older experimental host readers
   may reject the new local list. Raven now emits initialized locals and assignments
   through both bounded backends; the runtime's existing local support is reused.
+  Add owned branch labels, signed comparisons and Boolean/branch Emit overloads with
+  typed control-flow stack/initialization validation. Compute CLI/native destinations
+  after layout; Raven if/else and lowered loops reuse the shared body path.
 
 - Integrate Raven's compiler-lowered bodies into the bounded native metadata emitter,
   sharing implicit Int32 returns and simple named calls with .NET emission. Keep the
