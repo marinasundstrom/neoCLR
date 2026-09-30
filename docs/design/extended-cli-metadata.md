@@ -499,3 +499,37 @@ small importer consumer. Then validate destination-module reference import and o
 supported writer path before claiming Raven integration readiness. Larger mutation,
 resource ownership, diagnostics, multi-module and full assembly emit contracts remain
 open and need deeper consumer evidence before settling the public API.
+
+
+## Initial Cecil-inspired declaration model (2026-09-30)
+
+Implemented in `NeoCLR.Metadata.Experimental.Model`: owned read-only AssemblyDefinition,
+ModuleDefinition, TypeDefinition and definition-backed TypeReference. ReadAssembly
+combines the recognized artifact/profile layer with System.Reflection.Metadata for
+actual manifest/module and TypeDef rows. The existing Cecil/.NET comparison above
+applies; no new dependency or change to runtime semantics is introduced.
+
+This bounded experiment selects an owned read view first, not a mutable Cecil clone.
+It preserves names, version, module MVID, generic arity and nesting; references resolve
+to the exact definition within their module snapshot. Names/tokens/MVIDs are not
+silently promoted into complete binding identities. Structural profiles remain attached
+but their host-catalog UUIDs are not inferred from physical CLI metadata. The cost is
+copying and separate future builder/import work; the benefit is a simple lifetime and
+ownership contract for a compiler importer. No performance claim is made.
+
+A deliberate initial difference from Cecil-style navigation is that Types is a flat
+TypeDef view including nested declarations and the module pseudo-type. DeclaringType
+provides nesting links. These four API types are documented in the
+[host reference](../../api-docs/experimental-metadata.md#model-namespace).
+[Consumer evidence](../experiments/extended-cli-metadata/dotnet-model-validation.json)
+uses generated real CLI generic/nested Unicode declarations, compares ordinary reader
+snapshots and confirms corrupt tables fail even with a consistent #Neo digest.
+
+Scope: 4096 TypeDefs maximum, a cumulative 4 Mi UTF-16 code-unit declaration-name
+budget (including repeated uses), and the artifact reader's existing unsigned IL-only PE32
+limits. It reads one manifest module, not linked netmodules. TypeReference currently
+means a reference to an existing owned definition, not physical TypeRef/TypeSpec
+resolution. Members, signature decoding, constraints, mutation/emission and dependency
+resolution remain open. Next bounded task: complete assembly-reference identity and
+explicit dependency resolution for nominal references before import/remapping. The
+potential Raven implementation and Metadata Introspection projection remain plans.

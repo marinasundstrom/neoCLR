@@ -62,7 +62,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   binding checks and typed profile validation: 50 shared cases pass (44 rejections),
   plus size/ownership checks. This is consistency checking, not authentication or
   conventional CLI verification. Document both host API types and the author’s Cecil
-  suggestion, with a provisional object-model design above the existing codecs.
+  suggestion, with a provisional object-model design above the existing codecs. Add
+  the first read-only Cecil-inspired assembly/module/TypeDef model using real CLI
+  declarations, with snapshot-scoped definition-backed references. Generated consumer
+  checks cover Unicode, generics, nesting, ownership, local lookup and corrupt CLI
+  tables under a valid digest, including decoded-name amplification rejection.
+  Document four model types, their 4096-TypeDef and cumulative decoded-name limits;
+  dependency binding, physical TypeRef resolution and assembly writing remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

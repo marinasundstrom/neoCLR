@@ -23,9 +23,11 @@ contracts now pass 49 shared vectors (30 rejections). A typed .NET reference-pro
 Read/Create/Write facade passes 36 shared vectors (29 rejections). Bounded .NET PE32
 artifact recognition/extraction passes 50 shared cases (44 rejections). Following the
 author’s Cecil suggestion, the [provisional API direction](design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
-places assembly/module/reference/definition objects above these codecs. Next is a
-bounded object-model prototype backed by actual CLI declarations; real binding and
-complete assembly emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+places assembly/module/reference/definition objects above these codecs. An initial
+read-only model now reads real assembly/module/TypeDef declarations, with generic/nested
+Unicode and snapshot-scoped reference consumer checks. Next is assembly-reference
+identity and explicit nominal dependency resolution; complete binding and assembly
+emission remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The author further clarifies that the .NET API should support later Raven compiler

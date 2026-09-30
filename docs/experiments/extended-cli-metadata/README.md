@@ -602,3 +602,25 @@ API model during this slice. The [provisional object-model direction](../../desi
 keeps recognition/codecs below assembly/module/reference/definition objects. Next
 bounded work is a compiler-facing object-model slice tied to real CLI declarations;
 complete assembly emission and Raven/guest integration are still pending.
+
+
+## .NET declaration object model (2026-09-30)
+
+The first Cecil-inspired Model namespace reads actual assembly/module/TypeDef data
+through System.Reflection.Metadata after artifact recognition. Owned snapshots expose
+names/version/MVID, generic arity, nesting and local token lookup. Definition-backed
+TypeReference.Resolve returns the original definition; it does not yet resolve physical
+TypeRef rows or dependencies. Types is explicitly a flat table view, including nested
+types and `<Module>`. Complete assembly identity and member signatures remain pending.
+
+`verify_dotnet_model.py` generates a real assembly with generic/nested Unicode types,
+checks SRM/Cecil preservation after #Neo embedding and exercises the separate model
+consumer. Graph ownership, scope separation, lookup, ordinary input opt-in and malformed
+CLI tables under a valid digest pass. Build has zero warnings/errors.
+[Evidence](dotnet-model-validation.json) and the
+[complete four-type API reference](../../../api-docs/experimental-metadata.md#model-namespace)
+record the supported subset. No runtime assembly is loaded or executed.
+
+Next bounded task: assembly-reference identity and explicit nominal dependency
+resolution. Mutable import/builders, full assembly emission and Raven integration are
+still separate validation work.

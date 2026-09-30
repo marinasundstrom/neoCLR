@@ -6,7 +6,7 @@ using System.Reflection.PortableExecutable;
 using System.Text.Json;
 
 if (args.Length < 2) throw new ArgumentException("generate/read/rewrite path [output]");
-if (args[0] == "generate")
+if (args[0] is "generate" or "generate-model" or "generate-model-large-names")
 {
     var assembly = new PersistedAssemblyBuilder(new AssemblyName("NeoMetadataContainerProbe"), typeof(object).Assembly);
     var module = assembly.DefineDynamicModule("Probe");
@@ -28,6 +28,20 @@ if (args[0] == "generate")
     il.Emit(OpCodes.Ldarg_0);
     il.Emit(OpCodes.Ret);
     type.CreateType();
+    if (args[0] == "generate-model")
+    {
+        var generic = module.DefineType("Δοκιμή.Container`1", TypeAttributes.Public);
+        generic.DefineGenericParameters("T");
+        var nested = generic.DefineNestedType("Nested", TypeAttributes.NestedPublic);
+        nested.CreateType();
+        generic.CreateType();
+    }
+    if (args[0] == "generate-model-large-names")
+    {
+        var sharedNamespace = new string('N', 2048);
+        for (int index = 0; index < 2100; index++)
+            module.DefineType(sharedNamespace + ".Type" + index, TypeAttributes.Public).CreateType();
+    }
     var metadata = assembly.GenerateMetadata(out var bodies, out var fields);
     var builder = new ManagedPEBuilder(
         new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096),

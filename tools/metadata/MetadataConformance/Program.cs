@@ -7,6 +7,9 @@ try
     if (args.Length == 0) throw new ArgumentException("selftest | emit path | roundtrip input output | reject input");
     switch (args[0])
     {
+        case "assembly-model":
+            AssemblyModelChecks.Run(args[1], args[2], args[3], args[4]);
+            break;
         case "artifact-vectors":
             ArtifactChecks.Run(Read(args[1]));
             break;

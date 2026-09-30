@@ -1,0 +1,20 @@
+{
+  "date": "2026-09-30",
+  "scope": "read-only manifest module and TypeDef model; no dependency binding, member signatures or assembly emission",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "target_framework": "net10.0",
+  "srm_cecil_declarations_preserved": true,
+  "checks": [
+    "assembly/module fields",
+    "Unicode names",
+    "generic arity",
+    "nested declaring type",
+    "module pseudo-type",
+    "snapshot-scoped references",
+    "missing/wrong-kind lookup",
+    "owned data",
+    "decoded name amplification limit",
+    "ordinary input opt-in",
+    "invalid conventional tables rejected despite valid digest"
+  ]
+}

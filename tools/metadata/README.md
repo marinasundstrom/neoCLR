@@ -10,7 +10,8 @@ and structural signature syntax/context validation, reference-table codecs and
 explicit-catalog structural identity and synthesized-member contracts. MetadataProfile
 provides typed Read/Create/Write entry points with owned documents and section-profile
 validation. Bounded PE32 recognition/extraction is implemented; actual
-declaration resolution and compiler adapters remain pending. It is not the future neoCLR guest metadata/Introspection/Emit
+dependency binding and compiler adapters remain pending. A read-only Model namespace
+now exposes real assembly/module/TypeDef declarations and definition-backed references. It is not the future neoCLR guest metadata/Introspection/Emit
 library. Names and contracts are experimental.
 
 - [Complete API contract](../../api-docs/experimental-metadata.md)
@@ -26,6 +27,7 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_references.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_members.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_profiles.py
 python3 docs/experiments/extended-cli-metadata/verify_dotnet_artifacts.py
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_model.py
 ```
 
 The verifier builds the library/consumer, runs ownership and writer checks, cross-reads
@@ -60,3 +62,9 @@ ordinary classification available. Fifty shared cases pass, including 44 rejecti
 Support is bounded unsigned IL-only PE32, not a general loader or verifier.
 The [Cecil-inspired object model direction](../../docs/design/extended-cli-metadata.md#cecil-inspired-object-model-direction-2026-09-30)
 is provisional; the existing profile/codec APIs remain lower layers.
+
+The model consumer reads a generated generic/nested Unicode fixture through owned
+AssemblyDefinition/ModuleDefinition/TypeDefinition/TypeReference objects. It checks
+snapshot-local resolution, absence of input/reader lifetime coupling, and malformed
+CLI tables even with valid extension binding. Cross-module resolution and assembly
+writing remain pending.

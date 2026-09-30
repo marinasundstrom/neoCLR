@@ -6,11 +6,12 @@ Source project: `tools/metadata/NeoCLR.Metadata.Experimental`.
 This is the first reusable reader/writer slice intended for Raven's future symbol
 loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures, reference tables and synthesized-member tables**,
 and derives structural identities/member contracts against an explicitly supplied host catalog.
-Bounded PE32 artifact recognition is implemented; physical CLI declaration resolution,
-Introspection assembly loading and assembly emission remain pending.
+Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
+dependency binding, Introspection assembly loading and assembly emission remain pending.
 
 ## Namespace and types
 
+- [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
 - [MetadataArtifact](#metadataartifact): ordinary classification or owned extended profile.
 - [MetadataProfile](#metadataprofile): reference-profile reader and writer entry points.
@@ -641,3 +642,131 @@ python3 docs/experiments/extended-cli-metadata/verify_dotnet_artifacts.py
 The compiled consumer passes 50 shared Python/.NET cases (44 rejections), including
 Cecil's extension-stripping rewrite, marker erasure, rebinding, reordered streams,
 malformed ranges/names, wrong profiles, image-size limits and result ownership.
+
+
+## Model namespace
+
+Assembly: `NeoCLR.Metadata.Experimental`; namespace:
+`NeoCLR.Metadata.Experimental.Model`. This first Cecil-inspired object-model slice is
+**read-only and experimental**. It uses the existing artifact recognition layer and
+System.Reflection.Metadata internally to read actual declarations, with no Cecil
+package dependency. It does not load runtime assemblies. These names are distinct
+from System.Reflection.Metadata and Mono.Cecil types; qualify or alias when needed.
+
+### AssemblyDefinition
+
+```csharp
+public sealed class AssemblyDefinition
+{
+    public string Name { get; }
+    public Version Version { get; }
+    public ModuleDefinition MainModule { get; }
+    public MetadataProfileDocument? Profile { get; }
+    public static AssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image,
+                                                  bool expectedExtended = true);
+}
+```
+
+No public constructor or setters. Name is the simple assembly name and Version is the
+manifest version. Neither these fields nor MVID form a complete assembly binding
+identity. Culture, public key and assembly-reference policy are not modeled yet.
+MainModule is the owned manifest module; Profile is attached structural metadata, or
+null for explicitly admitted ordinary CLI input.
+
+ReadAssembly first applies MetadataArtifactReader's existing 4 MiB, unsigned IL-only
+PE32, stream and required-profile rules. The default requires extended metadata;
+expectedExtended false permits ordinary CLI assemblies. The method then reads the
+assembly and module rows, TypeDef names/namespaces, generic parameter counts and
+NestedClass ownership. It accepts at most 4096 TypeDefs and a cumulative 4 Mi UTF-16
+code units of decoded declaration names/namespaces (counting repeated uses). It rejects missing/invalid
+or cyclic declaring-type relationships. Missing assembly manifests (netmodules),
+invalid/unsupported artifacts and malformed inspected metadata raise
+InvalidDataException; underlying BadImageFormatException is retained as InnerException
+when converted. Callers must not mutate the span during reading.
+
+The returned graph owns its strings/values and profile. Readers/streams are disposed
+before return; no assembly loading, dependency discovery or open resource remains.
+Only the inspected declaration subset is validated: this is not full signature, IL,
+attribute, constraint or execution verification. MetadataProfile's catalog scope UUIDs
+are not automatically derived from assembly names or MVIDs.
+
+### ModuleDefinition
+
+```csharp
+public sealed class ModuleDefinition
+{
+    public AssemblyDefinition Assembly { get; }
+    public string Name { get; }
+    public Guid Mvid { get; }
+    public IReadOnlyList<TypeDefinition> Types { get; }
+    public TypeDefinition? GetTypeDefinition(uint metadataToken);
+}
+```
+
+No public constructor. Assembly points back to the owning snapshot. Name/Mvid are the
+stored module values; Mvid is not an experimental catalog module scope. Types is an
+owned read-only collection of every TypeDef in row order, **including nested types
+and `<Module>`**. This intentionally exposes a flat table view in the initial slice;
+it does not promise Cecil's exact collection organization.
+
+GetTypeDefinition performs local physical TypeDef-token lookup and returns the same
+owned definition instance. Zero, other token kinds and absent rows return null. It
+does not follow exports, physical TypeRef/TypeSpec rows or dependencies.
+
+### TypeDefinition
+
+```csharp
+public sealed class TypeDefinition
+{
+    public ModuleDefinition Module { get; }
+    public uint MetadataToken { get; }
+    public string Namespace { get; }
+    public string Name { get; }
+    public int GenericArity { get; }
+    public TypeDefinition? DeclaringType { get; }
+    public TypeReference ToReference();
+}
+```
+
+No public constructor. Module is the owning snapshot and MetadataToken its physical
+TypeDef address. Namespace/Name preserve metadata strings, including any backtick arity
+suffix; display names are not identity. GenericArity counts owned GenericParam rows,
+including captured outer parameters if encoded; it does not expose or validate the
+full generic constraint contract. DeclaringType links to the same graph's enclosing
+definition, or null for top-level types. ToReference creates a new definition-backed
+reference that resolves to this exact object. Fields, methods, attributes, base types
+and interfaces are not exposed by this slice.
+
+### TypeReference
+
+```csharp
+public sealed class TypeReference
+{
+    public ModuleDefinition Module { get; }
+    public uint MetadataToken { get; }
+    public TypeDefinition Resolve();
+}
+```
+
+Created only by TypeDefinition.ToReference. Module and MetadataToken address the target
+definition in one immutable snapshot. Resolve performs no dependency search and returns
+the exact original TypeDefinition. This is a **definition-backed nominal reference**,
+not yet a physical TypeRef/TypeSpec, imported reference or structural type expression.
+
+All four model classes use ordinary reference equality. Independent reads produce
+distinct graphs even when bytes/tokens/MVIDs match. Do not use token alone to compare
+types across modules or snapshots. Structural identity remains available separately
+through the validated Profile and explicit catalogs.
+
+The compiled consumer checks assembly/module fields, Unicode names, nested/generic
+TypeDefs, local lookup, graph ownership, snapshot separation, default extended-input
+requirements and rejection of corrupt CLI tables despite a valid binding digest.
+System.Reflection.Metadata and Cecil snapshots agree before and after embedding.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_model.py
+```
+
+This implements the navigation foundation only. Cross-module import/resolution,
+complete assembly identities, mutable graph/builders, member signatures and assembly
+writing remain pending; the potential Raven port has not been implemented.
