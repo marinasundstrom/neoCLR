@@ -39,6 +39,21 @@ help offline tools, but requires explicit resolution, identity and lifetime rule
 
 [Introspection design](https://github.com/marinasundstrom/neoCLR/blob/main/docs/introspection-design.md)
 
+## Function types: delegates evolved
+
+Two open proposals explore function types as structural signatures while retaining
+familiar callable bindings to a method and optional receiver or captured environment.
+Possible nominal specializations would preserve explicit type identity. A proposed
+Callable interface could accept different signatures through a common contract,
+similar to the role of .NET Delegate. This adds identity, conversion and introspection
+contracts that still need evaluation.
+
+These proposals are **not implemented on main**. Its development callback syntax
+continues to use the existing nominal Func/delegate runtime.
+
+[Delegates evolved proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/delegates-evolved.md)
+· [Callable interface proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/callable-interface.md)
+
 ## Collections
 
 [Sequence, MutableSequence and List](../features/collections/) distinguish reading,

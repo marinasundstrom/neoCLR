@@ -2,7 +2,14 @@
 
 ## Status
 
-**Proposal**
+**Open proposal — not implemented on main.**
+
+This earlier exploration is preserved as design history. See the later
+[Delegates evolved](delegates-evolved.md) proposal for structural signatures and
+possible nominal specializations, and the [Callable interface](callable-interface.md)
+proposal for a common callable abstraction. These documents explore different
+choices; none is a completed specification or implementation commitment. Main's
+function type source syntax still uses its existing nominal Func/delegate runtime.
 
 ## Summary
 

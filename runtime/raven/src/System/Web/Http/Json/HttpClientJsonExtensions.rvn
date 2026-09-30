@@ -11,7 +11,7 @@ import System.Web.Http.*
 public extension HttpClientJsonExtensions for HttpClient {
     /// Sends GET and decodes a successful response as a supported flat model.
     func GetFromJson<T>(url: string) -> Task<Result<T, HttpJsonError>> {
-        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        let transform: (Result<Object, HttpJsonError>) -> Result<T, HttpJsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
     }
 
@@ -22,13 +22,13 @@ public extension HttpClientJsonExtensions for HttpClient {
             _ = cancelled.Cancel()
             return cancelled.Task
         }
-        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        let transform: (Result<Object, HttpJsonError>) -> Result<T, HttpJsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), cancellationToken).Map(transform)
     }
 
     /// Sends GET and decodes a successful response as a supported flat model.
     func GetFromJson<T>(url: Uri) -> Task<Result<T, HttpJsonError>> {
-        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        let transform: (Result<Object, HttpJsonError>) -> Result<T, HttpJsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), CancellationToken.None).Map(transform)
     }
 
@@ -39,7 +39,7 @@ public extension HttpClientJsonExtensions for HttpClient {
             _ = cancelled.Cancel()
             return cancelled.Task
         }
-        let transform: Func<Result<Object, HttpJsonError>, Result<T, HttpJsonError>> = JsonClientOperations.Convert<T>
+        let transform: (Result<Object, HttpJsonError>) -> Result<T, HttpJsonError> = JsonClientOperations.Convert<T>
         return JsonClientOperations.Get(self, url, typeof(T), cancellationToken).Map(transform)
     }
 

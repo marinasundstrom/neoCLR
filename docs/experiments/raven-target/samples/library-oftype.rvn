@@ -1,0 +1,89 @@
+import System.*
+import System.Collections.*
+import System.Introspection.*
+import System.Linq.*
+import System.Option.*
+
+public func Check(value: bool, message: string) {
+    if !value {
+        System.Fault(message)
+    }
+}
+
+public class Probe : Iterable<Object?> {
+    var Moves: int = 0
+    var Disposals: int = 0
+    val Values = ArrayList<Object?>()
+
+    init() {
+        Values.Add(null)
+        Values.Add(42)
+        Values.Add("first")
+        Values.Add("second")
+    }
+
+    func GetIterator() -> Iterator<Object?> => Cursor(self)
+}
+
+public class Cursor : Iterator<Object?> {
+    private val source: Probe
+    private var position = -1
+    private var disposed = false
+
+    init(source: Probe) {
+        self.source = source
+    }
+
+    func MoveNext() -> bool {
+        source.Moves += 1
+        position += 1
+        return position < source.Values.Count
+    }
+
+    val Current: Object? => source.Values[position]
+
+    func Dispose() {
+        if !disposed {
+            disposed = true
+            source.Disposals += 1
+        }
+    }
+}
+
+func Main() {
+    let source = Probe()
+    let query = source.OfType<string>()
+    Check(source.Moves == 0, "OfType construction is lazy")
+    let first = query.Take(1).ToList()
+    Check(first.Count == 1 && first[0] == "first", "Filter skips null and incompatible values")
+    Check(source.Moves == 3 && source.Disposals == 1, "Early termination disposes source once")
+    let all = query.ToList()
+    Check(all.Count == 2 && all[0] == "first" && all[1] == "second", "Order and repeated enumeration")
+    Check(source.Disposals == 2, "Exhaustion disposes source")
+    let numbers = source.OfType<int>().ToList()
+    Check(numbers.Count == 1 && numbers[0] == 42, "Boxed value matching")
+    Check(source.OfType<MethodInfo>().Count() == 0, "No matches")
+    Check(source.OfType<long>().Count() == 0, "No numeric coercion")
+    let values: int[] = [1, 2]
+    Check(values.OfType<int>().Count() == 2, "Value source boxing")
+    Check(ArrayList<Object?>().OfType<string>().Count() == 0, "Empty input")
+    let info = typeof(Probe)
+    let members: MemberInfo[] = [info, info.GetMethods()[0]]
+    let types = members.OfType<TypeInfo>().ToList()
+    Check(types.Count == 1 && types[0].Equals(info), "Descriptor narrowing")
+    var found = false
+    for type in info.Module.GetTypes().OfType<TypeInfo>() {
+        if type.Equals(info) {
+            found = true
+        }
+    }
+    Check(found, "Module type query supports OfType")
+    let previousDisposals = source.Disposals
+    let iterator = source.OfType<string>().GetIterator()
+    Check(iterator.MoveNext() && iterator.Current == "first", "Explicit iterator match")
+    iterator.Dispose()
+    iterator.Dispose()
+    Check(source.Disposals == previousDisposals + 1, "Explicit disposal is idempotent")
+    Check(!iterator.MoveNext(), "Disposed iterator remains finished")
+    Console.WriteLine("OfType query contracts passed")
+}

@@ -137,3 +137,12 @@ After Preview 11, `System.Tuple<T1,...,TN>` adds heterogeneous value tuples with
 through seven components. Raven tuple syntax uses this family; copying a tuple
 copies its fields while retaining the identity of referenced objects. See the
 [value-tuple API guide](/docs/tuples.html) for construction, fields and limitations.
+
+
+### Development: type filtering
+
+Import `System.Linq.*` and use `source.OfType<ResultType>()` to lazily retain
+non-null compatible values in source order. The source type is inferred; matching
+values are narrowed to the requested type without numeric conversions. Each
+iteration is independent, and completing or disposing the iterator releases its
+source. See the [OfType member reference](xref:System.Linq.Operators.OfType).

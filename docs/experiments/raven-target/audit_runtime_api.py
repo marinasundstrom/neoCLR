@@ -6,6 +6,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+from build_runtime_library import SOURCES
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
@@ -15,7 +16,7 @@ args = parser.parse_args()
 source = json.loads((HERE / 'runtime-api-inventory.json').read_text())
 groups = {
     'primitives': ('Boolean String SByte Byte Int16 UInt16 Char UInt32 Int64 UInt64 Single Double IntPtr UIntPtr Int32', ['library-primitives.rvn', 'library-integers.rvn', 'library-booleans.rvn', 'library-strings.rvn', 'library-parsing.rvn', 'library-division.rvn']),
-    'errors': ('InvalidRangeError Int32ParseError OverflowError IntegerDivisionError Utf8SliceError ConsoleReadError FileReadError FileWriteError InvalidDateError InvalidTimeError EnvironmentError', ['library-errors.rvn']),
+    'errors': ('InvalidRangeError Int32ParseError OverflowError IntegerDivisionError Utf8SliceError ConsoleReadError FileReadError FileWriteError InvalidDateError InvalidTimeError EnvironmentError StreamError', ['library-errors.rvn']),
     'unions': ('Option Result Propagatable', ['library-case-payloads.rvn', 'library-unions.rvn', 'library-result-void-propagation.rvn', 'library-reference-payloads.rvn']),
     'interfaces': ('EquatableTo ComparableTo Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
     'unimplemented-contracts': ('Clonable Closable ConvertibleInto', []),
@@ -25,11 +26,20 @@ groups = {
     'process': ('Environment Console', ['library-environment.rvn', 'library-console.rvn']),
     'files': ('File Path', ['library-files.rvn', 'library-paths.rvn']),
     'math': ('Math', ['library-floating-math.rvn', 'library-math.rvn', 'library-clamp.rvn']),
-    'reflection': ('Type TypeInfo Reflection RuntimeTypeHandle', ['library-reflection.rvn', 'library-flags.rvn']),
+    'reflection': ('Type TypeInfo Reflection RuntimeTypeHandle BindingFlags', ['library-reflection.rvn', 'library-flags.rvn']),
     'signature-markers': ('Value Void UnionAttribute', ['library-void.rvn']),
 }
 lookup = {name: (group, samples) for group, (names, samples) in groups.items() for name in names.split()}
 rows = []
+# Both generated method bodies and adapters can call runtime services.
+caller_index = {}
+for candidate in dict.fromkeys([*source['sourceFiles'],
+        *[str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/generated').glob('*.neoil')]]):
+    for line, text in enumerate((ROOT / candidate).read_text().splitlines(), 1):
+        match = re.search(r'\bcall (neoCLR\.Runtime\.[^(]+)\(', text)
+        if match:
+            name = match[1]
+            caller_index.setdefault(name, []).append({'service': name, 'file': candidate, 'line': line})
 for file in source['sourceFiles']:
     entries = [d for d in source['declarations'] if d['file'] == file]
     if not entries:
@@ -38,15 +48,7 @@ for file in source['sourceFiles']:
         callers = []
         for entry in entries:
             name = entry['declaration'].split('(')[0].split()[-1]
-            # The source inventory starts at System.neoil; the Raven profile also
-            # supplies generated adapters (for example String scalar access).
-            candidates = dict.fromkeys([*source['sourceFiles'], *[str(p.relative_to(ROOT)) for p in (ROOT / 'runtime/raven/generated').glob('*.helpers.neoil')]])
-            for candidate in candidates:
-                if candidate == file:
-                    continue
-                for line, text in enumerate((ROOT / candidate).read_text().splitlines(), 1):
-                    if re.search(r'\bcall ' + re.escape(name) + r'\(', text):
-                        callers.append({'service': name, 'file': candidate, 'line': line})
+            callers.extend(c for c in caller_index.get(name, []) if c['file'] != file)
             if not any(c['service'] == name for c in callers):
                 raise ValueError('Service without a reviewed library caller: ' + name)
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'implementation-service', 'callers': callers})
@@ -178,6 +180,15 @@ for file in source['sourceFiles']:
                      'samples': ['library-math.rvn', 'library-clamp.rvn'],
                      'tests': ['docs/experiments/raven-target/verify_math_library.py', 'tests/math_helpers.rs', 'tests/math_typed.rs'],
                      'note': 'All twenty Math functions are Raven-authored; Double operations retain native services behind checked bootstrap-only bindings. Source authority is runtime/raven/src/System/Math/Functions.rvn.'})
+        continue
+    slice_name = Path(file).name.split('.')[0]
+    if file.startswith('runtime/raven/generated/') and slice_name in SOURCES:
+        origin = SOURCES[slice_name]
+        assert (ROOT / origin).is_file()
+        rows.append({'file': file, 'declarations': len(entries),
+                     'disposition': 'raven-authored-generated-library', 'source': origin,
+                     'tests': ['docs/experiments/raven-target/build_runtime_library.py'],
+                     'note': 'Matched source/bootstrap hashes and successful compilation/import establish provenance. This inventory does not establish runtime behavior; use the feature-specific executable consumers.'})
         continue
     group, samples = lookup[Path(file).stem]
     for sample in samples:

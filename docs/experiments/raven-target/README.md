@@ -1,5 +1,15 @@
 # Raven targeting neoCLR
 
+## Callback syntax and OfType backport (2026-09-30)
+
+Raven-authored library callback annotations now use function type syntax while the
+main bridge retains its existing nominal Func/delegate representation. OfType adds
+an exact two-generic-argument query declaration/binding; its library iterator uses
+existing boxing, type tests and casts. Runtime Contract options, source TypeInfo
+and serialized delegate behavior are unchanged. Match regenerated library and
+reference artifacts when using OfType. The query sample and validation are linked
+from [the query API record](../../raven-query-api.md#runtime-type-filtering--2026-09-30-backport).
+
 ## Task.Run integration (2026-09-27)
 
 Development references expose the static System.Tasks.Task submission owner alongside

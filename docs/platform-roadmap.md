@@ -1,9 +1,25 @@
 # neoCLR platform roadmap
 
-**Updated 2026-09-28.** This is the authoritative default for work priorities,
+**Updated 2026-09-30.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
+
+**Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**
+After the bounded main backport below, put the structural Function experiment on
+hold and work in Raven to improve neoCLR target support. The Function runtime
+branch remains isolated; its proposals are open, not completed on main. Specific
+compiler tasks and acceptance criteria remain to be selected. This does not
+approve a replacement backend or integration of neoCLR-specific policies into
+Raven main. General compiler fixes continue to require independent validation.
+The earlier Web API direction below remains recorded for later resumption.
+
+**Author-directed library backport (2026-09-30).** Bring Raven callback function
+syntax and lazy OfType filtering to main independently of the structural Function
+runtime branch. This bounded library change keeps the existing callable and
+introspection models. It is complete; the subsequent author direction above selects
+the next focus. See the
+[query contract and evidence](raven-query-api.md#runtime-type-filtering--2026-09-30-backport).
 
 **Author-directed release — Preview 11 (2026-09-27).**
 The current bounded surface is qualified for release with macOS arm64 Raven tools
@@ -14,7 +30,7 @@ Raven SDK/bridge qualification remains separate. The full Linux suite passes; a
 validator-only exit-code correction has independent archive-smoke evidence.
 This closes release preparation without adding optional Web API capabilities.
 
-**Active direction — minimal Web API (author-selected 2026-09-27).** Focus on
+**Preceding direction — minimal Web API (author-selected 2026-09-27).** Focus on
 serving a useful Web API, nested JSON serialization/deserialization, and a
 route parser used within an existing HttpServer handler, including named and typed
 parameters. This later author direction defers the earlier separate WebApplication

@@ -2238,7 +2238,7 @@ ldloc local2
 M0000001a_IL_0039:
 stloc local1
 M0000001a_IL_003a:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_003f:
 M0000001a_IL_0040:
 ldloc local0
@@ -2271,7 +2271,7 @@ ldloc local3
 M0000001a_IL_006f:
 stloc local1
 M0000001a_IL_0070:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_0075:
 M0000001a_IL_0076:
 ldloc local0
@@ -2308,7 +2308,7 @@ call System.String::Concat(String,String)
 M0000001a_IL_00b1:
 stloc local1
 M0000001a_IL_00b2:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_00b7:
 M0000001a_IL_00b8:
 ldloc local0
@@ -2345,7 +2345,7 @@ call System.String::Concat(String,String)
 M0000001a_IL_00f3:
 stloc local1
 M0000001a_IL_00f4:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_00f9:
 M0000001a_IL_00fa:
 ldloc local0
@@ -2382,7 +2382,7 @@ call System.String::Concat(String,String)
 M0000001a_IL_0135:
 stloc local1
 M0000001a_IL_0136:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_013b:
 M0000001a_IL_013c:
 ldloc local0
@@ -2421,222 +2421,222 @@ call System.String::Concat(String,String)
 M0000001a_IL_017c:
 stloc local1
 M0000001a_IL_017d:
-br M0000001a_IL_02e1
+br M0000001a_IL_02eb
 M0000001a_IL_0182:
 M0000001a_IL_0183:
+ldloc local0
 M0000001a_IL_0184:
-ldloc local0
-M0000001a_IL_0185:
 stloc local23
-M0000001a_IL_0187:
-ldloca local23
-M0000001a_IL_0189:
+M0000001a_IL_0186:
 ldloca local24
-M0000001a_IL_018b:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.InvalidNumber&)
+M0000001a_IL_0188:
+initobj System.Data.Json.JsonError.InvalidNumber
+M0000001a_IL_018e:
+ldloca local23
 M0000001a_IL_0190:
-brfalse M0000001a_IL_01af
-M0000001a_IL_0195:
-ldloc local24
+ldloca local24
+M0000001a_IL_0192:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.InvalidNumber&)
 M0000001a_IL_0197:
-pop
-M0000001a_IL_0198:
-M0000001a_IL_0199:
-br M0000001a_IL_01a4
-M0000001a_IL_01a4:
-ldstr "Invalid JSON number"
+brfalse M0000001a_IL_01b4
+M0000001a_IL_019c:
+M0000001a_IL_019d:
+br M0000001a_IL_01a8
+M0000001a_IL_01a8:
 M0000001a_IL_01a9:
+ldstr "Invalid JSON number"
+M0000001a_IL_01ae:
 stloc local1
-M0000001a_IL_01aa:
-br M0000001a_IL_02e1
 M0000001a_IL_01af:
-M0000001a_IL_01b0:
-ldloc local0
-M0000001a_IL_01b1:
-stloc local25
-M0000001a_IL_01b3:
-ldloca local25
+br M0000001a_IL_02eb
+M0000001a_IL_01b4:
 M0000001a_IL_01b5:
-ldloca local26
-M0000001a_IL_01b7:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.NumberOutOfRange&)
-M0000001a_IL_01bc:
-brfalse M0000001a_IL_01db
-M0000001a_IL_01c1:
-ldloc local26
-M0000001a_IL_01c3:
-pop
-M0000001a_IL_01c4:
-M0000001a_IL_01c5:
-br M0000001a_IL_01d0
-M0000001a_IL_01d0:
-ldstr "Number is not an Int32 integer token"
-M0000001a_IL_01d5:
-stloc local1
-M0000001a_IL_01d6:
-br M0000001a_IL_02e1
-M0000001a_IL_01db:
-M0000001a_IL_01dc:
 ldloc local0
-M0000001a_IL_01dd:
-stloc local27
+M0000001a_IL_01b6:
+stloc local25
+M0000001a_IL_01b8:
+ldloca local26
+M0000001a_IL_01ba:
+initobj System.Data.Json.JsonError.NumberOutOfRange
+M0000001a_IL_01c0:
+ldloca local25
+M0000001a_IL_01c2:
+ldloca local26
+M0000001a_IL_01c4:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.NumberOutOfRange&)
+M0000001a_IL_01c9:
+brfalse M0000001a_IL_01e5
+M0000001a_IL_01ce:
+M0000001a_IL_01cf:
+br M0000001a_IL_01da
+M0000001a_IL_01da:
+ldstr "Number is not an Int32 integer token"
 M0000001a_IL_01df:
-ldloca local28
-M0000001a_IL_01e1:
-initobj System.Data.Json.JsonError.Read
+stloc local1
+M0000001a_IL_01e0:
+br M0000001a_IL_02eb
+M0000001a_IL_01e5:
+M0000001a_IL_01e6:
+ldloc local0
 M0000001a_IL_01e7:
-ldloca local27
+stloc local27
 M0000001a_IL_01e9:
 ldloca local28
 M0000001a_IL_01eb:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Read&)
-M0000001a_IL_01f0:
-brfalse M0000001a_IL_0218
-M0000001a_IL_01f5:
+initobj System.Data.Json.JsonError.Read
+M0000001a_IL_01f1:
+ldloca local27
+M0000001a_IL_01f3:
 ldloca local28
-M0000001a_IL_01f7:
-call instance System.Data.Json.JsonError.Read::get_Reason()
-M0000001a_IL_01fc:
-stloc local8
-M0000001a_IL_01fe:
+M0000001a_IL_01f5:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Read&)
+M0000001a_IL_01fa:
+brfalse M0000001a_IL_0222
 M0000001a_IL_01ff:
-br M0000001a_IL_020a
-M0000001a_IL_020a:
-M0000001a_IL_020b:
+ldloca local28
+M0000001a_IL_0201:
+call instance System.Data.Json.JsonError.Read::get_Reason()
+M0000001a_IL_0206:
+stloc local8
+M0000001a_IL_0208:
+M0000001a_IL_0209:
+br M0000001a_IL_0214
+M0000001a_IL_0214:
+M0000001a_IL_0215:
 ldloca local8
-M0000001a_IL_020d:
+M0000001a_IL_0217:
 call instance System.IO.TextReadError::ToString()
-M0000001a_IL_0212:
-stloc local1
-M0000001a_IL_0213:
-br M0000001a_IL_02e1
-M0000001a_IL_0218:
-M0000001a_IL_0219:
-ldloc local0
-M0000001a_IL_021a:
-stloc local29
 M0000001a_IL_021c:
-ldloca local30
-M0000001a_IL_021e:
-initobj System.Data.Json.JsonError.Write
+stloc local1
+M0000001a_IL_021d:
+br M0000001a_IL_02eb
+M0000001a_IL_0222:
+M0000001a_IL_0223:
+ldloc local0
 M0000001a_IL_0224:
-ldloca local29
+stloc local29
 M0000001a_IL_0226:
 ldloca local30
 M0000001a_IL_0228:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Write&)
-M0000001a_IL_022d:
-brfalse M0000001a_IL_0255
-M0000001a_IL_0232:
+initobj System.Data.Json.JsonError.Write
+M0000001a_IL_022e:
+ldloca local29
+M0000001a_IL_0230:
 ldloca local30
-M0000001a_IL_0234:
-call instance System.Data.Json.JsonError.Write::get_Reason()
-M0000001a_IL_0239:
-stloc local9
-M0000001a_IL_023b:
+M0000001a_IL_0232:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Write&)
+M0000001a_IL_0237:
+brfalse M0000001a_IL_025f
 M0000001a_IL_023c:
-br M0000001a_IL_0247
-M0000001a_IL_0247:
-M0000001a_IL_0248:
+ldloca local30
+M0000001a_IL_023e:
+call instance System.Data.Json.JsonError.Write::get_Reason()
+M0000001a_IL_0243:
+stloc local9
+M0000001a_IL_0245:
+M0000001a_IL_0246:
+br M0000001a_IL_0251
+M0000001a_IL_0251:
+M0000001a_IL_0252:
 ldloca local9
-M0000001a_IL_024a:
+M0000001a_IL_0254:
 call instance System.IO.StreamError::ToString()
-M0000001a_IL_024f:
-stloc local1
-M0000001a_IL_0250:
-br M0000001a_IL_02e1
-M0000001a_IL_0255:
-M0000001a_IL_0256:
-ldloc local0
-M0000001a_IL_0257:
-stloc local31
 M0000001a_IL_0259:
-ldloca local32
-M0000001a_IL_025b:
-initobj System.Data.Json.JsonError.Reflection
+stloc local1
+M0000001a_IL_025a:
+br M0000001a_IL_02eb
+M0000001a_IL_025f:
+M0000001a_IL_0260:
+ldloc local0
 M0000001a_IL_0261:
-ldloca local31
+stloc local31
 M0000001a_IL_0263:
 ldloca local32
 M0000001a_IL_0265:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Reflection&)
-M0000001a_IL_026a:
-brfalse M0000001a_IL_028f
-M0000001a_IL_026f:
+initobj System.Data.Json.JsonError.Reflection
+M0000001a_IL_026b:
+ldloca local31
+M0000001a_IL_026d:
 ldloca local32
-M0000001a_IL_0271:
+M0000001a_IL_026f:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.Reflection&)
+M0000001a_IL_0274:
+brfalse M0000001a_IL_0299
+M0000001a_IL_0279:
+ldloca local32
+M0000001a_IL_027b:
 call instance System.Data.Json.JsonError.Reflection::get_Reason()
-M0000001a_IL_0276:
+M0000001a_IL_0280:
 pop
-M0000001a_IL_0277:
-M0000001a_IL_0278:
-br M0000001a_IL_0283
-M0000001a_IL_0283:
-M0000001a_IL_0284:
+M0000001a_IL_0281:
+M0000001a_IL_0282:
+br M0000001a_IL_028d
+M0000001a_IL_028d:
+M0000001a_IL_028e:
 ldstr "JSON reflection operation failed"
-M0000001a_IL_0289:
-stloc local1
-M0000001a_IL_028a:
-br M0000001a_IL_02e1
-M0000001a_IL_028f:
-M0000001a_IL_0290:
-ldloc local0
-M0000001a_IL_0291:
-stloc local33
 M0000001a_IL_0293:
-ldloca local34
-M0000001a_IL_0295:
-initobj System.Data.Json.JsonError.UnsupportedMapping
+stloc local1
+M0000001a_IL_0294:
+br M0000001a_IL_02eb
+M0000001a_IL_0299:
+M0000001a_IL_029a:
+ldloc local0
 M0000001a_IL_029b:
-ldloca local33
+stloc local33
 M0000001a_IL_029d:
 ldloca local34
 M0000001a_IL_029f:
-call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.UnsupportedMapping&)
-M0000001a_IL_02a4:
-brfalse M0000001a_IL_02c7
-M0000001a_IL_02a9:
+initobj System.Data.Json.JsonError.UnsupportedMapping
+M0000001a_IL_02a5:
+ldloca local33
+M0000001a_IL_02a7:
 ldloca local34
-M0000001a_IL_02ab:
-call instance System.Data.Json.JsonError.UnsupportedMapping::get_Message()
-M0000001a_IL_02b0:
-stloc local10
-M0000001a_IL_02b2:
+M0000001a_IL_02a9:
+call instance System.Data.Json.JsonError::TryGetValue(System.Data.Json.JsonError.UnsupportedMapping&)
+M0000001a_IL_02ae:
+brfalse M0000001a_IL_02d1
 M0000001a_IL_02b3:
-br M0000001a_IL_02be
-M0000001a_IL_02be:
-M0000001a_IL_02bf:
-ldloc local10
-M0000001a_IL_02c1:
-stloc local1
-M0000001a_IL_02c2:
-br M0000001a_IL_02e1
-M0000001a_IL_02c7:
+ldloca local34
+M0000001a_IL_02b5:
+call instance System.Data.Json.JsonError.UnsupportedMapping::get_Message()
+M0000001a_IL_02ba:
+stloc local10
+M0000001a_IL_02bc:
+M0000001a_IL_02bd:
+br M0000001a_IL_02c8
 M0000001a_IL_02c8:
-ldloc local0
 M0000001a_IL_02c9:
-pop
-M0000001a_IL_02ca:
-ldc.i4 1
+ldloc local10
 M0000001a_IL_02cb:
-brfalse M0000001a_IL_02dc
-M0000001a_IL_02d0:
-M0000001a_IL_02d1:
-ldstr "Empty"
-M0000001a_IL_02d6:
 stloc local1
-M0000001a_IL_02d7:
-br M0000001a_IL_02e1
-M0000001a_IL_02dc:
-M0000001a_IL_02dd:
-M0000001a_IL_02de:
-M0000001a_IL_02df:
+M0000001a_IL_02cc:
+br M0000001a_IL_02eb
+M0000001a_IL_02d1:
+M0000001a_IL_02d2:
+ldloc local0
+M0000001a_IL_02d3:
+pop
+M0000001a_IL_02d4:
+ldc.i4 1
+M0000001a_IL_02d5:
+brfalse M0000001a_IL_02e6
+M0000001a_IL_02da:
+M0000001a_IL_02db:
+ldstr "Empty"
 M0000001a_IL_02e0:
-fault "Guest program reached a terminal failure"
+stloc local1
 M0000001a_IL_02e1:
-M0000001a_IL_02e2:
+br M0000001a_IL_02eb
+M0000001a_IL_02e6:
+M0000001a_IL_02e7:
+M0000001a_IL_02e8:
+M0000001a_IL_02e9:
+M0000001a_IL_02ea:
+fault "Guest program reached a terminal failure"
+M0000001a_IL_02eb:
+M0000001a_IL_02ec:
 ldloc local1
-M0000001a_IL_02e3:
+M0000001a_IL_02ed:
 ret
 .end
 .method instance byref get_Value() -> System.Object

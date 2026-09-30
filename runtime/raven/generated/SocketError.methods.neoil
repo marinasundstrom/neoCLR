@@ -2739,403 +2739,403 @@ ldloc local0
 M0000001e_IL_000b:
 stloc local2
 M0000001e_IL_000c:
-ldloca local2
-M0000001e_IL_000e:
 ldloca local3
-M0000001e_IL_0010:
+M0000001e_IL_000e:
+initobj System.Networking.Sockets.SocketError.UnsupportedAddressFamily
+M0000001e_IL_0014:
+ldloca local2
+M0000001e_IL_0016:
+ldloca local3
+M0000001e_IL_0018:
 call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.UnsupportedAddressFamily&)
-M0000001e_IL_0015:
-brfalse M0000001e_IL_0033
-M0000001e_IL_001a:
-ldloc local3
-M0000001e_IL_001b:
-pop
-M0000001e_IL_001c:
 M0000001e_IL_001d:
-br M0000001e_IL_0028
-M0000001e_IL_0028:
-ldstr "UnsupportedAddressFamily"
-M0000001e_IL_002d:
-stloc local1
+brfalse M0000001e_IL_0039
+M0000001e_IL_0022:
+M0000001e_IL_0023:
+br M0000001e_IL_002e
 M0000001e_IL_002e:
-br M0000001e_IL_0296
+ldstr "UnsupportedAddressFamily"
 M0000001e_IL_0033:
+stloc local1
 M0000001e_IL_0034:
-M0000001e_IL_0035:
-ldloc local0
-M0000001e_IL_0036:
-stloc local4
-M0000001e_IL_0038:
-ldloca local4
+br M0000001e_IL_02dd
+M0000001e_IL_0039:
 M0000001e_IL_003a:
+ldloc local0
+M0000001e_IL_003b:
+stloc local4
+M0000001e_IL_003d:
 ldloca local5
-M0000001e_IL_003c:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Closed&)
-M0000001e_IL_0041:
-brfalse M0000001e_IL_0060
-M0000001e_IL_0046:
-ldloc local5
-M0000001e_IL_0048:
-pop
+M0000001e_IL_003f:
+initobj System.Networking.Sockets.SocketError.Closed
+M0000001e_IL_0045:
+ldloca local4
+M0000001e_IL_0047:
+ldloca local5
 M0000001e_IL_0049:
-M0000001e_IL_004a:
-br M0000001e_IL_0055
-M0000001e_IL_0055:
-ldstr "Closed"
-M0000001e_IL_005a:
-stloc local1
-M0000001e_IL_005b:
-br M0000001e_IL_0296
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Closed&)
+M0000001e_IL_004e:
+brfalse M0000001e_IL_006b
+M0000001e_IL_0053:
+M0000001e_IL_0054:
+br M0000001e_IL_005f
+M0000001e_IL_005f:
 M0000001e_IL_0060:
-M0000001e_IL_0061:
-M0000001e_IL_0062:
-ldloc local0
-M0000001e_IL_0063:
-stloc local6
+ldstr "Closed"
 M0000001e_IL_0065:
-ldloca local6
-M0000001e_IL_0067:
+stloc local1
+M0000001e_IL_0066:
+br M0000001e_IL_02dd
+M0000001e_IL_006b:
+M0000001e_IL_006c:
+ldloc local0
+M0000001e_IL_006d:
+stloc local6
+M0000001e_IL_006f:
 ldloca local7
-M0000001e_IL_0069:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Busy&)
-M0000001e_IL_006e:
-brfalse M0000001e_IL_008d
-M0000001e_IL_0073:
-ldloc local7
-M0000001e_IL_0075:
-pop
-M0000001e_IL_0076:
+M0000001e_IL_0071:
+initobj System.Networking.Sockets.SocketError.Busy
 M0000001e_IL_0077:
-br M0000001e_IL_0082
-M0000001e_IL_0082:
-ldstr "Busy"
-M0000001e_IL_0087:
-stloc local1
-M0000001e_IL_0088:
-br M0000001e_IL_0296
-M0000001e_IL_008d:
-M0000001e_IL_008e:
-M0000001e_IL_008f:
-ldloc local0
-M0000001e_IL_0090:
-stloc local8
+ldloca local6
+M0000001e_IL_0079:
+ldloca local7
+M0000001e_IL_007b:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Busy&)
+M0000001e_IL_0080:
+brfalse M0000001e_IL_009d
+M0000001e_IL_0085:
+M0000001e_IL_0086:
+br M0000001e_IL_0091
+M0000001e_IL_0091:
 M0000001e_IL_0092:
-ldloca local8
-M0000001e_IL_0094:
+ldstr "Busy"
+M0000001e_IL_0097:
+stloc local1
+M0000001e_IL_0098:
+br M0000001e_IL_02dd
+M0000001e_IL_009d:
+M0000001e_IL_009e:
+ldloc local0
+M0000001e_IL_009f:
+stloc local8
+M0000001e_IL_00a1:
 ldloca local9
-M0000001e_IL_0096:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidRange&)
-M0000001e_IL_009b:
-brfalse M0000001e_IL_00ba
-M0000001e_IL_00a0:
-ldloc local9
-M0000001e_IL_00a2:
-pop
 M0000001e_IL_00a3:
-M0000001e_IL_00a4:
-br M0000001e_IL_00af
-M0000001e_IL_00af:
-ldstr "InvalidRange"
-M0000001e_IL_00b4:
-stloc local1
-M0000001e_IL_00b5:
-br M0000001e_IL_0296
-M0000001e_IL_00ba:
-M0000001e_IL_00bb:
-M0000001e_IL_00bc:
-ldloc local0
-M0000001e_IL_00bd:
-stloc local10
-M0000001e_IL_00bf:
-ldloca local10
-M0000001e_IL_00c1:
-ldloca local11
+initobj System.Networking.Sockets.SocketError.InvalidRange
+M0000001e_IL_00a9:
+ldloca local8
+M0000001e_IL_00ab:
+ldloca local9
+M0000001e_IL_00ad:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidRange&)
+M0000001e_IL_00b2:
+brfalse M0000001e_IL_00cf
+M0000001e_IL_00b7:
+M0000001e_IL_00b8:
+br M0000001e_IL_00c3
 M0000001e_IL_00c3:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.LimitExceeded&)
-M0000001e_IL_00c8:
-brfalse M0000001e_IL_00e7
-M0000001e_IL_00cd:
-ldloc local11
+M0000001e_IL_00c4:
+ldstr "InvalidRange"
+M0000001e_IL_00c9:
+stloc local1
+M0000001e_IL_00ca:
+br M0000001e_IL_02dd
 M0000001e_IL_00cf:
-pop
 M0000001e_IL_00d0:
+ldloc local0
 M0000001e_IL_00d1:
-br M0000001e_IL_00dc
-M0000001e_IL_00dc:
-ldstr "LimitExceeded"
-M0000001e_IL_00e1:
-stloc local1
-M0000001e_IL_00e2:
-br M0000001e_IL_0296
-M0000001e_IL_00e7:
-M0000001e_IL_00e8:
+stloc local10
+M0000001e_IL_00d3:
+ldloca local11
+M0000001e_IL_00d5:
+initobj System.Networking.Sockets.SocketError.LimitExceeded
+M0000001e_IL_00db:
+ldloca local10
+M0000001e_IL_00dd:
+ldloca local11
+M0000001e_IL_00df:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.LimitExceeded&)
+M0000001e_IL_00e4:
+brfalse M0000001e_IL_0101
 M0000001e_IL_00e9:
-ldloc local0
 M0000001e_IL_00ea:
-stloc local12
-M0000001e_IL_00ec:
-ldloca local12
-M0000001e_IL_00ee:
-ldloca local13
-M0000001e_IL_00f0:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Cancelled&)
+br M0000001e_IL_00f5
 M0000001e_IL_00f5:
-brfalse M0000001e_IL_0114
-M0000001e_IL_00fa:
-ldloc local13
+M0000001e_IL_00f6:
+ldstr "LimitExceeded"
+M0000001e_IL_00fb:
+stloc local1
 M0000001e_IL_00fc:
-pop
-M0000001e_IL_00fd:
-M0000001e_IL_00fe:
-br M0000001e_IL_0109
-M0000001e_IL_0109:
-ldstr "Cancelled"
-M0000001e_IL_010e:
-stloc local1
+br M0000001e_IL_02dd
+M0000001e_IL_0101:
+M0000001e_IL_0102:
+ldloc local0
+M0000001e_IL_0103:
+stloc local12
+M0000001e_IL_0105:
+ldloca local13
+M0000001e_IL_0107:
+initobj System.Networking.Sockets.SocketError.Cancelled
+M0000001e_IL_010d:
+ldloca local12
 M0000001e_IL_010f:
-br M0000001e_IL_0296
-M0000001e_IL_0114:
-M0000001e_IL_0115:
+ldloca local13
+M0000001e_IL_0111:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.Cancelled&)
 M0000001e_IL_0116:
-ldloc local0
-M0000001e_IL_0117:
-stloc local14
-M0000001e_IL_0119:
-ldloca local14
+brfalse M0000001e_IL_0133
 M0000001e_IL_011b:
-ldloca local15
-M0000001e_IL_011d:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidAddress&)
-M0000001e_IL_0122:
-brfalse M0000001e_IL_0141
+M0000001e_IL_011c:
+br M0000001e_IL_0127
 M0000001e_IL_0127:
-ldloc local15
-M0000001e_IL_0129:
-pop
-M0000001e_IL_012a:
-M0000001e_IL_012b:
-br M0000001e_IL_0136
-M0000001e_IL_0136:
-ldstr "InvalidAddress"
-M0000001e_IL_013b:
+M0000001e_IL_0128:
+ldstr "Cancelled"
+M0000001e_IL_012d:
 stloc local1
-M0000001e_IL_013c:
-br M0000001e_IL_0296
+M0000001e_IL_012e:
+br M0000001e_IL_02dd
+M0000001e_IL_0133:
+M0000001e_IL_0134:
+ldloc local0
+M0000001e_IL_0135:
+stloc local14
+M0000001e_IL_0137:
+ldloca local15
+M0000001e_IL_0139:
+initobj System.Networking.Sockets.SocketError.InvalidAddress
+M0000001e_IL_013f:
+ldloca local14
 M0000001e_IL_0141:
-M0000001e_IL_0142:
+ldloca local15
 M0000001e_IL_0143:
-ldloc local0
-M0000001e_IL_0144:
-stloc local16
-M0000001e_IL_0146:
-ldloca local16
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidAddress&)
 M0000001e_IL_0148:
-ldloca local17
-M0000001e_IL_014a:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionRefused&)
-M0000001e_IL_014f:
-brfalse M0000001e_IL_016e
-M0000001e_IL_0154:
-ldloc local17
-M0000001e_IL_0156:
-pop
-M0000001e_IL_0157:
-M0000001e_IL_0158:
-br M0000001e_IL_0163
-M0000001e_IL_0163:
-ldstr "ConnectionRefused"
-M0000001e_IL_0168:
+brfalse M0000001e_IL_0165
+M0000001e_IL_014d:
+M0000001e_IL_014e:
+br M0000001e_IL_0159
+M0000001e_IL_0159:
+M0000001e_IL_015a:
+ldstr "InvalidAddress"
+M0000001e_IL_015f:
 stloc local1
+M0000001e_IL_0160:
+br M0000001e_IL_02dd
+M0000001e_IL_0165:
+M0000001e_IL_0166:
+ldloc local0
+M0000001e_IL_0167:
+stloc local16
 M0000001e_IL_0169:
-br M0000001e_IL_0296
-M0000001e_IL_016e:
-M0000001e_IL_016f:
-M0000001e_IL_0170:
-ldloc local0
+ldloca local17
+M0000001e_IL_016b:
+initobj System.Networking.Sockets.SocketError.ConnectionRefused
 M0000001e_IL_0171:
-stloc local18
+ldloca local16
 M0000001e_IL_0173:
-ldloca local18
+ldloca local17
 M0000001e_IL_0175:
-ldloca local19
-M0000001e_IL_0177:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionReset&)
-M0000001e_IL_017c:
-brfalse M0000001e_IL_019b
-M0000001e_IL_0181:
-ldloc local19
-M0000001e_IL_0183:
-pop
-M0000001e_IL_0184:
-M0000001e_IL_0185:
-br M0000001e_IL_0190
-M0000001e_IL_0190:
-ldstr "ConnectionReset"
-M0000001e_IL_0195:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionRefused&)
+M0000001e_IL_017a:
+brfalse M0000001e_IL_0197
+M0000001e_IL_017f:
+M0000001e_IL_0180:
+br M0000001e_IL_018b
+M0000001e_IL_018b:
+M0000001e_IL_018c:
+ldstr "ConnectionRefused"
+M0000001e_IL_0191:
 stloc local1
-M0000001e_IL_0196:
-br M0000001e_IL_0296
-M0000001e_IL_019b:
-M0000001e_IL_019c:
-M0000001e_IL_019d:
+M0000001e_IL_0192:
+br M0000001e_IL_02dd
+M0000001e_IL_0197:
+M0000001e_IL_0198:
 ldloc local0
-M0000001e_IL_019e:
-stloc local20
-M0000001e_IL_01a0:
-ldloca local20
-M0000001e_IL_01a2:
-ldloca local21
-M0000001e_IL_01a4:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AccessDenied&)
-M0000001e_IL_01a9:
-brfalse M0000001e_IL_01c8
-M0000001e_IL_01ae:
-ldloc local21
-M0000001e_IL_01b0:
-pop
+M0000001e_IL_0199:
+stloc local18
+M0000001e_IL_019b:
+ldloca local19
+M0000001e_IL_019d:
+initobj System.Networking.Sockets.SocketError.ConnectionReset
+M0000001e_IL_01a3:
+ldloca local18
+M0000001e_IL_01a5:
+ldloca local19
+M0000001e_IL_01a7:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.ConnectionReset&)
+M0000001e_IL_01ac:
+brfalse M0000001e_IL_01c9
 M0000001e_IL_01b1:
 M0000001e_IL_01b2:
 br M0000001e_IL_01bd
 M0000001e_IL_01bd:
-ldstr "AccessDenied"
-M0000001e_IL_01c2:
-stloc local1
+M0000001e_IL_01be:
+ldstr "ConnectionReset"
 M0000001e_IL_01c3:
-br M0000001e_IL_0296
-M0000001e_IL_01c8:
+stloc local1
+M0000001e_IL_01c4:
+br M0000001e_IL_02dd
 M0000001e_IL_01c9:
 M0000001e_IL_01ca:
 ldloc local0
 M0000001e_IL_01cb:
-stloc local22
+stloc local20
 M0000001e_IL_01cd:
-ldloca local22
+ldloca local21
 M0000001e_IL_01cf:
-ldloca local23
-M0000001e_IL_01d1:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.TimedOut&)
-M0000001e_IL_01d6:
-brfalse M0000001e_IL_01f5
-M0000001e_IL_01db:
-ldloc local23
-M0000001e_IL_01dd:
-pop
+initobj System.Networking.Sockets.SocketError.AccessDenied
+M0000001e_IL_01d5:
+ldloca local20
+M0000001e_IL_01d7:
+ldloca local21
+M0000001e_IL_01d9:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AccessDenied&)
 M0000001e_IL_01de:
-M0000001e_IL_01df:
-br M0000001e_IL_01ea
-M0000001e_IL_01ea:
-ldstr "TimedOut"
+brfalse M0000001e_IL_01fb
+M0000001e_IL_01e3:
+M0000001e_IL_01e4:
+br M0000001e_IL_01ef
 M0000001e_IL_01ef:
-stloc local1
 M0000001e_IL_01f0:
-br M0000001e_IL_0296
+ldstr "AccessDenied"
 M0000001e_IL_01f5:
+stloc local1
 M0000001e_IL_01f6:
-M0000001e_IL_01f7:
-ldloc local0
-M0000001e_IL_01f8:
-stloc local24
-M0000001e_IL_01fa:
-ldloca local24
+br M0000001e_IL_02dd
+M0000001e_IL_01fb:
 M0000001e_IL_01fc:
-ldloca local25
-M0000001e_IL_01fe:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.IoFailure&)
-M0000001e_IL_0203:
-brfalse M0000001e_IL_0222
-M0000001e_IL_0208:
-ldloc local25
-M0000001e_IL_020a:
-pop
+ldloc local0
+M0000001e_IL_01fd:
+stloc local22
+M0000001e_IL_01ff:
+ldloca local23
+M0000001e_IL_0201:
+initobj System.Networking.Sockets.SocketError.TimedOut
+M0000001e_IL_0207:
+ldloca local22
+M0000001e_IL_0209:
+ldloca local23
 M0000001e_IL_020b:
-M0000001e_IL_020c:
-br M0000001e_IL_0217
-M0000001e_IL_0217:
-ldstr "IoFailure"
-M0000001e_IL_021c:
-stloc local1
-M0000001e_IL_021d:
-br M0000001e_IL_0296
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.TimedOut&)
+M0000001e_IL_0210:
+brfalse M0000001e_IL_022d
+M0000001e_IL_0215:
+M0000001e_IL_0216:
+br M0000001e_IL_0221
+M0000001e_IL_0221:
 M0000001e_IL_0222:
-M0000001e_IL_0223:
-M0000001e_IL_0224:
-ldloc local0
-M0000001e_IL_0225:
-stloc local26
+ldstr "TimedOut"
 M0000001e_IL_0227:
-ldloca local26
-M0000001e_IL_0229:
-ldloca local27
-M0000001e_IL_022b:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidOperation&)
-M0000001e_IL_0230:
-brfalse M0000001e_IL_024f
-M0000001e_IL_0235:
-ldloc local27
-M0000001e_IL_0237:
-pop
-M0000001e_IL_0238:
+stloc local1
+M0000001e_IL_0228:
+br M0000001e_IL_02dd
+M0000001e_IL_022d:
+M0000001e_IL_022e:
+ldloc local0
+M0000001e_IL_022f:
+stloc local24
+M0000001e_IL_0231:
+ldloca local25
+M0000001e_IL_0233:
+initobj System.Networking.Sockets.SocketError.IoFailure
 M0000001e_IL_0239:
-br M0000001e_IL_0244
-M0000001e_IL_0244:
-ldstr "InvalidOperation"
-M0000001e_IL_0249:
-stloc local1
-M0000001e_IL_024a:
-br M0000001e_IL_0296
-M0000001e_IL_024f:
-M0000001e_IL_0250:
-M0000001e_IL_0251:
-ldloc local0
-M0000001e_IL_0252:
-stloc local28
+ldloca local24
+M0000001e_IL_023b:
+ldloca local25
+M0000001e_IL_023d:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.IoFailure&)
+M0000001e_IL_0242:
+brfalse M0000001e_IL_025f
+M0000001e_IL_0247:
+M0000001e_IL_0248:
+br M0000001e_IL_0253
+M0000001e_IL_0253:
 M0000001e_IL_0254:
-ldloca local28
-M0000001e_IL_0256:
-ldloca local29
-M0000001e_IL_0258:
-call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AddressInUse&)
-M0000001e_IL_025d:
-brfalse M0000001e_IL_027c
-M0000001e_IL_0262:
-ldloc local29
-M0000001e_IL_0264:
-pop
-M0000001e_IL_0265:
-M0000001e_IL_0266:
-br M0000001e_IL_0271
-M0000001e_IL_0271:
-ldstr "AddressInUse"
-M0000001e_IL_0276:
+ldstr "IoFailure"
+M0000001e_IL_0259:
 stloc local1
-M0000001e_IL_0277:
-br M0000001e_IL_0296
-M0000001e_IL_027c:
-M0000001e_IL_027d:
+M0000001e_IL_025a:
+br M0000001e_IL_02dd
+M0000001e_IL_025f:
+M0000001e_IL_0260:
 ldloc local0
-M0000001e_IL_027e:
-pop
-M0000001e_IL_027f:
-ldc.i4 1
-M0000001e_IL_0280:
+M0000001e_IL_0261:
+stloc local26
+M0000001e_IL_0263:
+ldloca local27
+M0000001e_IL_0265:
+initobj System.Networking.Sockets.SocketError.InvalidOperation
+M0000001e_IL_026b:
+ldloca local26
+M0000001e_IL_026d:
+ldloca local27
+M0000001e_IL_026f:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.InvalidOperation&)
+M0000001e_IL_0274:
 brfalse M0000001e_IL_0291
+M0000001e_IL_0279:
+M0000001e_IL_027a:
+br M0000001e_IL_0285
 M0000001e_IL_0285:
 M0000001e_IL_0286:
-ldstr "Empty"
+ldstr "InvalidOperation"
 M0000001e_IL_028b:
 stloc local1
 M0000001e_IL_028c:
-br M0000001e_IL_0296
+br M0000001e_IL_02dd
 M0000001e_IL_0291:
 M0000001e_IL_0292:
+ldloc local0
 M0000001e_IL_0293:
-M0000001e_IL_0294:
+stloc local28
 M0000001e_IL_0295:
-fault "Guest program reached a terminal failure"
-M0000001e_IL_0296:
+ldloca local29
 M0000001e_IL_0297:
+initobj System.Networking.Sockets.SocketError.AddressInUse
+M0000001e_IL_029d:
+ldloca local28
+M0000001e_IL_029f:
+ldloca local29
+M0000001e_IL_02a1:
+call instance System.Networking.Sockets.SocketError::TryGetValue(System.Networking.Sockets.SocketError.AddressInUse&)
+M0000001e_IL_02a6:
+brfalse M0000001e_IL_02c3
+M0000001e_IL_02ab:
+M0000001e_IL_02ac:
+br M0000001e_IL_02b7
+M0000001e_IL_02b7:
+M0000001e_IL_02b8:
+ldstr "AddressInUse"
+M0000001e_IL_02bd:
+stloc local1
+M0000001e_IL_02be:
+br M0000001e_IL_02dd
+M0000001e_IL_02c3:
+M0000001e_IL_02c4:
+ldloc local0
+M0000001e_IL_02c5:
+pop
+M0000001e_IL_02c6:
+ldc.i4 1
+M0000001e_IL_02c7:
+brfalse M0000001e_IL_02d8
+M0000001e_IL_02cc:
+M0000001e_IL_02cd:
+ldstr "Empty"
+M0000001e_IL_02d2:
+stloc local1
+M0000001e_IL_02d3:
+br M0000001e_IL_02dd
+M0000001e_IL_02d8:
+M0000001e_IL_02d9:
+M0000001e_IL_02da:
+M0000001e_IL_02db:
+M0000001e_IL_02dc:
+fault "Guest program reached a terminal failure"
+M0000001e_IL_02dd:
+M0000001e_IL_02de:
 ldloc local1
-M0000001e_IL_0298:
+M0000001e_IL_02df:
 ret
 .end
 .method instance byref get_Value() -> System.Object

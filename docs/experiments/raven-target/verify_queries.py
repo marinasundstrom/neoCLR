@@ -24,6 +24,9 @@ with tempfile.TemporaryDirectory(prefix='neoclr-queries-') as temporary:
     command = [sys.executable, str(bridge / 'run_project.py'), str(root / 'Demo.rvnproj'),
                *runner_arguments(args), '--runtime', str(args.runtime.resolve())]
     cases = [
+        ('OfType narrowing, deferred iteration and disposal',
+         (bridge / 'samples/library-oftype.rvn').read_text(),
+         (bridge / 'samples/library-oftype.expected.txt').read_text()),
         ('Conventional operator names with inferred callbacks',
          (bridge / 'samples/library-query-names.rvn').read_text(),
          (bridge / 'samples/library-query-names.expected.txt').read_text()),
@@ -57,7 +60,7 @@ func Main() {
         ('Option and Result terminals', (bridge / 'samples/library-query-terminals.rvn').read_text(),
          'Absent\nAbsent\n0\n42\nAbsent\nEmpty\n0\nMultiple\n42\nMultiple\n42\nAbsent\nSystem.String\nNo result\n42\nAbsent\nAbsent\n0\n0\nEmpty\nMultiple\n42\n'),
         ('Array queries and reflection materialization', (bridge / 'samples/library-array-queries.rvn').read_text(),
-         'Parse\nDivide\nEquals\nToString\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
+         'Parse\nDivide\nEquals\nToString\nget_Zero\nget_One\nop_Addition\nop_Subtraction\nop_Multiply\nop_Division\nCompareTo\n0\n17\n13\n3\n17\n52\n6\n0\n0\n43\n'),
         ('Array Iterable parameters, returns and independent iterators', header + '''
 func Pass(values: int[]) -> Iterable<int> {
     return values
@@ -184,11 +187,11 @@ func Main() {
     let flags = boxes.Map((value: Box) -> bool => value.Value == 42).ToList()
     if flags[0] { WriteLine("Boolean") }
     let dates = ArrayList<Date>()
-    if Date.FromDayNumber(0) is Ok(let date) {
+    if Date.FromDayNumber(0) is .Ok(let date) {
         dates.Add(date)
     }
     WriteLine(dates.Map((value: Date) -> int => value.DayNumber).ToList()[0])
-    let visit: Func<Box, System.Void> = (value: Box) => { WriteLine(value.Value) }
+    let visit: (Box) -> System.Void = (value: Box) => { WriteLine(value.Value) }
     let units = boxes.Map(visit).ToList()
     WriteLine(units.Count)
 }
@@ -280,7 +283,7 @@ func Main() {
         assert run.returncode != 0 and 'Query iterator has no current element' in run.stderr, run.stdout + run.stderr
         assert 'Must not continue' not in run.stdout
         results[label] = 'faulted'
-    for operator in ('Take(1)', 'Skip(0)', 'Concat(values)',
+    for operator in ('OfType<int>()', 'Take(1)', 'Skip(0)', 'Concat(values)',
                      'FlatMap((value: int) -> Iterable<int> => values)'):
         for state, advance in [('before advance', ''),
                                ('after exhaustion', 'while iterator.MoveNext() {}'),
@@ -297,7 +300,7 @@ func Main() {
     let values = ArrayList<int>()
     values.Add(42)
     let query = values.Map((value: int) -> int => {
-        Result<int, Error>.Ok(value).GetErrorCase()
+        System.Fault("Query callback fault")
         return value
     })
     WriteLine("Deferred")

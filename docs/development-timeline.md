@@ -25,6 +25,37 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-09-30: Independent library backport from Function work
+
+- **Author:** asks to backport useful changes to main, specifically function type
+  syntax instead of Func annotations and the OfType extension.
+- **Assistant:** selects the source syntax migration and library-only lazy type
+  filter for a main-based checkout. Keeps nominal delegate identity/serialization,
+  comparer names and main's TypeInfo/MemberInfo surface. Adapts descriptor filtering
+  tests to those existing contracts instead of importing FunctionTypeInfo or the
+  nominal/structural reflection split.
+- **Scope:** the Function runtime, delegate removal, Function target property,
+  Function Object semantics remain on the feature
+  branch. Query iterator state uses existing boxing, type tests, casts and disposal.
+- **Outcome:** 62 query outcomes, 38 native cases and five compiled callback/async consumers pass;
+  matching bootstrap/API snapshots and 1,800 website pages are checked. The audit
+  also needed its independent generated-method caller/provenance fix from the
+  feature branch. Stale Option/union spellings and reflection expectations in the
+  query fixtures were refreshed.
+- **Author follow-up:** asks which proposals can also move to main, then directs:
+  “Yes, but keep them as not completed on main.”
+- **Assistant action:** carries Delegates evolved and Callable interface as open,
+  unimplemented proposals, links the earlier exploration and updates the proposal
+  indexes. Leaves the unfinished structural-types draft and local edits on the
+  feature branch. This does not select their full contracts for implementation.
+- **Author direction after backport review:** “The idea is that we are going to
+  put this experiment on hold and start working on Raven to enable better neoCLR
+  target support”.
+- **Assistant response:** finishes the bounded backport and records Raven target
+  support as the immediate next focus. The Function experiment stays isolated and
+  on hold; no new compiler implementation or backend choice is claimed here.
+- **Evidence:** [query contract and validation](raven-query-api.md#runtime-type-filtering--2026-09-30-backport).
+
 ## 2026-09-27 — Focus on a minimal Web API
 
 - **Author:** “We should focus on the Http story”, specifying the minimum features

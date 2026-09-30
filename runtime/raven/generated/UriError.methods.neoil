@@ -585,137 +585,137 @@ ldobj System.UriError
 M0000000a_IL_0009:
 stloc local0
 M0000000a_IL_000a:
+ldloc local0
 M0000000a_IL_000b:
-ldloc local0
-M0000000a_IL_000c:
 stloc local2
-M0000000a_IL_000d:
-ldloca local2
-M0000000a_IL_000f:
+M0000000a_IL_000c:
 ldloca local3
-M0000000a_IL_0011:
-call instance System.UriError::TryGetValue(System.UriError.InvalidFormat&)
+M0000000a_IL_000e:
+initobj System.UriError.InvalidFormat
+M0000000a_IL_0014:
+ldloca local2
 M0000000a_IL_0016:
-brfalse M0000000a_IL_0034
-M0000000a_IL_001b:
-ldloc local3
-M0000000a_IL_001c:
-pop
+ldloca local3
+M0000000a_IL_0018:
+call instance System.UriError::TryGetValue(System.UriError.InvalidFormat&)
 M0000000a_IL_001d:
-M0000000a_IL_001e:
-br M0000000a_IL_0029
-M0000000a_IL_0029:
-ldstr "InvalidFormat"
+brfalse M0000000a_IL_003a
+M0000000a_IL_0022:
+M0000000a_IL_0023:
+br M0000000a_IL_002e
 M0000000a_IL_002e:
-stloc local1
 M0000000a_IL_002f:
-br M0000000a_IL_00d4
+ldstr "InvalidFormat"
 M0000000a_IL_0034:
+stloc local1
 M0000000a_IL_0035:
-ldloc local0
-M0000000a_IL_0036:
-stloc local4
-M0000000a_IL_0038:
-ldloca local4
+br M0000000a_IL_00e9
 M0000000a_IL_003a:
-ldloca local5
+M0000000a_IL_003b:
+ldloc local0
 M0000000a_IL_003c:
-call instance System.UriError::TryGetValue(System.UriError.UnsupportedAuthority&)
-M0000000a_IL_0041:
-brfalse M0000000a_IL_0060
+stloc local4
+M0000000a_IL_003e:
+ldloca local5
+M0000000a_IL_0040:
+initobj System.UriError.UnsupportedAuthority
 M0000000a_IL_0046:
-ldloc local5
+ldloca local4
 M0000000a_IL_0048:
-pop
-M0000000a_IL_0049:
+ldloca local5
 M0000000a_IL_004a:
-br M0000000a_IL_0055
+call instance System.UriError::TryGetValue(System.UriError.UnsupportedAuthority&)
+M0000000a_IL_004f:
+brfalse M0000000a_IL_006b
+M0000000a_IL_0054:
 M0000000a_IL_0055:
-ldstr "UnsupportedAuthority"
-M0000000a_IL_005a:
-stloc local1
-M0000000a_IL_005b:
-br M0000000a_IL_00d4
+br M0000000a_IL_0060
 M0000000a_IL_0060:
-M0000000a_IL_0061:
-M0000000a_IL_0062:
-ldloc local0
-M0000000a_IL_0063:
-stloc local6
+ldstr "UnsupportedAuthority"
 M0000000a_IL_0065:
-ldloca local6
-M0000000a_IL_0067:
+stloc local1
+M0000000a_IL_0066:
+br M0000000a_IL_00e9
+M0000000a_IL_006b:
+M0000000a_IL_006c:
+ldloc local0
+M0000000a_IL_006d:
+stloc local6
+M0000000a_IL_006f:
 ldloca local7
-M0000000a_IL_0069:
-call instance System.UriError::TryGetValue(System.UriError.TooLong&)
-M0000000a_IL_006e:
-brfalse M0000000a_IL_008d
-M0000000a_IL_0073:
-ldloc local7
-M0000000a_IL_0075:
-pop
-M0000000a_IL_0076:
+M0000000a_IL_0071:
+initobj System.UriError.TooLong
 M0000000a_IL_0077:
-br M0000000a_IL_0082
-M0000000a_IL_0082:
-ldstr "TooLong"
-M0000000a_IL_0087:
-stloc local1
-M0000000a_IL_0088:
-br M0000000a_IL_00d4
-M0000000a_IL_008d:
-M0000000a_IL_008e:
-M0000000a_IL_008f:
-ldloc local0
-M0000000a_IL_0090:
-stloc local8
+ldloca local6
+M0000000a_IL_0079:
+ldloca local7
+M0000000a_IL_007b:
+call instance System.UriError::TryGetValue(System.UriError.TooLong&)
+M0000000a_IL_0080:
+brfalse M0000000a_IL_009d
+M0000000a_IL_0085:
+M0000000a_IL_0086:
+br M0000000a_IL_0091
+M0000000a_IL_0091:
 M0000000a_IL_0092:
-ldloca local8
-M0000000a_IL_0094:
-ldloca local9
-M0000000a_IL_0096:
-call instance System.UriError::TryGetValue(System.UriError.BaseNotAbsolute&)
-M0000000a_IL_009b:
-brfalse M0000000a_IL_00ba
-M0000000a_IL_00a0:
-ldloc local9
-M0000000a_IL_00a2:
-pop
-M0000000a_IL_00a3:
-M0000000a_IL_00a4:
-br M0000000a_IL_00af
-M0000000a_IL_00af:
-ldstr "BaseNotAbsolute"
-M0000000a_IL_00b4:
+ldstr "TooLong"
+M0000000a_IL_0097:
 stloc local1
-M0000000a_IL_00b5:
-br M0000000a_IL_00d4
-M0000000a_IL_00ba:
-M0000000a_IL_00bb:
+M0000000a_IL_0098:
+br M0000000a_IL_00e9
+M0000000a_IL_009d:
+M0000000a_IL_009e:
 ldloc local0
-M0000000a_IL_00bc:
-pop
-M0000000a_IL_00bd:
-ldc.i4 1
-M0000000a_IL_00be:
+M0000000a_IL_009f:
+stloc local8
+M0000000a_IL_00a1:
+ldloca local9
+M0000000a_IL_00a3:
+initobj System.UriError.BaseNotAbsolute
+M0000000a_IL_00a9:
+ldloca local8
+M0000000a_IL_00ab:
+ldloca local9
+M0000000a_IL_00ad:
+call instance System.UriError::TryGetValue(System.UriError.BaseNotAbsolute&)
+M0000000a_IL_00b2:
 brfalse M0000000a_IL_00cf
+M0000000a_IL_00b7:
+M0000000a_IL_00b8:
+br M0000000a_IL_00c3
 M0000000a_IL_00c3:
 M0000000a_IL_00c4:
-ldstr "Empty"
+ldstr "BaseNotAbsolute"
 M0000000a_IL_00c9:
 stloc local1
 M0000000a_IL_00ca:
-br M0000000a_IL_00d4
+br M0000000a_IL_00e9
 M0000000a_IL_00cf:
 M0000000a_IL_00d0:
+ldloc local0
 M0000000a_IL_00d1:
+pop
 M0000000a_IL_00d2:
+ldc.i4 1
 M0000000a_IL_00d3:
+brfalse M0000000a_IL_00e4
+M0000000a_IL_00d8:
+M0000000a_IL_00d9:
+ldstr "Empty"
+M0000000a_IL_00de:
+stloc local1
+M0000000a_IL_00df:
+br M0000000a_IL_00e9
+M0000000a_IL_00e4:
+M0000000a_IL_00e5:
+M0000000a_IL_00e6:
+M0000000a_IL_00e7:
+M0000000a_IL_00e8:
 fault "Guest program reached a terminal failure"
-M0000000a_IL_00d4:
-M0000000a_IL_00d5:
+M0000000a_IL_00e9:
+M0000000a_IL_00ea:
 ldloc local1
-M0000000a_IL_00d6:
+M0000000a_IL_00eb:
 ret
 .end
 .method instance byref get_Value() -> System.Object

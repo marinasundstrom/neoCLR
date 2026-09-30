@@ -6,6 +6,24 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-30
+
+- Backport Raven function type syntax for library callback annotations and lazy
+  `Iterable<T>.OfType<U>()` filtering from the Function feature branch. OfType skips
+  null/incompatible elements, preserves order, narrows matches without numeric
+  coercion and disposes its source on completion or explicit disposal. Keep main's
+  existing nominal Func/delegate runtime, artifact formats, comparer names and
+  TypeInfo/MemberInfo contracts. Regenerate the matching library and public API
+  reference; document and test the independent query contract. Also backport the
+  source-coverage audit fix that includes generated method-body service callers
+  and records generated slice provenance without treating it as execution evidence.
+  Refresh stale query reflection expectations and union/fault fixtures, including
+  the callback sample's Option pattern. Carry the Delegates evolved and Callable
+  interface documents as open proposals, explicitly unimplemented on main; link
+  them from the earlier exploration and website proposal overview. Record the
+  author's subsequent direction to hold the Function experiment and focus next on
+  Raven's neoCLR target support; compiler tasks remain to be selected.
+
 ### 2026-09-28
 
 - Add development System.Tuple value types with one through seven components,

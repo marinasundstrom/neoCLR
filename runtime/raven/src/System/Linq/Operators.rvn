@@ -5,11 +5,15 @@ import System.Option.*
 import System.Result.*
 
 public extension Operators<T> for Iterable<T> {
-    func Filter(predicate: System.Func<T, bool>) -> Iterable<T> {
+    func OfType<U>() -> Iterable<U> {
+        return OfTypeSequence<T, U>(self)
+    }
+
+    func Filter(predicate: (T) -> bool) -> Iterable<T> {
         return WhereSequence<T>(self, predicate)
     }
 
-    func Map<U>(selector: System.Func<T, U>) -> Iterable<U> {
+    func Map<U>(selector: (T) -> U) -> Iterable<U> {
         return SelectSequence<T, U>(self, selector)
     }
 
@@ -20,7 +24,7 @@ public extension Operators<T> for Iterable<T> {
         return result
     }
 
-    func Any(predicate: System.Func<T, bool>) -> bool {
+    func Any(predicate: (T) -> bool) -> bool {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             if predicate(iterator.Current) {
@@ -32,7 +36,7 @@ public extension Operators<T> for Iterable<T> {
         return false
     }
 
-    func All(predicate: System.Func<T, bool>) -> bool {
+    func All(predicate: (T) -> bool) -> bool {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             if !predicate(iterator.Current) {
@@ -58,7 +62,7 @@ public extension Operators<T> for Iterable<T> {
         return count
     }
 
-    func Count(predicate: System.Func<T, bool>) -> int {
+    func Count(predicate: (T) -> bool) -> int {
         let iterator = self.GetIterator()
         var count = 0
         while iterator.MoveNext() {
@@ -74,7 +78,7 @@ public extension Operators<T> for Iterable<T> {
         return count
     }
 
-    func Fold<U>(seed: U, accumulator: System.Func<U, T, U>) -> U {
+    func Fold<U>(seed: U, accumulator: (U, T) -> U) -> U {
         let iterator = self.GetIterator()
         var result = seed
         while iterator.MoveNext() {
@@ -96,7 +100,7 @@ public extension Operators<T> for Iterable<T> {
         return ConcatSequence<T>(self, second)
     }
 
-    func FlatMap<U>(selector: System.Func<T, Iterable<U>>) -> Iterable<U> {
+    func FlatMap<U>(selector: (T) -> Iterable<U>) -> Iterable<U> {
         return FlatMapSequence<T, U>(self, selector)
     }
 
@@ -148,7 +152,7 @@ public extension Operators<T> for Iterable<T> {
         return Ok(value)
     }
 
-    func First(predicate: System.Func<T, bool>) -> System.Option<T> {
+    func First(predicate: (T) -> bool) -> System.Option<T> {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             let value = iterator.Current
@@ -161,7 +165,7 @@ public extension Operators<T> for Iterable<T> {
         return None
     }
 
-    func Last(predicate: System.Func<T, bool>) -> System.Option<T> {
+    func Last(predicate: (T) -> bool) -> System.Option<T> {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             var value = iterator.Current
@@ -180,7 +184,7 @@ public extension Operators<T> for Iterable<T> {
         return None
     }
 
-    func Single(predicate: System.Func<T, bool>) -> System.Result<T, SingleError> {
+    func Single(predicate: (T) -> bool) -> System.Result<T, SingleError> {
         let iterator = self.GetIterator()
         while iterator.MoveNext() {
             let value = iterator.Current
@@ -203,9 +207,9 @@ public extension Operators<T> for Iterable<T> {
 
 internal class WhereSequence<T> : Iterable<T> {
     private field source: Iterable<T>
-    private field callback: System.Func<T, bool>
+    private field callback: (T) -> bool
 
-    init(input: Iterable<T>, action: System.Func<T, bool>) {
+    init(input: Iterable<T>, action: (T) -> bool) {
         source = input
         callback = action
     }
@@ -217,12 +221,12 @@ internal class WhereSequence<T> : Iterable<T> {
 
 internal class WhereIterator<T> : Iterator<T> {
     private field source: Iterator<T>
-    private field callback: System.Func<T, bool>
+    private field callback: (T) -> bool
     private field cached: T[]
     private field active: bool
     private field finished: bool
 
-    init(input: Iterator<T>, action: System.Func<T, bool>) {
+    init(input: Iterator<T>, action: (T) -> bool) {
         source = input
         callback = action
         cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(1)
@@ -268,11 +272,73 @@ internal class WhereIterator<T> : Iterator<T> {
 }
 
 
+internal class OfTypeSequence<T, U> : Iterable<U> {
+    private field source: Iterable<T>
+
+    init(input: Iterable<T>) {
+        source = input
+    }
+
+    func GetIterator() -> Iterator<U> {
+        return OfTypeIterator<T, U>(source.GetIterator())
+    }
+}
+
+internal class OfTypeIterator<T, U> : Iterator<U> {
+    private field source: Iterator<T>
+    private field cached: U[]
+    private field active: bool
+    private field finished: bool
+
+    init(input: Iterator<T>) {
+        source = input
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
+        active = false
+        finished = false
+    }
+
+    func MoveNext() -> bool {
+        if finished {
+            return false
+        }
+        active = false
+        while source.MoveNext() {
+            let value: System.Object? = source.Current
+            if value is U {
+                cached[0] = (U)value!
+                active = true
+                return true
+            }
+        }
+        Dispose()
+        return false
+    }
+
+    val Current: U {
+        get {
+            if !active {
+                System.Fault("Query iterator has no current element")
+            }
+            return cached[0]
+        }
+    }
+
+    func Dispose() {
+        if finished {
+            return
+        }
+        finished = true
+        active = false
+        cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(0)
+        source.Dispose()
+    }
+}
+
 internal class SelectSequence<T, U> : Iterable<U> {
     private field source: Iterable<T>
-    private field callback: System.Func<T, U>
+    private field callback: (T) -> U
 
-    init(input: Iterable<T>, action: System.Func<T, U>) {
+    init(input: Iterable<T>, action: (T) -> U) {
         source = input
         callback = action
     }
@@ -284,12 +350,12 @@ internal class SelectSequence<T, U> : Iterable<U> {
 
 internal class SelectIterator<T, U> : Iterator<U> {
     private field source: Iterator<T>
-    private field callback: System.Func<T, U>
+    private field callback: (T) -> U
     private field cached: U[]
     private field active: bool
     private field finished: bool
 
-    init(input: Iterator<T>, action: System.Func<T, U>) {
+    init(input: Iterator<T>, action: (T) -> U) {
         source = input
         callback = action
         cached = System.Runtime.CompilerServices.CheckedStorage.Reserve<U>(1)
@@ -564,9 +630,9 @@ internal class ConcatIterator<T> : Iterator<T> {
 
 internal class FlatMapSequence<T, U> : Iterable<U> {
     private field source: Iterable<T>
-    private field callback: System.Func<T, Iterable<U>>
+    private field callback: (T) -> Iterable<U>
 
-    init(input: Iterable<T>, selector: System.Func<T, Iterable<U>>) {
+    init(input: Iterable<T>, selector: (T) -> Iterable<U>) {
         source = input
         callback = selector
     }
@@ -578,14 +644,14 @@ internal class FlatMapSequence<T, U> : Iterable<U> {
 
 internal class FlatMapIterator<T, U> : Iterator<U> {
     private field input: Iterable<T>
-    private field callback: System.Func<T, Iterable<U>>
+    private field callback: (T) -> Iterable<U>
     private field outer: Iterator<T>[]
     private field inner: Iterator<U>[]
     private field cached: U[]
     private field active: bool
     private field finished: bool
 
-    init(source: Iterable<T>, selector: System.Func<T, Iterable<U>>) {
+    init(source: Iterable<T>, selector: (T) -> Iterable<U>) {
         input = source
         callback = selector
         outer = System.Runtime.CompilerServices.CheckedStorage.Reserve<Iterator<T>>(0)

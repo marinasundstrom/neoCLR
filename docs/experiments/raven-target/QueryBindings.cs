@@ -6,6 +6,7 @@ static class QueryBindings
     public const string Declarations = """
         namespace Linq {
             public static class Operators {
+                public static Collections.Iterable<U> OfType<T,U>(this Collections.Iterable<T> self) => default;
                 public static Collections.Iterable<T> Filter<T>(this Collections.Iterable<T> self, Func<T, bool> predicate) => default;
                 public static Collections.Iterable<U> Map<T,U>(this Collections.Iterable<T> self, Func<T,U> selector) => default;
                 public static bool Any<T>(this Collections.Iterable<T> self) => default;
@@ -37,13 +38,14 @@ static class QueryBindings
             || definition.GenericParameters.Any(p => p.HasConstraints || p.Attributes != GenericParameterAttributes.NonVariant))
             throw new InvalidDataException("Unsupported query signature.");
         var types = method.GenericArguments.Select(GenericUnionBindings.Type).ToArray();
-        var arity = reference.Name is "Map" or "FlatMap" or "Fold" ? 2 : 1;
+        var arity = reference.Name is "Map" or "FlatMap" or "Fold" or "OfType" ? 2 : 1;
         if (types.Length != arity || types.Any(t => t is null))
             throw new InvalidDataException("Unsupported query type arguments.");
         var source = $"System.Collections.Iterable<{types[0]}>";
         var terminalArguments = definition.Parameters.Count == 2
             ? new[] { source, $"System.Func<{types[0]},Boolean>" } : new[] { source };
         var (expected, returns) = reference.Name switch {
+            "OfType" => (new[] { source }, $"System.Collections.Iterable<{types[1]}>"),
             "Filter" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, source),
             "Map" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
             "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),

@@ -1999,7 +1999,7 @@ call instance System.UriError::ToString()
 M00000018_IL_003f:
 stloc local1
 M00000018_IL_0040:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_0045:
 M00000018_IL_0046:
 ldloc local0
@@ -2034,7 +2034,7 @@ call instance System.Networking.DnsError::ToString()
 M00000018_IL_007b:
 stloc local1
 M00000018_IL_007c:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_0081:
 M00000018_IL_0082:
 ldloc local0
@@ -2069,7 +2069,7 @@ call instance System.Networking.Sockets.SocketError::ToString()
 M00000018_IL_00b8:
 stloc local1
 M00000018_IL_00b9:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_00be:
 M00000018_IL_00bf:
 ldloc local0
@@ -2104,7 +2104,7 @@ call instance System.IO.StreamError::ToString()
 M00000018_IL_00f5:
 stloc local1
 M00000018_IL_00f6:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_00fb:
 M00000018_IL_00fc:
 ldloc local0
@@ -2150,7 +2150,7 @@ call System.String::Concat(String,String)
 M00000018_IL_0141:
 stloc local1
 M00000018_IL_0142:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_0147:
 M00000018_IL_0148:
 ldloc local0
@@ -2183,7 +2183,7 @@ ldloc local7
 M00000018_IL_0179:
 stloc local1
 M00000018_IL_017a:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_017f:
 M00000018_IL_0180:
 ldloc local0
@@ -2216,7 +2216,7 @@ ldloc local8
 M00000018_IL_01b1:
 stloc local1
 M00000018_IL_01b2:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_01b7:
 M00000018_IL_01b8:
 ldloc local0
@@ -2249,7 +2249,7 @@ ldloc local9
 M00000018_IL_01e9:
 stloc local1
 M00000018_IL_01ea:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_01ef:
 M00000018_IL_01f0:
 ldloc local0
@@ -2282,93 +2282,93 @@ ldloc local10
 M00000018_IL_0221:
 stloc local1
 M00000018_IL_0222:
-br M00000018_IL_02a6
+br M00000018_IL_02ab
 M00000018_IL_0227:
 M00000018_IL_0228:
+ldloc local0
 M00000018_IL_0229:
-ldloc local0
-M00000018_IL_022a:
 stloc local31
-M00000018_IL_022c:
-ldloca local31
-M00000018_IL_022e:
+M00000018_IL_022b:
 ldloca local32
-M00000018_IL_0230:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
+M00000018_IL_022d:
+initobj System.Web.Http.HttpError.TimedOut
+M00000018_IL_0233:
+ldloca local31
 M00000018_IL_0235:
-brfalse M00000018_IL_0254
-M00000018_IL_023a:
-ldloc local32
+ldloca local32
+M00000018_IL_0237:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.TimedOut&)
 M00000018_IL_023c:
-pop
-M00000018_IL_023d:
-M00000018_IL_023e:
-br M00000018_IL_0249
-M00000018_IL_0249:
-ldstr "Request deadline exceeded"
+brfalse M00000018_IL_0259
+M00000018_IL_0241:
+M00000018_IL_0242:
+br M00000018_IL_024d
+M00000018_IL_024d:
 M00000018_IL_024e:
+ldstr "Request deadline exceeded"
+M00000018_IL_0253:
 stloc local1
-M00000018_IL_024f:
-br M00000018_IL_02a6
 M00000018_IL_0254:
-M00000018_IL_0255:
-ldloc local0
-M00000018_IL_0256:
-stloc local33
-M00000018_IL_0258:
-ldloca local34
+br M00000018_IL_02ab
+M00000018_IL_0259:
 M00000018_IL_025a:
-initobj System.Web.Http.HttpError.Handler
-M00000018_IL_0260:
-ldloca local33
-M00000018_IL_0262:
-ldloca local34
-M00000018_IL_0264:
-call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
-M00000018_IL_0269:
-brfalse M00000018_IL_028c
-M00000018_IL_026e:
-ldloca local34
-M00000018_IL_0270:
-call instance System.Web.Http.HttpError.Handler::get_Message()
-M00000018_IL_0275:
-stloc local11
-M00000018_IL_0277:
-M00000018_IL_0278:
-br M00000018_IL_0283
-M00000018_IL_0283:
-M00000018_IL_0284:
-ldloc local11
-M00000018_IL_0286:
-stloc local1
-M00000018_IL_0287:
-br M00000018_IL_02a6
-M00000018_IL_028c:
-M00000018_IL_028d:
 ldloc local0
-M00000018_IL_028e:
-pop
-M00000018_IL_028f:
-ldc.i4 1
-M00000018_IL_0290:
-brfalse M00000018_IL_02a1
-M00000018_IL_0295:
-M00000018_IL_0296:
-ldstr "Empty"
-M00000018_IL_029b:
+M00000018_IL_025b:
+stloc local33
+M00000018_IL_025d:
+ldloca local34
+M00000018_IL_025f:
+initobj System.Web.Http.HttpError.Handler
+M00000018_IL_0265:
+ldloca local33
+M00000018_IL_0267:
+ldloca local34
+M00000018_IL_0269:
+call instance System.Web.Http.HttpError::TryGetValue(System.Web.Http.HttpError.Handler&)
+M00000018_IL_026e:
+brfalse M00000018_IL_0291
+M00000018_IL_0273:
+ldloca local34
+M00000018_IL_0275:
+call instance System.Web.Http.HttpError.Handler::get_Message()
+M00000018_IL_027a:
+stloc local11
+M00000018_IL_027c:
+M00000018_IL_027d:
+br M00000018_IL_0288
+M00000018_IL_0288:
+M00000018_IL_0289:
+ldloc local11
+M00000018_IL_028b:
 stloc local1
-M00000018_IL_029c:
-br M00000018_IL_02a6
+M00000018_IL_028c:
+br M00000018_IL_02ab
+M00000018_IL_0291:
+M00000018_IL_0292:
+ldloc local0
+M00000018_IL_0293:
+pop
+M00000018_IL_0294:
+ldc.i4 1
+M00000018_IL_0295:
+brfalse M00000018_IL_02a6
+M00000018_IL_029a:
+M00000018_IL_029b:
+ldstr "Empty"
+M00000018_IL_02a0:
+stloc local1
 M00000018_IL_02a1:
-M00000018_IL_02a2:
-M00000018_IL_02a3:
-M00000018_IL_02a4:
-M00000018_IL_02a5:
-fault "Guest program reached a terminal failure"
+br M00000018_IL_02ab
 M00000018_IL_02a6:
 M00000018_IL_02a7:
-ldloc local1
 M00000018_IL_02a8:
+M00000018_IL_02a9:
+M00000018_IL_02aa:
+fault "Guest program reached a terminal failure"
+M00000018_IL_02ab:
+M00000018_IL_02ac:
+ldloc local1
+M00000018_IL_02ad:
 ret
 .end
 .method instance byref get_Value() -> System.Object

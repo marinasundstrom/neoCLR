@@ -258,12 +258,12 @@ public class HttpServer {
     }
 
     /// Handles one accepted context and sends the callback's buffered response.
-    func ServeOne(handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>) -> Task<Result<System.Void, HttpError>> {
+    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>) -> Task<Result<System.Void, HttpError>> {
         return ServeOne(handler, CancellationToken.None)
     }
 
     /// Cancellation ends this exchange, including an outstanding handler wait.
-    func ServeOne(handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
+    func ServeOne(handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, cancellationToken: CancellationToken) -> Task<Result<System.Void, HttpError>> {
         return HttpServeOperation(self, handler, cancellationToken).Start()
     }
 
@@ -680,7 +680,7 @@ internal class HttpServerExchange {
 
 internal class HttpServeOperation {
     private var server: HttpServer
-    private var handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>
+    private var handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>
     private var token: CancellationToken
     private var source: Promise<Result<System.Void, HttpError>> = Promise<Result<System.Void, HttpError>>()
     private var context: Option<HttpContext> = None()
@@ -690,7 +690,7 @@ internal class HttpServeOperation {
     private var callerRegistration: CancellationRegistration? = null
     private var shutdownRegistration: CancellationRegistration? = null
 
-    internal init(server: HttpServer, handler: Func<HttpRequest, Task<Result<HttpResponse, HttpError>>>, token: CancellationToken) {
+    internal init(server: HttpServer, handler: (HttpRequest) -> Task<Result<HttpResponse, HttpError>>, token: CancellationToken) {
         self.server = server
         self.handler = handler
         self.token = token

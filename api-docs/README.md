@@ -31,6 +31,11 @@ extension signature `static func self`; both overloads and their XML description
 remain present. The [manual reflection guide](reflection.md)
 provides the intended Invoke spelling. This renderer naming limitation adds no exclusion.
 
+Development adds the lazy `System.Linq.Operators.OfType<T, U>` extension, written
+`source.OfType<U>()`. Its XML member entry and matching reference document filtering,
+ordering, disposal and the existing Object conversion limits. Function syntax in
+Raven library callbacks remains backed by main's nominal Func metadata contracts.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not

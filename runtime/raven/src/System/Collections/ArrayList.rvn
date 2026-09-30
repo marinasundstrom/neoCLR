@@ -79,7 +79,7 @@ public open class ArrayList<T> : List<T> {
         return ArrayListIterator<T>(data, count)
     }
 
-    func Find(@match: System.Func<T, bool>) -> System.Option<T> {
+    func Find(@match: (T) -> bool) -> System.Option<T> {
         let buffer = data
         let extent = count
         var index = 0
@@ -93,7 +93,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindLast(@match: System.Func<T, bool>) -> System.Option<T> {
+    func FindLast(@match: (T) -> bool) -> System.Option<T> {
         let buffer = data
         let extent = count
         var index = extent - 1
@@ -107,7 +107,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindIndex(@match: System.Func<T, bool>) -> System.Option<int> {
+    func FindIndex(@match: (T) -> bool) -> System.Option<int> {
         let buffer = data
         let extent = count
         var index = 0
@@ -121,7 +121,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func FindLastIndex(@match: System.Func<T, bool>) -> System.Option<int> {
+    func FindLastIndex(@match: (T) -> bool) -> System.Option<int> {
         let buffer = data
         let extent = count
         var index = extent - 1
@@ -135,7 +135,7 @@ public open class ArrayList<T> : List<T> {
         return None
     }
 
-    func Exists(@match: System.Func<T, bool>) -> bool {
+    func Exists(@match: (T) -> bool) -> bool {
         let buffer = data
         let extent = count
         var index = 0
@@ -148,7 +148,7 @@ public open class ArrayList<T> : List<T> {
         return false
     }
 
-    func TrueForAll(@match: System.Func<T, bool>) -> bool {
+    func TrueForAll(@match: (T) -> bool) -> bool {
         let buffer = data
         let extent = count
         var index = 0
@@ -161,7 +161,7 @@ public open class ArrayList<T> : List<T> {
         return true
     }
 
-    func FindAll(@match: System.Func<T, bool>) -> ArrayList<T> {
+    func FindAll(@match: (T) -> bool) -> ArrayList<T> {
         let buffer = data
         let extent = count
         let result = ArrayList<T>()
