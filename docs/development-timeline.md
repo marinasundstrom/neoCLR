@@ -9450,3 +9450,24 @@ remote synchronization does not publish a runtime bundle or website.
   extraction. Full native System import, class-library compilation and general signature/
   instruction support are not implied by the initial integration. See the
   [implemented boundary and focused validation](raven-cli-bridge.md#shared-emission-pipeline--2026-09-30).
+
+### Follow-up — actual body-lowering reuse
+
+- **Author:** Asked to continue broader abstraction of .NET codegen and implement neoCLR equivalents.
+- **Assistant action:** Extracted the existing native linear-body lowering into an immutable
+  compiler model, then connected both the existing .NET method generator and the native
+  metadata builder through internal adapters. Native call identity and explicit Console
+  permissions remain adapter-owned. Unsupported .NET bodies and debug/PDB output keep
+  the existing general codegen path. No independent replacement of the whole .NET backend
+  was introduced.
+- **Scope:** Method-body reuse is implemented; type/signature builder unification is still
+  open. The same-compilation execution probe and C# fallback/PDB checks are recorded in
+  [the integration documentation](raven-cli-bridge.md#shared-linear-body-lowering-and-backend-method-builders--2026-09-30).
+
+- **Author clarification:** Defer metadata loading and its common .NET/neoCLR abstraction
+  to a future slice; avoid big workarounds and fix what is necessary for the end-to-end case.
+- **Observed outcome:** The same compilation prints Shared Hello and returns 42 on .NET
+  and neoCLR; the native compiler-command Hello/helper case also passes. An additional
+  translated-System probe passes API binding/execution but the driver rejects a host-bound
+  Math call with NEOMETA001. No importer change or assembly-identity workaround was made.
+  That issue remains explicit for the author-directed metadata-loading follow-up.

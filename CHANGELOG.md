@@ -21,6 +21,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   pipeline; rvnc and compatibility APIs reuse compiler setup/contract validation.
   Default .NET emission remains unchanged. Native debug output and CLI core rewriting
   reject before output; deeper shared type/method builder abstractions remain pending.
+  Extract shared Raven linear-body lowering consumed by .NET and native method-builder
+  adapters. Eligible release .NET methods reuse it; general/debug/PDB paths are retained.
+  A single compilation prints and returns 42 on both runtimes. Type/signature builder,
+  generic and control-flow abstractions remain open; the native source subset is unchanged.
+  Record a translated-System driver type-selection failure (host CoreLib collision);
+  direct API execution passes. Metadata loading is an author-deferred follow-up.
   Add MethodBuilder.Emit overloads for supported logical opcodes, Int32 operands and
   builder/imported/native call references. Helpers delegate to the same validated path;
   invalid opcode/operand pairs reject before mutation. Raven's native emitter consumes

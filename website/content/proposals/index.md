@@ -90,7 +90,10 @@ System now has a first explicit static Int32 callable import: Math.Min binds fro
 translated metadata and executes against that binary library. Full System symbol loading
 remains pending; the command still uses host primitives for binding. Native emission now
 uses Raven’s shared Compilation.Emit validation pipeline through an explicit backend;
-shared type/method builder abstractions remain a follow-up.
+shared linear-body lowering now feeds .NET and native method-builder adapters.
+Type/signature builders and broader instruction coverage remain follow-ups.
+The selected-System driver still has a host/projection type collision to resolve; the
+same-compilation Hello/helper case is the current codegen acceptance target.
 The metadata builder also exposes typed opcode Emit overloads for its current linear
 subset, consumed by Raven; broader instructions and editable bodies remain future work.
 Namespaced static library types also retain their identity through compiler reimport
