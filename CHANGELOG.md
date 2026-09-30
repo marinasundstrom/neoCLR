@@ -114,7 +114,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   ownership and conflicting module/contract checks guard PE/native emission.
   The Raven probe no longer requires the dependency builder graph. C# contracts
   and native top-level/Raven consumers pass, returning 42; native symbol loading
-  and production target installation remain pending.
+  and production target installation remain pending. The Raven consumer now uses an
+  optional compiler-owned native emitter API with explicit dependency bindings,
+  source-located diagnostics and validation before output writes. C# contract checks
+  and neoCLR execution to 42 cover the extracted adapter; the metadata project stays
+  independent and ordinary .NET compilation remains unchanged.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

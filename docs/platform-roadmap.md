@@ -438,3 +438,8 @@ Read-only callable import checkpoint (2026-09-30): Raven emission now consumes a
 metadata definition snapshot without the producer builder graph. C# and Raven native
 consumers return 42; [integration scope](raven-cli-bridge.md#read-only-call-imports--2026-09-30)
 still excludes native symbol loading and production target registration.
+
+Compiler adapter checkpoint (2026-09-30): the Raven consumer now calls an optional
+compiler-owned emitter API with explicit contracts and diagnostics. Native verification
+still returns 42; [integration scope](raven-cli-bridge.md#compiler-owned-native-adapter-checkpoint--2026-09-30)
+retains the .NET input bootstrap and leaves native loading/target composition pending.
