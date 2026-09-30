@@ -85,7 +85,8 @@ public sealed partial class MethodBuilder
             switch (instruction.Op)
             {
                 case "label": case "console.line": break;
-                case "constant": case "argument": stack.Add(false); break;
+                case "constant": stack.Add(false); break;
+                case "argument": stack.Add(Signature.ParameterTypes[instruction.Value] == PrimitiveType.Boolean); break;
                 case "boolean": stack.Add(true); break;
                 case "local.load":
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
@@ -97,8 +98,8 @@ public sealed partial class MethodBuilder
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(true); break;
                 case "less": case "greater": Pop(); Pop(); stack.Add(true); break;
                 case "call":
-                    for (int i = 0; i < instruction.Target!.ParameterCount; i++) Pop();
-                    if (instruction.Target.ReturnsValue) stack.Add(false);
+                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i] == PrimitiveType.Boolean);
+                    if (instruction.Target.ReturnsValue) stack.Add(instruction.Target.Signature.ReturnType == PrimitiveType.Boolean);
                     break;
                 case "native.call":
                     if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out var count)) throw new InvalidDataException("invalid native call");
@@ -107,7 +108,7 @@ public sealed partial class MethodBuilder
                 case "branch.true": case "branch.false": Pop(true); break;
                 case "branch": break;
                 case "return":
-                    if (ReturnsValue) Pop();
+                    if (ReturnsValue) Pop(Signature.ReturnType == PrimitiveType.Boolean);
                     if (stack.Count != 0) throw new InvalidDataException("invalid return stack");
                     continue;
                 default: throw new InvalidDataException("unsupported instruction");

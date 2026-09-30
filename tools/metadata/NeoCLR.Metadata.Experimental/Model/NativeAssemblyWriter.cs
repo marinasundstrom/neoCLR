@@ -46,7 +46,7 @@ public sealed partial class AssemblyBuilder
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.Name);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
-        static string[] Parameters(MethodBuilder method) => Enumerable.Repeat("Int32", method.ParameterCount).ToArray();
+        static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = true }
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = "Public", parameter_tokens = new int[method.ParameterCount] };
@@ -116,7 +116,7 @@ public sealed partial class AssemblyBuilder
             functions = methods.Select((method, index) => new {
                 name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
                 locals = Enumerable.Repeat("Int32", method.Locals.Count).ToArray(),
-                returns = method.ReturnsValue ? "Int32" : "Void", no_result = !method.ReturnsValue,
+                returns = method.Signature.ReturnType.ToString(), no_result = !method.ReturnsValue,
                 origin = Origin(method.Name, 0x06000001 + index, method), body = NativeBody(method)
             }).ToArray()
         };

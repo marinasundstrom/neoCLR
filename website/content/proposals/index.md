@@ -65,7 +65,7 @@ An isolated experimental codec now exercises framing, structural signatures and
 synthesized member descriptions.
 A bounded PE container probe retains ordinary metadata readability, but standard
 rewriting can discard the extension. A development .NET model now emits a bounded
-Int32 subset as PE or existing native assemblies. Native output includes functions
+primitive Int32/Boolean subset as PE or existing native assemblies. Native output includes functions
 outside types and has a direct neoCLR load/run test. The PE reader recovers callable
 declarations and resolves the emitted method-reference subset through explicit
 dependencies, with documented signature limits. A first opt-in Raven consumer now
@@ -192,3 +192,7 @@ portability and testing obligations. No replacement backend is selected.
 Concrete application scenarios, alternative designs and counterexamples help evaluate
 proposals. [Discuss on GitHub](https://github.com/marinasundstrom/neoCLR/issues)
 or browse the [original proposals](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/README.md).
+
+Development on the metadata branches also preserves Boolean parameters/results across
+Raven declarations, native reference projections and imported overloads. Int32/no-result
+entrypoints and the existing System bootstrap limits remain unchanged.

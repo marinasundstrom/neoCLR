@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An immutable callable reference imported into one output assembly.</summary>
-/// <remarks>Supports static Int32 signatures only. Import does not load code or verify access or native dependency availability.</remarks>
+/// <remarks>Supports static primitive signatures only. Import does not load code or verify access or native dependency availability.</remarks>
 public sealed class ImportedMethodReference
 {
     internal ImportedMethodReference(AssemblyBuilder owner, MethodBuilder target) { Owner = owner; Target = target; }
@@ -16,10 +16,12 @@ public sealed class ImportedMethodReference
     public string? DeclaringTypeName => Target.DeclaringType?.Name;
     /// <summary>Gets the method name.</summary>
     public string Name => Target.Name;
-    /// <summary>Gets the number of Int32 parameters.</summary>
+    /// <summary>Gets the number of parameters.</summary>
     public int ParameterCount => Target.ParameterCount;
-    /// <summary>Gets whether the result is Int32 rather than absent.</summary>
+    /// <summary>Gets whether a result is present.</summary>
     public bool ReturnsValue => Target.ReturnsValue;
+    /// <summary>Gets the immutable imported primitive signature.</summary>
+    public PrimitiveMethodSignature Signature => Target.Signature;
 }
 
 public sealed partial class AssemblyBuilder
@@ -28,7 +30,7 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<AssemblyIdentity, (Guid Mvid, AssemblyBuilder Graph)> importedGraphs = [];
 
     /// <summary>Imports an immutable callable contract from a read-only definition.</summary>
-    /// <param name="definition">External static nongeneric Int32 method or global function.</param>
+    /// <param name="definition">External static nongeneric primitive method or global function.</param>
     /// <param name="dependencyCoreLibrary">Host-asserted dependency core contract; must equal this output's explicit core identity.</param>
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -44,7 +46,7 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
             throw new InvalidDataException("unsupported external assembly identity");
-        if (!definition.TryGetStaticInt32Signature(out var count, out var result) ||
+        if (!definition.TryGetStaticPrimitiveSignature(out var signature) ||
             type is { GenericArity: not 0 } || type?.DeclaringType is not null)
             throw new InvalidDataException("unsupported imported method signature or owner");
         if (!importedGraphs.TryGetValue(identity, out var imported))
@@ -58,7 +60,7 @@ public sealed partial class AssemblyBuilder
         if (importedReferences.TryGetValue(key, out var existing))
         {
             if (existing.Name != definition.Name || existing.Namespace != type?.Namespace || existing.DeclaringTypeName != type?.Name ||
-                existing.ParameterCount != count || existing.ReturnsValue != result)
+                !existing.Signature.Matches(signature!))
                 throw new InvalidDataException("conflicting imported method contract");
             return existing;
         }
@@ -66,7 +68,7 @@ public sealed partial class AssemblyBuilder
         // Private reference-only nodes reuse both backends' existing exact-identity call encoding.
         // No producer bodies or mutable definition graph are retained or exposed.
         var owner = type is null ? null : new TypeBuilder(imported.Graph, type.Namespace, type.Name);
-        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, definition.Name, count, result));
+        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, definition.Name, signature!));
         importedReferences.Add(key, reference);
         return reference;
     }

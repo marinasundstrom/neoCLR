@@ -10,7 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName);
-    private sealed record MethodRow(string Name, int Owner, int Count, bool ReturnsValue);
+    private sealed record MethodRow(string Name, int Owner, PrimitiveMethodSignature Signature);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, AssemblyIdentity[] references)
@@ -78,7 +78,7 @@ public sealed class NativeAssemblyDefinition
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
             var counts = new Dictionary<int, int>();
-            var seenMethods = new HashSet<(int Owner, string Name, int Count)>();
+            var seenMethods = new HashSet<(int Owner, string Name, string Parameters)>();
             foreach (var method in Array(root, "functions", 4096))
             {
                 if (method.TryGetProperty("locals", out _))
@@ -97,9 +97,11 @@ public sealed class NativeAssemblyDefinition
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 if (method.TryGetProperty("locals", out _))
                     Require(Array(method, "locals", 256).All(l => l.GetString() == "Int32"), "unsupported native local");
-                var parameters = Array(method, "parameters", 256); Require(parameters.All(p => p.GetString() == "Int32"), "unsupported native parameter");
+                var parameters = Array(method, "parameters", 256);
+                var parameterTypes = parameters.Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
-                Require(Text(method, "returns") == (noResult ? "Void" : "Int32"), "unsupported native result");
+                var resultType = ReadPrimitive(Text(method, "returns"), true);
+                Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 var expectedName = (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(name));
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
@@ -107,14 +109,14 @@ public sealed class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
-                Require(seenMethods.Add((ownerIndex, name, parameters.Length)), "duplicate native signature");
+                Require(seenMethods.Add((ownerIndex, name, string.Join(",", parameterTypes))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(name, ownerIndex, parameters.Length, !noResult)); methodNames.Add(expectedName);
+                methods.Add(new(name, ownerIndex, new(resultType, parameterTypes))); methodNames.Add(expectedName);
             }
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Count == 0).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType != PrimitiveType.Boolean).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());
@@ -137,12 +139,20 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => graph.AddType(t.Namespace, t.Name)).ToArray();
         foreach (var method in methods)
         {
-            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Count, method.ReturnsValue) : owners[method.Owner].AddMethod(method.Name, method.Count, method.ReturnsValue);
-            if (method.ReturnsValue) output.LoadConstant(0);
+            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature) : owners[method.Owner].AddMethod(method.Name, method.Signature);
+            if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
+            else if (method.Signature.ReturnType == PrimitiveType.Boolean) output.Emit(OpCode.Ldc_Bool, false);
             output.Return();
         }
         return graph.WriteReferenceImage();
     }
+    private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
+    {
+        "Int32" => PrimitiveType.Int32,
+        "Boolean" => PrimitiveType.Boolean,
+        "Void" when allowVoid => PrimitiveType.Void,
+        _ => throw new InvalidDataException("unsupported native signature type")
+    };
     private static void CheckName(string name)
     {
         Require(!string.IsNullOrWhiteSpace(name) && !name.Any(char.IsControl), "invalid native descriptive name");

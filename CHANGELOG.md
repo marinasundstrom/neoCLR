@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add immutable Int32/Boolean/no-result primitive signatures to the experimental
+  metadata API, with typed declarations, imports, MemberRef resolution and native
+  reference projections. Keep Int32-only convenience/recognition contracts and
+  parameterless Int32/no-result entrypoints. Raven shares these signatures across
+  both backends, including imported overloads; older experimental readers may reject
+  Boolean declarations.
+
 - Add Int32 local declarations, method-owned local handles and raw Ldloc/Stloc operands
   to the experimental metadata API, with CLI local signatures and native local lists.
   Reject bad owners/indices, stack underflow and loads before stores. ClearBody retains

@@ -54,6 +54,26 @@ public sealed class MethodDefinition
     {
         parameterCount = 0;
         returnsValue = false;
+        if (!TryDecodeStaticPrimitiveSignature(signature, out var decoded) ||
+            decoded!.ReturnType == PrimitiveType.Boolean ||
+            decoded.ParameterTypes.Any(p => p != PrimitiveType.Int32)) return false;
+        parameterCount = decoded.ParameterTypes.Count;
+        returnsValue = decoded.ReturnType != PrimitiveType.Void;
+        return true;
+    }
+
+    /// <summary>Recognizes static nongeneric Int32/Boolean parameters and Int32/Boolean/void results.</summary>
+    /// <param name="decoded">An owned immutable signature on success; otherwise null.</param>
+    /// <returns>False for unsupported or malformed encodings; does not verify method bodies.</returns>
+    public bool TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded)
+    {
+        decoded = null;
+        return IsStatic && GenericArity == 0 && TryDecodeStaticPrimitiveSignature(signature, out decoded);
+    }
+
+    internal static bool TryDecodeStaticPrimitiveSignature(ReadOnlySpan<byte> signature, out PrimitiveMethodSignature? decoded)
+    {
+        decoded = null;
         if (signature.Length < 3 || signature[0] != 0) return false;
         int position = 1;
         int count = signature[position++];
@@ -65,10 +85,15 @@ public sealed class MethodDefinition
         }
         if (count > 256 || position >= signature.Length) return false;
         byte result = signature[position++];
-        if (result is not (0x01 or 0x08) || signature.Length - position != count) return false;
-        for (; position < signature.Length; position++) if (signature[position] != 0x08) return false;
-        parameterCount = count;
-        returnsValue = result == 0x08;
+        if (result is not (0x01 or 0x02 or 0x08) || signature.Length - position != count) return false;
+        var parameters = new PrimitiveType[count];
+        for (int i = 0; i < count; i++)
+        {
+            byte type = signature[position++];
+            if (type is not (0x02 or 0x08)) return false;
+            parameters[i] = type == 0x02 ? PrimitiveType.Boolean : PrimitiveType.Int32;
+        }
+        decoded = new(result == 0x01 ? PrimitiveType.Void : result == 0x02 ? PrimitiveType.Boolean : PrimitiveType.Int32, parameters);
         return true;
     }
 }

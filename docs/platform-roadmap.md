@@ -23,7 +23,8 @@ builder creation. Shared public nongeneric static-type plans now drive backend t
 builders; broader type/field references and full declaration traversal remain next,
 and the first paired body capability now supports initialized Int32 locals/assignments.
 Comparisons (including negated forms), if/else and lowered loops with break/continue now execute on both runtimes;
-broader signatures and type/field references remain next;
+Int32/Boolean/no-result signatures now flow through both backends, native imports and
+reference projections; conversions and general type/field references remain next;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in
@@ -34,7 +35,7 @@ executes the same Int32 and Unit Hello/helper compilations on both runtimes, inc
 assembly functions, explicit/implicit returns and an empty Unit entry. Supported callable
 signatures and declaration-builder contracts are now shared too; concrete adapters preserve
 CLI type-method and native assembly-function ownership. Type/signature builders, generics and
-control flow remain subsequent boundaries. The author asks to avoid large workarounds
+general member bodies remain subsequent boundaries. The author asks to avoid large workarounds
 and prioritize the Hello/helper end-to-end case. Shared metadata loading is deferred;
 the optional System driver has exposed a host/projection type collision and explicitly
 rejects that call. Its direct API case still passes; driver import is not yet reliable. [Integration boundary](raven-cli-bridge.md#shared-emission-pipeline--2026-09-30).

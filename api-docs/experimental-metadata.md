@@ -8,7 +8,7 @@ loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structu
 and derives structural identities/member contracts against an explicitly supplied host catalog.
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
 explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
-implemented. A controlled static-Int32 builder writes ordinary CLI PE and native
+implemented. A controlled static-primitive builder writes ordinary CLI PE and native
 format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading now uses a transitional native execution section
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Boolean parameters and results.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
@@ -804,6 +805,7 @@ public sealed class MethodDefinition
     public bool IsStatic { get; }
     public byte[] GetSignature();
     public bool TryGetStaticInt32Signature(out int parameterCount, out bool returnsValue);
+    public bool TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded);
 }
 ```
 
@@ -820,7 +822,7 @@ original input bytes can be modified without changing the snapshot. No body, par
 names, custom attributes, constraints or general signature type resolution is provided
 by MethodDefinition. Use MemberReference for the supported reference-resolution subset.
 
-TryGetStaticInt32Signature recognizes only the current writer contract: static,
+TryGetStaticInt32Signature recognizes the original Int32-only writer contract: static,
 nongeneric, default calling convention, 0–256 Int32 parameters, and Int32 or absent
 CLI void result. Success sets parameterCount and returnsValue; false resets them to
 zero/false. Instance/generic/vararg headers, other types, noncanonical count encodings,
@@ -851,8 +853,8 @@ the consuming module. MetadataToken is its physical MemberRef token; ParentToken
 the physical MemberRefParent token, and Name is the referenced name. GetSignature
 returns a fresh copy, including opaque field or unsupported method signatures.
 
-ResolveMethod supports the writer's static, nongeneric default-convention Int32
-parameters (0–256) and Int32/no-result contract. It resolves a local TypeDef or nominal
+ResolveMethod supports the writer's static, nongeneric default-convention Int32/Boolean
+parameters (0–256) and Int32/Boolean/no-result contract. It resolves a local TypeDef or nominal
 TypeRef parent, requiring the explicit resolver for external scopes. It then selects
 exactly one directly declared method by ordinal name and decoded parameter/result
 contract, returning that target snapshot's owned MethodDefinition. There is no implicit
@@ -998,7 +1000,7 @@ Namespace: `NeoCLR.Metadata.Experimental.Model`. These builders are the first wr
 part of the primary compiler abstraction. They construct new assemblies and allow body
 editing before another write; they do **not** rewrite arbitrary read snapshots or claim
 full Cecil compatibility. The current executable subset is top-level functions, public
-static classes and methods with Int32 parameters and either Int32 or CLI no-result return. This is a
+static classes and methods with Int32/Boolean parameters and Int32/Boolean or CLI no-result return. This is a
 compiler integration proof, not a complete language backend.
 
 ### AssemblyBuilder
@@ -1099,8 +1101,8 @@ public sealed class TypeBuilder
 ```
 
 Created only by AddType. Methods is a read-only view of owned methods in declaration
-order. AddMethod adds a public static hide-by-signature method. All parameters are
-Int32; returnsValue selects Int32 or CLI void/no-result. Names must be nonempty and at
+order. AddMethod adds a public static hide-by-signature method. The legacy overload uses Int32 parameters; returnsValue selects Int32 or CLI void/no-result.
+The signature overload preserves Int32/Boolean parameter and result types. Names must be nonempty and at
 most 1024 characters; parameter counts are 0–256; a type admits at most 256 methods.
 Duplicate name/parameter-count pairs and invalid inputs raise ArgumentException.
 Generic methods, fields, instance receivers and signature variants are future work.
@@ -1134,7 +1136,7 @@ from this graph or another builder; null raises ArgumentNullException. Each appe
 rejects more than 4096 instructions with InvalidDataException. ClearBody permits
 replacement without changing signature/ownership.
 
-Write checks argument indices, Int32 stack effects, call parameter/result contracts,
+Write checks argument indices, typed primitive stack effects, call parameter/result contracts,
 a final return with the exact declared stack shape, and no earlier return. It derives
 max stack and rejects underflow, extra results or missing return. Loops, branches,
 general local types, exceptions and arbitrary raw IL are intentionally absent. Int32 locals are documented below. Runtime overflow
@@ -1201,7 +1203,7 @@ public sealed class ImportedMethodReference
 }
 ```
 
-`ImportReference` copies a static, nongeneric Int32 signature from an external
+`ImportReference` copies a static, nongeneric primitive signature from an external
 read-only definition. No producer builder, body, runtime load or resolver is needed.
 `Owner` is the consuming builder; `AssemblyIdentity` is the exact dependency identity.
 The namespace and type name are null for a global function. `ReturnsValue` is false
@@ -1268,7 +1270,7 @@ translator. Bodies remain opaque; the original native artifact must pass neoCLR'
 verifier before execution. Disposing JSON parsing state or changing the input buffer
 has no effect on the snapshot. No native file is loaded into a runtime by either API.
 
-Supported declarations are public static Int32/no-result functions (including globals)
+Supported declarations are public static Int32/Boolean/no-result functions (including globals)
 and public static classes with no fields. The reader checks canonical identity tuples,
 encoded module/type/function names, references, origins, tokens, owner order, entry
 point signature, duplicate declarations and unsupported declaration fields. Unknown
@@ -1596,7 +1598,7 @@ public sealed partial class MethodBuilder {
 | Opcode | Operand | Contract |
 | --- | --- | --- |
 | Ldc_I4 | int | Push a signed Int32 constant. |
-| Ldarg | int | Load the zero-based Int32 argument; bounds checked when writing. |
+| Ldarg | int | Load the zero-based declared primitive argument; bounds checked when writing. |
 | Add, Sub, Mul | none | Consume two Int32 values and push the arithmetic result. |
 | Call | MethodBuilder | Use the target signature; external core/identity constraints checked when writing. |
 | Call | ImportedMethodReference | Must belong to the consuming assembly builder. |
@@ -1716,3 +1718,68 @@ needed. Compared with Cecil's general ILProcessor, this supports forward/backwar
 with owned labels and checked typed control flow, but still has no insertion/removal API,
 exception regions or arbitrary opcode surface. C# FlowChecks covers executable loops and
 invalid joins/initialization; Raven's executable consumer includes Console inside a loop.
+
+
+## Primitive signatures (development, 2026-10-01)
+
+All types below are in `NeoCLR.Metadata.Experimental.Model`.
+
+```csharp
+public enum PrimitiveType { Void, Int32, Boolean }
+public sealed class PrimitiveMethodSignature
+{
+    public PrimitiveMethodSignature(PrimitiveType returnType,
+                                    IEnumerable<PrimitiveType> parameterTypes);
+    public PrimitiveType ReturnType { get; }
+    public IReadOnlyList<PrimitiveType> ParameterTypes { get; }
+}
+MethodBuilder AssemblyBuilder.AddFunction(string name, PrimitiveMethodSignature signature);
+MethodBuilder TypeBuilder.AddMethod(string name, PrimitiveMethodSignature signature);
+PrimitiveMethodSignature MethodBuilder.Signature { get; }
+PrimitiveMethodSignature ImportedMethodReference.Signature { get; }
+bool MethodDefinition.TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded);
+```
+
+The signature constructor copies up to 256 ordered Int32/Boolean parameters. Results
+may also be Void, meaning no result, not an inhabited native Void value. Null parameters
+throw ArgumentNullException; invalid enum values, Void parameters or excessive counts
+throw ArgumentException. ParameterTypes is an immutable view of the copied array.
+
+The typed declaration overloads retain existing name/owner/count bounds. A null
+signature throws ArgumentNullException; duplicate name plus ordered parameter types
+throws ArgumentException, regardless of result type. Thus `Identity(int)` and
+`Identity(bool)` coexist, while return-only overloads reject. Legacy count/result
+overloads still mean Int32 parameters and Int32/no-result return.
+
+MethodBuilder.Signature and ImportedMethodReference.Signature expose the immutable
+contract. ParameterCount includes both types; ReturnsValue includes Boolean. Calls
+consume declared parameter types in reverse stack order, and Return checks the declared
+result. Int32 is not implicitly interchangeable with Boolean. Entrypoints remain
+parameterless Int32/no-result; Boolean entrypoints reject at write time.
+
+The primitive recognizer returns a fresh signature on success or null/false for
+unsupported or malformed encodings. It accepts only static nongeneric default CLI
+calling convention, canonical parameter counts and exact primitive encodings.
+TryGetStaticInt32Signature keeps its earlier stricter behavior and rejects Boolean.
+MemberReference.ResolveMethod and AssemblyBuilder.ImportReference match full primitive
+signatures, including ordered parameter types and result. Existing explicit resolver,
+identity, core-contract and snapshot checks remain in force.
+
+Native writers, readers and reference-only projections preserve these types without
+a format/schema change. Older experimental readers may reject Boolean declarations.
+Local declarations remain Int32-only; selected System inventory imports remain the
+separate Int32-only contract. Native bodies are still verified by neoCLR.
+
+```csharp
+var predicate = output.AddFunction("IsPositive",
+    new PrimitiveMethodSignature(PrimitiveType.Boolean, [PrimitiveType.Int32]));
+predicate.LoadArgument(0);
+predicate.LoadConstant(0);
+predicate.Emit(OpCode.Cgt);
+predicate.Return();
+```
+
+C# contract tests cover mixed arguments, overloads, CLI execution, native projection,
+MemberRef resolution, immutable signatures and invalid calls. Raven's integration
+probe also executes the emitted Boolean calls in neoCLR, including a separately
+compiled library referenced through its CLI declaration projection.

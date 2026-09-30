@@ -23,7 +23,7 @@ public sealed class MemberReference
     /// <summary>Copies the original signature blob, including unsupported signatures.</summary>
     /// <returns>New owned signature bytes.</returns>
     public byte[] GetSignature() => (byte[])signature.Clone();
-    /// <summary>Resolves the static Int32/no-result method subset through a nominal TypeDef or TypeRef parent.</summary>
+    /// <summary>Resolves the static Int32/Boolean/no-result method subset through a nominal TypeDef or TypeRef parent.</summary>
     /// <param name="resolver">Explicit assembly resolver required by external TypeRef scopes.</param>
     /// <returns>The unique matching method in the resolved type's owned snapshot.</returns>
     /// <exception cref="InvalidDataException">Unsupported signature/parent, missing or mismatched dependency, or absent/ambiguous method.</exception>
@@ -32,7 +32,7 @@ public sealed class MemberReference
     /// Host resolver failures propagate. No resolution result is cached.</remarks>
     public MethodDefinition ResolveMethod(IAssemblyResolver? resolver = null)
     {
-        if (!MethodDefinition.TryDecodeStaticInt32Signature(signature, out var parameters, out var result))
+        if (!MethodDefinition.TryDecodeStaticPrimitiveSignature(signature, out var decoded))
             throw new InvalidDataException("unsupported member method signature");
         TypeDefinition owner = (ParentToken >> 24) switch
         {
@@ -42,7 +42,7 @@ public sealed class MemberReference
             _ => throw new InvalidDataException("unsupported member method parent")
         };
         var matches = owner.Methods.Where(method => method.Name == Name &&
-            method.TryGetStaticInt32Signature(out var count, out var returns) && count == parameters && returns == result).Take(2).ToArray();
+            method.TryGetStaticPrimitiveSignature(out var candidate) && candidate!.Matches(decoded!)).Take(2).ToArray();
         if (matches.Length != 1) throw new InvalidDataException("member method missing or ambiguous: " + Name);
         return matches[0];
     }

@@ -5,7 +5,7 @@ using System.Reflection.PortableExecutable;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>A controlled editable assembly graph for the initial static Int32 compiler subset.</summary>
+/// <summary>A controlled editable assembly graph for the bounded static primitive compiler subset.</summary>
 /// <remarks>Produces ordinary unsigned CLI PE32 or native format-5 JSON. NEOX emission and arbitrary assembly rewriting are not supported.</remarks>
 public sealed partial class AssemblyBuilder
 {
@@ -38,10 +38,20 @@ public sealed partial class AssemblyBuilder
     /// <returns>An assembly-owned function with a null declaring type.</returns>
     /// <exception cref="ArgumentException">Invalid/duplicate signature or more than 256 functions.</exception>
     public MethodBuilder AddFunction(string name, int parameterCount = 0, bool returnsValue = true)
+        => AddFunction(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
+    /// <summary>Adds a static assembly-owned function with an explicit primitive signature.</summary>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <param name="signature">Int32/Boolean parameters and Int32/Boolean/Void result.</param>
+    /// <returns>An assembly-owned method builder.</returns>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or function limit exceeded.</exception>
+    public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature)
     {
-        if (string.IsNullOrEmpty(name) || name.Length > 1024 || parameterCount is < 0 or > 256 || functions.Count >= 256 ||
-            functions.Any(m => m.Name == name && m.ParameterCount == parameterCount)) throw new ArgumentException("invalid or duplicate function");
-        var function = new MethodBuilder(this, null, name, parameterCount, returnsValue);
+        ArgumentNullException.ThrowIfNull(signature);
+        if (string.IsNullOrEmpty(name) || name.Length > 1024 || functions.Count >= 256 ||
+            functions.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+            throw new ArgumentException("invalid or duplicate function");
+        var function = new MethodBuilder(this, null, name, signature);
         functions.Add(function);
         return function;
     }
@@ -53,7 +63,7 @@ public sealed partial class AssemblyBuilder
             instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("assembly string literal limit exceeded");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType == PrimitiveType.Boolean))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var method in methods) method.Validate();
         return methods;
@@ -113,8 +123,19 @@ public sealed partial class AssemblyBuilder
         {
             var signature = new BlobBuilder();
             new BlobEncoder(signature).MethodSignature().Parameters(method.ParameterCount,
-                result => { if (method.ReturnsValue) result.Type().Int32(); else result.Void(); },
-                parameters => { for (int i = 0; i < method.ParameterCount; i++) parameters.AddParameter().Type().Int32(); });
+                result =>
+                {
+                    if (!method.ReturnsValue) result.Void();
+                    else if (method.Signature.ReturnType == PrimitiveType.Boolean) result.Type().Boolean();
+                    else result.Type().Int32();
+                }, parameters =>
+                {
+                    foreach (var type in method.Signature.ParameterTypes)
+                        {
+                        if (type == PrimitiveType.Boolean) parameters.AddParameter().Type().Boolean();
+                        else parameters.AddParameter().Type().Int32();
+                    }
+                });
             return metadata.GetOrAddBlob(signature);
         }
         int ImportMethod(MethodBuilder method)
@@ -227,30 +248,45 @@ public sealed class TypeBuilder
     /// <returns>A mutable body builder.</returns>
     /// <exception cref="ArgumentException">Invalid or duplicate signature or more than 256 methods.</exception>
     public MethodBuilder AddMethod(string name, int parameterCount = 0, bool returnsValue = true)
+        => AddMethod(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
+    /// <summary>Adds a public static method with an explicit primitive signature.</summary>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <param name="signature">Int32/Boolean parameters and Int32/Boolean/Void result.</param>
+    /// <returns>A method builder owned by this type.</returns>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or method limit exceeded.</exception>
+    public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature)
     {
-        if (string.IsNullOrEmpty(name) || name.Length > 1024 || parameterCount is < 0 or > 256 || methods.Count >= 256 ||
-            methods.Any(m => m.Name == name && m.ParameterCount == parameterCount)) throw new ArgumentException("invalid or duplicate method");
-        var method = new MethodBuilder(Assembly, this, name, parameterCount, returnsValue); methods.Add(method); return method;
+        ArgumentNullException.ThrowIfNull(signature);
+        if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
+            methods.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+            throw new ArgumentException("invalid or duplicate method");
+        var method = new MethodBuilder(Assembly, this, name, signature); methods.Add(method); return method;
     }
 }
 
-/// <summary>Typed Int32 body construction with Boolean conditions; invalid control-flow contracts fail before emission.</summary>
+/// <summary>Typed Int32/Boolean body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
     internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
-    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result) { Assembly = assembly; DeclaringType = owner; Name = name; ParameterCount = count; ReturnsValue = result; }
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
+        : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature)
+    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; }
+    /// <summary>Gets the immutable primitive method signature.</summary>
+    public PrimitiveMethodSignature Signature { get; }
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declaring type, or null for a top-level function.</summary>
     public TypeBuilder? DeclaringType { get; }
     /// <summary>Gets the method name.</summary>
     public string Name { get; }
-    /// <summary>Gets the Int32 parameter count.</summary>
-    public int ParameterCount { get; }
-    /// <summary>Gets whether the method returns Int32 rather than no result.</summary>
-    public bool ReturnsValue { get; }
+    /// <summary>Gets the parameter count.</summary>
+    public int ParameterCount => Signature.ParameterTypes.Count;
+    /// <summary>Gets whether the method has an Int32 or Boolean result rather than no result.</summary>
+    public bool ReturnsValue => Signature.ReturnType != PrimitiveType.Void;
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
     public void LoadConstant(int value) => Emit(OpCode.Ldc_I4, value);
