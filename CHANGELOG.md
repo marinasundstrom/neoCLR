@@ -17,7 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   including DeclareLocal/LocalDefinition.Type, CLI/native local signatures and typed
   store validation. Raven supports Boolean local initialization, assignment and equality.
   This consumer also exposed a general Raven assignment-RHS parser defect; the
-  consumer branch fixes it with independent parser/assignment tests.
+  consumer branch fixes it with independent parser/assignment tests. Raven now
+  emits short-circuit Boolean &&/|| through shared branches, with skipped-side-effect
+  execution coverage on .NET and binary assemblies loaded by neoCLR.
 
 - Add Int32 local declarations, method-owned local handles and raw Ldloc/Stloc operands
   to the experimental metadata API, with CLI local signatures and native local lists.
