@@ -99,9 +99,11 @@ def main():
     try:
         from signatures import SECTION_KIND, SCHEMA, decode_signature
         from references import REFERENCE_SECTION, SIGNATURE_SECTION, read_profile
+        from members import SECTION_KIND as MEMBER_SECTION, SCHEMA as MEMBER_SCHEMA, read_members
         sections = decode(read_image(args.image), {SECTION_KIND: SCHEMA,
-                          REFERENCE_SECTION: 1, SIGNATURE_SECTION: 1})
+                          REFERENCE_SECTION: 1, SIGNATURE_SECTION: 1, MEMBER_SECTION: MEMBER_SCHEMA})
         profile = read_profile(sections)
+        members = read_members(sections, profile)
         inspected = []
         for section in sections:
             item = {"kind": section.kind, "version": section.version,
@@ -113,6 +115,9 @@ def main():
                 root, context, bindings = profile
                 item.update(signature=asdict(root), context=asdict(context),
                             reference_count=len(bindings.references), resolved=False)
+            if members is not None and section.kind == MEMBER_SECTION:
+                item.update(members=[asdict(member) for member in members],
+                            owner_shape_validated=True, resolved=False)
             inspected.append(item)
         print(json.dumps({"profile": "NEOX 0.1", "executable": False, "sections": inspected}, indent=2))
     except (OSError, FormatError) as error:

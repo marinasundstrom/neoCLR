@@ -198,7 +198,7 @@ literal transport needs its own explicit contract.
 | --- | --- | --- |
 | 0 | Main-based branch, proposal inventory, structural requirements and compatibility questions | This document |
 | 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing and structural payloads implemented](../experiments/extended-cli-metadata/README.md); CLI references/embedding pending |
-| 2 | Structural identity/resolution tests across independently emitted modules; synthesized-member and conformance references | [Standalone reference/identity fixtures pass](../experiments/extended-cli-metadata/README.md#reference-profile-evidence); actual compiler modules, members and conformance pending |
+| 2 | Structural identity/resolution tests across independently emitted modules; synthesized-member and conformance references | [Reference/identity and structural-member fixtures pass](../experiments/extended-cli-metadata/README.md#structural-member-evidence); actual compiler modules and conformance pending |
 | 3 | One native consumer slice using Self and structural Function signatures; verifier, invocation, GC and introspection evidence | Planned; depends on explicit runtime feature work |
 | 4 | Raven reader/symbol adapter, then writer/backend integration through target capabilities | Later integration |
 
@@ -210,7 +210,7 @@ unknown signature forms and resource limits. Include conventional CLI fixtures u
 Use at least two differently numbered modules for identity tests in step 2; compare
 actual behavior of pinned System.Reflection.Metadata and the bridge's reader separately.
 Record tool versions and artifact hashes. The isolated codec now has
-[22 passing focused tests](../experiments/extended-cli-metadata/README.md#signature-evidence-2026-09-30);
+[30 passing focused tests](../experiments/extended-cli-metadata/README.md#structural-member-evidence);
 Standalone fixtures now check consumer-local reference renumbering against a host catalog;
 actual CLI-reference, conventional-reader and compiled cross-module checks remain planned.
 

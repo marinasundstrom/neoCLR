@@ -61,7 +61,8 @@ tuples, Function types, unions/intersections and synthesized members, with later
 integration. Reusing ordinary declarations could retain useful tooling while native
 signatures preserve neoCLR identity. New readers and explicit capability checks would
 be required; container readability does not imply CLR execution compatibility.
-An isolated experimental codec now exercises framing and structural signatures.
+An isolated experimental codec now exercises framing, structural signatures and
+synthesized member descriptions.
 CLI embedding, runtime support and Raven integration remain pending; this is not a
 published platform format.
 

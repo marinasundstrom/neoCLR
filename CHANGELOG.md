@@ -8,20 +8,18 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-09-30
 
-- Start extended CLI metadata design on a main-based feature branch, covering
-  structural types, synthesized member identity, capabilities, compatibility limits
-  and a staged Raven integration plan. Record research and planned codec acceptance;
-  add an isolated NEOX 0.1 framing codec/inspector with a golden vector and six
-  focused tests for bounds, malformed directories and required schema negotiation.
-  Extend it with structural signature payloads and a checked-in nested fixture;
-  all 14 focused tests pass. Reuse structural-branch Function no-result/output
-  contracts and the owned/reference array distinction. Keep binder contexts local;
-  add a separate reference profile with catalog-scoped nominal identities and
-  declaring-owner generic/Self contexts. All 22 focused tests pass, including
-  independently numbered fixture references, bounded union/intersection keys and
-  rejection of unresolved definitions, wrong kinds and arity/owner mismatches.
-  Real CLI dependency resolution and compiled cross-module evidence remain pending.
-  CLI embedding, runtime support and Raven compiler changes remain unimplemented.
+- Develop extended CLI metadata on a main-based feature branch, with an isolated
+  NEOX 0.1 codec/inspector, versioned framing and structural signatures. Preserve
+  structural-branch Function no-result/output contracts and owned/reference arrays.
+  Add catalog-scoped nominal references and declaring-owner generic/Self contexts;
+  differently numbered fixture references resolve to equal structural keys.
+  Add synthesized array-length, tuple-element/deconstruction and Function-invocation
+  references with derived contracts, checked owner shapes and stable resolved member
+  keys within a catalog. All 30 focused tests pass, including golden byte vectors,
+  malformed input, resource limits, identity and inspector process checks.
+  Update the design, compatibility limits and staged Raven integration plan.
+  Real CLI dependency resolution, PE embedding, compiled cross-module evidence,
+  runtime support and Raven compiler changes remain unimplemented.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

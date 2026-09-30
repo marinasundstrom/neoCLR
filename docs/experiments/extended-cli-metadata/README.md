@@ -85,7 +85,8 @@ Node equality is syntactic and context-local, not cross-module semantic type ide
 This grammar does not yet enforce runtime storage-position legality or assignability.
 This local-only schema has no nominal references or generic instantiation. The reference
 profile below adds those in separate sections. CLI heap validation, standalone byref
-result types, synthesized-member references and the full primitive set remain pending.
+result types and the full primitive set remain pending. Synthesized-member references
+are covered by the later section-4 profile.
 No CLI signature prefix has been allocated. This private grammar is a codec experiment,
 not a second authoritative type model or a production alternative to CLI signatures.
 
@@ -206,6 +207,83 @@ exercised directly by the tests. Inspection success is not semantic acceptance.
 | `fixtures/references-a.neox` | `cda3bd97fe29c2a7f02df80702576f85bc80197ea95ab44e297b2056a86e69b4` |
 | `fixtures/references-b.neox` | `b35fa38129dfda62269eee21a7902794d4c9e0d05942432e5d59d271f6df0abd` |
 
-Next bounded task: synthesized structural-member references checked against owner
-shape and operation identity. Interface conformance records, PE embedding, actual CLI
-heap/token resolution, runtime execution and Raven integration remain pending.
+The next slice adds synthesized structural-member references, recorded below.
+Interface conformance records, PE embedding, actual CLI heap/token resolution,
+runtime execution and Raven integration remain pending.
+
+## Synthesized structural-member references (2026-09-30)
+
+Section 4/schema 1 holds descriptions of intrinsic operations on the section-3 root.
+It requires mandatory sections 2 and 3 and must itself be mandatory. This bounded
+profile has exactly one signature owner, designated by local handle 1. That handle is
+neither a CLI TypeSpec token nor semantic member identity. Multiple owners, paths into
+nested signatures and an owner-expression table remain later format work.
+
+The payload begins with a u16 row count (0–256). Each six-byte row is u16 owner handle,
+u8 operation, u8 flags (zero), u16 operand. Rows preserve input order. Duplicate rows,
+unknown operations/flags, non-1 owners, unexpected operands, malformed lengths and
+trailing bytes fail. There are no user-defined names, claimed signatures or executable
+addresses in these records. The codec validates rows; profile inspection additionally
+checks each operation against the structurally validated owner.
+
+| Operation | Code | Valid owner | Derived contract |
+| --- | --- | --- | --- |
+| array_length | 1 | array or array_ref | No explicit parameters; native unsigned integer result |
+| tuple_element | 2 | tuple | No explicit parameters; selected element result |
+| tuple_deconstruct | 3 | tuple | One out parameter per ordered element; no result |
+| function_invoke | 4 | function | Owner's parameter types, modes, result and no-result flag |
+
+Only tuple_element takes an operand: the zero-based element index, less than the
+owner's arity. Other operands must be zero. These contracts describe operations on
+an implicit owner value; they do not yet prescribe receiver passing, borrowing,
+boxing, field access, property mutability or an executable call ABI. TupleElement is
+a read projection, not a field declaration or a promise of a setter. TupleDeconstruct
+is a provisional structural operation; existing nominal System.Tuple is unchanged.
+
+`resolve_members` first resolves the complete owner/context against the host catalog,
+then derives descriptors. The immutable member key contains the operation-schema
+version, resolved owner key, operation identity and operand. It does not contain the
+member's row number, local owner handle or display name. Return/parameter contracts
+are derived, so a producer cannot forge an Invoke signature inconsistent with its
+Function owner. No MethodDef, dispatch address or interface conformance is synthesized.
+
+Function modes/no-result follow the structural branch's contracts already recorded
+above. ArrayLength's intrinsic result descriptor is `('intrinsic', 'native_uint')`,
+matching `Type::UIntPtr` in `src/verifier.rs` at structural branch revision
+`a081c6e3c9e7674e1050ddf4441d13f4a1bbbb9b`. The prototype's limited signature grammar
+cannot yet serialize UIntPtr. This descriptor is not a new guest type or an Int32
+property result; full primitive encoding/identity normalization remains future work.
+The owned/reference array identities remain distinct even when the operation matches.
+
+Compared with ordinary CLI member rows, these descriptions let a frontend discover
+operations without fabricating nominal declarations. The cost is a shared versioned
+operation vocabulary and a later backend mapping. Reuse the original structural draft
+and design's CLI baseline; no new .NET behavior or compatibility claim is made here.
+Neither a valid member record nor successful catalog resolution enables execution.
+
+## Structural-member evidence
+
+All 30 focused tests pass on Python 3.9.6, 2026-09-30. An independently written hex
+vector fixes the member-row layout. Tests cover all four operations, derived result
+and output contracts, preservation of every Function parameter mode/no-result,
+renumbered nominal references producing equal member descriptors, and resolution
+failure when dependencies are missing. Negative cases cover unknown operations,
+wrong shapes, tuple bounds, owner handles, flags, duplicates, every truncation of the
+member vector, resource limits and missing/optional profile dependencies.
+
+The inspector process checks a tuple-member fixture and rejects an incompatible
+FunctionInvoke owner without emitting partial JSON. It reports
+`owner_shape_validated: true`, `resolved: false`; it has no catalog and performs no
+runtime invocation. Unknown optional member schema versions remain opaque.
+
+Fixture: `fixtures/tuple-members.neox`.
+SHA-256: `c6a4a260f31c36177b1c906ccc8e792cda8e8f83f833ff8ca53c7c9276e2be00`.
+The test verifies byte-preserving re-encoding, reordered section discovery and derived
+descriptors. The fixture contains a two-element tuple, its second-element projection
+and deconstruction operation.
+
+Next bounded task: a PE/CLI container and reader-compatibility probe for an experimental
+#Neo stream. The standalone codec has answered enough framing/identity questions to
+start checking the main unresolved container assumption before expanding conformance
+records. Preserve conventional CLI streams and test ordinary metadata inspection
+separately from semantic decoding. Do not treat success as execution compatibility.
