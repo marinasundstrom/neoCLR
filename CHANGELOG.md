@@ -17,6 +17,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Add an owned native library/function inventory and explicit partial static Int32
+  reference views. Raven reuses its existing semantic importer for selected translated
+  System callables, then emits their native identities through a new MethodBuilder.Call
+  overload. API/driver cases execute Math.Min against binary System to 42. Visibility,
+  generic-arity collisions, invalid selections and unsupported Result signatures are
+  checked. Full core loading and general raw instruction editing remain pending.
   Raven now offers an opt-in `rvnc neoclr` command for source files and API-produced
   native PE references, emitting directly through the independent metadata project.
   Process tests verify/run a separately compiled library/application with assembly-owned

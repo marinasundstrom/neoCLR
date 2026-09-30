@@ -63,6 +63,15 @@ public sealed partial class AssemblyBuilder
         };
         IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)
         {
+            if (instruction.Op == "native.call")
+            {
+                var target = instruction.NativeTarget!;
+                target.TryGetStaticInt32Signature(out var count);
+                return new object[] { new { op = "call", arg = new {
+                    name = target.Name, owner = new { Named = target.DeclaringTypeName! },
+                    parameters = Enumerable.Repeat("Int32", count).ToArray()
+                } } };
+            }
             if (instruction.Op == "console.line")
                 return new object[] {
                     new { op = "ldstr", arg = instruction.Text! },

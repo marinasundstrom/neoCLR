@@ -18,6 +18,7 @@ and guest Introspection assembly loading remain pending.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
+- [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
 - [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
 - [RuntimeAssemblyContainer](#runtimeassemblycontainer): direct PE/#Neo native execution transport.
 - [MetadataArtifactReader](#metadataartifactreader): bounded PE extraction and recognition.
@@ -1489,3 +1490,79 @@ complete load set before invoking this API and creating the output file. Only th
 module is serialized. This Rust-host function is not a new guest introspection API or
 an addition to the .NET Cecil-style object model. The independent .NET NativeModuleContainer
 reader validates the emitted wire format in the cross-reader consumer tests.
+
+
+## NativeLibraryDefinition and NativeFunctionDefinition
+
+Development APIs in `NeoCLR.Metadata.Experimental.Model`. These .NET-host types
+are not guest Introspection APIs. They adapt native declarations to the existing
+Raven .NET semantic importer; they do not constitute a complete native symbol provider.
+
+```csharp
+public sealed class NativeLibraryDefinition {
+    public string ModuleName { get; }
+    public IReadOnlyList<string> TypeNames { get; }
+    public IReadOnlyList<NativeFunctionDefinition> Functions { get; }
+    public static NativeLibraryDefinition ReadAssembly(ReadOnlySpan<byte> image);
+    public byte[] CreateStaticInt32ReferenceAssembly(
+        AssemblyIdentity projectionIdentity, AssemblyIdentity coreLibrary,
+        IEnumerable<NativeFunctionDefinition> functions);
+}
+public sealed class NativeFunctionDefinition {
+    public NativeLibraryDefinition Library { get; }
+    public int TableIndex { get; }
+    public string Name { get; }
+    public string? DeclaringTypeName { get; }
+    public bool TryGetStaticInt32Signature(out int parameterCount);
+}
+// Additional MethodBuilder overload:
+public void Call(NativeFunctionDefinition target);
+```
+
+`ReadAssembly` accepts standalone binary schemas 2/3 through NativeModuleContainer,
+including the translated System library. It owns the decoded data and inventories all
+functions, even unsupported signatures. `ModuleName` and `Name` retain native spellings;
+`TypeNames` retains table order and can repeat for differing generic arities. Duplicate
+name/arity types fail. Inventories are limited to 65,536 types/functions, descriptive
+names to 4,096 characters, and transport retains its existing byte/depth/item limits.
+Malformed framing/inventory raises InvalidDataException. This is not runtime body or
+complete declaration validation. `TableIndex` is snapshot-local position, not an inferred
+CLI token or persistent native identity. `DeclaringTypeName` is a nominal Named owner;
+null also covers generic/primitive owner forms that this callable view does not support.
+
+`TryGetStaticInt32Signature` accepts static nongeneric nominal-owner functions with
+0–256 Int32 parameters and an Int32 result. Private, instance, virtual, abstract,
+byref-receiver, no-result, Result, generic and other signatures return false and count
+zero. Native visibility defaults to public when omitted; explicit nonpublic visibility or
+nonpublic origin access is rejected. It does not promise the owning type is
+projectable; the projection separately checks owner existence, public visibility and
+nongeneric shape.
+
+The projection requires an explicit **partial** selection of 1–4096 owned function
+objects and an unsigned synthetic identity distinct from the supplied core identity.
+At most 256 distinct owners are projected. Empty, duplicate, foreign or unsupported
+selections, duplicate signatures and invalid owners fail with InvalidDataException.
+Null arguments fail with ArgumentNullException. The returned ordinary reference-only
+PE preserves selected method names and Int32 signatures under original type names,
+using static containers and throwing bodies. It does **not** preserve native assembly
+identity, type instance/field/property shape, generic contracts, parameter names or
+attributes. No methods outside the explicit selection are claimed to be available.
+Treating the projection as a complete core library or as an executable implementation
+is unsupported. Native/native-host type-name collisions still require a proper core
+provider; the current command removes host facade references in selected-native mode and the
+consumer verifies that Math.Min binds to the native view, not the host implementation.
+
+`MethodBuilder.Call(NativeFunctionDefinition)` accepts only a recognized Int32
+callable from module `System`; null raises ArgumentNullException, other modules or
+signatures raise InvalidDataException. The native writer retains the original owner,
+function name and parameter signature; it does not synthesize writer-specific hashed
+identities for System methods. Stack underflow is rejected during writing. Ordinary
+CLI writing rejects this native-only operation. Runtime verification and execution must
+use the matching explicit System assembly. No revision or image digest is encoded for
+that implicit System dependency; this is a bootstrap limit to replace with a general
+native assembly binding contract.
+
+Compiled examples and failures: `NativeLibrarySymbolChecks.cs` in the metadata C# tests
+and Raven's `SystemSymbolChecks.cs` consumer. The current builder still has no public
+raw opcode/operand Emit API or editable instruction collection; these helpers are not
+full Cecil body-editing support.

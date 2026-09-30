@@ -1220,3 +1220,19 @@ all JSON readers. Keep indexed metadata design and compiler interoperability dec
 separate from codec microbenchmarks. Profile linking and the binary validation/typed
 deserialization passes before choosing optimizations; a JSON decoder change needs
 malformed-input/version/diagnostic compatibility checks. No such change is included here.
+
+
+## Instruction body editing direction — 2026-09-30
+
+The author asks about raw opcode/operand emits alongside Call/LoadArgument helpers and
+identifies Cecil ILProcessor-style insertion before/after an instruction as a possible
+future direction. Current MethodBuilder has only bounded helpers, not raw Emit overloads
+or an editable body. A proposed common instruction model would carry typed operands and
+instruction-reference branch targets; helpers and raw Emit would construct the same
+objects, and insertion/replacement/removal would act on the method body. Writers would
+validate supported opcodes, stack contracts and reference/branch ownership before output.
+This would also support Raven's future move away from Reflection.Emit for .NET. Relative
+to today's builder it adds editing and backend reuse, with costs in ownership, exception
+regions, branch repair, invalid intermediate states and serializer validation. API design,
+branch/exception semantics and validation are open; no broad opcode or Cecil parity is
+claimed. Defer body editing while advancing native assembly import/emission.

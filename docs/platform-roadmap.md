@@ -74,6 +74,15 @@ binding is only a bootstrap, not evidence of translated System symbol loading. B
 native declaration reading/projection or a native symbol provider is still required.
 [Command and loader boundary](raven-cli-bridge.md#opt-in-native-compiler-command--2026-09-30).
 
+**First translated System symbol slice:** An explicit static Int32 callable view now
+adapts selected native declarations to Raven's existing semantic importer. Math.Min binds
+to that view and executes against the translated System through both API and rvnc paths.
+This is not full core import: primitive binding remains hosted, and generic/instance/field/
+property contracts remain next. The author supports adapting the existing importer first,
+then a separate provider as needed, and removing Reflection.Emit from .NET in the future.
+A common instruction/operand model and later ILProcessor-like editing are recorded future
+metadata API directions. [Scope and architecture](raven-cli-bridge.md#translated-system-callable-import--2026-09-30).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

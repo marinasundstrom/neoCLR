@@ -9393,3 +9393,29 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** General native declarations, fields/generics/signatures, and a faithful
   projection or native symbol provider sufficient to bind against translated System.
   The command does not claim that support; see the [loader boundary](raven-cli-bridge.md#opt-in-native-compiler-command--2026-09-30).
+
+
+### 2026-09-30 — Reuse import/codegen boundaries and plan instruction editing
+
+- **Author question/direction:** Asked whether Raven's .NET semantic importer can be
+  adapted for neoCLR until a separate one exists, and described removing Reflection.Emit
+  as a future goal for the .NET target too.
+- **Assistant inspection:** Found ISemanticDataLoader/ICompilationEmitter boundaries;
+  DotNetSemanticDataLoader and PE symbols still use MetadataLoadContext and reflection
+  handles. The existing .NET code generator directly uses ILGenerator/builders. Proposed
+  reusing semantic import via a native reference view now and extracting common metadata
+  inputs and instruction/backend contracts incrementally.
+- **Action:** Added a native library inventory, explicit static callable projections,
+  compiler bindings and native System calls. This is a partial import, not the complete
+  core library. Runtime checking exposed native private visibility and generic-arity
+  name collisions; the reader accounts for both. Host facades also affected resolution,
+  so the selected native mode retains only the host primitive core bootstrap.
+- **Author question:** Asked whether the Cecil-like library supports raw opcode/operand
+  emission in addition to Call/LoadArgument helpers.
+- **Assistant answer:** It currently does not; public helpers cover a bounded internal
+  instruction set. Proposed a shared instruction/typed-operand model beneath helpers.
+- **Author follow-up:** “Cecil even has an ILProcessor that allows you to insert
+  instructions before and after another instruction. That might be a future direction.”
+- **Assistant proposal:** Future body editing with instruction objects, insertion,
+  replacement/removal and instruction references for branch targets. No public raw Emit
+  or ILProcessor-like editing has been implemented in this slice.

@@ -210,7 +210,7 @@ public sealed class TypeBuilder
 /// <summary>Linear, typed Int32 body construction; invalid stack contracts fail before emission.</summary>
 public sealed class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result) { Assembly = assembly; DeclaringType = owner; Name = name; ParameterCount = count; ReturnsValue = result; }
@@ -266,6 +266,19 @@ public sealed class MethodBuilder
         if (!ReferenceEquals(target.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(target));
         Append(new("call", Target: target.Target));
     }
+    /// <summary>Calls a static Int32 function selected from an explicitly loaded native System inventory.</summary>
+    /// <param name="target">Owned System function whose parameters and result are Int32.</param>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    /// <exception cref="InvalidDataException">Module is not System or the callable signature is unsupported.</exception>
+    /// <remarks>Native-only bootstrap. The host must supply the matching System assembly to neoCLR;
+    /// no assembly revision or image digest is encoded. Ordinary CLI output rejects this operation.</remarks>
+    public void Call(NativeFunctionDefinition target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (target.Library.ModuleName != "System" || !target.TryGetStaticInt32Signature(out _))
+            throw new InvalidDataException("native call requires a static Int32 System function");
+        Append(new("native.call", NativeTarget: target));
+    }
     /// <summary>Appends return; must be the last instruction with the declared stack shape.</summary>
     public void Return() => Append(new("return"));
     /// <summary>Clears the body for editing before another Write.</summary>
@@ -291,6 +304,9 @@ public sealed class MethodBuilder
                     if (instruction.Value < 0 || instruction.Value >= ParameterCount) throw new InvalidDataException("argument outside signature");
                     push = 1; break;
                 case "add": case "subtract": case "multiply": pop = 2; push = 1; break;
+                case "native.call":
+                    if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out pop)) throw new InvalidDataException("invalid native call");
+                    push = 1; break;
                 case "call": pop = instruction.Target!.ParameterCount; push = instruction.Target.ReturnsValue ? 1 : 0; break;
                 case "return":
                     if (i != Instructions.Count - 1 || stack != (ReturnsValue ? 1 : 0)) throw new InvalidDataException("invalid return stack");
