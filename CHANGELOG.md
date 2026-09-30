@@ -24,7 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contracts. Add bounded Raven diagnostics/import support; broader integration
   awaits its multi-target refactor. Verify inherited/explicit clone reachability
   and result types after artifact reload, and reject forged derived Self bounds
-  without a compiler or an explicit verifier call. The archived Neo bootstrap is unchanged. See
+  without a compiler or an explicit verifier call. Synchronize the Raven Self
+  branch with neoclr checkpoint `080e2cfef`, preserving target-owned marker
+  validation. The archived Neo bootstrap is unchanged. See
   [the contract and boundaries](docs/self-types.md).
 
 - Prepare and validate a local Function types toolchain, SDK and isolated VS Code

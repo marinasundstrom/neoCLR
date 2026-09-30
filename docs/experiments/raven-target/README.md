@@ -1691,3 +1691,12 @@ Explicit and inferred generic calls validate this rule under the configured Self
 Runtime Contract, with no additional target option. Metadata retains the declared
 return types and explicit interface mapping. These are bounded feature changes;
 broader neoCLR target integration follows the separate multi-target refactor.
+
+The Self feature branch also incorporates Raven neoclr checkpoint `080e2cfef`
+(2026-09-30), including the target-boundary extraction. Self marker validation
+now participates in DotNetRuntimeContract resolved checks; existing Runtime Self
+Contract settings and RAVT003 rejection behavior are preserved. This synchronization
+does not move Self into a new backend or modify the separate neoclr checkout.
+Validation: the merged compiler builds; 137 selected Self, target configuration,
+emission and incremental-reuse tests pass. The actual Clonable consumer passes
+native verification/execution and all six rejection cases.
