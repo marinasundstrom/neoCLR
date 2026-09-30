@@ -72,7 +72,11 @@ public sealed partial class AssemblyBuilder
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
     /// <exception cref="InvalidDataException">Invalid body, entry point, dependency identity or resource limit.</exception>
     /// <remarks>No image is loaded. Cross-assembly calls import exact assembly/type/member references. Repeated writes have a fixed MVID and timestamp for reproducibility.</remarks>
-    public byte[] Write()
+    public byte[] Write() => WriteImage(referenceOnly: false);
+
+    internal byte[] WriteReferenceImage() => WriteImage(referenceOnly: true);
+
+    private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph();
         var metadata = new MetadataBuilder();
@@ -93,6 +97,12 @@ public sealed partial class AssemblyBuilder
             return handle;
         }
         var objectType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Object"));
+        if (referenceOnly)
+        {
+            var attributeType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("ReferenceAssemblyAttribute"));
+            var constructor = metadata.AddMemberReference(attributeType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 }));
+            metadata.AddCustomAttribute(MetadataTokens.EntityHandle(0x20000001), constructor, metadata.GetOrAddBlob(new byte[] { 1, 0, 0, 0 }));
+        }
         var handles = methods.Select((method, index) => (method, handle: MetadataTokens.MethodDefinitionHandle(index + 1))).ToDictionary(pair => pair.method, pair => pair.handle);
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
@@ -129,7 +139,8 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var code = new BlobBuilder();
-            foreach (var instruction in method.Instructions)
+            if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
+            foreach (var instruction in referenceOnly ? [] : method.Instructions)
             {
                 switch (instruction.Op)
                 {
@@ -142,7 +153,7 @@ public sealed partial class AssemblyBuilder
                     case "return": code.WriteByte(0x2a); break;
                 }
             }
-            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: method.MaxStack);
+            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack);
             metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.Name), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
@@ -157,7 +168,7 @@ public sealed partial class AssemblyBuilder
         }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),
-            new MetadataRootBuilder(metadata), bodies, entryPoint: EntryPoint is null ? default : handles[EntryPoint],
+            new MetadataRootBuilder(metadata), bodies, entryPoint: referenceOnly || EntryPoint is null ? default : handles[EntryPoint],
             strongNameSignatureSize: 0, deterministicIdProvider: blobs => BlobContentId.FromHash(System.Security.Cryptography.SHA256.HashData(blobs.SelectMany(blob => blob.GetBytes()).ToArray())));
         var image = new BlobBuilder(); builder.Serialize(image);
         if (image.Count > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");

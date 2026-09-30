@@ -1227,3 +1227,63 @@ mutation, exact PE method resolution, native global no-result calls, owner/core/
 rejections, opaque unsupported signatures and stack errors. The native C# gate imports
 its cross-assembly global from a PE snapshot and returns 42. The Raven consumer also
 imports from the read-only snapshot and returns 42 in neoCLR.
+
+### Native declaration reader and compiler reference projection (development)
+
+```csharp
+namespace NeoCLR.Metadata.Experimental.Model;
+public sealed class NativeAssemblyDefinition
+{
+    public AssemblyIdentity Identity { get; }
+    public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image);
+    public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary);
+}
+```
+
+`ReadAssembly` copies an owned declaration snapshot from the bounded writer's native
+format-5 UTF-8 JSON. `Identity` retains the exact unsigned assembly identity.
+This is a metadata reader, not a native verifier, arbitrary format-5 reader, or body
+translator. Bodies remain opaque; the original native artifact must pass neoCLR's
+verifier before execution. Disposing JSON parsing state or changing the input buffer
+has no effect on the snapshot. No native file is loaded into a runtime by either API.
+
+Supported declarations are public static Int32/no-result functions (including globals)
+and public static classes with no fields. The reader checks canonical identity tuples,
+encoded module/type/function names, references, origins, tokens, owner order, entry
+point signature, duplicate declarations and unsupported declaration fields. Unknown
+root/declaration fields and duplicate JSON properties are rejected. It accepts at most
+4 MiB of input, depth 64, one manifest/module, 256 references/types, 4096 methods,
+256 methods per owner (including global scope), and 256 parameters per method.
+Unsupported, inconsistent or malformed metadata throws `InvalidDataException`.
+These consistency checks are not authentication and do not validate instruction bodies.
+
+`CreateReferenceAssembly` creates owned PE bytes for the existing .NET semantic-loader
+bootstrap. `coreLibrary` is explicit and must supply System.Object and
+System.Runtime.CompilerServices.ReferenceAssemblyAttribute; null throws
+`ArgumentNullException`. The PE contains callable/type declarations, the reference-only
+attribute, and throwing placeholder bodies. Native bodies are never translated or
+replaced with executable behavior. Entry points and native body dependency references
+are omitted; this supported signature subset needs only primitive/core types. Exceeded
+writer limits or incompatible assembly identities throw `InvalidDataException`.
+Each projection can receive a fresh MVID; callers should reuse one projection/snapshot
+for a compilation instead of treating repeated projections as the same module scope.
+
+```csharp
+var native = NativeAssemblyDefinition.ReadAssembly(nativeBytes);
+var referencePe = native.CreateReferenceAssembly(explicitCoreIdentity);
+var definitions = AssemblyDefinition.ReadAssembly(referencePe, expectedExtended: false);
+// Register referencePe with the existing compiler loader and import definitions
+// through AssemblyBuilder.ImportReference. Execute the original nativeBytes only.
+```
+
+This follows the .NET distinction between implementation and reference assemblies,
+including ReferenceAssemblyAttribute and throwing placeholder bodies. The temporary
+bridge adds a projection and cannot preserve arbitrary native semantics; a native
+semantic-data provider should replace it. See Microsoft's
+[reference assembly contract](https://learn.microsoft.com/en-us/dotnet/standard/assembly/reference-assemblies).
+
+Twenty-three C# contract groups pass, including native Unicode/global/no-result
+roundtrips, input ownership, malformed/unsupported metadata and count limits, reference
+marker inspection, and .NET execution-load rejection with BadImageFormatException.
+The Raven consumer starts from the native dependency, binds the projected declarations,
+and emits applications that neoCLR executes with the original dependency to 42.

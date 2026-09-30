@@ -1,0 +1,179 @@
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+
+namespace NeoCLR.Metadata.Experimental.Model;
+
+/// <summary>Read-only declaration snapshot of the bounded metadata writer's native format-5 output.</summary>
+/// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
+public sealed class NativeAssemblyDefinition
+{
+    private sealed record TypeRow(string Namespace, string Name, string NativeName);
+    private sealed record MethodRow(string Name, int Owner, int Count, bool ReturnsValue);
+    private readonly TypeRow[] types;
+    private readonly MethodRow[] methods;
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods)
+    { Identity = identity; this.types = types; this.methods = methods; }
+    /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
+    public AssemblyIdentity Identity { get; }
+
+    /// <summary>Copies the supported declarations from native UTF-8 JSON without executing code.</summary>
+    /// <param name="image">At most 4 MiB of API-produced format-5 JSON.</param>
+    /// <returns>An owned snapshot independent of the input buffer and JSON document.</returns>
+    /// <exception cref="InvalidDataException">Malformed/ambiguous JSON, unsupported declarations, inconsistent names/identity, or exceeded bounds.</exception>
+    /// <remarks>Rejects unknown declaration fields, duplicate JSON properties and unsupported signatures. Instruction bodies are not interpreted or translated.</remarks>
+    public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
+    {
+        if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("native image exceeds limit");
+        try
+        {
+            using var document = JsonDocument.Parse(image.ToArray(), new JsonDocumentOptions { MaxDepth = 64 });
+            var root = document.RootElement;
+            CheckDuplicates(root);
+            Shape(root, "format", "name", "revision", "references", "entry", "assemblies", "types", "functions");
+            Require(root.GetProperty("format").GetInt32() == 5, "unsupported native format");
+            var manifests = Array(root, "assemblies", 1); Require(manifests.Length == 1, "one assembly manifest required");
+            var manifest = manifests[0]; Shape(manifest, "name", "full_name", "modules", "references");
+            var identityText = Text(manifest, "full_name");
+            var identity = ReadIdentity(identityText);
+            CheckName(identity.Name);
+            Require(identity.PublicKeyToken.Length == 0 && identity.Flags == 0, "unsupported native assembly identity");
+            var moduleName = ModuleName(identityText);
+            Require(Text(root, "name") == moduleName && Text(root, "revision") == identity.Version.ToString() && Text(manifest, "name") == identity.Name, "native identity mismatch");
+            var modules = Array(manifest, "modules", 1);
+            Require(modules.Length == 1 && modules[0].GetString() == identity.Name + ".dll", "unsupported native module");
+            var referenceNames = Array(manifest, "references", 256).Select(e => e.GetString() ?? throw new InvalidDataException("null reference identity")).ToArray();
+            var references = Array(root, "references", 256);
+            Require(referenceNames.Length == references.Length, "native reference count mismatch");
+            var seenReferences = new HashSet<AssemblyIdentity>();
+            for (int i = 0; i < references.Length; i++)
+            {
+                var reference = ReadIdentity(referenceNames[i]); Shape(references[i], "name", "revision");
+                Require(!reference.Equals(identity) && seenReferences.Add(reference), "duplicate or self native reference");
+                Require(Text(references[i], "name") == ModuleName(referenceNames[i]) && Text(references[i], "revision") == reference.Version.ToString(), "native reference identity mismatch");
+            }
+            var typeElements = Array(root, "types", 256);
+            var types = new List<TypeRow>();
+            foreach (var type in typeElements)
+            {
+                Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin");
+                Require(Array(type, "fields", 0).Length == 0 && type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean() && type.GetProperty("is_sealed").GetBoolean(), "unsupported native type shape");
+                var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
+                Require(nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
+                var parts = nativeName[prefix.Length..].Split('_'); Require(parts.Length == 2, "invalid native type name");
+                var ns = Decode(parts[0]); var name = Decode(parts[1]);
+                Require(name.Length > 0 && name != "<Module>" && ns.Length + name.Length <= 1024 && types.All(t => t.NativeName != nativeName), "invalid or duplicate native type");
+                CheckName(ns.Length == 0 ? name : ns + "." + name);
+                var origin = type.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "publicly_visible");
+                Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
+                Require(origin.GetProperty("publicly_visible").GetBoolean(), "nonpublic native type unsupported");
+                types.Add(new(ns, name, nativeName));
+            }
+            var methods = new List<MethodRow>();
+            var methodNames = new List<string>();
+            var counts = new Dictionary<int, int>();
+            var seenMethods = new HashSet<(int Owner, string Name, int Count)>();
+            foreach (var method in Array(root, "functions", 4096))
+            {
+                Shape(method, "name", "owner", "parameters", "returns", "no_result", "origin", "body");
+                var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
+                var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
+                var owner = method.GetProperty("owner"); int ownerIndex = -1;
+                if (owner.ValueKind != JsonValueKind.Null)
+                {
+                    Shape(owner, "Named"); var ownerName = Text(owner, "Named");
+                    ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
+                }
+                else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
+                Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
+                var parameters = Array(method, "parameters", 256); Require(parameters.All(p => p.GetString() == "Int32"), "unsupported native parameter");
+                var noResult = method.GetProperty("no_result").GetBoolean();
+                Require(Text(method, "returns") == (noResult ? "Void" : "Int32"), "unsupported native result");
+                var expectedName = (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(name));
+                Require(Text(method, "name") == expectedName, "native callable name mismatch");
+                Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
+                Require(Text(origin, "member_access") == "Public", "nonpublic native method unsupported");
+                var tokens = Array(origin, "parameter_tokens", 256);
+                Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
+                Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
+                Require(seenMethods.Add((ownerIndex, name, parameters.Length)), "duplicate native signature");
+                counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
+                methods.Add(new(name, ownerIndex, parameters.Length, !noResult)); methodNames.Add(expectedName);
+            }
+            var entry = Text(root, "entry");
+            if (entry.Length != 0)
+            {
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Count == 0 && methods[p.index].ReturnsValue).ToArray();
+                Require(candidates.Length == 1, "invalid native entry point");
+            }
+            return new(identity, types.ToArray(), methods.ToArray());
+        }
+        catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
+        { throw new InvalidDataException("invalid native metadata", error); }
+    }
+
+    /// <summary>Creates a reference-only PE snapshot for the temporary .NET semantic-loader bridge.</summary>
+    /// <param name="coreLibrary">Explicit core identity supplying System.Object and ReferenceAssemblyAttribute.</param>
+    /// <returns>Owned PE bytes containing declarations, a ReferenceAssemblyAttribute and throwing placeholder bodies.</returns>
+    /// <exception cref="ArgumentNullException">Core identity is null.</exception>
+    /// <exception cref="InvalidDataException">Projection exceeds writer limits.</exception>
+    /// <remarks>No native body is translated. Entry points and native dependency references are not projected: supported signatures contain only primitives.
+    /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
+    public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
+    {
+        ArgumentNullException.ThrowIfNull(coreLibrary);
+        var graph = new AssemblyBuilder(Identity, coreLibrary);
+        var owners = types.Select(t => graph.AddType(t.Namespace, t.Name)).ToArray();
+        foreach (var method in methods)
+        {
+            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Count, method.ReturnsValue) : owners[method.Owner].AddMethod(method.Name, method.Count, method.ReturnsValue);
+            if (method.ReturnsValue) output.LoadConstant(0);
+            output.Return();
+        }
+        return graph.WriteReferenceImage();
+    }
+    private static void CheckName(string name)
+    {
+        Require(!string.IsNullOrWhiteSpace(name) && !name.Any(char.IsControl), "invalid native descriptive name");
+        _ = new UTF8Encoding(false, true).GetByteCount(name);
+    }
+    private static void Require(bool condition, string message) { if (!condition) throw new InvalidDataException(message); }
+    private static JsonElement[] Array(JsonElement element, string name, int limit)
+    {
+        var value = element.GetProperty(name); Require(value.ValueKind == JsonValueKind.Array && value.GetArrayLength() <= limit, "invalid or excessive " + name);
+        return value.EnumerateArray().ToArray();
+    }
+    private static string Text(JsonElement element, string name) => element.GetProperty(name).GetString() ?? throw new InvalidDataException("null " + name);
+    private static void Shape(JsonElement element, params string[] names)
+    {
+        Require(element.ValueKind == JsonValueKind.Object && element.EnumerateObject().Count() == names.Length && names.All(n => element.TryGetProperty(n, out _)), "unsupported native metadata fields");
+    }
+    private static void CheckDuplicates(JsonElement value)
+    {
+        if (value.ValueKind == JsonValueKind.Object)
+        {
+            var seen = new HashSet<string>();
+            foreach (var property in value.EnumerateObject()) { Require(seen.Add(property.Name), "duplicate JSON property"); CheckDuplicates(property.Value); }
+        }
+        else if (value.ValueKind == JsonValueKind.Array) foreach (var item in value.EnumerateArray()) CheckDuplicates(item);
+    }
+    private static string Decode(string hex)
+    {
+        var bytes = Convert.FromHexString(hex); Require(Convert.ToHexString(bytes) == hex, "noncanonical native name");
+        return new UTF8Encoding(false, true).GetString(bytes);
+    }
+    private static AssemblyIdentity ReadIdentity(string text)
+    {
+        var values = JsonSerializer.Deserialize<string[]>(text) ?? throw new InvalidDataException("missing native identity");
+        Require(values.Length == 5 && values.All(v => v is not null), "invalid native identity tuple");
+        var identity = new AssemblyIdentity(values[0], Version.Parse(values[1]), values[2], values[3], uint.Parse(values[4], CultureInfo.InvariantCulture));
+        var canonical = JsonSerializer.Serialize(new[] { identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(CultureInfo.InvariantCulture) });
+        Require(text == canonical, "noncanonical native identity"); return identity;
+    }
+    private static string ModuleName(string identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)));
+    private static void Origin(JsonElement origin, string identityText, AssemblyIdentity identity, string name, int token)
+    {
+        Require(Text(origin, "assembly") == identityText && Text(origin, "module") == identity.Name + ".dll" && Text(origin, "name") == name && origin.GetProperty("token").GetInt32() == token, "native origin mismatch");
+    }
+}

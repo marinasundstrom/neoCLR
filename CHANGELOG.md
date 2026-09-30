@@ -121,6 +121,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   independent and ordinary .NET compilation remains unchanged. The adapter now emits
   multiple source files with cross-file calls; both input orders verify/run to 42,
   and rejected later-file operations retain their source location without output.
+  Read bounded API-produced native declarations into an owned snapshot and project
+  reference-only PE metadata for Raven's current symbol loader. Validate declaration
+  consistency/bounds and reject unsupported shapes; bodies remain opaque to the
+  metadata reader. Mark projected PEs as reference assemblies with throwing bodies.
+  All 23 C# contract groups pass; Raven binds the native dependency through this
+  projection and all three applications run to 42 using the original native artifact.
+  This temporary input bridge does not implement a native semantic-data provider.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

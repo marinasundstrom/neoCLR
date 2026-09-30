@@ -447,3 +447,9 @@ retains the .NET input bootstrap and leaves native loading/target composition pe
 Multi-file adapter checkpoint (2026-09-30): cross-file function calls now execute
 in both source-tree orders, with correct later-file diagnostics and no partial output
 on validation failure. The native provider and production composition are still pending.
+
+Native-input checkpoint (2026-09-30): a bounded native declaration reader now feeds
+a temporary reference-only PE into Raven's existing semantic provider. The original
+native dependency runs with all three emitted application variants to 42. See
+[scope and replacement plan](raven-cli-bridge.md#native-dependency-input-through-a-reference-projection--2026-09-30);
+a native symbol provider and production registration remain pending.

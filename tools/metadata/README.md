@@ -160,3 +160,7 @@ consumer also checks unsupported operators and compiler binding failures.
 
 Read-only callable imports now let compiler consumers emit PE/native calls without
 the dependency builder graph. See the [host API reference](../../api-docs/experimental-metadata.md#importing-a-read-only-callable-development).
+
+The native declaration reader now projects compiler-only PE references from the
+writer's format-5 output. Bodies stay opaque; execute only the original native artifact.
+See the host API reference for strict bounds and the temporary input bridge contract.
