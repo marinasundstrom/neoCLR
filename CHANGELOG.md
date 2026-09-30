@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-09-30
+
+- Prepare and validate a local Function types toolchain, SDK and isolated VS Code
+  extension installation (`0.1.12-neoclr.20260929.functions1`). Include an editable
+  playground and callback, introspection and OfType projects with matching Build/Run
+  tasks. Record installed artifact hashes, four successful MSBuild consumers and
+  language-server completion/hover checks. Existing local installations are preserved;
+  this is a development snapshot, not a published release.
+
 ### 2026-09-29
 
 - Complete Function target inspection for ordinary instance bindings: preserve the

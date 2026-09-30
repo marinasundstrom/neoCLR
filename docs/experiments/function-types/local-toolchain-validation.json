@@ -1,0 +1,33 @@
+{
+  "date": "2026-09-30",
+  "status": "local development installation; not a release",
+  "version": "0.1.12-neoclr.20260929.functions1",
+  "neoclr_revision": "4d1e75065a5beb245d1610985beb864386ccef39",
+  "runtime_built_from": "19c6725f",
+  "runtime_source_note": "Bundle revision adds proposal documentation only; runtime sources match the built revision.",
+  "raven_revision": "47bc558d23486b166b2bb6d8747c2e6ab008cf88",
+  "sdk": "/Users/robert/.raven/sdk/0.1.12-neoclr.20260929.functions1",
+  "bundle": "/Users/robert/.neoclr/experiments/development-20260929-functions",
+  "vsix": "/Users/robert/.neoclr/builds/functions-20260929/raven-vscode.vsix",
+  "profile": "/Users/robert/.neoclr/vscode/functions-20260929",
+  "checks": {
+    "sdk_matching_files": 440,
+    "installed_extension_matching_files": 90,
+    "bundle_manifest": "all recorded payload hashes match",
+    "installed_msbuild_examples": {
+      "playground": "42\n42\nTrue\nFalse\nAddOne\n[Contracts]AddOne(System.Int32) -> System.Int32\nTrue\n42",
+      "callbacks": "Structural function callbacks passed",
+      "introspection": "Nominal and structural descriptors passed",
+      "oftype": "OfType query contracts passed"
+    },
+    "language_server": "Function object, FunctionTypeInfo, TypeInfo and NominalTypeInfo completion and hover over stdio LSP"
+  },
+  "sha256": {
+    "runtime": "4bbe448ccffbfd142eb876f0f1703f28d07fea12da35ca6ddbd1b74b16e8cc98",
+    "system": "80306eda09f1d9fd3b47b262411b074020de01b8a173cb54797ec343e92ef95d",
+    "reference": "998e2c5b3bafc5574b91f7acf2194ab000f4be482dea5c1547e7c37bd08e2e33",
+    "sdk_compiler": "412c4ca68b72d999ecc835002e9017d3875e94b3c0030ed5a244576db97eaddf",
+    "bridge": "0cdff21307aace92c604caad822735f95ec1e69af3b223d1a72e9bf7dea48018",
+    "vsix": "79cf8b6267364e8873dc70dd3e9b69b71b0a4ec019900afb590fd6db4359c602"
+  }
+}
