@@ -7,6 +7,9 @@ try
     if (args.Length == 0) throw new ArgumentException("selftest | emit path | roundtrip input output | reject input");
     switch (args[0])
     {
+        case "reference-vectors":
+            ReferenceChecks.Run(Read(args[1]));
+            break;
         case "signature-roundtrip":
             var signature = StructuralSignature.Read(Read(args[1]), args.Length > 3 && args[3] == "references");
             File.WriteAllBytes(args[2], StructuralSignature.Write(signature.Root, signature.Context,

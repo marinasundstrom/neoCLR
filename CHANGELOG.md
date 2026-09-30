@@ -41,8 +41,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   unchanged. Add the .NET structural signature reader/writer with immutable syntax
   trees and local generic/Self contexts: 14 cross-reader vectors and 103 rejection
   cases pass, and independent .NET nested emission matches Python. Preserve Function
-  modes/no-result and array distinctions with bounded decoding/encoding. Resolved
-  reference identities and Raven/neoCLR consumers remain pending.
+  modes/no-result and array distinctions with bounded decoding/encoding. Add .NET
+  reference-table read/write and explicit-catalog structural identity: 95 shared
+  vectors pass, including 22 equality/distinction cases and 69 rejections; independent
+  UUID byte-order emission, writer validation and ownership checks pass. Document
+  all six new host API types. Physical CLI binding and Raven/neoCLR consumers remain
+  pending; host scope UUIDs are not production assembly identities.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

@@ -254,8 +254,16 @@ for both .NET and neoCLR. This is a shared format/tooling requirement, not merel
 import path from Raven to the current runtime. Exact package names and implementation
 languages remain provisional. The Python codec is a research harness, not the proposed
 shipping library on either platform. The first [.NET library slice](../../tools/metadata/README.md)
-now covers framing, owned sections and structural signature syntax/context validation;
-reference resolution, Raven adapters and neoCLR guest library support remain pending.
+now covers framing, owned sections, structural signature syntax/context validation,
+reference tables and explicit-catalog structural identity. Physical CLI declaration
+resolution, Raven adapters and neoCLR guest library support remain pending.
+The catalog resolver reuses the provisional identity rules above: unlike a CLI token
+local to one module, its resolved key carries host-assigned assembly/module scope and
+declaration ownership. This permits reference renumbering without conflating binders,
+at the cost of requiring authoritative, compatible host catalogs. The UUID scopes
+are not a replacement for production CLI assembly identity.
+[95 shared vectors](../experiments/extended-cli-metadata/dotnet-references-validation.json)
+validate this bounded model; no execution, performance or production loader claim is made.
 
 The author clarifies the concrete library consumers:
 

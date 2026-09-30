@@ -17,7 +17,9 @@ type/member keys. A bounded PE32 #Neo probe preserves conventional metadata for
 .NET/Cecil inspection; Cecil rewriting strips the extension. An experimental marker/digest and explicit expected-input profile now reject
 stripped/changed metadata in 11 recognition cases. The first .NET reader/writer library now covers envelope framing, with four shared
 fixtures and 49 cross-reader rejection cases. Its structural signature codec now passes
-14 cross-reader vectors and 103 rejection cases; .NET reference-profile binding is next. Production loading and runtime support remain unimplemented. This scopes the requested exploration
+14 cross-reader vectors and 103 rejection cases. .NET reference tables and explicit-catalog
+structural identity pass 95 shared vectors (69 rejections). The next bounded slice is
+.NET synthesized-member contracts; PE/profile adapters and real CLI binding remain pending. Production loading and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 The author additionally requires eventual reader/writer support on both .NET and
 neoCLR. The [cross-platform library plan](design/extended-cli-metadata.md#reader-and-writer-support-on-net-and-neoclr)

@@ -502,3 +502,30 @@ Next bounded task: .NET reference-profile binding and declaration-owned structur
 identity against an explicit catalog, with cross-language equality/rejection fixtures.
 PE recognition and actual CLI declaration resolution remain independently required
 before Raven or guest Introspection/Emit integration.
+
+
+## .NET reference tables and structural identity (2026-09-30)
+
+The host library now reads/writes section-2/schema-1 tables and resolves structural
+identity against explicit host catalogs. Reference renumbering preserves identity;
+declaring method/type scopes and Self contracts remain significant. Normalization
+flattens like unions/intersections, removes duplicate operands and ignores order,
+without assignability or subtype reduction. Function modes/no-result and Array versus
+ArrayRef remain distinct. This ports the earlier Python model, not new runtime rules.
+
+`verify_dotnet_references.py` checks 95 shared cases, including 22 equality/distinction
+vectors, four table round-trips and 69 table/catalog rejections. Mixed-byte UUID golden
+vectors check .NET network-order reading and independent emission; the consumer also
+checks owned lists and writer rejection. Build passes with zero warnings/errors.
+[Recorded evidence](dotnet-references-validation.json) lists every case.
+The [host API reference](../../../api-docs/experimental-metadata.md) documents all six
+new types and their public members. Guest API snapshots remain unchanged.
+
+Scope UUIDs are host-assigned catalog identities, not physical CLI assembly identities.
+The library still needs PE/profile recognition, actual CLI declaration resolution and
+consumer adapters. No Raven symbol loading, guest Introspection loading, assembly
+emission or runtime execution is established by equality conformance.
+
+Next bounded task: port synthesized structural-member references/contracts into the
+.NET library using the shared member fixtures. Keep actual PE binding and Raven/guest
+integration as separately validated adapters.

@@ -4,8 +4,9 @@
 Assembly and namespace: `NeoCLR.Metadata.Experimental`. Target: .NET 10.
 Source project: `tools/metadata/NeoCLR.Metadata.Experimental`.
 This is the first reusable reader/writer slice intended for Raven's future symbol
-loader and code-generation adapters. It reads/writes **NEOX 0.1 framing and structural signature syntax**.
-No PE/CLI loading, artifact recognition, reference resolution,
+loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structural signatures and reference tables**,
+and resolves structural equality against an explicitly supplied host catalog.
+No PE/CLI loading, artifact recognition, physical CLI declaration resolution,
 Introspection assembly loading or assembly emission is implemented by this library yet.
 
 ## Namespace and types
@@ -15,6 +16,11 @@ Introspection assembly loading or assembly emission is implemented by this libra
 - [TypeExpression](#typeexpression): immutable raw signature syntax tree.
 - [SignatureContext](#signaturecontext): local generic arities and Self permission.
 - [StructuralSignature](#structuralsignature): validated signature read/write operations.
+- [MetadataReference and MetadataDefinition](#metadatareference-and-metadatadefinition): catalog keys and declarations.
+- [ReferenceBindings](#referencebindings): owned local references and binder owners.
+- [ReferenceTable](#referencetable): reference payload read/write operations.
+- [StructuralIdentity](#structuralidentity): catalog validation and normalized equality.
+- [ResolvedTypeIdentity](#resolvedtypeidentity): immutable resolved equality key.
 
 These .NET-host-only types have this complete manual reference because the site's
 RavenDoc source is the neoCLR guest compiler-reference assembly. They are not omitted
@@ -198,8 +204,8 @@ Unknown nodes, flags, modes, trailing bytes and out-of-bounds counts fail.
 With `allowReferences: false`, nominal nodes are rejected (section-1 profile).
 With `true`, the section-3 grammar admits a nominal index in 1–256 and up to 256
 argument children. This is grammar permission, **not** a check that the reference exists,
-is a type or has matching generic arity; the future reference layer must perform those
-checks. Standalone byref-result syntax, full primitive support, declaration resolution,
+is a type or has matching generic arity; `StructuralIdentity.Resolve` performs those
+checks against an explicit catalog. Standalone byref-result syntax, full primitive support, declaration resolution,
 position legality, member synthesis and execution remain outside this codec.
 
 The library preserves canonical payload framing, so valid read/write round-trips are
@@ -224,3 +230,122 @@ Both readers reject 103 malformed vectors, including every nested-fixture trunca
 invalid binders/Self contexts, unknown nodes/modes, bad conventions/flags, malformed
 lengths and depth/node limits. Writer/ownership and exact depth/arity boundaries are
 also exercised. None of these tests claims that the decoded metadata can execute.
+
+
+## MetadataReference and MetadataDefinition
+
+```csharp
+public readonly record struct MetadataReference(Guid Assembly, Guid Module, uint Token);
+public sealed record MetadataDefinition(string Kind, int Arity = 0,
+                                        MetadataReference? Owner = null);
+```
+
+Positional constructors and matching public init properties store the given values.
+Records provide value equality, hashes, deconstruction, printable representations and
+`with` copies. They do not validate at construction; table/resolver operations validate
+before use. Default MetadataReference is invalid. Assembly and Module must be nonempty
+host-assigned scope UUIDs; Token must be a TypeDef (0x02) or MethodDef (0x06) token with
+a nonzero row. These scopes are **not** CLI assembly names, MVID-derived assembly
+identity or a promise that a token exists in a physical PE image.
+
+Definition Kind is `type`, `interface` or `method`, with Arity 0–256. Only methods
+require Owner, a declaring-type reference. All other declarations require null Owner.
+The host supplies authoritative declarations, including referenced dependencies, and
+must use compatible scope assignments across catalogs when comparing resolved keys.
+
+## ReferenceBindings
+
+```csharp
+public sealed class ReferenceBindings
+{
+    public ReferenceBindings(IReadOnlyList<MetadataReference> references,
+        int typeOwner = 0, int methodOwner = 0, int selfOwner = 0);
+    public IReadOnlyList<MetadataReference> References { get; }
+    public int TypeOwner { get; }
+    public int MethodOwner { get; }
+    public int SelfOwner { get; }
+}
+```
+
+Copies the list into owned read-only storage. Null references raises
+ArgumentNullException; more than 256 entries raises ArgumentException. Owners are
+one-based local indices, with zero meaning absent. Further validation occurs in
+ReferenceTable and StructuralIdentity. TypeOwner and SelfOwner must name TypeDefs;
+MethodOwner must name a MethodDef. References must be unique.
+
+## ReferenceTable
+
+```csharp
+public static class ReferenceTable
+{
+    public static ReferenceBindings Read(ReadOnlySpan<byte> payload);
+    public static byte[] Write(ReferenceBindings bindings);
+}
+```
+
+Reads/writes section 2, schema 1: four little-endian u16 values for count/type owner/
+method owner/Self owner, followed by 36-byte reference rows. UUID bytes use network
+order, tokens little-endian order. At most 256 rows are allowed; input must have the
+exact expected length. Invalid GUIDs, token kinds/rows, duplicates, owner kinds/indices,
+truncation or trailing bytes raise InvalidDataException. Null writer bindings raises
+ArgumentNullException. Read owns its data; Write returns a fresh caller-owned array.
+Neither resolves declarations or checks that nominal uses exist in the table.
+
+## StructuralIdentity
+
+```csharp
+public static class StructuralIdentity
+{
+    public static ResolvedTypeIdentity Resolve(TypeExpression root,
+        SignatureContext context, ReferenceBindings bindings,
+        IReadOnlyDictionary<MetadataReference, MetadataDefinition> catalog);
+}
+```
+
+Validates bounded signature syntax, reference-table rules, catalog kinds and arities,
+nominal generic arguments, and declaring owners before returning an identity. Null
+arguments raise ArgumentNullException; malformed or unresolved data raises
+InvalidDataException. Do not mutate the catalog during resolution. Every reference
+must resolve, including unused entries. A nominal use must point to a type/interface
+with the exact number of arguments. Generic binders require matching declaring-owner
+arities; a bound method's declaring type must match TypeOwner. Self permission must
+match the presence of SelfOwner, which must identify a nongeneric interface contract.
+
+Generic parameters are keyed by declaring reference and ordinal; Self by contract.
+Local indices and table/directory order do not enter resolved identity. Unions and
+intersections flatten the same operator, discard duplicate operands and ignore order.
+A deduplicated singleton retains its operator wrapper. Tuples/arguments retain order;
+Function modes and no-result, and Array versus ArrayRef, remain distinct. This does
+not implement assignability, subtype reduction, distribution or null equivalences.
+
+Callers select and validate the envelope profile: section 2/schema 1 plus section
+3/schema 1 are required, and section 1 must not be mixed in. These payload-level APIs
+do not implement a production profile loader or PE recognition. They cannot establish
+that an assembly is safe to execute or populate Raven/neoCLR objects themselves.
+
+## ResolvedTypeIdentity
+
+```csharp
+public sealed class ResolvedTypeIdentity : IEquatable<ResolvedTypeIdentity>
+{
+    public bool Equals(ResolvedTypeIdentity? other);
+    public override bool Equals(object? obj);
+    public override int GetHashCode();
+}
+```
+
+Created only by Resolve; no public constructor or mutable state. Equals compares full
+resolved keys, returns false for null/other object types, and is consistent with the
+process-local hash. Use Equals or a normal equality-based collection; `==` is not
+overloaded. Neither hash codes nor private canonical bytes are persistence formats.
+
+The separate conformance consumer exercises these APIs with Python-generated tables,
+signatures and explicit catalogs:
+
+```sh
+python3 docs/experiments/extended-cli-metadata/verify_dotnet_references.py
+```
+
+All 95 shared vectors pass: 22 equality/distinction cases, four table round-trips and
+69 rejections. Independent C# golden UUID emission/reading, writer validation and list
+ownership checks also pass. The test-only JSON transport is not a library API.

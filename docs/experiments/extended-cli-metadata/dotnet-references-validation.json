@@ -1,0 +1,392 @@
+{
+  "date": "2026-09-30",
+  "scope": "explicit host catalog; no PE declaration loading or execution",
+  "dotnet_sdk": "11.0.100-rc.1.26425.128",
+  "target_framework": "net10.0",
+  "shared_vectors": 95,
+  "equality_vectors": 22,
+  "rejection_vectors": 69,
+  "independent_network_uuid_emission_and_ownership_checks": "passed",
+  "cases": [
+    {
+      "name": "reference-renumbering",
+      "result": "equal"
+    },
+    {
+      "name": "method-owner",
+      "result": "different"
+    },
+    {
+      "name": "assembly-scope",
+      "result": "different"
+    },
+    {
+      "name": "module-scope",
+      "result": "different"
+    },
+    {
+      "name": "self-contract",
+      "result": "different"
+    },
+    {
+      "name": "union-normalization",
+      "result": "equal"
+    },
+    {
+      "name": "union-singleton-wrapper",
+      "result": "different"
+    },
+    {
+      "name": "intersection-normalization",
+      "result": "equal"
+    },
+    {
+      "name": "intersection-singleton-wrapper",
+      "result": "different"
+    },
+    {
+      "name": "tuple-order",
+      "result": "different"
+    },
+    {
+      "name": "array-storage",
+      "result": "different"
+    },
+    {
+      "name": "unit-no-result",
+      "result": "different"
+    },
+    {
+      "name": "mode-value-ref",
+      "result": "different"
+    },
+    {
+      "name": "mode-value-readonly_ref",
+      "result": "different"
+    },
+    {
+      "name": "mode-value-out",
+      "result": "different"
+    },
+    {
+      "name": "mode-value-out_when_true",
+      "result": "different"
+    },
+    {
+      "name": "mode-ref-readonly_ref",
+      "result": "different"
+    },
+    {
+      "name": "mode-ref-out",
+      "result": "different"
+    },
+    {
+      "name": "mode-ref-out_when_true",
+      "result": "different"
+    },
+    {
+      "name": "mode-readonly_ref-out",
+      "result": "different"
+    },
+    {
+      "name": "mode-readonly_ref-out_when_true",
+      "result": "different"
+    },
+    {
+      "name": "mode-out-out_when_true",
+      "result": "different"
+    },
+    {
+      "name": "missing-catalog",
+      "result": "reject"
+    },
+    {
+      "name": "binder-arity",
+      "result": "reject"
+    },
+    {
+      "name": "self-not-interface",
+      "result": "reject"
+    },
+    {
+      "name": "self-generic",
+      "result": "reject"
+    },
+    {
+      "name": "method-owner-mismatch",
+      "result": "reject"
+    },
+    {
+      "name": "wrong-definition-kind",
+      "result": "reject"
+    },
+    {
+      "name": "negative-arity",
+      "result": "reject"
+    },
+    {
+      "name": "excessive-arity",
+      "result": "reject"
+    },
+    {
+      "name": "method-no-owner",
+      "result": "reject"
+    },
+    {
+      "name": "type-with-owner",
+      "result": "reject"
+    },
+    {
+      "name": "missing-type-owner",
+      "result": "reject"
+    },
+    {
+      "name": "missing-method-owner",
+      "result": "reject"
+    },
+    {
+      "name": "missing-self-owner",
+      "result": "reject"
+    },
+    {
+      "name": "bad-nominal-1",
+      "result": "reject"
+    },
+    {
+      "name": "bad-nominal-3",
+      "result": "reject"
+    },
+    {
+      "name": "bad-nominal-4",
+      "result": "reject"
+    },
+    {
+      "name": "table-empty",
+      "result": "valid"
+    },
+    {
+      "name": "table-fixture",
+      "result": "valid"
+    },
+    {
+      "name": "table-mixed-uuid",
+      "result": "valid"
+    },
+    {
+      "name": "table-maximum",
+      "result": "valid"
+    },
+    {
+      "name": "table-truncated-0",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-1",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-2",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-3",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-4",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-5",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-6",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-7",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-8",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-9",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-10",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-11",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-12",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-13",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-14",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-15",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-16",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-17",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-18",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-19",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-20",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-21",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-22",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-23",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-24",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-25",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-26",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-27",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-28",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-29",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-30",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-31",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-32",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-33",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-34",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-35",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-36",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-37",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-38",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-39",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-40",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-41",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-42",
+      "result": "reject"
+    },
+    {
+      "name": "table-truncated-43",
+      "result": "reject"
+    },
+    {
+      "name": "table-trailing",
+      "result": "reject"
+    },
+    {
+      "name": "table-zero-assembly",
+      "result": "reject"
+    },
+    {
+      "name": "table-zero-module",
+      "result": "reject"
+    },
+    {
+      "name": "table-duplicate",
+      "result": "reject"
+    },
+    {
+      "name": "table-count",
+      "result": "reject"
+    },
+    {
+      "name": "table-owner-range",
+      "result": "reject"
+    },
+    {
+      "name": "table-owner-kind",
+      "result": "reject"
+    },
+    {
+      "name": "table-token-kind",
+      "result": "reject"
+    },
+    {
+      "name": "table-token-row",
+      "result": "reject"
+    }
+  ]
+}
