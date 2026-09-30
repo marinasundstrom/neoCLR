@@ -2,8 +2,10 @@
 
 **Status: exploratory design, 2026-09-30.** Author-selected work on
 `codex/extended-cli-metadata`, based on main `3ac2ae7c5c8434d743d1b866d87e6b21f48e4de0`.
-This document starts format development; no binary reader, writer, runtime feature,
-or Raven integration is implemented by this change. Numeric encodings are unassigned.
+This document starts format development. A standalone
+[framing experiment](../experiments/extended-cli-metadata/README.md) now has a reader,
+writer and inspector. No CLI embedding, runtime feature or Raven integration is
+implemented. Production numeric encodings remain unassigned.
 
 ## Purpose and inputs
 
@@ -195,7 +197,7 @@ literal transport needs its own explicit contract.
 | Step | Deliverable and exit evidence | Status |
 | --- | --- | --- |
 | 0 | Main-based branch, proposal inventory, structural requirements and compatibility questions | This document |
-| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | Next bounded task |
+| 1 | Standalone experimental envelope/signature codec and inspector; precise experimental byte schema and golden fixtures | [Framing implemented](../experiments/extended-cli-metadata/README.md); structural payloads next |
 | 2 | Structural identity/resolution tests across independently emitted modules; synthesized-member and conformance references | Planned |
 | 3 | One native consumer slice using Self and structural Function signatures; verifier, invocation, GC and introspection evidence | Planned; depends on explicit runtime feature work |
 | 4 | Raven reader/symbol adapter, then writer/backend integration through target capabilities | Later integration |

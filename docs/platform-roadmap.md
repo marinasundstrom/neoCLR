@@ -10,8 +10,8 @@ on `codex/extended-cli-metadata`, based on main, with later Raven integration.
 Structural types are an explicit design requirement, including arrays, tuples,
 Function types, unions/intersections and synthesized members. The
 [design and staged acceptance plan](design/extended-cli-metadata.md) is exploratory;
-its next bounded task is an isolated codec/inspector prototype. No format or runtime
-support is implemented by the design slice. This scopes the requested exploration
+an isolated codec/inspector now validates experimental framing; structural payloads
+are next. CLI embedding and runtime support remain unimplemented. This scopes the requested exploration
 without promoting all proposals or merging the structural runtime experiment.
 
 **Immediate focus — Raven neoCLR target support (author-selected 2026-09-30).**

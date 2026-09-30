@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Start extended CLI metadata design on a main-based feature branch, covering
   structural types, synthesized member identity, capabilities, compatibility limits
   and a staged Raven integration plan. Record research and planned codec acceptance;
-  no binary format, runtime support or Raven compiler change is implemented yet.
+  add an isolated NEOX 0.1 framing codec/inspector with a golden vector and six
+  focused tests for bounds, malformed directories and required schema negotiation.
+  CLI embedding, runtime support and Raven compiler changes remain unimplemented.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
