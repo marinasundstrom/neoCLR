@@ -7,6 +7,27 @@ try
     if (args.Length == 0) throw new ArgumentException("selftest | emit path | roundtrip input output | reject input");
     switch (args[0])
     {
+        case "signature-roundtrip":
+            var signature = StructuralSignature.Read(Read(args[1]), args.Length > 3 && args[3] == "references");
+            File.WriteAllBytes(args[2], StructuralSignature.Write(signature.Root, signature.Context,
+                args.Length > 3 && args[3] == "references"));
+            break;
+        case "signature-reject":
+            try { StructuralSignature.Read(Read(args[1]), args.Length > 2 && args[2] == "references"); }
+            catch (InvalidDataException) { Console.WriteLine("rejected"); return 0; }
+            throw new Exception("malformed signature accepted");
+        case "signature-emit":
+            var root = new TypeExpression("function", [
+                new("array", [new("tuple", [new("int32"), new("string")])]),
+                new("intersection", [new("type_parameter"), new("self")]),
+                new("union", [new("nullable", [new("method_parameter")]), new("unit")])
+            ], modes: ["value", "readonly_ref"]);
+            File.WriteAllBytes(args[1], StructuralSignature.Write(root, new SignatureContext(1, 1, true)));
+            break;
+        case "signature-selftest":
+            SignatureChecks();
+            Console.WriteLine("signature writer, ownership and boundary checks passed");
+            break;
         case "roundtrip":
             File.WriteAllBytes(args[2], MetadataEnvelope.Write(MetadataEnvelope.Read(Read(args[1]), schemas), schemas));
             break;
@@ -71,4 +92,44 @@ static void Reject(Action action)
     try { action(); }
     catch (InvalidDataException) { return; }
     throw new Exception("invalid writer or schema input accepted");
+}
+
+static void SignatureChecks()
+{
+    var context = new SignatureContext();
+    var integer = new TypeExpression("int32");
+    var children = new[] { integer, new TypeExpression("unit") };
+    var modes = new[] { "ref" };
+    var function = new TypeExpression("function", children, modes: modes);
+    children[0] = new TypeExpression("string");
+    modes[0] = "out";
+    Check(function.Children[0].Kind == "int32" && function.Modes[0] == "ref", "owned node lists");
+    foreach (var node in new TypeExpression[] {
+        new("unknown"), new("self"), new("type_parameter"), new("method_parameter"),
+        new("tuple"), new("union", [integer]), new("array"), new("nominal", index: 1),
+        new("int32", [integer]), new("int32", index: 1), new("int32", noResult: true),
+        new("function", [integer, integer]),
+        new("function", [integer, integer], modes: ["out_when_true"]),
+        new("function", [integer], noResult: true),
+        new("function", [integer, integer], modes: ["unknown"])
+    }) Reject(() => StructuralSignature.Write(node, context));
+    var deep = integer;
+    for (int i = 0; i < 32; i++) deep = new("array", [deep]);
+    StructuralSignature.Read(StructuralSignature.Write(deep, context));
+    deep = new("array", [deep]);
+    Reject(() => StructuralSignature.Write(deep, context));
+    var wide = new TypeExpression("tuple", Enumerable.Repeat(integer, 256).ToArray());
+    StructuralSignature.Read(StructuralSignature.Write(wide, context));
+    var tooMany = new TypeExpression("tuple", Enumerable.Repeat(wide, 16).ToArray());
+    Reject(() => StructuralSignature.Write(tooMany, context));
+    foreach (var mode in new[] { "value", "ref", "readonly_ref", "out", "out_when_true" })
+    {
+        var node = new TypeExpression("function", [integer, new("bool")], modes: [mode]);
+        var bytes = StructuralSignature.Write(node, context);
+        var read = StructuralSignature.Read(bytes);
+        Check(read.Root.Modes[0] == mode && read.Root.Children[^1].Kind == "bool", "Function contract");
+    }
+    var unit = new TypeExpression("function", [new("unit")]);
+    var absent = new TypeExpression("function", [new("unit")], noResult: true);
+    Check(!StructuralSignature.Write(unit, context).SequenceEqual(StructuralSignature.Write(absent, context)), "unit versus no result");
 }

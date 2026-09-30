@@ -474,3 +474,31 @@ and neoCLR guest assembly loading/emission still require further slices.
 Next bounded task: .NET structural signature decoding/encoding and rejection tests
 against the same independent vectors. Keep PE recognition and real declaration binding
 as separate adapters rather than conflating framing success with semantic acceptance.
+
+## .NET structural signature codec (2026-09-30)
+
+The host library now adds immutable TypeExpression/SignatureContext objects and the
+StructuralSignature reader/writer. It implements the same local and reference-profile
+signature grammar as Python, including local nominal indices without resolving them.
+The [complete host API](../../../api-docs/experimental-metadata.md#structuralsignature)
+documents every type/member, supported spelling, ownership rule, limit and error.
+
+`verify_dotnet_signatures.py` builds the separate consumer and verifies 14 positive
+cross-reader vectors and 103 shared rejection cases. It compares independently built
+.NET nested-Function output against Python emission and checks writer validation, list
+ownership and exact valid depth/arity boundaries. Existing fixture payloads re-encode
+identically. [dotnet-signatures-validation.json](dotnet-signatures-validation.json)
+records versions, case inventory and positive-vector hashes. Build succeeds with zero
+warnings/errors. This reuses the established format/structural-branch comparison;
+it does not expand runtime type behavior or make performance claims.
+
+Envelope conformance remains separate. The .NET signature codec does not inspect PE,
+validate nominal table references, bind Self to a contract, normalize type identity,
+synthesize members, populate Raven symbols or load assemblies into Introspection.
+These remain explicit next layers. The Python reference/member model supplies shared
+fixtures, not a dependency of the .NET library.
+
+Next bounded task: .NET reference-profile binding and declaration-owned structural
+identity against an explicit catalog, with cross-language equality/rejection fixtures.
+PE recognition and actual CLI declaration resolution remain independently required
+before Raven or guest Introspection/Emit integration.

@@ -38,7 +38,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   conformance consumer. Four fixtures round-trip identically, independent .NET/Python
   emission agrees, and both readers reject 49 malformed vectors. Document all host
   types/members manually on the API site and in generated XML; guest snapshots stay
-  unchanged. Structural payload decoding and Raven/neoCLR consumers remain pending.
+  unchanged. Add the .NET structural signature reader/writer with immutable syntax
+  trees and local generic/Self contexts: 14 cross-reader vectors and 103 rejection
+  cases pass, and independent .NET nested emission matches Python. Preserve Function
+  modes/no-result and array distinctions with bounded decoding/encoding. Resolved
+  reference identities and Raven/neoCLR consumers remain pending.
 
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after

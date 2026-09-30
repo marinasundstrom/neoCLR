@@ -419,7 +419,10 @@ from the nominal main-based bridge, not copied from the Function feature branch.
 ## Experimental .NET metadata tooling (2026-09-30)
 
 `NeoCLR.Metadata.Experimental.MetadataEnvelope` and
-`NeoCLR.Metadata.Experimental.MetadataSection` are .NET-host-only types in
+`NeoCLR.Metadata.Experimental.MetadataSection`,
+`NeoCLR.Metadata.Experimental.TypeExpression`,
+`NeoCLR.Metadata.Experimental.SignatureContext` and
+`NeoCLR.Metadata.Experimental.StructuralSignature` are .NET-host-only types in
 `tools/metadata/NeoCLR.Metadata.Experimental`, not types in NeoCLR.CoreProbe or the
 Raven guest library. They therefore cannot be added to that assembly's RavenDoc type
 selection or refreshed from a guest compiler bridge. Their complete signatures,
