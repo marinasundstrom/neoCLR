@@ -9379,3 +9379,17 @@ remote synchronization does not publish a runtime bundle or website.
   pass in both source orders at Raven `0c13e890b`; no format changes were required.
 - **Next action:** Move native emission beyond the hard-coded probe. Broader source
   coverage and production target composition remain open.
+
+
+### 2026-09-30 — Translated System as compiler symbol input
+
+- **Author clarification:** “We of course also want to load symbol into the compiler
+  from neoclr assemblies. That is where the translated System (.Runtime) assembly plays in”.
+- **Assistant response:** Treat native emission and native symbol loading as paired
+  integration tracks. The translated System assembly is the next symbol-loader
+  acceptance input; host .NET primitive binding does not satisfy that requirement.
+- **Action:** Add an opt-in compiler command for actual source files and current
+  writer-produced PE/#Neo references. Keep the separate metadata project ownership.
+- **Open:** General native declarations, fields/generics/signatures, and a faithful
+  projection or native symbol provider sufficient to bind against translated System.
+  The command does not claim that support; see the [loader boundary](raven-cli-bridge.md#opt-in-native-compiler-command--2026-09-30).

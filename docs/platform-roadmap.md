@@ -66,6 +66,14 @@ compiler reimport and native calls, including same-name types in different names
 and both source orders. Wider signatures, native symbols and actual runtime class-library
 source compilation remain next. [Compiler contract](raven-cli-bridge.md#unit-returning-native-helpers-and-library-methods--2026-09-30).
 
+**Native compiler command:** An opt-in `rvnc neoclr` command now compiles source files
+and native writer-produced PE references directly to PE/#Neo, including assembly-owned
+functions. The author confirms symbol loading from translated System/System.Runtime is
+also required. Prioritize that loader acceptance alongside native emission; host primitive
+binding is only a bootstrap, not evidence of translated System symbol loading. Broader
+native declaration reading/projection or a native symbol provider is still required.
+[Command and loader boundary](raven-cli-bridge.md#opt-in-native-compiler-command--2026-09-30).
+
 **Earlier metadata checkpoints (historical progression):** The PE reader now recovers
 owned global/type callable declarations and the writer's static Int32 signature subset;
 21 C# contract groups cover ownership, unsupported signatures, decoding limits and

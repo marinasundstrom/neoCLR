@@ -17,6 +17,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   process cases and 16 focused Rust/CLI tests. Structural runtime support and
   production target registration remain pending. This is feature-branch support,
   not a published format or a general CIL loader.
+  Raven now offers an opt-in `rvnc neoclr` command for source files and API-produced
+  native PE references, emitting directly through the independent metadata project.
+  Process tests verify/run a separately compiled library/application with assembly-owned
+  functions. Translated standalone System symbol loading remains the next loader goal;
+  the command currently uses the documented host primitive bootstrap.
   Preserve namespaced Raven static library types through emission, reference reimport
   and native calls; same-name types in different namespaces execute correctly in both
   source orders. Namespace-owned functions and nested types remain rejected without

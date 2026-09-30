@@ -399,3 +399,55 @@ pending. This extends the earlier global-namespace-only compiler checkpoint.
 Validation: Raven `0c13e890b` on `codex/metadata-consumer`, metadata API at neoCLR
 `d075cb44` and runtime built at `116be40e`. The full C# probe and native verification/
 execution pass; Raven `tools/NeoClrMetadataProbe/validation.json` records artifact hashes.
+
+### Opt-in native compiler command — 2026-09-30
+
+Build `src/Raven.Compiler` with `-p:NeoClrMetadataProject=/absolute/path/to/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/NeoCLR.Metadata.Experimental.csproj`
+to enable `rvnc neoclr`. The metadata library remains an independent project and is
+not a dependency of ordinary compiler builds. Without that property the command
+reports how to enable it; default .NET emission is unchanged.
+
+```sh
+dotnet rvnc.dll neoclr --library -o Library.dll Library.rvn
+dotnet rvnc.dll neoclr --reference Library.dll -o App.dll Main.rvn Helper.rvn
+neoclr verify App.dll --module Library.dll
+neoclr run App.dll --module Library.dll
+```
+
+The command compiles supplied source files through the bounded native adapter and
+writes PE/#Neo schema-2 assemblies directly. Global source functions become native
+assembly-owned functions; classes retain namespaces. Repeated `--reference` options
+load native API-produced PE assemblies, validate their native declarations, and expose
+their CLI reference-only projections to Raven. No CLI-to-neoil application translation
+is involved. Binding/encoding failures create no destination, existing outputs are
+refused, and unknown options fail. Successful output creation uses CreateNew; a later
+I/O failure may leave a partial file. Output identity is its filename without extension,
+version 1.0.0.0, unsigned. Without `-o`, the first source's extension becomes `.dll`.
+
+This is a source-file command, not project/MSBuild/publish integration. It generates no
+PDB, runtimeconfig or apphost and does not execute under .NET. Explicit dependency
+paths are required; there is no automatic dependency resolution. C# process checks
+compile a namespaced library and a two-file application, exercise native assembly-owned
+Unit function calls and Console literal output, and verify/run in neoCLR to 42.
+Failures cover unsupported source, ordinary CLI references, invalid options and existing
+output preservation. The full earlier metadata probe remains green.
+
+**Symbol-loading boundary:** Host .NET primitive/Console/System.Runtime references
+remain a temporary semantic bootstrap (`TargetPlatform.DotNet`). The command configures
+that core identity and Console contract explicitly, without changing Runtime Contract
+options. It does not yet accept the translated standalone System assembly as a core
+reference: that file has broad format-5 declarations and no CLI projection, beyond the
+writer-shaped declaration reader's subset. The author's required next loader acceptance
+is to obtain Raven symbols from that translated System/System.Runtime metadata itself,
+then compile against and execute with the matching runtime assembly. Implement a native
+symbol provider or faithful broader projection; do not replace those symbols with host
+.NET equivalents or silently omit unsupported declarations. Emission and symbol loading
+are parallel integration requirements; full format adaptation is not a prerequisite for
+making the supported native compiler path usable.
+
+Validation: Raven `22b18a642` on `codex/metadata-consumer`, independent metadata API
+at neoCLR `9c95b10c`, release runtime built at `116be40e`. The C# probe with
+`--driver /path/to/rvnc.dll` passed all prior checks plus native command process cases.
+Raven's checked-in `tools/NeoClrMetadataProbe/validation.json` records matching tool
+hashes. A separate net10.0 default compiler build had no native metadata dependency,
+reported the disabled command and compiled an ordinary .NET application successfully.
