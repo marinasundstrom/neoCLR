@@ -9,7 +9,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
+    private sealed record FieldRow(string Name, PrimitiveType Type, FieldVisibility Visibility);
     private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
@@ -60,6 +61,7 @@ public sealed class NativeAssemblyDefinition
             }
             var typeElements = Array(root, "types", 256);
             var types = new List<TypeRow>();
+            int nextFieldToken = 0x04000001;
             foreach (var type in typeElements)
             {
                 var visibility = TypeVisibility.Public;
@@ -73,17 +75,42 @@ public sealed class NativeAssemblyDefinition
                     };
                 }
                 else Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin");
-                Require(Array(type, "fields", 0).Length == 0 && type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean() && type.GetProperty("is_sealed").GetBoolean(), "unsupported native type shape");
+                var isStatic = type.GetProperty("is_abstract").GetBoolean();
+                Require(type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_sealed").GetBoolean() == isStatic, "unsupported native type shape");
+                var fieldRows = new List<FieldRow>();
+                foreach (var field in Array(type, "fields", 256))
+                {
+                    Shape(field, "name", "ty", "visibility");
+                    var fieldName = Text(field, "name"); CheckName(fieldName);
+                    Require(fieldName.Length <= 1024 && fieldRows.All(f => f.Name != fieldName), "invalid or duplicate field");
+                    var fieldVisibility = Text(field, "visibility") switch {
+                        "public" => FieldVisibility.Public, "internal" => FieldVisibility.Internal, "private" => FieldVisibility.Private,
+                        _ => throw new InvalidDataException("unsupported field visibility") };
+                    fieldRows.Add(new(fieldName, ReadPrimitive(Text(field, "ty"), false), fieldVisibility));
+                }
+                Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
+                Require(nextFieldToken + fieldRows.Count <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
                 Require(nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
                 var parts = nativeName[prefix.Length..].Split('_'); Require(parts.Length == 2, "invalid native type name");
                 var ns = Decode(parts[0]); var name = Decode(parts[1]);
                 Require(name.Length > 0 && name != "<Module>" && ns.Length + name.Length <= 1024 && types.All(t => t.NativeName != nativeName), "invalid or duplicate native type");
                 CheckName(ns.Length == 0 ? name : ns + "." + name);
-                var origin = type.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "publicly_visible");
+                var origin = type.GetProperty("origin");
+                if (fieldRows.Count == 0) Shape(origin, "assembly", "module", "name", "token", "publicly_visible");
+                else
+                {
+                    Shape(origin, "assembly", "module", "name", "token", "publicly_visible", "field_tokens", "field_access", "field_readonly");
+                    var tokens = Array(origin, "field_tokens", 256); var fieldAccess = Array(origin, "field_access", 256); var readOnly = Array(origin, "field_readonly", 256);
+                    Require(tokens.Length == fieldRows.Count && fieldAccess.Length == fieldRows.Count && readOnly.Length == fieldRows.Count, "field origin count mismatch");
+                    for (int f = 0; f < fieldRows.Count; f++)
+                        Require(tokens[f].GetInt32() == nextFieldToken + f && !readOnly[f].GetBoolean() && fieldAccess[f].GetString() ==
+                            (fieldRows[f].Visibility == FieldVisibility.Internal ? "Assembly" : fieldRows[f].Visibility.ToString()), "field origin mismatch");
+                }
+                nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray()));
             }
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -164,7 +191,9 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => graph.AddType(t.Namespace, t.Name, t.Visibility)).ToArray();
+        var owners = types.Select(t => t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
+        for (int t = 0; t < types.Length; t++)
+            foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type, field.Visibility);
         foreach (var method in methods)
         {
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);

@@ -121,6 +121,14 @@ public sealed partial class AssemblyBuilder
             }).ToArray();
         }
         foreach (var type in types) CheckText(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name);
+        var fieldTokens = types.SelectMany(t => t.Fields).Select((field, index) => (field, token: 0x04000001 + index)).ToDictionary(p => p.field, p => p.token);
+        object TypeOrigin(TypeBuilder type, int index) => type.Fields.Count == 0
+            ? Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public)
+            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name,
+                token = 0x02000002 + index, publicly_visible = type.Visibility == TypeVisibility.Public,
+                field_tokens = type.Fields.Select(f => fieldTokens[f]).ToArray(),
+                field_access = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
+                field_readonly = type.Fields.Select(_ => false).ToArray() };
         var artifact = new
         {
             format = 5,
@@ -130,9 +138,8 @@ public sealed partial class AssemblyBuilder
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { new { name = Identity.Name, full_name = IdentityText(Identity), modules = new[] { Identity.Name + ".dll" }, references = dependencies.Keys.Select(IdentityText).ToArray() } },
             types = types.Select((type, index) => new NativeTypeRow(
-                TypeName(type), [], true, true, true,
-                Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name,
-                    0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public),
+                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = f.FieldType.ToString(), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
+                TypeOrigin(type, index),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),

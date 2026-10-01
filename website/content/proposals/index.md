@@ -238,3 +238,5 @@ Development metadata/runtime/compiler support now preserves namespaces on ownerl
 functions; the temporary CLI projection uses encoded global names. Original integer
 Math declarations execute on both .NET and binary neoCLR. Full class-library source
 compilation and native symbol import remain incomplete.
+
+The development metadata API now represents root classes and primitive mutable instance fields; binary runtime loading is tested. Compiler object construction and property emission remain subsequent work.

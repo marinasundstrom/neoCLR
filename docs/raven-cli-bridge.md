@@ -1741,3 +1741,29 @@ remains deferred.
 Validation: 49 focused property/binding C# tests pass, including the independently failing identity regression and .NET execution. The unchanged consumer inventory now enumerates exactly nine Order members.
 
 [Consumer frontier evidence](experiments/extended-cli-metadata/order-consumer-validation.json).
+
+## Root class and field producer foundation — 2026-10-01
+
+The separate metadata API now creates nonstatic root classes with primitive mutable
+instance fields. It writes ordinary CLI TypeDef/Field signatures and access flags,
+and the matching existing native reference-type/field layout with field origin tokens.
+The read-only snapshot exposes owned fields, signatures and type flags. This follows
+[ECMA-335 sixth edition](https://www.ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf)
+II.22.15 (Field), II.22.37 (TypeDef) and II.23.2.4 (FieldSig), reusing the existing
+native field/access design rather than adding a new runtime storage model.
+
+CLI classes inherit System.Object; the bounded native class is a root with no explicit
+base. Static AddType behavior is unchanged. The API does not synthesize a constructor
+or flatten properties into fields. Benefits are faithful primitive instance layout
+and independently inspectable ownership/access; costs are additional field rows,
+origin metadata and matching-reader requirements. No speedup is claimed. This remains
+the PE/#Neo native-payload/reference-projection bridge, not CLI-body execution.
+No Runtime Contract or runtime implementation changes; the tested binary is from
+`e8611966`. Native reader/writer and raw field snapshots now have matching bounds.
+
+Validation: 48 C# metadata groups; CLI reflection and owned field snapshots preserve
+class flags, multiple-type field ranges and access; malformed origins and invalid
+field declarations reject. API-produced binary class/field metadata loads/verifies
+in neoCLR and its independent primitive entry returns 42. This is a metadata-load
+gate, not yet an object allocation/mutation test. Instance calls and field bodies
+are next, followed by property associations and Raven's real Order declaration.

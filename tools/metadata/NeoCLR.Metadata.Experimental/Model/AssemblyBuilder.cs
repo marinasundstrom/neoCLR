@@ -85,6 +85,7 @@ public sealed partial class AssemblyBuilder
         if (methods.SelectMany(method => method.Instructions).Sum(instruction =>
             instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("assembly string literal limit exceeded");
+        if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
@@ -106,11 +107,22 @@ public sealed partial class AssemblyBuilder
     /// <returns>A type owned by this builder.</returns>
     /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or more than 256 types.</exception>
     public TypeBuilder AddType(string @namespace, string name, TypeVisibility visibility)
+        => AddTypeCore(@namespace, name, visibility, isStatic: true);
+    /// <summary>Adds a root reference class with mutable primitive instance fields.</summary>
+    /// <param name="namespace">Namespace, possibly empty.</param>
+    /// <param name="name">Nonempty type name.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An owned, nonabstract, nonsealed class definition.</returns>
+    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or exceeded limit.</exception>
+    /// <remarks>CLI base is System.Object. Native root classes have no declared base. Constructors are not synthesized.</remarks>
+    public TypeBuilder AddClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
+        => AddTypeCore(@namespace, name, visibility, isStatic: false);
+    private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic)
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
             types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
-        var type = new TypeBuilder(this, @namespace, name, visibility); types.Add(type); return type;
+        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic); types.Add(type); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
@@ -194,6 +206,7 @@ public sealed partial class AssemblyBuilder
         var bodyEncoder = new MethodBodyStreamEncoder(bodies);
         metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
             MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
+        int nextField = 1;
         int nextMethod = 1;
         void EmitMethod(MethodBuilder method)
         {
@@ -269,9 +282,28 @@ public sealed partial class AssemblyBuilder
         foreach (var function in functions) EmitMethod(function);
         foreach (var type in types)
         {
-            metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | TypeAttributes.Abstract | TypeAttributes.Sealed,
+            metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
                 metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
-                MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(nextMethod));
+                MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
+            foreach (var field in type.Fields)
+            {
+                var signature = new BlobBuilder();
+                var encoder = new BlobEncoder(signature).FieldSignature();
+                switch (field.FieldType)
+                {
+                    case PrimitiveType.Int32: encoder.Int32(); break;
+                    case PrimitiveType.Int64: encoder.Int64(); break;
+                    case PrimitiveType.Boolean: encoder.Boolean(); break;
+                    case PrimitiveType.String: encoder.String(); break;
+                    default: throw new InvalidDataException("unsupported field type");
+                }
+                metadata.AddFieldDefinition(field.Visibility switch {
+                    FieldVisibility.Public => FieldAttributes.Public,
+                    FieldVisibility.Internal => FieldAttributes.Assembly,
+                    _ => FieldAttributes.Private
+                }, metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
+                nextField++;
+            }
             foreach (var method in type.Methods) EmitMethod(method);
         }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
@@ -293,11 +325,13 @@ public enum TypeVisibility
     Internal
 }
 
-/// <summary>An editable top-level static class owned by an AssemblyBuilder.</summary>
-public sealed class TypeBuilder
+/// <summary>An editable top-level static or root reference class owned by an AssemblyBuilder.</summary>
+public sealed partial class TypeBuilder
 {
     private readonly List<MethodBuilder> methods = [];
-    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public) { Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; }
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true) { Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
+    /// <summary>Gets whether this is an abstract sealed static class.</summary>
+    public bool IsStatic { get; }
     /// <summary>Gets the declared top-level visibility.</summary>
     public TypeVisibility Visibility { get; }
     /// <summary>Gets the owning assembly.</summary>

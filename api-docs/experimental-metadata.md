@@ -29,6 +29,7 @@ and guest Introspection assembly loading remain pending.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
+- [Root classes and primitive instance fields](#root-classes-and-primitive-instance-fields): mutable layouts and field snapshots.
 - [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
 - [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
@@ -2132,3 +2133,62 @@ on type-owned methods. The runtime retains the namespace and rejects malformed o
 type-owned namespace annotations. Calls use exact executable names; source namespace
 lookup belongs to the compiler. New output requires the matching reader/runtime;
 older artifacts omit the field and retain their global-namespace behavior.
+
+## Root classes and primitive instance fields
+
+Development host API (2026-10-01), additional to existing static AddType:
+
+```csharp
+TypeBuilder AssemblyBuilder.AddClass(string @namespace, string name,
+    TypeVisibility visibility = TypeVisibility.Public);
+bool TypeBuilder.IsStatic { get; }
+IReadOnlyList<FieldBuilder> TypeBuilder.Fields { get; }
+FieldBuilder TypeBuilder.AddField(string name, PrimitiveType type,
+    FieldVisibility visibility = FieldVisibility.Private);
+public enum FieldVisibility { Public, Internal, Private }
+```
+
+AddClass creates a nonabstract, nonsealed root reference class. CLI base is
+System.Object; native metadata has no explicit base. No constructor is synthesized.
+AddType continues to create static classes. Both share the 256-type limit and
+namespace/name uniqueness. Invalid names/visibility/duplicates throw ArgumentException
+(including ArgumentOutOfRangeException for visibility). Namespaces and type names
+retain the existing AddType contract.
+
+AddField declares mutable instance storage, never a property. It accepts Int32,
+Int64, Boolean or String, a unique nonblank name without controls or invalid Unicode,
+up to 1024 characters, and defined FieldVisibility values. Invalid declarations or
+more than 256 fields per type throw ArgumentException before mutation. Static owners
+throw InvalidOperationException. Writing enforces at most 4096 assembly fields.
+Readonly, literal, static, generic and nominal-reference fields remain unsupported.
+FieldBuilder exposes read-only DeclaringType (TypeBuilder), Name (string), FieldType
+(PrimitiveType) and Visibility (FieldVisibility). Field handles are owned by their type.
+
+Read-only snapshot additions:
+
+```csharp
+uint TypeDefinition.Attributes { get; } // physical TypeAttributes
+IReadOnlyList<FieldDefinition> TypeDefinition.Fields { get; }
+IReadOnlyList<FieldDefinition> ModuleDefinition.Fields { get; }
+FieldDefinition? ModuleDefinition.GetFieldDefinition(uint metadataToken);
+```
+
+Fields are ordered physical Field rows, with at most 4096 rows and aggregate
+signature bytes bounded by the reader's existing 4 MiB limit. GetFieldDefinition
+returns null for absent/wrong-kind tokens. FieldDefinition exposes Module,
+MetadataToken, DeclaringType, Name and ushort Attributes (FieldAttributes).
+GetSignature() returns a new byte array; unsupported encodings remain opaque.
+TryGetPrimitiveType(out PrimitiveType type) recognizes exact Int32/Int64/Boolean/
+String field signatures, returning false and Void otherwise. No resolution or code
+loading occurs. CLI global fields retain the physical module pseudo-type as owner.
+
+```csharp
+var order = assembly.AddClass("Example", "Order");
+var number = order.AddField("Number", PrimitiveType.Int32);
+var pending = order.AddField("Pending", PrimitiveType.Boolean, FieldVisibility.Internal);
+```
+
+Native/reference projection preserves class flags, field order/types/access and
+module-scoped Field tokens in origin metadata. The bounded native reader rejects
+unsupported shapes and inconsistent origin rows. Old readers cannot read new class/
+field output. This declaration slice does not yet add allocation or field instructions.

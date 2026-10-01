@@ -10,10 +10,10 @@ public sealed class AssemblyDefinition
 {
     private readonly byte[] image;
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
-        IReadOnlyList<TypeRow> rows, IReadOnlyList<MethodRow> methods, IReadOnlyList<MemberReferenceRow> memberReferences, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
+        IReadOnlyList<TypeRow> rows, IReadOnlyList<FieldRow> fields, IReadOnlyList<MethodRow> methods, IReadOnlyList<MemberReferenceRow> memberReferences, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
     {
         Identity = identity; Profile = profile; this.image = image; EntryPointToken = entryPointToken;
-        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, methods, memberReferences, references, typeReferences);
+        MainModule = new ModuleDefinition(this, moduleName, mvid, rows, fields, methods, memberReferences, references, typeReferences);
     }
     /// <summary>Gets the assembly's simple name, not a complete binding identity.</summary>
     public string Name => Identity.Name;
@@ -60,6 +60,7 @@ public sealed class AssemblyDefinition
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
             if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
             if (reader.MemberReferences.Count > 4096) throw new InvalidDataException("too many member references");
+            if (reader.FieldDefinitions.Count > 4096) throw new InvalidDataException("too many field definitions");
             if (reader.MethodDefinitions.Count > 4096) throw new InvalidDataException("too many method definitions");
             if (reader.TypeReferences.Count > 4096) throw new InvalidDataException("too many type references");
             if (reader.AssemblyReferences.Count > 256) throw new InvalidDataException("too many assembly references");
@@ -125,7 +126,7 @@ public sealed class AssemblyDefinition
                 var type = reader.GetTypeDefinition(handle);
                 var declaring = type.GetDeclaringType();
                 rows.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(type.Namespace), ReadName(type.Name),
-                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring)));
+                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes));
             }
             var parents = rows.ToDictionary(row => row.Token, row => row.DeclaringToken);
             foreach (var row in rows)
@@ -140,6 +141,18 @@ public sealed class AssemblyDefinition
             int signatureBytes = 0;
             var methods = new List<MethodRow>();
             var typeRows = rows.ToDictionary(row => row.Token);
+            var fields = new List<FieldRow>();
+            foreach (var handle in reader.FieldDefinitions)
+            {
+                var field = reader.GetFieldDefinition(handle);
+                uint owner = (uint)MetadataTokens.GetToken(field.GetDeclaringType());
+                if (!typeRows.ContainsKey(owner)) throw new InvalidDataException("field has no declaring definition");
+                int length = field.Signature.IsNil ? 0 : reader.GetBlobReader(field.Signature).Length;
+                if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
+                    throw new InvalidDataException("missing or excessive field signature data");
+                signatureBytes += length;
+                fields.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(field.Name), (ushort)field.Attributes, reader.GetBlobBytes(field.Signature)));
+            }
             foreach (var handle in reader.MethodDefinitions)
             {
                 var method = reader.GetMethodDefinition(handle);
@@ -170,7 +183,7 @@ public sealed class AssemblyDefinition
                 signatureBytes += length;
                 memberReferences.Add(new((uint)MetadataTokens.GetToken(handle), parent, ReadName(member.Name), reader.GetBlobBytes(member.Signature)));
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
+            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, fields, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
         }
         catch (BadImageFormatException error)
         {
@@ -178,10 +191,11 @@ public sealed class AssemblyDefinition
         }
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
+    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature);
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -189,14 +203,21 @@ public sealed class ModuleDefinition
 {
     private readonly Dictionary<uint, TypeDefinition> definitions;
     private readonly Dictionary<uint, MethodDefinition> methods;
+    private readonly Dictionary<uint, FieldDefinition> fields;
+    private readonly Dictionary<uint, IReadOnlyList<FieldDefinition>> declaredFields;
     private readonly Dictionary<uint, IReadOnlyList<MethodDefinition>> declaredMethods;
     internal ModuleDefinition(AssemblyDefinition assembly, string name, Guid mvid, IReadOnlyList<AssemblyDefinition.TypeRow> rows,
-        IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.MemberReferenceRow> memberReferenceRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
+        IReadOnlyList<AssemblyDefinition.FieldRow> fieldRows, IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.MemberReferenceRow> memberReferenceRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
         Types = Array.AsReadOnly(types);
         definitions = types.ToDictionary(type => type.MetadataToken);
+        var storage = fieldRows.Select(row => new FieldDefinition(this, row)).ToArray();
+        Fields = Array.AsReadOnly(storage);
+        fields = storage.ToDictionary(field => field.MetadataToken);
+        declaredFields = storage.GroupBy(field => field.DeclaringType.MetadataToken)
+            .ToDictionary(group => group.Key, group => (IReadOnlyList<FieldDefinition>)Array.AsReadOnly(group.ToArray()));
         var callables = methodRows.Select(row => new MethodDefinition(this, row)).ToArray();
         Methods = Array.AsReadOnly(callables);
         methods = callables.ToDictionary(method => method.MetadataToken);
@@ -216,6 +237,13 @@ public sealed class ModuleDefinition
     public Guid Mvid { get; }
     /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
     public IReadOnlyList<TypeDefinition> Types { get; }
+    /// <summary>Gets physical Field rows in metadata order.</summary>
+    public IReadOnlyList<FieldDefinition> Fields { get; }
+    /// <summary>Looks up a field in this snapshot.</summary>
+    /// <param name="metadataToken">Field token; other kinds or missing rows return null.</param>
+    /// <returns>The owned field or null.</returns>
+    public FieldDefinition? GetFieldDefinition(uint metadataToken) => fields.GetValueOrDefault(metadataToken);
+    internal IReadOnlyList<FieldDefinition> GetDeclaredFields(uint token) => declaredFields.GetValueOrDefault(token) ?? Array.Empty<FieldDefinition>();
     /// <summary>Gets all callable definitions in physical MethodDef order, including global functions.</summary>
     public IReadOnlyList<MethodDefinition> Methods { get; }
     /// <summary>Gets top-level functions with no declaring type, in metadata order.</summary>
@@ -248,8 +276,12 @@ public sealed class TypeDefinition
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
     {
         Module = module; MetadataToken = row.Token; Namespace = row.Namespace;
-        Name = row.Name; GenericArity = row.Arity; declaringToken = row.DeclaringToken;
+        Name = row.Name; GenericArity = row.Arity; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
+    /// <summary>Gets the physical TypeAttributes flags.</summary>
+    public uint Attributes { get; }
+    /// <summary>Gets fields declared directly by this type.</summary>
+    public IReadOnlyList<FieldDefinition> Fields => Module.GetDeclaredFields(MetadataToken);
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; }
     /// <summary>Gets this image's TypeDef token; tokens are not cross-module identity.</summary>

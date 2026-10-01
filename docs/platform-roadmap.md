@@ -14,7 +14,9 @@ require native dependencies. Next use the [order-collections application](experi
 to drive constructor/property, object, generic and delegate contracts incrementally.
 The unchanged Order declaration binds and now has stable canonical property/accessor/
 field symbols; native emission stops at the nonstatic-class gate. The next bounded
-implementation is nominal type/receiver references, instance fields and constructor/
+implementation has begun: the independent API now writes/reads root classes and
+primitive instance fields, verified through native binary loading. Nominal type/receiver
+references and constructor/
 accessor/property definitions, then allocation and mutation. Its full consumer still
 has missing native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

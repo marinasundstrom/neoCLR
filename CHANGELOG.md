@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add root-class and primitive instance-field metadata production, native/reference
+  roundtrip and owned Field snapshots. Preserve ordinary CLI type/field flags and
+  tokens; validate binary runtime loading. Object construction/emission is not yet
+  included in this declaration slice; older bounded readers require updating.
+
+
 - Preserve namespace identity on ownerless metadata functions and in runtime loading.
   Add the explicit namespace overload and namespaced import contract. The temporary
   CLI projection reserves `<NeoFunction>` names; existing global encodings are unchanged.
