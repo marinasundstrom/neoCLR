@@ -19,7 +19,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   .NET, returning 42. Raven now also emits owned root-class locals and validates
   property mutation through aliases on both runtimes. Ordinary nonvirtual instance
   calls now share receiver-first evaluation, including private nested calls and
-  no-result mutation. Nullable/external locals,
+  no-result mutation. Private mutable primitive storage now emits only a field,
+  with qualified reads shared across backends. Nullable/external locals,
   implicit constructors, initializers and nominal signatures remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native

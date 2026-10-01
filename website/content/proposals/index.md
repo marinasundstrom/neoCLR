@@ -240,3 +240,9 @@ Math declarations execute on both .NET and binary neoCLR. Full class-library sou
 compilation and native symbol import remain incomplete.
 
 The development metadata API now represents root classes, primitive mutable instance fields, constructors and instance methods. API-produced construction, mutation and aliasing execute on .NET and binary neoCLR. Explicit property/accessor associations now round-trip through native metadata and CLI projections, with owned read-only property snapshots. Raven now compiles the unchanged Order declaration and executes construction/property checks on .NET and binary neoCLR. Both the metadata API and Raven now support nominal local aliasing and property mutation; ordinary nonvirtual instance calls also execute through shared codegen. Nominal signatures and broader collection/delegate/union emission remain subsequent work.
+
+
+Development checkpoint (2026-10-01): Raven private mutable primitive storage now
+emits as a field without property/accessor rows. The selected Order consumer and its
+private-storage helper verify and execute on both .NET and binary neoCLR; this is
+bounded emission coverage, not a complete class-library build.

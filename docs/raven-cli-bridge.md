@@ -1932,3 +1932,23 @@ private calls, no-result mutation and argument order. It is test code, not a sub
 for native library dependencies. Both source orders run on .NET and neoCLR to 42.
 56 focused Raven C# tests pass (54 baseline), plus the existing native emission probe.
 [Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+## Raven private primitive storage — 2026-10-01
+
+Raven now emits `private var` primitive storage without an initializer as the existing
+private instance field definition, preserving its field-only implementation. It does
+not generate a property or accessor methods. Shared body lowering also accepts qualified
+field reads such as `self.Number`; unqualified reads and mutations use the same canonical
+field symbol. This matches ordinary CLI field representation and adds no Runtime Contract
+option, metadata API or native schema. The compiler owns source classification and shared
+lowering; backend adapters own field handles and the existing binary execution bridge.
+
+The unchanged Order declaration still executes with a separate consumer. Its Counter
+helper now uses private storage, private nested calls and mutation. Both source orders
+verify/run to 42 on .NET and binary neoCLR. Metadata checks assert one Counter field,
+zero properties and seven real methods. 58 focused C# compiler tests pass; private storage
+initializers reject without writing output. See the [updated executable evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+Readonly storage, explicit field declarations, initializers and nominal signatures remain
+unsupported by this bounded native producer. The full native metadata/backend replacement
+and full consumer dependency coverage remain open.
