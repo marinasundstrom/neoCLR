@@ -1615,3 +1615,24 @@ Both .NET paths and neoCLR preserve an earlier arithmetic operand across the val
 block's loop, internal break/continue and assignments. A conditional return is
 rejected before returning a shared plan or modifying native output.
 [Recorded evidence](experiments/extended-cli-metadata/value-block-control-flow-raven-validation.json).
+
+
+## Assembly-function visibility foundation — 2026-10-01
+
+The separate metadata API adds a Public/Internal visibility overload for AddFunction.
+Existing overloads remain Public. Functions remain ownerless in native metadata and
+CLI globals in the reference projection. CLI uses ordinary Public/Assembly access
+flags (the same access mapping researched for method visibility above); native
+verification uses existing resolved module identity. This provides hidden assembly
+implementation functions without introducing synthetic native owner types, at the
+cost of explicit producer admission and access mapping. Private ownerless functions
+remain unsupported because native private access requires declaring-type identity.
+No runtime instruction, schema or Runtime Contract configuration changes. Older
+bounded readers reject internal ownerless rows; reader/writer updates must be paired.
+The native importer replacement and temporary CLI reference projection remain.
+
+Validation: 46 C# metadata groups and the API snapshot check pass. API-produced binary
+assemblies execute same-module internal calls, an internal entry and a public facade
+to 42. Native verification rejects an external internal-function call.
+[API/runtime evidence](experiments/extended-cli-metadata/function-visibility-api-validation.json).
+Raven source visibility integration is the next slice.

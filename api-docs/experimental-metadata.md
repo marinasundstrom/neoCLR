@@ -2067,3 +2067,22 @@ values in the reference projection. It rejects unknown access, inconsistent flag
 nonpublic global functions with InvalidDataException. Older readers reject new nonpublic
 rows. Bodies/references can describe forbidden calls: the writer is not an access checker;
 Raven binding and runtime verification enforce access. ImportReference retains that rule.
+
+
+### Assembly function access (development 2026-10-01)
+
+`AssemblyBuilder.AddFunction(string name, PrimitiveMethodSignature signature,
+MethodVisibility visibility)` creates an ownerless function with Public or Internal
+access. Existing overloads remain Public. Name/signature bounds and duplicate checks
+are unchanged. A null signature raises ArgumentNullException; invalid names, duplicate
+signatures or exceeded limits raise ArgumentException. Private/unknown visibility
+raises ArgumentOutOfRangeException before graph mutation: private access requires a
+declaring type in the current native access model.
+
+`MethodBuilder.Visibility` retains the selected access. CLI globals use ordinary
+Public/Assembly MethodAttributes; native functions retain no owner and use existing
+public/internal visibility. The bounded native reader preserves internal function
+access in its CLI reference projection and rejects private ownerless definitions.
+Older bounded readers reject internal global rows; no schema version changes. The
+writer does not authorize calls; native verification checks resolved module identity.
+Explicit entry selection may run an internal function in its defining module.

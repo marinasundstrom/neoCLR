@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--function-visibility-integration")
+{
+    await FunctionVisibilityChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--method-visibility-integration")
 {
     await MethodVisibilityChecks.RunRuntime(args[1], args[2]);
@@ -74,6 +80,7 @@ var tests = new (string Name, Action Body)[]
     ("Method visibility and reference projection", MethodVisibilityChecks.Run),
     ("Integer shifts and count width validation", ShiftChecks.Run),
     ("Integer bitwise operations and operand validation", BitOperationChecks.Run),
+    ("Internal assembly function access", FunctionVisibilityChecks.Run),
     ("Signed integer remainder results and faults", IntegerArithmeticChecks.Remainder),
     ("Signed integer division results and faults", IntegerArithmeticChecks.Division),
     ("Type visibility and projection", TypeVisibilityChecks.Run),

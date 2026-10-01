@@ -126,7 +126,7 @@ public sealed class NativeAssemblyDefinition
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
-                Require(ownerIndex >= 0 || visibility == MethodVisibility.Public, "nonpublic native global function unsupported");
+                Require(ownerIndex >= 0 || visibility != MethodVisibility.Private, "private native global function unsupported");
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
@@ -160,7 +160,7 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => graph.AddType(t.Namespace, t.Name, t.Visibility)).ToArray();
         foreach (var method in methods)
         {
-            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);
+            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature, method.Visibility) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);
             if (method.Signature.ReturnType == PrimitiveType.String) output.Emit(OpCode.Ldstr, "");
             else if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
             else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);

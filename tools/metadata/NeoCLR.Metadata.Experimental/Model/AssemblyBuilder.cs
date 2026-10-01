@@ -46,12 +46,23 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or function limit exceeded.</exception>
     public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature)
+        => AddFunction(name, signature, MethodVisibility.Public);
+    /// <summary>Adds an assembly-owned function with public or internal access.</summary>
+    /// <param name="name">Nonempty function name, unique by name and parameter types.</param>
+    /// <param name="signature">Supported primitive signature.</param>
+    /// <param name="visibility">Public or Internal; private access requires a declaring type.</param>
+    /// <returns>The owned function builder.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Visibility is not Public or Internal.</exception>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Name is invalid/duplicate or the function limit is exceeded.</exception>
+    public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
     {
+        if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || functions.Count >= 256 ||
             functions.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate function");
-        var function = new MethodBuilder(this, null, name, signature);
+        var function = new MethodBuilder(this, null, name, signature, visibility);
         functions.Add(function);
         return function;
     }

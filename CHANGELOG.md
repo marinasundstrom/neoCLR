@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add public/internal assembly-function visibility to the independent metadata API,
+  preserving CLI/native access and ownerless definitions. Binary runtime checks prove
+  internal calls/entries work and external calls require a public facade.
+
 - Add shared Raven emission of primitive conditional values; verify binary execution
   with typed branch joins, nested selections and skipped faulting/side-effecting branches.
   Value blocks now permit initialized locals, assignments and calls before their result;
