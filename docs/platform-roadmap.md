@@ -12,16 +12,14 @@ functions now emit with native namespace identity and execute 11 boundary cases 
 the host-core bootstrap, not a full System build. Whole Math/UnicodeScalar/GC still
 require native dependencies. Next use the [order-collections application](experiments/raven-target/samples/application-order-collections.rvn)
 to drive constructor/property, object, generic and delegate contracts incrementally.
-The unchanged Order declaration binds and now has stable canonical property/accessor/
-field symbols; native emission stops at the nonstatic-class gate. The next bounded
-implementation has begun: the independent API now writes/reads root classes and
-primitive instance fields, constructors and instance methods; construction, field
-mutation and aliasing execute on both .NET and binary neoCLR. Property associations now round-trip through native metadata and CLI projections.
-Read-only property snapshots preserve accessor identity and owned signatures. Next
-are shared Raven field/property/constructor bodies and nominal object locals. Raven's
-shared root/instance declaration categories and receiver argument slots now run on
-.NET; native source class admission still rejects incomplete member emission. Its full consumer still
-has missing native collection/LINQ/union dependencies under the host-only bootstrap.
+The unchanged Order declaration now emits with canonical properties/backing fields,
+accessors and its explicit constructor. A separate Main constructs it and checks
+Boolean/Int32 boundaries; both source orders verify/run on .NET and binary neoCLR,
+returning 42. The independent API supplies fields, constructors and property associations;
+Raven reuses compiler-synthesized accessor bodies through the shared instruction plan.
+Next are nominal object locals and aliasing/mutation, then broader field/constructor
+shapes, generic/delegate/union contracts. The full consumer still has 49 binding errors
+from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 
 **Compatibility baseline reaffirmed (2026-10-01):** preserve ordinary .NET/CLI metadata

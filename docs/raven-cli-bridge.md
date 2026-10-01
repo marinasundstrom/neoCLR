@@ -1850,3 +1850,34 @@ that the unchanged Order source now runs natively. PE/#Neo transport remains tem
 constructor/field/property body plans and nominal locals are next. 56 focused Raven
 C# tests pass (54 baseline), including Release/Debug instance execution and existing
 Order symbol stability. The existing native emission probe passes; it checks supported static/assembly-function regressions, not native instance source coverage. Raven revision: `8036b3404`.
+
+
+## Unchanged Raven Order source executes — 2026-10-01
+
+Raven now admits the actual Order declaration: an ordinary root class with explicit
+primitive constructor and mutable primitive auto-properties. Shared receiver, field
+load/store, accessor-call and allocation instructions reuse existing compiler-lowered
+bodies, including synthesized accessor bodies. Canonical symbols map to metadata
+fields/methods/properties; private backing storage and accessor associations survive
+CLI reference projection. .NET retains ordinary Field/Property/MethodSemantics and
+constructor base initialization; native roots reuse existing runtime allocation and
+instance-body semantics. Synthesized .NET debugger annotations are not projected.
+
+This advances the source gate recorded above. No Runtime Contract configuration or
+runtime source changes were needed; the tested runtime remains e8611966. The compiler
+owns source admission/lowering and adapter handles; the separate metadata API owns
+encoding and reference projection. PE/#Neo remains temporary native-payload transport,
+not CLR IL execution. User attributes, initializers, implicit constructors, explicit
+field declarations and nominal signatures/locals remain unsupported in this source path.
+General nullable receivers are not admitted; tested receivers are constructed objects
+or self. Full native symbol importing remains deferred.
+
+The exact Order source plus a separate Main passes Boolean and Int32-boundary cases on
+.NET and native binaries in both source orders, returning 42. C# projection checks
+retain two properties, two backing fields and five methods. 52 focused Raven tests pass
+(51 baseline), with Release/Debug property mutation and shared field capability checks.
+The native executable probe also rejects implicit constructors, initializers and object
+locals without output. Existing supported native emission probes pass. The complete
+order-collections program still has 49 binding errors from missing native dependencies.
+Next: object locals and aliasing/mutation, not a claim of complete consumer support.
+[Runtime evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
