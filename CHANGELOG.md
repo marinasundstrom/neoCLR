@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Compile the whole unchanged Raven Language class through the metadata target after
+  shared static-property accessor support. Both runtimes print und/sv/he and return
+  42 in both source orders. Refresh library inventory: comparer interfaces bind but
+  await interface declaration emission; ArrayList still needs native dependencies.
+  Reaffirm .NET behavior and supported CLI instruction semantics as the default;
+  the temporary payload bridge does not define a separate instruction set.
+
 - Add owned nominal class bounds for declaring-type parameters to the metadata producer.
   CLI GenericParamConstraint and native TypeBound retain exact bounds in reference
   projections. Concrete invalid arguments reject, including runtime verification of

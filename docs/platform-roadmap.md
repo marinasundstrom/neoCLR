@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Whole-source checkpoint (2026-10-01):** complete, unchanged
+System.Globalization.Language now executes on .NET and neoCLR in both file orders
+(und/sv/he; result 42), using shared static-property accessor calls. No new opcode or
+runtime format is needed. Comparer<T>/EqualityComparer<T> bind but await interface
+emission; ArrayList needs native library dependencies. [Current evidence](experiments/extended-cli-metadata/whole-library-runtime-validation.json).
+The author reaffirmed .NET behavior/instruction semantics as the baseline; unsupported
+features are coverage limits unless a divergence is explicitly chosen.
+
 **Constraint checkpoint (2026-10-01):** owned nominal bounds and class/struct/new
 requirements now pass Raven → independent metadata API → native binary loading and
 execution alongside .NET. This is a bounded integration, not complete class-library

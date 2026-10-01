@@ -326,3 +326,9 @@ The selected generic consumer runs on .NET and neoCLR; this does not establish f
 class-library emission. Open constrained operations, broader bounds and native symbol
 loading remain future integration work. See the host metadata API reference for the
 bounded producer contract.
+
+
+The development metadata target now compiles the complete unchanged Language
+class-library source and executes it on both .NET and neoCLR. Shared static-property
+accessor calls use ordinary CLI semantics; full collection/library emission remains
+in progress. Supported behavior follows .NET unless a divergence is explicitly chosen.

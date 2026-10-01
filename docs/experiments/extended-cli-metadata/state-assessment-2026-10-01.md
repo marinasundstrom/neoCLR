@@ -77,3 +77,22 @@ reopen structural-type experiments before ordinary compiler-required coverage. K
 performance as a later measured question: binary loading works, but this round did
 not benchmark codegen or prove a speedup. Preserve typed backend handles and avoid
 repeated reflection or metadata reconstruction in hot paths as coverage expands.
+
+
+## Follow-up: first whole-source unit
+
+The complete unchanged System.Globalization.Language class now emits and executes
+with shared static computed property support; no new opcode or metadata API was
+needed. [Whole-source evidence](whole-library-runtime-validation.json) records
+und/sv/he output and result 42 in both file orders/targets, plus setter and generic
+static getter checks. Static storage remains outside the native adapter.
+
+The [refreshed inventory](class-library-validation.json) shows comparer interfaces
+bind under the bootstrap but fail interface declaration emission. ArrayList needs its
+native dependencies before emission can be assessed. Interface metadata is the next
+small contract; full class-library acceptance remains open.
+
+The author reaffirmed that .NET behavior and CLI instruction semantics are the default
+unless an alternative is explicitly chosen. The native payload is a temporary storage
+and loader bridge, not a separate instruction-set design. Unsupported features such
+as exception handling limit coverage rather than changing supported semantics.

@@ -5,8 +5,9 @@
 This document starts format development. A standalone
 [framing experiment](../experiments/extended-cli-metadata/README.md) now has a reader,
 writer and inspector. A bounded [PE/CLI container probe](../experiments/extended-cli-metadata/README.md#pecli-container-probe-2026-09-30)
-now transports #Neo and tests ordinary reader behavior. No production format, runtime
-feature or Raven integration is implemented. Production numeric encodings remain unassigned.
+now transports #Neo and tests ordinary reader behavior. This opening section records the initial experiment; subsequent development now includes
+a bounded Raven/runtime integration. See the [current assessment](../experiments/extended-cli-metadata/state-assessment-2026-10-01.md)
+for implemented coverage. Production numeric encodings remain unassigned.
 
 ## Compatibility baseline reaffirmed — 2026-10-01
 
@@ -25,6 +26,14 @@ it must not silently become a permanent parallel format for ordinary CLI constru
 This clarification records the baseline, not a completed loader redesign or approval
 of every exploratory proposal. Existing structural/native semantic extensions retain
 their explicitly documented status and limits.
+
+The author further clarified on 2026-10-01: neoCLR behavior is to align with .NET
+unless an explicit alternative is chosen. The instruction set is the same for the
+supported subset; unsupported facilities (for example exception handling in this
+target) are coverage limits, not permission to redefine supported instructions.
+Physical payload/loader differences must not be described as a new semantic baseline.
+Existing intentional differences need their own documented decisions. New ordinary
+compiler support should reuse standard CLI metadata and instruction semantics.
 
 ## Purpose and inputs
 

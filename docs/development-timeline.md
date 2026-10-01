@@ -9723,3 +9723,20 @@ separates verified binary execution from declaration-only support and remaining 
 Full runtime-class-library emission, open constrained operations, broader bounds,
 collection dependencies and native symbol loading remain open. The proposed next
 sequence is recorded as a recommendation; no subsequent author selection is available.
+
+
+## 2026-10-01 — Whole-source acceptance and .NET alignment clarification
+
+Following the assessment, the author said “Continue.” The assistant selected the
+complete, unchanged System.Globalization.Language source as a small acceptance unit
+and found static computed properties blocked native emission. Shared accessor-call
+lowering and native declaration admission now cover that unit without changing the
+metadata API, runtime or instruction set. Both runtimes print und/sv/he and return 42;
+collection-interface inventory identifies the next declaration gap.
+
+During the work the author clarified: “We are supposed to align neoCLR behavior with
+.NET, unless we make other choices. The instruction set is the same, if we ignore
+what we don't support - like exceptions”. The assistant accepted .NET behavior and
+CLI instruction semantics as the default and recorded that unsupported coverage is
+not a semantic divergence. The temporary #Neo storage/loading bridge does not imply
+a separate instruction-set design. No new divergence was proposed or implemented.

@@ -2470,3 +2470,25 @@ notnull and byref-like contracts remain outside this producer slice. Notnull has
 corresponding CLI special flag and must not be silently erased. The planned native
 metadata/backend replacement must preserve those distinctions.
 See the [state assessment](experiments/extended-cli-metadata/state-assessment-2026-10-01.md).
+
+
+Whole-source Language acceptance (2026-10-01): the complete unchanged
+runtime/raven/src/System/Globalization/Language.rvn now executes through Raven's shared
+accessor-call lowering. Static computed properties map to ordinary static calls and
+existing CLI Property/MethodSemantics/native associations. The independent metadata
+API and runtime need no change. Static setters and constructed generic static getters
+also execute; static storage remains a diagnosed unsupported capability. Runtime
+Contract configuration and explicit console bridge are unchanged. Both file orders
+print und/sv/he and return 42 on .NET/native; five focused compiler tests pass.
+[Evidence](experiments/extended-cli-metadata/whole-library-runtime-validation.json)
+records hashes and the host-core bootstrap. This does not establish full-library
+compilation or native symbol import.
+
+The [updated source inventory](experiments/extended-cli-metadata/class-library-validation.json)
+shows Comparer<T>/EqualityComparer<T> bind but need interface declaration emission;
+ArrayList still fails binding on native dependencies. That identifies the next bounded
+contract without claiming collection support. Per the author's clarification, .NET
+behavior and CLI instruction semantics are the default for supported facilities.
+Unsupported exceptions/other features limit coverage; the temporary #Neo storage
+bridge does not justify a different instruction set. Native backend/metadata replacement
+must preserve these semantics and only deliberately chosen extensions.
