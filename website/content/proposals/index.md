@@ -247,4 +247,5 @@ emits as a field without property/accessor rows. The selected Order consumer and
 private-storage helper verify and execute on both .NET and binary neoCLR; this is
 bounded emission coverage, not a complete class-library build. Computed getters and
 implemented property accessors now share the same pipeline, including private setters
-and optional backing storage.
+and optional backing storage. Explicit root constructors also accept expression bodies,
+with overload selection and argument-order checks on both runtimes.

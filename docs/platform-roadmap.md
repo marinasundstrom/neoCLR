@@ -23,7 +23,8 @@ calls also execute, including private helpers and ordered argument side effects.
 Private mutable primitive storage now emits fields without property/accessor rows,
 with qualified reads and mutation validated on both runtimes. Computed getters and
 implemented block/arrow accessors now execute too, including private setters and
-`field` backing storage with preserved property metadata. Next are nominal
+`field` backing storage with preserved property metadata. Explicit root constructors
+now accept expression bodies with overload/argument-order execution coverage. Next are nominal
 parameters/results, broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

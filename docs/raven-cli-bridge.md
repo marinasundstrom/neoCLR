@@ -1987,3 +1987,24 @@ accessor shapes. Independent C# Release/Debug tests check behavior and metadata;
 includes the consumer and runtime hashes. Explicit accessor lists without bodies still
 reject before output; initializers, init-only accessors, indexers, virtual dispatch,
 nominal signatures and full native metadata/backend replacement remain future slices.
+
+
+## Raven expression-bodied constructors — 2026-10-01
+
+Native Raven emission now accepts explicit root constructors with arrow bodies. It
+reuses existing source callable plans and compiler lowering for assignment and Unit
+helper-call expressions. Overload signatures and the new-object contract are unchanged;
+no metadata schema, Runtime Contract option or runtime code change is needed. This
+matches the existing CLI constructor representation rather than introducing a native
+constructor variant. The .NET general constructor generator retains its base initialization
+responsibility; this change only broadens native declaration admission.
+
+The expanded Order executable consumer tests both overloads, helper-driven initialization,
+and two mutating argument calls whose order and evaluation count affect the result. Both
+source orders verify/run to 42 on .NET and binary neoCLR. Two focused C# Release/Debug
+tests check shared planner admission, overload metadata and execution; the 10-test baseline
+passed. Explicit base chaining rejects before output along with the earlier unsupported
+contracts. [Evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+Implicit constructors, chaining and field/property initializers still need a shared
+initialization contract. Nominal signatures and full native metadata/backend replacement
+remain separate work.
