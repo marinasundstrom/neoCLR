@@ -2086,3 +2086,49 @@ access in its CLI reference projection and rejects private ownerless definitions
 Older bounded readers reject internal global rows; no schema version changes. The
 writer does not authorize calls; native verification checks resolved module identity.
 Explicit entry selection may run an internal function in its defining module.
+
+## Assembly function namespaces
+
+Development host APIs (2026-10-01):
+
+```csharp
+MethodBuilder AssemblyBuilder.AddFunction(string @namespace, string name,
+    PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public);
+string MethodBuilder.Namespace { get; }
+```
+
+Adds an assembly-owned function with no declaring type. The namespace is empty for
+the global namespace; otherwise it consists of nonblank dot-separated segments,
+valid Unicode, and no control characters. Combined namespace/name length is at most
+1024 UTF-16 code units. Duplicate namespace/name/parameter-type signatures and more
+than 256 assembly functions are rejected. Null namespace/signature throws
+ArgumentNullException; invalid namespace/name/duplicate/limit throws ArgumentException;
+unsupported visibility throws ArgumentOutOfRangeException. Rejection leaves the graph
+unchanged. Existing AddFunction overloads use the empty namespace.
+
+MethodBuilder.Namespace returns the declared function namespace or type-owner
+namespace. Name remains the simple source name. ImportedMethodReference.Namespace
+now also exposes a namespaced function's namespace (null for global-namespace
+functions); DeclaringTypeName remains null for all ownerless functions.
+
+Native metadata stores the namespace separately and includes it in the executable
+name encoding. The temporary CLI projection uses global MethodDefs named
+`<NeoFunction>{uppercase UTF8 namespace hex}_{uppercase UTF8 name hex}`. The prefix
+is reserved by AddFunction even in the global namespace to avoid collisions. Existing
+unnamespaced function encoding is unchanged. Native snapshot/reference creation and
+ImportReference preserve the namespace through that encoding. Raw CLI snapshots
+expose the encoded physical Name; ordinary .NET source loaders do not gain native
+namespace-function lookup. Native bodies remain authoritative in PE/#Neo artifacts.
+
+```csharp
+var min = assembly.AddFunction("System.Math", "Min",
+    new PrimitiveMethodSignature(PrimitiveType.Int32,
+        new[] { PrimitiveType.Int32, PrimitiveType.Int32 }));
+// min.Namespace == "System.Math"; min.DeclaringType == null
+```
+
+The native reader rejects inconsistent namespace/executable names and namespaces
+on type-owned methods. The runtime retains the namespace and rejects malformed or
+type-owned namespace annotations. Calls use exact executable names; source namespace
+lookup belongs to the compiler. New output requires the matching reader/runtime;
+older artifacts omit the field and retain their global-namespace behavior.

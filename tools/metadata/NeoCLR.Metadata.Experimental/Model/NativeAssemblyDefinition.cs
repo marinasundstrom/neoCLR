@@ -10,7 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility);
-    private sealed record MethodRow(string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility);
+    private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, AssemblyIdentity[] references)
@@ -88,11 +88,17 @@ public sealed class NativeAssemblyDefinition
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
             var counts = new Dictionary<int, int>();
-            var seenMethods = new HashSet<(int Owner, string Name, string Parameters)>();
+            var seenMethods = new HashSet<(int Owner, string Namespace, string Name, string Parameters)>();
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
                 if (method.TryGetProperty("locals", out _)) fields.Add("locals");
+                var ns = "";
+                if (method.TryGetProperty("namespace", out var scope))
+                {
+                    fields.Add("namespace"); ns = scope.GetString() ?? throw new InvalidDataException("null function namespace");
+                    FunctionNamespaceEncoding.Validate(ns);
+                }
                 var visibility = MethodVisibility.Public;
                 if (method.TryGetProperty("visibility", out var access))
                 {
@@ -122,7 +128,8 @@ public sealed class NativeAssemblyDefinition
                 var noResult = method.GetProperty("no_result").GetBoolean();
                 var resultType = ReadPrimitive(Text(method, "returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
-                var expectedName = (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(name));
+                Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
+                var expectedName = (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
@@ -130,9 +137,9 @@ public sealed class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
-                Require(seenMethods.Add((ownerIndex, name, string.Join(",", parameterTypes))), "duplicate native signature");
+                Require(seenMethods.Add((ownerIndex, ns, name, string.Join(",", parameterTypes))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(name, ownerIndex, new(resultType, parameterTypes), visibility)); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility)); methodNames.Add(expectedName);
             }
             var entry = Text(root, "entry");
             if (entry.Length != 0)
@@ -160,7 +167,7 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => graph.AddType(t.Namespace, t.Name, t.Visibility)).ToArray();
         foreach (var method in methods)
         {
-            var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature, method.Visibility) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);
+            var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);
             if (method.Signature.ReturnType == PrimitiveType.String) output.Emit(OpCode.Ldstr, "");
             else if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
             else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);

@@ -233,3 +233,7 @@ minimum-value wrapping tests against binary assemblies executed by neoCLR.
 The compiler now uses one primitive value/no-result contract for signatures and locals,
 with separate .NET/native type mappers. This is an internal migration boundary; general
 nominal, generic and array type support remains pending in the native backend.
+
+Development metadata/runtime support now preserves namespaces on ownerless functions;
+the temporary CLI projection uses encoded global names. Real class-library source
+compilation remains incremental, with full native symbol import deferred.

@@ -336,6 +336,10 @@ pub struct Function {
     pub definition: Option<MemberId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub custom_attributes: Vec<CustomAttribute>,
+    /// Native namespace of an ownerless function. Empty for legacy global functions.
+    /// Calls still carry the producer's fully qualified executable name.
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub namespace: String,
     pub name: String,
     #[serde(default)]
     pub owner: Option<Type>,

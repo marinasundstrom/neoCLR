@@ -1674,3 +1674,11 @@ contracts. JSON is a complementary UTF-8/inheritance case; neither sample covers
 all language/runtime features. Metadata importer expansion remains deferred.
 
 [Recorded emission inventory](experiments/extended-cli-metadata/class-library-validation.json).
+
+## Function namespace metadata foundation — 2026-10-01
+
+The independent metadata API and runtime now retain native ownerless function
+namespaces. No Runtime Contract setting changes. The temporary CLI projection uses
+encoded global names; native source lookup and regular .NET semantic-loader support
+are distinct. Compiler integration is the next slice. [Contract, alternatives,
+compatibility and validation](design/extended-cli-metadata.md#ownerless-function-namespaces--2026-10-01).

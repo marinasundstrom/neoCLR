@@ -1263,3 +1263,36 @@ linear instruction set, with helpers delegating to that path. Raven's native emi
 consumes it. This implements opcode-based construction from the preceding direction;
 public instruction objects, body collections, branches and insertion/editing remain
 planned. The internal operation model is not yet the proposed common editable body.
+
+## Ownerless function namespaces — 2026-10-01
+
+Real System.Math source exposes the need to retain namespace identity separately
+from simple callable name without synthesizing native type ownership. ECMA-335 sixth
+edition, II.10.8 and II.22.26, provides CLI globals on `<Module>` and a MethodDef name,
+but no MethodDef namespace column ([primary specification](https://www.ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf),
+consulted 2026-10-01). TypeDef namespace does not supply namespaces for ownerless
+functions. This is an intentional native extension, not a change to CLI tables.
+
+Decision: an optional native function `namespace` string, empty/absent for legacy
+globals. The runtime retains and validates it; the producer incorporates it into the
+executable name. Direct calls retain exact function references, not dynamic namespace
+lookup. The metadata API keeps Namespace/Name/DeclaringType separate. Alternative
+synthetic native types would change author-directed ownership; ambiguous dotted
+name concatenation would lose boundaries. The temporary CLI projection uses a reserved,
+reversible `<NeoFunction>` UTF-8 hex name for namespaced globals. Existing globals
+retain their encoding. Reader/import adapters decode this projection; ordinary CLI
+source loaders see physical names, not native namespace semantics.
+
+Benefit: same-name functions in distinct namespaces and real class-library source
+retain identity and ownerless access semantics. Costs: extra metadata text and name
+encoding allocations, a reserved projection prefix, and matching reader/runtime
+requirements. No performance improvement is claimed. Binary transport/schema remains
+unchanged; the native declaration model gains an optional field. General native
+metadata/semantic import and eventual extended-CLI namespace tables remain future
+work; this bridge encoding is not that final table design.
+
+Validation: 47 C# metadata groups, three focused Rust namespace tests, ordinary CLI
+execution and direct binary native local/imported calls returning 42. Tests cover
+same-name namespace isolation, invalid/duplicate declarations, import identity,
+namespace/name consistency and legacy omission. Runtime owner validation is enforced
+independently from the API. API snapshot check remains required.

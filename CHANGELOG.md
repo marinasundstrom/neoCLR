@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Preserve namespace identity on ownerless metadata functions and in runtime loading.
+  Add the explicit namespace overload and namespaced import contract. The temporary
+  CLI projection reserves `<NeoFunction>` names; existing global encodings are unchanged.
+  New namespace-bearing artifacts require the matching runtime/metadata reader.
+
+
 - Record actual Raven class-library emission probes and select order-collections as
   the broad acceptance target. Selected integer Math functions bind but need native
   namespace-function metadata; whole-file dependency binding remains incomplete.

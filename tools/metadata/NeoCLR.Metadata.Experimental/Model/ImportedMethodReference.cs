@@ -10,8 +10,8 @@ public sealed class ImportedMethodReference
     public AssemblyBuilder Owner { get; }
     /// <summary>Gets the exact dependency identity.</summary>
     public AssemblyIdentity AssemblyIdentity => Target.Assembly.Identity;
-    /// <summary>Gets the declaring namespace, or null for a global function.</summary>
-    public string? Namespace => Target.DeclaringType?.Namespace;
+    /// <summary>Gets the declaring/function namespace, or null for a global-namespace function.</summary>
+    public string? Namespace => Target.DeclaringType?.Namespace ?? (Target.Namespace.Length == 0 ? null : Target.Namespace);
     /// <summary>Gets the top-level declaring type name, or null for a global function.</summary>
     public string? DeclaringTypeName => Target.DeclaringType?.Name;
     /// <summary>Gets the method name.</summary>
@@ -43,6 +43,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
+        var function = type is null ? FunctionNamespaceEncoding.Decode(definition.Name) : (Namespace: type.Namespace, Name: definition.Name);
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
             throw new InvalidDataException("unsupported external assembly identity");
@@ -59,7 +60,7 @@ public sealed partial class AssemblyBuilder
         var key = (identity, definition.MetadataToken);
         if (importedReferences.TryGetValue(key, out var existing))
         {
-            if (existing.Name != definition.Name || existing.Namespace != type?.Namespace || existing.DeclaringTypeName != type?.Name ||
+            if (existing.Name != function.Name || existing.Namespace != (type?.Namespace ?? (function.Namespace.Length == 0 ? null : function.Namespace)) || existing.DeclaringTypeName != type?.Name ||
                 !existing.Signature.Matches(signature!))
                 throw new InvalidDataException("conflicting imported method contract");
             return existing;
@@ -68,7 +69,7 @@ public sealed partial class AssemblyBuilder
         // Private reference-only nodes reuse both backends' existing exact-identity call encoding.
         // No producer bodies or mutable definition graph are retained or exposed.
         var owner = type is null ? null : new TypeBuilder(imported.Graph, type.Namespace, type.Name);
-        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, definition.Name, signature!));
+        var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace));
         importedReferences.Add(key, reference);
         return reference;
     }

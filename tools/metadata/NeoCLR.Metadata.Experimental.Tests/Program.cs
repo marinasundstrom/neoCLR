@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--function-namespace-integration")
+{
+    await FunctionNamespaceChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--function-visibility-integration")
 {
     await FunctionVisibilityChecks.RunRuntime(args[1], args[2]);
@@ -81,6 +87,7 @@ var tests = new (string Name, Action Body)[]
     ("Integer shifts and count width validation", ShiftChecks.Run),
     ("Integer bitwise operations and operand validation", BitOperationChecks.Run),
     ("Internal assembly function access", FunctionVisibilityChecks.Run),
+    ("Assembly function namespaces", FunctionNamespaceChecks.Run),
     ("Signed integer remainder results and faults", IntegerArithmeticChecks.Remainder),
     ("Signed integer division results and faults", IntegerArithmeticChecks.Division),
     ("Type visibility and projection", TypeVisibilityChecks.Run),

@@ -887,6 +887,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     };
                     function = Some(PendingFunction {
                         function: Function {
+                            namespace: String::new(),
                             sequence_points: vec![],
                             visibility,
                             definition: None,

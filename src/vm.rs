@@ -590,6 +590,14 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",
             ));
         }
+        if !function.namespace.is_empty()
+            && (function.owner.is_some()
+                || function.namespace.len() > 4096
+                || function.namespace.chars().any(char::is_control)
+                || function.namespace.split('.').any(|part| part.trim().is_empty()))
+        {
+            return Err(Fault::new("invalid ownerless function namespace"));
+        }
         crate::metadata::validate_slot_names(
             &function.parameter_names,
             function.parameters.len(),

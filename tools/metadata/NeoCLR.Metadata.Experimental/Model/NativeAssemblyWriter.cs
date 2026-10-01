@@ -44,7 +44,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleName(AssemblyBuilder assembly) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(assembly.Identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.Name);
+        static string FunctionName(MethodBuilder method) => (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
         static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
@@ -139,7 +139,8 @@ public sealed partial class AssemblyBuilder
                 method.Locals.Select(local => local.Type.ToString()).ToArray(),
                 method.Signature.ReturnType.ToString(), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
-                method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant())).ToArray()
+                method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
+                method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null)).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -148,7 +149,9 @@ public sealed partial class AssemblyBuilder
     private sealed record NativeMethodRow(string name, object? owner, string[] parameters, string[] locals,
         string returns, bool no_result, object origin, object[] body,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        string? visibility);
+        string? visibility,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        string? @namespace);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

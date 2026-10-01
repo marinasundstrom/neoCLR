@@ -56,13 +56,25 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Name is invalid/duplicate or the function limit is exceeded.</exception>
     public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
+        => AddFunction("", name, signature, visibility);
+    /// <summary>Adds an ownerless function in an explicit namespace.</summary>
+    /// <param name="namespace">Namespace, possibly empty; nonempty segments separated by dots.</param>
+    /// <param name="name">Nonempty simple name. The CLI projection prefix &lt;NeoFunction&gt; is reserved.</param>
+    /// <param name="signature">Supported primitive signature.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An assembly-owned function preserving namespace and simple name.</returns>
+    /// <exception cref="ArgumentNullException">Namespace or signature is null.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Visibility is unsupported.</exception>
+    /// <exception cref="ArgumentException">Invalid namespace/name, duplicate signature or exceeded limit.</exception>
+    public MethodBuilder AddFunction(string @namespace, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
-        if (string.IsNullOrEmpty(name) || name.Length > 1024 || functions.Count >= 256 ||
-            functions.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+        FunctionNamespaceEncoding.Validate(@namespace);
+        if (string.IsNullOrEmpty(name) || name.StartsWith(FunctionNamespaceEncoding.Prefix, StringComparison.Ordinal) || @namespace.Length + name.Length > 1024 || functions.Count >= 256 ||
+            functions.Any(m => m.Namespace == @namespace && m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate function");
-        var function = new MethodBuilder(this, null, name, signature, visibility);
+        var function = new MethodBuilder(this, null, name, signature, visibility, @namespace);
         functions.Add(function);
         return function;
     }
@@ -173,7 +185,7 @@ public sealed partial class AssemblyBuilder
                     type = metadata.AddTypeReference(ImportAssembly(owner.Assembly.Identity), metadata.GetOrAddString(owner.Namespace), metadata.GetOrAddString(owner.Name));
                     importedTypes.Add(owner, type);
                 }
-                handle = metadata.AddMemberReference(type, metadata.GetOrAddString(method.Name), Signature(method));
+                handle = metadata.AddMemberReference(type, metadata.GetOrAddString(method.CliName), Signature(method));
                 importedMethods.Add(method, handle);
             }
             return MetadataTokens.GetToken(handle);
@@ -251,7 +263,7 @@ public sealed partial class AssemblyBuilder
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack,
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | MethodAttributes.Static | MethodAttributes.HideBySig,
-                MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.Name), Signature(method), body, MetadataTokens.ParameterHandle(1));
+                MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
         }
         foreach (var function in functions) EmitMethod(function);
@@ -349,9 +361,12 @@ public sealed partial class MethodBuilder
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
-    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
-    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; }
-    /// <summary>Gets declared method visibility; assembly functions remain public.</summary>
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "")
+    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; Namespace = owner?.Namespace ?? @namespace; }
+    /// <summary>Gets the function namespace or the declaring type namespace; empty for the global namespace.</summary>
+    public string Namespace { get; }
+    internal string CliName => DeclaringType is null ? FunctionNamespaceEncoding.Encode(Namespace, Name) : Name;
+    /// <summary>Gets declared method or assembly-function visibility.</summary>
     public MethodVisibility Visibility { get; }
     /// <summary>Gets the immutable primitive method signature.</summary>
     public PrimitiveMethodSignature Signature { get; }
