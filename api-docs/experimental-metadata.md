@@ -3326,9 +3326,9 @@ to their type. Detached Module properties are unset until attachment. Physical t
 remain zero until encoding and rereading; token lookup is a loaded-image operation.
 `ModuleDefinition.Fields` reflects current authored fields.
 
-Method bodies, functions, properties and generic parameter declarations still use the
-existing builder representation. Authored method/function views and EntryPoint lookup
-throw `NotSupportedException`; use the builder facade for those operations. Other
+Method bodies, property associations and generic parameter declarations still use the
+existing builder representation. Authored method/function views and EntryPoint now expose canonical declarations;
+use the builder facade to create methods and edit bodies. Other
 snapshot metadata views are not materialized authored views. Loaded definitions remain
 read-only, byte-preserving snapshots. Writers currently use builder encoding adapters;
 this is not completion of canonical method/body or reader/editor migration.
@@ -3348,3 +3348,27 @@ renaming, ownership rejection, CLR shape/execution and native verify/run (42).
 `--authored-definition-integration <runtime> <fresh-directory>` reproduces the native
 case. The 76 C# contract groups and Raven external-signature/generic-library runtime
 probes pass. The broader collections Option<Order> gate remains unchanged.
+
+
+### Shared method declarations
+
+The next migration slice adds `MethodBuilder.Definition`, with the declaration owning
+its name, authored namespace, access/static flags and immutable signature.
+`MethodDefinition.AuthoredSignature` returns that same `MethodSignature` (null for
+loaded declarations); `MethodDefinition.Namespace` returns the authored namespace
+(null for loaded physical rows). `ModuleDefinition.Methods`, `.Functions`,
+`TypeDefinition.Methods` and `AssemblyDefinition.EntryPoint` return those exact
+objects. Global functions retain a null declaring type. Collections remain read-only
+views in this slice. No direct method constructor or mutable body definition yet.
+
+`MethodDefinition.Attributes` includes context-derived CLI flags for constructors,
+property accessors, interface contracts and implementations. Inspection and PE writing
+share flag calculation; writer-side accessor classification stays precomputed.
+Authored `GetSignature()` throws `InvalidOperationException`; raw signature recognizers
+remain loaded-image operations. Write and reread for physical tokens/signatures.
+EntryPointToken remains zero before serialization. Existing typed helpers and raw
+Emit overloads continue to operate through the method builder.
+
+Validated by 76 C# groups, including declaration identity and accessor/interface flag
+round trips; direct-struct CLR/native execution returns 42. Raven's external-signature
+native probe also passes with the rebuilt metadata dependency.

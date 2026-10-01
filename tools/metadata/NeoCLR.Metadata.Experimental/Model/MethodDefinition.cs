@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An owned physical MethodDef declaration, including type-independent global functions.</summary>
 /// <remarks>Signature bytes preserve CLI encodings; general signatures are opaque until a decoder supports them.
 /// No body is decoded and no runtime assembly is loaded.</remarks>
-public sealed class MethodDefinition
+public sealed partial class MethodDefinition
 {
     private readonly byte[] signature;
     private readonly uint declaringToken;
@@ -13,7 +13,7 @@ public sealed class MethodDefinition
         Module = module;
         MetadataToken = row.Token;
         Name = row.Name;
-        Attributes = row.Attributes;
+        declarationAttributes = row.Attributes;
         ImplementationAttributes = row.ImplementationAttributes;
         GenericArity = row.Arity;
         unsupportedGenericParameters = row.UnsupportedGenericParameters;
@@ -23,22 +23,25 @@ public sealed class MethodDefinition
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; }
     /// <summary>Gets the owned declaring type, or null for a global function.</summary>
-    public TypeDefinition? DeclaringType => Module.GetTypeDefinition(declaringToken);
+    public TypeDefinition? DeclaringType => Producer is { } producer ? producer.DeclaringType?.Definition : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets the physical MethodDef token, meaningful only within this module.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the declared metadata name.</summary>
     public string Name { get; }
     /// <summary>Gets raw CLI MethodAttributes bits, without target-specific reinterpretation.</summary>
-    public ushort Attributes { get; }
+    private readonly ushort declarationAttributes;
+    internal ushort DeclarationAttributes => declarationAttributes;
+    /// <summary>Gets CLI attributes, including authored accessor and interface implementation flags.</summary>
+    public ushort Attributes => Producer?.GetAttributes() ?? declarationAttributes;
     /// <summary>Gets raw CLI MethodImplAttributes bits.</summary>
     public ushort ImplementationAttributes { get; }
     /// <summary>Gets the number of declared method GenericParam rows.</summary>
     public int GenericArity { get; }
     /// <summary>Gets whether the MethodAttributes.Static bit is set.</summary>
-    public bool IsStatic => (Attributes & 0x10) != 0;
+    public bool IsStatic => (declarationAttributes & 0x10) != 0;
     /// <summary>Copies the CLI signature blob without resolving its type references.</summary>
     /// <returns>New owned bytes; unsupported encodings remain opaque rather than being simplified.</returns>
-    public byte[] GetSignature() => (byte[])signature.Clone();
+    public byte[] GetSignature() => Producer is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use AuthoredSignature");
 
     /// <summary>Recognizes the writer's static, nongeneric Int32 parameter/result or no-result signature subset.</summary>
     /// <param name="parameterCount">On success, Int32 parameter count (0–256); otherwise zero.</param>

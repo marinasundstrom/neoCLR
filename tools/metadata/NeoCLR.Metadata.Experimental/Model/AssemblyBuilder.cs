@@ -399,7 +399,7 @@ public sealed partial class AssemblyBuilder
         {
             if (method.IsAbstract)
             {
-                metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.HideBySig | (accessors.Contains(method) ? MethodAttributes.SpecialName : 0),
+                metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
                     MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), -1, MetadataTokens.ParameterHandle(1));
                 nextMethod++;
                 return;
@@ -492,7 +492,7 @@ public sealed partial class AssemblyBuilder
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
-            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | (method.DeclaringType?.Implements(method) == true ? MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot : 0) | MethodAttributes.HideBySig,
+            metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
             genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
             nextMethod++;
@@ -693,25 +693,25 @@ public sealed partial class MethodBuilder
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "", bool isStatic = true)
-    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; Namespace = owner?.Namespace ?? @namespace; IsStatic = isStatic; }
+    { Assembly = assembly; DeclaringType = owner; Definition = new MethodDefinition(this, name, owner?.Namespace ?? @namespace, signature, visibility, isStatic); }
     /// <summary>Gets whether the signature excludes an instance receiver.</summary>
-    public bool IsStatic { get; }
+    public bool IsStatic => Definition.IsStatic;
     /// <summary>Gets whether this is an instance .ctor with no result.</summary>
     public bool IsConstructor => !IsStatic && Name == ".ctor";
     internal int ArgumentCount => ParameterCount + (IsStatic ? 0 : 1);
     /// <summary>Gets the function namespace or the declaring type namespace; empty for the global namespace.</summary>
-    public string Namespace { get; }
+    public string Namespace => Definition.Namespace!;
     internal string CliName => DeclaringType is null ? FunctionNamespaceEncoding.Encode(Namespace, Name) : Name;
     /// <summary>Gets declared method or assembly-function visibility.</summary>
-    public MethodVisibility Visibility { get; }
+    public MethodVisibility Visibility => (Definition.DeclarationAttributes & 7) switch { 6 => MethodVisibility.Public, 3 => MethodVisibility.Internal, _ => MethodVisibility.Private };
     /// <summary>Gets the immutable primitive/owned-class method signature.</summary>
-    public MethodSignature Signature { get; }
+    public MethodSignature Signature => Definition.AuthoredSignature!;
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declaring type, or null for a top-level function.</summary>
     public TypeBuilder? DeclaringType { get; }
     /// <summary>Gets the method name.</summary>
-    public string Name { get; }
+    public string Name => Definition.Name;
     /// <summary>Gets the parameter count.</summary>
     public int ParameterCount => Signature.ParameterTypes.Count;
     /// <summary>Gets whether the method has a primitive or owned-class result rather than no result.</summary>

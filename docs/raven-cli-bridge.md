@@ -2741,3 +2741,21 @@ an explicit temporary lowering owned by the native writer; a future native instr
 contract aligned with CLI's no-result store would remove the extra pop. No runtime
 format/opcode or Raven Runtime Contract change was made. Value imports and union
 operations remain open; the unchanged collections gate is not claimed complete.
+
+
+### Metadata definition migration checkpoint (2026-10-01)
+
+On `codex/extended-cli-metadata`, assembly/type/field definitions now support bounded
+direct construction; method builders expose shared method declarations. Raven's
+`codex/metadata-consumer` adapter still uses the builder facade and requires no compiler
+or Runtime Contract changes. CLI/native encodings and ordinary .NET behavior remain
+unchanged. Native intent remains assembly-owned functions and CLI-compatible categories;
+this authoring migration introduces no new bridge encoding or information loss.
+The existing ownerless function projection remains temporary. Body definitions and
+loaded editing are pending, as are the broader collections Option<Order> imports.
+
+Validation: all 76 C# metadata contract groups, manual struct CLR/native execution (42),
+and rebuilt Raven external-signature library/application execution (42). Runtime
+SHA256 `193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D`;
+Raven compiler revision `55a29312f`. The metadata library owns graph migration; Raven
+owns target mapping, and neoCLR owns native loading/execution.

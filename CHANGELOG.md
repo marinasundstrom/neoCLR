@@ -13,6 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Manual struct construction executes on CLR and neoCLR (42). Authored collections
   are append-only; method/body definitions and loaded editing remain pending. Types
   and type Fields now expose IList instead of IReadOnlyList (development API change).
+  Method builders now share canonical declarations with module/type/function/entry-point
+  views; authored signatures and context-derived CLI flags are inspectable. Direct
+  method construction and definition-owned bodies remain pending.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

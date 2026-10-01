@@ -29,7 +29,7 @@ public sealed partial class AssemblyDefinition
     /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
     public uint EntryPointToken { get; }
     /// <summary>Gets the owned entry-point definition, or null for a library.</summary>
-    public MethodDefinition? EntryPoint => Producer is null ? MainModule.GetMethodDefinition(EntryPointToken) : throw new NotSupportedException("authored entry definitions are pending; use builder EntryPoint");
+    public MethodDefinition? EntryPoint => Producer is null ? MainModule.GetMethodDefinition(EntryPointToken) : Producer.EntryPoint?.Definition;
     /// <summary>Encodes an authored assembly, or copies an unchanged loaded snapshot byte for byte.</summary>
     /// <returns>Owned PE bytes.</returns>
     /// <remarks>Loaded snapshot editing remains unsupported.</remarks>
@@ -290,7 +290,7 @@ public sealed partial class ModuleDefinition
     internal IReadOnlyList<PropertyDefinition> GetDeclaredProperties(uint token) => declaredProperties.GetValueOrDefault(token) ?? Array.Empty<PropertyDefinition>();
     /// <summary>Gets physical Field rows in metadata order.</summary>
     private readonly IReadOnlyList<FieldDefinition> snapshotFields;
-    /// <summary>Gets fields in this module; authored method/function views remain unsupported during migration.</summary>
+    /// <summary>Gets fields in this module; authored views share builder declarations.</summary>
     public IReadOnlyList<FieldDefinition> Fields => Assembly.Producer is null ? snapshotFields : Types.SelectMany(t => t.Fields).ToArray();
     /// <summary>Looks up a field in this snapshot.</summary>
     /// <param name="metadataToken">Field token; other kinds or missing rows return null.</param>
@@ -299,12 +299,12 @@ public sealed partial class ModuleDefinition
     internal IReadOnlyList<FieldDefinition> GetDeclaredFields(uint token) => declaredFields.GetValueOrDefault(token) ?? Array.Empty<FieldDefinition>();
     /// <summary>Gets all callable definitions in physical MethodDef order, including global functions.</summary>
     private readonly IReadOnlyList<MethodDefinition> snapshotMethods;
-    /// <summary>Gets methods in this module; authored method/function views remain unsupported during migration.</summary>
-    public IReadOnlyList<MethodDefinition> Methods => Assembly.Producer is null ? snapshotMethods : throw new NotSupportedException("authored method definitions are pending; use builder methods");
+    /// <summary>Gets methods in this module; authored views share builder declarations.</summary>
+    public IReadOnlyList<MethodDefinition> Methods => Assembly.Producer is null ? snapshotMethods : Assembly.Producer.Functions.Concat(Assembly.Producer.Types.SelectMany(t => t.Methods)).Select(m => m.Definition).ToArray();
     /// <summary>Gets top-level functions with no declaring type, in metadata order.</summary>
     private readonly IReadOnlyList<MethodDefinition> snapshotFunctions;
-    /// <summary>Gets functions in this module; authored method/function views remain unsupported during migration.</summary>
-    public IReadOnlyList<MethodDefinition> Functions => Assembly.Producer is null ? snapshotFunctions : throw new NotSupportedException("authored function definitions are pending; use builder functions");
+    /// <summary>Gets functions in this module; authored views share builder declarations.</summary>
+    public IReadOnlyList<MethodDefinition> Functions => Assembly.Producer is null ? snapshotFunctions : Assembly.Producer.Functions.Select(m => m.Definition).ToArray();
     /// <summary>Looks up an owned MethodDef token; other kinds or absent rows return null.</summary>
     /// <param name="metadataToken">Physical MethodDef token in this snapshot.</param>
     /// <returns>The owned callable or null.</returns>
@@ -358,7 +358,7 @@ public sealed partial class TypeDefinition
     /// <summary>Gets the enclosing definition, or null for a top-level type.</summary>
     public TypeDefinition? DeclaringType => MetadataToken == 0 ? null : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets methods declared directly by this type; global functions belong to Module.Functions.</summary>
-    public IReadOnlyList<MethodDefinition> Methods => authoredFields is null ? Module.GetDeclaredMethods(MetadataToken) : throw new NotSupportedException("authored method definitions are pending; use builder methods");
+    public IReadOnlyList<MethodDefinition> Methods => authoredFields is null ? Module.GetDeclaredMethods(MetadataToken) : Producer?.Methods.Select(m => m.Definition).ToArray() ?? Array.Empty<MethodDefinition>();
     /// <summary>Creates a nominal reference scoped to this module snapshot.</summary>
     /// <returns>A reference that resolves to this exact owned definition.</returns>
     public TypeReference ToReference() => new(this);

@@ -585,3 +585,6 @@ Authored assembly/type/field constructors, facade Definition properties, ForDefi
 explicit Module.ImportReference and authored WriteNativeAssembly are host-only C# APIs
 covered by [the manual reference](experimental-metadata.md#authored-definitions-first-migration-slice).
 They are excluded from guest RavenDoc selection for the same host-language reason.
+
+MethodBuilder.Definition and MethodDefinition.AuthoredSignature/Namespace are also
+covered in the manual host metadata reference; guest RavenDoc selection is unchanged.

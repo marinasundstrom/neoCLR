@@ -39,9 +39,14 @@ internal static class AuthoredDefinitionChecks
         var type = assembly.MainModule.Types.Single(); var field = type.Fields.Single();
         var builder = AssemblyBuilder.ForDefinition(assembly);
         if (!ReferenceEquals(assembly.MainModule.Fields.Single(), field)) throw new Exception("module field view");
-        Reject<NotSupportedException>(() => _ = assembly.MainModule.Methods);
-        Reject<NotSupportedException>(() => _ = assembly.EntryPoint);
-        Reject<NotSupportedException>(() => _ = type.Methods);
+        var entry = executable.EntryPoint!;
+        if (!ReferenceEquals(entry, executable.MainModule.Functions.Single()) ||
+            !ReferenceEquals(entry, executable.MainModule.Methods.Single()) || entry.DeclaringType is not null ||
+            !ReferenceEquals(entry.AuthoredSignature, AssemblyBuilder.ForDefinition(executable).EntryPoint!.Signature))
+            throw new Exception("authored function definition identity");
+        Reject<InvalidOperationException>(() => entry.GetSignature());
+        var writtenEntry = AssemblyDefinition.ReadAssembly(executable.Write(), false).EntryPoint!;
+        if (entry.Attributes != writtenEntry.Attributes || entry.Name != writtenEntry.Name) throw new Exception("method declaration round trip");
         if (!ReferenceEquals(builder.Definition, assembly) || !ReferenceEquals(builder.Types[0].Definition, type) ||
             !ReferenceEquals(builder.Types[0].Fields[0].Definition, field) || builder.Types[0].Fields[0].Name != "MyField" ||
             !ReferenceEquals(type.ToReference().Resolve(), type) || !ReferenceEquals(field.DeclaringType, type))
@@ -55,6 +60,15 @@ internal static class AuthoredDefinitionChecks
         Reject<NotSupportedException>(() => type.Fields.Remove(field));
         var foreign = AssemblyDefinition.CreateAssembly(new("Other", new Version(1, 0, 0, 0)), builder.CoreLibrary);
         Reject<ArgumentException>(() => foreign.MainModule.Types.Add(type));
+        var method = builder.Types[0].AddMethod("get_Answer");
+        method.LoadConstant(42); method.Return();
+        builder.Types[0].AddProperty("Answer", PrimitiveType.Int32, getter: method);
+        var contract = builder.AddInterface("Example", "IAnswer");
+        var required = contract.AddInterfaceMethod("get_Answer", PrimitiveMethodSignature.Int32(0, true));
+        contract.AddProperty("Answer", PrimitiveType.Int32, getter: required);
+        if (!ReferenceEquals(type.Methods.Single(), method.Definition) ||
+            !ReferenceEquals(method.Definition.DeclaringType, type) ||
+            !ReferenceEquals(method.Definition.Module, assembly.MainModule)) throw new Exception("type method definition identity");
         var image = assembly.Write();
         if (!image.SequenceEqual(builder.Write())) throw new Exception("facade writer differs");
         var context = new AssemblyLoadContext("manual-definitions", isCollectible: true);
@@ -66,6 +80,12 @@ internal static class AuthoredDefinitionChecks
         }
         finally { context.Unload(); }
         var snapshot = AssemblyDefinition.ReadAssembly(image, false);
+        foreach (var declared in assembly.MainModule.Methods)
+        {
+            var physical = snapshot.MainModule.Methods.Single(m => m.Name == declared.Name && m.DeclaringType?.Name == declared.DeclaringType?.Name);
+            if (declared.Attributes != physical.Attributes || declared.GenericArity != physical.GenericArity || declared.IsStatic != physical.IsStatic)
+                throw new Exception("authored method flags differ from encoding");
+        }
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Add(type));
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Single(t => t.Name == "MyStruct").Fields[0].Name = "Changed");
         Reject<InvalidOperationException>(() => AssemblyBuilder.ForDefinition(snapshot));
