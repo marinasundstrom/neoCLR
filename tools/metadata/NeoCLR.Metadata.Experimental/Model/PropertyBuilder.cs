@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An owned primitive, root-class or vector property with explicit accessor associations.</summary>
+/// <summary>An owned supported value property with explicit accessor associations.</summary>
 public sealed class PropertyBuilder
 {
     internal PropertyBuilder(TypeBuilder owner, string name, SignatureType type, MethodBuilder? getter, MethodBuilder? setter, SignatureType[] parameters)
@@ -9,7 +9,7 @@ public sealed class PropertyBuilder
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple property name.</summary>
     public string Name { get; }
-    /// <summary>Gets the primitive or owned root-class property value type.</summary>
+    /// <summary>Gets the value signature, including declaring-type parameters and constructed classes.</summary>
     public SignatureType PropertyType { get; }
     /// <summary>Gets copied index parameter types, excluding receiver and setter value.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
@@ -26,9 +26,9 @@ public sealed partial class TypeBuilder
     private readonly List<PropertyBuilder> properties = [];
     /// <summary>Gets owned properties in declaration order.</summary>
     public IReadOnlyList<PropertyBuilder> Properties => properties.AsReadOnly();
-    /// <summary>Associates existing methods with a primitive, owned root-class or vector property; adds no storage or bodies.</summary>
-    /// <param name="name">Nonblank name, unique together with its index parameter types,, at most 1024 characters, without controls or invalid Unicode.</param>
-    /// <param name="type">Int32, Int64, Boolean, String or a nonstatic class owned by this assembly.</param>
+    /// <summary>Associates existing methods with a supported value property; adds no storage or bodies.</summary>
+    /// <param name="name">Nonblank name, unique together with its index parameter types, at most 1024 characters, without controls or invalid Unicode.</param>
+    /// <param name="type">Supported non-Void value signature, including declaring-type parameters; method parameters are invalid.</param>
     /// <param name="getter">Owned ordinary method whose parameters define the indices and whose result is the property type, or null.</param>
     /// <param name="setter">Owned ordinary method with matching index parameters followed by a property-value parameter and Void result, or null.</param>
     /// <returns>An immutable association owned by this type.</returns>
@@ -37,9 +37,8 @@ public sealed partial class TypeBuilder
     /// <remarks>At least one accessor is required. Index parameters are inferred from accessors and copied. Both must agree on index types and instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
     public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
-        if (GenericParameterNames.Count != 0) throw new ArgumentException("generic owner properties are not yet supported");
         ArgumentNullException.ThrowIfNull(type);
-        type.ValidateOwner(Assembly);
+        type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||
             properties.Count >= 256 || getter is null && setter is null)

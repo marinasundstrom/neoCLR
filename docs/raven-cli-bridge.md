@@ -2410,3 +2410,11 @@ No Runtime Contract configuration change. Generic properties and external constr
 field references are explicit remaining bridge limits, followed by constraints/imports
 and broader class-library acceptance. [Evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
 records the consumer and runtime hashes; this does not establish full-library emission.
+
+Generic property producer slice (2026-10-01): generic static/instance property values
+and index parameters now preserve VAR scope and accessor associations through standard
+CLI Property/MethodSemantics and existing native Constructed owners. Reader validation
+requires exact canonical open owner identity/arguments. API reflection execution and
+native binary verification/run (42) pass; no native schema or Runtime Contract change.
+Raven accessor integration follows; external constructed fields and constraints/imports
+remain separate work. This extends the existing [generic metadata contract](generic-metadata.md).

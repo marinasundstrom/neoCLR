@@ -517,3 +517,8 @@ The host-only experimental metadata manual also covers GenericTypeInstance (iden
 arguments, equality/hash), AddGenericClass, TypeBuilder.MakeGenericInstance, constructed
 class signatures and constructed NewObject/Emit overloads. These C# producer APIs remain
 excluded from RavenDoc's guest reference assembly; see [manual reference](experimental-metadata.md#generic-reference-classes-development).
+
+The experimental metadata manual includes the expanded AddProperty contract for
+static/instance generic owners, scoped value/index signatures and canonical native
+accessor-owner validation. It remains part of the host-only C# manual coverage, outside
+RavenDoc's guest reference assembly; see [manual reference](experimental-metadata.md#properties-on-generic-owners-development).

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Support properties and indexers on generic metadata owners, preserving declaring-type
+  parameter scope in value/index signatures and accessor associations. Native reading
+  rejects malformed owner instantiations and retains associations in CLI projections;
+  API binaries verify/run 42 without a runtime format change. Matching reader required.
+
 - Add generic reference-class construction to the metadata producer: typed fields,
   constructors, instance methods and nested constructed signatures preserve distinct
   owner/method scopes. CLI/native binaries verify and return 42; native reference

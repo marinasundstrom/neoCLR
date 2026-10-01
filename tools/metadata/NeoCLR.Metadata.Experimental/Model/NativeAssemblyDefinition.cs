@@ -76,7 +76,8 @@ public sealed class NativeAssemblyDefinition
                 if (type.TryGetProperty("visibility", out var access))
                 {
                     typeFields.Add("visibility");
-                    visibility = access.GetString() switch {
+                    visibility = access.GetString() switch
+                    {
                         "public" => TypeVisibility.Public,
                         "internal" => TypeVisibility.Internal,
                         _ => throw new InvalidDataException("unsupported native type visibility")
@@ -85,16 +86,19 @@ public sealed class NativeAssemblyDefinition
                 Shape(type, typeFields.ToArray());
                 var isStatic = type.GetProperty("is_abstract").GetBoolean();
                 Require(type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_sealed").GetBoolean() == isStatic, "unsupported native type shape");
-                Require(typeNames.Length == 0 || propertyElements.Length == 0, "generic owner properties unsupported");
                 var fieldRows = new List<FieldRow>();
                 foreach (var field in Array(type, "fields", 256))
                 {
                     Shape(field, "name", "ty", "visibility");
                     var fieldName = Text(field, "name"); CheckName(fieldName);
                     Require(fieldName.Length <= 1024 && fieldRows.All(f => f.Name != fieldName), "invalid or duplicate field");
-                    var fieldVisibility = Text(field, "visibility") switch {
-                        "public" => FieldVisibility.Public, "internal" => FieldVisibility.Internal, "private" => FieldVisibility.Private,
-                        _ => throw new InvalidDataException("unsupported field visibility") };
+                    var fieldVisibility = Text(field, "visibility") switch
+                    {
+                        "public" => FieldVisibility.Public,
+                        "internal" => FieldVisibility.Internal,
+                        "private" => FieldVisibility.Private,
+                        _ => throw new InvalidDataException("unsupported field visibility")
+                    };
                     fieldRows.Add(new(fieldName, field.GetProperty("ty").Clone(), fieldVisibility));
                 }
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
@@ -203,7 +207,8 @@ public sealed class NativeAssemblyDefinition
                 if (method.TryGetProperty("visibility", out var access))
                 {
                     fields.Add("visibility");
-                    visibility = access.GetString() switch {
+                    visibility = access.GetString() switch
+                    {
                         "public" => MethodVisibility.Public,
                         "internal" => MethodVisibility.Internal,
                         "private" => MethodVisibility.Private,
@@ -261,6 +266,7 @@ public sealed class NativeAssemblyDefinition
             var usedAccessors = new HashSet<int>();
             for (int owner = 0; owner < typeElements.Length; owner++)
             {
+                typeArity = types[owner].GenericNames.Length;
                 var names = new HashSet<string>();
                 foreach (var property in typeElements[owner].TryGetProperty("properties", out _) ? Array(typeElements[owner], "properties", 256) : [])
                 {
@@ -275,8 +281,23 @@ public sealed class NativeAssemblyDefinition
                         var reference = property.GetProperty(key);
                         if (reference.ValueKind == JsonValueKind.Null) return -1;
                         Shape(reference, "name", "owner", "instance", "parameters");
-                        var referenceOwner = reference.GetProperty("owner"); Shape(referenceOwner, "Named");
-                        Require(Text(referenceOwner, "Named") == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
+                        var referenceOwner = reference.GetProperty("owner");
+                        var constructed = referenceOwner.TryGetProperty("Constructed", out var construction);
+                        Shape(referenceOwner, constructed ? "Constructed" : "Named");
+                        Require(constructed == (typeArity > 0), "property accessor requires open owner construction");
+                        if (constructed)
+                        {
+                            Shape(construction, "definition", "arguments");
+                            var arguments = Array(construction, "arguments", 32);
+                            Require(arguments.Length == typeArity, "property accessor owner arity mismatch");
+                            for (int i = 0; i < arguments.Length; i++)
+                            {
+                                Shape(arguments[i], "TypeParameter");
+                                Require(arguments[i].GetProperty("TypeParameter").GetInt32() == i, "property accessor requires canonical open owner");
+                            }
+                        }
+                        var ownerName = constructed ? Text(construction, "definition") : Text(referenceOwner, "Named");
+                        Require(ownerName == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
                         var parameters = Array(reference, "parameters", 256).Select(p => ReadType(p, false)).ToArray();
                         Require(parameters.SequenceEqual(setter ? indices.Append(valueType) : indices), "property accessor parameters mismatch");
                         var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();

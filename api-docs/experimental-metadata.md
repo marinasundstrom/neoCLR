@@ -2314,7 +2314,8 @@ and exact origin Property tokens. The reader checks signature, owner, instance s
 accessor existence, uniqueness and origins before constructing a throwing reference
 projection. Outputs without properties retain their previous encoding. New property
 outputs require the matching bounded reader. Properties do not imply backing fields;
-indexed/generic/external nominal properties, attributes and default values remain unsupported.
+Indexed and generic-owner properties are supported by the later slices below; external
+nominal properties, attributes and default values remain unsupported.
 
 Development API migration (2026-10-01): rebuild consumers of AddProperty and
 PropertyBuilder.PropertyType and inspect SignatureType.Primitive/ClassType. Existing
@@ -2605,7 +2606,7 @@ MVAR parameter indices. `AddInstanceMethod(name, signature)` accepts named metho
 parameters; `MakeGenericInstance`, typed `Call` and raw `Emit(Call, instance)` work as
 for static calls. No virtual-dispatch contract is introduced. Both writers validate
 receiver stack shape; native reference projection preserves instance/generic flags.
-Generic constructors and generic property accessors remain invalid.
+Constructors and property accessors cannot declare their own method generic parameters.
 
 ### Typed local initialization (development)
 
@@ -2638,7 +2639,7 @@ the CLI arity suffix to Name (for example Helpers`1); the input simple name must
 contain a backtick. Invalid/duplicate names or limits throw ArgumentException; null
 parameter sequences throw ArgumentNullException. `TypeBuilder.GenericParameterNames`
 is an immutable ordinal list. AddGenericType creates static owners; AddGenericClass
-(below) creates instance owners. Generic owner properties are not admitted yet.
+(below) creates instance owners. Both can associate properties using scoped VAR.
 
 `SignatureType.TypeParameter(int index)` and nullable `TypeParameterIndex` represent
 VAR independently from method MVAR. Index bounds are 0–31 (ArgumentOutOfRangeException);
@@ -2703,5 +2704,25 @@ independent of the declaring type, including nested signature substitution.
 CLI emits standard GENERICINST, VAR and MemberRef/MethodSpec; native output uses the
 existing Constructed type and field contracts. The native declaration reader validates
 field scope and preserves generic fields/constructed signatures in its non-executable
-CLI reference projection. Constraints, generic properties, inheritance, external
+CLI reference projection. Constraints, inheritance, external
 owners and external constructed field handles remain outside this bounded API.
+
+
+### Properties on generic owners (development)
+
+`TypeBuilder.AddProperty` now accepts declaring-type parameters in the value and
+index signatures, including vectors and constructed class signatures containing VAR.
+Both static and instance owners retain their ordinary accessor shape. Accessors cannot
+declare method generic parameters; MVAR, out-of-range VAR, mismatched owner/result/index
+signatures and reused accessors throw ArgumentException before adding the association.
+No storage or bodies are synthesized by AddProperty; index signatures still come from
+the associated methods and visibility stays on each accessor.
+
+CLI keeps Property/PropertyMap/MethodSemantics and VAR signatures. Native metadata uses
+canonical open Constructed owners on accessor references. The reader validates exact
+owner identity, arity and ordered VAR arguments, resolves each accessor under the
+property's declaring-type scope, and preserves both property signatures and associations
+in its reference projection. Malformed owner references or scope violations throw
+InvalidDataException. Use the matching reader for these new producer outputs; the
+runtime already supports the native representation, so no runtime schema migration is
+required. This adds no external property import or generic constraints.
