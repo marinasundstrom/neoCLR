@@ -385,12 +385,9 @@ Producer value types also support generic payload storage and initialized local-
 field mutation. CLR and native tests retain value copies and reference payload aliases;
 imported value types and Raven union lowering remain development work.
 
-The development metadata API now supports direct assembly/type/field construction
-with builders sharing those declarations. A manually declared struct executes on CLR
-and neoCLR. Method declaration views now share builder identity. Assembly-level function creation and calls execute through
-body helpers. Direct type-method creation, body migration and loaded editing remain planned work; this is
-not a published general-purpose assembly editor.
-
-Direct static type-method declarations now participate in the same authored graph;
-a manual entry-point/function/type-method call chain executes on CLR and neoCLR.
-Direct instance declarations and body editing remain development work.
+The development metadata API supports direct assembly/type/field/function declarations,
+static and instance methods, and root-class constructors, with builders sharing those
+declarations. Manual CLR/native execution covers function calls, object creation,
+readonly-field initialization and struct storage. Canonical body editing, direct
+interface contracts and loaded assembly modification remain pending; this is not a
+published general-purpose assembly editor.

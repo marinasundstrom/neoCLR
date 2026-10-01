@@ -47,7 +47,14 @@ internal static class AuthoredDefinitionChecks
         Reject<InvalidOperationException>(() => entry.GetSignature());
         Reject<ArgumentException>(() => assembly.EntryPoint = entry);
         Reject<NotSupportedException>(() => executable.MainModule.Functions.Clear());
-        var writtenEntry = AssemblyDefinition.ReadAssembly(executable.Write(), false).EntryPoint!;
+        var writtenExecutable = AssemblyDefinition.ReadAssembly(executable.Write(), false);
+        foreach (var declaration in executable.MainModule.Types.SelectMany(t => t.Methods))
+        {
+            var physical = writtenExecutable.MainModule.Methods.Single(m => m.Name == declaration.Name && m.DeclaringType?.Name == declaration.DeclaringType?.Name);
+            if (physical.Attributes != declaration.Attributes || physical.IsStatic != declaration.IsStatic)
+                throw new Exception("instance/constructor CLI flags differ");
+        }
+        var writtenEntry = writtenExecutable.EntryPoint!;
         if (entry.Attributes != writtenEntry.Attributes || entry.Name != writtenEntry.Name) throw new Exception("method declaration round trip");
         if (!ReferenceEquals(builder.Definition, assembly) || !ReferenceEquals(builder.Types[0].Definition, type) ||
             !ReferenceEquals(builder.Types[0].Fields[0].Definition, field) || builder.Types[0].Fields[0].Name != "MyField" ||
@@ -86,7 +93,7 @@ internal static class AuthoredDefinitionChecks
         Reject<ArgumentException>(() => foreignType.Definition.Methods.Add(direct));
         Reject<NotSupportedException>(() => type.Methods.Clear());
         MethodBuilder.ForDefinition(direct).LoadConstant(42); MethodBuilder.ForDefinition(direct).Return();
-        Reject<ArgumentException>(() => new MethodDefinition("Instance", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true)));
+        Reject<InvalidOperationException>(() => type.Methods.Add(new MethodDefinition("Instance", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true))));
         Reject<ArgumentException>(() => new MethodDefinition(".cctor", (ushort)(MethodAttributes.Public | MethodAttributes.Static), PrimitiveMethodSignature.Int32(0, true)));
         var image = assembly.Write();
         if (!image.SequenceEqual(builder.Write())) throw new Exception("facade writer differs");
@@ -130,7 +137,28 @@ internal static class AuthoredDefinitionChecks
         var answerBody = MethodBuilder.ForDefinition(answer);
         if (!ReferenceEquals(answer.DeclaringType, type.Definition) || answer.Namespace != type.Namespace || !ReferenceEquals(answerBody, type.Methods.Single()))
             throw new Exception("manual type-method identity");
-        answerBody.LoadConstant(42); answerBody.Return();
+        var objectType = new TypeDefinition("Example", "Box", 1, assembly.MainModule.ImportReference(builder.CoreLibrary, "System", "Object"));
+        var value = new FieldDefinition("value", (ushort)(FieldAttributes.Private | FieldAttributes.InitOnly), PrimitiveType.Int32);
+        objectType.Fields.Add(value); assembly.MainModule.Types.Add(objectType);
+        var constructor = new MethodDefinition(".ctor", (ushort)(MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName),
+            new MethodSignature(PrimitiveType.Void, new[] { PrimitiveType.Int32 }));
+        objectType.Methods.Add(constructor);
+        var constructorBody = MethodBuilder.ForDefinition(constructor);
+        var valueBuilder = builder.Types.Single(t => t.Name == "Box").Fields.Single();
+        constructorBody.LoadArgument(0); constructorBody.LoadArgument(1); constructorBody.StoreField(valueBuilder); constructorBody.Return();
+        var read = new MethodDefinition("Read", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true));
+        objectType.Methods.Add(read);
+        var readBody = MethodBuilder.ForDefinition(read);
+        readBody.LoadArgument(0); readBody.LoadField(valueBuilder); readBody.Return();
+        answerBody.LoadConstant(42); answerBody.NewObject(constructorBody); answerBody.Call(readBody); answerBody.Return();
+        Reject<ArgumentException>(() => new MethodDefinition(".ctor", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true)));
+        Reject<ArgumentException>(() => new MethodDefinition("Read", (ushort)(MethodAttributes.Public | MethodAttributes.SpecialName), PrimitiveMethodSignature.Int32(0, true)));
+        Reject<ArgumentException>(() => new MethodDefinition(".ctor", (ushort)(MethodAttributes.Public | MethodAttributes.Static), new MethodSignature(PrimitiveType.Void, Array.Empty<PrimitiveType>())));
+        Reject<ArgumentException>(() => new MethodDefinition(".ctor", (ushort)MethodAttributes.Public, new MethodSignature(PrimitiveType.Void, Array.Empty<SignatureType>(), new[] { "T" })));
+        var staticOwner = builder.AddType("Example", "StaticOwner");
+        var unattachedInstance = new MethodDefinition("Read", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true));
+        Reject<InvalidOperationException>(() => staticOwner.Definition.Methods.Add(unattachedInstance));
+        Reject<InvalidOperationException>(() => MethodBuilder.ForDefinition(unattachedInstance));
         helper.Call(answerBody); helper.Return();
         var entryDefinition = new MethodDefinition("Main", PrimitiveMethodSignature.Int32(0, true));
         assembly.MainModule.Functions.Add(entryDefinition);
@@ -159,7 +187,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; instance-method construction, body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

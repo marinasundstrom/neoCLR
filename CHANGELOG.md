@@ -22,7 +22,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   static type-method construction and append-only TypeDefinition.Methods now share the
   same declarations with builders; the function-to-type-method call chain returns 42
   on both runtimes. TypeDefinition.Methods also changes to IList. Direct instance
-  declarations and canonical bodies remain pending.
+  declarations now also support root-class constructors and instance methods, including
+  readonly initialization and object calls returning 42 on CLR/neoCLR. Unsupported
+  owners and constructor signatures reject; canonical bodies remain pending.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

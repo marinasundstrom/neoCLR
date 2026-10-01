@@ -594,3 +594,6 @@ MethodBuilder.ForDefinition, append-only Module.Functions and authored EntryPoin
 
 Direct static type-method MethodDefinition construction and append-only TypeDefinition.Methods
 are covered in the host manual reference; no guest RavenDoc type selection changes apply.
+
+The host MethodDefinition CLI-attribute constructor’s instance/constructor cases, errors
+and limitations are documented in the manual reference; guest RavenDoc remains unchanged.

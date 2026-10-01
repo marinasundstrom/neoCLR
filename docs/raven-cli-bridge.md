@@ -2766,3 +2766,9 @@ builder-created type methods through the same collection. The CLI/CIL contract, 
 Contract configuration and Raven adapter mapping are unchanged; direct instance method
 construction and canonical bodies remain pending. The manual entry/function/type-method
 call chain verifies and returns 42 on neoCLR.
+
+Direct instance-method/root-constructor definitions now reuse the existing reference-class
+body and encoding paths. The manual object creation/readonly initialization/instance-call
+case returns 42 on CLR and neoCLR. Runtime Contract, Raven target admission and the
+CLI/native bridge representations are unchanged; this does not close imported union
+or instance-member support in the compiler.

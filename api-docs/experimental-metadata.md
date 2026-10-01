@@ -3424,10 +3424,10 @@ editing, canonical body definitions and loaded read/edit/write remain future sli
 
 `new MethodDefinition(string name, ushort attributes, MethodSignature signature)`
 creates a detached static type method. Attributes accept Static plus Public, Assembly
-or Private, and optional HideBySig. Instance, abstract, virtual, constructor and other
-flags are not admitted by this constructor; existing builders still support their
-previous bounded contracts. Null signatures throw `ArgumentNullException`; unsupported
-flags, empty/overlong names and `.ctor`/`.cctor` throw `ArgumentException`.
+or Private, and optional HideBySig. The subsequent instance/constructor extension is described below. Abstract, virtual
+and other flags remain unsupported by this constructor; existing builders retain
+their previous bounded contracts. Null signatures throw `ArgumentNullException`; unsupported
+flags, empty/overlong names and `.cctor` throw `ArgumentException`.
 
 Attach the declaring type to its authored module, then append the method to
 `TypeDefinition.Methods`. This property now returns `IList<MethodDefinition>` instead
@@ -3458,3 +3458,44 @@ Validation extends the manual executable to call a directly declared static type
 through an assembly-level helper. CLR and neoCLR return 42. C# contracts cover shared
 identity, access flags, duplicate/foreign attachment, detached-owner rejection and
 unsupported method categories. The broader collections Option<Order> gate is unchanged.
+
+
+### Direct instance methods and constructors
+
+The CLI-attribute `MethodDefinition(string, ushort, MethodSignature)` constructor now
+also accepts nonstatic instance methods and `.ctor` declarations. Public/Assembly/Private
+and optional HideBySig apply as before. A `.ctor` must be nonstatic, return Void and
+declare no method generic parameters. It may specify SpecialName and RTSpecialName
+together; writing supplies both flags as it does for existing builder constructors.
+Those flags on ordinary methods, partial constructor flag pairs, `.cctor`, arbitrary
+virtual/abstract flags and invalid constructor signatures throw `ArgumentException`.
+
+Attachment requires a reference-class owner for instance methods/constructors; static
+and value-type owners throw `InvalidOperationException` before ownership transfer.
+Direct interface contracts remain unsupported. Signature ownership, generic scopes,
+access and readonly-field rules reuse the existing method/body contracts. Detached
+method bodies still require attachment before `MethodBuilder.ForDefinition` succeeds.
+
+```csharp
+var constructor = new MethodDefinition(".ctor", 0x1806,
+    new MethodSignature(PrimitiveType.Void, new[] { PrimitiveType.Int32 }));
+attachedClass.Methods.Add(constructor);
+var body = MethodBuilder.ForDefinition(constructor);
+body.LoadArgument(0); // receiver
+body.LoadArgument(1);
+body.StoreField(ownedFieldBuilder);
+body.Return();
+```
+
+As with the existing producer, root-class CLI constructors initialize System.Object;
+native construction uses the existing root-object path. Constructor chaining, value-type
+instance methods and class virtual dispatch are not added by this authoring change.
+No wire format or CIL changes are introduced. This uses the Cecil-like definition/body
+helper separation while retaining the current bounded execution contract.
+
+The C# executable fixture constructs a manually declared reference class, initializes
+its private readonly Int32 field in a manual constructor, calls a manual instance reader,
+and carries the result through the function/type-method/struct path. CLR and neoCLR
+return 42. Tests also compare emitted constructor/instance flags and reject invalid
+constructor signatures and owner categories. Canonical body definitions, direct interface
+contracts and loaded editing remain pending; the collections Option<Order> gate is unchanged.
