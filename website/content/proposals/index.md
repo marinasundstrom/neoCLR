@@ -126,8 +126,8 @@ String signatures, locals and helper results now support computed Unicode consol
 output and separately compiled native text helpers. The independent metadata
 writer also supports typed argument stores; Raven source parameters remain immutable. Nulls, text operators, general
 object/field support and exception regions remain development work.
-Backend instruction/type profiles now admit shared bodies selectively: .NET supports
-shared division while the native writer still rejects it explicitly. The profiles
+Backend instruction/type profiles now admit shared bodies selectively. Signed Int32/Int64 division now executes through both
+backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
 Public/internal static helpers preserve visibility in CLI and native output and in
 the temporary compiler reference projection. General metadata

@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
 - [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
 - [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
 - [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
@@ -1146,6 +1147,7 @@ public sealed class MethodBuilder
     public void Add();
     public void Subtract();
     public void Multiply();
+    public void Divide();
     public void Call(MethodBuilder target);
     public void Return();
     public void ClearBody();
@@ -1608,7 +1610,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1623,7 +1625,7 @@ public sealed partial class MethodBuilder {
 | Ldc_I4 | int | Push a signed Int32 constant. |
 | Pop | none | Discard one value of either supported primitive type; empty stack rejects when writing. |
 | Ldarg | int | Load the zero-based declared primitive argument; bounds checked when writing. |
-| Add, Sub, Mul | none | Consume matching Int32/Int64 values and push the same-width arithmetic result. |
+| Add, Sub, Mul, Div | none | Consume matching Int32/Int64 values and push the same-width arithmetic result. |
 | Call | MethodBuilder | Use the target signature; external core/identity constraints checked when writing. |
 | Call | ImportedMethodReference | Must belong to the consuming assembly builder. |
 | Call | NativeFunctionDefinition | Native-only static Int32 System callable; matching System must be supplied at runtime. |
@@ -1962,3 +1964,19 @@ format-5 starg. No signature or container schema changes are required. Mutabilit
 a source binding rule, not additional parameter metadata. Ref/out/in and receiver
 assignment are outside this bounded API. C# contracts cover all four admitted types,
 caller isolation, the last slot, bounds, empty stack and type mismatch.
+
+
+### Signed division (development 2026-10-01)
+
+`OpCode.Div` and `void MethodBuilder.Divide()` append operand-free signed integer
+division. `Emit(OpCode.Div)` is equivalent to the helper. Writing requires two
+matching Int32 or Int64 values and leaves one value of that width; stack underflow,
+mixed widths, Boolean and String operands raise InvalidDataException before an image
+is returned. Operand-bearing Emit overloads reject Div with ArgumentException.
+The new enum member is appended; numeric enum values are not serialized opcodes.
+
+Both CLI div and native div truncate toward zero. Dividing by zero or the minimum
+signed value by -1 is legal to emit but faults when executed (CLR arithmetic
+exceptions; neoCLR DivideByZero/ArithmeticOverflow faults). Neither helper performs
+constant evaluation. No unsigned, floating or checked-context overload is provided.
+Existing signature metadata and native transport are unchanged.

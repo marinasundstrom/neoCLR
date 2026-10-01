@@ -211,6 +211,7 @@ public sealed partial class AssemblyBuilder
                     case "add": code.WriteByte(0x58); break;
                     case "subtract": code.WriteByte(0x59); break;
                     case "multiply": code.WriteByte(0x5a); break;
+                    case "divide": code.WriteByte(0x5b); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
@@ -366,6 +367,9 @@ public sealed partial class MethodBuilder
     public void Subtract() => Emit(OpCode.Sub);
     /// <summary>Appends matching-width Int32/Int64 multiplication.</summary>
     public void Multiply() => Emit(OpCode.Mul);
+    /// <summary>Appends matching-width signed Int32/Int64 division, truncating toward zero.</summary>
+    /// <remarks>Zero and minimum-value divided by -1 fault at execution, not when writing.</remarks>
+    public void Divide() => Emit(OpCode.Div);
     /// <summary>Appends a call; foreign methods are imported during Write.</summary>
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>

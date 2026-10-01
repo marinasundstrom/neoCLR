@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add typed signed division to the independent metadata API and Raven native emission.
+  Reuse CLI/native div encodings and runtime zero/overflow faults for Int32 and Int64.
+
 - Add public/internal static type visibility to the independent metadata builder,
   CLI output and native reference projection. Raven emits internal helpers through
   its shared type plan; native runtime loading uses the existing visibility contract.

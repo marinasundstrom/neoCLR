@@ -1345,3 +1345,27 @@ and rvnc probe. The paired executable runs an internal helper on both targets an
 separate native consumer through a public facade. A raw API-produced external call
 bypassing source checks fails native verification with `type access denied` in both
 library file orders. [Recorded binary/driver evidence](experiments/extended-cli-metadata/internal-types-validation.json).
+
+## Signed division on both emission targets — 2026-10-01
+
+Raven's native capability profile now admits the existing shared Divide operation;
+the independent metadata API adds OpCode.Div and MethodBuilder.Divide. Validation
+requires matching Int32/Int64 stack operands before output. Standard CLI div and the
+runtime's existing native div truncate toward zero and fault for zero or minimum/-1.
+This follows the [.NET div contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.div?view=net-10.0)
+(consulted 2026-10-01), rather than introducing a runtime helper or new instruction.
+It expands ordinary expression coverage at the cost of one explicit adapter mapping;
+no performance change is claimed. Unsigned/floating coverage remains pending.
+
+No Runtime Contract setting or runtime implementation changes. The old native
+rejection is superseded; custom restricted-profile tests continue to verify selective
+admission. Unsupported shift expressions retain source diagnostics and unchanged
+output. The compiler owns operation planning, the separate metadata project owns
+encoding, and native runtime verification/execution owns arithmetic faults. The
+CLI reference projection/#Neo bridge and deferred semantic importer remain unchanged.
+
+Validation: 41 C# metadata contract groups and API snapshot check pass. Raven
+`71a4e6124` passes the complete binary runtime/driver probe, including signed quotient
+results and four Int32/Int64 zero/overflow execution cases on both .NET and neoCLR.
+The unchanged shared planner's 36 focused tests pass as the targeted baseline.
+[Binary evidence](experiments/extended-cli-metadata/division-validation.json).

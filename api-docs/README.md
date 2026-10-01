@@ -452,3 +452,5 @@ The host reference includes Starg/StoreArgument and its typed by-value slot cont
 
 The host reference covers TypeVisibility, the explicit AddType overload and
 TypeBuilder.Visibility, including native/reference projection consistency.
+
+The host reference includes OpCode.Div and MethodBuilder.Divide with typed stack and execution-fault contracts.
