@@ -17,9 +17,9 @@ accessors and its explicit constructor. A separate Main constructs it and checks
 Boolean/Int32 boundaries; both source orders verify/run on .NET and binary neoCLR,
 returning 42. The independent API supplies fields, constructors and property associations;
 Raven reuses compiler-synthesized accessor bodies through the shared instruction plan.
-The metadata API now supports owned nominal locals with validated aliasing. Next is
-Raven nominal-local emission and aliasing/mutation, then broader field/constructor
-shapes, generic/delegate/union contracts. The full consumer still has 49 binding errors
+Both the metadata API and Raven now support owned nominal locals; mutation through
+an alias is observed through the original object on both runtimes. Next are nominal
+parameters/results, broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

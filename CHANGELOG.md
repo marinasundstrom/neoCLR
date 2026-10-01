@@ -16,7 +16,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   receiver-aware primitive body planning. Raven now emits the unchanged Order class
   with explicit primitive constructors, mutable auto-properties and shared compiler-
   synthesized accessor bodies. Both source orders verify/run on binary neoCLR and
-  .NET, returning 42. Object locals, implicit constructors and initializers remain gaps.
+  .NET, returning 42. Raven now also emits owned root-class locals and validates
+  property mutation through aliases on both runtimes. Nullable/external locals,
+  implicit constructors, initializers and nominal signatures remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor

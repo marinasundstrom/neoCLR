@@ -9571,3 +9571,16 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** shared field/property/constructor bodies, object locals and the broader
   consumer gaps. Broad symbol importing remains deferred. See the
   [current integration record](raven-cli-bridge.md#shared-root-and-instance-declaration-contracts--2026-10-01).
+
+
+### 2026-10-01 — Subsequent Order execution results
+
+- **Author:** continued the request for subsequent emission slices.
+- **Assistant actions/results:** the unchanged Order declaration now compiles with
+  constructors and auto-properties, using compiler-synthesized accessor bodies. A
+  separate Main executes boundary checks and then local aliasing/property mutation
+  on .NET and binary neoCLR in both file orders, returning 42. This advances the
+  earlier entry's recorded native class gate; it does not mean the full consumer runs.
+- **Open:** nominal signatures and generic/delegate/union coverage; the complete
+  order-collections sample still has native dependency binding gaps. See
+  [recorded executable evidence](experiments/extended-cli-metadata/order-runtime-validation.json).

@@ -2347,5 +2347,5 @@ CLI local signatures use CLASS plus the TypeDef coded index; native locals use t
 existing Named type contract. The bounded native reader validates local class ownership
 and shape, then omits implementation locals from reference projections as before.
 A matching reader is required for these new bodies. API C# tests and direct binary
-neoCLR execution validate local aliasing/mutation to 42; this is not yet evidence of
-Raven source object-local emission.
+neoCLR execution validate local aliasing/mutation to 42. The subsequent Raven
+consumer validates source-level aliasing too; see the [integration record](../docs/raven-cli-bridge.md#raven-object-locals-and-aliasing--2026-10-01).

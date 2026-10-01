@@ -1895,3 +1895,23 @@ returning 42 on .NET and neoCLR. No Runtime Contract or Rust change is involved.
 The bounded reader validates local class ownership but reference projections continue
 to omit body locals. This fills the library gap for Raven's next nominal-local slice;
 null, external-class locals and inheritance conversions remain unsupported.
+
+
+## Raven object locals and aliasing — 2026-10-01
+
+Raven's shared local plan now carries primitive kinds or nominal compiler symbols,
+with explicit root-local admission independent of declaration capabilities. .NET maps
+the symbol to its existing CLR type; neoCLR maps it to an owned metadata class handle.
+Ordinary CLASS local signatures and native Named types preserve identity; no boxing,
+Object erasure or Void placeholder is introduced. The matching metadata API (212b422b)
+is required, including nullable LocalDefinition.Type and nominal ClassType.
+
+The unchanged Order plus separate Main now mutates Number/Pending through one local
+and reads the changes through another alias. Both source orders verify/run on .NET
+and binary neoCLR, returning 42; property/member metadata checks remain. 54 focused
+compiler tests and the existing native emission regression probes pass. Nullable locals
+reject without output. Nominal signatures, nullable/external/generic local types,
+implicit constructors and initializers remain outside this bounded source path. No
+Runtime Contract or runtime source change; runtime remains e8611966. Native symbol
+loading and replacement of the temporary PE/#Neo bridge are still deferred.
+[Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
