@@ -21,8 +21,10 @@ public sealed partial class AssemblyBuilder
     {
         ArgumentNullException.ThrowIfNull(identity); ArgumentNullException.ThrowIfNull(coreLibrary);
         if (identity.PublicKeyToken.Length != 0 || identity.Flags != 0) throw new ArgumentException("writer supports unsigned unflagged identities");
-        Identity = identity; CoreLibrary = coreLibrary;
+        Identity = identity; CoreLibrary = coreLibrary; Definition = AssemblyDefinition.ForProducer(this, mvid);
     }
+    /// <summary>Gets the canonical authored assembly definition for type/field declarations.</summary>
+    public AssemblyDefinition Definition { get; }
     /// <summary>Gets the output identity.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets the explicit core-library identity.</summary>
@@ -192,7 +194,7 @@ public sealed partial class AssemblyBuilder
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
             types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
-        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames, isInterface, isValueType); types.Add(type); return type;
+        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames, isInterface, isValueType); Definition.MainModule.Types.Add(type.Definition); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
@@ -570,21 +572,33 @@ public enum TypeVisibility
 public sealed partial class TypeBuilder
 {
     private readonly List<MethodBuilder> methods = [];
-    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null, bool isInterface = false, bool isValueType = false) { IsValueType = isValueType; IsInterface = isInterface; GenericParameterNames = genericNames ?? Array.Empty<string>(); Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null, bool isInterface = false, bool isValueType = false)
+    {
+        Assembly = assembly; GenericParameterNames = genericNames ?? Array.Empty<string>();
+        var attributes = (visibility == TypeVisibility.Public ? TypeAttributes.Public : 0) |
+            (isInterface ? TypeAttributes.Interface | TypeAttributes.Abstract : isStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : isValueType ? TypeAttributes.Sealed | TypeAttributes.SequentialLayout : 0);
+        Definition = new TypeDefinition(@namespace, name, (uint)attributes, isInterface ? null : assembly.Definition.MainModule.ImportReference(assembly.CoreLibrary, "System", isValueType ? "ValueType" : "Object"));
+        Definition.Producer = this; Definition.Module = assembly.Definition.MainModule; Definition.GenericArity = GenericParameterNames.Count;
+    }
+    internal TypeBuilder(AssemblyBuilder assembly, TypeDefinition definition)
+    { Assembly = assembly; Definition = definition; GenericParameterNames = Array.Empty<string>(); definition.Producer = this; }
+    /// <summary>Gets the same authored definition stored in the module's Types collection.</summary>
+    public TypeDefinition Definition { get; }
+
     /// <summary>Gets immutable declaring-type parameter names in ordinal order.</summary>
     public IReadOnlyList<string> GenericParameterNames { get; }
     /// <summary>Gets whether this is an abstract sealed static class.</summary>
-    public bool IsStatic { get; }
+    public bool IsStatic => (Definition.Attributes & 0x180) == 0x180 && !IsInterface;
     /// <summary>Gets whether this declaration is a CLI value type rather than a reference type.</summary>
-    public bool IsValueType { get; }
+    public bool IsValueType => Definition.IsValueType;
     /// <summary>Gets the declared top-level visibility.</summary>
-    public TypeVisibility Visibility { get; }
+    public TypeVisibility Visibility => (Definition.Attributes & 7) == 1 ? TypeVisibility.Public : TypeVisibility.Internal;
     /// <summary>Gets the owning assembly.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declared namespace.</summary>
-    public string Namespace { get; }
+    public string Namespace => Definition.Namespace;
     /// <summary>Gets the declared name.</summary>
-    public string Name { get; }
+    public string Name => Definition.Name;
     /// <summary>Gets owned methods in declaration order.</summary>
     public IReadOnlyList<MethodBuilder> Methods => methods.AsReadOnly();
     /// <summary>Adds a public static method with Int32 parameters and Int32 or absent result.</summary>

@@ -6,7 +6,7 @@ using System.Security.Cryptography;
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An owned read-only assembly view, separate from runtime reflection and mutable emission.</summary>
-public sealed class AssemblyDefinition
+public sealed partial class AssemblyDefinition
 {
     private readonly byte[] image;
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
@@ -29,11 +29,11 @@ public sealed class AssemblyDefinition
     /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
     public uint EntryPointToken { get; }
     /// <summary>Gets the owned entry-point definition, or null for a library.</summary>
-    public MethodDefinition? EntryPoint => MainModule.GetMethodDefinition(EntryPointToken);
-    /// <summary>Returns a new byte-for-byte copy of this unchanged read snapshot.</summary>
-    /// <returns>Owned original PE bytes, preserving all validated and opaque data.</returns>
-    /// <remarks>This is preservation, not rebuilding or applying edits. Use AssemblyBuilder for controlled new output.</remarks>
-    public byte[] Write() => (byte[])image.Clone();
+    public MethodDefinition? EntryPoint => Producer is null ? MainModule.GetMethodDefinition(EntryPointToken) : throw new NotSupportedException("authored entry definitions are pending; use builder EntryPoint");
+    /// <summary>Encodes an authored assembly, or copies an unchanged loaded snapshot byte for byte.</summary>
+    /// <returns>Owned PE bytes.</returns>
+    /// <remarks>Loaded snapshot editing remains unsupported.</remarks>
+    public byte[] Write() => Producer is { } producer ? producer.Write() : (byte[])image.Clone();
 
     /// <summary>Recognizes bounded PE input and snapshots its assembly, type and callable declarations.</summary>
     /// <param name="image">Complete image; do not mutate during the call.</param>
@@ -236,7 +236,7 @@ public sealed class AssemblyDefinition
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
-public sealed class ModuleDefinition
+public sealed partial class ModuleDefinition
 {
     private readonly Dictionary<uint, TypeDefinition> definitions;
     private readonly Dictionary<uint, MethodDefinition> methods;
@@ -250,17 +250,17 @@ public sealed class ModuleDefinition
     {
         Assembly = assembly; Name = name; Mvid = mvid;
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
-        Types = Array.AsReadOnly(types);
+        Types = new DefinitionCollection<TypeDefinition>(types, type => { _ = Assembly.Producer?.AttachType(type) ?? throw new InvalidOperationException("loaded type collections are read-only"); });
         definitions = types.ToDictionary(type => type.MetadataToken);
         var storage = fieldRows.Select(row => new FieldDefinition(this, row)).ToArray();
-        Fields = Array.AsReadOnly(storage);
+        snapshotFields = Array.AsReadOnly(storage);
         fields = storage.ToDictionary(field => field.MetadataToken);
         declaredFields = storage.GroupBy(field => field.DeclaringType.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<FieldDefinition>)Array.AsReadOnly(group.ToArray()));
         var callables = methodRows.Select(row => new MethodDefinition(this, row)).ToArray();
-        Methods = Array.AsReadOnly(callables);
+        snapshotMethods = Array.AsReadOnly(callables);
         methods = callables.ToDictionary(method => method.MetadataToken);
-        Functions = Array.AsReadOnly(callables.Where(method => method.DeclaringType is null).ToArray());
+        snapshotFunctions = Array.AsReadOnly(callables.Where(method => method.DeclaringType is null).ToArray());
         declaredMethods = callables.Where(method => method.DeclaringType is not null)
             .GroupBy(method => method.DeclaringType!.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<MethodDefinition>)Array.AsReadOnly(group.ToArray()));
@@ -280,7 +280,7 @@ public sealed class ModuleDefinition
     /// <summary>Gets the declared MVID; this is not the experimental catalog's module scope UUID.</summary>
     public Guid Mvid { get; }
     /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
-    public IReadOnlyList<TypeDefinition> Types { get; }
+    public IList<TypeDefinition> Types { get; }
     /// <summary>Gets physical Property rows in metadata order.</summary>
     public IReadOnlyList<PropertyDefinition> Properties { get; }
     /// <summary>Looks up a property in this snapshot.</summary>
@@ -289,16 +289,22 @@ public sealed class ModuleDefinition
     public PropertyDefinition? GetPropertyDefinition(uint metadataToken) => properties.GetValueOrDefault(metadataToken);
     internal IReadOnlyList<PropertyDefinition> GetDeclaredProperties(uint token) => declaredProperties.GetValueOrDefault(token) ?? Array.Empty<PropertyDefinition>();
     /// <summary>Gets physical Field rows in metadata order.</summary>
-    public IReadOnlyList<FieldDefinition> Fields { get; }
+    private readonly IReadOnlyList<FieldDefinition> snapshotFields;
+    /// <summary>Gets fields in this module; authored method/function views remain unsupported during migration.</summary>
+    public IReadOnlyList<FieldDefinition> Fields => Assembly.Producer is null ? snapshotFields : Types.SelectMany(t => t.Fields).ToArray();
     /// <summary>Looks up a field in this snapshot.</summary>
     /// <param name="metadataToken">Field token; other kinds or missing rows return null.</param>
     /// <returns>The owned field or null.</returns>
     public FieldDefinition? GetFieldDefinition(uint metadataToken) => fields.GetValueOrDefault(metadataToken);
     internal IReadOnlyList<FieldDefinition> GetDeclaredFields(uint token) => declaredFields.GetValueOrDefault(token) ?? Array.Empty<FieldDefinition>();
     /// <summary>Gets all callable definitions in physical MethodDef order, including global functions.</summary>
-    public IReadOnlyList<MethodDefinition> Methods { get; }
+    private readonly IReadOnlyList<MethodDefinition> snapshotMethods;
+    /// <summary>Gets methods in this module; authored method/function views remain unsupported during migration.</summary>
+    public IReadOnlyList<MethodDefinition> Methods => Assembly.Producer is null ? snapshotMethods : throw new NotSupportedException("authored method definitions are pending; use builder methods");
     /// <summary>Gets top-level functions with no declaring type, in metadata order.</summary>
-    public IReadOnlyList<MethodDefinition> Functions { get; }
+    private readonly IReadOnlyList<MethodDefinition> snapshotFunctions;
+    /// <summary>Gets functions in this module; authored method/function views remain unsupported during migration.</summary>
+    public IReadOnlyList<MethodDefinition> Functions => Assembly.Producer is null ? snapshotFunctions : throw new NotSupportedException("authored function definitions are pending; use builder functions");
     /// <summary>Looks up an owned MethodDef token; other kinds or absent rows return null.</summary>
     /// <param name="metadataToken">Physical MethodDef token in this snapshot.</param>
     /// <returns>The owned callable or null.</returns>
@@ -321,7 +327,7 @@ public sealed class ModuleDefinition
 }
 
 /// <summary>A nominal declaration read from a physical TypeDef row.</summary>
-public sealed class TypeDefinition
+public sealed partial class TypeDefinition
 {
     private readonly uint declaringToken;
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
@@ -336,11 +342,11 @@ public sealed class TypeDefinition
     /// <summary>Gets the physical TypeAttributes flags.</summary>
     public uint Attributes { get; }
     /// <summary>Gets properties declared directly by this type.</summary>
-    public IReadOnlyList<PropertyDefinition> Properties => Module.GetDeclaredProperties(MetadataToken);
+    public IReadOnlyList<PropertyDefinition> Properties => authoredFields is null ? Module.GetDeclaredProperties(MetadataToken) : throw new NotSupportedException("authored property definitions are pending; use builder properties");
     /// <summary>Gets fields declared directly by this type.</summary>
-    public IReadOnlyList<FieldDefinition> Fields => Module.GetDeclaredFields(MetadataToken);
+    public IList<FieldDefinition> Fields => authoredFields ?? (IList<FieldDefinition>)Module.GetDeclaredFields(MetadataToken);
     /// <summary>Gets the owning module snapshot.</summary>
-    public ModuleDefinition Module { get; }
+    public ModuleDefinition Module { get; internal set; } = null!;
     /// <summary>Gets this image's TypeDef token; tokens are not cross-module identity.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the stored namespace, without constructing a display identity.</summary>
@@ -348,11 +354,11 @@ public sealed class TypeDefinition
     /// <summary>Gets the stored metadata name, including any generic arity suffix.</summary>
     public string Name { get; }
     /// <summary>Gets the number of declared GenericParam rows, including captured outer parameters where encoded.</summary>
-    public int GenericArity { get; }
+    public int GenericArity { get; internal set; }
     /// <summary>Gets the enclosing definition, or null for a top-level type.</summary>
-    public TypeDefinition? DeclaringType => Module.GetTypeDefinition(declaringToken);
+    public TypeDefinition? DeclaringType => MetadataToken == 0 ? null : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets methods declared directly by this type; global functions belong to Module.Functions.</summary>
-    public IReadOnlyList<MethodDefinition> Methods => Module.GetDeclaredMethods(MetadataToken);
+    public IReadOnlyList<MethodDefinition> Methods => authoredFields is null ? Module.GetDeclaredMethods(MetadataToken) : throw new NotSupportedException("authored method definitions are pending; use builder methods");
     /// <summary>Creates a nominal reference scoped to this module snapshot.</summary>
     /// <returns>A reference that resolves to this exact owned definition.</returns>
     public TypeReference ToReference() => new(this);
@@ -360,12 +366,13 @@ public sealed class TypeDefinition
 
 /// <summary>A nominal reference backed by a TypeDef or a physical TypeRef row.</summary>
 /// <remarks>Object equality is reference equality. Structural expressions and TypeSpec decoding are separate.</remarks>
-public sealed class TypeReference
+public sealed partial class TypeReference
 {
     private readonly bool definitionBacked;
+    private readonly TypeDefinition? definition;
     internal TypeReference(TypeDefinition definition)
     {
-        Module = definition.Module; MetadataToken = definition.MetadataToken;
+        this.definition = definition; Module = definition.Module; MetadataToken = definition.MetadataToken;
         Namespace = definition.Namespace; Name = definition.Name; definitionBacked = true;
     }
     internal TypeReference(ModuleDefinition module, AssemblyDefinition.TypeReferenceRow row)
@@ -387,7 +394,14 @@ public sealed class TypeReference
     /// <remarks>Does not follow exported-type forwarders or bind constructed generic TypeSpecs.</remarks>
     public TypeDefinition Resolve(IAssemblyResolver? resolver = null)
     {
-        if (definitionBacked) return Module.GetTypeDefinition(MetadataToken)!;
+        if (definitionBacked) return definition!;
+        if (ExplicitScope is { } scope)
+        {
+            var resolved = resolver?.Resolve(scope);
+            if (resolved is null || !resolved.Identity.Equals(scope)) throw new InvalidDataException("missing or mismatched explicit type scope");
+            var explicitMatches = resolved.MainModule.Types.Where(t => t.Namespace == Namespace && t.Name == Name && t.DeclaringType is null).Take(2).ToArray();
+            return explicitMatches.Length == 1 ? explicitMatches[0] : throw new InvalidDataException("missing or ambiguous explicit type reference");
+        }
         ModuleDefinition target;
         TypeDefinition? parent = null;
         switch (ResolutionScopeToken >> 24)

@@ -3296,3 +3296,55 @@ model, not promising drop-in Cecil API/binary compatibility or adding a Cecil ru
 dependency. neoCLR assembly-level functions and future metadata categories remain
 explicit extensions to that shared model. Different encoders consume it and validate
 supported target capabilities; they do not determine the public graph's shape.
+
+
+## Authored definitions: first migration slice
+
+Development API, 2026-10-01. CLI metadata and CIL remain the baseline; this slice
+changes the authoring model without changing the wire format or instruction set.
+It implements only the assembly/type/field part of the definition-first plan above.
+
+| API | Contract |
+| --- | --- |
+| `AssemblyDefinition.CreateAssembly(AssemblyIdentity identity, AssemblyIdentity coreLibrary)` | Creates an authored assembly with explicit target identity and core contract. Existing producer identity validation applies. |
+| `AssemblyDefinition.Write()` | Encodes authored definitions; loaded snapshots still return owned original bytes. |
+| `AssemblyDefinition.WriteNativeAssembly()` | Encodes authored definitions through the existing native writer. Loaded snapshots throw `InvalidOperationException`. |
+| `AssemblyBuilder.Definition` / `AssemblyBuilder.ForDefinition(AssemblyDefinition)` | Returns the same assembly/facade without copying declarations. Null input throws `ArgumentNullException`; loaded input throws `InvalidOperationException`. |
+| `ModuleDefinition.ImportReference(AssemblyIdentity scope, string namespace, string name)` | Creates an explicitly scoped reference; does not load a dependency or consult host reflection. Invalid/null arguments reject. Explicit resolution requires matching assembly identity. |
+| `TypeDefinition(string namespace, string name, uint attributes, TypeReference? baseType)` | Creates a detached declaration. Attachment admits nongeneric root classes, static classes or sealed sequential value types with the same module's explicitly imported core Object/ValueType base. Unsupported shape, foreign ownership or duplicate name throws `ArgumentException`. |
+| `TypeDefinition.BaseType` | Authored base reference; loaded base decoding is pending, so loaded null is not proof of no base. |
+| `FieldDefinition(string name, ushort attributes, SignatureType fieldType)` | Creates a detached instance field. Supports Private, Assembly or Public access and optional InitOnly; nonvoid signature required. Value-type storage retains existing primitive/generic-payload restrictions. |
+| `FieldDefinition.FieldType` | Authored signature; null for opaque loaded signatures. `GetSignature()` rejects authored fields until encoded/read; use FieldType instead. |
+| `FieldDefinition.Name` | Authored fields can be renamed with Unicode/name and duplicate checks. Loaded edits throw `InvalidOperationException`. |
+| `TypeBuilder.Definition` / `FieldBuilder.Definition` | Exact declaration object consumed by the facade. Builder field creation appends to the definition collection. |
+
+`ModuleDefinition.Types` and `TypeDefinition.Fields` now return `IList<T>` instead
+of `IReadOnlyList<T>`: a development API source compatibility change. Authored lists
+support appending only. Insertion elsewhere, replacement, removal and clearing throw
+`NotSupportedException`. Ownership is exclusive; attach a type to its module and fields
+to their type. Detached Module properties are unset until attachment. Physical tokens
+remain zero until encoding and rereading; token lookup is a loaded-image operation.
+`ModuleDefinition.Fields` reflects current authored fields.
+
+Method bodies, functions, properties and generic parameter declarations still use the
+existing builder representation. Authored method/function views and EntryPoint lookup
+throw `NotSupportedException`; use the builder facade for those operations. Other
+snapshot metadata views are not materialized authored views. Loaded definitions remain
+read-only, byte-preserving snapshots. Writers currently use builder encoding adapters;
+this is not completion of canonical method/body or reader/editor migration.
+
+```csharp
+var assembly = AssemblyDefinition.CreateAssembly(identity, targetCoreIdentity);
+var module = assembly.MainModule;
+var valueType = module.ImportReference(targetCoreIdentity, "System", "ValueType");
+var type = new TypeDefinition("Example", "MyStruct", 0x109, valueType);
+type.Fields.Add(new FieldDefinition("MyField", 0x6, PrimitiveType.Int32));
+module.Types.Add(type);
+byte[] pe = assembly.Write();
+```
+
+Validation: `AuthoredDefinitionChecks` covers exact facade identity, direct declarations,
+renaming, ownership rejection, CLR shape/execution and native verify/run (42).
+`--authored-definition-integration <runtime> <fresh-directory>` reproduces the native
+case. The 76 C# contract groups and Raven external-signature/generic-library runtime
+probes pass. The broader collections Option<Order> gate remains unchanged.

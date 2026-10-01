@@ -580,3 +580,8 @@ host C# metadata APIs covered by the [manual reference](experimental-metadata.md
 They remain explicitly excluded from guest RavenDoc selection; no guest reference
 assembly/signature changed. ClassType/GenericTypeInstance category semantics are
 updated in that same entry.
+
+Authored assembly/type/field constructors, facade Definition properties, ForDefinition,
+explicit Module.ImportReference and authored WriteNativeAssembly are host-only C# APIs
+covered by [the manual reference](experimental-metadata.md#authored-definitions-first-migration-slice).
+They are excluded from guest RavenDoc selection for the same host-language reason.

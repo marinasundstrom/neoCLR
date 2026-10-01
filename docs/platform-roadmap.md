@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Definition migration checkpoint (2026-10-01):** authored assembly/type/field construction
+now shares declaration objects with builder facades and retains existing CLI/native
+encoding. Manual struct execution returns 42 on both runtimes; Raven cross-assembly
+probes remain green. Methods/bodies, full editing and reader materialization remain
+open. The author reaffirmed CLI/CIL as the baseline to extend or modify, and continued
+authorization for end-to-end work. [Contract](../api-docs/experimental-metadata.md#authored-definitions-first-migration-slice).
+
 **Author-directed architecture correction (2026-10-01):** definitions must be the
 canonical editable assembly graph, usable directly; builders must be optional facades
 that mutate the same definitions, and writers must consume definitions. The current

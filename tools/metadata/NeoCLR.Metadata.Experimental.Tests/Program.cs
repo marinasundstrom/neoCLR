@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--authored-definition-integration")
+{
+    await AuthoredDefinitionChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--value-type-integration")
 {
     await ValueTypeChecks.RunRuntime(args[1], args[2]); return 0;
@@ -241,6 +245,7 @@ var tests = new (string Name, Action Body)[]
     ("Generic imported signatures and MethodSpec execution", GenericImportChecks.Run),
     ("Nominal imported method signatures and CLR execution", NominalMethodImportChecks.Run),
     ("Value-type categories defaults and CLI/native projection", ValueTypeChecks.Run),
+    ("Manual definitions share builder identity and writers", AuthoredDefinitionChecks.Run),
     ("Generic signature recognition and constraint rejection", CallableChecks.GenericSignatureRecognition),
     ("Producer MemberRef dependency and overload resolution", MemberReferenceChecks.ProducerReferences),
     ("Local MemberRef resolution and unsupported contracts", MemberReferenceChecks.LocalAndUnsupported),

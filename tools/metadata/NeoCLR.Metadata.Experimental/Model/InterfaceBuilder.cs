@@ -73,7 +73,7 @@ public sealed partial class TypeBuilder
     }
 
     /// <summary>Gets whether this is an interface declaration rather than a class.</summary>
-    public bool IsInterface { get; }
+    public bool IsInterface => (Definition.Attributes & 0x20) != 0;
 
     /// <summary>Adds a public abstract instance method to an interface.</summary>
     /// <param name="name">Nonempty simple method name; constructors are forbidden.</param>

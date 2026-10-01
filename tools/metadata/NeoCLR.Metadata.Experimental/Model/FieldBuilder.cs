@@ -14,19 +14,21 @@ public enum FieldVisibility
 /// <summary>An owned instance-field declaration with a supported value signature.</summary>
 public sealed partial class FieldBuilder
 {
-    internal FieldBuilder(TypeBuilder owner, string name, SignatureType type, FieldVisibility visibility, int index, bool isReadOnly)
-    { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; Index = index; IsReadOnly = isReadOnly; }
+    internal FieldBuilder(TypeBuilder owner, FieldDefinition definition, int index)
+    { DeclaringType = owner; Definition = definition; Index = index; }
+    /// <summary>Gets the same authored field object held by the declaring definition.</summary>
+    public FieldDefinition Definition { get; }
     internal int Index { get; }
     /// <summary>Gets the declaring nominal type.</summary>
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple metadata name.</summary>
-    public string Name { get; }
+    public string Name => Definition.Name;
     /// <summary>Gets the storage signature, including scoped VAR and constructed owned classes.</summary>
-    public SignatureType FieldType { get; }
+    public SignatureType FieldType => Definition.FieldType!;
     /// <summary>Gets declared accessibility.</summary>
-    public FieldVisibility Visibility { get; }
+    public FieldVisibility Visibility => (Definition.Attributes & 7) switch { 6 => FieldVisibility.Public, 3 => FieldVisibility.Internal, _ => FieldVisibility.Private };
     /// <summary>Gets whether stores are restricted to constructors of the declaring type.</summary>
-    public bool IsReadOnly { get; }
+    public bool IsReadOnly => (Definition.Attributes & 0x20) != 0;
 }
 
 public sealed partial class TypeBuilder
@@ -46,6 +48,14 @@ public sealed partial class TypeBuilder
     /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet. Value-type fields currently require primitive or declaring-type parameter signatures.</remarks>
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
+        var definition = new FieldDefinition(name, (ushort)((visibility switch { FieldVisibility.Public => 6, FieldVisibility.Internal => 3, FieldVisibility.Private => 1, _ => throw new ArgumentOutOfRangeException(nameof(visibility)) }) | (isReadOnly ? 0x20 : 0)), type);
+        Definition.Fields.Add(definition);
+        return definition.Producer!;
+    }
+    internal FieldBuilder AttachField(FieldDefinition definition)
+    {
+        var name = definition.Name; var type = definition.FieldType!;
+        var visibility = (definition.Attributes & 7) switch { 6 => FieldVisibility.Public, 3 => FieldVisibility.Internal, _ => FieldVisibility.Private };
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (IsValueType && type.Primitive is null && type.TypeParameterIndex is null) throw new ArgumentException("value-type fields currently require primitive or declaring-parameter storage", nameof(type));
@@ -56,6 +66,6 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("invalid or duplicate instance field");
         try { _ = new System.Text.UTF8Encoding(false, true).GetByteCount(name); }
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid field Unicode", error); }
-        var field = new FieldBuilder(this, name, type, visibility, fields.Count, isReadOnly); fields.Add(field); return field;
+        var field = new FieldBuilder(this, definition, fields.Count); fields.Add(field); definition.Producer = field; return field;
     }
 }

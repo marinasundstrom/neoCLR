@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Begin the definition-first migration: directly construct assemblies, types and fields,
+  with compatibility builders sharing declaration identity and both existing writers.
+  Manual struct construction executes on CLR and neoCLR (42). Authored collections
+  are append-only; method/body definitions and loaded editing remain pending. Types
+  and type Fields now expose IList instead of IReadOnlyList (development API change).
+
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-
   driven writers. The current snapshot/producer split remains an acknowledged gap;

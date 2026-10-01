@@ -1,0 +1,59 @@
+{
+  "verified": true,
+  "result": 42,
+  "scope": "manual assembly/type/field construction; same definitions in compatibility builders; native write/load/execute; method/body definition migration and loaded editing remain pending",
+  "date": "2026-10-01",
+  "branch": "codex/extended-cli-metadata",
+  "baseCommit": "1d100ce6",
+  "contractGroups": 76,
+  "clrResult": 42,
+  "ravenCommit": "55a29312f",
+  "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
+  "ravenProbes": {
+    "external-signature-runtime": {
+      "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
+      "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+      "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
+      "librarySha256": "606BEA5FBC474351EBA5FABD59040984E75889667EC6D6050599B6FCC60A1835",
+      "applicationSha256": "84C576D66AAB522D14BC80C70CC751C36721E2289CB852F025BCB4CBC0E576F7",
+      "verified": true,
+      "result": 42,
+      "coverage": [
+        "separate Raven library and application",
+        "external generic signatures with consumer-owned arguments",
+        "method generic forwarding",
+        "discarded nominal result",
+        "external interface arrays",
+        "imported nominal/generic method signatures",
+        "constructed factory/read with consumer-owned payload alias",
+        "unregistered dependency rejection",
+        "missing type rejection",
+        "nominal overload matching",
+        "missing method rejection"
+      ],
+      "scope": "public top-level unconstrained reference signatures; imported constructors/instance members, value types and translated System identity mapping remain unsupported"
+    },
+    "generic-library-runtime": {
+      "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
+      "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+      "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
+      "librarySha256": "B0789099F308A0527F93890A0BC39D187566FDADE4AE0F1C0F88F5A71DAC09E3",
+      "applicationSha256": "71F30AA25E53BB3F8CBC6DC070B7AF657C3B29E53A42C1D4388AA1D955F1F9A4",
+      "verified": true,
+      "result": 42,
+      "coverage": [
+        "separate Raven library and application",
+        "primitive, vector and consumer-owned nominal generic arguments",
+        "caller method/owner generic forwarding",
+        "external constructed argument",
+        "nominal alias mutation",
+        "generic arity overloads",
+        "returned array alias mutation",
+        "void external call",
+        "unregistered dependency rejection",
+        "missing generic declaration rejection"
+      ],
+      "scope": "unconstrained static generic methods on nongeneric owners; generic owners and constrained imports remain unsupported"
+    }
+  }
+}

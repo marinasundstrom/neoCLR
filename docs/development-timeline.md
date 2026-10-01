@@ -25,6 +25,17 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: CLI/CIL baseline and first definition migration
+
+- **Author:** “neoCLR CIL format will build on the same format. Extend or modify it.”
+  Directed continued end-to-end work with appropriate adjustments.
+- **Assistant action:** Began authored assembly/type/field construction with builders
+  sharing those declarations, retaining existing encodings. Manual struct construction
+  and optional method helpers execute on CLR and neoCLR (42); 76 C# contract groups
+  and two Raven cross-assembly probes pass.
+- **Open:** This is a partial migration. Canonical method/body definitions and loaded
+  editing are still pending; the unchanged collections Option<Order> gate remains open.
+
 ## 2026-10-01: Definitions are the editable metadata model
 
 - **Author:** Clarified the expected layering: “Builders -> Definitions -> Encoded
