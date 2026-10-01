@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Enable Raven expression-bodied functions and static methods through shared compiler
+  lowering on .NET and neoCLR. Verify binary loading/execution, separate-library
+  references, Unit calls and precise rejection of unsupported expressions.
+
 - Preserve public/internal/private static method visibility in the independent metadata
   API, CLI output and native projection. Binary runtime checks enforce assembly/type access.
   Integrate Raven static helper access through shared declaration capabilities; validate

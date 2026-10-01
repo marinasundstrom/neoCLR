@@ -1491,3 +1491,23 @@ internal calls and native verification rejects raw API callers independently.
 includes artifact hashes and runtime identity. The independent metadata foundation's
 45 C# contract groups and direct binary access tests remain applicable. These are
 feature-branch revisions, not main or published support.
+
+
+## Expression-bodied Raven callables — 2026-10-01
+
+Raven `912cdff51` and `c70956b91` on `codex/metadata-consumer` extend shared callable
+plans and native admission to arrow bodies. The original bound arrow block passes
+through the existing compiler Lowerer, as in ordinary .NET emission. This preserves
+return conversions and Unit statement semantics without backend-specific rewriting.
+The tradeoff is the existing bounded primitive/body capability subset; general .NET
+and Debug fallback remain. No new Runtime Contract configuration, metadata API, native
+instruction or schema is introduced. Compiler lowering owns source semantics; the
+independent writer and runtime consume existing encodings. PE/#Neo reference projection
+and eventual native symbol-loading replacement remain unchanged.
+
+Validation: 48 focused Raven C# tests and the complete binary runtime/rvnc probe pass
+against metadata `5ccc41e8`. Paired .NET/native cases cover Int32/Int64/Boolean/String,
+implicit widening, Unit entry/helper calls and Unicode console output. Separate-library
+methods execute in both source orders; unsupported arrow conversions retain exact
+source spans and unchanged output. [Recorded evidence](experiments/extended-cli-metadata/expression-body-raven-validation.json).
+This is feature-branch development; async/generic/instance native emission remains deferred.
