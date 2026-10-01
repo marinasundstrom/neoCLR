@@ -5,6 +5,20 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Author reaffirmation (2026-10-01):** .NET metadata is the baseline, with explicit
+neoCLR extensions such as assembly-level functions. The Cecil-like API is the primary
+abstraction for inspecting, modifying and creating assemblies. Preserve familiar
+metadata shape/behavior; current immutable snapshots, editable producer graphs and
+bounded imports are incremental coverage, not the final loaded read–edit–write model.
+[Conversation](development-timeline.md#2026-10-01-net-metadata-baseline-and-a-complete-cecil-like-lifecycle).
+
+**Imported generic-method checkpoint (2026-10-01):** separate Raven library and
+application binaries now execute unconstrained static generic methods with concrete
+primitive/vector arguments (42), including arity overloads and alias mutation. This
+completes a bounded method-instantiation prerequisite; imported nominal identities,
+generic declaring types and constrained dependencies remain open before collection
+imports. [Evidence](experiments/extended-cli-metadata/generic-library-validation.json).
+
 **Imported vector checkpoint (2026-10-01):** direct Raven emission now supports
 static primitive-vector calls across separately emitted library/application assemblies.
 The neoCLR-profile binary pair verifies and returns 42, including overload selection

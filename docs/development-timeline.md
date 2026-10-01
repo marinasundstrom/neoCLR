@@ -25,6 +25,25 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: .NET metadata baseline and a complete Cecil-like lifecycle
+
+- **Author:** Reaffirmed: “Our baseline is .NET metadata format and our future
+  extensions” and said the Cecil-like API must allow inspecting, modifying and
+  generating assemblies from nothing, without diverging too far in shape or behavior.
+  Noted that assembly-level functions are already supported.
+- **Assistant:** Agreed that ordinary metadata/IL keeps .NET shape and behavior;
+  existing assembly functions retain their CLI `<Module>` compatibility representation.
+  Explained that the active imported-generic slice uses GenericParam/MVAR and
+  MethodSpec/MemberRef rather than a new format. Distinguished immutable loaded
+  snapshots and editable producer graphs from the still-incomplete general loaded
+  assembly editing lifecycle. Narrow import APIs are implementation limits, not a
+  proposed permanent alternative object model.
+- **Actions/outcome:** Recorded this direction in the roadmap and API reference while
+  continuing the bounded library/application generic-call implementation. C# CLR
+  execution and direct native binary execution are the acceptance checks. Full
+  loaded read–edit–write support, imported nominal/generic owner identity and native
+  compiler symbol loading remain open; this exchange does not claim their completion.
+
 ## 2026-10-01: Refactor parity before expanding native emission
 
 - **Author:** Worried that codegen refactoring changed behavior. Suggested moving

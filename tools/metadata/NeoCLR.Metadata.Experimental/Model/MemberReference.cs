@@ -23,16 +23,17 @@ public sealed class MemberReference
     /// <summary>Copies the original signature blob, including unsupported signatures.</summary>
     /// <returns>New owned signature bytes.</returns>
     public byte[] GetSignature() => (byte[])signature.Clone();
-    /// <summary>Resolves the static primitive/vector/no-result method subset through a nominal TypeDef or TypeRef parent.</summary>
+    /// <summary>Resolves the static primitive/vector/no-result and unconstrained generic method subset through a nominal TypeDef or TypeRef parent.</summary>
     /// <param name="resolver">Explicit assembly resolver required by external TypeRef scopes.</param>
     /// <returns>The unique matching method in the resolved type's owned snapshot.</returns>
     /// <exception cref="InvalidDataException">Unsupported signature/parent, missing or mismatched dependency, or absent/ambiguous method.</exception>
-    /// <remarks>Does not compare module-local signature tokens as cross-module identities. Field references, generic/instance methods,
+    /// <remarks>Does not compare module-local signature tokens as cross-module identities. Field references, constrained generic/instance methods,
     /// inherited lookup, access checks, TypeSpec, ModuleRef, MethodDef-parent varargs and global MemberRefs are not resolved.
     /// Host resolver failures propagate. No resolution result is cached.</remarks>
     public MethodDefinition ResolveMethod(IAssemblyResolver? resolver = null)
     {
-        if (!MethodDefinition.TryDecodeStaticValueSignature(signature, out var decoded))
+        if (!MethodDefinition.TryDecodeStaticValueSignature(signature, out var decoded,
+                signature.Length > 1 && signature[0] == 0x10 && signature[1] is > 0 and <= 32 ? signature[1] : 0))
             throw new InvalidDataException("unsupported member method signature");
         TypeDefinition owner = (ParentToken >> 24) switch
         {
@@ -42,7 +43,7 @@ public sealed class MemberReference
             _ => throw new InvalidDataException("unsupported member method parent")
         };
         var matches = owner.Methods.Where(method => method.Name == Name &&
-            method.TryGetStaticValueSignature(out var candidate) && candidate!.Matches(decoded!)).Take(2).ToArray();
+            (method.TryGetStaticValueSignature(out var candidate) || method.TryGetStaticGenericValueSignature(out candidate)) && candidate!.Matches(decoded!)).Take(2).ToArray();
         if (matches.Length != 1) throw new InvalidDataException("member method missing or ambiguous: " + Name);
         return matches[0];
     }

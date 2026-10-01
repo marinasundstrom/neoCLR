@@ -199,13 +199,14 @@ public sealed partial class MethodBuilder
     /// <param name="opCode">Call.</param>
     /// <param name="operand">Reference imported by this output assembly builder.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
-    /// <exception cref="ArgumentException">Opcode is not Call or the reference belongs to another builder.</exception>
+    /// <exception cref="ArgumentException">Opcode is not Call, the definition is uninstantiated generic, or the reference belongs to another builder.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, ImportedMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
         RequireCall(opCode);
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
+        if (operand.Signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
         Append(new("call", Target: operand.Target));
     }
 

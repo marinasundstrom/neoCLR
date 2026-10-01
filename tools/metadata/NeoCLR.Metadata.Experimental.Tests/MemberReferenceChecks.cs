@@ -55,7 +55,8 @@ internal static class MemberReferenceChecks
         Reject(() => Read(Image([0, 1, 8, 8], duplicate: true)).MainModule.MemberReferences[0].ResolveMethod(), "missing or ambiguous");
         Reject(() => Read(Image([0, 0, 8])).MainModule.MemberReferences[0].ResolveMethod(), "missing or ambiguous");
         Reject(() => Read(Image([0, 1, 8, 8], parent: "module")).MainModule.MemberReferences[0].ResolveMethod(), "unsupported member method parent");
-        foreach (byte[] signature in new byte[][] { [6, 8], [0x20, 1, 8, 8], [0x10, 1, 0, 8], [0, 0, 0x12, 5], [0], [0, 1, 8, 8, 8] })
+        Reject(() => Read(Image([0x10, 1, 0, 8])).MainModule.MemberReferences[0].ResolveMethod(), "missing or ambiguous");
+        foreach (byte[] signature in new byte[][] { [6, 8], [0x20, 1, 8, 8], [0, 0, 0x12, 5], [0], [0, 1, 8, 8, 8] })
         {
             var member = Read(Image(signature)).MainModule.MemberReferences[0];
             Check(member.GetSignature().SequenceEqual(signature), "opaque field/general/malformed signature retained");

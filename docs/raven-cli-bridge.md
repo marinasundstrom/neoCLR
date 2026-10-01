@@ -2593,3 +2593,24 @@ The C# `--vector-library-runtime <neoclr-root> <fresh-output> <runtime>` probe i
 checks four element overloads, alias mutation, void calls, iteration, missing bindings
 and mismatched signatures. See [validation](experiments/extended-cli-metadata/vector-library-validation.json)
 for tested core/runtime identities. Imported generic collections remain open.
+
+## Imported generic-method boundary (2026-10-01)
+
+The metadata/Raven feature branches now admit unconstrained static generic methods
+on nongeneric owners with primitive/vector arguments. Native intent is ordinary generic
+substitution; the temporary input projection uses standard CLI MVAR/GenericParam and
+output CLI uses MethodSpec/MemberRef. Native binaries retain the existing generic call
+encoding and load directly, with no body translation or runtime format change.
+
+Configuration still requires CompilationOptions.NeoCLR, the matching declaration
+core and explicit dependency/core bindings. The metadata API owns decoding, scope and
+constraint rejection; Raven's adapter owns exact symbol/signature matching and concrete
+argument admission. Generic parameter display names are positional in the imported API;
+nominal identities, generic owners, constraints and caller-generic forwarding remain
+outside this imported subset. A future native semantic loader must replace the projected
+CLI input without treating these temporary limits as platform rules.
+
+The C# `--generic-library-runtime` probe emits both binaries, verifies/runs them (42),
+checks arity overloads, array aliases, void calls and missing dependency/declaration
+rejection. [Evidence](experiments/extended-cli-metadata/generic-library-validation.json)
+pins branches and tested runtime/core hashes. .NET shared codegen was not changed.

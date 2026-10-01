@@ -229,6 +229,8 @@ var tests = new (string Name, Action Body)[]
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("Primitive vector imported signatures", VectorImportChecks.Run),
+    ("Generic imported signatures and MethodSpec execution", GenericImportChecks.Run),
+    ("Generic signature recognition and constraint rejection", CallableChecks.GenericSignatureRecognition),
     ("Producer MemberRef dependency and overload resolution", MemberReferenceChecks.ProducerReferences),
     ("Local MemberRef resolution and unsupported contracts", MemberReferenceChecks.LocalAndUnsupported),
     ("MemberRef reader bounds and parent validation", MemberReferenceChecks.Bounds),

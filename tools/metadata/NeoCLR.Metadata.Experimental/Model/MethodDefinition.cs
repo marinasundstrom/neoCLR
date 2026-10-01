@@ -7,6 +7,7 @@ public sealed class MethodDefinition
 {
     private readonly byte[] signature;
     private readonly uint declaringToken;
+    private readonly bool unsupportedGenericParameters;
     internal MethodDefinition(ModuleDefinition module, AssemblyDefinition.MethodRow row)
     {
         Module = module;
@@ -15,6 +16,7 @@ public sealed class MethodDefinition
         Attributes = row.Attributes;
         ImplementationAttributes = row.ImplementationAttributes;
         GenericArity = row.Arity;
+        unsupportedGenericParameters = row.UnsupportedGenericParameters;
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
     }
@@ -81,6 +83,17 @@ public sealed class MethodDefinition
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded);
     }
 
+    /// <summary>Recognizes unconstrained static generic primitive/vector signatures with scoped method parameters.</summary>
+    /// <param name="decoded">Immutable signature with positional parameter names on success; null otherwise.</param>
+    /// <returns>False for nongeneric, constrained, malformed or unsupported declarations.</returns>
+    /// <remarks>At most 32 method parameters. No nominal types, declaring-type parameters or nested vectors.</remarks>
+    public bool TryGetStaticGenericValueSignature(out MethodSignature? decoded)
+    {
+        decoded = null;
+        return IsStatic && !unsupportedGenericParameters && GenericArity is > 0 and <= 32 &&
+            TryDecodeStaticValueSignature(signature, out decoded, GenericArity);
+    }
+
     internal static bool TryDecodeStaticPrimitiveSignature(ReadOnlySpan<byte> signature, out PrimitiveMethodSignature? decoded)
     {
         decoded = null;
@@ -90,11 +103,12 @@ public sealed class MethodDefinition
         return true;
     }
 
-    internal static bool TryDecodeStaticValueSignature(ReadOnlySpan<byte> signature, out MethodSignature? decoded)
+    internal static bool TryDecodeStaticValueSignature(ReadOnlySpan<byte> signature, out MethodSignature? decoded, int genericArity = 0)
     {
         decoded = null;
-        if (signature.Length < 3 || signature[0] != 0) return false;
+        if (signature.Length < 3 || signature[0] != (genericArity == 0 ? 0 : 0x10)) return false;
         int position = 1;
+        if (genericArity > 0 && signature[position++] != genericArity) return false;
         int count = signature[position++];
         if ((count & 0x80) != 0)
         {
@@ -102,19 +116,19 @@ public sealed class MethodDefinition
             count = ((count & 0x3f) << 8) | signature[position++];
             if (count < 128) return false;
         }
-        if (count > 256 || !ReadType(signature, ref position, true, out var result)) return false;
+        if (count > 256 || !ReadType(signature, ref position, true, out var result, genericArity)) return false;
         var parameters = new SignatureType[count];
         for (int i = 0; i < count; i++)
         {
-            if (!ReadType(signature, ref position, false, out var parameter)) return false;
+            if (!ReadType(signature, ref position, false, out var parameter, genericArity)) return false;
             parameters[i] = parameter!;
         }
         if (position != signature.Length) return false;
-        decoded = new(result!, parameters);
+        decoded = new(result!, parameters, Enumerable.Range(0, genericArity).Select(i => "T" + i));
         return true;
     }
 
-    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type)
+    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity)
     {
         type = null;
         if (position >= signature.Length) return false;
@@ -124,6 +138,13 @@ public sealed class MethodDefinition
         {
             if (position >= signature.Length) return false;
             code = signature[position++];
+        }
+        if (code == 0x1e)
+        {
+            if (position >= signature.Length || signature[position] >= genericArity) return false;
+            var parameter = SignatureType.MethodParameter(signature[position++]);
+            type = vector ? SignatureType.ArrayOf(parameter) : parameter;
+            return true;
         }
         PrimitiveType? primitive = code switch
         {

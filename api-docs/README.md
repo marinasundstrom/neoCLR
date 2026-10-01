@@ -556,3 +556,8 @@ TryGetStaticValueSignature and the primitive-vector import/resolution extensions
 covered by the [host metadata manual](experimental-metadata.md#imported-primitive-vectors-development-2026-10-01).
 These C# producer APIs remain explicitly excluded from guest RavenDoc selection;
 no guest API reference assembly change is needed.
+
+ImportedGenericMethodReference, ImportedMethodReference.MakeGenericInstance,
+TryGetStaticGenericValueSignature and imported-generic Call/Emit are host C# APIs
+covered by the [manual reference](experimental-metadata.md#imported-generic-methods-development-2026-10-01),
+explicitly outside guest RavenDoc type selection. No guest API was added.

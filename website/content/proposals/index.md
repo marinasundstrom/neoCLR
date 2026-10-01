@@ -354,3 +354,8 @@ emitted Raven library and application binaries. The native-profile runtime probe
 checks overloads and shared array mutation. Nominal/generic dependency imports and
 a native compiler symbol loader remain future work; CLI declaration projection is
 still the temporary input bridge.
+
+The development branch also supports imported unconstrained static generic methods
+with primitive/vector arguments. Separately emitted Raven library and application
+binaries execute generic calls directly in neoCLR. Nominal and generic declaring-type
+imports remain open; this does not yet provide general collection-library imports.

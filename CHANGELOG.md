@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Import bounded unconstrained static generic methods with primitive/vector and
+  scoped method-parameter signatures. Add immutable imported instantiations and
+  typed Call/raw Emit support; CLI uses MethodSpec/MemberRef and neoCLR uses its
+  existing generic-call format. Reject constraints, malformed scope and unsupported
+  arguments. Separate C# CLR and Raven native-profile library/application cases pass.
+  Record the author's .NET baseline and full Cecil-like read/edit/create/write direction;
+  general editing of loaded snapshots remains unimplemented.
+
 - Extend the experimental read-only callable decoder, imports and member resolution
   to Int32/Int64/Boolean/String vectors using standard CLI SZARRAY signatures.
   Preserve scalar-only recognizers and reject malformed, nominal and generic imports.

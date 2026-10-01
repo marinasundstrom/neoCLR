@@ -79,6 +79,42 @@ internal static class CallableChecks
             catch (InvalidDataException) { }
         }
     }
+    internal static void GenericSignatureRecognition()
+    {
+        foreach (var arity in new[] { 1, 32 })
+        {
+            byte[] signature = [0x10, (byte)arity, 1, 0x1e, (byte)(arity - 1), 0x1d, 0x1e, 0];
+            var method = AssemblyDefinition.ReadAssembly(Image(1, signature, genericArity: arity), false).MainModule.Functions.Single();
+            Check(method.TryGetStaticGenericValueSignature(out var value) && value!.GenericParameterNames.Count == arity, "bounded generic arity recognized");
+        }
+        foreach (byte[] signature in new byte[][] {
+            [0x10, 1, 0, 0x1e], // Missing index.
+            [0x10, 1, 0, 0x1e, 1], // Index outside scope.
+            [0x10, 1, 0, 0x1e, 0x80, 0], // Noncanonical index.
+            [0x10, 1, 0, 0x13, 0], // Declaring-type parameter.
+            [0x10, 1, 0, 0x1d, 0x1d, 0x1e, 0], // Nested vector.
+            [0x10, 2, 0, 8], // Signature/table arity mismatch.
+            [0x10, 0, 0, 8], // Generic bit with zero arity.
+            [0x10, 0x80, 1, 0, 8], // Noncanonical arity.
+            [0x10, 1, 1, 1, 1], // Void parameter.
+            [0x10, 1, 0, 0x1e, 0, 8] // Trailing data.
+        })
+            RejectGeneric(Image(1, signature, genericArity: 1));
+        RejectGeneric(Image(1, [0x10, 33, 0, 8], genericArity: 33));
+        foreach (var flags in new[] { GenericParameterAttributes.ReferenceTypeConstraint, GenericParameterAttributes.NotNullableValueTypeConstraint,
+            GenericParameterAttributes.DefaultConstructorConstraint, GenericParameterAttributes.Covariant })
+            RejectGeneric(Image(1, [0x10, 1, 0, 8], genericArity: 1, genericFlags: flags));
+        RejectGeneric(Image(1, [0x10, 1, 0, 8], genericArity: 1, typeConstraint: true));
+        RejectGeneric(Image(1, [0x10, 1, 0, 8], genericArity: 1, invalidIndex: true));
+        static void RejectGeneric(byte[] image)
+        {
+            var method = AssemblyDefinition.ReadAssembly(image, false).MainModule.Functions.Single();
+            Check(!method.TryGetStaticGenericValueSignature(out var value) && value is null, "unsupported generic declaration rejected");
+            var output = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
+            try { output.ImportReference(method, output.CoreLibrary); throw new Exception("unsupported generic import admitted"); }
+            catch (InvalidDataException) { }
+        }
+    }
     internal static void Limits()
     {
         Check(AssemblyDefinition.ReadAssembly(Image(4096, [0, 0, 8]), false).MainModule.Functions.Count == 4096, "4096 accepted");
@@ -87,7 +123,7 @@ internal static class CallableChecks
         Reject(Image(4096, new byte[1025]), "missing or excessive method signature");
         Reject(Image(1, [0, 0, 8], isStatic: false), "global function must be static");
     }
-    private static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true, bool nested = false, bool genericOwner = false)
+    private static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true, bool nested = false, bool genericOwner = false, int genericArity = 0, GenericParameterAttributes genericFlags = 0, bool typeConstraint = false, bool invalidIndex = false)
     {
         var metadata = new MetadataBuilder();
         metadata.AddModule(0, metadata.GetOrAddString("Fixture.dll"), metadata.GetOrAddGuid(Guid.NewGuid()), default, default);
@@ -106,6 +142,12 @@ internal static class CallableChecks
         for (int i = 0; i < count; i++)
             metadata.AddMethodDefinition(MethodAttributes.Public | (isStatic ? MethodAttributes.Static : 0), 0,
                 metadata.GetOrAddString("Method"), metadata.GetOrAddBlob(signature), -1, MetadataTokens.ParameterHandle(1));
+        for (int i = 0; i < genericArity; i++)
+        {
+            var parameter = metadata.AddGenericParameter(MetadataTokens.MethodDefinitionHandle(1), genericFlags,
+                metadata.GetOrAddString("T" + i), invalidIndex ? i + 1 : i);
+            if (typeConstraint) metadata.AddGenericParameterConstraint(parameter, MetadataTokens.TypeDefinitionHandle(1));
+        }
         var pe = new ManagedPEBuilder(new PEHeaderBuilder(), new MetadataRootBuilder(metadata), new BlobBuilder(), strongNameSignatureSize: 0);
         var image = new BlobBuilder(); pe.Serialize(image); return image.ToArray();
     }

@@ -24,6 +24,7 @@ and guest Introspection assembly loading remain pending.
 - [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
 - [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
 - [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
+- [Imported generic methods](#imported-generic-methods-development-2026-10-01): bounded static MethodSpec calls across assemblies.
 - [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Int64/Boolean/String parameters and results.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
@@ -876,7 +877,7 @@ filesystem probing, binding cache or access-policy decision. Resolver errors pro
 missing/wrong-identity dependencies, unsupported contracts/parents, and absent/ambiguous
 matches raise InvalidDataException. A return-contract mismatch cannot select a method.
 
-Field, instance/generic/vararg and nominal signature types remain opaque. ModuleRef,
+Field, instance/constrained-generic/vararg and nominal signature types remain opaque. ModuleRef,
 TypeSpec and MethodDef parents are range-checked on read but unsupported for resolution.
 Global MemberRefs and inherited method lookup are also unsupported. Local global calls
 emitted by the writer use MethodDef tokens and remain available through method lookup.
@@ -1245,7 +1246,7 @@ public sealed class ImportedMethodReference
 }
 ```
 
-`ImportReference` copies a static, nongeneric primitive or primitive-vector signature from an external
+`ImportReference` copies a static primitive/vector or bounded unconstrained generic signature from an external
 read-only definition. No producer builder, body, runtime load or resolver is needed.
 `Owner` is the consuming builder; `AssemblyIdentity` is the exact dependency identity.
 The namespace and type name are null for a global function. `ReturnsValue` is false
@@ -1258,7 +1259,7 @@ dependencies must be separately supplied and use this writer's format-5 naming
 contract. PE output uses ordinary AssemblyRef/TypeRef/MemberRef rows for type-owned
 methods. Cross-assembly globals remain native-only. Access checks are not performed.
 
-Nested/generic owners, instance/generic/other signatures, signed or flagged dependency
+Nested/generic owners, instance/constrained-generic/other signatures, signed or flagged dependency
 identities and imports of the output identity throw `InvalidDataException`. A single
 builder admits at most 256 imported assembly identities and 4096 imported methods.
 Different module MVIDs under one identity, or differing callable contracts under one
@@ -2588,7 +2589,8 @@ substituted `Signature`. `Call(GenericMethodInstance)` and
 ArgumentNullException; wrong arity, Void, foreign class/definition, wrong opcode,
 out-of-scope caller parameters and nested-array substitution throw ArgumentException.
 Body stack compatibility is validated on write. Only unconstrained static or ordinary instance definitions
-in the current output are supported; imported generic methods remain unsupported.
+in the current output are supported. Bounded static imported methods now use the separate
+[imported generic contract](#imported-generic-methods-development-2026-10-01).
 For example, `body.Call(identity.MakeGenericInstance(PrimitiveType.Int32))` consumes
 one Int32 for `Identity<T>(T)->T` and produces Int32. Forwarding may instead pass
 `SignatureType.MethodParameter(0)` from a caller that declares that parameter.
@@ -2665,7 +2667,8 @@ CLI uses GenericParam/VAR and a MemberRef on a constructed TypeSpec, optionally 
 in MethodSpec. Native definitions use open Constructed owners and explicit TypeParameter
 ordinals; calls substitute owner and method arguments independently. The native reader
 retains arities/names and validates open ownership before creating a reference projection.
-These are owned-output references; external generic imports are still unsupported.
+These are owned-output references; external method imports use the separate bounded
+[imported generic contract](#imported-generic-methods-development-2026-10-01).
 
 
 ### Generic reference classes (development)
@@ -2979,3 +2982,61 @@ contract. The C# vector checks execute ordinary CLR library/application images a
 check exact overload resolution, native declaration projection and malformed encodings.
 The Raven [runtime probe](../docs/experiments/extended-cli-metadata/vector-library-validation.json)
 executes independently emitted native library/application images with the neoCLR profile.
+
+
+## Imported generic methods (development, 2026-10-01)
+
+```csharp
+bool MethodDefinition.TryGetStaticGenericValueSignature(out MethodSignature? decoded);
+ImportedGenericMethodReference ImportedMethodReference.MakeGenericInstance(params SignatureType[] typeArguments);
+
+public sealed class ImportedGenericMethodReference {
+    public ImportedMethodReference Definition { get; }
+    public IReadOnlyList<SignatureType> TypeArguments { get; }
+    public MethodSignature Signature { get; }
+}
+void MethodBuilder.Call(ImportedGenericMethodReference method);
+void MethodBuilder.Emit(OpCode opCode, ImportedGenericMethodReference operand);
+```
+
+The recognizer returns an immutable signature for static unconstrained methods with
+1–32 method parameters, primitives, method parameters (`MVAR`) and single vectors of
+those types. Generic parameter names in this callable view are positional `T0`, `T1`,
+etc.; the original image remains unchanged. The generic arity must agree with the
+GenericParam table, whose indices must be consecutive and whose flags/constraints
+must be empty. Nongeneric, constrained, out-of-scope, noncanonical or malformed
+signatures return false/null. Declaring-type parameters and nominal types are outside
+this subset. Existing nongeneric recognizers keep their narrower behavior.
+
+ImportReference retains this declaration contract; MemberReference.ResolveMethod
+also matches its generic arity and exact parameter/result types. Instantiation copies
+one concrete non-Void primitive or primitive-vector argument per method parameter.
+Null arrays throw ArgumentNullException; wrong arity, unsupported arguments, a
+nongeneric definition or substitutions producing a nested vector throw ArgumentException.
+Definition exposes the immutable imported reference, never a mutable dependency builder.
+TypeArguments is the copied ordered sequence; Signature is fully substituted.
+
+Call and raw Emit(Call, reference) append the same generic call. Null references throw
+ArgumentNullException; wrong opcodes or consuming owners throw ArgumentException.
+An uninstantiated generic ImportedMethodReference cannot be called. Instruction limits
+and stack/type mismatches continue to throw InvalidDataException on append/write.
+CLI output uses a standard MethodSpec targeting an external MemberRef. Native output
+uses the existing generic_arguments call contract; there is no format or opcode change.
+
+For example, import `First<T>(T[]) -> T`, instantiate with PrimitiveType.Int32, then
+pass an Int32 vector to Call. The C# tests execute the resulting separate library and
+application on the CLR. Raven's native-profile [generic library probe](../docs/experiments/extended-cli-metadata/generic-library-validation.json)
+verifies and runs the equivalent binary boundary in neoCLR. Imported generic owners,
+nominal arguments, constraints and forwarding caller-scoped generic arguments remain
+unsupported; this is not general collection import support.
+
+### Lifecycle direction reaffirmed 2026-10-01
+
+.NET metadata remains the baseline; neoCLR extensions are explicit. This Cecil-like
+library is intended to support inspection, modification, creation from nothing and
+writing through familiar definition/reference concepts. Current loaded snapshots are
+immutable and preserve original bytes; producer graphs are editable. General editing
+of arbitrary loaded assemblies through one model is not implemented yet. The bounded
+import APIs described above must not be read as a permanent split or a new metadata
+format. Assembly-level functions already exist, with a CLI `<Module>` compatibility
+representation; new generic imports add no further format extension.
