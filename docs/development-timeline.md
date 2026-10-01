@@ -9747,3 +9747,23 @@ The author directed: “After this, implement dispatch for interfaces”. The as
 will follow interface-valued signature validation with concrete class implementations
 and calls through interface references. This supersedes generic interface inheritance
 as the immediate next slice; it does not claim dispatch is implemented yet.
+
+
+### 2026-10-01 — Reassess against the library and existing applications
+
+The author asked, after interface dispatch, whether larger steps could take the project
+toward compiling/running the full Raven runtime library and applications, suggesting
+running the existing samples and investigating gaps. The assistant first completed
+and committed nongeneric interface dispatch in the metadata API and shared Raven
+backend, with .NET/native execution and C# tests. It then performed 31 source inventory
+attempts and four legacy-bridge runtime controls using current compiler/runtime builds.
+
+All twelve selected applications bound/emitted ordinary CLI, while direct emission
+rejected the actual neoCLR target profile. Three application controls ran with expected
+output. Order-collections failed import because emitted CLI constructs None then calls
+a Some carrier constructor; the exact compiler root cause remains open. The 167-file
+library attempt used a consumer snapshot and exposed missing implementation services
+and runtime-contract identity conflicts, not a valid full-library bootstrap. The
+assistant proposes target-profile/bootstrap integration first, then collection/library
+boundaries and shared union/callback emission. These are proposed next milestones;
+the author has not yet responded to that sequence. [Assessment and evidence](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md).

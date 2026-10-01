@@ -5,6 +5,17 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Post-dispatch assessment (2026-10-01):** the author requested a broader library/app
+readiness check. Owned nongeneric interface dispatch now executes through the direct
+binary pipeline. All twelve selected existing samples bind and emit ordinary CLI with
+the real target snapshot, but direct emission still rejects the neoCLR target profile.
+Three unchanged applications run through the current legacy bridge; order-collections
+exposes invalid Option constructor selection in emitted CLI before import. The next
+proposed integration milestone is the native target profile and implementation seed,
+then generic collection contracts/imported members and broad union/callback emission.
+The whole-library attempt with an application-only snapshot is not a supported bootstrap.
+See the [assessment, evidence and acceptance gates](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md).
+
 **Interface declaration checkpoint (2026-10-01):** unchanged Comparer<T> and
 EqualityComparer<T> now emit ordinary CLI/native interface contracts and load/verify
 in both file orders. This does not yet prove interface dispatch. Disposable and Iterator<T> now join that evidence with abstract properties and

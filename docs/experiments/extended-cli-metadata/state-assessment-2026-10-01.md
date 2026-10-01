@@ -123,3 +123,13 @@ Interface invocation/implementation remains the next author-directed acceptance 
 generic interface inheritance remains deferred. Seven focused C# interface tests and
 68 metadata API test groups pass. The evidence exercises null/default reference flow,
 not dynamic dispatch.
+
+
+## Follow-up: assessment after dispatch
+
+Owned nongeneric interface method/property dispatch now passes on both runtimes.
+The author then requested larger source/sample-driven steps. The
+[new assessment](readiness-assessment-2026-10-01.md) records 31 fresh inventory attempts,
+twelve successful ordinary CLI sample emissions, three successful legacy-bridge runtime
+controls, an invalid Option constructor in the broad sample, and the direct backend's
+remaining target-profile gate. Use that assessment for the next bounded acceptance unit.

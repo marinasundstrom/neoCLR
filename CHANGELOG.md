@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Assess direct metadata-backend readiness with unchanged library/application sources
+  and reproducible legacy-bridge controls. Record the native target-profile gate,
+  missing implementation-bootstrap declarations and an emitted Option constructor
+  mismatch in order-collections. Three existing application controls run successfully;
+  the assessment proposes larger integration milestones without claiming a full build.
+
 - Add owned nongeneric interface implementations and CallVirtual/raw Callvirt to the
   metadata API. Preserve standard CLI InterfaceImpl and virtual/final implementation
   flags; use existing native interface lookup and callvirt. Raven shared emission now

@@ -2561,3 +2561,13 @@ pass. Owned nongeneric implicit implementations are the bounded target contract;
 generic interface dispatch, explicit/default methods, external imports and class virtual
 overrides remain future adapter work, not alternate platform semantics. Both feature
 branches remain experimental. Native symbol loading remains a separate compiler gate.
+
+
+The post-dispatch [readiness assessment](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md)
+compares the direct binary backend and existing CLI bridge. In particular,
+CompilationOptions.NeoCLR remains rejected by the direct backend's bootstrap gate even
+though twelve unchanged samples bind and emit through ordinary CLI. Reference snapshots
+for consumers do not supply RuntimeServices/CheckedStorage for compiling System itself.
+Three legacy-bridge samples run; order-collections produces invalid Option constructor
+CLI and is correctly rejected before execution. These are explicit integration gaps,
+not changes to runtime contracts or acceptance claims for the native backend.
