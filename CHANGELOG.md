@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add immutable external class/interface references and generic constructions to the
+  metadata producer. Preserve standard CLI TypeRef/GENERICINST/TypeSpec and native
+  dependency-scoped signatures through fields, locals, defaults and generic substitution.
+  Separate CLR/native library and consumer tests return 42. Imported member calls and
+  translated-System identity mapping remain open; Raven collections emission is still
+  blocked. Null-literal ImportReference calls now require an overload-selecting cast.
+
 - Reaffirm unchanged sample execution as the main native-emission acceptance gate.
   Rerun order-collections after generic imports: binding/CLI control emission pass,
   but direct emission still rejects imported nominal/generic signatures in Register

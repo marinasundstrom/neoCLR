@@ -1,0 +1,17 @@
+{
+  "verified": true,
+  "result": 42,
+  "scope": "API-produced external interface and Box<consumer Order> signatures, fields, generic substitution/forwarding, default locals and array operands; no imported member dispatch or translated-System mapping",
+  "branch": "codex/extended-cli-metadata",
+  "baseRevision": "c2819d5d",
+  "sourceState": "plus external type reference changes committed with this evidence",
+  "runtimeSha256": "193b7f995ee4fc92a086439fb1fdbdafc3a0c58139f0caf30cb4a2d8640a432d",
+  "artifacts": {
+    "ExternalTypes.dll": "66a670ee3d92c61ef67e808cea2cbad06101d8bb0bc52e304832953ae699fb78",
+    "TypeConsumer.dll": "2b2dc03f0600d3e0b0073eed667757383ba86d6b459de6434a23704fabcca2f7"
+  },
+  "metadataTests": "73/73 C# groups; ordinary CLR execution and reflected external/local generic scopes; invalid ownership, arity, constraints, value types and native dependency scope reject",
+  "ravenRegression": "cb1b3c9aa generic-library-runtime rebuilt against this API; native verify/run returns 42",
+  "apiSnapshotCheck": "passed",
+  "existingSampleGate": "application-order-collections remains blocked at imported declaration signatures; Raven target adapter unchanged in this slice"
+}

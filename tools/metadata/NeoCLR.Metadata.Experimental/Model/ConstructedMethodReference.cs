@@ -8,7 +8,7 @@ public sealed class ConstructedMethodReference
         Definition = definition;
         DeclaringTypeArguments = Array.AsReadOnly(ownerArguments);
         MethodArguments = Array.AsReadOnly(methodArguments);
-        SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } owner ? ownerArguments[owner]
+        SignatureType Substitute(SignatureType type) => type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } owner ? ownerArguments[owner]
             : type.MethodParameterIndex is { } method ? methodArguments[method]
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;

@@ -224,3 +224,19 @@ from the native model, without JSON. The separate .NET API can read these assemb
 `NeoCLR.Metadata.Experimental.Tests --compare-native <assembly.neox> <baseline.json>`
 compares all values through that independent reader. See the
 [direct assembler consumer](../../docs/experiments/extended-cli-metadata/direct-assembly.md).
+
+### Imported reference-type signatures
+
+The producer supports explicit public external reference-type imports and generic
+constructions, with standard CLI TypeRef/TypeSpec and native dependency identity.
+Run the C# contract groups normally, or verify the separate binary library/application:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --imported-type-integration /absolute/path/to/neoclr /tmp/fresh-imported-types
+```
+
+The runtime case returns 42 with Box<consumer Order>, interface references, fields,
+scoped generic forwarding, defaults and array operands. This is signature support;
+imported constructors/members and translated-System linkage remain pending. See
+[the API reference](../../api-docs/experimental-metadata.md#imported-type-signatures-development-2026-10-01).

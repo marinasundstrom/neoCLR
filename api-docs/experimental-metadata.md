@@ -15,6 +15,7 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Imported type signatures](#imported-type-signatures-development-2026-10-01): external nominal and constructed reference types.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [Integer shifts](#integer-shifts-development-2026-10-01): Shl/Shr with Int32 counts.
 - [Integer bitwise operations](#integer-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
@@ -2166,7 +2167,8 @@ Int64, Boolean, String or an owned nonstatic root class, a unique nonblank name 
 up to 1024 characters, and defined FieldVisibility values. Invalid declarations or
 more than 256 fields per type throw ArgumentException before mutation. Static owners
 throw InvalidOperationException. Writing enforces at most 4096 assembly fields.
-Literal, static, generic and external nominal-reference fields remain unsupported.
+Literal and static fields remain unsupported here. Later generic and imported reference-type
+field support uses the signature contracts documented below.
 Null types throw ArgumentNullException; Void and foreign classes throw ArgumentException
 before mutation. Forward and self references use exact output-builder identity.
 FieldBuilder exposes read-only DeclaringType (TypeBuilder), Name (string), FieldType
@@ -2432,7 +2434,7 @@ assuming a primitive enum. Imported read-only method contracts accept primitives
 
 CLI output uses CLASS TypeDef signatures; native output uses existing Named type records.
 Calls, argument stores and returns enforce exact class identity, just like nominal locals.
-No implicit base conversion, null literal, generic, structural or external nominal
+No implicit base conversion, null literal or structural
 signature support is added. Cross-assembly builder calls with nominal signatures reject
 at write rather than fabricating a TypeRef. Entries remain parameterless Int32/Void.
 NativeAssemblyDefinition accepts owned nonstatic Named signature references and remaps
@@ -3040,3 +3042,77 @@ of arbitrary loaded assemblies through one model is not implemented yet. The bou
 import APIs described above must not be read as a permanent split or a new metadata
 format. Assembly-level functions already exist, with a CLI `<Module>` compatibility
 representation; new generic imports add no further format extension.
+
+
+## Imported type signatures (development, 2026-10-01)
+
+```csharp
+ImportedTypeReference AssemblyBuilder.ImportReference(TypeDefinition definition, AssemblyIdentity dependencyCoreLibrary);
+
+public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference> {
+    public AssemblyBuilder Owner { get; }
+    public AssemblyIdentity AssemblyIdentity { get; }
+    public string Namespace { get; }
+    public string Name { get; }
+    public int GenericArity { get; }
+    public IReadOnlyList<SignatureType> TypeArguments { get; }
+    public ImportedTypeReference MakeGenericInstance(params SignatureType[] arguments);
+    public bool Equals(ImportedTypeReference? other);
+    public override bool Equals(object? obj);
+    public override int GetHashCode();
+    public override string ToString();
+}
+ImportedTypeReference? SignatureType.ImportedType { get; }
+public static implicit operator SignatureType(ImportedTypeReference type);
+```
+
+ImportReference copies the exact assembly identity, namespace, metadata name and arity
+from a public top-level reference class/interface declaration. It interns definition
+references per consumer and rejects conflicting dependency MVIDs. The explicit core
+identity must match the consumer. Value types, nested/static/nonpublic types, signed
+or flagged dependencies, self imports, constrained/variant generic definitions and
+arities above 32 are unsupported. Generic indices must be consecutive. Unsupported
+contracts and limits throw InvalidDataException; null inputs throw ArgumentNullException.
+The consumer admits at most 4096 imported type names and 256 dependency identities.
+The overload addition means a null literal in ImportReference needs an explicit
+MethodDefinition or TypeDefinition cast to select the intended overload.
+
+A nongeneric reference converts directly to SignatureType. A generic definition first
+needs MakeGenericInstance, which copies one non-Void consumer-scoped argument per
+parameter. Arguments may include the consumer's own classes, other imported reference
+types and scoped generic parameters; scope is checked at signature use. Depth is limited
+to 16. Null arrays throw ArgumentNullException. Wrong arity, already constructed/open
+signature use, foreign ownership, Void/null arguments and excessive depth throw
+ArgumentException. Generic substitution recurses into imported constructions.
+
+Owner identifies the consumer; AssemblyIdentity/Namespace/Name identify the external
+definition. GenericArity belongs to the definition; TypeArguments is empty for definition
+references and copied/read-only for constructions. Equality compares consumer ownership,
+exact external identity and ordered arguments; GetHashCode agrees. ToString is diagnostic
+only. No mutable dependency TypeBuilder is exposed. Imported constructions are accessed
+through SignatureType.ImportedType, while GenericInstance still describes owned types.
+LocalDefinition.SignatureType also carries these types; ClassType remains null for them.
+
+Example: import a dependency's Box<T> TypeDefinition, create an Order class in the
+consumer, and call `box.MakeGenericInstance(order)`. Use the resulting reference in
+MethodSignature, fields, locals, vectors and default-value initialization. Standard CLI
+output uses AssemblyRef/TypeRef and CLASS/GENERICINST signatures (TypeSpec for typed IL
+operands). The native writer uses existing Named/Constructed identities scoped to the
+dependency manifest. Its reference projection preserves external scope rather than
+inventing local definitions. Unknown scopes, noncanonical names and arity mismatches
+reject. No native format, instruction or schema extension was added. Earlier experimental
+metadata readers may reject these external signatures; rebuild consumers with this API.
+
+Native dependencies must use the metadata writer's existing format-5 naming contract;
+importing an arbitrary CLI declaration does not translate its executable implementation.
+Imported references are recorded as native dependencies even when not subsequently used.
+The reader resolves no dependencies and verifies no external constraints/layouts.
+Method/constructor imports containing these signatures and mappings to translated
+System's original native identities are **not yet implemented**. This slice supplies
+the signature contract required for that work; Raven's collections sample remains blocked.
+
+Validation: C# tests inspect actual CLR generic scopes and execute the output, then
+check native declaration projection and malformed dependency rejection. The
+`--imported-type-integration <neoclr> <fresh-output>` test mode loads a separate native
+library/application, verifies and returns 42, including external interface and
+Box<consumer Order> fields/defaults and generic forwarding.

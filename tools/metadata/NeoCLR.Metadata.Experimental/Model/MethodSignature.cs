@@ -1,9 +1,9 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned class/interface construction, scoped generic parameter or vector signature type.</summary>
+/// <summary>An immutable primitive, owned/imported reference type, scoped generic parameter or vector signature type.</summary>
 public sealed record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null) { GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null) { ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
     /// <summary>Gets the exact owned CLI CLASS identity (class or interface), or null for other signatures.</summary>
@@ -35,14 +35,30 @@ public sealed record SignatureType
     /// <exception cref="ArgumentOutOfRangeException">Index outside the supported range.</exception>
     public static SignatureType TypeParameter(int index)
         => index is >= 0 and < 32 ? new(null, null, typeParameter: index) : throw new ArgumentOutOfRangeException(nameof(index));
-    /// <summary>Gets the constructed class or interface identity, or null for other signatures.</summary>
+    /// <summary>Gets an owned constructed class/interface; imported constructions use ImportedType.</summary>
     public GenericTypeInstance? GenericInstance { get; }
     /// <summary>Creates a signature for an owned constructed generic reference type.</summary>
     public static implicit operator SignatureType(GenericTypeInstance type)
         => new(null, null, genericInstance: type ?? throw new ArgumentNullException(nameof(type)));
-    internal int NestingDepth => GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
+    /// <summary>Gets an external reference type or construction, or null for other signatures.</summary>
+    public ImportedTypeReference? ImportedType { get; }
+    /// <summary>Creates a signature for a nongeneric imported reference or a complete construction.</summary>
+    /// <exception cref="ArgumentNullException">Reference is null.</exception>
+    /// <exception cref="ArgumentException">An open generic definition requires construction.</exception>
+    public static implicit operator SignatureType(ImportedTypeReference type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        if (type.GenericArity != type.TypeArguments.Count) throw new ArgumentException("imported generic definition requires construction", nameof(type));
+        return new(null, null, importedType: type);
+    }
+    internal int NestingDepth => ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
     internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false)
     {
+        if (ImportedType is { } imported)
+        {
+            if (!ReferenceEquals(imported.Owner, assembly)) throw new ArgumentException("imported type belongs to another output");
+            foreach (var argument in imported.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete);
+        }
         if (MethodParameterIndex is { } index && index >= genericArity) throw new ArgumentException("method type parameter outside declared scope");
         if (TypeParameterIndex is { } ordinal && ordinal >= typeArity) throw new ArgumentException("type parameter outside declared scope");
         ArrayElement?.ValidateOwner(assembly, genericArity, typeArity, complete);
@@ -66,14 +82,14 @@ public sealed record SignatureType
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
 public class MethodSignature
 {
     /// <summary>Copies up to 256 non-Void parameters. Ownership is checked when defining a method.</summary>
-    /// <param name="returnType">Primitive, Void or nonstatic owned class.</param>
+    /// <param name="returnType">Supported primitive, Void or owned/imported reference type.</param>
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
     /// <exception cref="ArgumentNullException">Result or parameters are null.</exception>
     /// <exception cref="ArgumentException">Null/Void parameter or more than 256 parameters.</exception>

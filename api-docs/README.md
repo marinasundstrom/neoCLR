@@ -561,3 +561,9 @@ ImportedGenericMethodReference, ImportedMethodReference.MakeGenericInstance,
 TryGetStaticGenericValueSignature and imported-generic Call/Emit are host C# APIs
 covered by the [manual reference](experimental-metadata.md#imported-generic-methods-development-2026-10-01),
 explicitly outside guest RavenDoc type selection. No guest API was added.
+
+ImportedTypeReference, the type-definition ImportReference overload, generic
+construction/equality members and SignatureType.ImportedType/conversion are covered
+in the [host-only metadata manual](experimental-metadata.md#imported-type-signatures-development-2026-10-01).
+They are C# producer APIs explicitly excluded from the guest RavenDoc type selection;
+no guest reference assembly change is required.

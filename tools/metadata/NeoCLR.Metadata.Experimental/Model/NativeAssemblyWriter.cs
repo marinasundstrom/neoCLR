@@ -38,16 +38,23 @@ public sealed partial class AssemblyBuilder
                 if (dependencies.Count > 256) throw new InvalidDataException("too many imported assemblies");
             }
         }
+        foreach (var type in importedNominalTypes.Values)
+            if (!dependencies.ContainsKey(type.AssemblyIdentity))
+                dependencies.Add(type.AssemblyIdentity, new AssemblyBuilder(type.AssemblyIdentity, CoreLibrary));
+        if (dependencies.Count > 256) throw new InvalidDataException("too many imported assemblies");
         static string IdentityText(AssemblyIdentity identity) => JsonSerializer.Serialize(new[] {
             identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(System.Globalization.CultureInfo.InvariantCulture)
         });
-        static string ModuleName(AssemblyBuilder assembly) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(assembly.Identity))));
+        static string ModuleName(AssemblyBuilder assembly) => ModuleIdentity(assembly.Identity);
+        static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
-        static object SignatureValue(SignatureType type) => type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static string ExternalName(ImportedTypeReference type) => ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
+        static object ExternalValue(ImportedTypeReference type) => type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
+        static object SignatureValue(SignatureType type) => type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }

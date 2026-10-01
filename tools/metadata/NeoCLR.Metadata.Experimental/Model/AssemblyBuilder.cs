@@ -232,11 +232,22 @@ public sealed partial class AssemblyBuilder
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
         var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
+        var externalTypeHandles = new Dictionary<(AssemblyIdentity, string, string), TypeReferenceHandle>();
+        EntityHandle ImportedTypeHandle(ImportedTypeReference type)
+        {
+            var key = (type.AssemblyIdentity, type.Namespace, type.Name);
+            if (!externalTypeHandles.TryGetValue(key, out var handle))
+            {
+                handle = metadata.AddTypeReference(ImportAssembly(type.AssemblyIdentity), metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name));
+                externalTypeHandles.Add(key, handle);
+            }
+            return handle;
+        }
         var primitiveTokens = new Dictionary<PrimitiveType, TypeReferenceHandle>();
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
-            if (type.GenericInstance is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
+            if (type.ImportedType is { TypeArguments.Count: > 0 } || type.GenericInstance is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
             {
                 if (!elementSpecs.TryGetValue(type, out var spec))
                 {
@@ -245,6 +256,7 @@ public sealed partial class AssemblyBuilder
                 }
                 return MetadataTokens.GetToken(spec);
             }
+            if (type.ImportedType is { } imported) return MetadataTokens.GetToken(ImportedTypeHandle(imported));
             if (type.ClassType is { } owner) return MetadataTokens.GetToken(typeHandles[owner]);
             var primitive = type.Primitive!.Value;
             if (!primitiveTokens.TryGetValue(primitive, out var handle))
@@ -256,6 +268,17 @@ public sealed partial class AssemblyBuilder
         }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.ImportedType is { } imported)
+            {
+                var handle = ImportedTypeHandle(imported);
+                if (imported.TypeArguments.Count == 0) encoder.Type(handle, false);
+                else
+                {
+                    var arguments = encoder.GenericInstantiation(handle, imported.TypeArguments.Count, false);
+                    foreach (var argument in imported.TypeArguments) EncodeType(arguments.AddArgument(), argument);
+                }
+                return;
+            }
             if (type.GenericInstance is { } instance)
             {
                 var arguments = encoder.GenericInstantiation(typeHandles[instance.Definition], instance.TypeArguments.Count, false);

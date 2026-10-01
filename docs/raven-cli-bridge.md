@@ -2614,3 +2614,21 @@ The C# `--generic-library-runtime` probe emits both binaries, verifies/runs them
 checks arity overloads, array aliases, void calls and missing dependency/declaration
 rejection. [Evidence](experiments/extended-cli-metadata/generic-library-validation.json)
 pins branches and tested runtime/core hashes. .NET shared codegen was not changed.
+
+## External signature prerequisite (2026-10-01)
+
+The metadata API on codex/extended-cli-metadata can now import public unconstrained
+reference-type declarations and form external generic signatures using consumer-owned
+type arguments. CLI keeps ordinary TypeRef/TypeSpec shape; native Named/Constructed
+references retain manifest scope and survive the declaration projection. Binary runtime
+loading is tested with a separate library and Box<consumer Order> signatures.
+
+Raven's target adapter is unchanged in this slice. Its collections Register signature
+still fails admission. Follow-through must map external symbols to these references,
+then import constructors/instance members. The translated System artifact uses its
+original native names, whereas this API currently targets dependencies produced with
+its format-5 naming contract. An explicit mapping from System's retained origins is
+required; do not guess names or treat the synthetic CLI core identity as executable
+native identity. Native semantic metadata should eventually replace that bridge.
+Runtime Contract configuration remains unchanged. See
+[validation](experiments/extended-cli-metadata/imported-type-validation.json).

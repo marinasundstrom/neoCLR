@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--imported-type-integration")
+{
+    await ImportedTypeChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--interface-dispatch-integration")
 {
     await InterfaceDispatchChecks.RunRuntime(args[1], args[2]); return 0;
@@ -229,6 +233,7 @@ var tests = new (string Name, Action Body)[]
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("Primitive vector imported signatures", VectorImportChecks.Run),
+    ("Imported nominal and constructed type signatures", ImportedTypeChecks.Run),
     ("Generic imported signatures and MethodSpec execution", GenericImportChecks.Run),
     ("Generic signature recognition and constraint rejection", CallableChecks.GenericSignatureRecognition),
     ("Producer MemberRef dependency and overload resolution", MemberReferenceChecks.ProducerReferences),

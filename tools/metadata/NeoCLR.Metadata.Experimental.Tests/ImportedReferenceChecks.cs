@@ -38,7 +38,7 @@ internal static class ImportedReferenceChecks
         var replacement = new AssemblyBuilder(library.Identity, core);
         var replacementMethod = replacement.AddFunction("Replacement"); replacementMethod.LoadConstant(0); replacementMethod.Return();
         Reject<InvalidDataException>(() => app.ImportReference(AssemblyDefinition.ReadAssembly(replacement.Write(), false).MainModule.Functions.Single(), core), "conflicting MVID");
-        Reject<ArgumentNullException>(() => app.ImportReference(null!, core), "null definition");
+        Reject<ArgumentNullException>(() => app.ImportReference((MethodDefinition)null!, core), "null definition");
         Reject<ArgumentNullException>(() => app.ImportReference(definition, null!), "null core");
         Reject<ArgumentNullException>(() => main.Call((ImportedMethodReference)null!), "null reference");
         main.ClearBody(); main.Call(imported); main.Return();

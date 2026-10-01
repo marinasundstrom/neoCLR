@@ -51,11 +51,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
-        public static implicit operator BodyValueType(SignatureType type) => type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
+        public static implicit operator BodyValueType(SignatureType type) => type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
     private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
         ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];

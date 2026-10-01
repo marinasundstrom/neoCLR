@@ -6,7 +6,7 @@ public sealed class ConstructedFieldReference
     internal ConstructedFieldReference(FieldBuilder definition, GenericTypeInstance owner)
     {
         Definition = definition; DeclaringType = owner;
-        SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } index ? owner.TypeArguments[index]
+        SignatureType Substitute(SignatureType type) => type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } index ? owner.TypeArguments[index]
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray()) : type;
         FieldType = Substitute(definition.FieldType);

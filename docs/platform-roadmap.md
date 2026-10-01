@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**External signature prerequisite (2026-10-01):** the independent metadata API now
+emits external reference classes/interfaces and generic constructions, preserving CLI
+TypeRef/TypeSpec shape and native dependency scope. An API-produced Box<consumer Order>
+case loads/verifies/executes as binary assemblies (42), including generic forwarding.
+This does not yet advance the unchanged collections sample: next connect these types
+to imported member signatures and translated-System native identity mapping in Raven.
+[Evidence](experiments/extended-cli-metadata/imported-type-validation.json).
+
 **Primary acceptance reaffirmed (2026-10-01):** use unchanged existing samples to
 prove Raven → neoCLR assembly → runtime loading/execution. API work and focused probes
 support this gate. After imported generic-method support, order-collections still binds

@@ -359,3 +359,8 @@ The development branch also supports imported unconstrained static generic metho
 with primitive/vector arguments. Separately emitted Raven library and application
 binaries execute generic calls directly in neoCLR. Nominal and generic declaring-type
 imports remain open; this does not yet provide general collection-library imports.
+
+The independent metadata producer now retains external class/interface signatures and
+constructed generic references across CLI and native binary output. A separate library
+and consumer verify/run with Box<consumer Order>. Raven integration of those external
+types and members remains pending; the existing collections sample is still the gate.

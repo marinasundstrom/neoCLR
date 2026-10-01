@@ -21,7 +21,7 @@ public sealed class NativeAssemblyDefinition
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
-    /// <remarks>Includes implementation dependencies omitted from primitive-only PE projections. No dependencies are resolved or loaded.</remarks>
+    /// <remarks>Includes implementation dependencies; PE projections retain dependencies used in signatures. No dependencies are resolved or loaded.</remarks>
     public IReadOnlyList<AssemblyIdentity> References { get; }
 
     /// <summary>Copies the supported declarations from native UTF-8 JSON without executing code.</summary>
@@ -215,13 +215,14 @@ public sealed class NativeAssemblyDefinition
                 {
                     Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
-                    Require(definition >= 0, "constructed signature requires owned generic reference type");
-                    return signatureOwners[definition].MakeGenericInstance(Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
+                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray();
+                    return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
+                        : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities).MakeGenericInstance(arguments);
                 }
                 Shape(element, "Named");
                 var index = types.FindIndex(t => t.NativeName == Text(element, "Named") && !t.IsStatic);
-                Require(index >= 0, "signature class must be an owned root");
-                return signatureOwners[index];
+                return index >= 0 ? (SignatureType)signatureOwners[index]
+                    : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities);
             }
             foreach (var type in types)
             {
@@ -229,7 +230,7 @@ public sealed class NativeAssemblyDefinition
                 foreach (var field in type.Fields) _ = ReadType(field.Type, false);
             }
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -383,7 +384,7 @@ public sealed class NativeAssemblyDefinition
     /// <returns>Owned PE bytes containing declarations, a ReferenceAssemblyAttribute and throwing placeholder bodies for concrete methods; abstract interface methods remain bodyless.</returns>
     /// <exception cref="ArgumentNullException">Core identity is null.</exception>
     /// <exception cref="InvalidDataException">Projection exceeds writer limits.</exception>
-    /// <remarks>No native body is translated. Entry points and native dependency references are not projected: supported signatures contain primitives and owned root-class references.
+    /// <remarks>No native body is translated. Entry points and body-only dependencies are not projected. External signature references retain their exact assembly scope.
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
@@ -401,13 +402,28 @@ public sealed class NativeAssemblyDefinition
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
         SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
-            : type.TryGetProperty("Constructed", out var instance) ? owners[System.Array.FindIndex(types, row => row.NativeName == Text(instance, "definition"))].MakeGenericInstance(Array(instance, "arguments", 32).Select(ProjectType).ToArray())
+            : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
-            : owners[System.Array.FindIndex(types, row => row.NativeName == Text(type, "Named"))];
+            : ProjectNamed(Text(type, "Named"));
+        SignatureType ProjectNamed(string name)
+        {
+            int index = System.Array.FindIndex(types, row => row.NativeName == name);
+            return index >= 0 ? (SignatureType)owners[index] : ImportExternalType(graph, name, 0, References);
+        }
+        SignatureType ProjectConstruction(string name, SignatureType[] arguments)
+        {
+            int index = System.Array.FindIndex(types, row => row.NativeName == name);
+            return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References).MakeGenericInstance(arguments);
+        }
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
-        SignatureType Remap(SignatureType type) => type.GenericInstance is { } instance ? owners[System.Array.FindIndex(types, t => t.Namespace == instance.Definition.Namespace && t.Name == instance.Definition.Name)].MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? owners[System.Array.FindIndex(types, t => t.Namespace == instance.Definition.Namespace && t.Name == instance.Definition.Name)].MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
+        SignatureType RemapImported(ImportedTypeReference type)
+        {
+            var definition = graph.ImportTypeIdentity(type.AssemblyIdentity, type.Namespace, type.Name, type.GenericArity);
+            return type.TypeArguments.Count == 0 ? definition : definition.MakeGenericInstance(type.TypeArguments.Select(Remap).ToArray());
+        }
         var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)
         {
@@ -423,6 +439,19 @@ public sealed class NativeAssemblyDefinition
         foreach (var property in properties)
             owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
         return graph.WriteReferenceImage();
+    }
+    private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references)
+    {
+        foreach (var identity in references)
+        {
+            var text = JsonSerializer.Serialize(new[] { identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(CultureInfo.InvariantCulture) });
+            var prefix = ModuleName(text) + ".T_";
+            if (!name.StartsWith(prefix, StringComparison.Ordinal)) continue;
+            var parts = name[prefix.Length..].Split('_');
+            Require(parts.Length == 2, "invalid imported native type name");
+            return graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), arity);
+        }
+        throw new InvalidDataException("signature type must be owned or scoped to a declared dependency");
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
     {
