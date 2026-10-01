@@ -476,3 +476,7 @@ manual host reference; they are C# host APIs outside the RavenDoc guest assembly
 
 PropertyDefinition and module/type property collections, token lookup, copied signatures
 and owned accessor links are documented in that same host reference, outside RavenDoc.
+
+The manual host reference covers root-class DeclareLocal, nullable LocalDefinition.Type
+and ClassType, including the development API migration. These C# host APIs stay outside
+the RavenDoc guest assembly.

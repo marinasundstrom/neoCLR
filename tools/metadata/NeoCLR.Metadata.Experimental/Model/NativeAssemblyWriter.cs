@@ -156,7 +156,7 @@ public sealed partial class AssemblyBuilder
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = System.Array.Empty<string>(), ty = p.PropertyType.ToString(), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
-                method.Locals.Select(local => local.Type.ToString()).ToArray(),
+                method.Locals.Select(local => local.ClassType is { } type ? (object)new { Named = TypeName(type) } : local.Type!.Value.ToString()).ToArray(),
                 method.Signature.ReturnType.ToString(), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
@@ -167,7 +167,7 @@ public sealed partial class AssemblyBuilder
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
         return result;
     }
-    private sealed record NativeMethodRow(string name, object? owner, string[] parameters, string[] locals,
+    private sealed record NativeMethodRow(string name, object? owner, string[] parameters, object[] locals,
         string returns, bool no_result, object origin, object[] body,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add owned root-class metadata locals with exact nominal stack validation and
+  aliasing on CLI and binary neoCLR. Development API migration: LocalDefinition.Type
+  is nullable; ClassType identifies nominal slots. Primitive local behavior is unchanged.
+
 - Record Raven's shared root-class and instance-method declaration contracts and
   receiver-aware primitive body planning. Raven now emits the unchanged Order class
   with explicit primitive constructors, mutable auto-properties and shared compiler-

@@ -1881,3 +1881,17 @@ locals without output. Existing supported native emission probes pass. The compl
 order-collections program still has 49 binding errors from missing native dependencies.
 Next: object locals and aliasing/mutation, not a claim of complete consumer support.
 [Runtime evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+## Nominal local producer foundation — 2026-10-01
+
+The independent metadata API now declares locals of an owned root class. Ordinary
+CLI CLASS/TypeDef local signatures and existing native Named types preserve exact
+class identity and aliasing, with definite-store checks and no boxing or primitive
+sentinel. LocalDefinition.Type becomes nullable and ClassType carries nominal identity;
+host consumers must handle that development API change. 52 C# metadata groups and a
+direct binary runtime alias/mutation case pass on the existing e8611966 runtime,
+returning 42 on .NET and neoCLR. No Runtime Contract or Rust change is involved.
+The bounded reader validates local class ownership but reference projections continue
+to omit body locals. This fills the library gap for Raven's next nominal-local slice;
+null, external-class locals and inheritance conversions remain unsupported.

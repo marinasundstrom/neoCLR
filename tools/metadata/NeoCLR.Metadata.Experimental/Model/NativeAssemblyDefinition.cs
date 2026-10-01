@@ -168,7 +168,15 @@ public sealed class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 if (method.TryGetProperty("locals", out _))
-                    Require(Array(method, "locals", 256).All(l => l.GetString() is "Int32" or "Int64" or "Boolean" or "String"), "unsupported native local");
+                    foreach (var local in Array(method, "locals", 256))
+                    {
+                        if (local.ValueKind == JsonValueKind.String) _ = ReadPrimitive(local.GetString(), false);
+                        else
+                        {
+                            Shape(local, "Named");
+                            Require(types.Any(t => !t.IsStatic && t.NativeName == Text(local, "Named")), "local class must be an owned root");
+                        }
+                    }
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();

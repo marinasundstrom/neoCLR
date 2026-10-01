@@ -1,21 +1,24 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive local-slot identity owned by one method builder.</summary>
+/// <summary>An immutable primitive or root-class local-slot identity owned by one method builder.</summary>
 public sealed class LocalDefinition
 {
     internal LocalDefinition(MethodBuilder method, int index, PrimitiveType type) { Method = method; Index = index; Type = type; }
+    internal LocalDefinition(MethodBuilder method, int index, TypeBuilder type) { Method = method; Index = index; ClassType = type; }
     /// <summary>Gets the owning method.</summary>
     public MethodBuilder Method { get; }
     /// <summary>Gets the zero-based slot index.</summary>
     public int Index { get; }
-    /// <summary>Gets the declared Int32, Int64, Boolean or String slot type.</summary>
-    public PrimitiveType Type { get; }
+    /// <summary>Gets the primitive slot type, or null for a class local.</summary>
+    public PrimitiveType? Type { get; }
+    /// <summary>Gets the root-class declaration, or null for a primitive local.</summary>
+    public TypeBuilder? ClassType { get; }
 }
 
 public sealed partial class MethodBuilder
 {
     private readonly List<LocalDefinition> locals = [];
-    /// <summary>Gets primitive locals in slot order. ClearBody preserves these declarations.</summary>
+    /// <summary>Gets declared locals in slot order. ClearBody preserves these declarations.</summary>
     public IReadOnlyList<LocalDefinition> Locals => locals.AsReadOnly();
     /// <summary>Declares an Int32 local. Loads require a store on every reachable path.</summary>
     /// <returns>A local handle owned by this method.</returns>
@@ -29,6 +32,20 @@ public sealed partial class MethodBuilder
     public LocalDefinition DeclareLocal(PrimitiveType type)
     {
         if (type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String)) throw new ArgumentException("unsupported local type", nameof(type));
+        if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
+        var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
+    }
+    /// <summary>Declares a local holding an instance of a root class in this output assembly.</summary>
+    /// <param name="type">Nonstatic class declaration owned by the output assembly.</param>
+    /// <returns>A stable local handle; ClearBody retains its declared class identity.</returns>
+    /// <exception cref="ArgumentNullException">Class is null.</exception>
+    /// <exception cref="ArgumentException">Class is static or belongs to another assembly.</exception>
+    /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
+    /// <remarks>Loads require a store on every path. No inheritance, null, boxing or external class locals are admitted.</remarks>
+    public LocalDefinition DeclareLocal(TypeBuilder type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        if (type.IsStatic || !ReferenceEquals(type.Assembly, Assembly)) throw new ArgumentException("local requires an owned root class", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
     }

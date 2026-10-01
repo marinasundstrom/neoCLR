@@ -29,6 +29,7 @@ and guest Introspection assembly loading remain pending.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
+- [Root-class locals](#root-class-locals): owned nominal slots and aliasing.
 - [Primitive property associations](#primitive-property-associations): static/instance getter and setter metadata.
 - [Root construction and instance bodies](#root-construction-and-instance-bodies): constructors, receiver calls and field operations.
 - [Root classes and primitive instance fields](#root-classes-and-primitive-instance-fields): mutable layouts and field snapshots.
@@ -2316,3 +2317,35 @@ Reading enforces at most 4096 Property rows, 16384 MethodSemantics rows and the 
 4 MiB aggregate signature budget. Missing/ambiguous owners, absent signatures and
 accessors outside the declaring type fail with InvalidDataException. Input buffers
 and returned signature arrays can be changed without affecting the snapshot.
+
+## Root-class locals
+
+Development host API (2026-10-01):
+
+```csharp
+LocalDefinition MethodBuilder.DeclareLocal(TypeBuilder type);
+PrimitiveType? LocalDefinition.Type { get; }
+TypeBuilder? LocalDefinition.ClassType { get; }
+```
+
+A local is either primitive (Type has a value, ClassType is null) or nominal (Type is
+null, ClassType is the exact declared root class). **Development API migration:**
+LocalDefinition.Type is now nullable; callers that assumed every local was primitive
+must branch on Type/ClassType. Existing primitive overloads and slot ordering remain.
+No Void sentinel or System.Type handle represents a nominal slot.
+
+The class overload accepts only nonstatic root classes in the same output graph.
+Null throws ArgumentNullException; static/foreign classes throw ArgumentException
+before mutation. All locals share the existing 256-slot limit (InvalidDataException).
+ClearBody preserves local declarations. Ldloc/Stloc and existing helpers preserve
+reference identity and require exact declared class identity. Writing rejects wrong
+primitive/class stores, different nominal classes and loads before a store on every
+reachable path. Inheritance conversions, null constants and external nominal locals
+are not admitted.
+
+CLI local signatures use CLASS plus the TypeDef coded index; native locals use the
+existing Named type contract. The bounded native reader validates local class ownership
+and shape, then omits implementation locals from reference projections as before.
+A matching reader is required for these new bodies. API C# tests and direct binary
+neoCLR execution validate local aliasing/mutation to 42; this is not yet evidence of
+Raven source object-local emission.

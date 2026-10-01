@@ -204,6 +204,7 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
+        var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
@@ -281,7 +282,8 @@ public sealed partial class AssemblyBuilder
                 var variables = new BlobEncoder(signature).LocalVariableSignature(method.Locals.Count);
                 foreach (var local in method.Locals)
                 {
-                    if (local.Type == PrimitiveType.String) variables.AddVariable().Type().String();
+                    if (local.ClassType is { } classType) variables.AddVariable().Type().Type(typeHandles[classType], isValueType: false);
+                    else if (local.Type == PrimitiveType.String) variables.AddVariable().Type().String();
                     else if (local.Type == PrimitiveType.Boolean) variables.AddVariable().Type().Boolean();
                     else if (local.Type == PrimitiveType.Int64) variables.AddVariable().Type().Int64();
                     else variables.AddVariable().Type().Int32();

@@ -58,6 +58,7 @@ public sealed partial class MethodBuilder
     }
     private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
         ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];
+    private static BodyValueType LocalType(LocalDefinition local) => local.ClassType is { } owner ? BodyValueType.Receiver(owner) : local.Type!.Value;
     private sealed record FlowState(BodyValueType[] Stack, bool[] Assigned);
 
     internal void Validate()
@@ -125,8 +126,8 @@ public sealed partial class MethodBuilder
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.load":
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
-                    stack.Add(locals[instruction.Value].Type); break;
-                case "local.store": Pop(locals[instruction.Value].Type); assigned[instruction.Value] = true; break;
+                    stack.Add(LocalType(locals[instruction.Value])); break;
+                case "local.store": Pop(LocalType(locals[instruction.Value])); assigned[instruction.Value] = true; break;
                 case "shift.left": case "shift.right":
                     Pop(PrimitiveType.Int32);
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
