@@ -56,11 +56,11 @@ public enum OpCode
     Div,
     /// <summary>Computes signed Int32/Int64 remainder; zero faults at execution, and minimum/-1 follows the target runtime.</summary>
     Rem,
-    /// <summary>Bitwise AND of matching Int32/Int64 operands.</summary>
+    /// <summary>Bitwise AND of matching Int32/Int64 or Boolean operands.</summary>
     And,
-    /// <summary>Bitwise OR of matching Int32/Int64 operands.</summary>
+    /// <summary>Bitwise OR of matching Int32/Int64 or Boolean operands.</summary>
     Or,
-    /// <summary>Bitwise XOR of matching Int32/Int64 operands.</summary>
+    /// <summary>Bitwise XOR of matching Int32/Int64 or Boolean operands.</summary>
     Xor,
     /// <summary>Shifts an Int32/Int64 value left by an Int32 count.</summary>
     Shl,

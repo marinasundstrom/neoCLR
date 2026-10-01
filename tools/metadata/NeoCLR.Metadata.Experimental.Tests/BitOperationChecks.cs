@@ -23,17 +23,38 @@ internal static class BitOperationChecks
                 else method.BitwiseXor();
                 method.Return();
             }
+            foreach (var raw in new[] { false, true })
+            {
+                var boolean = type.AddMethod(raw ? "BooleanRaw" : "BooleanHelper", new(PrimitiveType.Boolean, [PrimitiveType.Boolean, PrimitiveType.Boolean]));
+                boolean.LoadArgument(0); boolean.LoadArgument(1);
+                if (raw) boolean.Emit(op);
+                else if (op == OpCode.And) boolean.BitwiseAnd();
+                else if (op == OpCode.Or) boolean.BitwiseOr();
+                else boolean.BitwiseXor();
+                boolean.Return();
+            }
             var loaded = Assembly.Load(graph.Write()).GetType("Bits")!;
+            foreach (var left in new[] { false, true })
+                foreach (var right in new[] { false, true })
+                    foreach (var name in new[] { "BooleanRaw", "BooleanHelper" })
+                    {
+                        var expected = op switch { OpCode.And => left & right, OpCode.Or => left | right, _ => left ^ right };
+                        if (!Equals(loaded.GetMethod(name)!.Invoke(null, [left, right]), expected)) throw new Exception("Boolean bitwise result");
+                    }
             foreach (var (left, right) in new[] { (0L, 0L), (-1L, 42L), (long.MinValue, long.MaxValue), (4294967296L, 42L) })
             {
                 var expected = op switch { OpCode.And => left & right, OpCode.Or => left | right, _ => left ^ right };
                 if (!Equals(loaded.GetMethod("Wide")!.Invoke(null, [left, right]), expected) ||
                     !Equals(loaded.GetMethod("Narrow")!.Invoke(null, [unchecked((int)left), unchecked((int)right)]), unchecked((int)expected))) throw new Exception("bitwise result");
             }
-            _ = graph.WriteNativeAssembly();
+            var projection = NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(core);
+            _ = AssemblyDefinition.ReadAssembly(projection, expectedExtended: false);
             var bad = type.AddMethod("Invalid");
             bad.LoadConstant(1); bad.Emit(op); bad.Return(); Reject();
             bad.ClearBody(); bad.LoadConstant(1); bad.Emit(OpCode.Ldc_I8, 2L); bad.Emit(op); bad.Return(); Reject();
+            bad.ClearBody(); bad.Emit(OpCode.Ldc_Bool, true); bad.LoadConstant(1); bad.Emit(op); bad.Return(); Reject();
+            bad.ClearBody(); bad.LoadConstant(1); bad.Emit(OpCode.Ldc_Bool, true); bad.Emit(op); bad.Return(); Reject();
+            // The result remains Boolean and cannot satisfy an Int32 return.
             bad.ClearBody(); bad.Emit(OpCode.Ldc_Bool, true); bad.Emit(OpCode.Ldc_Bool, false); bad.Emit(op); bad.Return(); Reject();
             void Reject()
             {

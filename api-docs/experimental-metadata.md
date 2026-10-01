@@ -2008,18 +2008,21 @@ neoCLR also faults on minimum/-1. CLI output follows the host CLR's rem behavior
 sensitive). No unsigned/floating remainder or new exception handling is added.
 
 
-### Integer bitwise operations (development 2026-10-01)
+### Integer and Boolean bitwise operations (development 2026-10-01)
 
 `OpCode.And`, `Or`, `Xor` and the operand-free `MethodBuilder.BitwiseAnd()`,
-`BitwiseOr()`, `BitwiseXor()` helpers consume two matching Int32/Int64 values and
-produce one of that width. `Emit(opCode)` is equivalent to the corresponding helper.
+`BitwiseOr()`, `BitwiseXor()` helpers consume two matching Int32/Int64 or Boolean
+values and produce the same type. Boolean operands use eager AND/OR/XOR truth tables;
+these instructions do not short-circuit. `Emit(opCode)` is equivalent to the corresponding helper.
 Sign bits participate normally; these operations do not overflow. CLI and native
 output use existing and/or/xor instructions, with no metadata extension.
 
-Writing rejects underflow, mixed widths, Boolean or String operands with
+Writing rejects underflow, mixed types/widths or String operands with
 InvalidDataException. Operand-bearing Emit overloads reject these opcodes with
 ArgumentException; the instruction limit still applies. New enum values are appended.
-Boolean and enum bitwise semantics are not added to this bounded producer.
+Enum and nullable Boolean semantics are not added. Native Boolean operands require
+the runtime Boolean bit-operation support introduced on `codex/extended-cli-metadata`
+in `fa25609d`; older runtimes reject them. CLI keeps ordinary and/or/xor encoding.
 
 
 ### Integer shifts (development 2026-10-01)

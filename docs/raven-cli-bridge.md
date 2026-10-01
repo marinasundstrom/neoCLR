@@ -1527,3 +1527,12 @@ reject this operand category; producer integration requires this runtime revisio
 Nullable Boolean, enum operators and short-circuit changes are outside this slice.
 Metadata and compiler admission follow separately. Rust truth-table tests exercise
 all twelve combinations and verify/run rejection of mixed types and Boolean addition.
+
+
+The independent metadata API now admits these exact Boolean operands through
+`Emit(OpCode.And/Or/Xor)` and `BitwiseAnd/Or/Xor`. Typed validation preserves a Boolean
+result and rejects mixed operands and mismatched returns. Native output requires
+runtime `fa25609d` or later on this feature branch. CLI output retains standard
+encodings and executes on .NET. All 45 C# metadata contract groups and the guest API
+snapshot check pass, including raw/helper truth tables and native reference projection.
+Raven source admission is the next integration slice.

@@ -112,7 +112,11 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("shift requires an Int32/Int64 value and Int32 count");
                     break;
-                case "add": case "subtract": case "multiply": case "divide": case "remainder": case "and": case "or": case "xor": case "less": case "greater":
+                case "and": case "or": case "xor":
+                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
+                        throw new InvalidDataException("bitwise operands require matching integer or Boolean types");
+                    var bitwiseType = stack[^1]; Pop(bitwiseType); Pop(bitwiseType); stack.Add(bitwiseType); break;
+                case "add": case "subtract": case "multiply": case "divide": case "remainder": case "less": case "greater":
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("integer operands required");
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);

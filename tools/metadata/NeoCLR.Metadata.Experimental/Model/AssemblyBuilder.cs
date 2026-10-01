@@ -402,11 +402,11 @@ public sealed partial class MethodBuilder
     /// <summary>Appends matching-width signed Int32/Int64 remainder, with the dividend's sign.</summary>
     /// <remarks>Zero faults at execution, not when writing. Native minimum/-1 faults; CLI follows the host CLR edge behavior.</remarks>
     public void Remainder() => Emit(OpCode.Rem);
-    /// <summary>Appends bitwise AND of matching Int32/Int64 operands.</summary>
+    /// <summary>Appends bitwise AND of matching Int32/Int64 or Boolean operands.</summary>
     public void BitwiseAnd() => Emit(OpCode.And);
-    /// <summary>Appends bitwise OR of matching Int32/Int64 operands.</summary>
+    /// <summary>Appends bitwise OR of matching Int32/Int64 or Boolean operands.</summary>
     public void BitwiseOr() => Emit(OpCode.Or);
-    /// <summary>Appends bitwise XOR of matching Int32/Int64 operands.</summary>
+    /// <summary>Appends bitwise XOR of matching Int32/Int64 or Boolean operands.</summary>
     public void BitwiseXor() => Emit(OpCode.Xor);
     /// <summary>Appends an Int32/Int64 left shift with an Int32 count.</summary>
     /// <remarks>CLI out-of-range counts are unspecified; native counts are masked to 5 or 6 bits.</remarks>
