@@ -44,6 +44,11 @@ See the [changelog](../CHANGELOG.md) and linked design documents for technical s
   same model. Validate direct definition construction and builder/definition mutation
   identity, retaining existing Raven/native executable checks. Unsupported loaded content
   must not be silently discarded during editing.
+- **Author follow-up:** Endorsed setting the architectural direction and aligning with
+  Mono.Cecil “when it matters”, then supplied https://github.com/jbevain/cecil.
+- **Assistant action:** Reviewed Cecil's assembly/type definitions, member ownership,
+  module imports and ILProcessor source, recording a sourced alignment map. No promise
+  of drop-in compatibility or adoption of Cecil as a dependency was inferred.
 - **Open:** This conversation records a correction and a refactor plan, not completion
   of the unified model. Full runtime-library emission and the collections union/import
   gate remain open. See the [API direction](../api-docs/experimental-metadata.md#definition-first-model-author-direction-2026-10-01).

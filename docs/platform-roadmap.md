@@ -14,6 +14,8 @@ more builder-only capability expansion. The first acceptance case is direct defi
 construction of the author's struct/field example plus preserved builder compatibility.
 [Plan and current gap](../api-docs/experimental-metadata.md#definition-first-model-author-direction-2026-10-01)
 and [conversation](development-timeline.md#2026-10-01-definitions-are-the-editable-metadata-model).
+The author subsequently endorsed Mono.Cecil alignment where it matters; follow the
+[sourced alignment map](../api-docs/experimental-metadata.md#cecil-alignment-reference-reviewed-2026-10-01).
 This changes the immediate implementation sequence, not the Raven/native end-to-end goal.
 
 **Value-type category prerequisite (2026-10-01):** the metadata producer now emits

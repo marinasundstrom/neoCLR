@@ -3258,3 +3258,41 @@ surfaces, repeated writing and supported loaded roundtrips, plus existing C# tes
 Raven-to-native consumers. The roadmap's unchanged collections/runtime-library acceptance
 remains the overall goal; this author-directed refactor precedes more builder-only
 feature expansion. No new constructor or mutation API in this plan is shipped yet.
+
+### Cecil alignment reference (reviewed 2026-10-01)
+
+The author endorsed alignment with [Mono.Cecil](https://github.com/jbevain/cecil)
+where it matters and supplied that repository as the reference. Review of its current
+source supports the following direction; these are refactor requirements, not claims
+that our API already implements them:
+
+- AssemblyDefinition creation, reading and writing address the same object model.
+  Follow that lifecycle and familiar definition/reference terminology.
+  [AssemblyDefinition source](https://github.com/jbevain/cecil/blob/master/Mono.Cecil/AssemblyDefinition.cs).
+- Type definitions expose attributes, base types and editable members. Follow that
+  shape; derive value-type classification from the base/category contract rather than
+  a collection of independent flags. Cecil's IsValueType checks System.ValueType/Enum
+  and does not support setting that property directly.
+  [TypeDefinition source](https://github.com/jbevain/cecil/blob/master/Mono.Cecil/TypeDefinition.cs).
+- Member collections maintain declaring-owner relationships when adding/removing members.
+  Adopt explicit ownership invariants to prevent accidentally sharing a definition
+  between modules/types. Exact reparenting behavior remains a design/validation choice.
+  [MemberDefinitionCollection source](https://github.com/jbevain/cecil/blob/master/Mono.Cecil/MemberDefinitionCollection.cs).
+- Module-scoped importing and type-system access provide reference context. Preserve
+  this separation from runtime loading; neoCLR must retain explicit core/dependency
+  identity rather than infer its target from host reflection.
+  [ModuleDefinition source](https://github.com/jbevain/cecil/blob/master/Mono.Cecil/ModuleDefinition.cs).
+- An ILProcessor operates on a method body's instruction collection and supports typed
+  raw emission plus insertion/removal/replacement. Adopt this relationship; convenient
+  Call/LoadArgument helpers may sit above it. Retargeting branches and maintaining valid
+  bodies need explicit rules and tests, not an assumption that list replacement does all
+  repairs automatically.
+  [ILProcessor source](https://github.com/jbevain/cecil/blob/master/Mono.Cecil.Cil/ILProcessor.cs).
+
+The benefit is one familiar editable graph for manual callers, compiler emission and
+inspection. The costs are migration of existing builder-owned state, ownership/cache
+invalidation rules and preservation testing for loaded content. We are aligning the
+model, not promising drop-in Cecil API/binary compatibility or adding a Cecil runtime
+dependency. neoCLR assembly-level functions and future metadata categories remain
+explicit extensions to that shared model. Different encoders consume it and validate
+supported target capabilities; they do not determine the public graph's shape.
