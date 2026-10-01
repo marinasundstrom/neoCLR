@@ -14,6 +14,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native admission retains nonvirtual IL receiver and nongeneric-constructor limits.
   Raven now opts into an explicit instance-generic capability through shared planning;
   its binary Order consumer passes receiver mutation/forwarding on both runtimes.
+  Expanded acceptance covers generic no-result copy/reverse, recursive instance calls,
+  receiver/argument order and independent receivers. Runtime tests force collection
+  during a generic call; API checks reject wrong receivers and generic constructors.
 
 - Add unconstrained generic function/static-method declarations with named method
   parameters, CLI GenericParam/MVAR signatures and native MethodTypeParameter records.

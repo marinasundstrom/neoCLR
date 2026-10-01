@@ -34,10 +34,20 @@ internal static class GenericInstanceChecks
         var projection = AssemblyDefinition.ReadAssembly(NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(graph.CoreLibrary), false);
         var method = projection.MainModule.Types.Single(t => t.Name == "Order").Methods.Single(m => m.Name == "Forward");
         if (method.IsStatic || method.GenericArity != 1) throw new Exception("generic receiver projection");
+        var malformed = System.Text.Json.Nodes.JsonNode.Parse(graph.WriteNativeAssembly())!;
+        var ctor = malformed["functions"]!.AsArray().First(m => m!["origin"]!["name"]!.GetValue<string>() == ".ctor")!;
+        ctor["generic_parameters"] = new System.Text.Json.Nodes.JsonArray("T");
+        try { NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(malformed.ToJsonString())); throw new Exception("generic constructor projection accepted"); } catch (InvalidDataException) { }
         var main = graph.EntryPoint!; main.ClearBody();
         main.LoadConstant(1); main.LoadConstant(2); main.Call(graph.Types[0].Methods.Single(m => m.Name == "Remember").MakeGenericInstance(PrimitiveType.Int32)); main.Return();
         try { graph.Write(); throw new Exception("missing receiver accepted"); } catch (InvalidDataException) { }
         try { graph.WriteNativeAssembly(); throw new Exception("missing native receiver accepted"); } catch (InvalidDataException) { }
+        var other = graph.AddClass("Example", "Other");
+        var otherCtor = other.AddConstructor([]); otherCtor.Return();
+        main.ClearBody(); main.NewObject(otherCtor); main.LoadConstant(1); main.LoadConstant(2);
+        main.Call(graph.Types[0].Methods.Single(m => m.Name == "Remember").MakeGenericInstance(PrimitiveType.Int32)); main.Return();
+        try { graph.Write(); throw new Exception("wrong receiver accepted"); } catch (InvalidDataException) { }
+        try { graph.WriteNativeAssembly(); throw new Exception("wrong native receiver accepted"); } catch (InvalidDataException) { }
     }
     internal static async Task RunRuntime(string runtime, string output)
     {

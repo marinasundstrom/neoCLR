@@ -176,6 +176,12 @@ fn generic_class_instance_calls_keep_receiver_identity() {
 .type class Counter
 .field Value Int32
 .method instance Remember<T>(T value, Int32 number) -> T
+ldc.i4 8
+newobj Counter
+pop
+ldc.i4 9
+newobj Counter
+pop
 ldarg 0
 ldarg number
 stfld Counter::Value
@@ -200,7 +206,15 @@ ret
     .unwrap();
     verify(&module).unwrap();
     assert_eq!(
-        run(&module, Limits::default()).unwrap().value,
+        run(
+            &module,
+            Limits {
+                heap_objects: 2,
+                ..Limits::default()
+            }
+        )
+        .unwrap()
+        .value,
         Value::Int32(42)
     );
     let mut invalid = module.clone();
