@@ -2146,3 +2146,27 @@ unsupported fixtures reject before writing, including nullable nominal propertie
 Runtime remains e8611966 on codex/extended-cli-metadata, with compiler work on
 codex/metadata-consumer. Readonly/static storage, indexed/generic/nullable properties,
 external nominal imports, constructor chaining and the full broad consumer remain open.
+
+
+### Explicit root base initialization — 2026-10-01
+
+Raven now admits explicit `base()` on bounded root constructors only when semantic
+binding identifies parameterless System.Object construction and no source/bound
+arguments. Compared with CLR initialization this preserves the existing root contract:
+.NET emits its normal bound base call, the independent CLI writer supplies its ordinary
+Object constructor prologue, and a native root has no base. No metadata format, runtime
+binary or Runtime Contract configuration changes are needed. This does not add
+user-defined base calls, inheritance or general constructor delegation; unresolved and
+unsupported initializers reject before output.
+
+The executable case also exposed private stored-property rebinding that recreated
+backing fields. Raven now preserves canonical identity for all stored properties, so
+initializer completion updates the field used by emission. This general compiler fix
+is independently validated on .NET rather than limited to the native bridge.
+Sixteen C# constructor/property/field tests pass in Release/Debug. Side-effecting field
+initializers and block/arrow constructor bodies run in the expected order. The Order
+consumer verifies/runs to 42 on both runtimes in both source orders; six rejection
+fixtures remain, now including a user-defined base call instead of root `base()`.
+[Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json)
+records the unchanged e8611966 runtime hash. Work remains on the metadata and compiler
+feature branches; this is not a claim of general inheritance support on main.

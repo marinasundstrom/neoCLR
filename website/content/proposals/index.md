@@ -260,3 +260,9 @@ preserve class identity, initialization and stored-object alias mutation on both
 Owned nominal auto-properties, computed getters and explicit accessors now also round-trip
 and execute, including private setters and forward-declared constructor initializers.
 Readonly/static fields, indexed/generic properties and external class imports remain future work.
+
+
+The development Raven target also accepts explicit parameterless root `base()` after
+checking its bound System.Object identity. It reuses existing root initialization on
+both targets; side-effecting initializers execute before block or expression bodies.
+User-defined base initialization and general constructor delegation remain future work.

@@ -35,7 +35,10 @@ through binary execution. Mutable owned nominal fields and private storage now p
 class identity, initializers and alias mutation in both source orders on both runtimes.
 Owned nominal properties now preserve auto/computed/explicit accessor associations,
 private setters and backing storage through the same pipeline. A shared binder fix
-also refreshes provisional auto-property initializers without replacing field identity. Next
+also refreshes provisional storage initializers without replacing field identity, now
+including private stored properties. Explicit root `base()` uses the existing initialization
+contract after semantic validation; side-effecting initializers and both body forms execute
+on both runtimes. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

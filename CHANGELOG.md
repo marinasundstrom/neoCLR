@@ -46,7 +46,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with qualified reads shared across backends. Computed properties and implemented
   get/set accessors now share body lowering, preserving private setter visibility and
   optional backing storage. Explicit root constructors also admit expression bodies,
-  with overload and argument-order runtime validation.
+  with overload and argument-order runtime validation. Explicit root `base()` now uses
+  the existing backend initialization policy after checking its bound System.Object
+  constructor. Preserve canonical private-storage fields during Raven rebinding so
+  forward initializers reach emitted storage. Side-effecting initialization and both
+  constructor body forms verify/run on .NET and binary neoCLR; user-defined base calls
+  remain unsupported.
   Default root constructors and primitive field/property initializers now share
   canonical initialization with .NET. Explicit mutable primitive fields now preserve
   public/internal/private access through Raven emission, without property rows.
