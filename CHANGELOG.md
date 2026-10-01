@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Support properties and indexers on generic metadata owners, preserving declaring-type
   parameter scope in value/index signatures and accessor associations. Native reading
   rejects malformed owner instantiations and retains associations in CLI projections;
-  API binaries verify/run 42 without a runtime format change. Matching reader required.
+  API binaries verify/run 42 without a runtime format change. Raven now emits generic
+  instance properties/indexers through the shared accessor paths; two-parameter key/value
+  indexers and alias mutation execute on both runtimes/source orders. Matching reader required.
 
 - Add generic reference-class construction to the metadata producer: typed fields,
   constructors, instance methods and nested constructed signatures preserve distinct

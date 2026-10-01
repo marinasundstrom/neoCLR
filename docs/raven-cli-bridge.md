@@ -2418,3 +2418,12 @@ requires exact canonical open owner identity/arguments. API reflection execution
 native binary verification/run (42) pass; no native schema or Runtime Contract change.
 Raven accessor integration follows; external constructed fields and constraints/imports
 remain separate work. This extends the existing [generic metadata contract](generic-metadata.md).
+
+Generic property/indexer integration is now verified through Raven: setter/getter calls,
+Order alias mutation and independent generic key/value parameters run 42 on .NET and
+neoCLR in both source orders. Matching producer/reader: `dbe03b1a` or later on
+`codex/extended-cli-metadata`; Raven `codex/metadata-consumer`; receiver runtime
+`6a7a0dd2` or later. No Runtime Contract change. Fifteen focused C# tests pass;
+[recorded evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
+includes consumer/runtime hashes. External constructed fields, constraints and generic
+imports remain open, along with broader class-library acceptance.

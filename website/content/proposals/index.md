@@ -308,5 +308,6 @@ and fields remain future work in this direct emission API.
 
 Development metadata producer work also supports generic reference classes with typed
 fields, constructors and instance calls. API-produced CLI/native binaries and Raven consumers execute the
-same storage case, including nested generic class values. Generic property/indexer metadata also preserves owner scope and accessor associations.
+same storage case, including nested generic class values. Generic property/indexer metadata also preserves owner scope and accessor associations,
+with Raven consumers verified on both runtimes.
 Constraints and full class-library compilation remain future work; see the [experimental metadata API](/docs/experimental-metadata/).
