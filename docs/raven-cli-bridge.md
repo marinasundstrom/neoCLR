@@ -2760,3 +2760,9 @@ and rebuilt Raven external-signature library/application execution (42). Runtime
 SHA256 `193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D`;
 Raven compiler revision `55a29312f`. The metadata library owns graph migration; Raven
 owns target mapping, and neoCLR owns native loading/execution.
+
+The next definition slice admits direct static type-method declarations and routes
+builder-created type methods through the same collection. The CLI/CIL contract, Runtime
+Contract configuration and Raven adapter mapping are unchanged; direct instance method
+construction and canonical bodies remain pending. The manual entry/function/type-method
+call chain verifies and returns 42 on neoCLR.

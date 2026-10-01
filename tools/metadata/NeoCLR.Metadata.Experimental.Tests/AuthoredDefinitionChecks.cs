@@ -78,6 +78,16 @@ internal static class AuthoredDefinitionChecks
         if (!ReferenceEquals(type.Methods.Single(), method.Definition) ||
             !ReferenceEquals(method.Definition.DeclaringType, type) ||
             !ReferenceEquals(method.Definition.Module, assembly.MainModule)) throw new Exception("type method definition identity");
+        var direct = new MethodDefinition("PrivateAnswer", (ushort)(MethodAttributes.Private | MethodAttributes.Static), PrimitiveMethodSignature.Int32(0, true));
+        var foreignType = AssemblyBuilder.ForDefinition(foreign).AddType("Other", "Owner");
+        var detachedType = new TypeDefinition("Example", "Detached", 0x181, assembly.MainModule.ImportReference(builder.CoreLibrary, "System", "Object"));
+        Reject<InvalidOperationException>(() => detachedType.Methods.Add(direct));
+        type.Methods.Add(direct);
+        Reject<ArgumentException>(() => foreignType.Definition.Methods.Add(direct));
+        Reject<NotSupportedException>(() => type.Methods.Clear());
+        MethodBuilder.ForDefinition(direct).LoadConstant(42); MethodBuilder.ForDefinition(direct).Return();
+        Reject<ArgumentException>(() => new MethodDefinition("Instance", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true)));
+        Reject<ArgumentException>(() => new MethodDefinition(".cctor", (ushort)(MethodAttributes.Public | MethodAttributes.Static), PrimitiveMethodSignature.Int32(0, true)));
         var image = assembly.Write();
         if (!image.SequenceEqual(builder.Write())) throw new Exception("facade writer differs");
         var context = new AssemblyLoadContext("manual-definitions", isCollectible: true);
@@ -112,7 +122,16 @@ internal static class AuthoredDefinitionChecks
         assembly.MainModule.Functions.Add(helperDefinition);
         Reject<ArgumentException>(() => assembly.MainModule.Functions.Add(helperDefinition));
         var helper = MethodBuilder.ForDefinition(helperDefinition);
-        helper.LoadConstant(42); helper.Return();
+        var answer = new MethodDefinition("Answer", (ushort)(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig), PrimitiveMethodSignature.Int32(0, true));
+        Reject<ArgumentException>(() => assembly.MainModule.Functions.Add(answer));
+        type.Definition.Methods.Add(answer);
+        Reject<ArgumentException>(() => type.Definition.Methods.Add(answer));
+        Reject<ArgumentException>(() => type.Definition.Methods.Add(helperDefinition));
+        var answerBody = MethodBuilder.ForDefinition(answer);
+        if (!ReferenceEquals(answer.DeclaringType, type.Definition) || answer.Namespace != type.Namespace || !ReferenceEquals(answerBody, type.Methods.Single()))
+            throw new Exception("manual type-method identity");
+        answerBody.LoadConstant(42); answerBody.Return();
+        helper.Call(answerBody); helper.Return();
         var entryDefinition = new MethodDefinition("Main", PrimitiveMethodSignature.Int32(0, true));
         assembly.MainModule.Functions.Add(entryDefinition);
         assembly.EntryPoint = entryDefinition;
@@ -140,7 +159,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; type-method construction, body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; instance-method construction, body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

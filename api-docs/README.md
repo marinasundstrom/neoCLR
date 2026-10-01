@@ -591,3 +591,6 @@ covered in the manual host metadata reference; guest RavenDoc selection is uncha
 
 The host manual reference also covers direct MethodDefinition function construction,
 MethodBuilder.ForDefinition, append-only Module.Functions and authored EntryPoint assignment.
+
+Direct static type-method MethodDefinition construction and append-only TypeDefinition.Methods
+are covered in the host manual reference; no guest RavenDoc type selection changes apply.

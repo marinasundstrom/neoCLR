@@ -3418,3 +3418,43 @@ assembly-level function category. Existing CLI global-function projection and na
 encoding remain unchanged. The executable test combines this call with direct struct
 field storage; CLR/native return 42. All 76 C# contract groups pass. Arbitrary instruction
 editing, canonical body definitions and loaded read/edit/write remain future slices.
+
+
+### Direct static type-method construction
+
+`new MethodDefinition(string name, ushort attributes, MethodSignature signature)`
+creates a detached static type method. Attributes accept Static plus Public, Assembly
+or Private, and optional HideBySig. Instance, abstract, virtual, constructor and other
+flags are not admitted by this constructor; existing builders still support their
+previous bounded contracts. Null signatures throw `ArgumentNullException`; unsupported
+flags, empty/overlong names and `.ctor`/`.cctor` throw `ArgumentException`.
+
+Attach the declaring type to its authored module, then append the method to
+`TypeDefinition.Methods`. This property now returns `IList<MethodDefinition>` instead
+of `IReadOnlyList<MethodDefinition>` (development source compatibility change). It is
+append-only for authored types and read-only for loaded types. Adding to a detached
+type throws `InvalidOperationException`. Attachment checks signature ownership and
+scope, duplicate name/parameter/generic-arity signatures and the 256-method limit.
+Foreign or already attached declarations reject without moving ownership. Explicit
+function declarations and type-method declarations cannot be interchanged. Interface
+methods continue to require the abstract-contract builder API.
+
+`MethodBuilder.ForDefinition` supplies existing typed helpers and raw Emit overloads.
+The method's namespace follows its declaring type, and its declaring type/module are
+the exact authored objects. Existing builder-created instance methods, constructors
+and interface contracts also enter this same collection. Method bodies remain in the
+builder representation. CLI attributes and encodings are unchanged.
+
+```csharp
+var answer = new MethodDefinition("Answer", 0x96,
+    PrimitiveMethodSignature.Int32(0, true)); // Public | Static | HideBySig
+attachedType.Methods.Add(answer);
+var body = MethodBuilder.ForDefinition(answer);
+body.LoadConstant(42);
+body.Return();
+```
+
+Validation extends the manual executable to call a directly declared static type method
+through an assembly-level helper. CLR and neoCLR return 42. C# contracts cover shared
+identity, access flags, duplicate/foreign attachment, detached-owner rejection and
+unsupported method categories. The broader collections Option<Order> gate is unchanged.

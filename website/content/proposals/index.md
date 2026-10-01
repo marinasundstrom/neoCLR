@@ -390,3 +390,7 @@ with builders sharing those declarations. A manually declared struct executes on
 and neoCLR. Method declaration views now share builder identity. Assembly-level function creation and calls execute through
 body helpers. Direct type-method creation, body migration and loaded editing remain planned work; this is
 not a published general-purpose assembly editor.
+
+Direct static type-method declarations now participate in the same authored graph;
+a manual entry-point/function/type-method call chain executes on CLR and neoCLR.
+Direct instance declarations and body editing remain development work.

@@ -53,6 +53,7 @@ public sealed partial class TypeDefinition
 {
     internal TypeBuilder? Producer { get; set; }
     private readonly IList<FieldDefinition>? authoredFields;
+    private readonly IList<MethodDefinition>? authoredMethods;
     /// <summary>Creates a detached type declaration with CLI attributes and an explicit base reference.</summary>
     /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric static/root classes and sealed sequential value types.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
@@ -61,6 +62,11 @@ public sealed partial class TypeDefinition
             throw new ArgumentException("invalid type name");
         Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType;
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
+        authoredMethods = new DefinitionCollection<MethodDefinition>([], method =>
+        {
+            if (Producer is null) throw new InvalidOperationException("attach the declaring type before adding methods");
+            Producer.AttachMethod(method);
+        });
         authoredFields = new DefinitionCollection<FieldDefinition>([], field =>
         {
             if (field.FieldType is null || field.AuthoredOwner is not null) throw new ArgumentException("field must be an unattached authored definition");

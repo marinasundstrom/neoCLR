@@ -374,7 +374,7 @@ public sealed partial class TypeDefinition
     /// <summary>Gets the enclosing definition, or null for a top-level type.</summary>
     public TypeDefinition? DeclaringType => MetadataToken == 0 ? null : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets methods declared directly by this type; global functions belong to Module.Functions.</summary>
-    public IReadOnlyList<MethodDefinition> Methods => authoredFields is null ? Module.GetDeclaredMethods(MetadataToken) : Producer?.Methods.Select(m => m.Definition).ToArray() ?? Array.Empty<MethodDefinition>();
+    public IList<MethodDefinition> Methods => authoredMethods ?? (IList<MethodDefinition>)Module.GetDeclaredMethods(MetadataToken);
     /// <summary>Creates a nominal reference scoped to this module snapshot.</summary>
     /// <returns>A reference that resolves to this exact owned definition.</returns>
     public TypeReference ToReference() => new(this);

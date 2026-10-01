@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function declarations, entry-point assignment and helper call; same declarations in body builders; CLR/native result 42; type-method construction, body definitions and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; instance-method construction, body definition migration and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -14,8 +14,8 @@
       "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
       "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
       "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-      "librarySha256": "DFC95F9FBAC9E5F696FE0AA20C172F1D827CB8484DB947D051338AFCACA03191",
-      "applicationSha256": "E5204F9C263B0CD373AC1DA4FF7E916EADE1EA28E788ACB2960C0281C2857ECE",
+      "librarySha256": "56B7B01A4968958565192198C0ECEF20BD89AD123F597BB47ADC04A8BCD5D98D",
+      "applicationSha256": "4F881AC04EDB6E6E2E6CBD78C3C5F05FC6A5807AD4BF051C6EA824B4B3B499B2",
       "verified": true,
       "result": 42,
       "coverage": [
@@ -56,5 +56,6 @@
       "scope": "unconstrained static generic methods on nongeneric owners; generic owners and constrained imports remain unsupported"
     }
   },
-  "continuationBaseCommit": "09166c9a"
+  "continuationBaseCommit": "09166c9a",
+  "staticTypeMethodBaseCommit": "7d4f5cb5"
 }
