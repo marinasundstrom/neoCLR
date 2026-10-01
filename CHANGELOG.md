@@ -12,6 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Preserve receiver identity and generic parameter scope in CLI MethodSpec and native
   call records/reference projections. Binary producer verification/execution returns 42;
   native admission retains nonvirtual IL receiver and nongeneric-constructor limits.
+  Raven now opts into an explicit instance-generic capability through shared planning;
+  its binary Order consumer passes receiver mutation/forwarding on both runtimes.
 
 - Add unconstrained generic function/static-method declarations with named method
   parameters, CLI GenericParam/MVAR signatures and native MethodTypeParameter records.

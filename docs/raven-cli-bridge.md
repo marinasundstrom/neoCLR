@@ -2328,3 +2328,11 @@ object identity; missing receivers reject before output. Generic constructors,
 by-reference class receivers and virtual generic dispatch remain unsupported. This
 continues the PE/#Neo execution bridge and its CLI projection rather than introducing
 a new metadata category. Raven integration follows in a separate slice.
+
+Raven now consumes this receiver contract through shared callable signatures and its
+existing receiver-first body planner. An explicit instance-generic capability controls
+admission independently from static generics; no Runtime Contract option is introduced.
+.NET retains generic declaration registration in its adapter and native code uses
+owned generic call references. Release/Debug C# cases and the Order binary consumer
+pass (42) on both runtimes/source orders. Generic type owners, constraints and virtual
+generic dispatch remain outside this step.
