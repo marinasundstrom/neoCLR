@@ -8,7 +8,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="visibility">Public or Internal.</param>
     /// <returns>An owned value-type definition; no instance constructor is synthesized.</returns>
     /// <exception cref="ArgumentException">Invalid identity, duplicate type or exceeded limit.</exception>
-    /// <remarks>Instance methods, field mutation through addresses, generic/nominal field storage and interface implementations are not yet supported.</remarks>
+    /// <remarks>Instance methods, direct nominal field storage and interface implementations are not yet supported. Field mutation requires an initialized local address.</remarks>
     public TypeBuilder AddValueType(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, false, isValueType: true);
 
@@ -17,7 +17,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="name">Simple name without an arity suffix.</param>
     /// <param name="genericParameterNames">One through 32 unique names, copied.</param>
     /// <param name="visibility">Public or Internal.</param>
-    /// <returns>An owned value-type definition with primitive field storage only.</returns>
+    /// <returns>An owned value-type definition with primitive or declaring-type-parameter field storage.</returns>
     /// <exception cref="ArgumentNullException">Parameter names are null.</exception>
     /// <exception cref="ArgumentException">Invalid identity/parameters, duplicate type or exceeded limit.</exception>
     public TypeBuilder AddGenericValueType(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)

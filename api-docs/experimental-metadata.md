@@ -3175,7 +3175,7 @@ unconstrained parameters and appends the normal metadata arity suffix to the nam
 Names/visibility/duplicate and resource checks match AddClass/AddGenericClass; invalid
 inputs throw ArgumentException and null generic parameter collections throw
 ArgumentNullException. Neither method creates an instance constructor. The definition
-supports static methods, primitive instance fields, defaults, parameters/results,
+supports static methods, primitive or declaring-parameter instance fields, defaults, parameters/results,
 locals, vectors and generic construction/arguments. Public/internal visibility is
 preserved in both output formats.
 
@@ -3192,11 +3192,13 @@ preserve it without a new instruction or format revision.
 ValueType and DefaultConstructor generic requirements admit these definitions;
 ReferenceType requirements and nominal class bounds reject them. Instance methods,
 constructors and interface implementation are not yet supported for producer value
-types (InvalidOperationException). Nonprimitive field storage, including generic
-payload fields, is rejected with ArgumentException, avoiding unsupported inline layout
-and recursive storage. StoreField/Emit(Stfld, ...) on a value-type owner reject with
-ArgumentException until addressed receiver support is implemented. Field reads of
-values are supported. Static properties may use static accessors as elsewhere.
+types (InvalidOperationException). Direct nominal field storage is rejected with ArgumentException, avoiding unsupported
+recursive inline layouts. Declaring-type parameters are allowed, with types substituted
+at construction. StoreField/Emit(Stfld, ...) on a value-type owner require an address
+obtained from LoadLocalAddress for an initialized local of the exact owner type.
+Reads accept either that address or a value copy. Uninitialized, mismatched-owner and
+value-copy stores throw InvalidDataException on write; partial field assignment does
+not initialize a local. Readonly field restrictions remain unchanged. Static properties may use static accessors as elsewhere.
 
 Imported value-type definitions still reject: importing them as reference types would
 corrupt signature/category semantics. Native reader checks the bounded shape and rejects
@@ -3207,5 +3209,9 @@ The C# checks execute defaults, field reads, static/generic forwarding and vecto
 storage on CLR and native neoCLR, both returning 42. They also test CLR reflection,
 read snapshots, native projection, constraints and invalid shape/storage rejection.
 [Evidence](../docs/experiments/extended-cli-metadata/value-type-validation.json).
-This is a prerequisite for Raven union emission, not support for Option<T> payloads or
-a completed collections gate.
+This is a prerequisite for Raven union emission, not a completed collections gate.
+Generic payload storage and addressed local field mutation are now tested: value
+payloads and arrays retain copies, while reference payloads retain their aliases.
+The legacy native managed-reference store returns an inhabited Void value; the native
+writer appends a pop (and adjusts branch offsets) to preserve CLI stfld stack behavior.
+No runtime opcode or format change is introduced.

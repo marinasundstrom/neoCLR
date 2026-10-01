@@ -2727,3 +2727,17 @@ steps. The metadata API owns category-preserving encoding/projection; Raven will
 explicit value-type capabilities and union lowering rather than class-based admission.
 The future native semantic loader must replace CLI input without carrying forward
 these temporary producer limits. [Evidence](experiments/extended-cli-metadata/value-type-validation.json).
+
+### Value payloads and addressed locals (2026-10-01)
+
+The producer now supports declaring-type parameter fields and field loads/stores
+through initialized local addresses of the exact value-type owner. Default initialization
+remains explicit; partial field stores do not establish definite assignment. CLR and
+native tests confirm independent scalar/nested payload copies, array copies and retained
+reference payload aliases. The native writer emits stfld followed by pop for addressed
+value stores because the existing runtime returns inhabited Void; CLI output uses plain
+stfld. Expanded native branch offsets are validated by the executable checks. This is
+an explicit temporary lowering owned by the native writer; a future native instruction
+contract aligned with CLI's no-result store would remove the extra pop. No runtime
+format/opcode or Raven Runtime Contract change was made. Value imports and union
+operations remain open; the unchanged collections gate is not claimed complete.

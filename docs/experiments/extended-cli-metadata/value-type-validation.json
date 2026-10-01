@@ -2,12 +2,10 @@
   "verified": true,
   "result": 42,
   "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-  "assemblySha256": "2F24E193E43261B130AE62694D5FF770077B240ED30D63F7BEA438B451523649",
-  "scope": "owned value-type categories, primitive fields, defaults, static forwarding, generic construction/arguments and arrays; no imported value types, generic payload fields, instance methods or addressed mutation",
+  "assemblySha256": "14C0B23DFE81038CF39138ECD0E3C3707CECFCCA97988207AF99F07C11645B09",
+  "scope": "owned value types with generic payload storage and initialized local-address field access; scalar/value payload copies, array copies and reference payload aliases; imported values, instance methods and general managed pointers remain unsupported",
   "testedBranch": "codex/extended-cli-metadata",
-  "sourceBaseRevision": "15bccb73",
-  "sourceState": "plus owned-value-type changes committed with this evidence",
-  "metadataTests": "75/75 C# groups",
-  "apiSnapshotCheck": "passed",
-  "ravenIntegration": "not changed; collections Option<Order> remains unsupported"
+  "sourceBaseRevision": "d78d5311",
+  "sourceState": "plus value payload/address changes committed with this evidence",
+  "metadataTests": "75/75 C# groups"
 }

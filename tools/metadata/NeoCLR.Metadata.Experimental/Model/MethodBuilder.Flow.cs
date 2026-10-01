@@ -107,7 +107,20 @@ public sealed partial class MethodBuilder
                             throw new InvalidDataException("readonly field requires its declaring constructor");
                         Pop(instruction.ConstructedField?.FieldType ?? instruction.Field.FieldType);
                     }
-                    Pop(instruction.ConstructedField is { } fieldReference ? (SignatureType)fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature);
+                    SignatureType fieldOwner = instruction.ConstructedField is { } fieldReference
+                        ? fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature;
+                    if (instruction.Field!.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].AddressedLocal is { } receiverLocal)
+                    {
+                        if (!assigned[receiverLocal] || locals[receiverLocal].SignatureType != fieldOwner)
+                            throw new InvalidDataException("value-type field receiver requires an initialized local of the exact owner type");
+                        stack.RemoveAt(stack.Count - 1);
+                    }
+                    else
+                    {
+                        if (instruction.Field.DeclaringType.IsValueType && instruction.Op == "field.store")
+                            throw new InvalidDataException("value-type field store requires an addressed local receiver");
+                        Pop(fieldOwner);
+                    }
                     if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
                     break;
                 case "array.new":

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add generic payload fields and initialized local-address field access for producer
+  value types. CLR/native tests preserve value and array copies plus reference payload
+  aliases. Invalid receiver types, uninitialized locals and stores into value copies
+  reject; native lowering discards the legacy store's Void result to retain CLI semantics.
+
 - Add bounded owned value-type declarations to the metadata producer, preserving
   VALUETYPE/GENERICINST categories through CLI output, native loading and projection.
   Defaults, primitive field reads, generic forwarding and arrays execute on CLR and

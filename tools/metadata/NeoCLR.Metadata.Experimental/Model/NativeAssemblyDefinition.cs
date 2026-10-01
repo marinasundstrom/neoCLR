@@ -232,7 +232,7 @@ public sealed class NativeAssemblyDefinition
                 foreach (var field in type.Fields)
                 {
                     var storage = ReadType(field.Type, false);
-                    Require(!type.IsValueType || storage.Primitive is not null, "value-type fields currently require primitive storage");
+                    Require(!type.IsValueType || storage.Primitive is not null || storage.TypeParameterIndex is not null, "value-type fields currently require primitive or declaring-parameter storage");
                 }
             }
             typeArity = 0;

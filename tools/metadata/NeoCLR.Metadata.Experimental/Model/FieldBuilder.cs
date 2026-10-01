@@ -41,14 +41,14 @@ public sealed partial class TypeBuilder
     /// <param name="isReadOnly">Restrict stores to declaring instance constructors; defaults to false.</param>
     /// <returns>A field handle owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
-    /// <exception cref="ArgumentException">Invalid name/type/access, nonprimitive value-type storage, duplicate name or exceeded field limit.</exception>
+    /// <exception cref="ArgumentException">Invalid name/type/access, unsupported value-type storage, duplicate name or exceeded field limit.</exception>
     /// <exception cref="InvalidOperationException">This is a static class.</exception>
-    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet. Value-type fields currently require primitive signatures.</remarks>
+    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet. Value-type fields currently require primitive or declaring-type parameter signatures.</remarks>
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
-        if (IsValueType && type.Primitive is null) throw new ArgumentException("value-type fields currently require primitive storage", nameof(type));
+        if (IsValueType && type.Primitive is null && type.TypeParameterIndex is null) throw new ArgumentException("value-type fields currently require primitive or declaring-parameter storage", nameof(type));
         if (IsStatic || IsInterface) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||

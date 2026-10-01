@@ -380,3 +380,7 @@ The development metadata producer now preserves owned value-type categories in C
 and native binaries. Defaults, primitive fields, generic forwarding and arrays execute
 on both runtimes. Generic payload storage and imported union/value types remain open;
 Raven's collections sample is still blocked at Option<Order>.
+
+Producer value types also support generic payload storage and initialized local-address
+field mutation. CLR and native tests retain value copies and reference payload aliases;
+imported value types and Raven union lowering remain development work.

@@ -123,6 +123,10 @@ public sealed partial class AssemblyBuilder
         };
         IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)
         {
+            // Legacy native stores through managed references return an inhabited Void.
+            // The producer contract follows CLI stfld, which leaves no stack value.
+            if (instruction.Op == "field.store" && instruction.Field!.DeclaringType.IsValueType)
+                return new[] { Instruction(instruction), new { op = "pop" } };
             if (instruction.Op == "native.call")
             {
                 var target = instruction.NativeTarget!;
@@ -149,7 +153,7 @@ public sealed partial class AssemblyBuilder
         {
             var offsets = new int[method.Instructions.Count + 1];
             for (int i = 0; i < method.Instructions.Count; i++)
-                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, _ => 1 });
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, "field.store" when method.Instructions[i].Field!.DeclaringType.IsValueType => 2, _ => 1 });
             var labels = method.LabelPositions();
             return method.Instructions.SelectMany(instruction => instruction.Op switch
             {

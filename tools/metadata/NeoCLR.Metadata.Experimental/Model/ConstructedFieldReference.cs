@@ -40,12 +40,11 @@ public sealed partial class MethodBuilder
     /// <param name="opCode">Ldfld or Stfld.</param>
     /// <param name="operand">Owned reference, valid in the caller's parameter scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
-    /// <exception cref="ArgumentException">Wrong opcode, foreign definition or out-of-scope argument. Value-type stores require future addressed receiver support.</exception>
+    /// <exception cref="ArgumentException">Wrong opcode, foreign definition or out-of-scope argument.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; receiver, value and readonly checks run on write.</exception>
     public void Emit(OpCode opCode, ConstructedFieldReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        if (opCode == OpCode.Stfld && operand.Definition.DeclaringType.IsValueType) throw new ArgumentException("value-type stores require addressed receiver support", nameof(operand));
         ((SignatureType)operand.DeclaringType).ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand.Definition, ConstructedField: operand));
     }
