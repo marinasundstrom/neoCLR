@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Reaffirm unchanged sample execution as the main native-emission acceptance gate.
+  Rerun order-collections after generic imports: binding/CLI control emission pass,
+  but direct emission still rejects imported nominal/generic signatures in Register
+  and writes no native image. Record that limit without treating focused probes or
+  earlier legacy-bridge execution as completion of the direct target.
+
 - Import bounded unconstrained static generic methods with primitive/vector and
   scoped method-parameter signatures. Add immutable imported instantiations and
   typed Call/raw Emit support; CLI uses MethodSpec/MemberRef and neoCLR uses its

@@ -25,6 +25,27 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Existing samples remain the end-to-end acceptance target
+
+- **Author:** Clarified that the main goal is Raven compiling neoCLR assemblies which
+  neoCLR loads and executes. Existing compiling/executing samples predate this work
+  and should assess progress.
+- **Assistant:** Confirmed that API lifecycle work is supporting work and focused
+  probes validate individual gaps, rather than replacing unchanged sample acceptance.
+  Committed the imported-generic prerequisite, then reran the unchanged
+  application-order-collections source through direct emission.
+- **Observed outcome:** Binding and ordinary CLI control emission succeed; direct
+  emission still rejects Register's MutableMap<int, Order>/ArrayList<Order>
+  signatures, writes zero native bytes and is not executed. The generic-method slice
+  did not close that nominal/generic-owner boundary. Prior legacy-bridge execution
+  remains baseline evidence, not proof of direct emission.
+- **Next work:** Drive imported nominal/generic type and member identity from this
+  existing sample and its translated System dependency, retaining ordinary .NET
+  TypeRef/TypeSpec/MemberRef shape. Constructor/instance calls, callbacks and union
+  lowering remain subsequent sample requirements. Do not substitute a growing set
+  of isolated synthetic successes for this end-to-end gate. See the
+  [fresh checkpoint](experiments/extended-cli-metadata/collections-after-generic-imports.json).
+
 ## 2026-10-01: .NET metadata baseline and a complete Cecil-like lifecycle
 
 - **Author:** Reaffirmed: “Our baseline is .NET metadata format and our future

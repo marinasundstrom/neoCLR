@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Primary acceptance reaffirmed (2026-10-01):** use unchanged existing samples to
+prove Raven → neoCLR assembly → runtime loading/execution. API work and focused probes
+support this gate. After imported generic-method support, order-collections still binds
+and emits the CLI control but direct emission writes no image: Register's imported
+MutableMap<int, Order>/ArrayList<Order> signatures remain unsupported. Next address
+external nominal/generic type and member identities against the translated System
+library, then advance through this sample's constructor/callback/union requirements.
+[Fresh evidence](experiments/extended-cli-metadata/collections-after-generic-imports.json).
+
 **Author reaffirmation (2026-10-01):** .NET metadata is the baseline, with explicit
 neoCLR extensions such as assembly-level functions. The Cecil-like API is the primary
 abstraction for inspecting, modifying and creating assemblies. Preserve familiar
