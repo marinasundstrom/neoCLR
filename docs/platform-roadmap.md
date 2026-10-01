@@ -28,7 +28,9 @@ Comparisons (including negated forms), if/else and lowered loops with break/cont
 Int32/Boolean/no-result signatures now flow through both backends, native imports and
 reference projections, with Boolean local initialization/assignment, equality and short-circuit &&/|| and discarded primitive call results. Int64 signatures/locals and signed Int32↔Int64
 conversions and signed unary +/−/~ now share that path; broader conversions and general type/field references remain next;
-metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
+String signatures, locals, literals and imported text helpers now share the path,
+with computed console output on both runtimes. General object/field contracts and
+metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in
 `Compilation.Emit`; rvnc and API wrappers share compiler setup and target validation.

@@ -47,7 +47,9 @@ public enum OpCode
     /// <summary>Negates Int32/Int64 with wrapping signed overflow.</summary>
     Neg,
     /// <summary>Complements every bit of Int32/Int64, preserving width.</summary>
-    Not
+    Not,
+    /// <summary>Pushes a Unicode string literal; requires a string operand.</summary>
+    Ldstr
 }
 
 public sealed partial class MethodBuilder
@@ -84,6 +86,20 @@ public sealed partial class MethodBuilder
     {
         if (opCode != OpCode.Ldc_I8) throw OperandError(opCode);
         Append(new("constant64", LongValue: operand));
+    }
+
+    /// <summary>Appends a string literal shared by CLI and native emission.</summary>
+    /// <param name="opCode">Ldstr; other opcodes reject.</param>
+    /// <param name="operand">Non-null valid Unicode text, at most 64 KiB in UTF-8; empty text is supported.</param>
+    /// <exception cref="ArgumentNullException">Operand is null.</exception>
+    /// <exception cref="ArgumentException">Incorrect opcode, invalid Unicode or oversized literal.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    /// <remarks>Rejects unpaired UTF-16 surrogates instead of substituting replacement characters.</remarks>
+    public void Emit(OpCode opCode, string operand)
+    {
+        if (opCode != OpCode.Ldstr) throw OperandError(opCode);
+        ValidateLiteral(operand);
+        Append(new("string", Text: operand));
     }
 
     /// <summary>Appends a call to a local or external builder method.</summary>

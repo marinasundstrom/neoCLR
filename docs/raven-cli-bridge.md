@@ -1139,3 +1139,52 @@ neoCLR, returning 42; it checks one projected type with three methods and reject
 unsupported property in either order. The existing integration probe also passes.
 This run did not repeat the optional compiler-driver checks.
 [Executable evidence](experiments/extended-cli-metadata/partial-static-types-validation.json).
+
+## String signatures and computed console output — 2026-10-01
+
+Tested Raven `codex/metadata-consumer` revision: `86d4fed0f`.
+
+The development metadata API and Raven shared body path now carry String parameters,
+results, initialized locals, assignments, literals, call results and joins. A helper
+from a separately compiled native library can return text to Console.WriteLine.
+Source binding/lowering still belongs to Raven; backend mappers retain selected-core
+.NET types and native built-in String identities. No Runtime Contract option changes.
+Ordinary .NET remains default; native emission is still explicit and primitive
+binding still uses the .NET bootstrap, with native declarations imported through
+temporary CLI reference projections. General symbol-loader work remains deferred.
+
+The independent metadata library encodes CLI String signatures and ldstr user-string
+tokens, or native String signatures and UTF-8 ldstr. Existing runtime String verification
+and execution load the binary payload directly; format/schema versions are unchanged.
+String calls/returns/local stores and branch joins validate exact stack types.
+Entrypoints remain Int32/no-result. Null literals/nullable signatures, equality,
+concatenation and instance members remain outside the supported producer subset.
+
+The Console policy checks the registered reference and one-string WriteLine overload.
+The shared plan emits its argument normally; the native adapter calls the new
+WriteConsoleLine() operation, which consumes String and discards bundled System's
+inhabited Void. This remains a bootstrap library mapping owned by the compiler adapter
+and metadata writer; eventual native core symbol import/call resolution replaces it.
+Reference projection bodies still throw and do not translate native execution.
+
+Compared with .NET's [ldstr instruction](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.ldstr?view=net-10.0)
+and [UTF-16 text model](https://learn.microsoft.com/en-us/dotnet/standard/base-types/character-encoding-introduction)
+(primary documentation reviewed 2026-10-01), this producer contract accepts Unicode
+scalar text encodable in UTF-8 and rejects unpaired surrogate code units. It retains
+the existing 64 KiB UTF-8 literal limit and aggregate image limits. The alternative
+of replacement encoding would silently change text; preserving arbitrary UTF-16
+would require a new native text representation. Reusing the current runtime avoids
+that format change at the cost of a narrower literal domain than .NET. No interning,
+allocation or performance equivalence is claimed; equality remains separately scoped.
+
+Validation: 38 C# metadata contract groups and 41 focused Raven tests cover Unicode,
+empty/NUL literals, UTF-8 size boundaries, malformed operands, projection/import,
+selected-core .NET signatures/locals and Debug/Release execution. The integration
+probe exercises computed text and cross-assembly String overloads in binary native
+assemblies; native runtime verification and execution must pass.
+
+The updated rvnc driver case also passes: it compiles a String helper library and
+prints its returned Unicode text from the binary native application.
+[Executable evidence](experiments/extended-cli-metadata/string-values-validation.json).
+Older bounded metadata readers reject the newly admitted String declarations; use
+the matching metadata library and compiler adapter. Existing artifacts remain readable.

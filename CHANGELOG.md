@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add String signatures/locals and typed Ldstr emission to the experimental metadata
+  API, including Unicode validation, native reference projection and imports. A native
+  stack-consuming WriteConsoleLine overload enables Raven text helpers and computed
+  console output, including cross-assembly calls. Reuse existing runtime String/ldstr
+  support; nulls, equality and concatenation remain outside this writer subset.
+
 - Raven native emission now coalesces partial static classes by semantic identity,
   preserving cross-part methods and rejecting unsupported members in any part.
   C# end-to-end checks verify both file orders on .NET and binary neoCLR assemblies;

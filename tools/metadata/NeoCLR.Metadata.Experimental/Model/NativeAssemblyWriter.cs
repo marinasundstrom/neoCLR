@@ -9,7 +9,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Emits a native neoCLR format-5 assembly directly from this graph.</summary>
     /// <returns>Owned UTF-8 JSON bytes accepted by the native assembly loader.</returns>
     /// <exception cref="InvalidDataException">Invalid graph, unsupported descriptive names, identity collision, incompatible core contract or output limit.</exception>
-    /// <remarks>Supports linear Int32 bodies, cross-assembly top-level functions and native-only constant console output.
+    /// <remarks>Supports bounded built-in typed bodies, cross-assembly top-level functions and native-only console output.
     /// Dependencies must be emitted separately and supplied explicitly to the runtime. No PE conversion or external process runs.
     /// This is the current native JSON format, not the experimental NEOX PE transport.</remarks>
     public byte[] WriteNativeAssembly()
@@ -52,6 +52,7 @@ public sealed partial class AssemblyBuilder
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = "Public", parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
+            "string" => new { op = "ldstr", arg = (object)instruction.Text! },
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
             "negate" => new { op = "neg" },
             "complement" => new { op = "not" },
@@ -84,6 +85,11 @@ public sealed partial class AssemblyBuilder
                     parameters = Enumerable.Repeat("Int32", count).ToArray()
                 } } };
             }
+            if (instruction.Op == "console.write")
+                return new object[] {
+                    new { op = "call", arg = new { name = "System.Console.WriteLine", owner = new { Named = "System.Console" }, parameters = new[] { "String" } } },
+                    new { op = "pop" }
+                };
             if (instruction.Op == "console.line")
                 return new object[] {
                     new { op = "ldstr", arg = instruction.Text! },
@@ -96,7 +102,7 @@ public sealed partial class AssemblyBuilder
         {
             var offsets = new int[method.Instructions.Count + 1];
             for (int i = 0; i < method.Instructions.Count; i++)
-                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, _ => 1 });
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, _ => 1 });
             var labels = method.LabelPositions();
             return method.Instructions.SelectMany(instruction => instruction.Op switch {
                 "label" => Array.Empty<object>(),

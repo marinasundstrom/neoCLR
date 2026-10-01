@@ -41,7 +41,7 @@ public sealed partial class AssemblyBuilder
         => AddFunction(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
     /// <summary>Adds a static assembly-owned function with an explicit primitive signature.</summary>
     /// <param name="name">Nonempty metadata name.</param>
-    /// <param name="signature">Int32/Int64/Boolean parameters and Int32/Int64/Boolean/Void result.</param>
+    /// <param name="signature">Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String/Void result.</param>
     /// <returns>An assembly-owned method builder.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or function limit exceeded.</exception>
@@ -126,6 +126,7 @@ public sealed partial class AssemblyBuilder
                 result =>
                 {
                     if (!method.ReturnsValue) result.Void();
+                    else if (method.Signature.ReturnType == PrimitiveType.String) result.Type().String();
                     else if (method.Signature.ReturnType == PrimitiveType.Int64) result.Type().Int64();
                     else if (method.Signature.ReturnType == PrimitiveType.Boolean) result.Type().Boolean();
                     else result.Type().Int32();
@@ -133,7 +134,8 @@ public sealed partial class AssemblyBuilder
                 {
                     foreach (var type in method.Signature.ParameterTypes)
                         {
-                        if (type == PrimitiveType.Boolean) parameters.AddParameter().Type().Boolean();
+                        if (type == PrimitiveType.String) parameters.AddParameter().Type().String();
+                        else if (type == PrimitiveType.Boolean) parameters.AddParameter().Type().Boolean();
                         else if (type == PrimitiveType.Int64) parameters.AddParameter().Type().Int64();
                         else parameters.AddParameter().Type().Int32();
                     }
@@ -168,7 +170,7 @@ public sealed partial class AssemblyBuilder
             var offsets = new int[method.Instructions.Count + 1];
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "constant" or "call" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "string" or "constant" or "call" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "local.load" or "local.store" => 4,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
@@ -189,6 +191,7 @@ public sealed partial class AssemblyBuilder
                     case "branch": case "branch.true": case "branch.false":
                         code.WriteByte(instruction.Op == "branch" ? (byte)0x38 : instruction.Op == "branch.true" ? (byte)0x3a : (byte)0x39);
                         code.WriteInt32(offsets[labels[instruction.Value]] - (code.Count + 4)); break;
+                    case "string": code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!))); break;
                     case "constant64": code.WriteByte(0x21); code.WriteInt64(instruction.LongValue); break;
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
@@ -211,7 +214,8 @@ public sealed partial class AssemblyBuilder
                 var variables = new BlobEncoder(signature).LocalVariableSignature(method.Locals.Count);
                 foreach (var local in method.Locals)
                 {
-                    if (local.Type == PrimitiveType.Boolean) variables.AddVariable().Type().Boolean();
+                    if (local.Type == PrimitiveType.String) variables.AddVariable().Type().String();
+                    else if (local.Type == PrimitiveType.Boolean) variables.AddVariable().Type().Boolean();
                     else if (local.Type == PrimitiveType.Int64) variables.AddVariable().Type().Int64();
                     else variables.AddVariable().Type().Int32();
                 }
@@ -264,7 +268,7 @@ public sealed class TypeBuilder
         => AddMethod(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
     /// <summary>Adds a public static method with an explicit primitive signature.</summary>
     /// <param name="name">Nonempty metadata name.</param>
-    /// <param name="signature">Int32/Int64/Boolean parameters and Int32/Int64/Boolean/Void result.</param>
+    /// <param name="signature">Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String/Void result.</param>
     /// <returns>A method builder owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or method limit exceeded.</exception>
@@ -278,7 +282,7 @@ public sealed class TypeBuilder
     }
 }
 
-/// <summary>Typed Int32/Int64/Boolean body construction; invalid control-flow contracts fail before emission.</summary>
+/// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
     internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0);
@@ -298,7 +302,7 @@ public sealed partial class MethodBuilder
     public string Name { get; }
     /// <summary>Gets the parameter count.</summary>
     public int ParameterCount => Signature.ParameterTypes.Count;
-    /// <summary>Gets whether the method has an Int32, Int64 or Boolean result rather than no result.</summary>
+    /// <summary>Gets whether the method has an Int32, Int64, Boolean or String result rather than no result.</summary>
     public bool ReturnsValue => Signature.ReturnType != PrimitiveType.Void;
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
@@ -310,14 +314,23 @@ public sealed partial class MethodBuilder
     /// <remarks>Native emission only; ordinary CLI Write rejects this operation. Does not alter the surrounding primitive stack.</remarks>
     public void WriteConsoleLine(string text)
     {
+        ValidateLiteral(text);
+        Append(new("console.line", Text: text));
+    }
+    /// <summary>Consumes a String stack value and writes it through native System.Console.WriteLine.</summary>
+    /// <remarks>Native-only bootstrap; discards bundled System's inhabited Void result. Ordinary CLI output rejects this operation.</remarks>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded, or stack mismatch when writing.</exception>
+    public void WriteConsoleLine() => Append(new("console.write"));
+
+    private static void ValidateLiteral(string text)
+    {
         ArgumentNullException.ThrowIfNull(text);
         try
         {
             if (new System.Text.UTF8Encoding(false, true).GetByteCount(text) > 65536)
-                throw new ArgumentException("console literal exceeds 64 KiB", nameof(text));
+                throw new ArgumentException("string literal exceeds 64 KiB", nameof(text));
         }
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid Unicode", nameof(text), error); }
-        Append(new("console.line", Text: text));
     }
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Zero-based parameter index.</param>

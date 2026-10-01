@@ -16,7 +16,8 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
-- [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Int64/Boolean parameters and results.
+- [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
+- [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Int64/Boolean/String parameters and results.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
@@ -853,8 +854,8 @@ the consuming module. MetadataToken is its physical MemberRef token; ParentToken
 the physical MemberRefParent token, and Name is the referenced name. GetSignature
 returns a fresh copy, including opaque field or unsupported method signatures.
 
-ResolveMethod supports the writer's static, nongeneric default-convention Int32/Int64/Boolean
-parameters (0–256) and Int32/Int64/Boolean/no-result contract. It resolves a local TypeDef or nominal
+ResolveMethod supports the writer's static, nongeneric default-convention Int32/Int64/Boolean/String
+parameters (0–256) and Int32/Int64/Boolean/String/no-result contract. It resolves a local TypeDef or nominal
 TypeRef parent, requiring the explicit resolver for external scopes. It then selects
 exactly one directly declared method by ordinal name and decoded parameter/result
 contract, returning that target snapshot's owned MethodDefinition. There is no implicit
@@ -1000,7 +1001,7 @@ Namespace: `NeoCLR.Metadata.Experimental.Model`. These builders are the first wr
 part of the primary compiler abstraction. They construct new assemblies and allow body
 editing before another write; they do **not** rewrite arbitrary read snapshots or claim
 full Cecil compatibility. The current executable subset is top-level functions, public
-static classes and methods with Int32/Int64/Boolean parameters and Int32/Int64/Boolean or CLI no-result return. This is a
+static classes and methods with Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String or CLI no-result return. This is a
 compiler integration proof, not a complete language backend.
 
 ### AssemblyBuilder
@@ -1102,7 +1103,7 @@ public sealed class TypeBuilder
 
 Created only by AddType. Methods is a read-only view of owned methods in declaration
 order. AddMethod adds a public static hide-by-signature method. The legacy overload uses Int32 parameters; returnsValue selects Int32 or CLI void/no-result.
-The signature overload preserves Int32/Int64/Boolean parameter and result types. Names must be nonempty and at
+The signature overload preserves Int32/Int64/Boolean/String parameter and result types. Names must be nonempty and at
 most 1024 characters; parameter counts are 0–256; a type admits at most 256 methods.
 Duplicate name/parameter-count pairs and invalid inputs raise ArgumentException.
 Generic methods, fields, instance receivers and signature variants are future work.
@@ -1270,7 +1271,7 @@ translator. Bodies remain opaque; the original native artifact must pass neoCLR'
 verifier before execution. Disposing JSON parsing state or changing the input buffer
 has no effect on the snapshot. No native file is loaded into a runtime by either API.
 
-Supported declarations are public static Int32/Int64/Boolean/no-result functions (including globals)
+Supported declarations are public static Int32/Int64/Boolean/String/no-result functions (including globals)
 and public static classes with no fields. The reader checks canonical identity tuples,
 encoded module/type/function names, references, origins, tokens, owner order, entry
 point signature, duplicate declarations and unsupported declaration fields. Unknown
@@ -1585,7 +1586,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1667,7 +1668,7 @@ body with `InvalidDataException`. Each write recomputes initialization; a previo
 or successful write does not initialize a rebuilt body. CLI emission writes Int32 local
 signatures and init-locals method headers; native emission writes format-5 `locals` and
 native local instructions. The reader accepts absent locals in older producer artifacts
-and validates declared Int32/Int64/Boolean local lists; reference projections still omit executable
+and validates declared Int32/Int64/Boolean/String local lists; reference projections still omit executable
 body details. Older experimental readers may reject the added `locals` field.
 
 Unlike unrestricted Cecil bodies, this bounded API enforces initialization and stack
@@ -1726,7 +1727,7 @@ invalid joins/initialization; Raven's executable consumer includes Console insid
 All types below are in `NeoCLR.Metadata.Experimental.Model`.
 
 ```csharp
-public enum PrimitiveType { Void, Int32, Boolean, Int64 }
+public enum PrimitiveType { Void, Int32, Boolean, Int64, String }
 public sealed class PrimitiveMethodSignature
 {
     public PrimitiveMethodSignature(PrimitiveType returnType,
@@ -1741,7 +1742,7 @@ PrimitiveMethodSignature ImportedMethodReference.Signature { get; }
 bool MethodDefinition.TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded);
 ```
 
-The signature constructor copies up to 256 ordered Int32/Int64/Boolean parameters. Results
+The signature constructor copies up to 256 ordered Int32/Int64/Boolean/String parameters. Results
 may also be Void, meaning no result, not an inhabited native Void value. Null parameters
 throw ArgumentNullException; invalid enum values, Void parameters or excessive counts
 throw ArgumentException. ParameterTypes is an immutable view of the copied array.
@@ -1793,7 +1794,7 @@ LocalDefinition MethodBuilder.DeclareLocal(PrimitiveType type);
 PrimitiveType LocalDefinition.Type { get; }
 ```
 
-DeclareLocal accepts Int32, Int64 or Boolean, returning a stable method-owned slot with an
+DeclareLocal accepts Int32, Int64, Boolean or String, returning a stable method-owned slot with an
 immutable Type. Void and unknown enum values throw ArgumentException; the shared
 256-local limit throws InvalidDataException. DeclareInt32Local remains shorthand for
 DeclareLocal(PrimitiveType.Int32). ClearBody preserves the slot and type, but resets
@@ -1814,7 +1815,7 @@ that stores a predicate result, reassigns it and compares Boolean locals on both
 ### Discarding call results (development, 2026-10-01)
 
 `MethodBuilder.Emit(OpCode.Pop)` removes one evaluation-stack value, preserving all
-values below it. It accepts no operand and works for Int32, Int64 or Boolean. Emission with
+values below it. It accepts no operand and works for Int32, Int64, Boolean or String. Emission with
 an operand throws ArgumentException without appending an instruction. Writer flow
 validation throws InvalidDataException on underflow, including popping after a
 no-result call. A no-result call has no value to discard. CLI emission uses `pop`;
@@ -1878,3 +1879,38 @@ unary support is not implied. Native verification remains required. C# contracts
 both widths, extrema, invalid stack operands and native projections. Raven's shared
 body path handles built-in signed unary + (identity), - and ~; the native consumer
 executes minimum-value wrapping and complements in binary assemblies.
+
+### String values (development, 2026-10-01)
+
+```csharp
+// NeoCLR.Metadata.Experimental.Model
+// PrimitiveType.String and OpCode.Ldstr are appended enum members.
+void MethodBuilder.Emit(OpCode opCode, string operand);
+void MethodBuilder.WriteConsoleLine();
+```
+
+`String` is supported in PrimitiveMethodSignature parameters/results, DeclareLocal,
+MethodDefinition.TryGetStaticPrimitiveSignature, imported method references and native
+reference projections. It is a built-in text contract, not general nominal type support.
+The legacy Int32 recognizer still rejects String; String entrypoints are invalid.
+
+`Emit(Ldstr, text)` pushes a string. Text may be empty and contain embedded NUL or
+supplementary Unicode characters; it must be non-null, valid Unicode and at most
+65,536 UTF-8 bytes. Null throws ArgumentNullException; an incorrect opcode, unpaired
+UTF-16 surrogate or oversized literal throws ArgumentException without appending an
+instruction. The assembly-wide string/instruction/image limits still apply.
+The CLI writer uses a user-string token and native output uses UTF-8 text with ldstr.
+
+`WriteConsoleLine()` consumes one String value through the existing native System
+console bootstrap and discards its inhabited Void result. It is native-only; CLI
+Write rejects it. Stack mismatch/underflow fail at write time with InvalidDataException.
+The existing string-argument overload remains a constant-output convenience.
+
+String calls, returns, local stores, loads, Pop and control-flow joins retain exact
+type checks. Arithmetic, numeric conversions, Ceq/Clt/Cgt and conditional branches do
+not accept String. Null literals, string equality/concatenation and String instance
+members are outside this bounded writer API; no interning/identity guarantee is made.
+
+The C# StringChecks consumer covers CLI execution, native projection and imports,
+Unicode/empty/NUL literals, exact UTF-8 bounds and rejected operations. Raven's native
+probe additionally executes computed Unicode text and a separately compiled library.

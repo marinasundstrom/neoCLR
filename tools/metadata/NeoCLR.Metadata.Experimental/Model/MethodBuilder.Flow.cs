@@ -92,6 +92,8 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("unary integer operation requires Int32 or Int64");
                     break;
+                case "string": stack.Add(PrimitiveType.String); break;
+                case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
                 case "convert32": case "convert64":
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
@@ -110,7 +112,8 @@ public sealed partial class MethodBuilder
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);
                     stack.Add(instruction.Op is "less" or "greater" ? PrimitiveType.Boolean : integerType); break;
                 case "equal":
-                    if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
+                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
+                        throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "call":
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);

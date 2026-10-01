@@ -62,7 +62,7 @@ public sealed class MethodDefinition
         return true;
     }
 
-    /// <summary>Recognizes static nongeneric Int32/Int64/Boolean parameters and Int32/Int64/Boolean/void results.</summary>
+    /// <summary>Recognizes static nongeneric Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String/void results.</summary>
     /// <param name="decoded">An owned immutable signature on success; otherwise null.</param>
     /// <returns>False for unsupported or malformed encodings; does not verify method bodies.</returns>
     public bool TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded)
@@ -85,15 +85,15 @@ public sealed class MethodDefinition
         }
         if (count > 256 || position >= signature.Length) return false;
         byte result = signature[position++];
-        if (result is not (0x01 or 0x02 or 0x08 or 0x0a) || signature.Length - position != count) return false;
+        if (result is not (0x01 or 0x02 or 0x08 or 0x0a or 0x0e) || signature.Length - position != count) return false;
         var parameters = new PrimitiveType[count];
         for (int i = 0; i < count; i++)
         {
             byte type = signature[position++];
-            if (type is not (0x02 or 0x08 or 0x0a)) return false;
-            parameters[i] = type == 0x02 ? PrimitiveType.Boolean : type == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32;
+            if (type is not (0x02 or 0x08 or 0x0a or 0x0e)) return false;
+            parameters[i] = type == 0x0e ? PrimitiveType.String : type == 0x02 ? PrimitiveType.Boolean : type == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32;
         }
-        decoded = new(result == 0x01 ? PrimitiveType.Void : result == 0x02 ? PrimitiveType.Boolean : result == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32, parameters);
+        decoded = new(result == 0x0e ? PrimitiveType.String : result == 0x01 ? PrimitiveType.Void : result == 0x02 ? PrimitiveType.Boolean : result == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32, parameters);
         return true;
     }
 }

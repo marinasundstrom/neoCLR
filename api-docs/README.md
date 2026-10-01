@@ -443,3 +443,7 @@ an undocumented public-type exclusion. The separate project generates XML docs w
 warnings treated as errors. The existing guest API snapshot remains unchanged and
 must still pass `scripts/build-api-docs.py --check`. When native/guest metadata APIs
 are introduced, add those actual types and members to the matching guest reference.
+
+The host reference also covers the development String signature/local contract,
+Emit(OpCode, string), Ldstr and the stack-consuming WriteConsoleLine() overload.
+These remain host-only APIs under the same explicit guest-reference exclusion above.

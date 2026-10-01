@@ -56,7 +56,7 @@ internal static class NativeReaderChecks
             n => n["types"]![0]!["is_sealed"] = false,
             n => n["types"]![0]!["origin"]!["token"] = 1,
             n => n["functions"]![1]!["owner"]!["Named"] = "Missing",
-            n => n["functions"]![1]!["parameters"]![0] = "String",
+            n => n["functions"]![1]!["parameters"]![0] = "Object",
             n => n["functions"]![1]!["returns"] = "Void",
             n => n["functions"]![1]!["origin"]!["member_access"] = "Private",
             n => n["functions"]![1]!["origin"]!["parameter_tokens"]![0] = 1,

@@ -96,7 +96,7 @@ public sealed class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 if (method.TryGetProperty("locals", out _))
-                    Require(Array(method, "locals", 256).All(l => l.GetString() is "Int32" or "Int64" or "Boolean"), "unsupported native local");
+                    Require(Array(method, "locals", 256).All(l => l.GetString() is "Int32" or "Int64" or "Boolean" or "String"), "unsupported native local");
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
@@ -140,7 +140,8 @@ public sealed class NativeAssemblyDefinition
         foreach (var method in methods)
         {
             var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature) : owners[method.Owner].AddMethod(method.Name, method.Signature);
-            if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
+            if (method.Signature.ReturnType == PrimitiveType.String) output.Emit(OpCode.Ldstr, "");
+            else if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
             else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);
             else if (method.Signature.ReturnType == PrimitiveType.Boolean) output.Emit(OpCode.Ldc_Bool, false);
             output.Return();
@@ -149,6 +150,7 @@ public sealed class NativeAssemblyDefinition
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
     {
+        "String" => PrimitiveType.String,
         "Int64" => PrimitiveType.Int64,
         "Int32" => PrimitiveType.Int32,
         "Boolean" => PrimitiveType.Boolean,

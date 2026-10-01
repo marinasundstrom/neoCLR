@@ -41,7 +41,7 @@ internal static class CallableChecks
     internal static void SignatureRecognition()
     {
         foreach (byte[] signature in new byte[][] {
-            [0, 0, 0x0e], // Valid string result, outside Int32 subset.
+            [0, 0, 0x1c], // Object result, outside the supported built-in subset.
             [0x20, 0, 8], // Instance calling convention.
             [0x10, 1, 0, 8], // Generic calling convention.
             [5, 0, 8], // Vararg.
