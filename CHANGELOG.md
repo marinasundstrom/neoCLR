@@ -15,11 +15,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven now emits namespace functions through shared admission and executes the
   original integer Math declarations on both .NET and binary neoCLR.
 
-
 - Record actual Raven class-library emission probes and select order-collections as
   the broad acceptance target. Selected integer Math functions now emit and execute;
-  whole-file dependency binding remains incomplete.
-
+  whole-file dependency binding remains incomplete. The unchanged Order declaration
+  now isolates the native object-emission gate. Its probe exposed a shared Raven bug:
+  implicit property accessors/backing fields are now stable across repeated binding,
+  validated independently on .NET with 49 focused tests.
 
 - Add public/internal assembly-function visibility to the independent metadata API,
   preserving CLI/native access and ownerless definitions. Binary runtime checks prove

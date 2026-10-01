@@ -12,6 +12,11 @@ functions now emit with native namespace identity and execute 11 boundary cases 
 the host-core bootstrap, not a full System build. Whole Math/UnicodeScalar/GC still
 require native dependencies. Next use the [order-collections application](experiments/raven-target/samples/application-order-collections.rvn)
 to drive constructor/property, object, generic and delegate contracts incrementally.
+The unchanged Order declaration binds and now has stable canonical property/accessor/
+field symbols; native emission stops at the nonstatic-class gate. The next bounded
+implementation is nominal type/receiver references, instance fields and constructor/
+accessor/property definitions, then allocation and mutation. Its full consumer still
+has missing native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 
 **Compatibility baseline reaffirmed (2026-10-01):** preserve ordinary .NET/CLI metadata
