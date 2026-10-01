@@ -539,3 +539,7 @@ AddInterface/AddGenericInterface, TypeBuilder.IsInterface/AddInterfaceMethod and
 MethodBuilder.IsAbstract are covered by the [host-only metadata manual](experimental-metadata.md#interface-declarations-development).
 These C# producer types remain outside guest RavenDoc selection; abstract interface
 methods retain no body in the native reader's CLI reference projection.
+
+The same interface manual section now covers TypeBuilder.BaseInterfaces/AddBaseInterface
+and AddProperty associations for abstract interface accessors. Host-only C# coverage
+remains separate from the guest RavenDoc snapshot.

@@ -29,16 +29,14 @@ public sealed partial class TypeBuilder
     /// <summary>Associates existing methods with a supported value property; adds no storage or bodies.</summary>
     /// <param name="name">Nonblank name, unique together with its index parameter types, at most 1024 characters, without controls or invalid Unicode.</param>
     /// <param name="type">Supported non-Void value signature, including declaring-type parameters; method parameters are invalid.</param>
-    /// <param name="getter">Owned ordinary method whose parameters define the indices and whose result is the property type, or null.</param>
-    /// <param name="setter">Owned ordinary method with matching index parameters followed by a property-value parameter and Void result, or null.</param>
+    /// <param name="getter">Owned method (including an abstract interface method) whose parameters define the indices and whose result is the property type, or null.</param>
+    /// <param name="setter">Owned method (including an abstract interface method) with matching index parameters followed by a property-value parameter and Void result, or null.</param>
     /// <returns>An immutable association owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type, missing or incompatible accessors, duplicate name, reused accessor or exceeded limit.</exception>
     /// <remarks>At least one accessor is required. Index parameters are inferred from accessors and copied. Both must agree on index types and instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
-    /// <exception cref="InvalidOperationException">Interface property declarations are not supported by this builder yet.</exception>
     public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
-        if (IsInterface) throw new InvalidOperationException("interface properties are not supported yet");
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||

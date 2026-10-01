@@ -19,6 +19,13 @@ internal static class InterfaceChecks
         var t = SignatureType.TypeParameter(0);
         owner.AddInterfaceMethod("Compare", new(PrimitiveType.Int32, [t, t]));
         graph.AddInterface("Example", "Marker", TypeVisibility.Internal);
+        var disposable = graph.AddInterface("Example", "Disposable");
+        disposable.AddInterfaceMethod("Dispose", new(PrimitiveType.Void, []));
+        var iterator = graph.AddGenericInterface("Example", "Iterator", ["T"]);
+        iterator.AddBaseInterface(disposable);
+        var get = iterator.AddInterfaceMethod("get_Current", new(t, []));
+        var set = iterator.AddInterfaceMethod("set_Current", new(PrimitiveType.Void, [t]));
+        iterator.AddProperty("Current", t, get, set);
         var main = graph.AddFunction("Main"); main.LoadConstant(42); main.Return(); graph.EntryPoint = main;
         return graph;
     }
@@ -30,6 +37,10 @@ internal static class InterfaceChecks
             !type.GetMethod("Compare")!.IsVirtual || type.GetMethod("Compare")!.GetMethodBody() is not null ||
             type.MakeGenericType(typeof(int)).GetMethod("Compare")!.GetParameters()[0].ParameterType != typeof(int))
             throw new Exception("CLI interface contract");
+        var iterator = loaded.GetType("Example.Iterator`1")!.MakeGenericType(typeof(int));
+        if (iterator.GetInterfaces().Single().Name != "Disposable" || iterator.GetProperty("Current")!.PropertyType != typeof(int) ||
+            !iterator.GetProperty("Current")!.GetMethod!.IsSpecialName || !iterator.GetProperty("Current")!.SetMethod!.IsAbstract)
+            throw new Exception("CLI inherited interface and abstract property");
         if (!Equals(loaded.EntryPoint!.Invoke(null, null), 42)) throw new Exception("CLI entry");
         var projected = NativeAssemblyDefinition.ReadAssembly(graph.WriteNativeAssembly()).CreateReferenceAssembly(graph.CoreLibrary);
         using var pe = new PEReader(new MemoryStream(projected)); var reader = pe.GetMetadataReader();
@@ -38,7 +49,13 @@ internal static class InterfaceChecks
         if ((definition.Attributes & TypeAttributes.Interface) == 0 || !definition.BaseType.IsNil || method.RelativeVirtualAddress != 0 ||
             (method.Attributes & (MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot)) != (MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot))
             throw new Exception("projected interface flags/body");
+        var iteratorDefinition = reader.GetTypeDefinition(reader.TypeDefinitions.Single(h => reader.GetString(reader.GetTypeDefinition(h).Name) == "Iterator`1"));
+        if (iteratorDefinition.GetInterfaceImplementations().Count != 1 || iteratorDefinition.GetProperties().Count != 1)
+            throw new Exception("projected interface bases/property");
         void Reject(Action action) { try { action(); } catch (Exception e) when (e is ArgumentException or InvalidOperationException or InvalidDataException) { return; } throw new Exception("invalid interface accepted"); }
+        var a = graph.AddInterface("Example", "A"); var b = graph.AddInterface("Example", "B");
+        a.AddBaseInterface(b); Reject(() => b.AddBaseInterface(a)); Reject(() => a.AddBaseInterface(b));
+        Reject(() => a.AddBaseInterface(graph.Types[0]));
         var owner = graph.Types[0];
         Reject(() => owner.AddConstructor(Array.Empty<PrimitiveType>()));
         Reject(() => owner.AddMethod("Static", new(PrimitiveType.Void, [])));
@@ -50,7 +67,9 @@ internal static class InterfaceChecks
         foreach (var change in new Action<JsonNode>[] {
             n => n["functions"]![1]!["is_abstract"] = false,
             n => n["functions"]![1]!["body"]!.AsArray().Add(new JsonObject { ["op"] = "ret" }),
-            n => n["types"]![0]!["is_reference_type"] = true
+            n => n["types"]![0]!["is_reference_type"] = true,
+            n => n["types"]![3]!["implements"]![0]!["Named"] = n["types"]![3]!["name"]!.GetValue<string>(),
+            n => n["types"]![3]!["properties"]![0]!["instance"] = false
         })
         {
             var malformed = JsonNode.Parse(Create().WriteNativeAssembly())!; change(malformed);

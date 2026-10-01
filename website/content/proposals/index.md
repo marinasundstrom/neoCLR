@@ -336,3 +336,7 @@ in progress. Supported behavior follows .NET unless a divergence is explicitly c
 The experimental producer and Raven target now also preserve invariant comparer
 interface declarations through native assembly loading and CLI reference projection.
 Interface dispatch and full collection compilation are not covered by that checkpoint.
+
+That declaration coverage now includes unchanged Disposable and Iterator<T> sources,
+with inherited nongeneric interfaces and abstract property metadata. Execution through
+an interface remains a separate acceptance gate.

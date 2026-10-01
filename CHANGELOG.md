@@ -13,6 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Interface identity through reference projection. Raven now emits unchanged Comparer
   and EqualityComparer sources; binary loading/verification passes. The independent
   entry returns 42; interface implementation/dispatch is not yet exercised by this API.
+  Extend declarations with owned nongeneric interface inheritance and abstract property
+  associations, including unchanged Disposable/Iterator source. Reject cycles and
+  malformed associations; accept canonical empty field origins on property-only types.
 
 - Compile the whole unchanged Raven Language class through the metadata target after
   shared static-property accessor support. Both runtimes print und/sv/he and return

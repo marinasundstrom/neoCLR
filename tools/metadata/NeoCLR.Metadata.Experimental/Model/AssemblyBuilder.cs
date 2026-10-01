@@ -366,7 +366,7 @@ public sealed partial class AssemblyBuilder
         {
             if (method.IsAbstract)
             {
-                metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.HideBySig,
+                metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.HideBySig | (accessors.Contains(method) ? MethodAttributes.SpecialName : 0),
                     MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), -1, MetadataTokens.ParameterHandle(1));
                 nextMethod++;
                 return;
@@ -484,6 +484,7 @@ public sealed partial class AssemblyBuilder
                 }) | (field.IsReadOnly ? FieldAttributes.InitOnly : 0), metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
                 nextField++;
             }
+            foreach (var inherited in type.BaseInterfaces) metadata.AddInterfaceImplementation(typeHandle, typeHandles[inherited]);
             foreach (var method in type.Methods) EmitMethod(method);
             bool firstProperty = true;
             foreach (var property in type.Properties)

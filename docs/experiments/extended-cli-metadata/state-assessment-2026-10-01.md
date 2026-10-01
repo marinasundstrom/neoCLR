@@ -103,3 +103,9 @@ emit, project and load as abstract interface contracts on both targets. The test
 is independent (42); [evidence](interface-library-runtime-validation.json) explicitly
 sets interfaceDispatch and entryUsesInterfaces to false. Properties, inherited contracts,
 implementation and dispatch remain separate gates; no runtime/ISA change was needed.
+
+
+Iterator extension: Disposable and Iterator<T> now also emit/load unchanged with
+abstract property associations and inherited nongeneric interfaces. Interface-valued
+signatures, generic base instantiations and dispatch remain open. The independent-entry
+qualification in the machine-readable evidence still applies.

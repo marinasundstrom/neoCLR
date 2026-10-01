@@ -2511,3 +2511,15 @@ independent entry returns 42. This is metadata-loading evidence, not dispatch ev
 [Consumer evidence](experiments/extended-cli-metadata/interface-library-runtime-validation.json).
 68 API test groups and 13 focused compiler tests pass; API-produced interface binaries
 also load/verify/run the independent entry. Both feature branches remain experimental.
+
+
+Iterator declaration extension: the same producer/adapter now preserves nongeneric
+inherited interface edges and abstract property associations. Complete unchanged
+Disposable and Iterator<T> sources join the comparer test in both file orders.
+CLI uses InterfaceImpl/Property/MethodSemantics and bodyless SpecialName accessors;
+native metadata uses existing implements/property records. The reader validates cycles,
+identity and accessor scope, and accepts canonical empty field-origin arrays for
+property-only types. No runtime or instruction change. 68 API groups and 13 focused
+compiler tests pass, plus native binary verification. The entry remains independent;
+interface calls/implementations, generic base instantiations and interface-valued
+signatures remain next. Runtime Contract options and host-core bootstrap are unchanged.

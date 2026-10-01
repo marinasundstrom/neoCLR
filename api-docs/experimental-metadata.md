@@ -2823,6 +2823,8 @@ public TypeBuilder AssemblyBuilder.AddInterface(string @namespace, string name,
 public TypeBuilder AssemblyBuilder.AddGenericInterface(string @namespace, string name,
     IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public);
 public bool TypeBuilder.IsInterface { get; }
+public IReadOnlyList<TypeBuilder> TypeBuilder.BaseInterfaces { get; }
+public void TypeBuilder.AddBaseInterface(TypeBuilder baseInterface);
 public MethodBuilder TypeBuilder.AddInterfaceMethod(string name, MethodSignature signature);
 public bool MethodBuilder.IsAbstract { get; }
 ```
@@ -2831,15 +2833,17 @@ The factories return owned interfaces with public/internal visibility. Generic n
 are copied (1–32 distinct names); CLI arity is appended to the supplied simple name.
 Ordinary type identity/256-type limits apply. Invalid identities, visibility, names or
 duplicates throw ArgumentException; null generic names throw ArgumentNullException.
-Interfaces are invariant in this API; inherited interfaces are not exposed yet.
+Interfaces are invariant in this API. AddBaseInterface admits directly inherited,
+owned nongeneric interfaces; generic base instantiations are not exposed yet.
 
 AddInterfaceMethod creates a public abstract instance contract, with supported
 primitive/owned-class/array/declaring-type-parameter signatures. A null signature throws
 ArgumentNullException; duplicate/invalid signatures, reserved constructor names,
 method-level generics or per-owner 256-method limits throw ArgumentException.
 Calling it on a class, or ordinary AddMethod/AddInstanceMethod/AddConstructor on an
-interface, throws InvalidOperationException. Interfaces cannot own storage fields or
-properties in this slice; those builder operations throw InvalidOperationException.
+interface, throws InvalidOperationException. Interfaces cannot own storage fields; AddField throws InvalidOperationException.
+AddProperty now associates abstract getter/setter declarations, including declaring-type
+parameter values and index signatures, using the same validation as class properties.
 Interface references/constructed interface values are not yet admitted as storage
 signatures, nominal class bounds or allocation targets. This is an API coverage limit.
 
@@ -2852,8 +2856,8 @@ var compare = comparer.AddInterfaceMethod("Compare",
 ```
 
 Writing rejects abstract methods with instructions/locals and direct calls to them
-with InvalidDataException. Implementations, interface dispatch, default/static interface
-methods and property contracts are subsequent work. An abstract method has no CLI
+with InvalidDataException. Implementations, interface dispatch and default/static interface methods remain
+subsequent work. An abstract method has no CLI
 body (RVA zero), including in a reference projection: no throwing placeholder is used.
 CLI uses Interface/Abstract type flags with no base class, and public abstract virtual
 new-slot method flags. These are ordinary CLI contracts, not extensions; see
@@ -2867,3 +2871,27 @@ needed. The native reader validates this shape and preserves interfaces through 
 reference projection. Unknown/mismatched flags, bodies/locals, storage and invalid
 owner contracts reject with InvalidDataException. Matching reader/producers are
 required; older experimental readers reject the additional declaration category.
+
+
+Interface inheritance and properties use standard InterfaceImpl, Property and
+MethodSemantics metadata. Abstract accessor methods also carry SpecialName and no
+body. AddBaseInterface returns no value; it adds an edge visible through the read-only
+BaseInterfaces view. Null throws ArgumentNullException; a noninterface owner throws
+InvalidOperationException. Foreign, noninterface or generic bases, duplicate edges,
+cycles and more than 256 direct bases throw ArgumentException. Interface declaration
+order does not matter. No class-implements-interface contract is implied by this API.
+
+```csharp
+var disposable = assembly.AddInterface("Example", "Disposable");
+disposable.AddInterfaceMethod("Dispose", new MethodSignature(PrimitiveType.Void, []));
+var iterator = assembly.AddGenericInterface("Example", "Iterator", ["T"]);
+iterator.AddBaseInterface(disposable);
+var current = iterator.AddInterfaceMethod("get_Current",
+    new MethodSignature(SignatureType.TypeParameter(0), []));
+iterator.AddProperty("Current", SignatureType.TypeParameter(0), current);
+```
+
+Native reading validates inherited identities, cycles and accessor associations and
+preserves them in reference projection. Property-only declarations with zero fields
+may include the writer's empty field-origin arrays; all three arrays must be present
+and empty when that form is used. Partial/inconsistent field-origin metadata rejects.
