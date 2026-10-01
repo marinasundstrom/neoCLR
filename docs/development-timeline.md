@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Return to the end-to-end case
+
+- **Author:** “We should make this good enough for now. Record the direction. Work
+  towards the working end-to-end case. Update the metadata library as you need to”.
+- **Assistant:** Paused broad architecture migration and reran the unchanged collections
+  sample. Binding and CLI control emission still succeed; direct native emission still
+  rejects PendingOrder returning Option<Order>. This is investigation evidence, not a fix.
+- **Finding:** Raven's portable admission currently admits external classes/interfaces,
+  metadata imported nominal signatures use CLASS, and native projection reconstructs
+  external nominal types without a value-category declaration. These must preserve the
+  same value-type contract before enabling the union signature end to end.
+- **Direction recorded:** Metadata work is now driven by integration blockers. The
+  Cecil-like definitions, Reflection.Emit-style builders and definitions/metadata/PE
+  boundaries remain the intended architecture, not prerequisites to further integration.
+  Imported value signatures, downstream members/union operations and explicit native
+  System identities remain open. See the roadmap and refreshed collections evidence.
+
 ## 2026-10-01: Explicit metadata and PE boundaries
 
 - **Author:** Specified “builders -> definitions -> metadata -> PE” and readers/writers

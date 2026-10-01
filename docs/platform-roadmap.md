@@ -5,6 +5,22 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Active author-directed priority (2026-10-01):** the author considers the metadata API
+architecture good enough for now. Resume the unchanged Raven/native end-to-end case;
+defer broad API migration, naming cleanup and encoding/PE extraction unless a concrete
+integration blocker requires them. This supersedes the earlier instruction to prioritize
+full definition unification. Preserve the recorded architecture as direction, not a gate.
+
+Fresh validation against metadata `e13c8634` and Raven `80edf8fbe` confirms the unchanged
+collections sample binds and emits its CLI control (7168 bytes), but native emission
+still rejects PendingOrder's Option<Order> signature. The immediate work is preserving
+imported value categories through admission, signatures, native dependency loading and
+projection, then advancing the original sample to its next observed blocker.
+[Fresh evidence](experiments/extended-cli-metadata/collections-after-definition-migration.json).
+Do not widen reference-type admission to make value unions pass. Remaining instance/
+generic-owner imports, union operations and translated-System identities must be
+validated incrementally; their completion is not claimed by the current probe.
+
 **Layering (author clarification, 2026-10-01):** builders → definitions → metadata → PE,
 with readers reversing the encoding/container boundaries. Current combined encoding/PE
 packaging and immutable reader snapshots still need separation/materialization. This is

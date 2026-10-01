@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record the author's return to Raven/native end-to-end work: defer broad metadata API
+  migration unless integration requires it. Refresh the unchanged collections probe;
+  binding/CLI control emission succeed, native emission still rejects Option<Order>.
+  No new emission/runtime support is claimed by this investigation checkpoint.
+
 - Advance definition-first metadata authoring: direct assemblies, types, fields,
   functions, static/instance methods, constructors and interface contracts share
   declarations with builders. Interface relationships and method-body instruction,

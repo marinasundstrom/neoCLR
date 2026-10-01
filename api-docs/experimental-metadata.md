@@ -3689,3 +3689,13 @@ AssemblyDefinition reading returns bounded immutable snapshots. Native container
 also has its existing adapter path. No format change or new binary layer API is claimed
 by this record. The definition migration provides shared authoring state; extracting the
 encoding/packaging boundary and materializing editable loaded definitions remain work.
+
+
+### Integration priority after architecture checkpoint
+
+Author direction, 2026-10-01: the current API is good enough to resume the working
+Raven/native case. Further object-model migration, builder naming and encoding/PE
+separation are deferred unless required by an observed integration blocker. This
+supersedes the earlier migration-first sequencing, not the architectural direction.
+The current blocker remains imported Option<Order> value-category support; the
+reference-only import contract must not be widened by treating it as a class.

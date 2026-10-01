@@ -2799,3 +2799,11 @@ storage with builders. Constructed value-constrained calls return 42; Runtime Co
 Raven admission and CLI/native generic encodings are unchanged. The author specified
 builders → definitions → metadata → PE, with reverse reader boundaries. Extracting the
 combined metadata/PE writer and editable reader materialization remains future work.
+
+
+Integration priority reset (2026-10-01): broad metadata architecture work is deferred
+behind the unchanged collections case. The fresh probe against metadata e13c8634 and
+Raven 80edf8fbe still stops at PendingOrder's Option<Order> return signature, while CLI
+control emission succeeds. Runtime Contract and native admission have not changed.
+Imported value categories, member/union operations and native System identity mapping
+remain open. Future metadata changes should serve those measured blockers.
