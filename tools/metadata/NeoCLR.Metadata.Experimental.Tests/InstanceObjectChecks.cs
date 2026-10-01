@@ -74,6 +74,8 @@ internal static class InstanceObjectChecks
         if (Directory.Exists(output)) throw new IOException("output must be fresh");
         Directory.CreateDirectory(output);
         var graph = Create();
+        graph.Types[0].AddProperty("Number", PrimitiveType.Int32, graph.Types[0].Methods[1], graph.Types[0].Methods[3]);
+        graph.Types[0].AddProperty("Pending", PrimitiveType.Boolean, graph.Types[0].Methods[2]);
         var path = Path.Combine(output, "Order.dll");
         File.WriteAllBytes(path, RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), graph.CoreLibrary));
         foreach (var command in new[] { "verify", "run" })
@@ -85,6 +87,6 @@ internal static class InstanceObjectChecks
             await process.WaitForExitAsync(); var text = await stdout + await stderr;
             if (process.ExitCode != (command == "verify" ? 0 : 42)) throw new Exception(text);
         }
-        Console.WriteLine("PASS constructor/instance calls/field mutation/alias -> CLI and native binary execution 42");
+        Console.WriteLine("PASS properties/constructor/instance calls/field mutation/alias -> CLI and native binary execution 42");
     }
 }

@@ -29,6 +29,7 @@ and guest Introspection assembly loading remain pending.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
+- [Primitive property associations](#primitive-property-associations): static/instance getter and setter metadata.
 - [Root construction and instance bodies](#root-construction-and-instance-bodies): constructors, receiver calls and field operations.
 - [Root classes and primitive instance fields](#root-classes-and-primitive-instance-fields): mutable layouts and field snapshots.
 - [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
@@ -2250,7 +2251,41 @@ Reference projections preserve instance signatures and constructor flags with th
 bodies; executable native bodies still reside in the required #Neo payload.
 
 No constructor is synthesized. Inheritance, virtual dispatch, constructor chaining,
-properties/MethodSemantics, nominal parameters/results/locals and instance snapshot
+indexed properties, nominal parameters/results/locals and instance snapshot
 imports remain outside this bounded producer. The C# fixture constructs an Order,
 mutates it through one alias and reads through another; both targets return 42.
 This does not yet compile Raven's actual Order declaration.
+
+## Primitive property associations
+
+Development host API (2026-10-01):
+
+```csharp
+IReadOnlyList<PropertyBuilder> TypeBuilder.Properties { get; }
+PropertyBuilder TypeBuilder.AddProperty(string name, PrimitiveType type,
+    MethodBuilder? getter = null, MethodBuilder? setter = null);
+```
+
+PropertyBuilder exposes DeclaringType (TypeBuilder), Name (string), PropertyType
+(PrimitiveType), GetMethod/SetMethod (nullable MethodBuilder), and IsStatic (bool).
+These immutable associations add no storage or bodies. Accessors must already belong
+to the same type, be ordinary methods and agree on static/instance shape. The getter
+has no declared parameters and returns the property type; the setter takes one value
+of that type and returns Void. At least one accessor is required. Accessor visibility
+is preserved independently, including private setters. Ordinary accessor names are
+allowed; CLI emission adds SpecialName to associated methods.
+
+Only non-indexed Int32/Int64/Boolean/String properties are supported. A unique nonblank
+name has at most 1024 characters, no control characters or invalid Unicode. Invalid
+contracts, duplicate names, accessors already associated with another property and
+more than 256 properties per type throw ArgumentException before mutation. Writing
+rejects more than 4096 assembly properties with InvalidDataException. The accessor
+reuse/name limits are bounded producer restrictions, not permanent native rules.
+
+CLI output contains Property, PropertyMap and MethodSemantics rows with ordinary
+static/HasThis signatures. Native metadata uses existing property/accessor references
+and exact origin Property tokens. The reader checks signature, owner, instance shape,
+accessor existence, uniqueness and origins before constructing a throwing reference
+projection. Outputs without properties retain their previous encoding. New property
+outputs require the matching bounded reader. Properties do not imply backing fields;
+indexed/generic/nominal properties, attributes and default values remain unsupported.

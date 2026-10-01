@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add non-indexed primitive property associations to the metadata producer and native
+  reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor
+  visibility; reject incompatible, reused or missing accessors. Property-bearing
+  binary assemblies verify and execute in neoCLR. Raven source property emission is
+  still pending; new property output requires the matching bounded metadata reader.
+
 - Add root-class and primitive instance-field metadata production, native/reference
   roundtrip and owned Field snapshots. Preserve ordinary CLI type/field flags and
   tokens; validate binary runtime loading. Add primitive root constructors, nonvirtual

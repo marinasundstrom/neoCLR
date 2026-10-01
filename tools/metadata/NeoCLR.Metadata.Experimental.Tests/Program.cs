@@ -101,6 +101,7 @@ var tests = new (string Name, Action Body)[]
     ("Internal assembly function access", FunctionVisibilityChecks.Run),
     ("Assembly function namespaces", FunctionNamespaceChecks.Run),
     ("Root class and instance field metadata", ClassFieldChecks.Run),
+    ("Property accessor metadata and projection", PropertyChecks.Run),
     ("Root class construction and instance field bodies", InstanceObjectChecks.Run),
     ("Signed integer remainder results and faults", IntegerArithmeticChecks.Remainder),
     ("Signed integer division results and faults", IntegerArithmeticChecks.Division),

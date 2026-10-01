@@ -12,10 +12,12 @@ public sealed class NativeAssemblyDefinition
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
     private sealed record FieldRow(string Name, PrimitiveType Type, FieldVisibility Visibility);
     private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility, bool Instance);
+    private sealed record PropertyRow(int Owner, string Name, PrimitiveType Type, int Getter, int Setter);
+    private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, AssemblyIdentity[] references)
-    { Identity = identity; this.types = types; this.methods = methods; References = System.Array.AsReadOnly(references); }
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references)
+    { Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
@@ -61,20 +63,24 @@ public sealed class NativeAssemblyDefinition
             }
             var typeElements = Array(root, "types", 256);
             var types = new List<TypeRow>();
+            int nextPropertyToken = 0x17000001;
             int nextFieldToken = 0x04000001;
             foreach (var type in typeElements)
             {
+                var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
+                if (type.TryGetProperty("properties", out _)) typeFields.Add("properties");
+                var propertyElements = type.TryGetProperty("properties", out _) ? Array(type, "properties", 256) : [];
                 var visibility = TypeVisibility.Public;
                 if (type.TryGetProperty("visibility", out var access))
                 {
-                    Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin", "visibility");
+                    typeFields.Add("visibility");
                     visibility = access.GetString() switch {
                         "public" => TypeVisibility.Public,
                         "internal" => TypeVisibility.Internal,
                         _ => throw new InvalidDataException("unsupported native type visibility")
                     };
                 }
-                else Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin");
+                Shape(type, typeFields.ToArray());
                 var isStatic = type.GetProperty("is_abstract").GetBoolean();
                 Require(type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_sealed").GetBoolean() == isStatic, "unsupported native type shape");
                 var fieldRows = new List<FieldRow>();
@@ -97,10 +103,21 @@ public sealed class NativeAssemblyDefinition
                 Require(name.Length > 0 && name != "<Module>" && ns.Length + name.Length <= 1024 && types.All(t => t.NativeName != nativeName), "invalid or duplicate native type");
                 CheckName(ns.Length == 0 ? name : ns + "." + name);
                 var origin = type.GetProperty("origin");
-                if (fieldRows.Count == 0) Shape(origin, "assembly", "module", "name", "token", "publicly_visible");
+                var originFields = new List<string> { "assembly", "module", "name", "token", "publicly_visible" };
+                if (origin.TryGetProperty("property_tokens", out _))
+                {
+                    originFields.Add("property_tokens");
+                    var tokens = Array(origin, "property_tokens", 256);
+                    Require(tokens.Length == propertyElements.Length && tokens.Select((t, i) => t.GetInt32() == nextPropertyToken + i).All(v => v), "property origin mismatch");
+                }
+                else Require(propertyElements.Length == 0, "missing property origins");
+                nextPropertyToken += propertyElements.Length;
+                Require(nextPropertyToken <= 0x17001001, "too many properties");
+                if (fieldRows.Count == 0 && propertyElements.Length == 0) Shape(origin, originFields.ToArray());
                 else
                 {
-                    Shape(origin, "assembly", "module", "name", "token", "publicly_visible", "field_tokens", "field_access", "field_readonly");
+                    originFields.AddRange(["field_tokens", "field_access", "field_readonly"]);
+                    Shape(origin, originFields.ToArray());
                     var tokens = Array(origin, "field_tokens", 256); var fieldAccess = Array(origin, "field_access", 256); var readOnly = Array(origin, "field_readonly", 256);
                     Require(tokens.Length == fieldRows.Count && fieldAccess.Length == fieldRows.Count && readOnly.Length == fieldRows.Count, "field origin count mismatch");
                     for (int f = 0; f < fieldRows.Count; f++)
@@ -173,13 +190,46 @@ public sealed class NativeAssemblyDefinition
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
                 methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility, instance)); methodNames.Add(expectedName);
             }
+            var properties = new List<PropertyRow>();
+            var usedAccessors = new HashSet<int>();
+            for (int owner = 0; owner < typeElements.Length; owner++)
+            {
+                var names = new HashSet<string>();
+                foreach (var property in typeElements[owner].TryGetProperty("properties", out _) ? Array(typeElements[owner], "properties", 256) : [])
+                {
+                    Shape(property, "name", "instance", "parameters", "ty", "getter", "setter");
+                    var name = Text(property, "name"); CheckName(name);
+                    Require(name.Length <= 1024 && names.Add(name), "invalid or duplicate property");
+                    Require(Array(property, "parameters", 0).Length == 0, "indexed properties unsupported");
+                    var valueType = ReadPrimitive(Text(property, "ty"), false);
+                    var instance = property.GetProperty("instance").GetBoolean();
+                    int Accessor(string key, bool setter)
+                    {
+                        var reference = property.GetProperty(key);
+                        if (reference.ValueKind == JsonValueKind.Null) return -1;
+                        Shape(reference, "name", "owner", "instance", "parameters");
+                        var referenceOwner = reference.GetProperty("owner"); Shape(referenceOwner, "Named");
+                        Require(Text(referenceOwner, "Named") == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
+                        var parameters = Array(reference, "parameters", 1).Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
+                        Require(parameters.SequenceEqual(setter ? new[] { valueType } : []), "property accessor parameters mismatch");
+                        var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
+                        Require(candidates.Length == 1, "missing or ambiguous property accessor");
+                        var (method, index) = candidates[0];
+                        Require(method.Instance == instance && method.Name != ".ctor" && method.Signature.ReturnType == (setter ? PrimitiveType.Void : valueType) && usedAccessors.Add(index), "incompatible or reused property accessor");
+                        return index;
+                    }
+                    var getter = Accessor("getter", false); var setter = Accessor("setter", true);
+                    Require(getter >= 0 || setter >= 0, "property needs an accessor");
+                    properties.Add(new(owner, name, valueType, getter, setter));
+                }
+            }
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
                 var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
-            return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray());
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -199,6 +249,7 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type, field.Visibility);
+        var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)
         {
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility)
@@ -210,7 +261,10 @@ public sealed class NativeAssemblyDefinition
             else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);
             else if (method.Signature.ReturnType == PrimitiveType.Boolean) output.Emit(OpCode.Ldc_Bool, false);
             output.Return();
+            projectedMethods.Add(output);
         }
+        foreach (var property in properties)
+            owners[property.Owner].AddProperty(property.Name, property.Type, property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
         return graph.WriteReferenceImage();
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch

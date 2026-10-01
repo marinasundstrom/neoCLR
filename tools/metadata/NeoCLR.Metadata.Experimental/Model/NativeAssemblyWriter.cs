@@ -124,13 +124,23 @@ public sealed partial class AssemblyBuilder
         }
         foreach (var type in types) CheckText(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name);
         var fieldTokens = types.SelectMany(t => t.Fields).Select((field, index) => (field, token: 0x04000001 + index)).ToDictionary(p => p.field, p => p.token);
-        object TypeOrigin(TypeBuilder type, int index) => type.Fields.Count == 0
-            ? Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public)
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name,
-                token = 0x02000002 + index, publicly_visible = type.Visibility == TypeVisibility.Public,
-                field_tokens = type.Fields.Select(f => fieldTokens[f]).ToArray(),
-                field_access = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
-                field_readonly = type.Fields.Select(_ => false).ToArray() };
+        var propertyTokens = types.SelectMany(t => t.Properties).Select((property, index) => (property, token: 0x17000001 + index)).ToDictionary(p => p.property, p => p.token);
+        object TypeOrigin(TypeBuilder type, int index)
+        {
+            var name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name;
+            if (type.Fields.Count == 0 && type.Properties.Count == 0)
+                return Origin(name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public);
+            var origin = new Dictionary<string, object> {
+                ["assembly"] = IdentityText(Identity), ["module"] = Identity.Name + ".dll", ["name"] = name,
+                ["token"] = 0x02000002 + index, ["publicly_visible"] = type.Visibility == TypeVisibility.Public,
+                ["field_tokens"] = type.Fields.Select(f => fieldTokens[f]).ToArray(),
+                ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
+                ["field_readonly"] = type.Fields.Select(_ => false).ToArray()
+            };
+            if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
+            return origin;
+        }
+        object? Accessor(MethodBuilder? method) => method is null ? null : new { name = FunctionName(method), owner = Owner(method), instance = !method.IsStatic, parameters = Parameters(method) };
         var artifact = new
         {
             format = 5,
@@ -142,7 +152,8 @@ public sealed partial class AssemblyBuilder
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = f.FieldType.ToString(), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
                 TypeOrigin(type, index),
-                type.Visibility == TypeVisibility.Internal ? "internal" : null)).ToArray(),
+                type.Visibility == TypeVisibility.Internal ? "internal" : null,
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = System.Array.Empty<string>(), ty = p.PropertyType.ToString(), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => local.Type.ToString()).ToArray(),
@@ -167,6 +178,8 @@ public sealed partial class AssemblyBuilder
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        string? visibility);
+        string? visibility,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? properties);
 
 }

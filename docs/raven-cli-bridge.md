@@ -1797,3 +1797,28 @@ is unchanged in this slice.
 Validation: 49 C# metadata test groups, reference projection and CLI constructor/default
 field behavior, invalid receivers and receiver-store rejection, and native binary
 verify/run. [Recorded evidence](experiments/extended-cli-metadata/instance-object-validation.json).
+
+
+## Primitive property associations — 2026-10-01
+
+The metadata API now associates non-indexed primitive properties with existing static
+or instance methods, including read-only/write-only properties and private accessors.
+Ordinary CLI Property/PropertyMap/MethodSemantics tables preserve signature, accessor
+identity and visibility. This follows ECMA-335 II.22.28, II.22.35, II.22.36 and II.23.2.5;
+the existing native Property/FunctionRef representation carries the same association
+and origin tokens. It adds no storage or dispatch behavior. Reuse of accessors and
+same-name properties is restricted by this bounded producer. The benefit is preserving
+source property contracts instead of reducing them to fields; costs are extra metadata
+and reader validation. No runtime implementation or Runtime Contract changes are needed.
+
+The metadata library owns the mapping and throwing CLI reference projection. Native
+bodies still execute from #Neo; replacement with a native metadata/backend remains
+future work. Existing property-free output is unchanged; property-bearing output needs
+the matching reader. Raven's real Order source is still blocked at nonstatic type
+emission; this API fixture does not claim compiler integration.
+
+Validation: 50 C# metadata groups; CLI property read/write and static property execution,
+read-only/write-only projection, private setter preservation and malformed accessor/
+origin rejection. The binary Order fixture with Number/Pending properties verifies
+and executes in neoCLR e8611966, returning 42. See
+[property evidence](experiments/extended-cli-metadata/property-validation.json).

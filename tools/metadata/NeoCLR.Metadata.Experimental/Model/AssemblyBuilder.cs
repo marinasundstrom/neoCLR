@@ -85,6 +85,7 @@ public sealed partial class AssemblyBuilder
         if (methods.SelectMany(method => method.Instructions).Sum(instruction =>
             instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("assembly string literal limit exceeded");
+        if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void)))
@@ -185,6 +186,7 @@ public sealed partial class AssemblyBuilder
                 });
             return metadata.GetOrAddBlob(signature);
         }
+        var accessors = types.SelectMany(t => t.Properties).SelectMany(p => new[] { p.GetMethod, p.SetMethod }).OfType<MethodBuilder>().ToHashSet();
         int ImportMethod(MethodBuilder method)
         {
             if (handles.TryGetValue(method, out var local)) return MetadataTokens.GetToken(local);
@@ -288,14 +290,14 @@ public sealed partial class AssemblyBuilder
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
-            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : 0) | MethodAttributes.HideBySig,
+            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
         }
         foreach (var function in functions) EmitMethod(function);
         foreach (var type in types)
         {
-            metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
+            var typeHandle = metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
                 metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             foreach (var field in type.Fields)
@@ -318,6 +320,17 @@ public sealed partial class AssemblyBuilder
                 nextField++;
             }
             foreach (var method in type.Methods) EmitMethod(method);
+            bool firstProperty = true;
+            foreach (var property in type.Properties)
+            {
+                // PROPERTY | HASTHIS, zero index parameters, primitive return type.
+                var signature = new byte[] { property.IsStatic ? (byte)0x08 : (byte)0x28, 0,
+                    property.PropertyType switch { PrimitiveType.Boolean => 0x02, PrimitiveType.Int32 => 0x08, PrimitiveType.Int64 => 0x0a, PrimitiveType.String => 0x0e, _ => throw new InvalidDataException("unsupported property type") } };
+                var handle = metadata.AddProperty(PropertyAttributes.None, metadata.GetOrAddString(property.Name), metadata.GetOrAddBlob(signature));
+                if (firstProperty) { metadata.AddPropertyMap(typeHandle, handle); firstProperty = false; }
+                if (property.GetMethod is { } getter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Getter, handles[getter]);
+                if (property.SetMethod is { } setter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Setter, handles[setter]);
+            }
         }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),

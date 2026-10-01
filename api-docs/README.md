@@ -470,3 +470,6 @@ AddClass, TypeBuilder.IsStatic/Fields/AddField, FieldVisibility/FieldBuilder/Fie
 The same manual host reference now includes root constructors, instance methods,
 receiver slots, Dup/Newobj/Ldfld/Stfld and their overloads. These remain C# host APIs
 excluded from the RavenDoc guest assembly; no guest runtime API was added.
+
+PropertyBuilder, TypeBuilder.Properties and AddProperty are also covered by the
+manual host reference; they are C# host APIs outside the RavenDoc guest assembly.
