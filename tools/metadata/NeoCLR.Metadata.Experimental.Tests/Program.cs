@@ -187,6 +187,7 @@ var tests = new (string Name, Action Body)[]
     ("Constructed generic static owners", GenericOwnerChecks.Run),
     ("Constructed generic instance classes", GenericClassChecks.Run),
     ("Nominal type constraints", TypeConstraintChecks.Run),
+    ("Special type constraints", SpecialConstraintChecks.Run),
     ("Array instructions and execution", ArrayInstructionChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),

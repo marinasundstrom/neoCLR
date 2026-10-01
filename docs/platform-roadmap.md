@@ -5,6 +5,12 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Constraint checkpoint (2026-10-01):** owned nominal bounds and class/struct/new
+requirements now pass Raven → independent metadata API → native binary loading and
+execution alongside .NET. This is a bounded integration, not complete class-library
+emission. Per the author's request, pause expansion to assess the state and select
+subsequent work from concrete consumer gaps. [Assessment and evidence](experiments/extended-cli-metadata/state-assessment-2026-10-01.md).
+
 **Latest author-directed acceptance (2026-10-01):** compile real Raven class-library
 parts before broader metadata loading. The original integer Math Min/Max/Sign
 functions now emit with native namespace identity and execute 11 boundary cases on

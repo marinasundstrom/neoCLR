@@ -2441,3 +2441,32 @@ binary runtime verification/execution pass; invalid concrete native arguments re
 Raven integration follows. The author requests the other constraint categories next;
 class/struct/new/nullability and interface/dependent bounds require distinct contracts.
 This reuses the existing [generic contract research](generic-metadata.md).
+
+
+Special type constraints and assessment (2026-10-01): Raven now preserves `class`,
+`struct` and `new()` type-parameter requirements through shared capability admission
+and the independent producer. Owned nominal bounds and constructed-field access are
+also integrated. The broad generic consumer verifies/runs 42 on CLI/native in both
+source orders; this is still selected-source coverage, not the full application.
+Ordinary .NET struct metadata now includes its implied DefaultConstructor flag.
+
+CLI GenericParam flags follow [.NET's documented categories](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.genericparameterattributes?view=net-10.0).
+Native ReferenceType/ValueType/DefaultConstructor are new distinct constraint kinds,
+rather than aliases for notvoid/notreference: String is a reference; managed arrays
+are references; pointers/byrefs and Void are not admitted as these value arguments.
+Native value records satisfy value/default-constructor requirements; reference classes
+need a public zero-argument instance constructor and must not be abstract for new().
+This preserves useful concrete-instantiation checks at the cost of a runtime schema
+extension. Existing payloads retain their meaning, but new kinds require the matching
+`codex/extended-cli-metadata` runtime. Raven is on `codex/metadata-consumer`; no Runtime
+Contract option change. The [evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
+records the tested runtime hash. No release/main support is implied.
+
+The producer owns metadata identity/validation; Raven owns source constraints and
+capability admission; the runtime checks concrete substitutions. Native executable
+metadata plus CLI reference projection remains a temporary bridge. Metadata importer,
+new T() codegen, open constrained dispatch, method bounds, interface/dependent bounds,
+notnull and byref-like contracts remain outside this producer slice. Notnull has no
+corresponding CLI special flag and must not be silently erased. The planned native
+metadata/backend replacement must preserve those distinctions.
+See the [state assessment](experiments/extended-cli-metadata/state-assessment-2026-10-01.md).

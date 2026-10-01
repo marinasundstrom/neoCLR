@@ -530,3 +530,7 @@ with the same explicit RavenDoc guest-assembly exclusion as the other C# produce
 GenericTypeConstraint and TypeBuilder.GenericConstraints/AddBaseTypeConstraint are
 covered in the [host-only metadata manual](experimental-metadata.md#nominal-type-constraints-development),
 with explicit guest RavenDoc exclusion as for the other C# producer APIs.
+
+TypeParameterConstraints and TypeBuilder.SpecialConstraints/SetSpecialConstraints are
+covered in the [host-only metadata manual](experimental-metadata.md#special-type-parameter-requirements-development).
+They remain explicitly excluded from guest RavenDoc selection because they are C# producer APIs.

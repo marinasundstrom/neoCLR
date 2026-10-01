@@ -318,3 +318,11 @@ exact receiver/value checks; external assembly fields remain outside the current
 Development metadata also retains nominal class bounds on type parameters through CLI
 and native metadata, with invalid concrete arguments rejected. Other constraint kinds
 remain under development.
+
+
+Development checkpoint: the experimental Raven metadata target now preserves owned
+nominal generic bounds and class/struct/new requirements through binary execution.
+The selected generic consumer runs on .NET and neoCLR; this does not establish full
+class-library emission. Open constrained operations, broader bounds and native symbol
+loading remain future integration work. See the host metadata API reference for the
+bounded producer contract.

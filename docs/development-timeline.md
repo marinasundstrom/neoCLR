@@ -9707,3 +9707,19 @@ the broad class-library/collection consumer or metadata importing is complete. S
 - **Open:** generic properties/indexers, direct external constructed field handles,
   constraints, imported generic owners and full class-library compilation. Native
   rejection is explicit at these boundaries; ordinary .NET support remains available.
+
+
+## 2026-10-01 — Constraints followed by an integration assessment
+
+The author directed “After this, continue with generic type constraints directly,”
+then “Continue with the rest of the constraints after this slice,” and finally
+“After this we should assess the state.” The assistant completed constructed-field
+integration, owned nominal type bounds, and distinct class/struct/new type requirements
+across the producer, Raven adapter and runtime. A .NET struct-flag inconsistency found
+by C# tests was also corrected. These are feature-branch results, not release claims.
+
+The assistant's [assessment](experiments/extended-cli-metadata/state-assessment-2026-10-01.md)
+separates verified binary execution from declaration-only support and remaining work.
+Full runtime-class-library emission, open constrained operations, broader bounds,
+collection dependencies and native symbol loading remain open. The proposed next
+sequence is recorded as a recommendation; no subsequent author selection is available.

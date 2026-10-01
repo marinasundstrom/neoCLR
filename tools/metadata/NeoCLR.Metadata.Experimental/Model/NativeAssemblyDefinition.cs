@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
@@ -71,15 +71,25 @@ public sealed class NativeAssemblyDefinition
                 var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
                 if (type.TryGetProperty("generic_parameters", out _)) typeFields.Add("generic_parameters");
                 var constraints = new List<(int Parameter, string Bound)>();
+                var specialConstraints = new Dictionary<int, TypeParameterConstraints>();
                 if (type.TryGetProperty("generic_constraints", out _))
                 {
                     typeFields.Add("generic_constraints");
-                    foreach (var constraint in Array(type, "generic_constraints", 32))
+                    foreach (var constraint in Array(type, "generic_constraints", 128))
                     {
                         Shape(constraint, "parameter", "kind");
                         int parameter = constraint.GetProperty("parameter").GetInt32();
-                        Require(parameter >= 0 && parameter < typeNames.Length && constraints.All(c => c.Parameter != parameter), "invalid or duplicate type bound parameter");
-                        var kind = constraint.GetProperty("kind"); Shape(kind, "TypeBound");
+                        Require(parameter >= 0 && parameter < typeNames.Length, "invalid type bound parameter");
+                        var kind = constraint.GetProperty("kind");
+                        if (kind.ValueKind == JsonValueKind.String)
+                        {
+                            var flag = kind.GetString() switch { "ReferenceType" => TypeParameterConstraints.ReferenceType, "ValueType" => TypeParameterConstraints.ValueType, "DefaultConstructor" => TypeParameterConstraints.DefaultConstructor, _ => throw new InvalidDataException("unsupported special constraint") };
+                            var existing = specialConstraints.GetValueOrDefault(parameter);
+                            Require(!existing.HasFlag(flag), "duplicate special constraint"); specialConstraints[parameter] = existing | flag;
+                            continue;
+                        }
+                        Require(constraints.All(c => c.Parameter != parameter), "duplicate type bound parameter");
+                        Shape(kind, "TypeBound");
                         var bound = kind.GetProperty("TypeBound"); Shape(bound, "Named");
                         constraints.Add((parameter, Text(bound, "Named")));
                     }
@@ -152,7 +162,7 @@ public sealed class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray(), typeNames, constraints.ToArray()));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints));
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
@@ -164,6 +174,8 @@ public sealed class NativeAssemblyDefinition
                     Require(bound >= 0, "type bound requires owned nongeneric class");
                     signatureOwners[i].AddBaseTypeConstraint(constraint.Parameter, signatureOwners[bound]);
                 }
+            for (int i = 0; i < types.Count; i++)
+                foreach (var (parameter, flags) in types[i].SpecialConstraints) signatureOwners[i].SetSpecialConstraints(parameter, flags);
             int genericArity = 0; int typeArity = 0;
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true)
             {
@@ -359,6 +371,8 @@ public sealed class NativeAssemblyDefinition
         for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
+        for (int i = 0; i < types.Length; i++)
+            foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
         SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? owners[System.Array.FindIndex(types, row => row.NativeName == Text(instance, "definition"))].MakeGenericInstance(Array(instance, "arguments", 32).Select(ProjectType).ToArray())

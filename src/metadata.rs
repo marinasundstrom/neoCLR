@@ -169,6 +169,12 @@ pub struct Module {
 pub enum ConstraintKind {
     NotVoid,
     NotReference,
+    /// Ordinary managed reference types; independent of nullability annotations.
+    ReferenceType,
+    /// Non-Void value storage, excluding references and pointer/byref signatures.
+    ValueType,
+    /// Value initialization or a public parameterless constructor on a concrete class.
+    DefaultConstructor,
     TypeBound(Type),
 }
 

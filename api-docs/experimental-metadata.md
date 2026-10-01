@@ -2770,3 +2770,44 @@ This is a nominal bound, not a class/struct/new()/notnull flag. Those categories
 method constraints, interface/dependent bounds and dispatch through an open constrained
 parameter remain separate contracts. The runtime already enforces nominal TypeBound;
 no schema change is needed for this slice.
+
+
+### Special type-parameter requirements (development)
+
+`NeoCLR.Metadata.Experimental.Model.TypeParameterConstraints` is a flags enum:
+`None = 0`, `ReferenceType = 4`, `ValueType = 8`, `DefaultConstructor = 16`.
+`ReferenceType` requires a managed reference (including String and vectors);
+`ValueType` requires a supported nonnullable value. `DefaultConstructor` accepts a
+value type or a concrete class with a public parameterless instance constructor.
+The producer currently admits Int32, Int64 and Boolean value arguments.
+
+```csharp
+public IReadOnlyDictionary<int, TypeParameterConstraints> TypeBuilder.SpecialConstraints { get; }
+public void TypeBuilder.SetSpecialConstraints(int parameterIndex, TypeParameterConstraints constraints);
+```
+
+The read-only view maps zero-based declared parameter ordinals to requirements.
+`SetSpecialConstraints` replaces that ordinal's special flags; `None` clears them
+without removing a nominal bound. Invalid ordinals, unknown bits, reference/value
+combinations and value/nominal-class-bound combinations throw `ArgumentException`.
+A reference or constructor flag may coexist with a nominal bound. Set both ValueType
+and DefaultConstructor for Raven's `struct` declaration. No method flags are exposed.
+
+```csharp
+var owner = assembly.AddGenericClass("Example", "Box", ["T"]);
+owner.SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType |
+    TypeParameterConstraints.DefaultConstructor);
+```
+
+Concrete arguments are checked when constructed, except class constructor existence
+is deferred until writing so definition order does not matter. Final graph validation
+rejects an unsatisfied requirement with `InvalidDataException`, including requirements
+added after an earlier use. Symbolic arguments defer concrete checks to runtime
+substitution. Flags do not enable construction or constrained dispatch on symbolic T.
+
+CLI uses ordinary GenericParam attributes; native metadata has distinct ReferenceType,
+ValueType and DefaultConstructor constraint kinds. The declaration reader rejects
+unknown, duplicate or conflicting flags and preserves accepted flags in reference
+projections. Native execution needs the matching feature-branch runtime; old runtimes
+cannot decode these new kinds. Native notvoid/notreference keep their prior meaning.
+See the [integration assessment](../docs/experiments/extended-cli-metadata/state-assessment-2026-10-01.md).

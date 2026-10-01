@@ -24,6 +24,9 @@ pub(crate) fn parse(text: &str, names: &[Option<String>]) -> Result<Vec<GenericC
             let kind = match word {
                 "notvoid" => ConstraintKind::NotVoid,
                 "notreference" => ConstraintKind::NotReference,
+                "reference" => ConstraintKind::ReferenceType,
+                "value" => ConstraintKind::ValueType,
+                "new" => ConstraintKind::DefaultConstructor,
                 _ => ConstraintKind::TypeBound(crate::assembler::parse_type(word)?),
             };
             Ok(GenericConstraint { parameter, kind })
@@ -41,6 +44,16 @@ pub(crate) fn validate(constraints: &[GenericConstraint], arity: usize) -> Resul
             return Err(Fault::new(
                 "generic constraint parameter outside declaring context",
             ));
+        }
+        if constraints.iter().any(|other| {
+            other.parameter == constraint.parameter
+                && matches!(
+                    (&constraint.kind, &other.kind),
+                    (ConstraintKind::ReferenceType, ConstraintKind::ValueType)
+                        | (ConstraintKind::ValueType, ConstraintKind::ReferenceType)
+                )
+        }) {
+            return Err(Fault::new("conflicting reference/value constraints"));
         }
         if constraints[..index].contains(constraint) {
             return Err(Fault::new("duplicate generic constraint"));
@@ -117,6 +130,14 @@ pub(crate) fn validate_bounds(
     Ok(())
 }
 
+fn value_type(module: &crate::Module, ty: &Type) -> bool {
+    ty.is_primitive() && !matches!(ty, Type::Void | Type::String)
+        || module.type_definition(ty).is_some_and(|definition| {
+            !definition.is_reference_type
+                && definition.representation == crate::metadata::Representation::Record
+        })
+}
+
 pub(crate) fn check(
     module: &crate::Module,
     constraints: &[GenericConstraint],
@@ -134,6 +155,43 @@ pub(crate) fn check(
                         argument,
                         Type::ByRef(_) | Type::ReadOnlyByRef(_) | Type::InterfaceRef(_)
                     )
+            }
+            ConstraintKind::ReferenceType
+            | ConstraintKind::ValueType
+            | ConstraintKind::DefaultConstructor => {
+                if symbolic(argument) {
+                    continue;
+                }
+                if matches!(
+                    argument,
+                    Type::Named(_) | Type::Constructed { .. } | Type::Scoped { .. }
+                ) && module.type_definition(argument).is_none()
+                {
+                    continue;
+                }
+                match constraint.kind {
+                    ConstraintKind::ReferenceType => !module.is_object_reference_type(argument),
+                    ConstraintKind::ValueType => !value_type(module, argument),
+                    _ => {
+                        !value_type(module, argument)
+                            && !module.type_definition(argument).is_some_and(|definition| {
+                                definition.is_reference_type
+                                    && !definition.is_abstract
+                                    && definition.representation
+                                        == crate::metadata::Representation::Record
+                                    && module.functions.iter().any(|function| {
+                                        function.owner.as_ref() == Some(&definition.open_type())
+                                            && function.name.ends_with("..ctor")
+                                            && function.instance
+                                            && function.no_result
+                                            && function.parameters.is_empty()
+                                            && function.generic_parameters.is_empty()
+                                            && function.visibility
+                                                == crate::metadata::Visibility::Public
+                                    })
+                            })
+                    }
+                }
             }
             ConstraintKind::TypeBound(bound) => {
                 // Independent of addressing mode. A bound never performs a conversion.
@@ -199,6 +257,9 @@ pub(crate) fn emit(constraints: &[GenericConstraint], names: &[String]) -> Resul
                 match &constraint.kind {
                     ConstraintKind::NotVoid => "notvoid".to_string(),
                     ConstraintKind::NotReference => "notreference".to_string(),
+                    ConstraintKind::ReferenceType => "reference".to_string(),
+                    ConstraintKind::ValueType => "value".to_string(),
+                    ConstraintKind::DefaultConstructor => "new".to_string(),
                     ConstraintKind::TypeBound(bound) =>
                         crate::type_identity::signature_name(bound)?,
                 }

@@ -12,7 +12,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   CLI GenericParamConstraint and native TypeBound retain exact bounds in reference
   projections. Concrete invalid arguments reject, including runtime verification of
   corrupted call metadata. Earlier uses are revalidated when bounds change. This does
-  not map class/struct/new flags or add interface/dependent bounds.
+  not add interface/dependent bounds. Extend producer/reader and native enforcement with
+  distinct reference/value/default-constructor requirements and CLI GenericParam flags.
+  Raven class/struct/new type declarations execute on both targets; matching runtime
+  required for new native constraint kinds. No symbolic new T() or constrained dispatch.
+  Record the bounded integration assessment and remaining class-library gates.
 
 - Add immutable constructed-field references and typed load/store/raw emits. CLI field
   MemberRefs preserve open signatures on constructed TypeSpecs; native field operations

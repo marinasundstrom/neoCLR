@@ -202,3 +202,51 @@ fn owner_and_method_parameter_constraints_have_independent_indices() {
         );
     }
 }
+
+#[test]
+fn cli_compatible_reference_value_and_constructor_requirements_are_distinct() {
+    let module = assemble(".module Special\n.type ReferenceOnly<T>\n.constraint T reference\n.field Item T\n.end\n.type ValueOnly<T>\n.constraint T value\n.field Item T\n.end\n.type Constructible<T>\n.constraint T new\n.field Item T\n.end").unwrap();
+    for ty in [
+        "ReferenceOnly<String>",
+        "ReferenceOnly<arrayref<Int32>>",
+        "ValueOnly<Int32>",
+        "Constructible<Int32>",
+    ] {
+        assert!(
+            module.instantiated_fields(&parse_type(ty).unwrap()).is_ok(),
+            "{ty}"
+        );
+    }
+    for ty in [
+        "ReferenceOnly<Int32>",
+        "ValueOnly<Void>",
+        "ValueOnly<String>",
+        "ValueOnly<Int32&>",
+        "Constructible<String>",
+        "Constructible<arrayref<Int32>>",
+    ] {
+        assert!(
+            module
+                .instantiated_fields(&parse_type(ty).unwrap())
+                .is_err(),
+            "{ty}"
+        );
+    }
+    assert!(assemble(".module Bad\n.type Both<T>\n.constraint T reference value\n.end").is_err());
+}
+
+#[test]
+fn default_constructor_requirement_rejects_private_missing_and_abstract_classes() {
+    let source = ".module Ctors\n.type class Item\n.method instance .ctor() -> noresult\nret\n.end\n.end\n.type Constructible<T>\n.constraint T new\n.field Item T\n.end";
+    let mut module = assemble(source).unwrap();
+    let argument = parse_type("Constructible<Item>").unwrap();
+    assert!(module.instantiated_fields(&argument).is_ok());
+    module.functions[0].visibility = neoclr::metadata::Visibility::Private;
+    assert!(module.instantiated_fields(&argument).is_err());
+    module.functions[0].visibility = neoclr::metadata::Visibility::Public;
+    module.types[0].is_abstract = true;
+    assert!(module.instantiated_fields(&argument).is_err());
+    module.types[0].is_abstract = false;
+    module.functions.clear();
+    assert!(module.instantiated_fields(&argument).is_err());
+}

@@ -176,6 +176,14 @@ public sealed partial class AssemblyBuilder
             return origin;
         }
         object? Accessor(MethodBuilder? method) => method is null ? null : new { name = FunctionName(method), owner = Owner(method), instance = !method.IsStatic, parameters = Parameters(method) };
+        object[]? Constraints(TypeBuilder type)
+        {
+            var result = type.GenericConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = new { Named = TypeName(c.BaseType) } } }).ToList();
+            foreach (var (parameter, flags) in type.SpecialConstraints.OrderBy(p => p.Key))
+                foreach (var flag in new[] { TypeParameterConstraints.ReferenceType, TypeParameterConstraints.ValueType, TypeParameterConstraints.DefaultConstructor })
+                    if (flags.HasFlag(flag)) result.Add(new { parameter, kind = flag.ToString() });
+            return result.Count == 0 ? null : result.ToArray();
+        }
         var artifact = new
         {
             format = 5,
@@ -188,7 +196,7 @@ public sealed partial class AssemblyBuilder
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
                 TypeOrigin(type, index),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), type.GenericConstraints.Count == 0 ? null : type.GenericConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = new { Named = TypeName(c.BaseType) } } }).ToArray())).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type))).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),

@@ -41,16 +41,16 @@ public sealed record SignatureType
     public static implicit operator SignatureType(GenericTypeInstance type)
         => new(null, null, genericInstance: type ?? throw new ArgumentNullException(nameof(type)));
     internal int NestingDepth => GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
-    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0)
+    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false)
     {
         if (MethodParameterIndex is { } index && index >= genericArity) throw new ArgumentException("method type parameter outside declared scope");
         if (TypeParameterIndex is { } ordinal && ordinal >= typeArity) throw new ArgumentException("type parameter outside declared scope");
-        ArrayElement?.ValidateOwner(assembly, genericArity, typeArity);
+        ArrayElement?.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (GenericInstance is { } instance)
         {
             if (!ReferenceEquals(instance.Definition.Assembly, assembly)) throw new ArgumentException("foreign constructed class");
-            instance.Definition.ValidateTypeArguments(instance.TypeArguments);
-            foreach (var argument in instance.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity);
+            instance.Definition.ValidateTypeArguments(instance.TypeArguments, complete);
+            foreach (var argument in instance.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete);
         }
         if ((ArrayElement?.ClassType ?? ClassType) is { } owner && !ReferenceEquals(owner.Assembly, assembly))
             throw new ArgumentException("signature requires a class owned by the output assembly");
@@ -103,9 +103,9 @@ public class MethodSignature
     public SignatureType ReturnType { get; }
     /// <summary>Gets declared parameters, excluding the receiver.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
-    internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0)
+    internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false)
     {
-        foreach (var type in ParameterTypes.Append(ReturnType)) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity);
+        foreach (var type in ParameterTypes.Append(ReturnType)) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
     }
     internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
 }

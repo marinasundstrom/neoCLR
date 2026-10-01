@@ -97,23 +97,23 @@ public sealed partial class AssemblyBuilder
         try
         {
             foreach (var type in types)
-                foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count);
+                foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
-                method.Signature.ValidateOwner(this, arity);
-                foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                method.Signature.ValidateOwner(this, arity, complete: true);
+                foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
                     if (instruction.ConstructedTarget is { } target)
                     {
-                        target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments);
-                        foreach (var argument in target.DeclaringTypeArguments.Concat(target.MethodArguments)) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                        target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments, complete: true);
+                        foreach (var argument in target.DeclaringTypeArguments.Concat(target.MethodArguments)) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                     }
                     if (instruction.GenericTarget is { } generic)
-                        foreach (var argument in generic.TypeArguments) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
-                    if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
-                    instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                        foreach (var argument in generic.TypeArguments) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
+                    if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
+                    instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 }
                 if (validateBodies) method.Validate();
             }
@@ -493,7 +493,8 @@ public sealed partial class AssemblyBuilder
         foreach (var row in genericRows.OrderBy(r => r.Sort))
             for (int i = 0; i < row.Names.Count; i++)
             {
-                var parameter = metadata.AddGenericParameter(row.Owner, GenericParameterAttributes.None, metadata.GetOrAddString(row.Names[i]), i);
+                var attributes = row.Owner.Kind == HandleKind.TypeDefinition ? (GenericParameterAttributes)types[MetadataTokens.GetRowNumber(row.Owner) - 2].SpecialConstraints.GetValueOrDefault(i) : GenericParameterAttributes.None;
+                var parameter = metadata.AddGenericParameter(row.Owner, attributes, metadata.GetOrAddString(row.Names[i]), i);
                 if (row.Owner.Kind == HandleKind.TypeDefinition)
                 {
                     var owner = types[MetadataTokens.GetRowNumber(row.Owner) - 2];
