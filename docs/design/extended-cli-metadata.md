@@ -1346,3 +1346,20 @@ builder rejection, native named-type reading and binary runtime execution. Raven
 source tests factory returns, aliases, nominal constructor arguments and overload identity
 in both source orders on .NET and neoCLR. The temporary CLI-reference/native-payload bridge
 remains; this does not claim the runtime executes ordinary CLI method bodies.
+
+
+### Owned nominal field storage — 2026-10-01
+
+Mutable instance fields now use the same SignatureType as method signatures.
+Compared with CLR fields, this preserves ordinary CLASS/TypeDef signatures and exact
+class identity, including forward/self references. The native format uses its existing
+Named field type; no format extension or JSON execution input is introduced. The
+benefit is one output-owned identity model for compiler fields, parameters and results;
+the cost is a development API change from primitive FieldType to SignatureType and
+continued restriction to owned root classes. External imports, generics, nullable
+contracts and readonly enforcement remain separate work. Default allocation remains
+runtime behavior; this does not add a source-level non-null initialization guarantee.
+
+C# tests exercise CLI execution, alias mutation through a stored object, native
+reference projection, forward/self declarations and rejected foreign/wrong identities.
+The API-produced PE binary verifies and executes with result 42 on neoCLR.

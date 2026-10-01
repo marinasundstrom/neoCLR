@@ -2090,3 +2090,30 @@ verify/run to 42 on .NET and binary neoCLR; projection checks preserve access an
 absence of properties. Static and nominal field rejection leaves output untouched.
 Readonly, by-reference and attributed field declarations remain later contracts.
 [Evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+### Owned nominal field storage — 2026-10-01
+
+Raven's shared field load/store plan now accepts the same owned root-class logical
+types as callable signatures. The native adapter maps explicit mutable fields and
+private `var` storage to independent metadata field handles; nominal property rows
+remain outside this slice. No Runtime Contract configuration changes are required.
+Ordinary .NET emission remains the default and uses the existing field definitions.
+
+The independent API writes ordinary CLI CLASS signatures and existing native Named
+field records. The current binary #Neo executable/reference-projection bridge remains
+in place; native extended-CLI codegen will replace that bridge, not the logical source
+field identity contract. External imports, nullable contracts, readonly enforcement,
+static fields and generics remain deferred. Default allocation is not a new source
+non-null initialization guarantee.
+
+Validation: 54 metadata C# contract groups; API-produced PE verifies/runs with result
+42; four Raven C# Release/Debug field tests; unchanged Order plus a separate Holder
+consumer verifies/runs with result 42 on .NET and binary neoCLR in both file orders.
+The consumer checks private nominal initializers, replacement and mutation through
+an alias stored in a field. Five incomplete-contract fixtures still reject without
+output, now including nullable nominal fields instead of supported nominal fields.
+Runtime remains revision e8611966 on codex/extended-cli-metadata; compiler work is on
+codex/metadata-consumer. See the refreshed
+[record](experiments/extended-cli-metadata/order-runtime-validation.json) for hashes.
+The broad collection/LINQ/union consumer and native symbol imports remain incomplete.

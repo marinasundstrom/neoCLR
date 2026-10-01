@@ -10,7 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
-    private sealed record FieldRow(string Name, PrimitiveType Type, FieldVisibility Visibility);
+    private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, PrimitiveType Type, int Getter, int Setter);
     private readonly PropertyRow[] properties;
@@ -92,7 +92,7 @@ public sealed class NativeAssemblyDefinition
                     var fieldVisibility = Text(field, "visibility") switch {
                         "public" => FieldVisibility.Public, "internal" => FieldVisibility.Internal, "private" => FieldVisibility.Private,
                         _ => throw new InvalidDataException("unsupported field visibility") };
-                    fieldRows.Add(new(fieldName, ReadPrimitive(Text(field, "ty"), false), fieldVisibility));
+                    fieldRows.Add(new(fieldName, field.GetProperty("ty").Clone(), fieldVisibility));
                 }
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
                 Require(nextFieldToken + fieldRows.Count <= 0x04001001, "too many fields");
@@ -140,6 +140,8 @@ public sealed class NativeAssemblyDefinition
                 Require(index >= 0, "signature class must be an owned root");
                 return signatureOwners[index];
             }
+            foreach (var type in types)
+                foreach (var field in type.Fields) _ = ReadType(field.Type, false);
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
             var counts = new Dictionary<int, int>();
@@ -267,7 +269,9 @@ public sealed class NativeAssemblyDefinition
         var graph = new AssemblyBuilder(Identity, coreLibrary);
         var owners = types.Select(t => t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         for (int t = 0; t < types.Length; t++)
-            foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type, field.Visibility);
+            foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type.ValueKind == JsonValueKind.String
+                ? (SignatureType)ReadPrimitive(field.Type.GetString(), false)
+                : owners[System.Array.FindIndex(types, row => row.NativeName == Text(field.Type, "Named"))], field.Visibility);
         SignatureType Remap(SignatureType type) => type.ClassType is { } c
             ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
         var projectedMethods = new List<MethodBuilder>();

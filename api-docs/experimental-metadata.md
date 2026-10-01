@@ -2147,7 +2147,7 @@ TypeBuilder AssemblyBuilder.AddClass(string @namespace, string name,
     TypeVisibility visibility = TypeVisibility.Public);
 bool TypeBuilder.IsStatic { get; }
 IReadOnlyList<FieldBuilder> TypeBuilder.Fields { get; }
-FieldBuilder TypeBuilder.AddField(string name, PrimitiveType type,
+FieldBuilder TypeBuilder.AddField(string name, SignatureType type,
     FieldVisibility visibility = FieldVisibility.Private);
 public enum FieldVisibility { Public, Internal, Private }
 ```
@@ -2160,13 +2160,21 @@ namespace/name uniqueness. Invalid names/visibility/duplicates throw ArgumentExc
 retain the existing AddType contract.
 
 AddField declares mutable instance storage, never a property. It accepts Int32,
-Int64, Boolean or String, a unique nonblank name without controls or invalid Unicode,
+Int64, Boolean, String or an owned nonstatic root class, a unique nonblank name without controls or invalid Unicode,
 up to 1024 characters, and defined FieldVisibility values. Invalid declarations or
 more than 256 fields per type throw ArgumentException before mutation. Static owners
 throw InvalidOperationException. Writing enforces at most 4096 assembly fields.
-Readonly, literal, static, generic and nominal-reference fields remain unsupported.
+Readonly, literal, static, generic and external nominal-reference fields remain unsupported.
+Null types throw ArgumentNullException; Void and foreign classes throw ArgumentException
+before mutation. Forward and self references use exact output-builder identity.
 FieldBuilder exposes read-only DeclaringType (TypeBuilder), Name (string), FieldType
-(PrimitiveType) and Visibility (FieldVisibility). Field handles are owned by their type.
+(SignatureType) and Visibility (FieldVisibility). Field handles are owned by their type.
+Development API migration: rebuild consumers and inspect FieldType.Primitive or
+FieldType.ClassType; primitive AddField calls continue through implicit conversion.
+CLI fields use ordinary CLASS TypeDef signatures; native fields use existing Named
+records, preserved by reference projection. This introduces no new binary schema.
+Nominal stores require the exact declared class; null literals, nullable source
+contracts and external class imports are not added by this slice.
 
 Read-only snapshot additions:
 
@@ -2236,7 +2244,7 @@ the existing external assembly identity/core contract; imported snapshot referen
 remain static-only.
 
 Emit(Ldfld, field)/LoadField consume the exact declaring-class receiver and push the
-primitive field value. Emit(Stfld, field)/StoreField consume receiver then value.
+primitive or owned nominal field value. Emit(Stfld, field)/StoreField consume receiver then value.
 Field handles must belong to the output assembly; foreign fields/wrong opcodes throw
 ArgumentException and null operands throw ArgumentNullException before mutation.
 Writing rejects stack underflow, mismatched receivers/values/joins and receiver stores

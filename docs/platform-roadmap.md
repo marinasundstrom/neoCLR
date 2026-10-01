@@ -31,7 +31,8 @@ shared backend type mapping; factories, self-return, constructor arguments, over
 and alias mutation verify/run on .NET and binary neoCLR in both file orders. The current
 nominal-signature/default-constructor/primitive-initialization slices are complete. Explicit
 mutable primitive fields also preserve visibility, initialization and alias mutation
-through binary execution. Next
+through binary execution. Mutable owned nominal fields and private storage now preserve
+class identity, initializers and alias mutation in both source orders on both runtimes. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

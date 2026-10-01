@@ -312,7 +312,8 @@ public sealed partial class AssemblyBuilder
             {
                 var signature = new BlobBuilder();
                 var encoder = new BlobEncoder(signature).FieldSignature();
-                switch (field.FieldType)
+                if (field.FieldType.ClassType is { } fieldClass) encoder.Type(typeHandles[fieldClass], false);
+                else switch (field.FieldType.Primitive)
                 {
                     case PrimitiveType.Int32: encoder.Int32(); break;
                     case PrimitiveType.Int64: encoder.Int64(); break;

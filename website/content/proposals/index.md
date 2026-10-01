@@ -255,4 +255,6 @@ initialization with .NET and execute in the binary neoCLR consumer.
 
 Explicit mutable primitive instance fields now preserve public/internal/private access
 through Raven's native collector and the existing field metadata. Initialization and alias
-mutation run on both targets; readonly, static and nominal field storage remain future work.
+mutation run on both targets. Mutable owned nominal fields and private storage now also
+preserve class identity, initialization and stored-object alias mutation on both targets.
+Readonly/static fields, nominal properties and external class imports remain future work.

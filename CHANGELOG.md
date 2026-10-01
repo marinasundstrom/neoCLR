@@ -16,7 +16,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   construction helper. Rebuild consumers and inspect Primitive/ClassType explicitly.
   Raven now consumes the shared logical signature contract for factories, aliases,
   nominal overloads, self-return and constructor parameters on .NET and binary neoCLR.
-  External nominal imports, nullability and generic signatures remain unsupported.
+  Extend the same identity model to mutable nominal instance fields, preserving CLI
+  CLASS and native Named field signatures and exact store validation. FieldBuilder.FieldType
+  now uses SignatureType; rebuild development consumers. API-produced binaries verify/run
+  with stored-object alias mutation. Raven shares field load/store planning for explicit
+  nominal fields and private storage, including initializers, validated on both runtimes
+  in both source orders. External nominal imports, nullability and generic
+  signatures remain unsupported.
 
 - Record the shared Raven fix for accessible explicit setters on `val` properties:
   owner writes invoke the setter while outside writes remain rejected. This corrects

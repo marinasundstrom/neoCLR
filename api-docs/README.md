@@ -465,7 +465,7 @@ MethodVisibility, the explicit AddMethod overload and MethodBuilder.Visibility a
 
 Assembly-function namespace overloads, MethodBuilder.Namespace and the extended ImportedMethodReference.Namespace contract are covered in the manual host reference under the same guest RavenDoc exclusion.
 
-AddClass, TypeBuilder.IsStatic/Fields/AddField, FieldVisibility/FieldBuilder/FieldDefinition, TypeDefinition.Attributes/Fields and ModuleDefinition.Fields/GetFieldDefinition are documented in the manual host reference, under the existing explicit guest RavenDoc exclusion.
+AddClass, TypeBuilder.IsStatic/Fields/AddField, FieldVisibility/FieldBuilder/FieldDefinition, TypeDefinition.Attributes/Fields and ModuleDefinition.Fields/GetFieldDefinition are documented in the manual host reference, under the existing explicit guest RavenDoc exclusion. AddField and FieldBuilder.FieldType now use the same host-only SignatureType for primitive and owned nominal fields; the manual reference includes that development API migration.
 
 The same manual host reference now includes root constructors, instance methods,
 receiver slots, Dup/Newobj/Ldfld/Stfld and their overloads. These remain C# host APIs
