@@ -29,6 +29,7 @@ and guest Introspection assembly loading remain pending.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
+- [Root construction and instance bodies](#root-construction-and-instance-bodies): constructors, receiver calls and field operations.
 - [Root classes and primitive instance fields](#root-classes-and-primitive-instance-fields): mutable layouts and field snapshots.
 - [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
@@ -2191,4 +2192,65 @@ var pending = order.AddField("Pending", PrimitiveType.Boolean, FieldVisibility.I
 Native/reference projection preserves class flags, field order/types/access and
 module-scoped Field tokens in origin metadata. The bounded native reader rejects
 unsupported shapes and inconsistent origin rows. Old readers cannot read new class/
-field output. This declaration slice does not yet add allocation or field instructions.
+field output. Construction and field instructions are described below.
+
+## Root construction and instance bodies
+
+Development host API (2026-10-01):
+
+```csharp
+MethodBuilder TypeBuilder.AddInstanceMethod(string name, PrimitiveMethodSignature signature,
+    MethodVisibility visibility = MethodVisibility.Public);
+MethodBuilder TypeBuilder.AddConstructor(IEnumerable<PrimitiveType> parameterTypes,
+    MethodVisibility visibility = MethodVisibility.Public);
+bool MethodBuilder.IsStatic { get; }
+bool MethodBuilder.IsConstructor { get; }
+void MethodBuilder.Duplicate();
+void MethodBuilder.NewObject(MethodBuilder constructor);
+void MethodBuilder.LoadField(FieldBuilder field);
+void MethodBuilder.StoreField(FieldBuilder field);
+void MethodBuilder.Emit(OpCode opcode, FieldBuilder field);
+// Added enum values: Dup, Newobj, Ldfld, Stfld.
+```
+
+AddInstanceMethod creates a nonvirtual method on a root class. AddConstructor creates
+an instance .ctor with Void result. Signatures contain only declared primitive
+parameters (maximum 256), excluding the receiver. Argument slot zero holds the exact
+declaring-class receiver; declared parameters start at one. Static methods keep their
+existing indexing. LoadArgument supports both kinds; StoreArgument rejects receiver
+stores when writing. Entry points must be static. Names .ctor/.cctor are reserved in
+ordinary AddMethod/AddInstanceMethod; use AddConstructor. Null signatures/parameter
+sequences throw ArgumentNullException. Invalid names, access values, duplicate
+name/parameter signatures or limits throw ArgumentException; static owners reject
+instance declarations with InvalidOperationException before mutation.
+
+Emit(Dup) and Duplicate copy the top stack value, preserving reference identity.
+Emit(Newobj, constructor) and NewObject consume declared constructor arguments and
+push an owned class reference. Emit(Call, method) and Call consume declared parameters
+and, for instance methods, the receiver below them. Direct Call to a constructor and
+Newobj to an ordinary method throw ArgumentException. Builder method references retain
+the existing external assembly identity/core contract; imported snapshot references
+remain static-only.
+
+Emit(Ldfld, field)/LoadField consume the exact declaring-class receiver and push the
+primitive field value. Emit(Stfld, field)/StoreField consume receiver then value.
+Field handles must belong to the output assembly; foreign fields/wrong opcodes throw
+ArgumentException and null operands throw ArgumentNullException before mutation.
+Writing rejects stack underflow, mismatched receivers/values/joins and receiver stores
+with InvalidDataException; existing instruction/body bounds apply. Access control
+remains enforced by the executing target, not a new writer-level access checker.
+
+CLI output uses ordinary HasThis signatures, constructor flags, newobj/dup/ldfld/stfld
+and Field tokens. A root constructor's CLI body receives an automatic six-byte
+ldarg.0/call System.Object::.ctor prologue; branches target the declared body, never
+re-run that prologue. Native roots need no base call, and use the existing instance,
+newobj.ctor and field-slot contracts. This is an explicit backend initialization
+contract, not arbitrary identical IL bodies or general constructor chaining.
+Reference projections preserve instance signatures and constructor flags with throwing
+bodies; executable native bodies still reside in the required #Neo payload.
+
+No constructor is synthesized. Inheritance, virtual dispatch, constructor chaining,
+properties/MethodSemantics, nominal parameters/results/locals and instance snapshot
+imports remain outside this bounded producer. The C# fixture constructs an Order,
+mutates it through one alias and reads through another; both targets return 42.
+This does not yet compile Raven's actual Order declaration.

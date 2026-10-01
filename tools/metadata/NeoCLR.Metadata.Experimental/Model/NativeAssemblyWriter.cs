@@ -44,7 +44,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleName(AssemblyBuilder assembly) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(assembly.Identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
+        static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
         static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
@@ -66,7 +66,9 @@ public sealed partial class AssemblyBuilder
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
-            "call" => new { op = "call", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), parameters = Parameters(instruction.Target!) } },
+            "call" or "new.object" => new { op = instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
+            "duplicate" => new { op = "dup" },
+            "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.load" => new { op = "ldloc", arg = (object)instruction.Value },
             "local.store" => new { op = "stloc", arg = (object)instruction.Value },
             "add" => new { op = "add" },
@@ -147,7 +149,8 @@ public sealed partial class AssemblyBuilder
                 method.Signature.ReturnType.ToString(), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
-                method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null)).ToArray()
+                method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
+                method.IsStatic ? null : true)).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -158,7 +161,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        string? @namespace);
+        string? @namespace,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        bool? instance);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

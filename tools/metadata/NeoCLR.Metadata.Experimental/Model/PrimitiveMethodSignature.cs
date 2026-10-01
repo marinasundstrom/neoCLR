@@ -15,7 +15,7 @@ public enum PrimitiveType
     String
 }
 
-/// <summary>An immutable static nongeneric primitive method signature.</summary>
+/// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>
 public sealed class PrimitiveMethodSignature
 {
     /// <summary>Copies parameter types and validates the bounded signature.</summary>

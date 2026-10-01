@@ -51,7 +51,14 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private sealed record FlowState(PrimitiveType[] Stack, bool[] Assigned);
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null)
+    {
+        internal static BodyValueType Receiver(TypeBuilder owner) => new(PrimitiveType.Void, owner);
+        public static implicit operator BodyValueType(PrimitiveType type) => new(type);
+    }
+    private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
+        ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];
+    private sealed record FlowState(BodyValueType[] Stack, bool[] Assigned);
 
     internal void Validate()
     {
@@ -64,9 +71,11 @@ public sealed partial class MethodBuilder
                 throw new InvalidDataException("unmarked branch label");
             if (instruction.Op is "local.load" or "local.store" && (instruction.Value < 0 || instruction.Value >= locals.Count))
                 throw new InvalidDataException("local outside declarations");
-            if (instruction.Op is "argument" or "argument.store" && (instruction.Value < 0 || instruction.Value >= ParameterCount))
+            if (instruction.Op is "argument" or "argument.store" && (instruction.Value < 0 || instruction.Value >= ArgumentCount))
                 throw new InvalidDataException("argument outside signature");
         }
+        if (!IsStatic && Instructions.Any(i => i.Op == "argument.store" && i.Value == 0))
+            throw new InvalidDataException("receiver stores are unsupported");
         MaxStack = 0;
         var states = new FlowState?[Instructions.Count];
         var work = new Queue<int>();
@@ -77,7 +86,7 @@ public sealed partial class MethodBuilder
             var stack = state.Stack.ToList(); var assigned = (bool[])state.Assigned.Clone();
             var instruction = Instructions[index];
             // Preserve native primitive identity across stack operations and joins.
-            void Pop(PrimitiveType type = PrimitiveType.Int32)
+            void Pop(BodyValueType type)
             {
                 if (stack.Count == 0 || stack[^1] != type) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
@@ -85,23 +94,34 @@ public sealed partial class MethodBuilder
             switch (instruction.Op)
             {
                 case "label": case "console.line": break;
+                case "duplicate":
+                    if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
+                    stack.Add(stack[^1]); break;
+                case "field.load": case "field.store":
+                    if (instruction.Op == "field.store") Pop(instruction.Field!.FieldType);
+                    Pop(BodyValueType.Receiver(instruction.Field!.DeclaringType));
+                    if (instruction.Op == "field.load") stack.Add(instruction.Field.FieldType);
+                    break;
+                case "new.object":
+                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
+                    stack.Add(BodyValueType.Receiver(instruction.Target.DeclaringType!)); break;
                 case "pop":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.RemoveAt(stack.Count - 1); break;
                 case "negate": case "complement":
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("unary integer operation requires Int32 or Int64");
                     break;
                 case "string": stack.Add(PrimitiveType.String); break;
                 case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
                 case "convert32": case "convert64":
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("integer conversion requires Int32 or Int64");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
-                case "argument.store": Pop(Signature.ParameterTypes[instruction.Value]); break;
-                case "argument": stack.Add(Signature.ParameterTypes[instruction.Value]); break;
+                case "argument.store": Pop(ArgumentType(instruction.Value)); break;
+                case "argument": stack.Add(ArgumentType(instruction.Value)); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.load":
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
@@ -109,29 +129,30 @@ public sealed partial class MethodBuilder
                 case "local.store": Pop(locals[instruction.Value].Type); assigned[instruction.Value] = true; break;
                 case "shift.left": case "shift.right":
                     Pop(PrimitiveType.Int32);
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("shift requires an Int32/Int64 value and Int32 count");
                     break;
                 case "and": case "or": case "xor":
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("bitwise operands require matching integer or Boolean types");
                     var bitwiseType = stack[^1]; Pop(bitwiseType); Pop(bitwiseType); stack.Add(bitwiseType); break;
                 case "add": case "subtract": case "multiply": case "divide": case "remainder": case "less": case "greater":
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("integer operands required");
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);
                     stack.Add(instruction.Op is "less" or "greater" ? PrimitiveType.Boolean : integerType); break;
                 case "equal":
-                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "call":
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
+                    if (!instruction.Target.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));
                     if (instruction.Target.ReturnsValue) stack.Add(instruction.Target.Signature.ReturnType);
                     break;
                 case "native.call":
                     if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out var count)) throw new InvalidDataException("invalid native call");
-                    for (int i = 0; i < count; i++) Pop();
+                    for (int i = 0; i < count; i++) Pop(PrimitiveType.Int32);
                     stack.Add(PrimitiveType.Int32); break;
                 case "branch.true": case "branch.false": Pop(PrimitiveType.Boolean); break;
                 case "branch": break;

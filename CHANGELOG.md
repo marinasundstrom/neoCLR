@@ -10,8 +10,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add root-class and primitive instance-field metadata production, native/reference
   roundtrip and owned Field snapshots. Preserve ordinary CLI type/field flags and
-  tokens; validate binary runtime loading. Object construction/emission is not yet
-  included in this declaration slice; older bounded readers require updating.
+  tokens; validate binary runtime loading. Add primitive root constructors, nonvirtual
+  instance calls, Dup/Newobj/Ldfld/Stfld and typed receiver validation. One API graph
+  executes construction, field mutation and aliasing on .NET and binary neoCLR. CLI
+  root constructors initialize System.Object before the declared body. Properties,
+  inheritance and nominal signatures/locals remain unsupported; older bounded readers
+  require updating.
 
 
 - Preserve namespace identity on ownerless metadata functions and in runtime loading.

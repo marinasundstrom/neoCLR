@@ -1767,3 +1767,33 @@ field declarations reject. API-produced binary class/field metadata loads/verifi
 in neoCLR and its independent primitive entry returns 42. This is a metadata-load
 gate, not yet an object allocation/mutation test. Instance calls and field bodies
 are next, followed by property associations and Raven's real Order declaration.
+
+
+## Root object execution foundation — 2026-10-01
+
+The independent metadata producer now supports root constructors and nonvirtual
+instance methods with primitive declared signatures, typed receivers, allocation,
+duplication and primitive field loads/stores. The API-produced Order fixture executes
+constructor branches, private field access, mutation and reference aliasing. Both CLI
+execution and direct binary neoCLR execution return 42; the native image verifies.
+This extends the declaration evidence above without claiming Raven Order emission.
+
+Ordinary CLI HasThis, constructor flags and newobj/dup/ldfld/stfld encodings are retained.
+The CLI backend initializes System.Object before the declared root constructor body;
+native root construction uses the existing runtime contract without a base call.
+The metadata library owns that bounded initialization policy. Chaining/inheritance,
+property associations and nominal signatures/locals remain unsupported. Field slots
+are preassigned to avoid scanning the layout per emitted field instruction; no
+performance claim is made. Runtime Contract configuration is unchanged. The runtime
+binary remains e8611966, with no new Rust implementation required.
+
+The PE/#Neo bridge still carries executable native bodies and throwing CLI reference
+projections. A future native metadata/backend representation replaces that transport;
+this slice does not change the broader import boundary or ordinary Raven .NET behavior.
+Next integrate property associations and shared receiver/type contracts for the real
+Order source, followed by generic/delegate/union consumer coverage. The compiler itself
+is unchanged in this slice.
+
+Validation: 49 C# metadata test groups, reference projection and CLI constructor/default
+field behavior, invalid receivers and receiver-store rejection, and native binary
+verify/run. [Recorded evidence](experiments/extended-cli-metadata/instance-object-validation.json).

@@ -15,9 +15,9 @@ to drive constructor/property, object, generic and delegate contracts incrementa
 The unchanged Order declaration binds and now has stable canonical property/accessor/
 field symbols; native emission stops at the nonstatic-class gate. The next bounded
 implementation has begun: the independent API now writes/reads root classes and
-primitive instance fields, verified through native binary loading. Nominal type/receiver
-references and constructor/
-accessor/property definitions, then allocation and mutation. Its full consumer still
+primitive instance fields, constructors and instance methods; construction, field
+mutation and aliasing execute on both .NET and binary neoCLR. Next are property
+associations and shared Raven nominal type/receiver contracts, including object locals. Its full consumer still
 has missing native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

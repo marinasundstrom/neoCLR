@@ -239,4 +239,4 @@ functions; the temporary CLI projection uses encoded global names. Original inte
 Math declarations execute on both .NET and binary neoCLR. Full class-library source
 compilation and native symbol import remain incomplete.
 
-The development metadata API now represents root classes and primitive mutable instance fields; binary runtime loading is tested. Compiler object construction and property emission remain subsequent work.
+The development metadata API now represents root classes, primitive mutable instance fields, constructors and instance methods. API-produced construction, mutation and aliasing execute on .NET and binary neoCLR. Property associations and Raven compiler object emission remain subsequent work.

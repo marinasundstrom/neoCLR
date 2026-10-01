@@ -11,7 +11,7 @@ public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
     private sealed record FieldRow(string Name, PrimitiveType Type, FieldVisibility Visibility);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility);
+    private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
     private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, AssemblyIdentity[] references)
@@ -126,6 +126,8 @@ public sealed class NativeAssemblyDefinition
                     fields.Add("namespace"); ns = scope.GetString() ?? throw new InvalidDataException("null function namespace");
                     FunctionNamespaceEncoding.Validate(ns);
                 }
+                var instance = false;
+                if (method.TryGetProperty("instance", out var instanceValue)) { fields.Add("instance"); instance = instanceValue.GetBoolean(); }
                 var visibility = MethodVisibility.Public;
                 if (method.TryGetProperty("visibility", out var access))
                 {
@@ -156,7 +158,10 @@ public sealed class NativeAssemblyDefinition
                 var resultType = ReadPrimitive(Text(method, "returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
-                var expectedName = (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
+                Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a root class");
+                var constructor = instance && name == ".ctor";
+                Require(!constructor || resultType == PrimitiveType.Void, "constructor must have no result");
+                var expectedName = constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
@@ -166,12 +171,12 @@ public sealed class NativeAssemblyDefinition
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, string.Join(",", parameterTypes))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility)); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility, instance)); methodNames.Add(expectedName);
             }
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());
@@ -196,7 +201,10 @@ public sealed class NativeAssemblyDefinition
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type, field.Visibility);
         foreach (var method in methods)
         {
-            var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility) : owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility);
+            var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility)
+                : !method.Instance ? owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility)
+                : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(method.Signature.ParameterTypes, method.Visibility)
+                : owners[method.Owner].AddInstanceMethod(method.Name, method.Signature, method.Visibility);
             if (method.Signature.ReturnType == PrimitiveType.String) output.Emit(OpCode.Ldstr, "");
             else if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
             else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);

@@ -14,8 +14,9 @@ public enum FieldVisibility
 /// <summary>An owned, mutable primitive instance-field declaration.</summary>
 public sealed class FieldBuilder
 {
-    internal FieldBuilder(TypeBuilder owner, string name, PrimitiveType type, FieldVisibility visibility)
-    { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; }
+    internal FieldBuilder(TypeBuilder owner, string name, PrimitiveType type, FieldVisibility visibility, int index)
+    { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; Index = index; }
+    internal int Index { get; }
     /// <summary>Gets the declaring reference class.</summary>
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple metadata name.</summary>
@@ -48,6 +49,6 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("invalid or duplicate instance field");
         try { _ = new System.Text.UTF8Encoding(false, true).GetByteCount(name); }
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid field Unicode", error); }
-        var field = new FieldBuilder(this, name, type, visibility); fields.Add(field); return field;
+        var field = new FieldBuilder(this, name, type, visibility, fields.Count); fields.Add(field); return field;
     }
 }

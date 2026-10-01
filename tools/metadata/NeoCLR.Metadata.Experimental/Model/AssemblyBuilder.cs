@@ -5,7 +5,7 @@ using System.Reflection.PortableExecutable;
 
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>A controlled editable assembly graph for the bounded static primitive compiler subset.</summary>
+/// <summary>A controlled editable assembly graph for the bounded primitive and root-object compiler subset.</summary>
 /// <remarks>Produces ordinary unsigned CLI PE32 or native format-5 JSON. NEOX emission and arbitrary assembly rewriting are not supported.</remarks>
 public sealed partial class AssemblyBuilder
 {
@@ -87,7 +87,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("assembly string literal limit exceeded");
         if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var method in methods) method.Validate();
         return methods;
@@ -165,7 +165,7 @@ public sealed partial class AssemblyBuilder
         BlobHandle Signature(MethodBuilder method)
         {
             var signature = new BlobBuilder();
-            new BlobEncoder(signature).MethodSignature().Parameters(method.ParameterCount,
+            new BlobEncoder(signature).MethodSignature(SignatureCallingConvention.Default, 0, !method.IsStatic).Parameters(method.ParameterCount,
                 result =>
                 {
                     if (!method.ReturnsValue) result.Void();
@@ -202,6 +202,8 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
+        var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
+        var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
         var bodyEncoder = new MethodBodyStreamEncoder(bodies);
         metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
@@ -212,19 +214,30 @@ public sealed partial class AssemblyBuilder
         {
             var code = new BlobBuilder();
             var offsets = new int[method.Instructions.Count + 1];
+            offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "string" or "constant" or "call" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "string" or "constant" or "call" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" => 4,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
             var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
+            else if (method.IsConstructor)
+            {
+                code.WriteByte(0x02); // ldarg.0: initialize the sole supported CLI root base.
+                code.WriteByte(0x28); code.WriteInt32(MetadataTokens.GetToken(objectConstructor));
+            }
             foreach (var instruction in referenceOnly ? [] : method.Instructions)
             {
                 switch (instruction.Op)
                 {
                     case "label": break;
+                    case "duplicate": code.WriteByte(0x25); break;
+                    case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                    case "field.load": case "field.store":
+                        code.WriteByte(instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
+                        code.WriteInt32(MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
                     case "negate": code.WriteByte(0x65); break;
                     case "complement": code.WriteByte(0x66); break;
                     case "pop": code.WriteByte(0x26); break;
@@ -273,9 +286,9 @@ public sealed partial class AssemblyBuilder
                 }
                 locals = metadata.AddStandaloneSignature(metadata.GetOrAddBlob(signature));
             }
-            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack,
+            int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
-            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | MethodAttributes.Static | MethodAttributes.HideBySig,
+            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : 0) | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
         }
@@ -316,7 +329,7 @@ public sealed partial class AssemblyBuilder
     }
 }
 
-/// <summary>Supported visibility for top-level static types.</summary>
+/// <summary>Supported visibility for top-level types.</summary>
 public enum TypeVisibility
 {
     /// <summary>Accessible outside the defining assembly.</summary>
@@ -366,17 +379,39 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid visibility/name, duplicate signature or method limit exceeded.</exception>
     public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
+        => AddMethodCore(name, signature, visibility, isStatic: true, constructor: false);
+    /// <summary>Adds a nonvirtual instance method with primitive parameters/results.</summary>
+    /// <param name="name">Nonempty simple name; .ctor/.cctor are reserved.</param>
+    /// <param name="signature">Primitive declared parameters, excluding the receiver.</param>
+    /// <param name="visibility">Public, Internal or Private.</param>
+    /// <returns>An owned method whose argument zero is the declaring-class receiver.</returns>
+    /// <exception cref="ArgumentException">Invalid or duplicate contract or exceeded limit.</exception>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
+    public MethodBuilder AddInstanceMethod(string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
+        => AddMethodCore(name, signature, visibility, isStatic: false, constructor: false);
+    /// <summary>Adds a root-class constructor with primitive declared parameters and no result.</summary>
+    /// <param name="parameterTypes">At most 256 primitive parameters, excluding the receiver.</param>
+    /// <param name="visibility">Public, Internal or Private.</param>
+    /// <returns>An owned .ctor body with receiver at argument zero.</returns>
+    /// <exception cref="ArgumentException">Invalid/duplicate contract or exceeded limit.</exception>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
+    /// <remarks>CLI emission initializes System.Object before this body. Native root construction requires no base call. Constructor chaining is unsupported.</remarks>
+    public MethodBuilder AddConstructor(IEnumerable<PrimitiveType> parameterTypes, MethodVisibility visibility = MethodVisibility.Public)
+        => AddMethodCore(".ctor", new(PrimitiveType.Void, parameterTypes), visibility, isStatic: false, constructor: true);
+    private MethodBuilder AddMethodCore(string name, PrimitiveMethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor)
     {
+        if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a reference class");
+        if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");
-        var method = new MethodBuilder(Assembly, this, name, signature, visibility); methods.Add(method); return method;
+        var method = new MethodBuilder(Assembly, this, name, signature, visibility, isStatic: isStatic); methods.Add(method); return method;
     }
 }
 
-/// <summary>Supported static method access scopes.</summary>
+/// <summary>Supported method access scopes.</summary>
 public enum MethodVisibility
 {
     /// <summary>Accessible outside the declaring assembly, subject to owner visibility.</summary>
@@ -390,13 +425,18 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
-    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "")
-    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; Namespace = owner?.Namespace ?? @namespace; }
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "", bool isStatic = true)
+    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; Namespace = owner?.Namespace ?? @namespace; IsStatic = isStatic; }
+    /// <summary>Gets whether the signature excludes an instance receiver.</summary>
+    public bool IsStatic { get; }
+    /// <summary>Gets whether this is an instance .ctor with no result.</summary>
+    public bool IsConstructor => !IsStatic && Name == ".ctor";
+    internal int ArgumentCount => ParameterCount + (IsStatic ? 0 : 1);
     /// <summary>Gets the function namespace or the declaring type namespace; empty for the global namespace.</summary>
     public string Namespace { get; }
     internal string CliName => DeclaringType is null ? FunctionNamespaceEncoding.Encode(Namespace, Name) : Name;
@@ -443,12 +483,12 @@ public sealed partial class MethodBuilder
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid Unicode", nameof(text), error); }
     }
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
-    /// <param name="index">Zero-based parameter index.</param>
+    /// <param name="index">Argument slot index; instance receiver is zero and declared parameters start at one.</param>
     public void LoadArgument(int index) => Emit(OpCode.Ldarg, index);
     /// <summary>Stores a value into a by-value argument slot in this invocation.</summary>
-    /// <param name="index">Zero-based declared argument index; bounds and exact type are checked when writing.</param>
+    /// <param name="index">Argument slot index; instance declared parameters start at one. Bounds and exact type are checked when writing.</param>
     /// <exception cref="InvalidDataException">Instruction limit exceeded, or invalid index/stack type when writing.</exception>
-    /// <remarks>Does not update caller storage. This bounded API has no implicit receiver or by-reference parameters.</remarks>
+    /// <remarks>Does not update caller storage. Receiver stores and by-reference parameters are unsupported.</remarks>
     public void StoreArgument(int index) => Emit(OpCode.Starg, index);
     /// <summary>Appends matching-width Int32/Int64 addition.</summary>
     public void Add() => Emit(OpCode.Add);

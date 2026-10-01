@@ -65,19 +65,27 @@ public enum OpCode
     /// <summary>Shifts an Int32/Int64 value left by an Int32 count.</summary>
     Shl,
     /// <summary>Arithmetically shifts an Int32/Int64 value right by an Int32 count.</summary>
-    Shr
+    Shr,
+    /// <summary>Duplicates the top evaluation-stack value, preserving object identity.</summary>
+    Dup,
+    /// <summary>Allocates and invokes a root-class constructor.</summary>
+    Newobj,
+    /// <summary>Loads a mutable instance field.</summary>
+    Ldfld,
+    /// <summary>Stores a mutable instance field.</summary>
+    Stfld
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Pop, Conv_I4, Conv_I8, Neg, Not or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Neg, Not or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
-            OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
+            OpCode.Dup => "duplicate", OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Shl => "shift.left", OpCode.Shr => "shift.right", OpCode.And => "and", OpCode.Or => "or", OpCode.Xor => "xor", OpCode.Rem => "remainder", OpCode.Div => "divide", OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));
@@ -118,17 +126,26 @@ public sealed partial class MethodBuilder
         Append(new("string", Text: operand));
     }
 
-    /// <summary>Appends a call to a local or external builder method.</summary>
-    /// <param name="opCode">Call.</param>
+    /// <summary>Appends a call or allocation using a local or external builder method.</summary>
+    /// <param name="opCode">Call or Newobj; constructors require Newobj.</param>
     /// <param name="operand">Method with a supported signature; external identity/core contracts are checked when writing.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
-    /// <exception cref="ArgumentException">Opcode is not Call.</exception>
+    /// <exception cref="ArgumentException">Wrong opcode or constructor usage.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, MethodBuilder operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
-        Append(new("call", Target: operand));
+        if (opCode == OpCode.Newobj)
+        {
+            if (!operand.IsConstructor) throw new ArgumentException("newobj requires a constructor", nameof(operand));
+            Append(new("new.object", Target: operand));
+        }
+        else
+        {
+            RequireCall(opCode);
+            if (operand.IsConstructor) throw new ArgumentException("constructor chaining is unsupported", nameof(operand));
+            Append(new("call", Target: operand));
+        }
     }
 
     /// <summary>Appends a call to an owned imported read-only method reference.</summary>
@@ -171,6 +188,40 @@ public sealed partial class MethodBuilder
         if (opCode != OpCode.Ldc_Bool) throw OperandError(opCode);
         Append(new("boolean", operand ? 1 : 0));
     }
+
+    /// <summary>Appends a field load/store using an owned output-field handle.</summary>
+    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <param name="operand">An instance field declared in this output assembly.</param>
+    /// <exception cref="ArgumentNullException">Field is null.</exception>
+    /// <exception cref="ArgumentException">Wrong opcode or foreign field.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void Emit(OpCode opCode, FieldBuilder operand)
+    {
+        ArgumentNullException.ThrowIfNull(operand);
+        if (!ReferenceEquals(operand.DeclaringType.Assembly, Assembly)) throw new ArgumentException("field belongs to another output", nameof(operand));
+        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand));
+    }
+    /// <summary>Duplicates the top stack value.</summary>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
+    public void Duplicate() => Emit(OpCode.Dup);
+    /// <summary>Allocates an object and invokes its constructor, consuming the declared arguments.</summary>
+    /// <param name="constructor">Root-class constructor.</param>
+    /// <exception cref="ArgumentException">Not a constructor.</exception>
+    /// <exception cref="ArgumentNullException">Constructor is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void NewObject(MethodBuilder constructor) => Emit(OpCode.Newobj, constructor);
+    /// <summary>Consumes a receiver and loads its field value.</summary>
+    /// <param name="field">Owned instance field.</param>
+    /// <exception cref="ArgumentException">Foreign field.</exception>
+    /// <exception cref="ArgumentNullException">Field is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void LoadField(FieldBuilder field) => Emit(OpCode.Ldfld, field);
+    /// <summary>Consumes a receiver followed by a value and stores the field.</summary>
+    /// <param name="field">Owned instance field.</param>
+    /// <exception cref="ArgumentException">Foreign field.</exception>
+    /// <exception cref="ArgumentNullException">Field is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void StoreField(FieldBuilder field) => Emit(OpCode.Stfld, field);
 
     private static ArgumentException OperandError(OpCode opCode)
         => new($"Unsupported opcode or operand kind: {opCode}", nameof(opCode));
