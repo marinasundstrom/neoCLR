@@ -338,10 +338,13 @@ public sealed partial class AssemblyBuilder
             {
                 var signature = new BlobBuilder();
                 new BlobEncoder(signature).PropertySignature(isInstanceProperty: !property.IsStatic)
-                    .Parameters(0, result =>
+                    .Parameters(property.ParameterTypes.Count, result =>
                     {
                         EncodeType(result.Type(), property.PropertyType);
-                    }, _ => { });
+                    }, parameters =>
+                    {
+                        foreach (var type in property.ParameterTypes) EncodeType(parameters.AddParameter().Type(), type);
+                    });
                 var handle = metadata.AddProperty(PropertyAttributes.None, metadata.GetOrAddString(property.Name), metadata.GetOrAddBlob(signature));
                 if (firstProperty) { metadata.AddPropertyMap(typeHandle, handle); firstProperty = false; }
                 if (property.GetMethod is { } getter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Getter, handles[getter]);

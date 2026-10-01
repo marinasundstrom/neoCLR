@@ -276,3 +276,7 @@ array allocation/indexing now passes C# API-produced binary runtime checks; Rave
 consumption now executes Order arrays, indexed mutation and Length on both targets.
 Shared array iteration now also executes nested/labeled control flow; generic collections
 and the full runtime class-library build remain incomplete.
+
+Development metadata work now includes indexed property signatures and overloads,
+preserving CLI/native accessor associations. Native execution and Raven consumption
+are being validated in the next slices.

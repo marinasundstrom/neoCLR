@@ -2506,3 +2506,34 @@ newarr/ldelem/stelem type tokens and ldlen; native uses the corresponding typed 
 One scalar primitive TypeRef is cached per output kind. No nested arrays, spans,
 covariance, element addresses or imported nominal elements are admitted. C# tests
 verify CLI execution and API-produced binary verification/execution on neoCLR.
+
+## Indexed property associations (development, 2026-10-01)
+
+`TypeBuilder.AddProperty` now also accepts indexed getter/setter methods. Its existing
+signature is unchanged. `PropertyBuilder.ParameterTypes : IReadOnlyList<SignatureType>`
+exposes a copied immutable list of index types, excluding receiver and setter value.
+For a getter, all parameters are indices; for a setter-only property, all but its last
+parameter are indices. The final setter parameter must equal PropertyType and its
+result must be Void. Both accessors must agree on index types and instance/static
+shape. Primitive, owned-class and vector index types follow MethodSignature rules.
+A getter may have 256 indices; a setter leaves at most 255 within the method limit.
+
+Properties overload by name plus exact index parameter sequence; return type alone
+does not distinguish overloads. Duplicate signatures, reused accessors and inconsistent
+getter/setter signatures throw ArgumentException without adding a property. This
+relaxes the former name-only uniqueness check. Rebuild development host consumers to
+use ParameterTypes. Ordinary non-indexed properties have an empty list.
+
+CLI output encodes standard Property signatures/MethodSemantics; native output uses
+the existing property parameters list and accessor function references. The native
+reader validates these lists and reproduces CLI reference signatures. PropertyDefinition
+retains the full signature through GetSignature; its non-indexed TryGetPrimitiveSignature
+helper deliberately returns false for indexers. No DefaultMemberAttribute is synthesized:
+Raven source binding already identifies its indexers, while other CLI compilers may need
+that attribute to recognize source-level indexing. Native introspection's no-index
+GetValue/SetValue convenience calls are not expanded by this producer change.
+
+Example: define `GetItem(Int32) -> Int32` and `SetItem(Int32, Int32) -> Void`, then
+`owner.AddProperty("Item", PrimitiveType.Int32, get, set)`. The resulting ParameterTypes
+contains one Int32. The same name may have a separate Int64-index getter. C# tests
+execute these accessor associations on .NET and inspect native reference projections.

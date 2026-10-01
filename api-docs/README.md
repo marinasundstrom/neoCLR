@@ -495,3 +495,6 @@ The same host-only exclusion covers SignatureType.ArrayOf/ArrayElement,
 LocalDefinition.SignatureType and MethodBuilder vector helpers/raw typed Emit overload
 (2026-10-01). Their signatures, errors, CLI/native representations and current element
 limits are documented in the [manual metadata reference](experimental-metadata.md#vector-declarations-development-2026-10-01).
+
+PropertyBuilder.ParameterTypes and indexed AddProperty associations remain host-only
+under the existing RavenDoc exclusion. See the [indexed property reference](experimental-metadata.md#indexed-property-associations-development-2026-10-01) for accessor validation and projection limits.

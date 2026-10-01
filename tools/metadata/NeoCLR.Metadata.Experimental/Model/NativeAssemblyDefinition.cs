@@ -222,8 +222,8 @@ public sealed class NativeAssemblyDefinition
                 {
                     Shape(property, "name", "instance", "parameters", "ty", "getter", "setter");
                     var name = Text(property, "name"); CheckName(name);
-                    Require(name.Length <= 1024 && names.Add(name), "invalid or duplicate property");
-                    Require(Array(property, "parameters", 0).Length == 0, "indexed properties unsupported");
+                    var indices = Array(property, "parameters", 256).Select(p => ReadType(p, false)).ToArray();
+                    Require(name.Length <= 1024 && names.Add(name + "(" + string.Join(",", indices.Select(TypeKey)) + ")"), "invalid or duplicate property");
                     var valueType = ReadType(property.GetProperty("ty"), false);
                     var instance = property.GetProperty("instance").GetBoolean();
                     int Accessor(string key, bool setter)
@@ -233,8 +233,8 @@ public sealed class NativeAssemblyDefinition
                         Shape(reference, "name", "owner", "instance", "parameters");
                         var referenceOwner = reference.GetProperty("owner"); Shape(referenceOwner, "Named");
                         Require(Text(referenceOwner, "Named") == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
-                        var parameters = Array(reference, "parameters", 1).Select(p => ReadType(p, false)).ToArray();
-                        Require(parameters.SequenceEqual(setter ? new[] { valueType } : []), "property accessor parameters mismatch");
+                        var parameters = Array(reference, "parameters", 256).Select(p => ReadType(p, false)).ToArray();
+                        Require(parameters.SequenceEqual(setter ? indices.Append(valueType) : indices), "property accessor parameters mismatch");
                         var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
                         Require(candidates.Length == 1, "missing or ambiguous property accessor");
                         var (method, index) = candidates[0];

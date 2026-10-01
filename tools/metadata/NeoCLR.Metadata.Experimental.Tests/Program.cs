@@ -139,6 +139,7 @@ var tests = new (string Name, Action Body)[]
     ("Root class and instance field metadata", ClassFieldChecks.Run),
     ("Nominal local identity and aliasing", NominalLocalChecks.Run),
     ("Array signatures, slots and projection", ArraySignatureChecks.Run),
+    ("Indexed property signatures and overloads", IndexedPropertyChecks.Run),
     ("Array instructions and execution", ArrayInstructionChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),

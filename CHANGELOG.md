@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Extend metadata property associations to indexed signatures, inferring copied index
+  parameters from accessors and validating getter/setter agreement. Preserve ordinary
+  CLI property parameters and native parameter lists, including overloaded indexers
+  and read-only associations, through reference projections.
+
 - Add bounded vector signatures for primitive and owned root-class elements across
   parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native
   ArrayRef identities in reference projections. LocalDefinition.SignatureType exposes
