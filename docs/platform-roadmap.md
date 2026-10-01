@@ -26,8 +26,11 @@ implemented block/arrow accessors now execute too, including private setters and
 `field` backing storage with preserved property metadata. Explicit root constructors
 now accept expression bodies with overload/argument-order execution coverage. Default
 constructors and primitive field/property initializers now share the compiler initialization
-plan and execute on both targets. Next are nominal
-parameters/results, broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
+plan and execute on both targets. Owned nominal parameters/results now flow through
+shared backend type mapping; factories, self-return, constructor arguments, overloads
+and alias mutation verify/run on .NET and binary neoCLR in both file orders. The current
+nominal-signature/default-constructor/primitive-initialization slices are complete. Next
+are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

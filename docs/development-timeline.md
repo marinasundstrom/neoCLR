@@ -9584,3 +9584,16 @@ remote synchronization does not publish a runtime bundle or website.
 - **Open:** nominal signatures and generic/delegate/union coverage; the complete
   order-collections sample still has native dependency binding gaps. See
   [recorded executable evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+## 2026-10-01 — complete the current emission slices
+
+The author directed: “Continue will those slices. Don’t stop until done”, referring to
+nominal signatures, implicit constructors and field/property initialization. The assistant
+proposed sharing canonical constructor initialization first, then extending the separate
+metadata signature model and Raven adapters. Implemented work now includes shared bound
+field-initializer assignments, default root constructors and owned nominal parameters/
+results. C# contracts and .NET/binary neoCLR consumers passed; the author has not yet
+responded to these outcomes. These are bounded producer/codegen slices, not a claim that
+the broad class-library/collection consumer or metadata importing is complete. See
+[the integration evidence](raven-cli-bridge.md#raven-owned-nominal-signature-integration--2026-10-01).

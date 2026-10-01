@@ -14,6 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   neoCLR. Development API migration: builder methods and Signature properties now use
   MethodSignature/SignatureType; PrimitiveMethodSignature remains a compatible primitive
   construction helper. Rebuild consumers and inspect Primitive/ClassType explicitly.
+  Raven now consumes the shared logical signature contract for factories, aliases,
+  nominal overloads, self-return and constructor parameters on .NET and binary neoCLR.
   External nominal imports, nullability and generic signatures remain unsupported.
 
 - Record the shared Raven fix for accessible explicit setters on `val` properties:
@@ -37,8 +39,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   optional backing storage. Explicit root constructors also admit expression bodies,
   with overload and argument-order runtime validation.
   Default root constructors and primitive field/property initializers now share
-  canonical initialization with .NET; nullable/external locals, nominal signatures
-  and chaining remain gaps.
+  canonical initialization with .NET; nullable/external locals and chaining remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor

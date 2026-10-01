@@ -2044,3 +2044,30 @@ self-return calls plus mutation through a nominal parameter. See the
 [design comparison](design/extended-cli-metadata.md#owned-nominal-callable-signatures--2026-10-01).
 Raven's shared logical signature mapping is the next consumer slice; this foundation
 does not introduce a general semantic importer or external nominal type contract.
+
+
+## Raven owned nominal signature integration — 2026-10-01
+
+Raven now consumes metadata commit `b2333489` through shared CallableSignature and
+EmissionType values carrying compiler identities. Explicit adapter capabilities admit
+root-class signatures; backend maps resolve .NET types or owned metadata TypeBuilders.
+All native class definitions exist before method signatures are materialized. Factory
+results, nominal arguments, self-return, constructor parameters and overload distinction
+now use the same body plan as primitive calls. The native reader carries those signatures
+through the CLI reference projection. There is no Runtime Contract option, native opcode
+or schema change; the existing Named type records load directly in the runtime.
+
+63 focused C# compiler tests pass, including Release/Debug execution and a profile that
+denies nominal signatures. The expanded unchanged-Order consumer tests returned aliases,
+mutation, discarded nominal results, nominal overloads and constructor arguments; both
+source orders verify/run to 42 on .NET and binary neoCLR. The existing primitive/import
+regression probe passes after updating its obsolete default-root-constructor rejection
+to reject abstract classes. [Saved evidence](experiments/extended-cli-metadata/order-runtime-validation.json)
+records consumer/source/runtime hashes. The direct metadata producer separately passes
+53 groups and a binary runtime case. API snapshot validation passes.
+
+The requested bounded nominal-signature/default-constructor/primitive-initialization
+slices are complete. Cross-assembly nominal importing, nullability, generic/structural
+signatures, nominal fields/properties, readonly storage and constructor chaining remain
+separate contracts. General metadata importing is still deferred; the broad consumer's
+49 native collection/LINQ/union binding errors are not hidden with substitute libraries.
