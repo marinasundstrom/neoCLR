@@ -417,3 +417,9 @@ The following shared-lowering checkpoint resolves a concrete-case construction f
 that masked the propagation path. The unchanged collections probe now reaches native
 out-local admission. Managed-reference and byref-call support remain development work;
 the full application still has not executed.
+
+
+The next development slice exposes standard typed `ldobj`/`stobj` through the metadata
+API for owned local addresses. C# producer tests execute generic copies and local
+updates on CLR and neoCLR (42), with definite-assignment rejection tests. Byref
+parameter/call support and the full collections application remain incomplete.

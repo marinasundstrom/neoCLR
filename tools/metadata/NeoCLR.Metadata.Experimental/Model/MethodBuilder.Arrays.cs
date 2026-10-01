@@ -2,8 +2,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Appends a typed vector operation or addressed-local initialization.</summary>
-    /// <param name="opCode">Newarr, Ldelem, Stelem or Initobj.</param>
+    /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
+    /// <param name="opCode">Newarr, Ldelem, Stelem, Initobj, Ldobj or Stobj.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, unsupported element or foreign owner.</exception>
@@ -11,11 +11,11 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
-        if (opCode == OpCode.Initobj)
+        if (opCode is OpCode.Initobj or OpCode.Ldobj or OpCode.Stobj)
         {
-            if (elementType.Primitive == PrimitiveType.Void) throw new ArgumentException("initialization requires a value type", nameof(elementType));
+            if (elementType.Primitive == PrimitiveType.Void) throw new ArgumentException("addressed operation requires a non-Void type", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-            Append(new("local.initialize", Type: elementType));
+            Append(new(opCode switch { OpCode.Ldobj => "object.load", OpCode.Stobj => "object.store", _ => "local.initialize" }, Type: elementType));
             return;
         }
         _ = SignatureType.ArrayOf(elementType);

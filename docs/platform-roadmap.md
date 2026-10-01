@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Managed-local checkpoint (2026-10-02):** metadata builders now emit typed ldobj/stobj
+for owned local addresses, including generic copies, with definite-assignment checks.
+The same C# producer executes on CLR and loads/verifies/runs as a native binary (42).
+This is the first bounded part of propagation support; byref parameter signatures,
+out-call contracts and imported value receivers remain open. The unchanged collections
+sample is still blocked at native out-local admission. See
+[the contract and validation](design/extended-cli-metadata.md#typed-local-object-operations-2026-10-02).
+
 **Shared-lowering checkpoint (2026-10-02):** fix the concrete-case construction
 exception masked by semantic-model fallback. The apparent propagation rejection is
 now resolved at shared lowering; unchanged collections native emission reaches

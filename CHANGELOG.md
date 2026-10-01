@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add typed `ldobj`/`stobj` emission and `LoadObject`/`StoreObject` helpers to the
+  experimental metadata API for owned local addresses, with exact-type and path-sensitive
+  assignment checks. The C# consumer exercises generic copies and branch-merged updates
+  on CLR and native binary loading/verification/execution (42). Byref signatures and
+  Raven propagation calls remain pending; no runtime instruction or format change.
+
 - Record the shared Raven concrete-case lowering fix and refreshed unchanged collections
   probe: normal CLI emission succeeds; native emission advances from masked propagation
   rejection to synthesized out-local admission. The general fix is isolated on Raven's

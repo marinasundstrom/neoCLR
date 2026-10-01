@@ -1416,3 +1416,29 @@ constructor writes and binaries whose direct or indirect illegal writes fail bot
 and run. Runtime Rust tests also cover readonly address reads. Raven consumes the flags
 for private val storage and stored val properties; explicit readonly field syntax and
 static readonly storage are separate compiler slices.
+
+
+### Typed local object operations (2026-10-02)
+
+Raven propagation exposes the need to address synthesized out locals. The first bounded
+producer slice now supports exact typed reads and writes through owned local addresses,
+using ordinary CLI `ldobj`/`stobj` (ECMA-335 sixth edition, Partition III, existing primary
+baseline above) and the runtime's existing equivalent instructions. Builders append to
+the existing definition body; writers encode those operations. There is no new encoding
+or native opcode. Unlike the legacy native value-field store, native stobj already has
+CLI's empty-result stack behavior, so the writer must not insert a pop.
+
+The verifier tracks the addressed local identity: a store assigns that local, a load
+requires assignment on every predecessor, and joins retain the existing exact-address
+rule. This exposes the existing instruction contract instead of synthesizing defaults
+to bypass definite assignment. It costs additional API/flow cases but avoids a new
+memory mechanism. No performance improvement is claimed. General ref/out signatures,
+callee out-assignment checks, imported value receivers and Raven admission remain later
+work; this checkpoint does not change the unchanged collections diagnostic.
+
+Validation: `LocalObjectChecks.cs` runs generic primitive/string/vector copies and
+branch-merged local mutation; emitted CLI and native binary both return 42. Negative
+checks cover uninitialized reads, value and address type mismatch, non-address operands,
+Void and non-dominating writes. Run the C# contract executable, then its
+`--local-object-integration <runtime> <fresh-output>` mode for actual native binary
+loading, verification and execution. The runtime needs no rebuild for this slice.

@@ -624,3 +624,8 @@ are covered in the manual [experimental metadata reference](experimental-metadat
 They remain host C# APIs excluded from the guest RavenDoc type selection; the guest
 reference assembly/snapshot does not change. Native reader projection of those
 relationships is documented alongside the APIs and validated by C# execution tests.
+
+The experimental host-only `MethodBuilder.LoadObject`, `StoreObject`, and `OpCode.Ldobj`/
+`Stobj` are documented in the [typed local operations reference](experimental-metadata.md#typed-local-initialization-development).
+They remain excluded from the guest RavenDoc assembly because the metadata producer is
+C#, not a guest runtime API. The guest API snapshot is unchanged by this slice.

@@ -1,0 +1,18 @@
+namespace NeoCLR.Metadata.Experimental.Model;
+
+public sealed partial class MethodBuilder
+{
+    /// <summary>Consumes an initialized owned local address and loads its value.</summary>
+    /// <param name="type">Exact non-Void local type, including scoped generic parameters.</param>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
+    /// <exception cref="ArgumentException">Invalid type, ownership or generic scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; address, type and definite-assignment checks run on write.</exception>
+    public void LoadObject(SignatureType type) => Emit(OpCode.Ldobj, type);
+
+    /// <summary>Consumes an owned local address followed by its value and establishes definite assignment.</summary>
+    /// <param name="type">Exact non-Void local type, including scoped generic parameters.</param>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
+    /// <exception cref="ArgumentException">Invalid type, ownership or generic scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; address and type checks run on write.</exception>
+    public void StoreObject(SignatureType type) => Emit(OpCode.Stobj, type);
+}

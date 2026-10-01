@@ -2625,8 +2625,23 @@ accepts `SignatureType`. `MethodBuilder.LoadLocalAddress(LocalDefinition)` and
 an uninitialized local; initialization establishes definite assignment only for that
 exact local. Both writers reject a mismatched type, non-address operand, an address
 escaping through value storage/calls/returns, and later loads not initialized on every
-reachable path. General managed-reference signatures and indirect load/store are not
+reachable path. General managed-reference signatures are not
 part of this bounded API. Address values at joins must identify the same local.
+
+`OpCode.Ldobj` and `OpCode.Stobj` accept an exact non-Void `SignatureType` through
+`Emit(OpCode, SignatureType)`. The corresponding helpers are
+`MethodBuilder.LoadObject(SignatureType type)` and `StoreObject(SignatureType type)`.
+Load consumes an owned local address and pushes its value; store consumes an address
+followed by the value and leaves no result. Store establishes definite assignment for
+that local; load requires assignment on every incoming path. Primitive, nominal,
+vector and scoped generic local types follow the existing signature rules. A null
+operand throws ArgumentNullException; Void, invalid scope or foreign ownership throws
+ArgumentException before appending. Instruction limits and invalid stack/address/type
+or assignment contracts throw InvalidDataException (the latter on writing).
+CLI uses standard ldobj/stobj tokens, including TypeSpec for generic/vector operands;
+native emits its existing typed ldobj/stobj. This does not admit pointers, field/array
+addresses, escaping references or byref parameters. See `LocalObjectChecks.cs` for an
+executable generic copy and branch-merged local update.
 
 `MethodBuilder.LoadDefault(SignatureType)` declares one scratch local, initializes it
 and loads its value (three instructions). Types may be primitives, owned root classes,

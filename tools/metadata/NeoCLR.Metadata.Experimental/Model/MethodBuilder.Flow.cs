@@ -162,6 +162,17 @@ public sealed partial class MethodBuilder
                 case "argument": stack.Add(ArgumentType(instruction.Value)); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.address": stack.Add(new BodyValueType(PrimitiveType.Void, AddressedLocal: instruction.Value)); break;
+                case "object.load":
+                case "object.store":
+                    if (instruction.Op == "object.store") Pop(instruction.Type!);
+                    if (stack.Count == 0 || stack[^1].AddressedLocal is not { } addressed || locals[addressed].SignatureType != instruction.Type)
+                        throw new InvalidDataException("object operation requires an owned local address of the exact type");
+                    if (instruction.Op == "object.load" && !assigned[addressed])
+                        throw new InvalidDataException("indirect local loaded before store on some path");
+                    stack.RemoveAt(stack.Count - 1);
+                    if (instruction.Op == "object.store") assigned[addressed] = true;
+                    else stack.Add(instruction.Type!);
+                    break;
                 case "local.initialize":
                     if (stack.Count == 0 || stack[^1].AddressedLocal is not { } initialized || locals[initialized].SignatureType != instruction.Type)
                         throw new InvalidDataException("initobj requires an owned local address of the exact type");

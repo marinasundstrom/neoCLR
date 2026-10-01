@@ -87,7 +87,11 @@ public enum OpCode
     /// <summary>Initializes an addressed local to the default of its exact SignatureType.</summary>
     Initobj,
     /// <summary>Dispatches an owned nongeneric interface instance method; requires a MethodBuilder operand.</summary>
-    Callvirt
+    Callvirt,
+    /// <summary>Loads through an initialized owned local address of the exact SignatureType.</summary>
+    Ldobj,
+    /// <summary>Stores through an owned local address of the exact SignatureType, establishing assignment.</summary>
+    Stobj
 }
 
 public sealed partial class MethodBuilder

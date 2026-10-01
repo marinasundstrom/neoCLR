@@ -105,6 +105,7 @@ public sealed partial class AssemblyBuilder
             "duplicate" => new { op = "dup" },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
+            "object.load" or "object.store" => new { op = instruction.Op == "object.load" ? "ldobj" : "stobj", arg = SignatureValue(instruction.Type!) },
             "local.initialize" => new { op = "initobj", arg = SignatureValue(instruction.Type!) },
             "local.load" => new { op = "ldloc", arg = (object)instruction.Value },
             "local.store" => new { op = "stloc", arg = (object)instruction.Value },
