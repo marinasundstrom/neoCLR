@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Imported generic arguments (2026-10-01):** Raven/native execution now covers
+consumer-owned nominal arguments, imported constructions and caller method/owner
+parameter forwarding through external unconstrained static generic methods (42).
+This closes an instantiation gap; the unchanged collections gate remains the
+Option<Order> signature and downstream member/native-identity requirements.
+[Evidence](experiments/extended-cli-metadata/generic-library-validation.json).
+
 **Raven external-signature checkpoint (2026-10-01):** the target adapter now consumes
 registered external reference types and constructions. Separate Raven-produced binaries
 verify/run (42), including nullable locals, interface arrays and generic forwarding.

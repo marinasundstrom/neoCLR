@@ -2658,3 +2658,22 @@ remain open. Synthetic CLI core identity is not native implementation identity.
 The temporary CLI symbol source must eventually be replaced by native metadata loading.
 
 See [probe evidence](experiments/extended-cli-metadata/external-signature-validation.json) and [unchanged-sample gate](experiments/extended-cli-metadata/collections-after-external-signatures.json).
+
+## Consumer-scoped imported generic calls (2026-10-01)
+
+The next bounded integration removes the primitive-only instantiation gate for imported
+unconstrained static generic methods. Arguments are validated in the consuming assembly,
+while the definition retains its dependency identity. Caller method and declaring-type
+parameters are checked at emission; foreign output types and out-of-scope parameters
+reject. This preserves normal .NET MethodSpec/MemberRef semantics and introduces no
+metadata format, runtime opcode or Runtime Contract change.
+
+Raven maps these arguments through its existing target type mapper. The C# native probe
+now executes consumer-owned Order arguments with alias mutation, caller method/owner
+parameter forwarding and an external Box<int> construction. Both emitted binaries verify
+and execution returns 42. The metadata C# checks additionally execute the consumer-owned
+argument on the CLR. The CLI projection remains the temporary symbol source; explicit
+core/dependency configuration is unchanged. These feature-branch results do not advance
+the collections Option<Order> gate: imported value/union signatures, generic declaring
+type members and translated-System native identities remain open. Native loading of
+compiler symbols remains future work.

@@ -366,3 +366,7 @@ and consumer verify/run with Box<consumer Order>. Raven now consumes those exter
 type signatures, with a separately emitted Raven library/consumer pair executing in
 neoCLR. Imported member calls and value/union signatures remain open; the unchanged
 collections sample now reaches its Option<Order> signature boundary.
+
+Imported static generic calls now also accept consumer-owned reference types, external
+constructions and caller generic parameters. Raven binaries verify and execute this
+boundary in neoCLR; value/union contracts and full collection imports remain open.

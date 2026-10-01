@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Expand imported static generic calls to consumer-owned/imported reference arguments
+  and caller generic parameters, checking ownership at construction and scope on emit.
+  Standard MethodSpec shape remains unchanged. CLR and Raven-to-neoCLR probes execute
+  nominal alias mutation and generic forwarding; collections union imports remain open.
+
 - Integrate external reference signatures in Raven through an explicit target capability.
   Separate Raven-produced library/consumer binaries verify and return 42 in neoCLR.
   The unchanged collections sample advances past Register to PendingOrder’s unsupported

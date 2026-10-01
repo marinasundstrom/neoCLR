@@ -3012,15 +3012,18 @@ this subset. Existing nongeneric recognizers keep their narrower behavior.
 
 ImportReference retains this declaration contract; MemberReference.ResolveMethod
 also matches its generic arity and exact parameter/result types. Instantiation copies
-one concrete non-Void primitive or primitive-vector argument per method parameter.
-Null arrays throw ArgumentNullException; wrong arity, unsupported arguments, a
+one non-Void consumer-scoped signature type per method parameter, including owned or
+imported reference types, constructions, supported vectors and caller generic parameters.
+Null arrays throw ArgumentNullException; wrong arity, foreign type ownership, a
 nongeneric definition or substitutions producing a nested vector throw ArgumentException.
 Definition exposes the immutable imported reference, never a mutable dependency builder.
-TypeArguments is the copied ordered sequence; Signature is fully substituted.
+TypeArguments is the copied ordered sequence; Signature substitutes method parameters
+and may retain caller-scoped parameters until emission.
 
 Call and raw Emit(Call, reference) append the same generic call. Null references throw
-ArgumentNullException; wrong opcodes or consuming owners throw ArgumentException.
-An uninstantiated generic ImportedMethodReference cannot be called. Instruction limits
+ArgumentNullException; wrong opcodes, consuming owners or caller generic scopes throw
+ArgumentException. Method/declaring-type parameter indices are checked against the
+caller at emission. An uninstantiated generic ImportedMethodReference cannot be called. Instruction limits
 and stack/type mismatches continue to throw InvalidDataException on append/write.
 CLI output uses a standard MethodSpec targeting an external MemberRef. Native output
 uses the existing generic_arguments call contract; there is no format or opcode change.
@@ -3028,9 +3031,11 @@ uses the existing generic_arguments call contract; there is no format or opcode 
 For example, import `First<T>(T[]) -> T`, instantiate with PrimitiveType.Int32, then
 pass an Int32 vector to Call. The C# tests execute the resulting separate library and
 application on the CLR. Raven's native-profile [generic library probe](../docs/experiments/extended-cli-metadata/generic-library-validation.json)
-verifies and runs the equivalent binary boundary in neoCLR. Imported generic owners,
-nominal arguments, constraints and forwarding caller-scoped generic arguments remain
-unsupported; this is not general collection import support.
+verifies and runs the equivalent binary boundary in neoCLR, including consumer-owned
+nominal arguments, alias mutation, external constructions and caller method/owner
+parameter forwarding. Imported generic declaring types, nominal types in the imported
+definition signature and constraints remain unsupported; this is not general collection
+import support.
 
 ### Lifecycle direction reaffirmed 2026-10-01
 

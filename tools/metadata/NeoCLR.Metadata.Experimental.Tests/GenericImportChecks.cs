@@ -33,12 +33,25 @@ internal static class GenericImportChecks
         Reject<ArgumentException>(() => entry.Call(imported));
         Reject<ArgumentException>(() => imported.MakeGenericInstance());
         Reject<ArgumentException>(() => imported.MakeGenericInstance(PrimitiveType.Void));
-        Reject<ArgumentException>(() => imported.MakeGenericInstance(parameter));
+        Reject<ArgumentException>(() => entry.Call(imported.MakeGenericInstance(parameter)));
+        Reject<ArgumentException>(() => entry.Call(imported.MakeGenericInstance(SignatureType.TypeParameter(0))));
         Reject<ArgumentException>(() => imported.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)));
         Reject<ArgumentNullException>(() => imported.MakeGenericInstance(null!));
         Reject<ArgumentException>(() => entry.Emit(OpCode.Add, call));
         var other = new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core);
         Reject<ArgumentException>(() => other.AddFunction("Main").Call(call));
+        var foreignType = other.AddClass("", "Foreign");
+        Reject<ArgumentException>(() => imported.MakeGenericInstance(foreignType));
+        var owned = app.AddClass("", "Item");
+        var field = owned.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public);
+        var constructor = owned.AddConstructor([]); constructor.Return();
+        var roundtrip = app.AddType("", "Checks").AddMethod("Roundtrip", 0, true);
+        var firstItem = imported.MakeGenericInstance(owned);
+        roundtrip.LoadConstant(1); roundtrip.NewArray(owned); roundtrip.Duplicate(); roundtrip.LoadConstant(0);
+        roundtrip.NewObject(constructor); roundtrip.Duplicate(); roundtrip.LoadConstant(42); roundtrip.StoreField(field);
+        roundtrip.StoreArrayElement(owned); roundtrip.Call(firstItem); roundtrip.LoadField(field); roundtrip.Return();
+        var forward = app.AddFunction("Forward", new MethodSignature(parameter, [SignatureType.ArrayOf(parameter)], ["T"]));
+        forward.LoadArgument(0); forward.Call(imported.MakeGenericInstance(parameter)); forward.Return();
         var appImage = app.Write();
         var read = AssemblyDefinition.ReadAssembly(appImage, false);
         Check(ReferenceEquals(read.MainModule.MemberReferences.Single(m => m.Name == "First").ResolveMethod(new Resolver(snapshot)), definition), "generic MemberRef resolution");
@@ -46,7 +59,9 @@ internal static class GenericImportChecks
         try
         {
             context.LoadFromStream(new MemoryStream(image));
-            Check((int)context.LoadFromStream(new MemoryStream(appImage)).EntryPoint!.Invoke(null, null)! == 42, "CLR executes imported MethodSpec");
+            var loaded = context.LoadFromStream(new MemoryStream(appImage));
+            Check((int)loaded.EntryPoint!.Invoke(null, null)! == 42, "CLR executes imported MethodSpec");
+            Check((int)loaded.GetType("Checks")!.GetMethod("Roundtrip")!.Invoke(null, null)! == 42, "CLR retains consumer-owned generic argument identity");
         }
         finally { context.Unload(); }
         _ = RuntimeAssemblyContainer.WriteBinary(app.WriteNativeAssembly(), core);

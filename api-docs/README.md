@@ -567,3 +567,6 @@ construction/equality members and SignatureType.ImportedType/conversion are cove
 in the [host-only metadata manual](experimental-metadata.md#imported-type-signatures-development-2026-10-01).
 They are C# producer APIs explicitly excluded from the guest RavenDoc type selection;
 no guest reference assembly change is required.
+
+Consumer-scoped arguments and emission-time generic scope checks for imported generic
+calls are updated in the same host-only manual; guest signatures remain unchanged.
