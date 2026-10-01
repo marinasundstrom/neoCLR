@@ -2574,3 +2574,21 @@ arity; return type still does not distinguish methods. MethodDefinition.GenericA
 and raw signatures retain generic declarations in native CLI reference projections;
 primitive-only recognizers continue to decline them. This extends the development
 MethodSignature constructor; rebuild host consumers.
+
+
+### Instantiated generic calls (development)
+
+`MethodBuilder.MakeGenericInstance(params SignatureType[] typeArguments)` returns an
+immutable `GenericMethodInstance` exposing `Definition`, copied `TypeArguments` and
+substituted `Signature`. `Call(GenericMethodInstance)` and
+`Emit(OpCode.Call, GenericMethodInstance)` append an owned call. Null arguments throw
+ArgumentNullException; wrong arity, Void, foreign class/definition, wrong opcode,
+out-of-scope caller parameters and nested-array substitution throw ArgumentException.
+Body stack compatibility is validated on write. Only unconstrained static definitions
+in the current output are supported; imported generic methods remain unsupported.
+For example, `body.Call(identity.MakeGenericInstance(PrimitiveType.Int32))` consumes
+one Int32 for `Identity<T>(T)->T` and produces Int32. Forwarding may instead pass
+`SignatureType.MethodParameter(0)` from a caller that declares that parameter.
+CLI output uses cached MethodSpec records; native calls carry explicit generic arguments
+and substituted parameter types. The binary integration test verifies forwarding,
+Int32/Int64/Boolean instantiations, owned-object identity and generic vector creation/access.

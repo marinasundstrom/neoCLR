@@ -285,3 +285,7 @@ overloads and multiple indices.
 The next development milestone is generic emission. Unconstrained method/function
 declarations now preserve named generic parameters, locals and array signatures;
 instantiated calls and Raven consumption are still in progress.
+
+The development metadata producer also emits unconstrained generic function/static
+method instantiations and forwarding, verified from binary assemblies on neoCLR.
+Generic types, constraints and Raven generic source integration remain separate work.

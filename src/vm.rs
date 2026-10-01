@@ -547,7 +547,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || function.receiver_readonly
                 || function.is_internal_call()
                 || function.pinvoke.is_some()
-                || !function.generic_parameters.is_empty())
+                || (function.instance && !function.generic_parameters.is_empty()))
         {
             return Err(Fault::new("class methods require ordinary IL receivers"));
         }

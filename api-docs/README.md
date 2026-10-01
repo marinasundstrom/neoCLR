@@ -501,3 +501,7 @@ under the existing RavenDoc exclusion. See the [indexed property reference](expe
 
 SignatureType.MethodParameter/MethodParameterIndex and MethodSignature.GenericParameterNames
 are host-only and covered by the [manual generic reference](experimental-metadata.md#generic-method-declarations-development-2026-10-01), under the existing explicit RavenDoc exclusion.
+
+The experimental host C# `GenericMethodInstance` and generic call overloads are covered
+by [the manual metadata reference](experimental-metadata.md); these host APIs are not
+RavenDoc input types.

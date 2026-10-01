@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--generic-integration")
+{
+    await GenericCallChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--indexer-integration")
 {
     await IndexedPropertyChecks.RunRuntime(args[1], args[2]);
@@ -147,6 +153,7 @@ var tests = new (string Name, Action Body)[]
     ("Array signatures, slots and projection", ArraySignatureChecks.Run),
     ("Indexed property signatures and overloads", IndexedPropertyChecks.Run),
     ("Generic method declarations and projection", GenericSignatureChecks.Run),
+    ("Generic instantiated and forwarded calls", GenericCallChecks.Run),
     ("Array instructions and execution", ArrayInstructionChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),

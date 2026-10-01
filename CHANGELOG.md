@@ -11,7 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add unconstrained generic function/static-method declarations with named method
   parameters, CLI GenericParam/MVAR signatures and native MethodTypeParameter records.
   Generic locals and vector element tokens preserve scope and reference projections;
-  invalid scopes and open calls reject. Instantiated producer calls follow separately.
+  invalid scopes and open calls reject. Add immutable generic call instances, ordinary
+  CLI MethodSpec tokens and native generic arguments, including forwarding through
+  caller parameters and typed array factories. API-produced binaries verify/run 42;
+  permit generic static class methods without relaxing instance receiver restrictions.
 
 - Extend metadata property associations to indexed signatures, inferring copied index
   parameters from accessors and validating getter/setter agreement. Preserve ordinary

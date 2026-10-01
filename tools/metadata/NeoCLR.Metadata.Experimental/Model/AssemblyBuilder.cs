@@ -237,6 +237,20 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
+        var methodSpecs = new Dictionary<(MethodBuilder Definition, BlobHandle Arguments), MethodSpecificationHandle>();
+        int GenericCallToken(GenericMethodInstance method)
+        {
+            var blob = new BlobBuilder();
+            var arguments = new BlobEncoder(blob).MethodSpecificationSignature(method.TypeArguments.Count);
+            foreach (var argument in method.TypeArguments) EncodeType(arguments.AddArgument(), argument);
+            var key = (method.Definition, metadata.GetOrAddBlob(blob));
+            if (!methodSpecs.TryGetValue(key, out var handle))
+            {
+                handle = metadata.AddMethodSpecification(handles[method.Definition], key.Item2);
+                methodSpecs.Add(key, handle);
+            }
+            return MetadataTokens.GetToken(handle);
+        }
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
@@ -252,7 +266,7 @@ public sealed partial class AssemblyBuilder
             offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" => 4,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
@@ -306,6 +320,7 @@ public sealed partial class AssemblyBuilder
                     case "xor": code.WriteByte(0x61); break;
                     case "shift.left": code.WriteByte(0x62); break;
                     case "shift.right": code.WriteByte(0x63); break;
+                    case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
@@ -486,7 +501,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

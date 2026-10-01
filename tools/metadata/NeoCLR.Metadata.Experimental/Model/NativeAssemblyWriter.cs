@@ -69,6 +69,11 @@ public sealed partial class AssemblyBuilder
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
+            "call.generic" => new { op = "call", arg = (object)new {
+                name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = false,
+                generic_arguments = instruction.GenericTarget!.TypeArguments.Select(SignatureValue).ToArray(),
+                parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
+            } },
             "call" or "new.object" => new { op = instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },

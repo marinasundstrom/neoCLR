@@ -155,3 +155,14 @@ fn method_parameter_wrappers_parse_and_substitute_recursively() {
         Type::ByRef(Box::new(Type::Array(Box::new(Type::Int32))))
     );
 }
+
+#[test]
+fn static_generic_class_method_has_no_receiver_restriction() {
+    let source = ".module Test\n.entry Main\n.type class Helpers\n.method static Identity<T>(T value) -> T\nldarg value\nret\n.end\n.end\n.function Main() -> Int32\nldc.i4 42\ncall Helpers::Identity<Int32>(Int32)\nret\n.end";
+    let module = assemble(source).unwrap();
+    verify(&module).unwrap();
+    assert_eq!(
+        run(&module, Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+}

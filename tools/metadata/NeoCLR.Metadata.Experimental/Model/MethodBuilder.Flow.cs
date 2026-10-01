@@ -162,10 +162,11 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
-                case "call":
-                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
+                case "call": case "call.generic":
+                    var callSignature = instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
+                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(callSignature.ParameterTypes[i]);
                     if (!instruction.Target.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));
-                    if (instruction.Target.ReturnsValue) stack.Add(instruction.Target.Signature.ReturnType);
+                    if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
                     break;
                 case "native.call":
                     if (!instruction.NativeTarget!.TryGetStaticInt32Signature(out var count)) throw new InvalidDataException("invalid native call");

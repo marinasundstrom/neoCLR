@@ -690,3 +690,8 @@ a bootstrap; next test a bounded real class-library slice through that translati
 and Raven reference loading. General translation is not implemented by the current
 static-Int32 writer. Preserve unsupported information by rejecting it, then grow
 coverage from the actual library instead of encoding permanent .NET restrictions.
+
+Generic producer follow-through (2026-10-01, author-directed): unconstrained owned
+function/static-method instantiations now execute through ordinary CLI MethodSpec and
+native generic call arguments. C# producer tests cover forwarding, typed vectors and
+nominal identity; API binary verify/run returns 42. Raven source integration follows.

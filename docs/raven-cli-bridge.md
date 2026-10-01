@@ -2292,3 +2292,10 @@ signatures reject without writing output. C# Release/Debug tests also check two-
 assignment order independently. Evidence fields now name the actual indexer checks,
 replacing copied array-probe labels from the initial snapshot. This is a bounded
 collection consumer, not the generic ArrayList/HashMap implementation or full sample.
+
+Generic producer milestone: the host metadata API now emits owned unconstrained generic
+static calls using CLI MethodSpec and native generic arguments. Forwarded method
+parameters and generic array factories verify and execute from a binary PE/#Neo
+container (42). Raven source integration is the next slice; generic type/constraint/import
+support is not implied. The native loader admits generic static class methods while
+retaining its generic instance-method restriction.
