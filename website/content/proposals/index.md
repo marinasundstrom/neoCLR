@@ -131,6 +131,8 @@ backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
 The separate metadata API also preserves public/internal/private static method access;
 Block and expression bodies now share compiler lowering on both targets.
+Primitive value-producing conditionals use shared branch joins and execute only the
+selected branch.
 Native eager Boolean and/or/xor now verify and execute with exact Boolean operands;
 the independent metadata writer and Raven now produce them through the shared body
 path, preserving eager left-to-right operand evaluation.

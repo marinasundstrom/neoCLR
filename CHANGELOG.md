@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add shared Raven emission of primitive conditional values; verify binary execution
+  with typed branch joins, nested selections and skipped faulting/side-effecting branches.
+
 - Support exact Boolean operands for native and/or/xor in runtime execution and
   verification; retain mixed-type and Boolean arithmetic rejection. The independent
   metadata writer now accepts exact Boolean operands through raw emits and helpers.

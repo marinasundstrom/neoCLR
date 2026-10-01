@@ -1556,3 +1556,23 @@ all three eager operators on both targets. Existing short-circuit and integer bi
 cases pass against the rebuilt runtime. [Artifact/runtime evidence](experiments/extended-cli-metadata/boolean-bitwise-raven-validation.json).
 Older native runtimes reject Boolean operands; these feature-branch revisions must
 be deployed together. No throughput or allocation improvement is claimed.
+
+
+## Primitive conditional values — 2026-10-01
+
+Raven `a9e6d2d7b` on `codex/metadata-consumer` now emits primitive value-producing
+if/else through shared branch instructions. Matching Int32/Int64/Boolean/String
+branches leave one value at the join; only the selected branch executes. This uses
+ordinary .NET conditional control flow and existing neoCLR branch/stack validation,
+with no new Runtime Contract option, metadata format, writer API or runtime code.
+Compiler binding still owns source expression context and conversions. The initial
+slice permits single-expression branch blocks; Unit/missing-else values, nonprimitive
+joins and multi-statement value blocks remain outside this bounded plan. .NET keeps
+its general fallback. CLI reference projection remains temporary pending native
+symbol loading. No performance improvement is claimed.
+
+Validation: 32 existing shared-body/block-expression C# tests plus both new Release/
+Debug conditional tests pass. The full binary runtime/rvnc probe passes against
+metadata `83200ad6` and runtime `fa25609d`, covering both alternatives, nested values,
+all four primitive types and skipped faulting/side-effecting branches.
+[Recorded evidence](experiments/extended-cli-metadata/conditional-values-raven-validation.json).
