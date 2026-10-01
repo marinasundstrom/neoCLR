@@ -9618,3 +9618,18 @@ the broad class-library/collection consumer or metadata importing is complete. S
   native payload plus CLI projection remains a temporary bridge. No complete emission
   story or measured performance improvement is claimed; no author reply to these
   results is recorded yet.
+
+## 2026-10-01 — indexed collections, then generics
+
+- **Author:** requested another large set of slices to a reasonable stopping point.
+- **Assistant:** selected indexed properties to build on vector emission and support
+  collection element access, then implemented independent metadata associations and
+  shared Raven accessor planning. C# API binaries verify/run on neoCLR; the expanded
+  concrete OrderBuffer consumer runs on both targets/source orders, with alias and
+  evaluation-order checks, bounds faults and rejection of unsupported signatures.
+- **Author steering during work:** “After all this: Continue with another big set of
+  slices. I assume generics. Don’t stop until you reach a reasonable point”.
+- **Assistant response:** finish the indexer evidence/commits, then pursue a connected
+  generic signature/call milestone through metadata, Raven and runtime execution.
+  That generic work is a plan at this entry, not a completed result. Full generic
+  collections/System compilation and native symbol importing remain open.

@@ -15,7 +15,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   assemblies now verify and execute overloaded getters and multi-index setter-only
   associations on neoCLR, returning 42. Existing runtime instructions suffice. Raven
   now consumes indexed properties through shared accessor planning and explicit
-  capabilities; overloads and multi-index properties execute on both targets.
+  capabilities; overloads and multi-index properties execute on both targets. Expanded
+  Order collection acceptance covers nominal/array indices, alias mutation, evaluation
+  order and bounds faults; correct the probe evidence labels to the actual checks.
 
 - Add bounded vector signatures for primitive and owned root-class elements across
   parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native

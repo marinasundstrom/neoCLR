@@ -51,8 +51,10 @@ The next connected milestone is indexed properties: metadata producer/projection
 support now preserves index parameters and overloaded accessor associations.
 API-produced binaries verify and execute indexed accessors on neoCLR (42); shared
 Raven now emits indexed accessor calls and associations; overloads, multiple indices
-and read-only getters execute on both targets in both source orders (42). A richer
-Order collection consumer is the next acceptance slice. Broader field/constructor shapes and
+and read-only getters execute on both targets in both source orders (42). A concrete
+Order collection now also proves nominal/array indices, object aliases, evaluation
+order and indexed bounds faults. The author directs generics as the next connected
+milestone; begin with native generic signatures and calls, then Raven consumption. Broader field/constructor shapes and
 generic/delegate/union contracts remain subsequent work. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
