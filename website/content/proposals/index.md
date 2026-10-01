@@ -131,6 +131,8 @@ backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
 The separate metadata API also preserves public/internal/private static method access;
 Block and expression bodies now share compiler lowering on both targets.
+Native eager Boolean and/or/xor now verify and execute with exact Boolean operands;
+metadata/compiler admission follows separately.
 Raven emits these helpers through shared declaration plans, with compiler and runtime
 checks rejecting inaccessible dependency calls.
 Public/internal static helpers preserve visibility in CLI and native output and in

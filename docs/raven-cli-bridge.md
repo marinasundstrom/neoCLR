@@ -1511,3 +1511,19 @@ implicit widening, Unit entry/helper calls and Unicode console output. Separate-
 methods execute in both source orders; unsupported arrow conversions retain exact
 source spans and unchanged output. [Recorded evidence](experiments/extended-cli-metadata/expression-body-raven-validation.json).
 This is feature-branch development; async/generic/instance native emission remains deferred.
+
+
+## Eager Boolean operation foundation — 2026-10-01
+
+Native and/or/xor now accept two exact Boolean operands and produce Boolean, while
+retaining integer behavior. Mixed Boolean/integer operands and Boolean arithmetic
+remain invalid. This follows the truth tables and eager evaluation expected by
+[Raven's existing Boolean operator binding and .NET Boolean operators](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/boolean-logical-operators)
+(consulted 2026-10-01). CLI uses integer stack operations for Boolean bitwise logic;
+neoCLR keeps its distinct Boolean stack value. Reusing opcode names avoids synthetic
+branches or Boolean/integer coercion, at the cost of typed verifier/runtime dispatch.
+No new schema, opcode number or Runtime Contract option is introduced. Older runtimes
+reject this operand category; producer integration requires this runtime revision.
+Nullable Boolean, enum operators and short-circuit changes are outside this slice.
+Metadata and compiler admission follow separately. Rust truth-table tests exercise
+all twelve combinations and verify/run rejection of mixed types and Boolean addition.

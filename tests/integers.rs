@@ -178,3 +178,42 @@ fn wide_faults_and_invalid_memory_operations_report_locations() {
             .is_err()
     );
 }
+
+#[test]
+fn boolean_bit_operations_preserve_boolean_results() {
+    for left in [false, true] {
+        for right in [false, true] {
+            for (op, expected) in [
+                ("and", left & right),
+                ("or", left | right),
+                ("xor", left ^ right),
+            ] {
+                let source = format!(
+                    ".module BooleanBits\n.entry Main\n.function Main() -> bool\nldc.bool {left}\nldc.bool {right}\n{op}\nret\n.end"
+                );
+                let module = assemble(&source).unwrap();
+                neoclr::verify(&module).unwrap();
+                assert_eq!(
+                    run(&module, Limits::default()).unwrap().value,
+                    Value::Boolean(expected)
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn boolean_bit_operations_reject_mixed_types_and_boolean_arithmetic() {
+    for body in [
+        "ldc.bool true\nldc.i4 1\nand",
+        "ldc.i4 1\nldc.bool true\nor",
+        "ldc.bool true\nldc.i8 1\nxor",
+        "ldc.bool true\nldc.bool false\nadd",
+    ] {
+        let source =
+            format!(".module Invalid\n.entry Main\n.function Main() -> bool\n{body}\nret\n.end");
+        let module = assemble(&source).unwrap();
+        assert!(neoclr::verify(&module).is_err(), "{body}");
+        assert!(run(&module, Limits::default()).is_err(), "{body}");
+    }
+}

@@ -1520,7 +1520,10 @@ fn typed_effect(
                     | BranchLessEqualUnsigned(_)
             );
             require(
-                values[0] == values[1] && (integer(ty) || (floating && *ty == T::Double)),
+                values[0] == values[1]
+                    && (integer(ty)
+                        || (floating && *ty == T::Double)
+                        || (matches!(op, BitAnd | BitOr | BitXor) && *ty == T::Boolean)),
                 "invalid binary operand types",
             )?;
             if matches!(

@@ -178,7 +178,7 @@ normalization; other checks use exact type equality. See [integer storage](integ
 | `pop` | `T →` | Discard value |
 | `add`, `sub`, `mul` | `N,N → N` | Wrapping integer arithmetic |
 | `add.ovf`, `sub.ovf`, `mul.ovf` | `N,N → N` | Signed checked integer arithmetic; overflow Fault |
-| `and`, `or`, `xor` | `N,N → N` | Bitwise logic |
+| `and`, `or`, `xor` | `N,N → N` or `bool,bool → bool` | Bitwise integer or eager Boolean logic; operands must match |
 | `not` | `N → N` | Bitwise complement |
 | `neg` | `N → N` | Wrapping two's-complement negation |
 | `shl`, `shr`, `shr.un` | `N,Int32 or Native → N` | Left, arithmetic-right, or logical-right shift; count masked to width |

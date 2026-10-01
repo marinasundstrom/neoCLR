@@ -62,6 +62,12 @@ pub(crate) fn binary(op: &Op, left: Value, right: Value) -> Result<Value, Fault>
         return crate::floating::binary(op, *left, *right);
     }
     match (left, right) {
+        (Value::Boolean(a), Value::Boolean(b)) => match op {
+            Op::BitAnd => Ok(Value::Boolean(a & b)),
+            Op::BitOr => Ok(Value::Boolean(a | b)),
+            Op::BitXor => Ok(Value::Boolean(a ^ b)),
+            _ => Err(Fault::new("invalid Boolean operation")),
+        },
         (Value::Int32(a), Value::Int32(b)) => calculate!(a, b, i32, u32, Int32),
         (Value::Int64(a), Value::Int64(b)) => calculate!(a, b, i64, u64, Int64),
         (Value::IntPtr(a), Value::IntPtr(b)) => calculate!(a, b, isize, usize, IntPtr),

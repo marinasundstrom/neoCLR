@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Support exact Boolean operands for native and/or/xor in runtime execution and
+  verification; retain mixed-type and Boolean arithmetic rejection. Metadata/compiler
+  producer admission follows separately.
+
 - Enable Raven expression-bodied functions and static methods through shared compiler
   lowering on .NET and neoCLR. Verify binary loading/execution, separate-library
   references, Unit calls and precise rejection of unsupported expressions.
