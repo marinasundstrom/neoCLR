@@ -1595,3 +1595,23 @@ Both branches execute with distinct locals and outer assignments; prefix loops r
 before output writes. [Recorded evidence](experiments/extended-cli-metadata/value-block-raven-validation.json).
 No performance improvement is claimed; metadata/runtime evidence from unchanged
 components remains applicable.
+
+
+## Internal value-block control flow — 2026-10-01
+
+Raven `53e4519d0` extends value-block prefixes with existing statement if/loop emission,
+including internal break/continue. Preflight traverses lowered statement blocks and
+discarded block expressions, rejecting returns and jumps whose target is outside the
+value block. This keeps partially evaluated enclosing-expression operands intact.
+Pure Unit statements have no emitted effect. Disposal remains unsupported. Existing
+.NET fallback, source semantics, Runtime Contract options and CLI/native encodings
+remain unchanged. This adds compiler planning work without a performance claim;
+nonlocal exits require a future enclosing-expression stack contract. The metadata
+project remains separate, with no API/schema/runtime change in this slice. Native
+symbol loading remains deferred; the temporary CLI reference projection is unchanged.
+
+Validation: 55 focused Raven C# tests and the full binary runtime/rvnc probe pass.
+Both .NET paths and neoCLR preserve an earlier arithmetic operand across the value
+block's loop, internal break/continue and assignments. A conditional return is
+rejected before returning a shared plan or modifying native output.
+[Recorded evidence](experiments/extended-cli-metadata/value-block-control-flow-raven-validation.json).

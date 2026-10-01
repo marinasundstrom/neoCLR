@@ -133,7 +133,8 @@ The separate metadata API also preserves public/internal/private static method a
 Block and expression bodies now share compiler lowering on both targets.
 Primitive value-producing conditionals use shared branch joins and execute only the
 selected branch. Value blocks support initialized locals, assignments and calls
-before their final primitive expression.
+and internal if/loop control flow before their final primitive expression. Returns
+and jumps leaving a value block remain unsupported.
 Native eager Boolean and/or/xor now verify and execute with exact Boolean operands;
 the independent metadata writer and Raven now produce them through the shared body
 path, preserving eager left-to-right operand evaluation.
