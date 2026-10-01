@@ -51,7 +51,7 @@ Primitive value-producing if/else now shares typed branch joins on both backends
 value blocks also permit initialized locals, assignments, calls and internal if/loop
 control flow before the result, with returns/outgoing jumps rejected during planning.
 The metadata API now supports public/internal ownerless functions with native access
-enforcement; Raven visibility integration follows next.
+enforcement; Raven now preserves explicit public/internal and default internal access.
 General object/field and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 

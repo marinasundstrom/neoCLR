@@ -1635,4 +1635,13 @@ Validation: 46 C# metadata groups and the API snapshot check pass. API-produced 
 assemblies execute same-module internal calls, an internal entry and a public facade
 to 42. Native verification rejects an external internal-function call.
 [API/runtime evidence](experiments/extended-cli-metadata/function-visibility-api-validation.json).
-Raven source visibility integration is the next slice.
+Raven `11b922327` now uses shared function-access capabilities and preserves explicit
+public/internal and default internal source access. No Runtime Contract configuration
+changes. Ordinary .NET remains the default; native emission is opt-in. Previously
+widened default functions are now internal, so external raw calls can be rejected.
+Direct source import of projected CLI globals remains deferred; a public static facade
+exercises cross-assembly use without changing native ownership.
+Validation: 51 focused Raven C# tests and the full binary/rvnc probe pass, including both
+file orders, reference access flags, facade execution and denied external internal calls.
+[Compiler/runtime evidence](experiments/extended-cli-metadata/function-visibility-raven-validation.json).
+The runtime binary remains built from `fa25609d`; no runtime implementation changes.

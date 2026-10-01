@@ -130,7 +130,7 @@ Backend instruction/type profiles now admit shared bodies selectively. Signed In
 backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
 The metadata API now also preserves public/internal ownerless function access;
-Raven visibility integration follows next.
+Raven now preserves explicit public/internal and default internal function access.
 The separate metadata API also preserves public/internal/private static method access;
 Block and expression bodies now share compiler lowering on both targets.
 Primitive value-producing conditionals use shared branch joins and execute only the

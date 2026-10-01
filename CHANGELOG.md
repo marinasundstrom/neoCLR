@@ -10,7 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add public/internal assembly-function visibility to the independent metadata API,
   preserving CLI/native access and ownerless definitions. Binary runtime checks prove
-  internal calls/entries work and external calls require a public facade.
+  internal calls/entries work and external calls require a public facade. Raven now
+  preserves explicit public/internal and default internal access through shared
+  capabilities; previously widened default functions become internal.
 
 - Add shared Raven emission of primitive conditional values; verify binary execution
   with typed branch joins, nested selections and skipped faulting/side-effecting branches.
