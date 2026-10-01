@@ -17,7 +17,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with explicit primitive constructors, mutable auto-properties and shared compiler-
   synthesized accessor bodies. Both source orders verify/run on binary neoCLR and
   .NET, returning 42. Raven now also emits owned root-class locals and validates
-  property mutation through aliases on both runtimes. Nullable/external locals,
+  property mutation through aliases on both runtimes. Ordinary nonvirtual instance
+  calls now share receiver-first evaluation, including private nested calls and
+  no-result mutation. Nullable/external locals,
   implicit constructors, initializers and nominal signatures remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native

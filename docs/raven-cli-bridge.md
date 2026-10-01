@@ -1915,3 +1915,20 @@ implicit constructors and initializers remain outside this bounded source path. 
 Runtime Contract or runtime source change; runtime remains e8611966. Native symbol
 loading and replacement of the temporary PE/#Neo bridge are still deferred.
 [Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+## Ordinary source instance calls — 2026-10-01
+
+Raven now lowers ordinary nonvirtual source instance calls through the shared receiver
+and call-reference contracts. Receiver evaluation precedes arguments; nested calls and
+argument side effects preserve source order. Private self calls and no-result mutating
+methods reuse existing metadata/runtime signatures. No Runtime Contract or runtime/
+metadata schema changes were needed. Native receivers remain constructed objects, self
+or owned locals; virtual/nullable/imported instance calls and nominal signatures are
+still unsupported in this bounded path.
+
+An independent Counter helper added to the unchanged Order consumer checks nested
+private calls, no-result mutation and argument order. It is test code, not a substitute
+for native library dependencies. Both source orders run on .NET and neoCLR to 42.
+56 focused Raven C# tests pass (54 baseline), plus the existing native emission probe.
+[Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
