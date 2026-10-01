@@ -1645,3 +1645,32 @@ Validation: 51 focused Raven C# tests and the full binary/rvnc probe pass, inclu
 file orders, reference access flags, facade execution and denied external internal calls.
 [Compiler/runtime evidence](experiments/extended-cli-metadata/function-visibility-raven-validation.json).
 The runtime binary remains built from `fa25609d`; no runtime implementation changes.
+
+## Class-library emission acceptance — 2026-10-01
+
+The author prioritizes compiling actual Raven runtime-library source before broader
+metadata loading, then using a broad consumer to drive missing codegen/metadata.
+`NeoClrMetadataProbe --class-library-emission <runtime/raven/src> <fresh-output>`
+now records source hashes, exact selected source, diagnostic phase and emitted byte
+count. It uses the existing host-core primitive bootstrap; no Runtime Contract or
+production target configuration changes. Ordinary .NET emission is unaffected.
+
+The first run attempts unchanged Math, UnicodeScalar and GC files. They stop in
+binding because native Result/error/RuntimeServices dependencies are absent. This
+is not evidence that their bodies or metadata are supported. Selecting the original
+Int32 Min/Max/Sign declarations with their System.Math namespace, excluding unrelated
+imports/declarations, binds successfully and stops at NEOMETA001: native function
+namespace metadata is missing. All failures leave the output empty. No runtime
+execution or completed class-library assembly is claimed. The probe reports current
+outcomes rather than asserting that unsupported features must remain unsupported.
+
+Next: preserve namespace identity for native ownerless functions and define its CLI
+projection explicitly, then emit and execute the selected real Math declarations.
+Use neoCLR's order-collections application as the broader acceptance case: it spans
+constructors/properties, generic collections/interfaces, arrays/iteration,
+lambdas/delegates, Option/Result/patterns and shared reference identity. Compile its
+actual library dependency sources as coverage grows; do not substitute fake library
+contracts. JSON is a complementary UTF-8/inheritance case; neither sample covers
+all language/runtime features. Metadata importer expansion remains deferred.
+
+[Recorded emission inventory](experiments/extended-cli-metadata/class-library-validation.json).

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record actual Raven class-library emission probes and select order-collections as
+  the broad acceptance target. Selected integer Math functions bind but need native
+  namespace-function metadata; whole-file dependency binding remains incomplete.
+
+
 - Add public/internal assembly-function visibility to the independent metadata API,
   preserving CLI/native access and ownerless definitions. Binary runtime checks prove
   internal calls/entries work and external calls require a public facade. Raven now

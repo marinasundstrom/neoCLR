@@ -5,6 +5,16 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Latest author-directed acceptance (2026-10-01):** compile real Raven class-library
+parts before broader metadata loading. The source inventory now isolates namespace
+function metadata as the first emission gap: unchanged Int32 Math Min/Max/Sign
+bind but cannot emit. Whole Math/UnicodeScalar/GC first require native dependencies.
+After this baseline, use the [order-collections application](experiments/raven-target/samples/application-order-collections.rvn)
+as the broad codegen/metadata acceptance case, compiling its library dependencies
+incrementally. This is a selected target, not a passing native source build.
+[Evidence and next slice](raven-cli-bridge.md#class-library-emission-acceptance--2026-10-01).
+
+
 **Compatibility baseline reaffirmed (2026-10-01):** preserve ordinary .NET/CLI metadata
 and instruction encodings, with explicit neoCLR extensions. The current native #Neo
 execution payload plus CLI reference projection is a working bridge, not yet full

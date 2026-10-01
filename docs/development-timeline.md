@@ -9535,3 +9535,23 @@ remote synchronization does not publish a runtime bundle or website.
   promotion. The source-emitter prototype was removed before commit, the stale text
   corrected, and typed stores were scoped to the independent metadata API with direct
   CLI/native execution tests. No language change was made to create a consumer.
+
+## 2026-10-01 — real class-library compilation and broad consumer
+
+- **Author:** identified compilation of the runtime/class library written in Raven as
+  the ultimate test; asked to try parts to expose emission/metadata gaps before
+  metadata loading. Then requested the broadest sample covering needed target features.
+- **Assistant proposal:** start with unchanged source and a precise member selection,
+  then use a broad consumer to drive shared codegen and native metadata together.
+- **Performed:** added and ran a C# source inventory. Whole Math, UnicodeScalar and GC
+  fail binding with missing native library dependencies under the host-core bootstrap.
+  Original Int32 Min/Max/Sign declarations retain their namespace, bind, and fail native
+  emission on namespace-function metadata; no assembly or runtime success is claimed.
+- **Assistant selection:** order-collections is the broadest practical inspected seed:
+  classes, constructors, properties, generics, interfaces, arrays, iteration, delegates,
+  lambdas, unions/patterns and aliasing. JSON adds UTF-8/inheritance but more initial
+  dependencies. This comparison is an inspection, not a complete feature census.
+- **Open:** namespace-function identity/projection first, then incrementally compile
+  the consumer's real library source closure. Broader metadata importing stays deferred.
+  [Evidence](experiments/extended-cli-metadata/class-library-validation.json) and
+  [scope](raven-cli-bridge.md#class-library-emission-acceptance--2026-10-01).
