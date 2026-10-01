@@ -362,5 +362,7 @@ imports remain open; this does not yet provide general collection-library import
 
 The independent metadata producer now retains external class/interface signatures and
 constructed generic references across CLI and native binary output. A separate library
-and consumer verify/run with Box<consumer Order>. Raven integration of those external
-types and members remains pending; the existing collections sample is still the gate.
+and consumer verify/run with Box<consumer Order>. Raven now consumes those external
+type signatures, with a separately emitted Raven library/consumer pair executing in
+neoCLR. Imported member calls and value/union signatures remain open; the unchanged
+collections sample now reaches its Option<Order> signature boundary.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Integrate external reference signatures in Raven through an explicit target capability.
+  Separate Raven-produced library/consumer binaries verify and return 42 in neoCLR.
+  The unchanged collections sample advances past Register to PendingOrder’s unsupported
+  Option<Order> signature; imported members and translated-System mappings remain open.
+
 - Add immutable external class/interface references and generic constructions to the
   metadata producer. Preserve standard CLI TypeRef/GENERICINST/TypeSpec and native
   dependency-scoped signatures through fields, locals, defaults and generic substitution.

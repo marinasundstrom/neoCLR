@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Raven external-signature checkpoint (2026-10-01):** the target adapter now consumes
+registered external reference types and constructions. Separate Raven-produced binaries
+verify/run (42), including nullable locals, interface arrays and generic forwarding.
+The unchanged collections gate advances past Register admission to PendingOrder's
+Option<Order> return signature. Imported value/union contracts, constructors/member calls
+and translated-System native identity mapping remain open; direct sample execution is
+not complete. [Probe](experiments/extended-cli-metadata/external-signature-validation.json)
+and [current gate](experiments/extended-cli-metadata/collections-after-external-signatures.json).
+
 **External signature prerequisite (2026-10-01):** the independent metadata API now
 emits external reference classes/interfaces and generic constructions, preserving CLI
 TypeRef/TypeSpec shape and native dependency scope. An API-produced Box<consumer Order>

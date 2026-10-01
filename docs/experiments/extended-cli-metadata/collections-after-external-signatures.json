@@ -1,0 +1,33 @@
+{
+  "selection": "application-order-collections",
+  "targetReference": "api-docs/reference/NeoCLR.CoreProbe.dll",
+  "targetReferenceSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
+  "targetProfile": "CompilationOptions.NeoCLR plus native Self marker; CLI declaration snapshot, not a native symbol importer",
+  "hostProfile": "Existing direct-emitter .NET primitive bootstrap; no native library dependencies",
+  "methodology": "Unchanged sources; grouped foundational contracts, individual library units, selected applications and entire library. Binding failures stop emission. Target configuration rejection is recorded, not bypassed. No application with failed emission is run. Ordinary CLI bridge emission is a nonexecuted control using a reference-only core. Full diagnostics saved per case; report retains first 12.",
+  "cases": [
+    {
+      "id": "application-order-collections-target",
+      "profile": "target",
+      "sources": [
+        {
+          "path": "docs/experiments/raven-target/samples/application-order-collections.rvn",
+          "sha256": "D775C2C648591482CF53A0A735603CA51AEA48C2F2BB33633C95830E57B6550B"
+        }
+      ],
+      "phase": "emission",
+      "bytes": 0,
+      "diagnosticCount": 1,
+      "diagnostics": [
+        "error NEOMETA001: Native emission does not support callable declaration: static func PendingOrder(index: Map\u003Cint, Order\u003E, number: int) -\u003E Option\u003COrder\u003E."
+      ],
+      "cliBridgeEmission": {
+        "success": true,
+        "bytes": 7168,
+        "diagnostics": []
+      },
+      "execution": null
+    }
+  ]
+}
