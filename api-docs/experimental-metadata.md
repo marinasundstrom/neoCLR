@@ -2475,6 +2475,33 @@ identity; covariance is not admitted by this bounded writer.
 CLI output uses standard SZARRAY signatures; native output uses ArrayRef, preserving
 reference identity. The native reader validates elements and reconstructs the same
 CLI signatures for reference assemblies. These host-only C# APIs remain covered by
-this manual reference, not the RavenDoc runtime snapshot. This declaration slice
-does not yet expose allocation/indexing instructions. C# contract tests execute array
+this manual reference, not the RavenDoc runtime snapshot. Allocation/indexing APIs are described below. C# contract tests execute array
 parameter/result/local and property/field aliasing on .NET and compare native projections.
+
+### Vector body operations
+
+```csharp
+void MethodBuilder.Emit(OpCode opCode, SignatureType elementType);
+void MethodBuilder.NewArray(SignatureType elementType);
+void MethodBuilder.LoadArrayElement(SignatureType elementType);
+void MethodBuilder.StoreArrayElement(SignatureType elementType);
+void MethodBuilder.LoadArrayLength();
+```
+
+The typed Emit overload accepts Newarr, Ldelem and Stelem with scalar element types
+accepted by ArrayOf. Wrong opcode/element/ownership throws ArgumentException; null
+throws ArgumentNullException, with no body mutation. Helpers have the same validation.
+Allocation consumes Int32 length and pushes a reference array with default-initialized
+elements. Loads consume array/index and push an element; stores consume array/index/value.
+Exact element identity is checked at write time (InvalidDataException); bounds and
+negative lengths fault at execution. New arrays of reference elements contain null
+references until initialized. The current API does not expose null literals.
+
+Operand-free Emit(OpCode.Ldlen) consumes an array and pushes native unsigned length,
+which the bounded flow checker admits into Conv_I4, duplication or discard. Returning
+it as Int32 without conversion rejects. LoadArrayLength appends ldlen/conv.i4, checks
+the instruction limit before appending either, and produces Int32. CLI uses standard
+newarr/ldelem/stelem type tokens and ldlen; native uses the corresponding typed operations.
+One scalar primitive TypeRef is cached per output kind. No nested arrays, spans,
+covariance, element addresses or imported nominal elements are admitted. C# tests
+verify CLI execution and API-produced binary verification/execution on neoCLR.

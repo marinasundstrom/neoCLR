@@ -73,19 +73,27 @@ public enum OpCode
     /// <summary>Loads a mutable instance field.</summary>
     Ldfld,
     /// <summary>Stores a mutable instance field.</summary>
-    Stfld
+    Stfld,
+    /// <summary>Allocates a vector; requires a scalar SignatureType operand and Int32 length.</summary>
+    Newarr,
+    /// <summary>Loads an element; requires a scalar SignatureType operand.</summary>
+    Ldelem,
+    /// <summary>Stores an element; requires a scalar SignatureType operand.</summary>
+    Stelem,
+    /// <summary>Loads vector length as native unsigned integer; normalize with Conv_I4.</summary>
+    Ldlen
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Neg, Not or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Neg, Not, Ldlen or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
-            OpCode.Dup => "duplicate", OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
+            OpCode.Ldlen => "array.length", OpCode.Dup => "duplicate", OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Shl => "shift.left", OpCode.Shr => "shift.right", OpCode.And => "and", OpCode.Or => "or", OpCode.Xor => "xor", OpCode.Rem => "remainder", OpCode.Div => "divide", OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));

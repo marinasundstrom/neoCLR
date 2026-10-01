@@ -272,4 +272,5 @@ User-defined base initialization and general constructor delegation remain futur
 
 Development metadata API: vector declarations now round-trip primitive and owned-class
 arrays as CLI SZARRAY/native ArrayRef, including locals and property storage. Executable
-array instructions and Raven consumption remain the next slices.
+array allocation/indexing now passes C# API-produced binary runtime checks; Raven
+consumption remains the next slice.

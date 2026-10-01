@@ -1,12 +1,12 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive or owned root-class signature type.</summary>
+/// <summary>An immutable primitive, owned root-class or vector signature type.</summary>
 public sealed record SignatureType
 {
     private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null) { Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; }
-    /// <summary>Gets the primitive kind, or null for a class reference.</summary>
+    /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
-    /// <summary>Gets the exact owned class identity, or null for a primitive.</summary>
+    /// <summary>Gets the exact owned class identity, or null for a primitive or vector.</summary>
     public TypeBuilder? ClassType { get; }
     /// <summary>Gets the element type for a zero-based vector, or null for a scalar.</summary>
     public SignatureType? ArrayElement { get; }

@@ -53,6 +53,8 @@ public sealed partial class AssemblyBuilder
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
+            "array.length" => new { op = "ldlen" },
+            "array.new" or "array.load" or "array.store" => new { op = instruction.Op == "array.new" ? "newarr" : instruction.Op == "array.load" ? "ldelem" : "stelem", arg = SignatureValue(instruction.Type!) },
             "string" => new { op = "ldstr", arg = (object)instruction.Text! },
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
             "negate" => new { op = "neg" },

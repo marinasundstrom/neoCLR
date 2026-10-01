@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native
   ArrayRef identities in reference projections. LocalDefinition.SignatureType exposes
   the full slot type; primitive/class projections are null for array slots. Allocation
-  and element instruction support follows separately.
+  and element instructions now expose typed helpers and raw Newarr/Ldelem/Stelem/Ldlen
+  emits. Binary runtime tests cover primitive/nominal aliasing, empty arrays, negative
+  lengths and bounds faults; raw ldlen retains native unsigned width before conv.i4.
 
 - Support readonly primitive/nominal instance fields in the independent metadata API,
   CLI InitOnly flags and native reference projections. Enforce declaring-constructor

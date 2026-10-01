@@ -51,7 +51,7 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => new(PrimitiveType.Void, owner);
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
@@ -109,6 +109,16 @@ public sealed partial class MethodBuilder
                     Pop(BodyValueType.Receiver(instruction.Field!.DeclaringType));
                     if (instruction.Op == "field.load") stack.Add(instruction.Field.FieldType);
                     break;
+                case "array.new":
+                    Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
+                case "array.load": case "array.store":
+                    if (instruction.Op == "array.store") Pop(instruction.Type!);
+                    Pop(PrimitiveType.Int32); Pop(SignatureType.ArrayOf(instruction.Type!));
+                    if (instruction.Op == "array.load") stack.Add(instruction.Type!);
+                    break;
+                case "array.length":
+                    if (stack.Count == 0 || stack[^1].ArrayElement is null) throw new InvalidDataException("array length requires a vector");
+                    stack[^1] = new(PrimitiveType.Void, NativeLength: true); break;
                 case "new.object":
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
                     stack.Add(BodyValueType.Receiver(instruction.Target.DeclaringType!)); break;
@@ -123,8 +133,8 @@ public sealed partial class MethodBuilder
                 case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
                 case "convert32": case "convert64":
-                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
-                        throw new InvalidDataException("integer conversion requires Int32 or Int64");
+                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
+                        throw new InvalidDataException("integer conversion requires Int32/Int64 or array length for conv.i4");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
                 case "argument.store": Pop(ArgumentType(instruction.Value)); break;

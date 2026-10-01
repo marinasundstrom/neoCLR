@@ -168,6 +168,18 @@ public sealed partial class AssemblyBuilder
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
         var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
+        var primitiveTokens = new Dictionary<PrimitiveType, TypeReferenceHandle>();
+        int ElementToken(SignatureType type)
+        {
+            if (type.ClassType is { } owner) return MetadataTokens.GetToken(typeHandles[owner]);
+            var primitive = type.Primitive!.Value;
+            if (!primitiveTokens.TryGetValue(primitive, out var handle))
+            {
+                handle = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString(primitive.ToString()));
+                primitiveTokens.Add(primitive, handle);
+            }
+            return MetadataTokens.GetToken(handle);
+        }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
             if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
@@ -229,7 +241,7 @@ public sealed partial class AssemblyBuilder
             offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "string" or "constant" or "call" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" => 4,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
@@ -245,6 +257,10 @@ public sealed partial class AssemblyBuilder
                 switch (instruction.Op)
                 {
                     case "label": break;
+                    case "array.length": code.WriteByte(0x8e); break;
+                    case "array.new": case "array.load": case "array.store":
+                        code.WriteByte(instruction.Op == "array.new" ? (byte)0x8d : instruction.Op == "array.load" ? (byte)0xa3 : (byte)0xa4);
+                        code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "duplicate": code.WriteByte(0x25); break;
                     case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "field.load": case "field.store":
@@ -452,7 +468,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
