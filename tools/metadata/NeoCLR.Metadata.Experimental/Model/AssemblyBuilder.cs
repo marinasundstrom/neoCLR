@@ -70,17 +70,11 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid namespace/name, duplicate signature or exceeded limit.</exception>
     public MethodBuilder AddFunction(string @namespace, string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
-        if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
-        ArgumentNullException.ThrowIfNull(signature);
-        signature.ValidateOwner(this);
-        FunctionNamespaceEncoding.Validate(@namespace);
-        if (string.IsNullOrEmpty(name) || name.StartsWith(FunctionNamespaceEncoding.Prefix, StringComparison.Ordinal) || @namespace.Length + name.Length > 1024 || functions.Count >= 256 ||
-            functions.Any(m => m.Namespace == @namespace && m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
-            throw new ArgumentException("invalid or duplicate function");
-        var function = new MethodBuilder(this, null, name, signature, visibility, @namespace);
-        functions.Add(function);
-        return function;
+        var definition = new MethodDefinition(name, signature, visibility, @namespace);
+        Definition.MainModule.Functions.Add(definition);
+        return definition.Producer!;
     }
+
     internal MethodBuilder[] ValidateGraph(bool validateBodies = true)
     {
         var methods = functions.Concat(types.SelectMany(t => t.Methods)).ToArray();

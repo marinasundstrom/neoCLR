@@ -2746,7 +2746,8 @@ operations remain open; the unchanged collections gate is not claimed complete.
 ### Metadata definition migration checkpoint (2026-10-01)
 
 On `codex/extended-cli-metadata`, assembly/type/field definitions now support bounded
-direct construction; method builders expose shared method declarations. Raven's
+direct construction; method builders expose shared method declarations. Assembly-level
+function definitions can also be attached directly and emitted using body helpers. Raven's
 `codex/metadata-consumer` adapter still uses the builder facade and requires no compiler
 or Runtime Contract changes. CLI/native encodings and ordinary .NET behavior remain
 unchanged. Native intent remains assembly-owned functions and CLI-compatible categories;

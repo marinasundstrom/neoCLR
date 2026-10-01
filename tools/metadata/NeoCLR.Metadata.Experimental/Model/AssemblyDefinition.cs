@@ -28,8 +28,21 @@ public sealed partial class AssemblyDefinition
 
     /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
     public uint EntryPointToken { get; }
-    /// <summary>Gets the owned entry-point definition, or null for a library.</summary>
-    public MethodDefinition? EntryPoint => Producer is null ? MainModule.GetMethodDefinition(EntryPointToken) : Producer.EntryPoint?.Definition;
+    /// <summary>Gets the entry-point definition, or null for a library; authored assemblies also permit assignment.</summary>
+    /// <exception cref="InvalidOperationException">Assignment to a loaded snapshot.</exception>
+    /// <exception cref="ArgumentException">The assigned definition is detached or belongs to another assembly.</exception>
+    /// <remarks>Signature and body eligibility are validated when writing.</remarks>
+    public MethodDefinition? EntryPoint
+    {
+        get => Producer is null ? MainModule.GetMethodDefinition(EntryPointToken) : Producer.EntryPoint?.Definition;
+        set
+        {
+            if (Producer is null) throw new InvalidOperationException("loaded entry points are read-only");
+            if (value is not null && (value.Producer is null || !ReferenceEquals(value.Producer.Assembly, Producer)))
+                throw new ArgumentException("entry point must belong to this authored assembly");
+            Producer.EntryPoint = value?.Producer;
+        }
+    }
     /// <summary>Encodes an authored assembly, or copies an unchanged loaded snapshot byte for byte.</summary>
     /// <returns>Owned PE bytes.</returns>
     /// <remarks>Loaded snapshot editing remains unsupported.</remarks>
@@ -260,7 +273,11 @@ public sealed partial class ModuleDefinition
         var callables = methodRows.Select(row => new MethodDefinition(this, row)).ToArray();
         snapshotMethods = Array.AsReadOnly(callables);
         methods = callables.ToDictionary(method => method.MetadataToken);
-        snapshotFunctions = Array.AsReadOnly(callables.Where(method => method.DeclaringType is null).ToArray());
+        Functions = new DefinitionCollection<MethodDefinition>(callables.Where(method => method.DeclaringType is null), function =>
+        {
+            if (Assembly.Producer is not { } producer) throw new InvalidOperationException("loaded functions are read-only");
+            producer.AttachFunction(function);
+        });
         declaredMethods = callables.Where(method => method.DeclaringType is not null)
             .GroupBy(method => method.DeclaringType!.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<MethodDefinition>)Array.AsReadOnly(group.ToArray()));
@@ -302,9 +319,8 @@ public sealed partial class ModuleDefinition
     /// <summary>Gets methods in this module; authored views share builder declarations.</summary>
     public IReadOnlyList<MethodDefinition> Methods => Assembly.Producer is null ? snapshotMethods : Assembly.Producer.Functions.Concat(Assembly.Producer.Types.SelectMany(t => t.Methods)).Select(m => m.Definition).ToArray();
     /// <summary>Gets top-level functions with no declaring type, in metadata order.</summary>
-    private readonly IReadOnlyList<MethodDefinition> snapshotFunctions;
     /// <summary>Gets functions in this module; authored views share builder declarations.</summary>
-    public IReadOnlyList<MethodDefinition> Functions => Assembly.Producer is null ? snapshotFunctions : Assembly.Producer.Functions.Select(m => m.Definition).ToArray();
+    public IList<MethodDefinition> Functions { get; }
     /// <summary>Looks up an owned MethodDef token; other kinds or absent rows return null.</summary>
     /// <param name="metadataToken">Physical MethodDef token in this snapshot.</param>
     /// <returns>The owned callable or null.</returns>

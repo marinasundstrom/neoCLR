@@ -21,9 +21,9 @@ public sealed partial class MethodDefinition
         signature = row.Signature;
     }
     /// <summary>Gets the owning module snapshot.</summary>
-    public ModuleDefinition Module { get; }
+    public ModuleDefinition Module { get; internal set; } = null!;
     /// <summary>Gets the owned declaring type, or null for a global function.</summary>
-    public TypeDefinition? DeclaringType => Producer is { } producer ? producer.DeclaringType?.Definition : Module.GetTypeDefinition(declaringToken);
+    public TypeDefinition? DeclaringType => Producer is { } producer ? producer.DeclaringType?.Definition : AuthoredSignature is not null ? null : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets the physical MethodDef token, meaningful only within this module.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the declared metadata name.</summary>
@@ -41,7 +41,7 @@ public sealed partial class MethodDefinition
     public bool IsStatic => (declarationAttributes & 0x10) != 0;
     /// <summary>Copies the CLI signature blob without resolving its type references.</summary>
     /// <returns>New owned bytes; unsupported encodings remain opaque rather than being simplified.</returns>
-    public byte[] GetSignature() => Producer is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use AuthoredSignature");
+    public byte[] GetSignature() => AuthoredSignature is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use AuthoredSignature");
 
     /// <summary>Recognizes the writer's static, nongeneric Int32 parameter/result or no-result signature subset.</summary>
     /// <param name="parameterCount">On success, Int32 parameter count (0–256); otherwise zero.</param>

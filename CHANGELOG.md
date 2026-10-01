@@ -15,7 +15,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and type Fields now expose IList instead of IReadOnlyList (development API change).
   Method builders now share canonical declarations with module/type/function/entry-point
   views; authored signatures and context-derived CLI flags are inspectable. Direct
-  method construction and definition-owned bodies remain pending.
+  type-method construction and definition-owned bodies remain pending. Assembly-level
+  functions can now be constructed directly, appended to Module.Functions, selected as
+  EntryPoint and given bodies through MethodBuilder.ForDefinition; the manual helper-call
+  case executes on CLR and neoCLR (42). Module.Functions now returns IList.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

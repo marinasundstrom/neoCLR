@@ -9,7 +9,8 @@ milestone sequencing and scope. Explicit author directions take precedence.
 now shares declaration objects with builder facades and retains existing CLI/native
 encoding. Manual struct execution returns 42 on both runtimes; Raven cross-assembly
 probes remain green. Canonical method declarations and authored entry/function views now follow; direct
-method construction, bodies, full editing and reader materialization remain open. The author reaffirmed CLI/CIL as the baseline to extend or modify, and continued
+type-method construction, bodies, full editing and reader materialization remain open.
+Direct assembly-function construction and helper-call execution are now covered as well. The author reaffirmed CLI/CIL as the baseline to extend or modify, and continued
 authorization for end-to-end work. [Contract](../api-docs/experimental-metadata.md#authored-definitions-first-migration-slice).
 
 **Author-directed architecture correction (2026-10-01):** definitions must be the

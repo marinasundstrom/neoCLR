@@ -588,3 +588,6 @@ They are excluded from guest RavenDoc selection for the same host-language reaso
 
 MethodBuilder.Definition and MethodDefinition.AuthoredSignature/Namespace are also
 covered in the manual host metadata reference; guest RavenDoc selection is unchanged.
+
+The host manual reference also covers direct MethodDefinition function construction,
+MethodBuilder.ForDefinition, append-only Module.Functions and authored EntryPoint assignment.

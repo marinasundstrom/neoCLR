@@ -40,11 +40,13 @@ internal static class AuthoredDefinitionChecks
         var builder = AssemblyBuilder.ForDefinition(assembly);
         if (!ReferenceEquals(assembly.MainModule.Fields.Single(), field)) throw new Exception("module field view");
         var entry = executable.EntryPoint!;
-        if (!ReferenceEquals(entry, executable.MainModule.Functions.Single()) ||
-            !ReferenceEquals(entry, executable.MainModule.Methods.Single()) || entry.DeclaringType is not null ||
+        if (!ReferenceEquals(entry, executable.MainModule.Functions.Single(m => m.Name == "Main")) ||
+            !ReferenceEquals(entry, executable.MainModule.Methods.Single(m => m.Name == "Main")) || entry.DeclaringType is not null ||
             !ReferenceEquals(entry.AuthoredSignature, AssemblyBuilder.ForDefinition(executable).EntryPoint!.Signature))
             throw new Exception("authored function definition identity");
         Reject<InvalidOperationException>(() => entry.GetSignature());
+        Reject<ArgumentException>(() => assembly.EntryPoint = entry);
+        Reject<NotSupportedException>(() => executable.MainModule.Functions.Clear());
         var writtenEntry = AssemblyDefinition.ReadAssembly(executable.Write(), false).EntryPoint!;
         if (entry.Attributes != writtenEntry.Attributes || entry.Name != writtenEntry.Name) throw new Exception("method declaration round trip");
         if (!ReferenceEquals(builder.Definition, assembly) || !ReferenceEquals(builder.Types[0].Definition, type) ||
@@ -60,6 +62,13 @@ internal static class AuthoredDefinitionChecks
         Reject<NotSupportedException>(() => type.Fields.Remove(field));
         var foreign = AssemblyDefinition.CreateAssembly(new("Other", new Version(1, 0, 0, 0)), builder.CoreLibrary);
         Reject<ArgumentException>(() => foreign.MainModule.Types.Add(type));
+        var scoped = new MethodDefinition("Scoped", new MethodSignature(builder.Types[0], Array.Empty<SignatureType>()));
+        Reject<ArgumentException>(() => foreign.MainModule.Functions.Add(scoped));
+        Reject<InvalidOperationException>(() => MethodBuilder.ForDefinition(scoped));
+        assembly.MainModule.Functions.Add(scoped);
+        var scopedBody = MethodBuilder.ForDefinition(scoped);
+        scopedBody.LoadDefault(builder.Types[0]); scopedBody.Return();
+        Reject<ArgumentException>(() => assembly.MainModule.Functions.Add(new MethodDefinition("Scoped", scoped.AuthoredSignature!)));
         var method = builder.Types[0].AddMethod("get_Answer");
         method.LoadConstant(42); method.Return();
         builder.Types[0].AddProperty("Answer", PrimitiveType.Int32, getter: method);
@@ -86,6 +95,8 @@ internal static class AuthoredDefinitionChecks
             if (declared.Attributes != physical.Attributes || declared.GenericArity != physical.GenericArity || declared.IsStatic != physical.IsStatic)
                 throw new Exception("authored method flags differ from encoding");
         }
+        Reject<InvalidOperationException>(() => snapshot.EntryPoint = null);
+        Reject<InvalidOperationException>(() => snapshot.MainModule.Functions.Add(new MethodDefinition("New", PrimitiveMethodSignature.Int32(0, true))));
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Add(type));
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Single(t => t.Name == "MyStruct").Fields[0].Name = "Changed");
         Reject<InvalidOperationException>(() => AssemblyBuilder.ForDefinition(snapshot));
@@ -96,10 +107,19 @@ internal static class AuthoredDefinitionChecks
     {
         var assembly = Create(); var builder = AssemblyBuilder.ForDefinition(assembly);
         var type = builder.Types.Single(); var field = type.Fields.Single();
-        var entry = builder.AddFunction("Main"); builder.EntryPoint = entry;
+        var helperDefinition = new MethodDefinition("Answer", PrimitiveMethodSignature.Int32(0, true), @namespace: "Example");
+        Reject<InvalidOperationException>(() => MethodBuilder.ForDefinition(helperDefinition));
+        assembly.MainModule.Functions.Add(helperDefinition);
+        Reject<ArgumentException>(() => assembly.MainModule.Functions.Add(helperDefinition));
+        var helper = MethodBuilder.ForDefinition(helperDefinition);
+        helper.LoadConstant(42); helper.Return();
+        var entryDefinition = new MethodDefinition("Main", PrimitiveMethodSignature.Int32(0, true));
+        assembly.MainModule.Functions.Add(entryDefinition);
+        assembly.EntryPoint = entryDefinition;
+        var entry = MethodBuilder.ForDefinition(entryDefinition);
         var local = entry.DeclareLocal(type);
         entry.LoadDefault(type); entry.StoreLocal(local);
-        entry.LoadLocalAddress(local); entry.LoadConstant(42); entry.StoreField(field);
+        entry.LoadLocalAddress(local); entry.Call(helper); entry.StoreField(field);
         entry.LoadLocal(local); entry.LoadField(field); entry.Return();
         return assembly;
     }
@@ -120,7 +140,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field construction; same definitions in compatibility builders; native write/load/execute; method/body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; type-method construction, body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

@@ -3328,7 +3328,7 @@ remain zero until encoding and rereading; token lookup is a loaded-image operati
 
 Method bodies, property associations and generic parameter declarations still use the
 existing builder representation. Authored method/function views and EntryPoint now expose canonical declarations;
-use the builder facade to create methods and edit bodies. Other
+use the builder facade to create type methods and edit bodies. Other
 snapshot metadata views are not materialized authored views. Loaded definitions remain
 read-only, byte-preserving snapshots. Writers currently use builder encoding adapters;
 this is not completion of canonical method/body or reader/editor migration.
@@ -3358,8 +3358,8 @@ its name, authored namespace, access/static flags and immutable signature.
 loaded declarations); `MethodDefinition.Namespace` returns the authored namespace
 (null for loaded physical rows). `ModuleDefinition.Methods`, `.Functions`,
 `TypeDefinition.Methods` and `AssemblyDefinition.EntryPoint` return those exact
-objects. Global functions retain a null declaring type. Collections remain read-only
-views in this slice. No direct method constructor or mutable body definition yet.
+objects. Global functions retain a null declaring type. Type-method and aggregate method collections remain read-only views. The following
+slice enables direct assembly-function construction; mutable body definitions remain pending.
 
 `MethodDefinition.Attributes` includes context-derived CLI flags for constructors,
 property accessors, interface contracts and implementations. Inspection and PE writing
@@ -3372,3 +3372,49 @@ Emit overloads continue to operate through the method builder.
 Validated by 76 C# groups, including declaration identity and accessor/interface flag
 round trips; direct-struct CLR/native execution returns 42. Raven's external-signature
 native probe also passes with the rebuilt metadata dependency.
+
+
+### Direct assembly-level function construction
+
+`new MethodDefinition(string name, MethodSignature signature,
+MethodVisibility visibility = MethodVisibility.Public, string @namespace = "")`
+creates a detached static function. Public/Internal access is supported; other access
+throws `ArgumentOutOfRangeException`. Null signatures throw `ArgumentNullException`;
+invalid/reserved names and namespaces throw `ArgumentException`. Final Unicode/body
+validation remains at writing, preserving existing builder behavior.
+
+Append to `assembly.MainModule.Functions` to attach and validate signature ownership,
+uniqueness and the 256-function limit. This collection now returns `IList<MethodDefinition>`
+instead of `IReadOnlyList<MethodDefinition>` (development API change). Loaded collections
+reject appends; authored collections reject replacement/removal/reordering. Attached or
+loaded declarations cannot be attached again. A failed foreign-signature attachment does
+not transfer ownership. Type-owned methods still require TypeBuilder construction.
+
+`MethodBuilder.ForDefinition(MethodDefinition)` returns the existing body helper facade.
+Null throws `ArgumentNullException`; detached or loaded input throws
+`InvalidOperationException`. `AssemblyDefinition.EntryPoint` can now be set on authored
+assemblies, including null for a library. Foreign/detached entries throw
+`ArgumentException`; loaded assignment throws `InvalidOperationException`. Writing
+still validates the entry signature/body. Detached Module is unset until attachment.
+
+```csharp
+var answer = new MethodDefinition("Answer", PrimitiveMethodSignature.Int32(0, true),
+    @namespace: "Example");
+assembly.MainModule.Functions.Add(answer);
+var answerBody = MethodBuilder.ForDefinition(answer);
+answerBody.LoadConstant(42);
+answerBody.Return();
+var main = new MethodDefinition("Main", PrimitiveMethodSignature.Int32(0, true));
+assembly.MainModule.Functions.Add(main);
+assembly.EntryPoint = main;
+var mainBody = MethodBuilder.ForDefinition(main);
+mainBody.Call(answerBody);
+mainBody.Return();
+byte[] image = assembly.Write();
+```
+
+This follows Cecil's declaration/body-helper separation while preserving neoCLR's
+assembly-level function category. Existing CLI global-function projection and native
+encoding remain unchanged. The executable test combines this call with direct struct
+field storage; CLR/native return 42. All 76 C# contract groups pass. Arbitrary instruction
+editing, canonical body definitions and loaded read/edit/write remain future slices.

@@ -387,6 +387,6 @@ imported value types and Raven union lowering remain development work.
 
 The development metadata API now supports direct assembly/type/field construction
 with builders sharing those declarations. A manually declared struct executes on CLR
-and neoCLR. Method declaration views now share builder identity. Direct method creation, body
-migration and loaded editing remain planned work; this is
+and neoCLR. Method declaration views now share builder identity. Assembly-level function creation and calls execute through
+body helpers. Direct type-method creation, body migration and loaded editing remain planned work; this is
 not a published general-purpose assembly editor.
