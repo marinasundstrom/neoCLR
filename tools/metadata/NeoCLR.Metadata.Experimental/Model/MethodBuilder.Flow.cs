@@ -90,7 +90,7 @@ public sealed partial class MethodBuilder
             // Preserve native primitive identity across stack operations and joins.
             void Pop(BodyValueType type)
             {
-                if (stack.Count == 0 || stack[^1] != type && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
+                if (stack.Count == 0 || stack[^1] != type && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -197,13 +197,14 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
+                case "call.virtual.constructed":
                 case "call.virtual":
                 case "call":
                 case "call.constructed":
                 case "call.generic":
                     var callSignature = instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(callSignature.ParameterTypes[i]);
-                    if (!instruction.Target.IsStatic) Pop(instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
+                    if (!instruction.Target.IsStatic) Pop(instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature));
                     if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
                     break;
                 case "native.call":

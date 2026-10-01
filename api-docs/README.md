@@ -616,3 +616,11 @@ views are covered in the manual host reference; no guest RavenDoc selection chan
 ImportedTypeReference.IsValueType and expanded value import behavior are host C# APIs
 covered in the manual reference. The native value_type_references annotation is documented
 there as a transport contract; guest RavenDoc selection is unchanged.
+
+ImportedConstructedMethodReference and its properties, imported dispatch category
+properties, MakeConstructedReference, typed Call/CallVirtual/Emit overloads, and the
+closed generic InterfaceImplementation constructor/TypeArguments and builder overload
+are covered in the manual [experimental metadata reference](experimental-metadata.md).
+They remain host C# APIs excluded from the guest RavenDoc type selection; the guest
+reference assembly/snapshot does not change. Native reader projection of those
+relationships is documented alongside the APIs and validated by C# execution tests.

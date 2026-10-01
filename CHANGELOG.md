@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Emit imported constructed interface calls and final virtual class calls using standard
+  CLI MemberRef/TypeSpec and callvirt contracts. Closed generic interface implementations
+  share authored definitions with builders and survive native reference projection.
+  Separate metadata library/consumer binaries return 42 on CLR and neoCLR; a Raven
+  consumer also returns 42, with missing-dependency rejection and null receiver coverage.
+  The unchanged collections sample advances past TryAdd/Add to propagation-expression
+  lowering. General class virtual overrides, generic interface inheritance and union
+  execution remain open; no new native opcode or runtime workaround is introduced.
+
 - Preserve imported value categories through CLI signatures, generic substitution,
   native projection and runtime dependency validation. Separate library/consumer cases
   execute on CLR and neoCLR (42), and a Raven consumer passes. Native manifests may now

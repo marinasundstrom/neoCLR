@@ -52,11 +52,34 @@ public sealed partial class TypeBuilder
     private readonly List<TypeBuilder> implementedInterfaces = [];
     /// <summary>Gets the directly implemented nongeneric interfaces of a root class.</summary>
     public IReadOnlyList<TypeBuilder> ImplementedInterfaces => implementedInterfaces.AsReadOnly();
+    private readonly List<GenericTypeInstance> constructedInterfaces = [];
+    internal IEnumerable<SignatureType> InterfaceSignatures => InterfaceContracts.Select(t => (SignatureType)t).Concat(constructedInterfaces.Select(t => (SignatureType)t));
+    internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InterfaceMethods.Select(m => (m.Name, m.Signature)).Concat(
+        constructedInterfaces.SelectMany(i => i.Definition.Methods.Select(m => (m.Name, new ConstructedMethodReference(m, i.TypeArguments.ToArray(), []).Signature))));
+    /// <summary>Declares a closed owned generic interface implementation on a nongeneric root class.</summary>
+    /// <exception cref="ArgumentNullException">Contract is null.</exception>
+    /// <exception cref="ArgumentException">Foreign, open, duplicate, inherited or noninterface contract.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not a nongeneric root class.</exception>
+    public void AddInterfaceImplementation(GenericTypeInstance contract)
+    {
+        ArgumentNullException.ThrowIfNull(contract);
+        Definition.Interfaces.Add(new InterfaceImplementation(contract.Definition.Definition.ToReference(), contract.TypeArguments));
+    }
+    internal void AttachConstructedInterface(GenericTypeInstance contract)
+    {
+        if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count > 0) throw new InvalidOperationException("constructed interfaces require a nongeneric root class");
+        if (!contract.Definition.IsInterface || !ReferenceEquals(contract.Definition.Assembly, Assembly) ||
+            contract.Definition.BaseInterfaces.Count > 0 || constructedInterfaces.Count >= 256 || constructedInterfaces.Contains(contract))
+            throw new ArgumentException("unsupported or duplicate constructed interface");
+        foreach (var argument in contract.TypeArguments) argument.ValidateOwner(Assembly);
+        constructedInterfaces.Add(contract);
+    }
+    internal bool ConformsTo(GenericTypeInstance contract) => constructedInterfaces.Contains(contract);
     internal IEnumerable<TypeBuilder> InterfaceContracts => baseInterfaces.Concat(implementedInterfaces);
     internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InterfaceContracts.Any(i => i.ConformsTo(contract));
     internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
     internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
-        InterfaceMethods.Any(c => c.Name == method.Name && c.Signature.ReturnType == method.Signature.ReturnType &&
+        RequiredInterfaceMethods.Any(c => c.Name == method.Name && c.Signature.ReturnType == method.Signature.ReturnType &&
             c.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
 
     /// <summary>Declares implicit public implementation of an owned nongeneric interface.</summary>

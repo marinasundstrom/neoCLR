@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--imported-interface-integration")
+{
+    await ImportedInterfaceChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--imported-value-integration")
 {
     await ImportedValueChecks.RunRuntime(args[1], args[2]); return 0;
@@ -247,6 +251,7 @@ var tests = new (string Name, Action Body)[]
     ("Primitive vector imported signatures", VectorImportChecks.Run),
     ("Imported nominal and constructed type signatures", ImportedTypeChecks.Run),
     ("Generic imported signatures and MethodSpec execution", GenericImportChecks.Run),
+    ("Imported generic interface dispatch", ImportedInterfaceChecks.Run),
     ("Imported value signatures and CLR execution", ImportedValueChecks.Run),
     ("Nominal imported method signatures and CLR execution", NominalMethodImportChecks.Run),
     ("Value-type categories defaults and CLI/native projection", ValueTypeChecks.Run),

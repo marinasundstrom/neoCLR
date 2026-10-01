@@ -99,9 +99,9 @@ public sealed partial class MethodDefinition
 
     internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
     {
-        if (!IsStatic || unsupportedGenericParameters || GenericArity is < 0 or > 32)
+        if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");
-        try { return new ImportedSignatureDecoder(signature, Module, consumer, core, GenericArity).Read(); }
+        try { return new ImportedSignatureDecoder(signature, Module, consumer, core, GenericArity, DeclaringType?.GenericArity ?? 0, !IsStatic).Read(); }
         catch (ArgumentException error) { throw new InvalidDataException("invalid imported signature", error); }
     }
 

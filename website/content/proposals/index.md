@@ -406,3 +406,9 @@ native loading. A Raven consumer of a separately produced native value library e
 successfully. The collections sample advances to a body-lowering invocation gap; full
 union/member support remains development work. New imported-value images require the
 updated runtime.
+
+Development integration now executes imported constructed interface dispatch and final
+class calls through Raven-produced native consumers (42). The metadata library also
+supports closed generic interface implementations and matching CLI projection. The
+unchanged collections application next stops at propagation-expression lowering; this
+is not yet complete application support.

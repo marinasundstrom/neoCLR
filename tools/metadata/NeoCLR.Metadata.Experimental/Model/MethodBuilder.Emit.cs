@@ -196,18 +196,18 @@ public sealed partial class MethodBuilder
     }
 
     /// <summary>Appends a call to an owned imported read-only method reference.</summary>
-    /// <param name="opCode">Call.</param>
+    /// <param name="opCode">Call, or Callvirt when RequiresVirtualDispatch is true.</param>
     /// <param name="operand">Reference imported by this output assembly builder.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
-    /// <exception cref="ArgumentException">Opcode is not Call, the definition is uninstantiated generic, or the reference belongs to another builder.</exception>
+    /// <exception cref="ArgumentException">Wrong dispatch opcode, an uninstantiated generic definition, or a reference from another builder.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, ImportedMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
+        if (opCode != (operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
-        if (operand.Signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
-        Append(new("call", Target: operand.Target));
+        if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
+        Append(new(operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : (SignatureType)operand.DeclaringReference!));
     }
 
     /// <summary>Appends a native-only call to a loaded static Int32 System declaration.</summary>

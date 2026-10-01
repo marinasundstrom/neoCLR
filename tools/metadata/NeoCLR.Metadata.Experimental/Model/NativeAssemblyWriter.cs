@@ -77,9 +77,9 @@ public sealed partial class AssemblyBuilder
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
-            "new.constructed" or "call.constructed" => new
+            "new.constructed" or "call.constructed" or "call.virtual.constructed" => new
             {
-                op = instruction.Op == "new.constructed" ? "newobj.ctor" : "call",
+                op = instruction.Op == "new.constructed" ? "newobj.ctor" : instruction.Op == "call.virtual.constructed" ? "callvirt" : "call",
                 arg = (object)new
                 {
                     name = FunctionName(instruction.Target!),
@@ -209,7 +209,7 @@ public sealed partial class AssemblyBuilder
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType, type.IsStatic, type.IsStatic || type.IsValueType,
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
-                !type.InterfaceContracts.Any() ? null : type.InterfaceContracts.Select(b => (object)new { Named = TypeName(b) }).ToArray(),
+                !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type))).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(

@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, string[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
@@ -119,7 +119,7 @@ public sealed class NativeAssemblyDefinition
                 }
                 bool isInterface = type.TryGetProperty("representation", out var representation);
                 if (isInterface) { typeFields.Add("representation"); Require(representation.GetString() == "Interface", "unsupported native representation"); }
-                var baseInterfaces = type.TryGetProperty("implements", out _) ? Array(type, "implements", 256).Select(b => { Shape(b, "Named"); return Text(b, "Named"); }).ToArray() : [];
+                var baseInterfaces = type.TryGetProperty("implements", out _) ? Array(type, "implements", 256).Select(b => b.Clone()).ToArray() : [];
                 if (type.TryGetProperty("implements", out _)) typeFields.Add("implements");
 
                 Shape(type, typeFields.ToArray());
@@ -192,13 +192,20 @@ public sealed class NativeAssemblyDefinition
                 if (marker >= 0) Require(int.TryParse(simpleName[(marker + 1)..], out importedArity) && importedArity > 0, "invalid imported value arity");
                 _ = ImportExternalType(signatureGraph, reference, importedArity, referenceIdentities, valueTypeReferences);
             }
+            int genericArity = 0; int typeArity = 0;
             var signatureOwners = types.Select(t => DefineType(signatureGraph, t)).ToArray();
             for (int i = 0; i < types.Count; i++)
                 foreach (var inherited in types[i].BaseInterfaces)
                 {
-                    int parent = types.FindIndex(t => t.NativeName == inherited);
+                    bool constructed = inherited.TryGetProperty("Constructed", out var instance);
+                    Shape(inherited, constructed ? "Constructed" : "Named");
+                    if (constructed) Shape(instance, "definition", "arguments");
+                    int parent = types.FindIndex(t => t.NativeName == (constructed ? Text(instance, "definition") : Text(inherited, "Named")));
                     Require(parent >= 0, "missing inherited interface");
-                    if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
+                    Require(!constructed || types[parent].BaseInterfaces.Length == 0, "constructed interface inheritance is unsupported");
+                    if (constructed) signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent].MakeGenericInstance(
+                        Array(instance, "arguments", 32).Select(a => ReadType(a, false)).ToArray()));
+                    else if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
                     else signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent]);
                 }
             for (int i = 0; i < types.Count; i++)
@@ -210,7 +217,6 @@ public sealed class NativeAssemblyDefinition
                 }
             for (int i = 0; i < types.Count; i++)
                 foreach (var (parameter, flags) in types[i].SpecialConstraints) signatureOwners[i].SetSpecialConstraints(parameter, flags);
-            int genericArity = 0; int typeArity = 0;
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true)
             {
                 if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
@@ -416,10 +422,6 @@ public sealed class NativeAssemblyDefinition
         var graph = new AssemblyBuilder(Identity, coreLibrary);
         var owners = types.Select(t => DefineType(graph, t)).ToArray();
         for (int i = 0; i < types.Length; i++)
-            foreach (var inherited in types[i].BaseInterfaces)
-                if (types[i].IsInterface) owners[i].AddBaseInterface(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
-                else owners[i].AddInterfaceImplementation(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
-        for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
@@ -439,6 +441,13 @@ public sealed class NativeAssemblyDefinition
             int index = System.Array.FindIndex(types, row => row.NativeName == name);
             return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References, valueTypeReferences).MakeGenericInstance(arguments);
         }
+        for (int i = 0; i < types.Length; i++)
+            foreach (var inherited in types[i].BaseInterfaces) {
+                var contract = ProjectType(inherited);
+                if (contract.GenericInstance is { } constructed) owners[i].AddInterfaceImplementation(constructed);
+                else if (types[i].IsInterface) owners[i].AddBaseInterface(contract.ClassType!);
+                else owners[i].AddInterfaceImplementation(contract.ClassType!);
+            }
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
         SignatureType Remap(SignatureType type) => type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? owners[System.Array.FindIndex(types, t => t.Namespace == instance.Definition.Namespace && t.Name == instance.Definition.Name)].MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))

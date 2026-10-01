@@ -76,7 +76,8 @@ public sealed partial class TypeDefinition
             try { target = relationship.InterfaceType.Resolve(); }
             catch (InvalidDataException error) { throw new ArgumentException("interface relationship requires an owned definition reference", error); }
             if (target.Producer is not { } targetBuilder) throw new ArgumentException("interface relationship requires an attached authored target");
-            if (Producer.IsInterface) Producer.AttachBaseInterface(targetBuilder);
+            if (relationship.TypeArguments.Count > 0) Producer.AttachConstructedInterface(targetBuilder.MakeGenericInstance(relationship.TypeArguments.ToArray()));
+            else if (Producer.IsInterface) Producer.AttachBaseInterface(targetBuilder);
             else Producer.AttachInterfaceImplementation(targetBuilder);
             relationship.DeclaringType = this;
         });

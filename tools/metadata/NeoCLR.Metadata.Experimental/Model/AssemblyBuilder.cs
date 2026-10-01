@@ -94,11 +94,18 @@ public sealed partial class AssemblyBuilder
         try
         {
             foreach (var type in types.Where(t => !t.IsInterface))
-                foreach (var contract in type.InterfaceMethods)
+                foreach (var contract in type.RequiredInterfaceMethods)
                     if (!type.Methods.Any(m => !m.IsStatic && m.Visibility == MethodVisibility.Public && m.Name == contract.Name &&
                         m.Signature.GenericParameterNames.Count == 0 && m.Signature.ReturnType == contract.Signature.ReturnType &&
                         m.Signature.ParameterTypes.SequenceEqual(contract.Signature.ParameterTypes)))
                         throw new InvalidDataException("missing public interface implementation: " + contract.Name);
+            foreach (var type in types)
+                foreach (var contract in type.InterfaceSignatures)
+                {
+                    if (contract.GenericInstance is { Definition.BaseInterfaces.Count: > 0 })
+                        throw new InvalidDataException("constructed interface inheritance is unsupported");
+                    contract.ValidateOwner(this, complete: true);
+                }
             foreach (var type in types)
                 foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
             foreach (var method in methods)
@@ -108,7 +115,7 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
-                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op != "call.virtual")
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstructedTarget is { } target)
                     {
@@ -349,7 +356,18 @@ public sealed partial class AssemblyBuilder
         int ConstructedCallToken(ConstructedMethodReference reference)
         {
             var ownerBlob = new BlobBuilder();
-            var arguments = new BlobEncoder(ownerBlob).TypeSpecificationSignature().GenericInstantiation(typeHandles[reference.Definition.DeclaringType!], reference.DeclaringTypeArguments.Count, false);
+            var declaring = reference.Definition.DeclaringType!;
+            EntityHandle declaringHandle;
+            if (typeHandles.TryGetValue(declaring, out var ownedHandle)) declaringHandle = ownedHandle;
+            else {
+                if (!CoreLibrary.Equals(declaring.Assembly.CoreLibrary)) throw new InvalidDataException("incompatible core identity");
+                if (!importedTypes.TryGetValue(declaring, out var external)) {
+                    external = metadata.AddTypeReference(ImportAssembly(declaring.Assembly.Identity), metadata.GetOrAddString(declaring.Namespace), metadata.GetOrAddString(declaring.Name));
+                    importedTypes.Add(declaring, external);
+                }
+                declaringHandle = external;
+            }
+            var arguments = new BlobEncoder(ownerBlob).TypeSpecificationSignature().GenericInstantiation(declaringHandle, reference.DeclaringTypeArguments.Count, declaring.IsValueType);
             foreach (var type in reference.DeclaringTypeArguments) EncodeType(arguments.AddArgument(), type);
             var ownerKey = metadata.GetOrAddBlob(ownerBlob);
             if (!ownerSpecs.TryGetValue(ownerKey, out var owner)) { owner = metadata.AddTypeSpecification(ownerKey); ownerSpecs.Add(ownerKey, owner); }
@@ -406,7 +424,7 @@ public sealed partial class AssemblyBuilder
                 {
                     "constant64" => 9,
                     "label" => 0,
-                    "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -469,7 +487,7 @@ public sealed partial class AssemblyBuilder
                     case "xor": code.WriteByte(0x61); break;
                     case "shift.left": code.WriteByte(0x62); break;
                     case "shift.right": code.WriteByte(0x63); break;
-                    case "new.constructed": case "call.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
+                    case "new.constructed": case "call.constructed": case "call.virtual.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : instruction.Op == "call.virtual.constructed" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
@@ -511,7 +529,7 @@ public sealed partial class AssemblyBuilder
                 }) | (field.IsReadOnly ? FieldAttributes.InitOnly : 0), metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
                 nextField++;
             }
-            foreach (var inherited in type.InterfaceContracts) metadata.AddInterfaceImplementation(typeHandle, typeHandles[inherited]);
+            foreach (var inherited in type.InterfaceSignatures) metadata.AddInterfaceImplementation(typeHandle, MetadataTokens.EntityHandle(ElementToken(inherited)));
             foreach (var method in type.Methods) EmitMethod(method);
             bool firstProperty = true;
             foreach (var property in type.Properties)
@@ -777,7 +795,7 @@ public sealed partial class MethodBuilder
     /// <summary>Appends a call to an imported read-only method contract.</summary>
     /// <param name="target">Reference imported by this method's assembly builder.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
-    /// <exception cref="ArgumentException">Reference belongs to another output builder.</exception>
+    /// <exception cref="ArgumentException">Foreign reference, open generic definition, or a contract requiring Callvirt.</exception>
     public void Call(ImportedMethodReference target) => Emit(OpCode.Call, target);
     /// <summary>Calls a static Int32 function selected from an explicitly loaded native System inventory.</summary>
     /// <param name="target">Owned System function whose parameters and result are Int32.</param>

@@ -3,14 +3,14 @@ namespace NeoCLR.Metadata.Experimental.Model;
 // Decode in the consuming scope: TypeDef tokens belong to the dependency snapshot,
 // but the resulting references and constructed arguments belong to the output.
 internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDefinition module,
-    AssemblyBuilder consumer, AssemblyIdentity core, int arity)
+    AssemblyBuilder consumer, AssemblyIdentity core, int arity, int ownerArity, bool instance)
 {
     private readonly ReadOnlySpan<byte> signature = bytes;
     private int position;
 
     internal MethodSignature Read()
     {
-        if (Byte() != (arity == 0 ? 0 : 0x10) || arity > 0 && Number() != arity)
+        if (Byte() != ((arity == 0 ? 0 : 0x10) | (instance ? 0x20 : 0)) || arity > 0 && Number() != arity)
             throw new InvalidDataException("unsupported imported calling convention");
         var count = Number();
         if (count > 256) throw new InvalidDataException("imported parameter limit");
@@ -31,6 +31,10 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             case 0x08: return PrimitiveType.Int32;
             case 0x0a: return PrimitiveType.Int64;
             case 0x0e: return PrimitiveType.String;
+            case 0x13:
+                var ownerOrdinal = Number();
+                if (ownerOrdinal >= ownerArity) throw new InvalidDataException("unscoped imported owner parameter");
+                return SignatureType.TypeParameter(ownerOrdinal);
             case 0x1e:
                 var ordinal = Number();
                 if (ordinal >= arity) throw new InvalidDataException("unscoped imported method parameter");

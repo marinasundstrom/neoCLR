@@ -3741,3 +3741,62 @@ reference-class substitution for an imported value rejects. Raven's dedicated co
 probe also returns 42 with imported returns, parameters, locals and forwarding. The
 unchanged collections sample advances to an unsupported lowered invocation; it does not
 execute yet.
+
+## Imported member dispatch and closed generic interfaces (2026-10-02)
+
+These are development host C# APIs in `NeoCLR.Metadata.Experimental.Model`. They
+use the existing CLI/CIL format: HAS_THIS and VAR in signatures, TypeSpec parents
+for constructed MemberRefs and callvirt for interface/final virtual dispatch. Native
+format-5 uses its existing constructed-owner function references and interface
+relationships. No new opcode is introduced. Reuse the CLI/Cecil comparison and
+research above; the benefit is one exact imported contract for both writers, with
+a bounded supported subset instead of host reflection loading. The cost is explicit
+dependency registration and rejection of currently unsupported declarations.
+
+| Type/member | Contract |
+| --- | --- |
+| `AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)` | Also imports public nongeneric instance methods of public top-level reference classes/interfaces. Concrete class methods must be nonvirtual or final; interface methods must be abstract/virtual. Owners may be invariant, unconstrained generic reference types. Core/identity/MVID, access/category and scoped signature checks remain mandatory. |
+| `ImportedMethodReference.IsStatic : bool` | Whether the reference excludes a receiver. |
+| `ImportedMethodReference.IsInterfaceMethod : bool` | Whether the declaring contract is an interface. |
+| `ImportedMethodReference.RequiresVirtualDispatch : bool` | Whether Callvirt is required, including final virtual class members; Call is rejected for these references. |
+| `ImportedMethodReference.MakeConstructedReference(IEnumerable<SignatureType> declaringTypeArguments, IEnumerable<SignatureType>? methodArguments = null)` | Returns `ImportedConstructedMethodReference`. Copies arguments, requires exact arities and consumer ownership; caller VAR/MVAR scope is checked when emitted. Instance method generics remain unsupported; static generics may have method arguments. |
+| `ImportedConstructedMethodReference.Definition` | The consumer-owned open imported member. |
+| `ImportedConstructedMethodReference.DeclaringType` | Consumer-owned constructed `ImportedTypeReference`. |
+| `ImportedConstructedMethodReference.Signature` | Substituted `MethodSignature`, with declaring and method parameters replaced simultaneously. |
+| `ImportedConstructedMethodReference.MethodArguments` | Read-only copied method argument list. |
+| `MethodBuilder.Call(ImportedConstructedMethodReference)` | Emits a direct Call for a concrete/static contract. |
+| `MethodBuilder.CallVirtual(ImportedMethodReference)` and `CallVirtual(ImportedConstructedMethodReference)` | Emit Callvirt for an imported interface/final virtual contract. |
+| `MethodBuilder.Emit(OpCode, ImportedMethodReference)` and `Emit(OpCode, ImportedConstructedMethodReference)` | Raw typed operands retain the same ownership, dispatch and generic-scope checks as helpers. No unrestricted integer/token escape hatch. |
+| `InterfaceImplementation(TypeReference, IEnumerable<SignatureType>)` | Definition-owned relationship with copied arguments; attachment validates ownership and shape. |
+| `InterfaceImplementation.TypeArguments : IReadOnlyList<SignatureType>` | Empty for nongeneric relationships, copied ordered arguments for a construction. |
+| `TypeBuilder.AddInterfaceImplementation(GenericTypeInstance)` | Appends the same definition relationship. Supports nongeneric root classes implementing closed owned generic interfaces with no inherited interface edges. Existing nongeneric overload is unchanged. |
+
+Null inputs throw `ArgumentNullException`; invalid construction/ownership/opcodes
+throw `ArgumentException` (an invalid implementation owner throws
+`InvalidOperationException`). Unsupported imported declarations, signature bytes,
+identity conflicts, limits, missing public interface implementations and invalid
+body stacks throw `InvalidDataException`. Instructions retain the existing count
+limits. Generic arities are at most 32; constructed relationships are bounded to
+256. The target interface must be in the same assembly as an authored implementation;
+imported dispatch references themselves can cross assemblies. Neither API infers
+implementation conformance from matching method names alone.
+
+```csharp
+var imported = consumer.ImportReference(interfaceMethodDefinition, explicitCore);
+var call = imported.MakeConstructedReference(new SignatureType[] { PrimitiveType.Int32 });
+body.Call(factoryReference); // Returns exactly the imported constructed interface.
+body.LoadConstant(42);
+body.CallVirtual(call);
+body.Return();
+```
+
+Readers preserve closed generic interface relationships in reference projections;
+older experimental host readers reject this expanded subset. The existing native
+runtime already supports these relationships. Imported constructors/value-instance
+members, generic instance methods, nonfinal virtual class slots, generic interface
+inheritance, cross-dependency TypeRef signatures and native System identity mapping
+remain outside this increment. `ImportedInterfaceChecks` executes a separately
+written library/consumer on CLR and neoCLR (42), checks native null-receiver failure,
+wrong arity/opcode/owner rejection and reference projection. Raven's corresponding
+probe executes constructed interface and final class calls (42); the unchanged
+collections sample advances to propagation-expression lowering.
