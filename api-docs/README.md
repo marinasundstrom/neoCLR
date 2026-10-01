@@ -526,3 +526,7 @@ RavenDoc's guest reference assembly; see [manual reference](experimental-metadat
 ConstructedFieldReference and the constructed LoadField/StoreField/Emit overloads are
 covered by the [host-only metadata manual](experimental-metadata.md#constructed-fields-development),
 with the same explicit RavenDoc guest-assembly exclusion as the other C# producer APIs.
+
+GenericTypeConstraint and TypeBuilder.GenericConstraints/AddBaseTypeConstraint are
+covered in the [host-only metadata manual](experimental-metadata.md#nominal-type-constraints-development),
+with explicit guest RavenDoc exclusion as for the other C# producer APIs.

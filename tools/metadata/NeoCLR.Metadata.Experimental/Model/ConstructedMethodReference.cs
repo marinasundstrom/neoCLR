@@ -44,6 +44,7 @@ public sealed partial class MethodBuilder
             if (type is null || type.Primitive == PrimitiveType.Void) throw new ArgumentException("invalid generic argument");
             type.ValidateOwner(Assembly, 32, 32);
         }
+        owner.ValidateTypeArguments(owners);
         return new(this, owners, methods);
     }
     /// <summary>Allocates and invokes a constructor on a constructed generic class.</summary>

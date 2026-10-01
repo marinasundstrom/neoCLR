@@ -2433,3 +2433,11 @@ validate exact receiver/value types before emitting standard CLI Field MemberRef
 existing native field operations. No schema/Runtime Contract change. Raven integration
 follows; the author directs generic type constraints immediately after this slice.
 Constraints must preserve CLR/native semantics rather than translating unlike flags.
+
+Author-directed type-constraint slice (2026-10-01): owned nongeneric class bounds now
+use CLI GenericParamConstraint and existing native TypeBound, preserving meaning rather
+than mapping CLR flags to native notvoid/notreference. Producer/reference projection and
+binary runtime verification/execution pass; invalid concrete native arguments reject.
+Raven integration follows. The author requests the other constraint categories next;
+class/struct/new/nullability and interface/dependent bounds require distinct contracts.
+This reuses the existing [generic contract research](generic-metadata.md).

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add owned nominal class bounds for declaring-type parameters to the metadata producer.
+  CLI GenericParamConstraint and native TypeBound retain exact bounds in reference
+  projections. Concrete invalid arguments reject, including runtime verification of
+  corrupted call metadata. Earlier uses are revalidated when bounds change. This does
+  not map class/struct/new flags or add interface/dependent bounds.
+
 - Add immutable constructed-field references and typed load/store/raw emits. CLI field
   MemberRefs preserve open signatures on constructed TypeSpecs; native field operations
   retain exact receiver identity. C# tests reject wrong receiver/owner scope and binaries

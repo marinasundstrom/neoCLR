@@ -94,7 +94,31 @@ public sealed partial class AssemblyBuilder
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
             if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null))
                 throw new InvalidDataException("external nominal method references require an import contract");
-        if (validateBodies) foreach (var method in methods) method.Validate();
+        try
+        {
+            foreach (var type in types)
+                foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count);
+            foreach (var method in methods)
+            {
+                int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
+                method.Signature.ValidateOwner(this, arity);
+                foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                foreach (var instruction in method.Instructions)
+                {
+                    if (instruction.ConstructedTarget is { } target)
+                    {
+                        target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments);
+                        foreach (var argument in target.DeclaringTypeArguments.Concat(target.MethodArguments)) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                    }
+                    if (instruction.GenericTarget is { } generic)
+                        foreach (var argument in generic.TypeArguments) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                    if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                    instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity);
+                }
+                if (validateBodies) method.Validate();
+            }
+        }
+        catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract", error); }
         return methods;
     }
     /// <summary>Gets or sets a local parameterless Int32 or no-result entry point; null writes a library.</summary>
@@ -467,7 +491,16 @@ public sealed partial class AssemblyBuilder
             }
         }
         foreach (var row in genericRows.OrderBy(r => r.Sort))
-            for (int i = 0; i < row.Names.Count; i++) metadata.AddGenericParameter(row.Owner, GenericParameterAttributes.None, metadata.GetOrAddString(row.Names[i]), i);
+            for (int i = 0; i < row.Names.Count; i++)
+            {
+                var parameter = metadata.AddGenericParameter(row.Owner, GenericParameterAttributes.None, metadata.GetOrAddString(row.Names[i]), i);
+                if (row.Owner.Kind == HandleKind.TypeDefinition)
+                {
+                    var owner = types[MetadataTokens.GetRowNumber(row.Owner) - 2];
+                    foreach (var constraint in owner.GenericConstraints.Where(c => c.ParameterIndex == i))
+                        metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.BaseType]);
+                }
+            }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),
             new MetadataRootBuilder(metadata), bodies, entryPoint: referenceOnly || EntryPoint is null ? default : handles[EntryPoint],

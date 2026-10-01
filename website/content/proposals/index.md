@@ -314,3 +314,7 @@ Constraints and full class-library compilation remain future work; see the [expe
 
 Development producer metadata also supports constructed generic field references with
 exact receiver/value checks; external assembly fields remain outside the current API.
+
+Development metadata also retains nominal class bounds on type parameters through CLI
+and native metadata, with invalid concrete arguments rejected. Other constraint kinds
+remain under development.

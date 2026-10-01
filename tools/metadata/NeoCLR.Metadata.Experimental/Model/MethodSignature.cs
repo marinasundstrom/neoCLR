@@ -49,6 +49,7 @@ public sealed record SignatureType
         if (GenericInstance is { } instance)
         {
             if (!ReferenceEquals(instance.Definition.Assembly, assembly)) throw new ArgumentException("foreign constructed class");
+            instance.Definition.ValidateTypeArguments(instance.TypeArguments);
             foreach (var argument in instance.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity);
         }
         if ((ArrayElement?.ClassType ?? ClassType) is { } owner && !ReferenceEquals(owner.Assembly, assembly))

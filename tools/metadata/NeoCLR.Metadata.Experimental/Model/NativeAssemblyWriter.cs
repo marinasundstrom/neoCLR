@@ -70,16 +70,30 @@ public sealed partial class AssemblyBuilder
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
-            "new.constructed" or "call.constructed" => new { op = instruction.Op == "new.constructed" ? "newobj.ctor" : "call", arg = (object)new {
-                name = FunctionName(instruction.Target!), owner = TypeOwner(instruction.Target!.DeclaringType!, instruction.ConstructedTarget!.DeclaringTypeArguments), instance = !instruction.Target.IsStatic,
-                generic_arguments = instruction.ConstructedTarget.MethodArguments.Select(SignatureValue).ToArray(),
-                parameters = instruction.ConstructedTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
-            } },
-            "call.generic" => new { op = "call", arg = (object)new {
-                name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic,
-                generic_arguments = instruction.GenericTarget!.TypeArguments.Select(SignatureValue).ToArray(),
-                parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
-            } },
+            "new.constructed" or "call.constructed" => new
+            {
+                op = instruction.Op == "new.constructed" ? "newobj.ctor" : "call",
+                arg = (object)new
+                {
+                    name = FunctionName(instruction.Target!),
+                    owner = TypeOwner(instruction.Target!.DeclaringType!, instruction.ConstructedTarget!.DeclaringTypeArguments),
+                    instance = !instruction.Target.IsStatic,
+                    generic_arguments = instruction.ConstructedTarget.MethodArguments.Select(SignatureValue).ToArray(),
+                    parameters = instruction.ConstructedTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
+                }
+            },
+            "call.generic" => new
+            {
+                op = "call",
+                arg = (object)new
+                {
+                    name = FunctionName(instruction.Target!),
+                    owner = Owner(instruction.Target!),
+                    instance = !instruction.Target!.IsStatic,
+                    generic_arguments = instruction.GenericTarget!.TypeArguments.Select(SignatureValue).ToArray(),
+                    parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
+                }
+            },
             "call" or "new.object" => new { op = instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
@@ -130,7 +144,8 @@ public sealed partial class AssemblyBuilder
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, _ => 1 });
             var labels = method.LabelPositions();
-            return method.Instructions.SelectMany(instruction => instruction.Op switch {
+            return method.Instructions.SelectMany(instruction => instruction.Op switch
+            {
                 "label" => Array.Empty<object>(),
                 "branch" or "branch.true" or "branch.false" => new object[] {
                     new { op = instruction.Op == "branch" ? "br" : instruction.Op == "branch.true" ? "brtrue" : "brfalse", arg = offsets[labels[instruction.Value]] }
@@ -146,9 +161,13 @@ public sealed partial class AssemblyBuilder
             var name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name;
             if (type.Fields.Count == 0 && type.Properties.Count == 0)
                 return Origin(name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public);
-            var origin = new Dictionary<string, object> {
-                ["assembly"] = IdentityText(Identity), ["module"] = Identity.Name + ".dll", ["name"] = name,
-                ["token"] = 0x02000002 + index, ["publicly_visible"] = type.Visibility == TypeVisibility.Public,
+            var origin = new Dictionary<string, object>
+            {
+                ["assembly"] = IdentityText(Identity),
+                ["module"] = Identity.Name + ".dll",
+                ["name"] = name,
+                ["token"] = 0x02000002 + index,
+                ["publicly_visible"] = type.Visibility == TypeVisibility.Public,
                 ["field_tokens"] = type.Fields.Select(f => fieldTokens[f]).ToArray(),
                 ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
                 ["field_readonly"] = type.Fields.Select(f => f.IsReadOnly).ToArray()
@@ -169,7 +188,7 @@ public sealed partial class AssemblyBuilder
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
                 TypeOrigin(type, index),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray())).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), type.GenericConstraints.Count == 0 ? null : type.GenericConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = new { Named = TypeName(c.BaseType) } } }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -200,6 +219,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? properties,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        string[]? generic_parameters);
+        string[]? generic_parameters,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? generic_constraints);
 
 }

@@ -2746,3 +2746,27 @@ readonly constructor rule. CLI emits a Field MemberRef on a constructed TypeSpec
 the open field signature. Native field indices retain the runtime's constructed receiver
 identity and layout. External *assembly* imports remain unsupported; this API accesses
 owned fields from outside their declaring type and supersedes that earlier restriction.
+
+
+### Nominal type constraints (development)
+
+`TypeBuilder.AddBaseTypeConstraint(int parameterIndex, TypeBuilder baseType)` adds one
+owned nongeneric nonstatic root-class bound to a declared type parameter. Null bounds
+throw ArgumentNullException; invalid indices, repeated parameters, foreign/static/generic
+bounds throw ArgumentException. `GenericConstraints` exposes read-only
+`GenericTypeConstraint` snapshots with `ParameterIndex` and `BaseType`; the public record
+constructor creates a value only and does not add a constraint to a definition.
+
+CLI uses GenericParamConstraint; native uses TypeBound. Within this root-class producer
+subset, concrete arguments must be the bound class itself (inheritance/interfaces are
+not representable yet). Symbolic VAR/MVAR arguments are deferred to runtime substitution.
+Constructing an invalid concrete reference throws ArgumentException; writing revalidates
+previous uses after added bounds and throws InvalidDataException. The native reader
+validates bound ordinals/identity and preserves bounds in the CLI reference projection.
+Malformed bound metadata throws InvalidDataException. Existing unconstrained outputs
+retain their encoding; constrained outputs need the matching reader.
+
+This is a nominal bound, not a class/struct/new()/notnull flag. Those categories,
+method constraints, interface/dependent bounds and dispatch through an open constrained
+parameter remain separate contracts. The runtime already enforces nominal TypeBound;
+no schema change is needed for this slice.
