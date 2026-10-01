@@ -12,7 +12,7 @@ internal static class GenericCallChecks
         var t = SignatureType.MethodParameter(0);
         var identity = graph.Functions.Single(m => m.Name == "Identity");
         var forward = graph.AddFunction("Forward", new MethodSignature(t, [t], ["U"]));
-        forward.LoadArgument(0); forward.Call(identity.MakeGenericInstance(t)); forward.Return();
+        forward.LoadArgument(0); forward.Emit(OpCode.Call, identity.MakeGenericInstance(t)); forward.Return();
         var single = graph.AddFunction("Single", new MethodSignature(SignatureType.ArrayOf(t), [t], ["T"]));
         var values = single.DeclareLocal(SignatureType.ArrayOf(t));
         single.LoadConstant(1); single.NewArray(t); single.StoreLocal(values);
@@ -42,9 +42,18 @@ internal static class GenericCallChecks
         Reject(() => identity.MakeGenericInstance(GenericSignatureChecks.Create().Types[0]));
         Reject(() => graph.EntryPoint!.Call(identity.MakeGenericInstance(SignatureType.MethodParameter(0))));
         Reject(() => graph.EntryPoint!.Emit(OpCode.Add, identity.MakeGenericInstance(PrimitiveType.Int32)));
+        SignatureType[] arguments = [PrimitiveType.Int32];
+        var immutable = identity.MakeGenericInstance(arguments);
+        arguments[0] = PrimitiveType.Boolean;
+        if (immutable.TypeArguments[0].Primitive != PrimitiveType.Int32 || immutable.Signature.ReturnType.Primitive != PrimitiveType.Int32)
+            throw new Exception("instantiation retained mutable argument array");
         var single = graph.Functions.Single(m => m.Name == "Single");
         Reject(() => single.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)));
         if (!Equals(Assembly.Load(graph.Write()).EntryPoint!.Invoke(null, null), 42)) throw new Exception("rejection mutated body");
+        var entry = graph.EntryPoint!; entry.ClearBody();
+        entry.LoadConstant(1); entry.Call(identity.MakeGenericInstance(PrimitiveType.Boolean)); entry.Emit(OpCode.Pop); entry.LoadConstant(42); entry.Return();
+        try { graph.Write(); throw new Exception("wrong generic stack argument accepted"); } catch (InvalidDataException) { }
+        try { graph.WriteNativeAssembly(); throw new Exception("wrong native generic stack argument accepted"); } catch (InvalidDataException) { }
     }
     internal static async Task RunRuntime(string runtime, string output)
     {

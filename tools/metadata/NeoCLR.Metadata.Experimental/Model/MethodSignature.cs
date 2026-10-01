@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned root-class or vector signature type.</summary>
+/// <summary>An immutable primitive, owned root-class, method-parameter or vector signature type.</summary>
 public sealed record SignatureType
 {
     private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null) { Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; }
@@ -10,7 +10,7 @@ public sealed record SignatureType
     public TypeBuilder? ClassType { get; }
     /// <summary>Gets the element type for a zero-based vector, or null for a scalar.</summary>
     public SignatureType? ArrayElement { get; }
-    /// <summary>Creates a one-dimensional zero-based vector of primitives or owned root classes.</summary>
+    /// <summary>Creates a one-dimensional zero-based vector of primitives, owned root classes or method parameters.</summary>
     /// <param name="elementType">Non-Void scalar type; nested and multidimensional arrays are not admitted.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Element is Void or another array.</exception>
@@ -49,7 +49,7 @@ public sealed record SignatureType
     public override string ToString() => ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
-/// <summary>An immutable nongeneric signature with primitive or owned nominal parameters/results.</summary>
+/// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
 public class MethodSignature
 {
     /// <summary>Copies up to 256 non-Void parameters. Ownership is checked when defining a method.</summary>
@@ -57,6 +57,7 @@ public class MethodSignature
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
     /// <exception cref="ArgumentNullException">Result or parameters are null.</exception>
     /// <exception cref="ArgumentException">Null/Void parameter or more than 256 parameters.</exception>
+    /// <param name="genericParameterNames">Copied unique method parameter names, at most 32; omitted for nongeneric signatures.</param>
     public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null)
     {
         ArgumentNullException.ThrowIfNull(returnType);

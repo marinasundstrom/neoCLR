@@ -2309,3 +2309,10 @@ in its existing adapter path; shared Release bodies use those registered handles
 Native imported generics, generic types, instance generics and constraints remain outside
 this milestone. Development branches: Raven `codex/metadata-consumer`, neoCLR
 `codex/extended-cli-metadata` (producer/runtime commit `2916fc3f`).
+
+Expanded generic acceptance now covers inferred/explicit calls, recursive forwarding,
+multiple type parameters and overloads, generic array creation/iteration, conditional
+values and object identity. Both source orders return 42 on .NET/native; five binding-valid
+unsupported forms reject with source diagnostics and no output. [Recorded evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
+includes the tested runtime and consumer hashes. This is a bounded milestone; native
+generic types, constraints, instance methods and imported generic symbols are still open.

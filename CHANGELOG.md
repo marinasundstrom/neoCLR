@@ -16,7 +16,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   caller parameters and typed array factories. API-produced binaries verify/run 42;
   permit generic static class methods without relaxing instance receiver restrictions.
   Raven now shares generic signature/body planning for owned static calls; the Order
-  generic consumer executes on both targets in both source orders (42).
+  generic consumer executes on both targets in both source orders (42). Expanded
+  acceptance covers inference, recursion, multiple type parameters, generic vector
+  creation/iteration and conditional values; unsupported native contracts reject
+  without output. C# API checks cover raw calls, copied arguments and stack mismatches.
 
 - Extend metadata property associations to indexed signatures, inferring copied index
   parameters from accessors and validating getter/setter agreement. Preserve ordinary

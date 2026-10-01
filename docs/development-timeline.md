@@ -9633,3 +9633,15 @@ the broad class-library/collection consumer or metadata importing is complete. S
   generic signature/call milestone through metadata, Raven and runtime execution.
   That generic work is a plan at this entry, not a completed result. Full generic
   collections/System compilation and native symbol importing remain open.
+
+- **Assistant follow-through:** completed generic declaration, instantiation and Raven
+  adapter slices. Ordinary .NET GenericParam/MVAR/MethodSpec encodings and native
+  method parameters/call arguments retain the same bounded source semantics. A loader
+  restriction incorrectly grouped generic static class methods with receiver-dependent
+  methods; static generic methods now load while generic instance admission remains
+  unchanged. Expanded Order tests pass forwarding, inference, recursion, generic vector
+  construction/iteration, overloads, multi-parameter methods and conditional values on
+  both runtimes in both source orders. Five unsupported native contracts produce
+  source diagnostics without output. See the [generic evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
+  This completes the unconstrained owned static-generic milestone, not generic types,
+  constrained dispatch, native symbol imports or full System collection compilation.

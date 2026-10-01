@@ -2592,3 +2592,8 @@ one Int32 for `Identity<T>(T)->T` and produces Int32. Forwarding may instead pas
 CLI output uses cached MethodSpec records; native calls carry explicit generic arguments
 and substituted parameter types. The binary integration test verifies forwarding,
 Int32/Int64/Boolean instantiations, owned-object identity and generic vector creation/access.
+
+Generic-call regression checks also confirm that caller mutation of the argument array
+cannot alter an existing instance, and both writers reject a mismatched substituted
+stack argument before producing an image. Raw `Emit(Call, instance)` supports forwarded
+parameters with the same scope and stack contract as `Call(instance)`.
