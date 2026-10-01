@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; body definition migration and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual interface declaration and virtual dispatch; body definition migration and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -14,8 +14,8 @@
       "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
       "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
       "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-      "librarySha256": "A6E765DE3E6BBCD9D82E332B505E6E17AAC74C167AAFE78D155DF328867B178A",
-      "applicationSha256": "DB159AA9B29C6C141260AFA7BCD2A4D03E0EF9A494E1D2F094D08A9871D0339D",
+      "librarySha256": "4BD97C0B34C21E45070DA719C25C2C980605F5CB31A9EC9CFE71406474AEED02",
+      "applicationSha256": "3097EB38757F8B5841F6935AF682C1519AC7F94360724510E2A645F8CB01D0ED",
       "verified": true,
       "result": 42,
       "coverage": [
@@ -58,5 +58,6 @@
   },
   "continuationBaseCommit": "09166c9a",
   "staticTypeMethodBaseCommit": "7d4f5cb5",
-  "instanceMethodBaseCommit": "f7e715a0"
+  "instanceMethodBaseCommit": "f7e715a0",
+  "interfaceDeclarationBaseCommit": "ddc5cb75"
 }

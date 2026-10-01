@@ -2772,3 +2772,9 @@ body and encoding paths. The manual object creation/readonly initialization/inst
 case returns 42 on CLR and neoCLR. Runtime Contract, Raven target admission and the
 CLI/native bridge representations are unchanged; this does not close imported union
 or instance-member support in the compiler.
+
+Direct nongeneric interface and abstract-method definitions now dispatch through the
+existing interface implementation helpers (CLR/neoCLR: 42). This authoring change retains
+CLI InterfaceImpl/abstract-method/callvirt and existing native encodings; Runtime Contract
+and Raven admission are unchanged. Relationship definitions and canonical bodies remain
+pending. The rebuilt Raven external-signature probe continues to verify/run (42).

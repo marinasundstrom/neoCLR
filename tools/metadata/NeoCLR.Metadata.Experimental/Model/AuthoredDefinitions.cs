@@ -55,7 +55,7 @@ public sealed partial class TypeDefinition
     private readonly IList<FieldDefinition>? authoredFields;
     private readonly IList<MethodDefinition>? authoredMethods;
     /// <summary>Creates a detached type declaration with CLI attributes and an explicit base reference.</summary>
-    /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric static/root classes and sealed sequential value types.</remarks>
+    /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric interfaces, static/root classes and sealed sequential value types.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
     {
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 || (name + @namespace).Any(char.IsControl))
@@ -120,15 +120,19 @@ public sealed partial class AssemblyBuilder
         {
             var attributes = definition.Attributes;
             var category = attributes & ~1u;
-            if (definition.Name.Contains('`') || category is not (0 or 0x180 or 0x108)) throw new ArgumentException("unsupported manual type shape");
-            if (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+            if (definition.Name.Contains('`') || category is not (0 or 0x180 or 0x108 or 0xa0)) throw new ArgumentException("unsupported manual type shape");
+            if (category == 0xa0)
+            {
+                if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
+            }
+            else if (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.
             foreach (var field in definition.Fields)
             {
                 field.FieldType!.ValidateOwner(this);
-                if (category == 0x180 || definition.IsValueType && field.FieldType.Primitive is null)
+                if (category is 0x180 or 0xa0 || definition.IsValueType && field.FieldType.Primitive is null)
                     throw new ArgumentException("unsupported field storage on manual type");
             }
             if (definition.Fields.Count > 256) throw new ArgumentException("field limit exceeded");

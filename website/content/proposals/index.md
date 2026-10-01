@@ -388,6 +388,7 @@ imported value types and Raven union lowering remain development work.
 The development metadata API supports direct assembly/type/field/function declarations,
 static and instance methods, and root-class constructors, with builders sharing those
 declarations. Manual CLR/native execution covers function calls, object creation,
-readonly-field initialization and struct storage. Canonical body editing, direct
-interface contracts and loaded assembly modification remain pending; this is not a
+readonly-field initialization and struct storage. Direct nongeneric interface contracts also dispatch through existing implementation
+helpers. Canonical body editing, relationship definitions and loaded assembly modification
+remain pending; this is not a
 published general-purpose assembly editor.

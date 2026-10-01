@@ -597,3 +597,6 @@ are covered in the host manual reference; no guest RavenDoc type selection chang
 
 The host MethodDefinition CLI-attribute constructor’s instance/constructor cases, errors
 and limitations are documented in the manual reference; guest RavenDoc remains unchanged.
+
+Direct nongeneric interface TypeDefinition and abstract MethodDefinition construction
+are covered in the manual host reference; guest RavenDoc selection is unchanged.

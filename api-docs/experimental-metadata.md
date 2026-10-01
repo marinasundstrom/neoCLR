@@ -3472,7 +3472,7 @@ virtual/abstract flags and invalid constructor signatures throw `ArgumentExcepti
 
 Attachment requires a reference-class owner for instance methods/constructors; static
 and value-type owners throw `InvalidOperationException` before ownership transfer.
-Direct interface contracts remain unsupported. Signature ownership, generic scopes,
+Direct interface contracts are covered by the subsequent interface slice below. Signature ownership, generic scopes,
 access and readonly-field rules reuse the existing method/body contracts. Detached
 method bodies still require attachment before `MethodBuilder.ForDefinition` succeeds.
 
@@ -3499,3 +3499,40 @@ and carries the result through the function/type-method/struct path. CLR and neo
 return 42. Tests also compare emitted constructor/instance flags and reject invalid
 constructor signatures and owner categories. Canonical body definitions, direct interface
 contracts and loaded editing remain pending; the collections Option<Order> gate is unchanged.
+
+
+### Direct interface declarations and dispatch
+
+A nongeneric `TypeDefinition` with Interface | Abstract and optional Public attributes
+can now be attached directly. Its base reference must be null and it cannot declare
+fields. Unsupported bases/storage reject before module ownership is transferred.
+
+The CLI-attribute `MethodDefinition` constructor admits public instance contracts with
+Abstract | Virtual | NewSlot together (optional HideBySig). Partial flag combinations,
+static/private contracts, constructors and method-generic contracts reject with
+`ArgumentException`. Attach these declarations to an authored interface; an abstract
+contract on a class or concrete declaration on an interface throws
+`InvalidOperationException`. These bounds match existing interface builder support.
+
+```csharp
+var contract = new TypeDefinition("Example", "IRead", 0xa1, null);
+assembly.MainModule.Types.Add(contract);
+var read = new MethodDefinition("Read", 0x5c6,
+    PrimitiveMethodSignature.Int32(0, true));
+contract.Methods.Add(read);
+// Use MethodBuilder.ForDefinition(read) as the target of CallVirtual.
+```
+
+The contract remains bodyless. Writing rejects instructions or locals on it through
+existing abstract-method validation. Relationships (base interfaces and class
+implementations) still use TypeBuilder.AddBaseInterface/AddInterfaceImplementation;
+they have not yet moved to directly mutable definition collections. Generic interface
+definitions still require builders. No class virtual dispatch, static interface methods,
+default implementations or new instruction encodings are introduced.
+
+The manual executable declares IRead and Read directly, registers the class implementation
+through the existing helper and calls it with CallVirtual. CLR and neoCLR return 42.
+All 76 C# groups pass, including existing multi-implementation/inherited interface tests
+and new invalid-owner/flags/interface-storage checks. Raven's rebuilt external-signature
+probe also passes. Canonical bodies, relationship definitions and loaded editing remain
+pending; this does not resolve the collections Option<Order> import gap.

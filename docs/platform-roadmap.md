@@ -9,7 +9,9 @@ milestone sequencing and scope. Explicit author directions take precedence.
 now shares declaration objects with builder facades and retains existing CLI/native
 encoding. Manual struct execution returns 42 on both runtimes; Raven cross-assembly
 probes remain green. Canonical method declarations and authored entry/function views now follow; direct
-interface-method construction, bodies, full editing and reader materialization remain open.
+relationship definitions, bodies, full editing and reader materialization remain open.
+Direct nongeneric interface and abstract-method declarations now dispatch on CLR/neoCLR
+(42), while relationship registration still uses builder helpers.
 Direct root-class constructors and instance methods now execute readonly initialization
 and object calls on CLR and neoCLR (42).
 Direct static type methods now attach through TypeDefinition.Methods and execute through

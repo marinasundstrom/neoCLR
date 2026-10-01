@@ -39,9 +39,9 @@ public sealed partial class MethodDefinition
         declarationAttributes = (ushort)((visibility == MethodVisibility.Public ? 6 : 3) | 0x10);
         this.signature = [];
     }
-    /// <summary>Creates a detached static/instance type method or root-class constructor with CLI attributes.</summary>
+    /// <summary>Creates a detached type method, root-class constructor or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may additionally use SpecialName and RTSpecialName together.</param>
+    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; public instance interface contracts require Abstract, Virtual and NewSlot together.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
@@ -50,8 +50,11 @@ public sealed partial class MethodDefinition
     {
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" ||
-            (attributes & ~0x1897) != 0 || (attributes & 7) is not (1 or 3 or 6))
+            (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 6))
             throw new ArgumentException("invalid type-method declaration");
+        bool contract = (attributes & 0x540) != 0;
+        if (contract && ((attributes & 0x540) != 0x540 || (attributes & 0x17) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
+            throw new ArgumentException("invalid interface method flags or signature");
         bool constructor = name == ".ctor";
         if (constructor && ((attributes & 0x10) != 0 || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
             (attributes & 0x1800) != 0 && (!constructor || (attributes & 0x1800) != 0x1800))
@@ -115,7 +118,8 @@ public sealed partial class TypeBuilder
         if (!definition.IsTypeDeclaration || definition.AuthoredSignature is not { } signature ||
             definition.Producer is { } producer && !ReferenceEquals(producer.DeclaringType, this))
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
-        if (definition.Producer is null && IsInterface) throw new InvalidOperationException("interface methods require abstract contract builders");
+        if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))
+            throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");
         if (!definition.IsStatic && (IsStatic || IsValueType)) throw new InvalidOperationException("instance methods require a reference class");
         signature.ValidateOwner(Assembly, GenericParameterNames.Count);
         if (methods.Count >= 256 || methods.Any(m => m.Name == definition.Name &&
