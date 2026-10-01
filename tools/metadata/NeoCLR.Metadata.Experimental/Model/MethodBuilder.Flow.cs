@@ -11,7 +11,7 @@ public sealed class BranchLabel
 
 public sealed partial class MethodBuilder
 {
-    private readonly List<BranchLabel> labels = [];
+    private List<BranchLabel> labels => Definition.Body.LabelStorage;
     /// <summary>Creates an unmarked branch destination. ClearBody retains label handles.</summary>
     /// <returns>A label owned by this method.</returns>
     /// <exception cref="InvalidDataException">4096-label limit exceeded.</exception>

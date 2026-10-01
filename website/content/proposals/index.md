@@ -390,6 +390,6 @@ static and instance methods, and root-class constructors, with builders sharing 
 declarations. Manual CLR/native execution covers function calls, object creation,
 readonly-field initialization and struct storage. Direct nongeneric interface contracts also dispatch through existing implementation
 helpers. Interface relationship definitions now support direct inherited/implemented
-edges. Canonical body editing and loaded assembly modification
-remain pending; this is not a
+edges. Method definitions now own instruction/local/label storage; helpers operate on
+that same body. Arbitrary instruction editing and loaded assembly modification remain pending; this is not a
 published general-purpose assembly editor.

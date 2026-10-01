@@ -682,7 +682,7 @@ public enum MethodVisibility
 public sealed partial class MethodBuilder
 {
     internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null);
-    internal List<Operation> Instructions { get; } = [];
+    internal List<Operation> Instructions => Definition.Body.Instructions;
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
@@ -789,7 +789,7 @@ public sealed partial class MethodBuilder
     /// <summary>Appends return with the declared stack shape; no values may remain afterward.</summary>
     public void Return() => Emit(OpCode.Ret);
     /// <summary>Clears instructions for editing before another Write; local declarations and handles are retained.</summary>
-    public void ClearBody() => Instructions.Clear();
+    public void ClearBody() => Definition.Body.ClearInstructions();
     private void Append(Operation operation)
     {
         if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");

@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; body definition migration and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned body storage and clearing; arbitrary instruction editing and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -14,8 +14,8 @@
       "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
       "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
       "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-      "librarySha256": "4BD97C0B34C21E45070DA719C25C2C980605F5CB31A9EC9CFE71406474AEED02",
-      "applicationSha256": "3097EB38757F8B5841F6935AF682C1519AC7F94360724510E2A645F8CB01D0ED",
+      "librarySha256": "EB76C799C279499FCF3D6E70CB08C09352B153819860D2CD47A26D2F71346A44",
+      "applicationSha256": "AFD347CBD4CDCE21EF10EAADDD06DF6DFB8493409D7652E56F9F20AC4F3E59FF",
       "verified": true,
       "result": 42,
       "coverage": [
@@ -60,5 +60,6 @@
   "staticTypeMethodBaseCommit": "7d4f5cb5",
   "instanceMethodBaseCommit": "f7e715a0",
   "interfaceDeclarationBaseCommit": "ddc5cb75",
-  "relationshipBaseCommit": "a86113a4"
+  "relationshipBaseCommit": "a86113a4",
+  "bodyStorageBaseCommit": "564b9cba"
 }

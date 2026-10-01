@@ -3564,3 +3564,34 @@ implementingClass.Interfaces.Add(new InterfaceImplementation(derivedInterface.To
 The manual inherited-interface dispatch case executes on CLR/neoCLR (42). All 76 C#
 groups pass, including duplicate/cycle/category rejection. CLI InterfaceImpl and native
 encoding remain unchanged. Generic relationships and loaded editing remain unsupported.
+
+
+### Definition-owned method bodies
+
+`MethodDefinition.Body : MethodBodyDefinition` now owns authored instruction, local
+and symbolic-label storage. Existing MethodBuilder helpers and raw Emit overloads
+operate on this same storage, as do the CLI/native writer adapters. The definition
+returns one stable body object. Loaded Body access throws `NotSupportedException`;
+loaded-body materialization and editing remain pending. An abstract declaration may
+have an empty Body, but writing rejects instructions or locals on it.
+
+| Member | Contract |
+| --- | --- |
+| `MethodBodyDefinition.Method` | Exact owning MethodDefinition. |
+| `Locals : IReadOnlyList<LocalDefinition>` | Cached, live read-only view of declared slots; existing builder-owned handles remain compatible. |
+| `Labels : IReadOnlyList<BranchLabel>` | Cached, live read-only view of allocated label handles. |
+| `ClearInstructions()` | Removes instructions and label marks, preserving locals and label handles. Referenced labels must be marked again. Writers revalidate the result. |
+
+Use `MethodBuilder.ForDefinition(method)` for emission after attachment. ClearBody
+now delegates to Body.ClearInstructions. Read-only local views no longer allocate a
+wrapper on each getter call; no broader performance improvement is claimed. This
+moves canonical storage without introducing a second instruction graph or changing
+CLI/CIL/native lowering. Public arbitrary instruction lists, insert-before/after,
+body decoding, exception regions and independent local construction are not added.
+
+C# tests verify method/body/local/label identity, clear-and-rebuild with a retained
+branch label and locals, CLR execution (42), and rejection of loaded Body access.
+The native manual object/interface/struct case replaces a body through the definition
+API before emission and returns 42. All 76 contract groups and the rebuilt Raven
+external-signature probe pass. Property/generic-definition migration and loaded editing
+remain open, as does the collections Option<Order> target gap.

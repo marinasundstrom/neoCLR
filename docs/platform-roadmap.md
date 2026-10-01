@@ -9,7 +9,9 @@ milestone sequencing and scope. Explicit author directions take precedence.
 now shares declaration objects with builder facades and retains existing CLI/native
 encoding. Manual struct execution returns 42 on both runtimes; Raven cross-assembly
 probes remain green. Canonical method declarations and authored entry/function views now follow; direct
-bodies, full editing and reader materialization remain open. Interface relationships
+full instruction editing, remaining property/generic migration and reader materialization
+remain open. Method definitions now own instruction/local/label storage, with existing
+helpers using that same body and cached read-only local/label views. Interface relationships
 now have append-only authored definitions; inherited dispatch executes on both runtimes.
 Direct nongeneric interface and abstract-method declarations now dispatch on CLR/neoCLR
 (42), while relationship registration still uses builder helpers.

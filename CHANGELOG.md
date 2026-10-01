@@ -8,28 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
-- Begin the definition-first migration: directly construct assemblies, types and fields,
-  with compatibility builders sharing declaration identity and both existing writers.
-  Manual struct construction executes on CLR and neoCLR (42). Authored collections
-  are append-only; method/body definitions and loaded editing remain pending. Types
-  and type Fields now expose IList instead of IReadOnlyList (development API change).
-  Method builders now share canonical declarations with module/type/function/entry-point
-  views; authored signatures and context-derived CLI flags are inspectable. Direct
-  type-method construction and definition-owned bodies remain pending. Assembly-level
-  functions can now be constructed directly, appended to Module.Functions, selected as
-  EntryPoint and given bodies through MethodBuilder.ForDefinition; the manual helper-call
-  case executes on CLR and neoCLR (42). Module.Functions now returns IList. Direct
-  static type-method construction and append-only TypeDefinition.Methods now share the
-  same declarations with builders; the function-to-type-method call chain returns 42
-  on both runtimes. TypeDefinition.Methods also changes to IList. Direct instance
-  declarations now also support root-class constructors and instance methods, including
-  readonly initialization and object calls returning 42 on CLR/neoCLR. Unsupported
-  owners and constructor signatures reject. Direct nongeneric interface and abstract
-  method declarations now dispatch through the existing implementation helper on both
-  runtimes (42); invalid owner/flag/storage shapes reject. Canonical bodies and
-  interface relationship definitions now support direct inherited/implemented edges,
-  sharing ownership with builder facades; inherited dispatch returns 42 on both runtimes.
-  Canonical bodies and loaded relationship materialization remain pending.
+- Advance definition-first metadata authoring: direct assemblies, types, fields,
+  functions, static/instance methods, constructors and interface contracts share
+  declarations with builders. Interface relationships and method-body instruction,
+  local and label storage now belong to definitions. CLR/native execution covers
+  object creation, readonly initialization, inherited dispatch and struct storage (42).
+  Body clearing preserves local/label handles. Authored collections are append-only;
+  Types, type Fields/Methods and module Functions expose IList (development API change).
+  Arbitrary instruction editing, remaining property/generic migration and loaded
+  editing remain pending; CLI/CIL encoding is unchanged.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

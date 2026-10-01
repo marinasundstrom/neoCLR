@@ -603,3 +603,6 @@ are covered in the manual host reference; guest RavenDoc selection is unchanged.
 
 InterfaceImplementation and TypeDefinition.Interfaces are host C# APIs documented in
 the manual metadata reference; they are excluded from guest RavenDoc selection.
+
+MethodBodyDefinition and MethodDefinition.Body are host C# APIs documented in the manual
+reference, including local/label views and clearing; guest RavenDoc selection is unchanged.

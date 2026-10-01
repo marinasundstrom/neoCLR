@@ -60,6 +60,24 @@ internal static class AuthoredDefinitionChecks
         Reject<InvalidDataException>(() => executable.WriteNativeAssembly());
         abstractBody.ClearBody();
         var writtenEntry = writtenExecutable.EntryPoint!;
+        Reject<NotSupportedException>(() => _ = writtenEntry.Body);
+        var definitionBody = executable.EntryPoint!.Body;
+        var emitter = MethodBuilder.ForDefinition(executable.EntryPoint);
+        if (!ReferenceEquals(definitionBody.Method, executable.EntryPoint) || !ReferenceEquals(definitionBody.Locals, emitter.Locals))
+            throw new Exception("canonical body/local identity");
+        var savedLocals = definitionBody.Locals.ToArray();
+        var destination = emitter.DefineLabel();
+        if (!ReferenceEquals(destination, definitionBody.Labels.Single())) throw new Exception("canonical label identity");
+        definitionBody.ClearInstructions();
+        emitter.LoadConstant(42); emitter.Emit(OpCode.Br, destination); emitter.MarkLabel(destination); emitter.Return();
+        if (!savedLocals.SequenceEqual(definitionBody.Locals)) throw new Exception("body clear lost local identity");
+        var rewrittenContext = new AssemblyLoadContext("definition-body-rewrite", isCollectible: true);
+        try
+        {
+            if ((int)rewrittenContext.LoadFromStream(new MemoryStream(executable.Write())).EntryPoint!.Invoke(null, null)! != 42)
+                throw new Exception("definition body rewrite execution");
+        }
+        finally { rewrittenContext.Unload(); }
         if (entry.Attributes != writtenEntry.Attributes || entry.Name != writtenEntry.Name) throw new Exception("method declaration round trip");
         if (!ReferenceEquals(builder.Definition, assembly) || !ReferenceEquals(builder.Types[0].Definition, type) ||
             !ReferenceEquals(builder.Types[0].Fields[0].Definition, field) || builder.Types[0].Fields[0].Name != "MyField" ||
@@ -140,6 +158,8 @@ internal static class AuthoredDefinitionChecks
         Reject<ArgumentException>(() => type.Definition.Methods.Add(answer));
         Reject<ArgumentException>(() => type.Definition.Methods.Add(helperDefinition));
         var answerBody = MethodBuilder.ForDefinition(answer);
+        answerBody.LoadConstant(-1); answerBody.Return();
+        answer.Body.ClearInstructions();
         if (!ReferenceEquals(answer.DeclaringType, type.Definition) || answer.Namespace != type.Namespace || !ReferenceEquals(answerBody, type.Methods.Single()))
             throw new Exception("manual type-method identity");
         var objectType = new TypeDefinition("Example", "Box", 1, assembly.MainModule.ImportReference(builder.CoreLibrary, "System", "Object"));
@@ -216,7 +236,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned body storage and clearing; arbitrary instruction editing and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

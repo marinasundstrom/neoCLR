@@ -18,9 +18,9 @@ public sealed class LocalDefinition
 
 public sealed partial class MethodBuilder
 {
-    private readonly List<LocalDefinition> locals = [];
+    private List<LocalDefinition> locals => Definition.Body.LocalStorage;
     /// <summary>Gets declared locals in slot order. ClearBody preserves these declarations.</summary>
-    public IReadOnlyList<LocalDefinition> Locals => locals.AsReadOnly();
+    public IReadOnlyList<LocalDefinition> Locals => Definition.Body.Locals;
     /// <summary>Declares an Int32 local. Loads require a store or typed initialization on every reachable path.</summary>
     /// <returns>A local handle owned by this method.</returns>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
