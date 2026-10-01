@@ -136,7 +136,7 @@ public sealed partial class AssemblyBuilder
                 ["token"] = 0x02000002 + index, ["publicly_visible"] = type.Visibility == TypeVisibility.Public,
                 ["field_tokens"] = type.Fields.Select(f => fieldTokens[f]).ToArray(),
                 ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
-                ["field_readonly"] = type.Fields.Select(_ => false).ToArray()
+                ["field_readonly"] = type.Fields.Select(f => f.IsReadOnly).ToArray()
             };
             if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
             return origin;

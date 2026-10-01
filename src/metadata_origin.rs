@@ -44,6 +44,7 @@ pub struct MetadataOrigin {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub field_access: Vec<SourceAccess>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    /// Init-only storage flags, also enforced by managed field operations. Missing flags remain mutable.
     pub field_readonly: Vec<bool>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub property_tokens: Vec<u32>,

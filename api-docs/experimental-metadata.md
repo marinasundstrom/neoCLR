@@ -2148,7 +2148,7 @@ TypeBuilder AssemblyBuilder.AddClass(string @namespace, string name,
 bool TypeBuilder.IsStatic { get; }
 IReadOnlyList<FieldBuilder> TypeBuilder.Fields { get; }
 FieldBuilder TypeBuilder.AddField(string name, SignatureType type,
-    FieldVisibility visibility = FieldVisibility.Private);
+    FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false);
 public enum FieldVisibility { Public, Internal, Private }
 ```
 
@@ -2159,20 +2159,32 @@ namespace/name uniqueness. Invalid names/visibility/duplicates throw ArgumentExc
 (including ArgumentOutOfRangeException for visibility). Namespaces and type names
 retain the existing AddType contract.
 
-AddField declares mutable instance storage, never a property. It accepts Int32,
+AddField declares instance storage, never a property; storage is mutable by default. It accepts Int32,
 Int64, Boolean, String or an owned nonstatic root class, a unique nonblank name without controls or invalid Unicode,
 up to 1024 characters, and defined FieldVisibility values. Invalid declarations or
 more than 256 fields per type throw ArgumentException before mutation. Static owners
 throw InvalidOperationException. Writing enforces at most 4096 assembly fields.
-Readonly, literal, static, generic and external nominal-reference fields remain unsupported.
+Literal, static, generic and external nominal-reference fields remain unsupported.
 Null types throw ArgumentNullException; Void and foreign classes throw ArgumentException
 before mutation. Forward and self references use exact output-builder identity.
 FieldBuilder exposes read-only DeclaringType (TypeBuilder), Name (string), FieldType
-(SignatureType) and Visibility (FieldVisibility). Field handles are owned by their type.
+(SignatureType), Visibility (FieldVisibility) and IsReadOnly (bool). Field handles are owned by their type.
 Development API migration: rebuild consumers and inspect FieldType.Primitive or
 FieldType.ClassType; primitive AddField calls continue through implicit conversion.
 CLI fields use ordinary CLASS TypeDef signatures; native fields use existing Named
 records, preserved by reference projection. This introduces no new binary schema.
+Setting isReadOnly emits ordinary CLI InitOnly and the existing native field_readonly
+flag. Executable writes fail with InvalidDataException when an ordinary method or a
+constructor of another type stores the field. Declaration/reference projection preserves
+these flags. The updated runtime enforces direct stores and returns readonly managed
+field addresses outside the declaring constructor; reads and mutation of an object
+referenced by a readonly field remain legal. This is shallow storage protection, not
+deep immutability or an unsafe-memory sandbox. Raw unmanaged pointers remain outside
+managed readonly guarantees. Constructors can acquire writable initialization references.
+Development migration: rebuild AddField consumers for the added optional argument and
+use the matching runtime; older runtimes do not enforce these flags during execution.
+No new binary schema is introduced by this bridge extension.
+
 Nominal stores require the exact declared class; null literals, nullable source
 contracts and external class imports are not added by this slice.
 
@@ -2247,7 +2259,7 @@ Emit(Ldfld, field)/LoadField consume the exact declaring-class receiver and push
 primitive or owned nominal field value. Emit(Stfld, field)/StoreField consume receiver then value.
 Field handles must belong to the output assembly; foreign fields/wrong opcodes throw
 ArgumentException and null operands throw ArgumentNullException before mutation.
-Writing rejects stack underflow, mismatched receivers/values/joins and receiver stores
+Writing rejects stores to readonly fields outside a declaring constructor, stack underflow, mismatched receivers/values/joins and receiver stores
 with InvalidDataException; existing instruction/body bounds apply. Access control
 remains enforced by the executing target, not a new writer-level access checker.
 

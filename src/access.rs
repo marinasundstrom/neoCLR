@@ -107,6 +107,44 @@ pub(crate) fn check_field(
     }
 }
 
+/// Init-only provenance is enforced for managed field operations. Missing flags retain
+/// the legacy mutable contract; constructor privilege belongs to the declaring type.
+pub(crate) fn field_is_readonly(
+    module: &Module,
+    caller: &Function,
+    owner: &Type,
+    index: usize,
+) -> Result<bool, Fault> {
+    let (declaring_owner, index) = crate::inheritance::field_owner(module, owner, index)?;
+    let definition = record_definition(module, &declaring_owner)?;
+    let readonly = definition
+        .origin
+        .as_ref()
+        .is_some_and(|origin| origin.field_readonly.get(index) == Some(&true));
+    let constructor = caller.instance
+        && caller.name.ends_with("..ctor")
+        && declaring_type(module, caller)
+            .zip(definition.definition.as_ref())
+            .is_some_and(|(a, b)| a == b);
+    Ok(readonly && !constructor)
+}
+
+pub(crate) fn check_field_store(
+    module: &Module,
+    caller: &Function,
+    owner: &Type,
+    index: usize,
+) -> Result<(), Fault> {
+    check_field(module, caller, owner, index)?;
+    if field_is_readonly(module, caller, owner, index)? {
+        return Err(Fault::coded(
+            crate::FaultCode::InvalidProgram,
+            "readonly field can be assigned only by its declaring constructor",
+        ));
+    }
+    Ok(())
+}
+
 pub(crate) fn check_construction(
     module: &Module,
     caller: &Function,

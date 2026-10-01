@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--readonly-field-integration")
+{
+    await ReadOnlyFieldChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--nominal-property-integration")
 {
     await InstanceObjectChecks.RunRuntime(args[1], args[2], nominalProperties: true);
@@ -126,6 +132,7 @@ var tests = new (string Name, Action Body)[]
     ("Assembly function namespaces", FunctionNamespaceChecks.Run),
     ("Root class and instance field metadata", ClassFieldChecks.Run),
     ("Nominal local identity and aliasing", NominalLocalChecks.Run),
+    ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),
     ("Nominal field identity and alias storage", NominalFieldChecks.Run),
     ("Nominal parameter and result identity", NominalSignatureChecks.Run),

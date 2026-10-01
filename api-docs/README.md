@@ -485,3 +485,8 @@ PropertyBuilder.PropertyType and TypeBuilder.AddProperty also use the host-only
 SignatureType for owned nominal properties (2026-10-01). Their signatures, accessor
 identity rules and rebuild migration are covered in the manual host reference; the
 existing experimental .NET API exclusion from guest RavenDoc remains unchanged.
+
+FieldBuilder.IsReadOnly and AddField's optional isReadOnly argument (2026-10-01) are
+also covered in the manual host reference under the same RavenDoc exclusion. The
+reference documents writer restrictions, native runtime enforcement and rebuild/runtime
+compatibility requirements; no guest Raven public API is added by this slice.

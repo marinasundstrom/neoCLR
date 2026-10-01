@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Support readonly primitive/nominal instance fields in the independent metadata API,
+  CLI InitOnly flags and native reference projections. Enforce declaring-constructor
+  direct stores and readonly managed addresses in verification and execution. Existing
+  missing/false flags remain mutable; raw unmanaged memory is outside these guarantees.
+  AddField gains optional isReadOnly and FieldBuilder exposes IsReadOnly: rebuild host
+  consumers and use the updated runtime, since older runtimes do not enforce these flags.
+  Raven now emits private val storage and stored val properties with preserved flags.
+
 - Add owned nominal method/function parameters and results with exact stack identity,
   ordinary CLI CLASS signatures and existing native Named records. The native reader
   preserves them in reference projections; API-produced binary assemblies execute on

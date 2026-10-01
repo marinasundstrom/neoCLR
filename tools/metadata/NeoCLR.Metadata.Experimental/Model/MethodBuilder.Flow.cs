@@ -100,7 +100,12 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.Add(stack[^1]); break;
                 case "field.load": case "field.store":
-                    if (instruction.Op == "field.store") Pop(instruction.Field!.FieldType);
+                    if (instruction.Op == "field.store")
+                    {
+                        if (instruction.Field!.IsReadOnly && (!IsConstructor || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
+                            throw new InvalidDataException("readonly field requires its declaring constructor");
+                        Pop(instruction.Field.FieldType);
+                    }
                     Pop(BodyValueType.Receiver(instruction.Field!.DeclaringType));
                     if (instruction.Op == "field.load") stack.Add(instruction.Field.FieldType);
                     break;

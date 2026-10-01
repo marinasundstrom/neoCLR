@@ -321,11 +321,11 @@ public sealed partial class AssemblyBuilder
                     case PrimitiveType.String: encoder.String(); break;
                     default: throw new InvalidDataException("unsupported field type");
                 }
-                metadata.AddFieldDefinition(field.Visibility switch {
+                metadata.AddFieldDefinition((field.Visibility switch {
                     FieldVisibility.Public => FieldAttributes.Public,
                     FieldVisibility.Internal => FieldAttributes.Assembly,
                     _ => FieldAttributes.Private
-                }, metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
+                }) | (field.IsReadOnly ? FieldAttributes.InitOnly : 0), metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
                 nextField++;
             }
             foreach (var method in type.Methods) EmitMethod(method);

@@ -1378,3 +1378,32 @@ runtime behavior: accessors remain independently declared methods with their own
 Reference projection validates nominal getter/result and setter/parameter identities.
 Static, read-only, write-only and private setters are covered by C# contract tests;
 API-produced binaries verify/run with result 42 on the current neoCLR runtime.
+
+
+### Readonly instance storage — 2026-10-01
+
+The independent API adds optional AddField(isReadOnly: true) and FieldBuilder.IsReadOnly.
+This preserves ordinary CLI InitOnly flags and extends exact writer validation to reject
+stores outside the declaring constructor. The current native bridge carries the flag in
+its existing field_readonly origin array, now consumed by execution as well as reflection.
+A native semantic field flag should replace that provenance encoding when the extended-CLI
+backend replaces the bridge; the source storage contract should survive that replacement.
+
+Comparison with CLR: readonly is shallow storage protection, not object immutability.
+Reuse the readonly research in docs/design-research.md and the existing managed-reference
+contract. The runtime checks resolved declaring-type identity (including inherited field
+ownership) for direct stores. Outside that constructor, managed field addresses retain
+readonly capability, so reads work but stores through the address fault and fail verification.
+Writable initialization references inside constructors remain possible. Raw unmanaged
+pointers are outside these managed guarantees; this verifier is not a memory-safety sandbox.
+The benefit is consistent metadata, writer and runtime treatment instead of reflection-only
+flags; the cost is extra runtime ownership checks and a semantic compatibility requirement.
+No performance claim is made. Missing/false flags retain the previous mutable behavior.
+
+Consumers must rebuild for AddField's new optional parameter and use the updated runtime:
+older binaries accept the metadata but do not enforce init-only stores. No format-number
+or binary schema change is claimed. C# tests cover CLI flags, projection, owned/foreign
+constructor writes and binaries whose direct or indirect illegal writes fail both verify
+and run. Runtime Rust tests also cover readonly address reads. Raven consumes the flags
+for private val storage and stored val properties; explicit readonly field syntax and
+static readonly storage are separate compiler slices.

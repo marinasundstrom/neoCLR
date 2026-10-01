@@ -1273,6 +1273,13 @@ fn typed_effect(
             Result::Ok(vec![loaded(&field(owner, *index)?)])
         }
         SetField(index) => {
+            let owner = exact(&values[0])?;
+            let owner = if let T::ByRef(target) = owner {
+                target.as_ref()
+            } else {
+                owner
+            };
+            crate::access::check_field_store(module, function, owner, *index)?;
             if module.is_reference_type(exact(&values[0])?) {
                 stored(module, &values[1], &field(exact(&values[0])?, *index)?)?;
                 return Ok(vec![]);
@@ -1291,11 +1298,18 @@ fn typed_effect(
         }
         FieldAddress(index) => match exact(&values[0])? {
             owner if module.is_reference_type(owner) => {
-                one(T::ByRef(Box::new(field(owner, *index)?)))
+                let ty = T::ByRef(Box::new(field(owner, *index)?));
+                if crate::access::field_is_readonly(module, function, owner, *index)? {
+                    Ok(vec![StackType::Readonly(ty)])
+                } else {
+                    one(ty)
+                }
             }
             T::ByRef(owner) => {
                 let ty = T::ByRef(Box::new(field(owner, *index)?));
-                if matches!(values[0], StackType::Readonly(_)) {
+                if matches!(values[0], StackType::Readonly(_))
+                    || crate::access::field_is_readonly(module, function, owner, *index)?
+                {
                     Ok(vec![StackType::Readonly(ty)])
                 } else if let StackType::Slot { local, .. } = &values[0] {
                     Ok(vec![StackType::Slot {

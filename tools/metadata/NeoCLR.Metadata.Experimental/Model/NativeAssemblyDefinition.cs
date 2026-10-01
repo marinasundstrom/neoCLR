@@ -10,7 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
-    private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility);
+    private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
     private readonly PropertyRow[] properties;
@@ -121,8 +121,11 @@ public sealed class NativeAssemblyDefinition
                     var tokens = Array(origin, "field_tokens", 256); var fieldAccess = Array(origin, "field_access", 256); var readOnly = Array(origin, "field_readonly", 256);
                     Require(tokens.Length == fieldRows.Count && fieldAccess.Length == fieldRows.Count && readOnly.Length == fieldRows.Count, "field origin count mismatch");
                     for (int f = 0; f < fieldRows.Count; f++)
-                        Require(tokens[f].GetInt32() == nextFieldToken + f && !readOnly[f].GetBoolean() && fieldAccess[f].GetString() ==
+                    {
+                        Require(tokens[f].GetInt32() == nextFieldToken + f && fieldAccess[f].GetString() ==
                             (fieldRows[f].Visibility == FieldVisibility.Internal ? "Assembly" : fieldRows[f].Visibility.ToString()), "field origin mismatch");
+                        fieldRows[f] = fieldRows[f] with { IsReadOnly = readOnly[f].GetBoolean() };
+                    }
                 }
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
@@ -271,7 +274,7 @@ public sealed class NativeAssemblyDefinition
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type.ValueKind == JsonValueKind.String
                 ? (SignatureType)ReadPrimitive(field.Type.GetString(), false)
-                : owners[System.Array.FindIndex(types, row => row.NativeName == Text(field.Type, "Named"))], field.Visibility);
+                : owners[System.Array.FindIndex(types, row => row.NativeName == Text(field.Type, "Named"))], field.Visibility, field.IsReadOnly);
         SignatureType Remap(SignatureType type) => type.ClassType is { } c
             ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
         var projectedMethods = new List<MethodBuilder>();

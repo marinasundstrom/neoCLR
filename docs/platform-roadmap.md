@@ -38,7 +38,9 @@ private setters and backing storage through the same pipeline. A shared binder f
 also refreshes provisional storage initializers without replacing field identity, now
 including private stored properties. Explicit root `base()` uses the existing initialization
 contract after semantic validation; side-effecting initializers and both body forms execute
-on both runtimes. Next
+on both runtimes. Readonly instance storage now preserves CLI/native flags and rejects
+ordinary direct/managed-address writes in verification and execution; Raven consumes it
+for private `val` storage and stored `val` properties. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

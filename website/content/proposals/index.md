@@ -259,7 +259,10 @@ mutation run on both targets. Mutable owned nominal fields and private storage n
 preserve class identity, initialization and stored-object alias mutation on both targets.
 Owned nominal auto-properties, computed getters and explicit accessors now also round-trip
 and execute, including private setters and forward-declared constructor initializers.
-Readonly/static fields, indexed/generic properties and external class imports remain future work.
+Readonly instance storage now preserves flags and constructor-only direct stores, with
+readonly managed field addresses outside construction. Raven private `val` storage and
+stored `val` properties execute on the updated runtime; this is shallow storage protection.
+Static fields, indexed/generic properties and external class imports remain future work.
 
 
 The development Raven target also accepts explicit parameterless root `base()` after

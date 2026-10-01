@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>Access scopes for a mutable instance field.</summary>
+/// <summary>Access scopes for an instance field.</summary>
 public enum FieldVisibility
 {
     /// <summary>Accessible outside the assembly, subject to type visibility.</summary>
@@ -11,11 +11,11 @@ public enum FieldVisibility
     Private
 }
 
-/// <summary>An owned, mutable primitive or owned root-class instance-field declaration.</summary>
+/// <summary>An owned primitive or root-class instance-field declaration.</summary>
 public sealed class FieldBuilder
 {
-    internal FieldBuilder(TypeBuilder owner, string name, SignatureType type, FieldVisibility visibility, int index)
-    { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; Index = index; }
+    internal FieldBuilder(TypeBuilder owner, string name, SignatureType type, FieldVisibility visibility, int index, bool isReadOnly)
+    { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; Index = index; IsReadOnly = isReadOnly; }
     internal int Index { get; }
     /// <summary>Gets the declaring reference class.</summary>
     public TypeBuilder DeclaringType { get; }
@@ -25,6 +25,8 @@ public sealed class FieldBuilder
     public SignatureType FieldType { get; }
     /// <summary>Gets declared accessibility.</summary>
     public FieldVisibility Visibility { get; }
+    /// <summary>Gets whether stores are restricted to constructors of the declaring type.</summary>
+    public bool IsReadOnly { get; }
 }
 
 public sealed partial class TypeBuilder
@@ -32,16 +34,17 @@ public sealed partial class TypeBuilder
     private readonly List<FieldBuilder> fields = [];
     /// <summary>Gets owned instance fields in declaration order.</summary>
     public IReadOnlyList<FieldBuilder> Fields => fields.AsReadOnly();
-    /// <summary>Adds a mutable primitive or owned root-class instance field to a nonstatic root class.</summary>
+    /// <summary>Adds a primitive or owned root-class instance field to a nonstatic root class.</summary>
     /// <param name="name">Nonempty unique field name, at most 1024 characters.</param>
     /// <param name="type">Int32, Int64, Boolean, String or a nonstatic class owned by this assembly.</param>
     /// <param name="visibility">Public, Internal or Private; defaults to Private.</param>
+    /// <param name="isReadOnly">Restrict stores to declaring instance constructors; defaults to false.</param>
     /// <returns>A field handle owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type/access, duplicate name or exceeded field limit.</exception>
     /// <exception cref="InvalidOperationException">This is a static class.</exception>
-    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/readonly/literal fields yet.</remarks>
-    public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private)
+    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet.</remarks>
+    public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
         ArgumentNullException.ThrowIfNull(type);
         if (type.ClassType is { } owner && !ReferenceEquals(owner.Assembly, Assembly))
@@ -53,6 +56,6 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("invalid or duplicate instance field");
         try { _ = new System.Text.UTF8Encoding(false, true).GetByteCount(name); }
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid field Unicode", error); }
-        var field = new FieldBuilder(this, name, type, visibility, fields.Count); fields.Add(field); return field;
+        var field = new FieldBuilder(this, name, type, visibility, fields.Count, isReadOnly); fields.Add(field); return field;
     }
 }

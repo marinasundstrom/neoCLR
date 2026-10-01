@@ -2170,3 +2170,34 @@ fixtures remain, now including a user-defined base call instead of root `base()`
 [Updated evidence](experiments/extended-cli-metadata/order-runtime-validation.json)
 records the unchanged e8611966 runtime hash. Work remains on the metadata and compiler
 feature branches; this is not a claim of general inheritance support on main.
+
+
+### Readonly instance storage — 2026-10-01
+
+The independent API now models primitive and owned nominal readonly fields via
+AddField(isReadOnly: true)/FieldBuilder.IsReadOnly, using standard CLI InitOnly and
+existing native field_readonly flags. The writer rejects stores outside the declaring
+constructor; projections preserve flags. The runtime now checks those flags on direct
+stores and restricts managed field addresses outside the declaring constructor to
+readonly access. Reading the address and mutating a referenced object remain legal.
+This is shallow storage protection, not deep immutability or an unsafe-memory sandbox;
+raw unmanaged pointers remain outside the managed guarantee.
+
+Raven passes canonical field mutability into this API and admits private val storage
+and stored val properties through the existing shared initialization plan. Ordinary
+.NET remains the default. No Runtime Contract option or binary schema version changes,
+but this is a semantic compatibility change: rebuild host consumers for AddField's new
+optional parameter and use the updated runtime. The earlier e8611966 runtime does not
+enforce these flags during execution. The tested runtime is the readonly-field slice on
+codex/extended-cli-metadata; the exact tested binary SHA is recorded in the refreshed
+[Order evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+The origin-array encoding is a temporary bridge; native field semantics must replace
+it when the extended-CLI backend replaces the bridge.
+
+Validation: 56 metadata C# contract groups, eight Raven constructor C# tests in
+Release/Debug, and 82 focused Rust tests covering constructors, access, managed references,
+metadata origins and reflection. API-produced binaries return 42 for valid construction;
+illegal direct and indirect stores fail both verify and run. The Order consumer returns
+42 on .NET and neoCLR in both source orders and preserves InitOnly/getter-only metadata.
+Static/literal storage, explicit readonly field syntax in the bounded Raven collector,
+generic/nullable fields and external nominal imports remain separate work.

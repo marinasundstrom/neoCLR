@@ -594,7 +594,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             && (function.owner.is_some()
                 || function.namespace.len() > 4096
                 || function.namespace.chars().any(char::is_control)
-                || function.namespace.split('.').any(|part| part.trim().is_empty()))
+                || function
+                    .namespace
+                    .split('.')
+                    .any(|part| part.trim().is_empty()))
         {
             return Err(Fault::new("invalid ownerless function namespace"));
         }
@@ -3940,7 +3943,7 @@ fn interpret_instructions_with_dispatch(
                         ));
                     }
                     if let Value::ObjectReference(object) = receiver {
-                        crate::access::check_field(module, &function, object.target(), *i)?;
+                        crate::access::check_field_store(module, &function, object.target(), *i)?;
                         let fields = module.instantiated_fields(object.target())?;
                         let target = fields
                             .get(*i)
@@ -3952,7 +3955,12 @@ fn interpret_instructions_with_dispatch(
                         return Ok(None);
                     }
                     if let Value::SlotReference(reference) = receiver {
-                        crate::access::check_field(module, &function, reference.target(), *i)?;
+                        crate::access::check_field_store(
+                            module,
+                            &function,
+                            reference.target(),
+                            *i,
+                        )?;
                         let fields = module.instantiated_fields(reference.target())?;
                         let target = fields
                             .get(*i)
@@ -3969,7 +3977,7 @@ fn interpret_instructions_with_dispatch(
                             "stfld requires a record value or managed reference",
                         ));
                     };
-                    crate::access::check_field(module, &function, &ty, *i)?;
+                    crate::access::check_field_store(module, &function, &ty, *i)?;
                     let field = fields
                         .get_mut(*i)
                         .ok_or_else(|| Fault::new("field index out of range"))?;
@@ -4066,7 +4074,15 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
-                        let reference = object.reference.field(*index, target)?;
+                        let mut reference = object.reference.field(*index, target)?;
+                        if crate::access::field_is_readonly(
+                            module,
+                            &function,
+                            object.target(),
+                            *index,
+                        )? {
+                            reference.restrict_readonly();
+                        }
                         frame.pop()?;
                         frame.stack.push(Value::SlotReference(reference));
                         return Ok(None);
@@ -4079,7 +4095,16 @@ fn interpret_instructions_with_dispatch(
                             .ok_or_else(|| Fault::new("field index out of range"))?
                             .ty
                             .clone();
-                        let reference = reference.field(*index, target)?;
+                        let readonly = crate::access::field_is_readonly(
+                            module,
+                            &function,
+                            reference.target(),
+                            *index,
+                        )?;
+                        let mut reference = reference.field(*index, target)?;
+                        if readonly {
+                            reference.restrict_readonly();
+                        }
                         frame.pop()?;
                         frame.stack.push(Value::SlotReference(reference));
                         return Ok(None);
