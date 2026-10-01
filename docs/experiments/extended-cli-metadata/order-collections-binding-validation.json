@@ -1,0 +1,66 @@
+{
+  "date": "2026-10-01",
+  "sharedRavenFix": "46491585e",
+  "integrationFix": "b2293c67e",
+  "methodology": "Unchanged Raven sample -> ordinary CLI target emission -> existing legacy importer -> neoil native assembler -> binary application plus binary System -> runtime verification/execution. This is not direct Raven metadata-backend emission or a fresh System source build.",
+  "sourceSha256": "D775C2C648591482CF53A0A735603CA51AEA48C2F2BB33633C95830E57B6550B",
+  "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
+  "bridgeSha256": "62513E073898423ED57D80A981F3C1ADA75AB891684740141BE7921428F74B72",
+  "artifacts": {
+    "application-order-collections-target.cli.dll": {
+      "sha256": "F0B494D1581DB91177D4259CCD011F9299C9CFB70146123618658E4AE04274E6",
+      "bytes": 7168
+    },
+    "App.neox": {
+      "sha256": "9FCDA4FEDFB22615A278A7CE5CB98F9A0A38441AA88F59FBABA7DA77909E5C3A",
+      "bytes": 377976
+    },
+    "System.Collections.neox": {
+      "sha256": "A19756E92FDC1357A71840DB67B83361330887E93DADA37A779230D4A62A86EC",
+      "bytes": 5542303
+    }
+  },
+  "verification": {
+    "exitCode": 0,
+    "stdout": "ImportedUnion: typed-stack/control-flow verification passed (4174 IL functions; maximum stack 7; runtime value checks remain)\n"
+  },
+  "execution": {
+    "exitCode": 0,
+    "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+    "matchesExpected": true
+  },
+  "directEmission": {
+    "id": "application-order-collections-target",
+    "profile": "target",
+    "sources": [
+      {
+        "path": "docs/experiments/raven-target/samples/application-order-collections.rvn",
+        "sha256": "D775C2C648591482CF53A0A735603CA51AEA48C2F2BB33633C95830E57B6550B"
+      }
+    ],
+    "phase": "emission",
+    "bytes": 0,
+    "diagnosticCount": 1,
+    "diagnostics": [
+      "error NEOMETA001: Native emission does not support only nongeneric primitive or owned root-class parameters/results (Unit only as result): Register (None, default=False, params=False, ref=None, None, default=False, params=False, ref=None, None, default=False, params=False, ref=None)."
+    ],
+    "cliBridgeEmission": {
+      "success": true,
+      "bytes": 7168,
+      "diagnostics": []
+    },
+    "execution": null
+  },
+  "compilerValidation": {
+    "newRegressionCases": 16,
+    "surroundingCases": 323,
+    "passed": true
+  },
+  "remaining": [
+    "Direct emission of imported generic collection signatures/members",
+    "Generic interface/backend coverage",
+    "Native symbol loading and implementation seed",
+    "Loop-capture defect documented in prior audit"
+  ]
+}

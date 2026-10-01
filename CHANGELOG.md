@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Integrate Raven's independent union-case contextual-typing correction into local
+  compiler main (`46491585e`) and the target branch. The unchanged collections sample
+  now imports, verifies and matches expected output; assembled binary App and System
+  also load/verify/run. Preserve the distinction from direct metadata emission, which
+  still rejects imported generic collection signatures. Record 339 passing C# cases.
+
 - Record Raven's bounded .NET refactor-parity audit and validated neoCLR-profile
   binary emission: Hello World/function calls, Unit entry, arrays and owned interface
   dispatch verify/run without a host core reference. Exact primitive/Unit core

@@ -225,3 +225,33 @@ implementation-bootstrap seed, native symbol importing, generic interface dispat
 imported nominal/generic member emission and broad collections/union/callback bodies
 remain open. The API and compiler target stay on their respective feature branches;
 only the independently proven compiler fixes were integrated into local Raven main.
+
+## Collections constructor blocker resolved
+
+Raven shared fix `46491585e` (local main; integration port `b2293c67e`) corrects
+contextual argument typing before overload resolution: a concrete union case can
+target only the matching case, while carrier parameters retain family lookup.
+This fixes None selecting the Some constructor without changing codegen or Runtime
+Contracts. Sixteen C# regressions cover four spellings, both case declaration orders
+and Debug/Release, asserting semantic selection and execution; 323 surrounding cases
+also pass. The original two-case test failed before the fix.
+
+[Fresh collections evidence](order-collections-binding-validation.json) supersedes
+the earlier carrier failure. The unchanged sample emits ordinary CLI, imports and
+verifies, and produces its complete expected output on neoCLR. Both the App and the
+existing generated System collection library were then assembled to native binaries;
+loading, verification and execution with both binary inputs produce the same output.
+No verifier rule was relaxed. This proves existing runtime binary capability for the
+broader application, not direct Raven metadata-backend acceptance or System source
+compilation. The native direct backend still rejects imported generic Register
+signatures with NEOMETA001 and emits no bytes.
+
+Use Raven's `--readiness-sample <neoclr-root> <fresh-output> <runtime> application-order-collections`
+probe to repeat only this source, then the existing bridge's `--import` command on
+`application-order-collections-target.cli.dll`. Generate System using
+`collection_library.py` as in prior controls. Assemble each neoil input with
+`neoclr assemble <source> <output.neox> --format neox` (pass the System source with
+`--system` for App assembly), then `neoclr verify App.neox --system System.Collections.neox`
+and `neoclr run App.neox --system System.Collections.neox`. Compare stdout with the
+checked-in sample's `.expected.txt`. The native generic import, implementation-seed
+and loop-capture gaps remain open; historical findings above remain preserved.

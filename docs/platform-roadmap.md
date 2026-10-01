@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Collections binding checkpoint (2026-10-01):** the imported carrier-constructor
+bug is fixed in Raven binding and integrated into local main (`46491585e`). The
+unchanged order-collections sample now imports, verifies and runs with exact output;
+assembled binary App and System also verify/run. This is legacy-bridge/assembler
+control evidence, not direct Raven metadata emission or a fresh System source build.
+Direct emission now reaches the imported generic Register signature boundary instead
+of the old profile gate. Keep imported collection contracts/member references as the
+next backend acceptance step. [Evidence](experiments/extended-cli-metadata/order-collections-binding-validation.json).
+
 **Native profile checkpoint (2026-10-01):** after independently proven general Raven
 fixes reached local main and a bounded .NET refactor-parity audit, direct emission now
 accepts the real neoCLR semantic profile with a validated CLI declaration core.
