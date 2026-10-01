@@ -412,3 +412,8 @@ class calls through Raven-produced native consumers (42). The metadata library a
 supports closed generic interface implementations and matching CLI projection. The
 unchanged collections application next stops at propagation-expression lowering; this
 is not yet complete application support.
+
+The following shared-lowering checkpoint resolves a concrete-case construction failure
+that masked the propagation path. The unchanged collections probe now reaches native
+out-local admission. Managed-reference and byref-call support remain development work;
+the full application still has not executed.

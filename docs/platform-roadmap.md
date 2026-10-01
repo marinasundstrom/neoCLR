@@ -5,6 +5,16 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Shared-lowering checkpoint (2026-10-02):** fix the concrete-case construction
+exception masked by semantic-model fallback. The apparent propagation rejection is
+now resolved at shared lowering; unchanged collections native emission reaches
+synthesized uninitialized out-local admission. The CLI control still emits 7168 bytes.
+The general Raven fix is isolated as `dcc77ef5f` on the main-based compiler-fixes branch,
+with 25/25 focused tests passing on both compiler lines. Next build explicit managed
+local-address/byref-signature/value-receiver support for propagation, retaining CLR/CIL
+semantics and capability checks. Union/protocol execution and native System identity
+mapping are not complete. [Evidence](experiments/extended-cli-metadata/collections-after-shared-union-lowering.json).
+
 **Imported-member checkpoint (2026-10-02):** imported values retain their signature
 category, and constructed interface/final virtual class calls now use explicit imported
 member contracts. Separate metadata and Raven consumers execute on neoCLR (42); the

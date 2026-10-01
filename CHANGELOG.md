@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Record the shared Raven concrete-case lowering fix and refreshed unchanged collections
+  probe: normal CLI emission succeeds; native emission advances from masked propagation
+  rejection to synthesized out-local admission. The general fix is isolated on Raven's
+  main-based compiler-fixes branch and passes 25 focused tests on both compiler lines.
+  Managed-reference/byref emission remains pending; no metadata/runtime expansion is
+  claimed by this checkpoint.
+
 - Emit imported constructed interface calls and final virtual class calls using standard
   CLI MemberRef/TypeSpec and callvirt contracts. Closed generic interface implementations
   share authored definitions with builders and survive native reference projection.
