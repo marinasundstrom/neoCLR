@@ -2543,3 +2543,34 @@ assembly with overloaded getters and a two-index setter-only association. neoCLR
 loads and verifies its property contracts and executes the accessor calls to 42.
 This uses existing runtime metadata validation and call instructions, not an indexer
 opcode or a new runtime introspection invocation API.
+
+## Generic method declarations (development, 2026-10-01)
+
+```csharp
+SignatureType SignatureType.MethodParameter(int index);
+int? SignatureType.MethodParameterIndex { get; }
+MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes,
+    IEnumerable<string>? genericParameterNames = null);
+IReadOnlyList<string> MethodSignature.GenericParameterNames { get; }
+```
+
+MethodParameter creates a positional method type reference (MVAR); indices outside
+0–31 throw ArgumentOutOfRangeException. Declaration/local/instruction use checks the
+index against the current method's declared arity and throws ArgumentException for
+invalid scope. Fields and property accessors cannot use method generic parameters.
+The signature constructor copies up to 32 unique nonblank valid-Unicode names of at
+most 256 characters without controls; invalid names/counts throw ArgumentException.
+Names are immutable and preserved in CLI GenericParam rows and native generic_parameters.
+Only unconstrained ownerless functions and static methods are admitted. Constructors,
+instance generic methods, generic types and constraints remain outside this API slice.
+
+For example, `new MethodSignature(SignatureType.MethodParameter(0),
+[SignatureType.MethodParameter(0)], ["T"])` defines `Identity<T>(T) -> T`.
+Method generic parameters also work in locals and vector elements. CLI uses MVAR and
+TypeSpec operands for typed array instructions; native uses MethodTypeParameter.
+Direct Call/Emit(Call, MethodBuilder) on an open generic definition throws
+ArgumentException. Generic entries are invalid. Overload uniqueness includes generic
+arity; return type still does not distinguish methods. MethodDefinition.GenericArity
+and raw signatures retain generic declarations in native CLI reference projections;
+primitive-only recognizers continue to decline them. This extends the development
+MethodSignature constructor; rebuild host consumers.

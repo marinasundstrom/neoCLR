@@ -73,7 +73,7 @@ public sealed partial class AssemblyBuilder
         signature.ValidateOwner(this);
         FunctionNamespaceEncoding.Validate(@namespace);
         if (string.IsNullOrEmpty(name) || name.StartsWith(FunctionNamespaceEncoding.Prefix, StringComparison.Ordinal) || @namespace.Length + name.Length > 1024 || functions.Count >= 256 ||
-            functions.Any(m => m.Namespace == @namespace && m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+            functions.Any(m => m.Namespace == @namespace && m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate function");
         var function = new MethodBuilder(this, null, name, signature, visibility, @namespace);
         functions.Add(function);
@@ -89,7 +89,7 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
             if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null))
@@ -169,8 +169,18 @@ public sealed partial class AssemblyBuilder
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
         var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
         var primitiveTokens = new Dictionary<PrimitiveType, TypeReferenceHandle>();
+        var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
+            if (type.MethodParameterIndex is not null)
+            {
+                if (!elementSpecs.TryGetValue(type, out var spec))
+                {
+                    var blob = new BlobBuilder(); EncodeType(new BlobEncoder(blob).TypeSpecificationSignature(), type);
+                    spec = metadata.AddTypeSpecification(metadata.GetOrAddBlob(blob)); elementSpecs.Add(type, spec);
+                }
+                return MetadataTokens.GetToken(spec);
+            }
             if (type.ClassType is { } owner) return MetadataTokens.GetToken(typeHandles[owner]);
             var primitive = type.Primitive!.Value;
             if (!primitiveTokens.TryGetValue(primitive, out var handle))
@@ -182,6 +192,7 @@ public sealed partial class AssemblyBuilder
         }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.MethodParameterIndex is { } index) { encoder.GenericMethodTypeParameter(index); return; }
             if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
             if (type.ClassType is { } owner) { encoder.Type(typeHandles[owner], false); return; }
             switch (type.Primitive)
@@ -196,7 +207,7 @@ public sealed partial class AssemblyBuilder
         BlobHandle Signature(MethodBuilder method)
         {
             var signature = new BlobBuilder();
-            new BlobEncoder(signature).MethodSignature(SignatureCallingConvention.Default, 0, !method.IsStatic).Parameters(method.ParameterCount,
+            new BlobEncoder(signature).MethodSignature(SignatureCallingConvention.Default, method.Signature.GenericParameterNames.Count, !method.IsStatic).Parameters(method.ParameterCount,
                 result =>
                 {
                     if (!method.ReturnsValue) result.Void();
@@ -312,6 +323,8 @@ public sealed partial class AssemblyBuilder
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
+            for (int i = 0; i < method.Signature.GenericParameterNames.Count; i++)
+                metadata.AddGenericParameter(handles[method], GenericParameterAttributes.None, metadata.GetOrAddString(method.Signature.GenericParameterNames[i]), i);
             nextMethod++;
         }
         foreach (var function in functions) EmitMethod(function);
@@ -440,6 +453,7 @@ public sealed partial class TypeBuilder
     public MethodBuilder AddConstructor(MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(signature);
+        if (signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic constructors unsupported", nameof(signature));
         if (signature.ReturnType != PrimitiveType.Void) throw new ArgumentException("constructor must have no result", nameof(signature));
         return AddMethodCore(".ctor", signature, visibility, false, true);
     }
@@ -450,8 +464,9 @@ public sealed partial class TypeBuilder
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         signature.ValidateOwner(Assembly);
+        if (!isStatic && signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic instance methods are not yet supported", nameof(signature));
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
-            methods.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
+            methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");
         var method = new MethodBuilder(Assembly, this, name, signature, visibility, isStatic: isStatic); methods.Add(method); return method;
     }

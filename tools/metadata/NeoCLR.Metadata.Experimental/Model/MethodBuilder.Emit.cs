@@ -143,6 +143,7 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, MethodBuilder operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
+        if (operand.Signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic calls require an instantiation", nameof(operand));
         if (opCode == OpCode.Newobj)
         {
             if (!operand.IsConstructor) throw new ArgumentException("newobj requires a constructor", nameof(operand));

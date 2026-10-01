@@ -281,3 +281,7 @@ Development metadata work now includes indexed property signatures and overloads
 preserving CLI/native accessor associations. API-produced indexed assemblies now
 verify and execute on neoCLR; Raven also emits shared indexed accessor calls, including
 overloads and multiple indices.
+
+The next development milestone is generic emission. Unconstrained method/function
+declarations now preserve named generic parameters, locals and array signatures;
+instantiated calls and Raven consumption are still in progress.

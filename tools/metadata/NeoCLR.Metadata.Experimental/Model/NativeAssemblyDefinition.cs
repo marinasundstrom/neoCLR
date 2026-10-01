@@ -135,9 +135,16 @@ public sealed class NativeAssemblyDefinition
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
             var signatureOwners = types.Select(t => t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
+            int genericArity = 0;
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true)
             {
                 if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
+                if (element.TryGetProperty("MethodTypeParameter", out var parameter))
+                {
+                    Shape(element, "MethodTypeParameter");
+                    int ordinal = parameter.GetInt32(); Require(ordinal >= 0 && ordinal < genericArity, "method parameter outside scope");
+                    return SignatureType.MethodParameter(ordinal);
+                }
                 if (element.TryGetProperty("ArrayRef", out var arrayElement))
                 {
                     Require(allowArray, "nested arrays unsupported"); Shape(element, "ArrayRef");
@@ -150,7 +157,7 @@ public sealed class NativeAssemblyDefinition
             }
             foreach (var type in types)
                 foreach (var field in type.Fields) _ = ReadType(field.Type, false);
-            string TypeKey(SignatureType type) => type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -159,6 +166,9 @@ public sealed class NativeAssemblyDefinition
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
+                var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
+                genericArity = genericNames.Length;
+                if (method.TryGetProperty("generic_parameters", out _)) fields.Add("generic_parameters");
                 if (method.TryGetProperty("locals", out _)) fields.Add("locals");
                 var ns = "";
                 if (method.TryGetProperty("namespace", out var scope))
@@ -198,6 +208,7 @@ public sealed class NativeAssemblyDefinition
                 var resultType = ReadType(method.GetProperty("returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
+                Require(!instance || genericArity == 0, "generic instance methods unsupported");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a root class");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void, "constructor must have no result");
@@ -209,10 +220,11 @@ public sealed class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
-                Require(seenMethods.Add((ownerIndex, ns, name, string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
+                Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility, instance)); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames), visibility, instance)); methodNames.Add(expectedName);
             }
+            genericArity = 0;
             var properties = new List<PropertyRow>();
             var usedAccessors = new HashSet<int>();
             for (int owner = 0; owner < typeElements.Length; owner++)
@@ -238,7 +250,7 @@ public sealed class NativeAssemblyDefinition
                         var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
                         Require(candidates.Length == 1, "missing or ambiguous property accessor");
                         var (method, index) = candidates[0];
-                        Require(method.Instance == instance && method.Name != ".ctor" && method.Signature.ReturnType == (setter ? PrimitiveType.Void : valueType) && usedAccessors.Add(index), "incompatible or reused property accessor");
+                        Require(method.Instance == instance && method.Signature.GenericParameterNames.Count == 0 && method.Name != ".ctor" && method.Signature.ReturnType == (setter ? PrimitiveType.Void : valueType) && usedAccessors.Add(index), "incompatible or reused property accessor");
                         return index;
                     }
                     var getter = Accessor("getter", false); var setter = Accessor("setter", true);
@@ -249,7 +261,7 @@ public sealed class NativeAssemblyDefinition
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray());
@@ -280,7 +292,7 @@ public sealed class NativeAssemblyDefinition
         var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)
         {
-            var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap));
+            var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames);
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)

@@ -54,7 +54,9 @@ Raven now emits indexed accessor calls and associations; overloads, multiple ind
 and read-only getters execute on both targets in both source orders (42). A concrete
 Order collection now also proves nominal/array indices, object aliases, evaluation
 order and indexed bounds faults. The author directs generics as the next connected
-milestone; begin with native generic signatures and calls, then Raven consumption. Broader field/constructor shapes and
+milestone. Generic function/static-method declarations now preserve named parameters,
+CLI GenericParam/MVAR and native method parameter identities; generic locals and arrays
+round-trip. Instantiated calls and Raven consumption follow. Broader field/constructor shapes and
 generic/delegate/union contracts remain subsequent work. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

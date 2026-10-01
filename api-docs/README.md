@@ -498,3 +498,6 @@ limits are documented in the [manual metadata reference](experimental-metadata.m
 
 PropertyBuilder.ParameterTypes and indexed AddProperty associations remain host-only
 under the existing RavenDoc exclusion. See the [indexed property reference](experimental-metadata.md#indexed-property-associations-development-2026-10-01) for accessor validation and projection limits.
+
+SignatureType.MethodParameter/MethodParameterIndex and MethodSignature.GenericParameterNames
+are host-only and covered by the [manual generic reference](experimental-metadata.md#generic-method-declarations-development-2026-10-01), under the existing explicit RavenDoc exclusion.

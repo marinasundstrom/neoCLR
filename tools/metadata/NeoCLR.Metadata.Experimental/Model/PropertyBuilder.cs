@@ -46,7 +46,7 @@ public sealed partial class TypeBuilder
         try { _ = new System.Text.UTF8Encoding(false, true).GetByteCount(name); }
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid property Unicode", error); }
         foreach (var accessor in new[] { getter, setter }.OfType<MethodBuilder>())
-            if (!ReferenceEquals(accessor.DeclaringType, this) || accessor.IsConstructor ||
+            if (!ReferenceEquals(accessor.DeclaringType, this) || accessor.IsConstructor || accessor.Signature.GenericParameterNames.Count != 0 ||
                 properties.Any(p => ReferenceEquals(p.GetMethod, accessor) || ReferenceEquals(p.SetMethod, accessor)))
                 throw new ArgumentException("accessor must be an unassociated ordinary method of this type");
         var indices = getter is not null ? getter.Signature.ParameterTypes.ToArray()

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add unconstrained generic function/static-method declarations with named method
+  parameters, CLI GenericParam/MVAR signatures and native MethodTypeParameter records.
+  Generic locals and vector element tokens preserve scope and reference projections;
+  invalid scopes and open calls reject. Instantiated producer calls follow separately.
+
 - Extend metadata property associations to indexed signatures, inferring copied index
   parameters from accessors and validating getter/setter agreement. Preserve ordinary
   CLI property parameters and native parameter lists, including overloaded indexers

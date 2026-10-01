@@ -11,7 +11,7 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, SignatureType elementType)
     {
         _ = SignatureType.ArrayOf(elementType);
-        elementType.ValidateOwner(Assembly);
+        elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count);
         Append(new(opCode switch {
             OpCode.Newarr => "array.new", OpCode.Ldelem => "array.load", OpCode.Stelem => "array.store",
             _ => throw OperandError(opCode)

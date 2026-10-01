@@ -58,7 +58,7 @@ public sealed partial class MethodBuilder
     public LocalDefinition DeclareLocal(SignatureType type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        type.ValidateOwner(Assembly);
+        type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count);
         if (type.Primitive == PrimitiveType.Void) throw new ArgumentException("local cannot be Void", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
