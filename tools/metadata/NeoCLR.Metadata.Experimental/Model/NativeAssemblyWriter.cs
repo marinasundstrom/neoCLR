@@ -49,7 +49,7 @@ public sealed partial class AssemblyBuilder
         static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = "Public", parameter_tokens = new int[method.ParameterCount] };
+            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "string" => new { op = "ldstr", arg = (object)instruction.Text! },
@@ -134,17 +134,21 @@ public sealed partial class AssemblyBuilder
                 Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name,
                     0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null)).ToArray(),
-            functions = methods.Select((method, index) => new {
-                name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
-                locals = method.Locals.Select(local => local.Type.ToString()).ToArray(),
-                returns = method.Signature.ReturnType.ToString(), no_result = !method.ReturnsValue,
-                origin = Origin(method.Name, 0x06000001 + index, method), body = NativeBody(method)
-            }).ToArray()
+            functions = methods.Select((method, index) => new NativeMethodRow(
+                FunctionName(method), Owner(method), Parameters(method),
+                method.Locals.Select(local => local.Type.ToString()).ToArray(),
+                method.Signature.ReturnType.ToString(), !method.ReturnsValue,
+                Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
+                method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant())).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
         return result;
     }
+    private sealed record NativeMethodRow(string name, object? owner, string[] parameters, string[] locals,
+        string returns, bool no_result, object origin, object[] body,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        string? visibility);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

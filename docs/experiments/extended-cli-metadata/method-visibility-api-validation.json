@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-01",
+  "producer": "independent metadata API",
+  "sameAssemblyInternalAndSameTypePrivateResult": 42,
+  "externalInternalAndPrivateRejected": true,
+  "privateWrongOwnerRejected": true,
+  "runtimeSha256": "929b169bab427e67d18c052cabe130cab14b651d72e64c0d25da49ae90586150"
+}

@@ -20,6 +20,7 @@ and guest Introspection assembly loading remain pending.
 - [Integer bitwise operations](#integer-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
 - [Signed remainder](#signed-remainder-development-2026-10-01): dividend-signed Int32/Int64 remainder.
 - [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
+- [MethodVisibility](#methodvisibility-development-2026-10-01): public/internal/private static method declarations.
 - [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
 - [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
 - [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
@@ -1142,6 +1143,7 @@ public sealed class MethodBuilder
     public AssemblyBuilder Assembly { get; }
     public TypeBuilder? DeclaringType { get; }
     public string Name { get; }
+    public MethodVisibility Visibility { get; }
     public int ParameterCount { get; }
     public bool ReturnsValue { get; }
     public void LoadConstant(int value);
@@ -2035,3 +2037,30 @@ results agree. CLI results for negative/oversized counts are unspecified; native
 execution keeps its existing count masking (low 5 or 6 bits). Callers needing portable
 masked semantics can emit an explicit AND on the count before shifting. The API does
 not insert that policy or change ordinary .NET codegen. The enum values are appended.
+
+
+### MethodVisibility (development 2026-10-01)
+
+```csharp
+public enum MethodVisibility { Public, Internal, Private }
+public MethodBuilder TypeBuilder.AddMethod(string name,
+    PrimitiveMethodSignature signature, MethodVisibility visibility);
+public MethodVisibility MethodBuilder.Visibility { get; }
+```
+
+The overload creates a static method with explicit access; existing AddMethod overloads
+remain public. Public is subject to owner visibility, Internal restricts access to the
+assembly, and Private to the declaring type. Invalid enum values raise
+ArgumentOutOfRangeException; null signatures raise ArgumentNullException; name,
+duplicate-signature and method-count rules are unchanged. Visibility is immutable.
+Assembly functions retain public metadata representation; protected/friend access is
+not added. MethodDefinition.Attributes already exposes the corresponding CLI bits.
+
+CLI output uses standard Public/Assembly/Private MethodAttributes. Native output reuses
+public/internal/private visibility and matching origin member_access (Internal maps to
+Assembly). Public rows keep the omitted visibility default. The bounded native reader
+accepts old public rows, validates access/origin consistency and preserves all three
+values in the reference projection. It rejects unknown access, inconsistent flags and
+nonpublic global functions with InvalidDataException. Older readers reject new nonpublic
+rows. Bodies/references can describe forbidden calls: the writer is not an access checker;
+Raven binding and runtime verification enforce access. ImportReference retains that rule.

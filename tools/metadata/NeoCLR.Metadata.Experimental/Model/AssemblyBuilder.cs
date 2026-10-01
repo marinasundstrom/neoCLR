@@ -239,7 +239,7 @@ public sealed partial class AssemblyBuilder
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : method.MaxStack,
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
-            metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.HideBySig,
+            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | MethodAttributes.Static | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.Name), Signature(method), body, MetadataTokens.ParameterHandle(1));
             nextMethod++;
         }
@@ -300,13 +300,34 @@ public sealed class TypeBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or method limit exceeded.</exception>
     public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature)
+        => AddMethod(name, signature, MethodVisibility.Public);
+    /// <summary>Adds a static primitive method with explicit visibility.</summary>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <param name="signature">The primitive parameter and result contract.</param>
+    /// <param name="visibility">Public, internal or private access.</param>
+    /// <returns>A method owned by this type.</returns>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate signature or method limit exceeded.</exception>
+    public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
     {
+        if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");
-        var method = new MethodBuilder(Assembly, this, name, signature); methods.Add(method); return method;
+        var method = new MethodBuilder(Assembly, this, name, signature, visibility); methods.Add(method); return method;
     }
+}
+
+/// <summary>Supported static method access scopes.</summary>
+public enum MethodVisibility
+{
+    /// <summary>Accessible outside the declaring assembly, subject to owner visibility.</summary>
+    Public,
+    /// <summary>Accessible within the declaring assembly.</summary>
+    Internal,
+    /// <summary>Accessible only within the declaring type.</summary>
+    Private
 }
 
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
@@ -317,8 +338,10 @@ public sealed partial class MethodBuilder
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
-    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature)
-    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; }
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
+    { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; }
+    /// <summary>Gets declared method visibility; assembly functions remain public.</summary>
+    public MethodVisibility Visibility { get; }
     /// <summary>Gets the immutable primitive method signature.</summary>
     public PrimitiveMethodSignature Signature { get; }
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>

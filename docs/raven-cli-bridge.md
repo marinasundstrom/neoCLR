@@ -1439,3 +1439,27 @@ The paired program covers sign extension, lost high bits, zero and 31/63-bit cou
 and Int64 values with Int32 counts. Unsupported floating conversion validates precise
 source diagnostics and preserved output after shifts become supported.
 [Binary evidence](experiments/extended-cli-metadata/shifts-validation.json).
+
+## Metadata method visibility foundation — 2026-10-01
+
+The separate host metadata project now preserves public/internal/private static method
+access in CLI output, native definitions and reference projections. Existing overloads
+remain public. This adopts standard [CLI MethodAttributes access](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodattributes?view=net-10.0)
+(consulted 2026-10-01); native output uses its existing visibility and matching origin
+member_access fields. It enables implementation helpers without making them public,
+at the cost of explicit access mapping and reader consistency checks. No new runtime
+instruction or schema is introduced; no performance change is claimed.
+
+The raw writer deliberately does not enforce call accessibility. Native verification
+checks resolved declaring type/assembly identity, including references created directly
+by the API. Assembly-level functions remain public in this bounded producer; protected,
+friend and inheritance-dependent access remain outside scope. Public encoding stays
+unchanged; older bounded readers reject new nonpublic rows. The native reference
+projection still contains throwing bodies; #Neo remains executable payload.
+
+Validation: 45 C# contract groups and API snapshot check pass. A directly produced
+binary runs legal same-type private and same-assembly internal calls to 42. Native
+verification rejects external private/internal calls and same-assembly private calls
+from another owner. [Independent API/runtime evidence](experiments/extended-cli-metadata/method-visibility-api-validation.json).
+Raven source support is the next slice; this foundation does not yet alter its native
+source admission or Runtime Contract configuration.

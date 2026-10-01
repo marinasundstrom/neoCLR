@@ -41,7 +41,9 @@ isolation; ordinary Raven source parameters remain immutable. Backend-owned inst
 before native builder allocation, with restricted-profile tests validating
 selective admission. Signed Int32/Int64 division, remainder, bitwise AND/OR/XOR and signed shifts now execute on both backends. Logical assembly-function/static-method/static-type categories now share those
 profiles. Public/internal static type visibility is also preserved across both targets.
-General object/field, member visibility and broader metadata-category contracts and
+The independent metadata API now preserves public/internal/private static method
+visibility, with direct binary runtime enforcement; Raven integration is the next slice.
+General object/field and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

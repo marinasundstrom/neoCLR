@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Preserve public/internal/private static method visibility in the independent metadata
+  API, CLI output and native projection. Binary runtime checks enforce assembly/type access.
+
 - Add typed Int32/Int64 AND, OR and XOR to the metadata writer and shared Raven
   emission on both targets, using existing CLI/native instructions. Add left and signed
   right shifts with Int32 counts; retain CLI-unspecified/native-masked out-of-range counts.

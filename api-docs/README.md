@@ -460,3 +460,5 @@ OpCode.Rem and MethodBuilder.Remainder are covered in the same host reference, i
 And/Or/Xor and BitwiseAnd/BitwiseOr/BitwiseXor are covered in the manual host reference.
 
 Shl/Shr and ShiftLeft/ShiftRight include count-width validation and the CLI/native out-of-range count distinction in the manual host reference.
+
+MethodVisibility, the explicit AddMethod overload and MethodBuilder.Visibility are covered by the manual host reference; they remain excluded from guest RavenDoc selection.

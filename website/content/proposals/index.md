@@ -129,6 +129,8 @@ object/field support and exception regions remain development work.
 Backend instruction/type profiles now admit shared bodies selectively. Signed Int32/Int64 division, remainder, bitwise AND/OR/XOR and signed shifts now execute through both
 backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
+The separate metadata API also preserves public/internal/private static method access;
+Raven source integration is subsequent work.
 Public/internal static helpers preserve visibility in CLI and native output and in
 the temporary compiler reference projection. General metadata
 category contracts, codegen portability and metadata importer work remain development
