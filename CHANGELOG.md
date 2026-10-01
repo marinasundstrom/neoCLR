@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   owner/method scopes. CLI/native binaries verify and return 42; native reference
   projection retains generic field signatures. Exact receiver/field scope and 16-level
   nesting limits reject unsupported contracts. External constructed field handles,
-  generic properties and constraints remain deferred.
+  generic properties and constraints remain deferred. Raven now shares generic class
+  values, storage and construction across adapters; primitive, object and nested
+  Box values execute on both runtimes in both source orders.
 
 - Add bounded static generic type definitions and constructed-owner method references
   to the metadata producer. Preserve independent VAR/MVAR scope, sorted GenericParam

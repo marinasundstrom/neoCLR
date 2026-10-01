@@ -9687,3 +9687,23 @@ the broad class-library/collection consumer or metadata importing is complete. S
 - **Open:** generic instance layouts/fields, constraints, imported generics and full
   class-library compilation remain unimplemented boundaries. The native binary payload
   plus CLI projection is still a bridge, not the final native compiler backend.
+
+
+### 2026-10-01 — Generic instance storage follows static owners
+
+- **Author direction:** continue the existing emission integration, committing bounded
+  slices. The prior stopping point identified generic instance layouts and fields next.
+- **Assistant implementation:** added generic reference-class construction and exact
+  constructed receiver identity to the independent metadata producer. Constructors,
+  fields using declaring-type VAR, nested class signatures and generic instance methods
+  use ordinary CLI representations and existing native Constructed metadata. No new
+  runtime encoding was needed. Raven now shares these value and call paths through
+  separate generic-class and constructed-field capabilities.
+- **Outcome:** producer binary verification/execution returns 42; all 65 C# metadata
+  contract groups pass. Raven's Order consumer executes primitive, object and nested
+  generic storage on .NET and native in both source orders. Focused Release/Debug
+  regressions exercise shared planning and mutation through aliases. See producer
+  commit `62bf5931` and [binary evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
+- **Open:** generic properties/indexers, direct external constructed field handles,
+  constraints, imported generic owners and full class-library compilation. Native
+  rejection is explicit at these boundaries; ordinary .NET support remains available.

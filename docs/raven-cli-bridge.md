@@ -2400,3 +2400,13 @@ and type identity. API-produced binaries verify/run 42 without runtime changes.
 Raven integration follows. External constructed fields, generic properties, constraints
 and full class-library emission remain open. This reuses the [generic metadata design](generic-metadata.md)
 rather than creating a second generic storage representation.
+
+Generic instance storage integration now passes: Raven shares generic class value,
+constructor and field-body planning; native emission binds owner and method arguments
+independently. Primitive, Order and nested Box<Box<int>> consumers verify/run 42 on
+.NET/neoCLR in both source orders. Matching producer: `62bf5931` or later; runtime
+`6a7a0dd2` or later on `codex/extended-cli-metadata`, Raven `codex/metadata-consumer`.
+No Runtime Contract configuration change. Generic properties and external constructed
+field references are explicit remaining bridge limits, followed by constraints/imports
+and broader class-library acceptance. [Evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
+records the consumer and runtime hashes; this does not establish full-library emission.

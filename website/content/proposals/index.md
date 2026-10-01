@@ -307,6 +307,6 @@ method parameter scopes and constructed method references. Generic instance layo
 and fields remain future work in this direct emission API.
 
 Development metadata producer work also supports generic reference classes with typed
-fields, constructors and instance calls. API-produced CLI/native binaries execute the
-same storage case. Generic properties, constraints and full class-library compilation
+fields, constructors and instance calls. API-produced CLI/native binaries and Raven consumers execute the
+same storage case, including nested generic class values. Generic properties, constraints and full class-library compilation
 remain future work; see the [experimental metadata API](/docs/experimental-metadata/).
