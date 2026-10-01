@@ -2008,3 +2008,17 @@ contracts. [Evidence](experiments/extended-cli-metadata/order-runtime-validation
 Implicit constructors, chaining and field/property initializers still need a shared
 initialization contract. Nominal signatures and full native metadata/backend replacement
 remain separate work.
+
+
+## Default constructors and primitive initialization — 2026-10-01
+
+Raven's shared FieldInitializationPlan now supplies canonical bound field assignments to
+both the .NET constructor generator and native constructor lowering. Native default root
+constructors use an empty body after these assignments; explicit constructors run them
+before their bodies. Mutable private storage and primitive property initializers now work
+without a metadata/runtime change or Runtime Contract option. This restores ordinary
+constructor initialization behavior through the existing CLI/native field representation.
+Chaining, primary constructors, readonly storage and lifecycle initialization blocks remain
+explicitly outside this native slice. 44 focused C# tests pass; implicit and explicit
+initialization execute in both source orders to 42 on .NET and binary neoCLR.
+[Evidence](experiments/extended-cli-metadata/order-runtime-validation.json).

@@ -27,8 +27,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with qualified reads shared across backends. Computed properties and implemented
   get/set accessors now share body lowering, preserving private setter visibility and
   optional backing storage. Explicit root constructors also admit expression bodies,
-  with overload and argument-order runtime validation. Nullable/external locals,
-  implicit constructors, initializers and nominal signatures remain gaps.
+  with overload and argument-order runtime validation.
+  Default root constructors and primitive field/property initializers now share
+  canonical initialization with .NET; nullable/external locals, nominal signatures
+  and chaining remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor
