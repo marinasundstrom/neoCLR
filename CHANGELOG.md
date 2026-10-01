@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add immutable constructed-field references and typed load/store/raw emits. CLI field
+  MemberRefs preserve open signatures on constructed TypeSpecs; native field operations
+  retain exact receiver identity. C# tests reject wrong receiver/owner scope and binaries
+  execute 42. External assembly fields remain unsupported.
+
 - Support properties and indexers on generic metadata owners, preserving declaring-type
   parameter scope in value/index signatures and accessor associations. Native reading
   rejects malformed owner instantiations and retains associations in CLI projections;

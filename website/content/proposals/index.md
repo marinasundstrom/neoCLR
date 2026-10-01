@@ -311,3 +311,6 @@ fields, constructors and instance calls. API-produced CLI/native binaries and Ra
 same storage case, including nested generic class values. Generic property/indexer metadata also preserves owner scope and accessor associations,
 with Raven consumers verified on both runtimes.
 Constraints and full class-library compilation remain future work; see the [experimental metadata API](/docs/experimental-metadata/).
+
+Development producer metadata also supports constructed generic field references with
+exact receiver/value checks; external assembly fields remain outside the current API.

@@ -309,6 +309,20 @@ public sealed partial class AssemblyBuilder
             if (!ownerMethodSpecs.TryGetValue(methodKey, out var spec)) { spec = metadata.AddMethodSpecification(member, methodKey.Item2); ownerMethodSpecs.Add(methodKey, spec); }
             return MetadataTokens.GetToken(spec);
         }
+        var constructedFields = new Dictionary<(FieldBuilder, TypeSpecificationHandle), MemberReferenceHandle>();
+        int ConstructedFieldToken(ConstructedFieldReference reference)
+        {
+            var owner = (TypeSpecificationHandle)MetadataTokens.EntityHandle(ElementToken(reference.DeclaringType));
+            var key = (reference.Definition, owner);
+            if (!constructedFields.TryGetValue(key, out var member))
+            {
+                var signature = new BlobBuilder();
+                EncodeType(new BlobEncoder(signature).FieldSignature(), reference.Definition.FieldType);
+                member = metadata.AddMemberReference(owner, metadata.GetOrAddString(reference.Definition.Name), metadata.GetOrAddBlob(signature));
+                constructedFields.Add(key, member);
+            }
+            return MetadataTokens.GetToken(member);
+        }
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
@@ -324,11 +338,15 @@ public sealed partial class AssemblyBuilder
             var offsets = new int[method.Instructions.Count + 1];
             offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
-                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
+                {
+                    "constant64" => 9,
+                    "label" => 0,
+                    "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
-                    "equal" or "less" or "greater" => 2, _ => 1
+                    "equal" or "less" or "greater" => 2,
+                    _ => 1
                 });
             var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
@@ -343,14 +361,17 @@ public sealed partial class AssemblyBuilder
                 {
                     case "label": break;
                     case "array.length": code.WriteByte(0x8e); break;
-                    case "array.new": case "array.load": case "array.store":
+                    case "array.new":
+                    case "array.load":
+                    case "array.store":
                         code.WriteByte(instruction.Op == "array.new" ? (byte)0x8d : instruction.Op == "array.load" ? (byte)0xa3 : (byte)0xa4);
                         code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "duplicate": code.WriteByte(0x25); break;
                     case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;
-                    case "field.load": case "field.store":
+                    case "field.load":
+                    case "field.store":
                         code.WriteByte(instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
-                        code.WriteInt32(MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
+                        code.WriteInt32(instruction.ConstructedField is { } fieldReference ? ConstructedFieldToken(fieldReference) : MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
                     case "negate": code.WriteByte(0x65); break;
                     case "complement": code.WriteByte(0x66); break;
                     case "pop": code.WriteByte(0x26); break;
@@ -358,7 +379,9 @@ public sealed partial class AssemblyBuilder
                     case "equal": code.WriteByte(0xfe); code.WriteByte(0x01); break;
                     case "less": code.WriteByte(0xfe); code.WriteByte(0x04); break;
                     case "greater": code.WriteByte(0xfe); code.WriteByte(0x02); break;
-                    case "branch": case "branch.true": case "branch.false":
+                    case "branch":
+                    case "branch.true":
+                    case "branch.false":
                         code.WriteByte(instruction.Op == "branch" ? (byte)0x38 : instruction.Op == "branch.true" ? (byte)0x3a : (byte)0x39);
                         code.WriteInt32(offsets[labels[instruction.Value]] - (code.Count + 4)); break;
                     case "string": code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!))); break;
@@ -416,7 +439,8 @@ public sealed partial class AssemblyBuilder
                 var signature = new BlobBuilder();
                 var encoder = new BlobEncoder(signature).FieldSignature();
                 EncodeType(encoder, field.FieldType);
-                metadata.AddFieldDefinition((field.Visibility switch {
+                metadata.AddFieldDefinition((field.Visibility switch
+                {
                     FieldVisibility.Public => FieldAttributes.Public,
                     FieldVisibility.Internal => FieldAttributes.Assembly,
                     _ => FieldAttributes.Private
@@ -567,7 +591,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

@@ -786,3 +786,9 @@ neoCLR in both source orders. Matching producer/reader: `dbe03b1a` or later on
 [recorded evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
 includes consumer/runtime hashes. External constructed fields, constraints and generic
 imports remain open, along with broader class-library acceptance.
+
+Constructed-field producer slice: typed field references now bind generic owners and
+validate exact receiver/value types before emitting standard CLI Field MemberRefs or
+existing native field operations. No schema/Runtime Contract change. Raven integration
+follows; the author directs generic type constraints immediately after this slice.
+Constraints must preserve CLR/native semantics rather than translating unlike flags.

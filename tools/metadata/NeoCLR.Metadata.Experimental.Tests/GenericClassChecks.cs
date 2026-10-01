@@ -17,7 +17,7 @@ internal static class GenericClassChecks
         helpers.AddProperty("Empty", SignatureType.TypeParameter(0), empty);
         var box = graph.AddGenericClass("Example", "Box", ["Element"]);
         var t = SignatureType.TypeParameter(0);
-        var value = box.AddField("value", t);
+        var value = box.AddField("value", t, FieldVisibility.Public);
         var ctor = box.AddConstructor(new MethodSignature(PrimitiveType.Void, [t]));
         ctor.LoadArgument(0); ctor.LoadArgument(1); ctor.StoreField(value); ctor.Return();
         var get = box.AddInstanceMethod("Get", new MethodSignature(t, []));
@@ -38,9 +38,9 @@ internal static class GenericClassChecks
         var main = graph.EntryPoint!; main.ClearBody();
         var local = main.DeclareLocal(box.MakeGenericInstance(PrimitiveType.Int32));
         main.LoadConstant(1); main.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); main.StoreLocal(local);
-        main.LoadLocal(local); main.LoadConstant(42); main.Call(set.MakeConstructedReference([PrimitiveType.Int32]));
+        main.LoadLocal(local); main.LoadConstant(42); main.StoreField(value.MakeConstructedReference(PrimitiveType.Int32));
         main.LoadLocal(local); main.Emit(OpCode.Ldc_I8, 5000000000L); main.Call(echo.MakeConstructedReference([PrimitiveType.Int32], [PrimitiveType.Int64])); main.Emit(OpCode.Pop);
-        main.LoadLocal(local); main.LoadConstant(0); main.Call(getIndex.MakeConstructedReference([PrimitiveType.Int32])); main.Return();
+        main.LoadLocal(local); main.LoadField(value.MakeConstructedReference(PrimitiveType.Int32)); main.Return();
         return graph;
     }
     internal static void Run()
@@ -107,6 +107,13 @@ internal static class GenericClassChecks
         SignatureType nested = PrimitiveType.Int32;
         for (int i = 0; i < 16; i++) nested = definition.MakeGenericInstance(nested);
         Reject(() => definition.MakeGenericInstance(nested));
+        Reject(() => graph.EntryPoint!.LoadField(definition.Fields[0].MakeConstructedReference(SignatureType.TypeParameter(0))));
+        Reject(() => graph.EntryPoint!.LoadField(foreign.Types.Last().Fields[0].MakeConstructedReference(PrimitiveType.Int32)));
+        var wrongField = Create(); var wrongBody = wrongField.EntryPoint!; wrongBody.ClearBody();
+        wrongBody.LoadConstant(42); wrongBody.NewObject(wrongField.Types.Last().Methods[0].MakeConstructedReference([PrimitiveType.Int32]));
+        wrongBody.LoadField(wrongField.Types.Last().Fields[0].MakeConstructedReference(PrimitiveType.String));
+        wrongBody.Emit(OpCode.Pop); wrongBody.LoadConstant(42); wrongBody.Return();
+        try { wrongField.Write(); throw new Exception("wrong field receiver accepted"); } catch (InvalidDataException) { }
         var wrong = Create(); var body = wrong.EntryPoint!; body.ClearBody();
         body.LoadConstant(42); body.NewObject(wrong.Types.Last().Methods[0].MakeConstructedReference([PrimitiveType.Int32]));
         body.Call(wrong.Types.Last().Methods[1].MakeConstructedReference([PrimitiveType.String])); body.Emit(OpCode.Pop); body.LoadConstant(42); body.Return();

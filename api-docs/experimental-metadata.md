@@ -2726,3 +2726,23 @@ in its reference projection. Malformed owner references or scope violations thro
 InvalidDataException. Use the matching reader for these new producer outputs; the
 runtime already supports the native representation, so no runtime schema migration is
 required. This adds no external property import or generic constraints.
+
+
+### Constructed fields (development)
+
+`FieldBuilder.MakeConstructedReference(params SignatureType[] typeArguments)` returns
+an immutable `ConstructedFieldReference` with `Definition`, `DeclaringType` (a
+GenericTypeInstance) and substituted `FieldType`. Arguments are copied; original
+field signatures stay open. Constructor arguments follow MakeGenericInstance's bounds,
+ownership and 16-level nesting rules. Null throws ArgumentNullException; wrong arity,
+invalid/foreign types or unsupported substitution throws ArgumentException.
+
+`MethodBuilder.LoadField(ConstructedFieldReference)`, `StoreField(...)` and
+`Emit(OpCode, ConstructedFieldReference)` accept Ldfld/Stfld. Caller VAR/MVAR scope
+and ownership are checked before appending; invalid opcode/scope throws ArgumentException,
+null throws ArgumentNullException, and instruction limits throw InvalidDataException.
+Writing checks the exact constructed receiver, substituted value type and existing
+readonly constructor rule. CLI emits a Field MemberRef on a constructed TypeSpec with
+the open field signature. Native field indices retain the runtime's constructed receiver
+identity and layout. External *assembly* imports remain unsupported; this API accesses
+owned fields from outside their declaring type and supersedes that earlier restriction.

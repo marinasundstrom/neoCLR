@@ -12,7 +12,7 @@ public enum FieldVisibility
 }
 
 /// <summary>An owned instance-field declaration with a supported value signature.</summary>
-public sealed class FieldBuilder
+public sealed partial class FieldBuilder
 {
     internal FieldBuilder(TypeBuilder owner, string name, SignatureType type, FieldVisibility visibility, int index, bool isReadOnly)
     { DeclaringType = owner; Name = name; FieldType = type; Visibility = visibility; Index = index; IsReadOnly = isReadOnly; }

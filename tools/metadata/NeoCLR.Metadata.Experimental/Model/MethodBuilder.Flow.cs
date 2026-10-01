@@ -105,10 +105,10 @@ public sealed partial class MethodBuilder
                     {
                         if (instruction.Field!.IsReadOnly && (!IsConstructor || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
                             throw new InvalidDataException("readonly field requires its declaring constructor");
-                        Pop(instruction.Field.FieldType);
+                        Pop(instruction.ConstructedField?.FieldType ?? instruction.Field.FieldType);
                     }
-                    Pop(BodyValueType.Receiver(instruction.Field!.DeclaringType));
-                    if (instruction.Op == "field.load") stack.Add(instruction.Field.FieldType);
+                    Pop(instruction.ConstructedField is { } fieldReference ? (SignatureType)fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature);
+                    if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
                     break;
                 case "array.new":
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
