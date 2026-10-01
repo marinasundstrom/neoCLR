@@ -235,6 +235,7 @@ var tests = new (string Name, Action Body)[]
     ("Primitive vector imported signatures", VectorImportChecks.Run),
     ("Imported nominal and constructed type signatures", ImportedTypeChecks.Run),
     ("Generic imported signatures and MethodSpec execution", GenericImportChecks.Run),
+    ("Nominal imported method signatures and CLR execution", NominalMethodImportChecks.Run),
     ("Generic signature recognition and constraint rejection", CallableChecks.GenericSignatureRecognition),
     ("Producer MemberRef dependency and overload resolution", MemberReferenceChecks.ProducerReferences),
     ("Local MemberRef resolution and unsupported contracts", MemberReferenceChecks.LocalAndUnsupported),

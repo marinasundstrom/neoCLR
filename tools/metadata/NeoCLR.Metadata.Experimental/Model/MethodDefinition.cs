@@ -94,6 +94,14 @@ public sealed class MethodDefinition
             TryDecodeStaticValueSignature(signature, out decoded, GenericArity);
     }
 
+    internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
+    {
+        if (!IsStatic || unsupportedGenericParameters || GenericArity is < 0 or > 32)
+            throw new InvalidDataException("unsupported imported method declaration");
+        try { return new ImportedSignatureDecoder(signature, Module, consumer, core, GenericArity).Read(); }
+        catch (ArgumentException error) { throw new InvalidDataException("invalid imported signature", error); }
+    }
+
     internal static bool TryDecodeStaticPrimitiveSignature(ReadOnlySpan<byte> signature, out PrimitiveMethodSignature? decoded)
     {
         decoded = null;

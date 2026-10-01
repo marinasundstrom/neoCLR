@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Import dependency-local reference types/constructions in static method signatures
+  through the metadata producer and Raven target. CLR factory/reader and native Raven
+  generic factory/payload-alias tests execute successfully. Bounded decoding rejects
+  malformed/value-type/unsupported TypeRef signatures; collections Option<Order>,
+  instance members and translated-System identity mapping remain open.
+
 - Expand imported static generic calls to consumer-owned/imported reference arguments
   and caller generic parameters, checking ownership at construction and scope on emit.
   Standard MethodSpec shape remains unchanged. CLR and Raven-to-neoCLR probes execute

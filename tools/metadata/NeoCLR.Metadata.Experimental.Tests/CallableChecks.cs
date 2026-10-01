@@ -123,7 +123,7 @@ internal static class CallableChecks
         Reject(Image(4096, new byte[1025]), "missing or excessive method signature");
         Reject(Image(1, [0, 0, 8], isStatic: false), "global function must be static");
     }
-    private static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true, bool nested = false, bool genericOwner = false, int genericArity = 0, GenericParameterAttributes genericFlags = 0, bool typeConstraint = false, bool invalidIndex = false)
+    internal static byte[] Image(int count, byte[] signature, bool global = true, bool isStatic = true, bool nested = false, bool genericOwner = false, int genericArity = 0, GenericParameterAttributes genericFlags = 0, bool typeConstraint = false, bool invalidIndex = false)
     {
         var metadata = new MetadataBuilder();
         metadata.AddModule(0, metadata.GetOrAddString("Fixture.dll"), metadata.GetOrAddGuid(Guid.NewGuid()), default, default);

@@ -1247,8 +1247,9 @@ public sealed class ImportedMethodReference
 }
 ```
 
-`ImportReference` copies a static primitive/vector or bounded unconstrained generic signature from an external
-read-only definition. No producer builder, body, runtime load or resolver is needed.
+`ImportReference` copies a static signature containing primitives, vectors, dependency-local
+reference types/constructions and optional unconstrained method parameters from an
+external read-only definition. No producer builder, body, runtime load or resolver is needed.
 `Owner` is the consuming builder; `AssemblyIdentity` is the exact dependency identity.
 The namespace and type name are null for a global function. `ReturnsValue` is false
 for no result. References expose no body editing or signature mutation.
@@ -1260,7 +1261,10 @@ dependencies must be separately supplied and use this writer's format-5 naming
 contract. PE output uses ordinary AssemblyRef/TypeRef/MemberRef rows for type-owned
 methods. Cross-assembly globals remain native-only. Access checks are not performed.
 
-Nested/generic owners, instance/constrained-generic/other signatures, signed or flagged dependency
+Nominal signature tokens must identify public top-level unconstrained invariant reference
+types in that dependency snapshot (TypeDef). TypeRef signatures require a future explicit
+resolver contract. Value types, nested/generic owners, instance/constrained-generic/other
+signatures, signed or flagged dependency
 identities and imports of the output identity throw `InvalidDataException`. A single
 builder admits at most 256 imported assembly identities and 4096 imported methods.
 Different module MVIDs under one identity, or differing callable contracts under one
@@ -3033,7 +3037,7 @@ pass an Int32 vector to Call. The C# tests execute the resulting separate librar
 application on the CLR. Raven's native-profile [generic library probe](../docs/experiments/extended-cli-metadata/generic-library-validation.json)
 verifies and runs the equivalent binary boundary in neoCLR, including consumer-owned
 nominal arguments, alias mutation, external constructions and caller method/owner
-parameter forwarding. Imported generic declaring types, nominal types in the imported
+parameter forwarding. Imported generic declaring types, cross-dependency nominal types in the imported
 definition signature and constraints remain unsupported; this is not general collection
 import support.
 
@@ -3121,3 +3125,34 @@ check native declaration projection and malformed dependency rejection. The
 `--imported-type-integration <neoclr> <fresh-output>` test mode loads a separate native
 library/application, verifies and returns 42, including external interface and
 Box<consumer Order> fields/defaults and generic forwarding.
+
+## Imported nominal method signatures (development, 2026-10-01)
+
+The existing `AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)`
+overload decodes dependency-local CLASS and GENERICINST signatures into consumer-owned
+`ImportedTypeReference` values, including supported vectors and method parameters. A
+method can return `Box<T>`, accept it, or accept a vector of a dependency interface.
+The method owner still must be nongeneric and top-level, and the method static. The
+exact dependency definition snapshot supplies type name, arity and reference category;
+module-local tokens are never compared across assemblies.
+
+The immutable `ImportedMethodReference.Signature` exposes the remapped contract. Import
+interning still checks exact identity/MVID/token and signature equality. Scoped generic
+arguments and substituted signatures use the existing `MakeGenericInstance` API.
+Malformed/truncated/noncanonical encodings, missing definitions, excessive nesting,
+value-type encodings, nested vectors and unsupported TypeRef signatures throw
+`InvalidDataException`. Null inputs retain `ArgumentNullException` behavior.
+
+Standard CLI TypeRef/MemberRef/MethodSpec output and native dependency-scoped named
+signatures are retained, without runtime format changes. Direct calls through foreign
+mutable producer methods do not gain nominal support; use the explicit snapshot import.
+Primitive-only recognizers and `MemberReference.ResolveMethod` retain their documented
+narrower subset. General nominal MemberRef resolution is still pending.
+
+The C# contract tests execute a library factory returning an object and a library reader
+accepting it on the CLR. Raven's native probe additionally tests a generic factory,
+consumer-owned payload aliases, interface-vector overload matching and missing-method
+rejection. Nullable annotations are not retained by the current declaration projection;
+these cross-assembly factory contracts use nonnullable references. Imported value/union
+contracts, constructors/instance calls and translated-System native identities remain
+unsupported. [Native evidence](../docs/experiments/extended-cli-metadata/nominal-method-validation.json).

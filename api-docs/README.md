@@ -570,3 +570,7 @@ no guest reference assembly change is required.
 
 Consumer-scoped arguments and emission-time generic scope checks for imported generic
 calls are updated in the same host-only manual; guest signatures remain unchanged.
+
+Nominal method imports extend the existing host C# ImportReference contract; the
+[manual reference](experimental-metadata.md#imported-nominal-method-signatures-development-2026-10-01)
+records signature support and reader limitations. Guest RavenDoc selection is unchanged.

@@ -370,3 +370,8 @@ collections sample now reaches its Option<Order> signature boundary.
 Imported static generic calls now also accept consumer-owned reference types, external
 constructions and caller generic parameters. Raven binaries verify and execute this
 boundary in neoCLR; value/union contracts and full collection imports remain open.
+
+Development static imports now include dependency-local nominal method signatures.
+A Raven library factory returns Box<consumer Order> and preserves the payload alias
+through native execution. Value-type unions and instance/generic-owner member imports
+remain open; this is not yet full collection-library compilation.

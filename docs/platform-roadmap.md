@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Nominal method imports (2026-10-01):** separately emitted Raven binaries now execute
+static factory/reader calls with Box<consumer Order>, payload alias mutation and nominal
+overload matching (42). Dependency-local reference signatures are imported through the
+metadata API; value-type unions and imported instance/generic-owner methods remain open.
+The unchanged collections sample still stops at Option<Order>; preserve its value-type
+category rather than widening reference admission. [Probe](experiments/extended-cli-metadata/nominal-method-validation.json)
+and [current gate](experiments/extended-cli-metadata/collections-after-nominal-methods.json).
+
 **Imported generic arguments (2026-10-01):** Raven/native execution now covers
 consumer-owned nominal arguments, imported constructions and caller method/owner
 parameter forwarding through external unconstrained static generic methods (42).
