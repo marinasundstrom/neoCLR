@@ -127,7 +127,8 @@ output and separately compiled native text helpers. The independent metadata
 writer also supports typed argument stores; Raven source parameters remain immutable. Nulls, text operators, general
 object/field support and exception regions remain development work.
 Backend instruction/type profiles now admit shared bodies selectively: .NET supports
-shared division while the native writer still rejects it explicitly. General metadata
+shared division while the native writer still rejects it explicitly. The profiles
+also admit assembly functions, static methods and static types independently. General metadata
 category contracts, codegen portability and metadata importer work remain development
 tasks on the feature branches.
 

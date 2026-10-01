@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Raven backend profiles now admit logical declaration categories independently:
+  assembly functions, static methods and static types. Preserve native ownership
+  and the temporary CLI carrier representation without a metadata format change.
+
 - Raven now uses immutable backend instruction/type capability profiles to admit
   shared body plans before native builders are allocated. .NET admits shared signed
   division; the native producer explicitly rejects it until its writer supports it.

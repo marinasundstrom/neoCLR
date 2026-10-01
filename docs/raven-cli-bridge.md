@@ -1281,3 +1281,26 @@ output, alongside existing binary load/execute and compiler-driver acceptance ca
 [Binary runtime and driver evidence](experiments/extended-cli-metadata/emission-capabilities-validation.json).
 The metadata API and runtime implementation are unchanged in this slice; their prior
 39 C# contract groups and native argument-store evidence remain applicable.
+
+## Declaration-category profiles — 2026-10-01
+
+Raven's backend-owned capability profiles now explicitly admit logical assembly
+functions, static methods and static types, independently of instruction/type admission.
+Omitted categories admit nothing. Production source-plan collection checks the profile
+before declaration builders; callable body admission also checks the category. The
+profiles are immutable snapshots shared by declaration and body adapters.
+
+These logical categories preserve the existing difference between native assembly
+functions and .NET carrier methods. Compared with placing physical CLI method ownership
+in the common contract, they keep representation in the backend at the cost of explicit
+category admission. Existing API/type/method encodings and runtime behavior are reused;
+no new format extension, Runtime Contract option or loader change is introduced. The
+independent metadata project is unchanged. Visibility and general nominal/field/member
+categories remain open, as does full extended-CLI executable compatibility.
+
+Validation: 53 focused Raven tests pass, including category isolation and copied
+configuration, .NET declaration metadata/runtime checks and existing instruction/type
+capability checks. Native binary/driver acceptance is recorded with the matching
+compiler revision below. This is feature-branch development, not published support.
+
+Raven revision `e5b462e74`: [binary runtime and compiler-driver evidence](experiments/extended-cli-metadata/declaration-capabilities-validation.json).
