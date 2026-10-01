@@ -1393,3 +1393,23 @@ capability tests and the complete binary runtime/rvnc probe pass. Raven `2e03b8d
 runs both quotient and remainder result programs, plus eight Int32/Int64 zero/overflow
 fault programs against .NET and neoCLR. Native fault cases pass binary verification
 before failing execution. [Recorded evidence](experiments/extended-cli-metadata/remainder-validation.json).
+
+## Shared integer bitwise operations — 2026-10-01
+
+The shared Raven planner now admits Int32/Int64 AND, OR and XOR in both backend
+profiles. The independent metadata writer adds And/Or/Xor and the corresponding
+BitwiseAnd/BitwiseOr/BitwiseXor helpers. Both consume matching integer widths; the
+writer rejects invalid stack shapes before producing output. No Runtime Contract
+setting or runtime implementation change is needed. Boolean/enum bitwise support
+remains outside the bounded producer, without changing ordinary .NET behavior.
+
+The baseline is conventional CLI and/or/xor ([.NET opcode definitions](https://github.com/dotnet/runtime/blob/main/src/coreclr/inc/opcode.def),
+consulted 2026-10-01). Reusing those instructions preserves fixed-width sign bits
+and avoids helper calls or new metadata categories. The cost is explicit capability
+and adapter mappings; no performance improvement is asserted without measurement.
+The native payload/reference projection bridge and deferred importer remain unchanged.
+
+Validation: 43 C# metadata groups and the API snapshot check pass. Raven `9885caf6e`
+passes 41 focused shared-body/capability tests and the complete binary native/rvnc
+probe, including all three operators at both widths with negative and wide values.
+[Binary evidence](experiments/extended-cli-metadata/bitwise-validation.json).

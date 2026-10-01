@@ -74,6 +74,9 @@ public sealed partial class AssemblyBuilder
             "multiply" => new { op = "mul" },
             "divide" => new { op = "div" },
             "remainder" => new { op = "rem" },
+            "and" => new { op = "and" },
+            "or" => new { op = "or" },
+            "xor" => new { op = "xor" },
             "return" => new { op = "ret" },
             _ => throw new InvalidDataException("unsupported instruction")
         };

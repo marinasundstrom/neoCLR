@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Integer bitwise operations](#integer-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
 - [Signed remainder](#signed-remainder-development-2026-10-01): dividend-signed Int32/Int64 remainder.
 - [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
 - [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
@@ -1150,6 +1151,9 @@ public sealed class MethodBuilder
     public void Multiply();
     public void Divide();
     public void Remainder();
+    public void BitwiseAnd();
+    public void BitwiseOr();
+    public void BitwiseXor();
     public void Call(MethodBuilder target);
     public void Return();
     public void ClearBody();
@@ -1612,7 +1616,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div, Rem }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div, Rem, And, Or, Xor }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1997,3 +2001,17 @@ divisor. Both writers use existing rem instructions. Zero divisors fault at exec
 neoCLR also faults on minimum/-1. CLI output follows the host CLR's rem behavior
 (the tested host faults for minimum/-1 too; .NET documents this edge as platform
 sensitive). No unsigned/floating remainder or new exception handling is added.
+
+
+### Integer bitwise operations (development 2026-10-01)
+
+`OpCode.And`, `Or`, `Xor` and the operand-free `MethodBuilder.BitwiseAnd()`,
+`BitwiseOr()`, `BitwiseXor()` helpers consume two matching Int32/Int64 values and
+produce one of that width. `Emit(opCode)` is equivalent to the corresponding helper.
+Sign bits participate normally; these operations do not overflow. CLI and native
+output use existing and/or/xor instructions, with no metadata extension.
+
+Writing rejects underflow, mixed widths, Boolean or String operands with
+InvalidDataException. Operand-bearing Emit overloads reject these opcodes with
+ArgumentException; the instruction limit still applies. New enum values are appended.
+Boolean and enum bitwise semantics are not added to this bounded producer.

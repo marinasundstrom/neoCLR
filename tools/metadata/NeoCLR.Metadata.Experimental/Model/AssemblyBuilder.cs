@@ -213,6 +213,9 @@ public sealed partial class AssemblyBuilder
                     case "multiply": code.WriteByte(0x5a); break;
                     case "divide": code.WriteByte(0x5b); break;
                     case "remainder": code.WriteByte(0x5d); break;
+                    case "and": code.WriteByte(0x5f); break;
+                    case "or": code.WriteByte(0x60); break;
+                    case "xor": code.WriteByte(0x61); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
@@ -374,6 +377,12 @@ public sealed partial class MethodBuilder
     /// <summary>Appends matching-width signed Int32/Int64 remainder, with the dividend's sign.</summary>
     /// <remarks>Zero faults at execution, not when writing. Native minimum/-1 faults; CLI follows the host CLR edge behavior.</remarks>
     public void Remainder() => Emit(OpCode.Rem);
+    /// <summary>Appends bitwise AND of matching Int32/Int64 operands.</summary>
+    public void BitwiseAnd() => Emit(OpCode.And);
+    /// <summary>Appends bitwise OR of matching Int32/Int64 operands.</summary>
+    public void BitwiseOr() => Emit(OpCode.Or);
+    /// <summary>Appends bitwise XOR of matching Int32/Int64 operands.</summary>
+    public void BitwiseXor() => Emit(OpCode.Xor);
     /// <summary>Appends a call; foreign methods are imported during Write.</summary>
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
