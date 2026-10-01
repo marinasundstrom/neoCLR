@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Raven now shares an explicit primitive value/no-result type contract between
+  callable signatures and locals, with separate .NET/native mappers. Native local
+  emission no longer depends on the callable builder's mapping helper. Preserve the
+  selected .NET core and existing native assembly format; general type support is pending.
+
 - Add operand-free Neg/Not to the experimental metadata API for signed Int32/Int64
   values, with wrapping negation and width-preserving complement. Reject Boolean and
   empty-stack operands before writing. Raven shares unary +, - and ~ across both

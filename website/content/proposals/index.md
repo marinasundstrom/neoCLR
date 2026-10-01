@@ -207,3 +207,7 @@ entrypoints remain Int32/Unit, and broader type/conversion support is still pend
 
 Signed unary +, - and ~ now use the shared compiler path for Int32/Int64, including
 minimum-value wrapping tests against binary assemblies executed by neoCLR.
+
+The compiler now uses one primitive value/no-result contract for signatures and locals,
+with separate .NET/native type mappers. This is an internal migration boundary; general
+nominal, generic and array type support remains pending in the native backend.

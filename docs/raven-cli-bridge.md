@@ -1082,3 +1082,36 @@ Tested Raven consumer revision `0f2743fb2` on `codex/metadata-consumer`;
 [executable evidence](experiments/extended-cli-metadata/unary-integers-validation.json).
 This reuses `src/numeric.rs` unary behavior and `src/verifier.rs` operand checks.
 The independent metadata API remains on `codex/extended-cli-metadata`.
+
+## Shared primitive type contract — 2026-10-01
+
+Callable signatures and local declarations now carry EmissionPrimitiveType rather
+than passing semantic SpecialType values to backend builders. Shared classification
+admits Int32, Int64 and Boolean values and explicitly distinguishes NoResult. Unit/void
+are normalized only in return position; Unit parameters/locals, nullable and other
+unsupported types are not silently converted into no-result or primitive values.
+
+Both declaration and body builders use IEmissionTypeMapper<TType>. The .NET mapper
+resolves every type through the caller's selected-core resolver; it never substitutes
+host typeof handles. The native mapper lives independently of the callable builder
+and maps to the separate metadata library's PrimitiveType contract. Native local
+emission no longer depends on the callable declaration builder for type mapping.
+
+This is a bounded type boundary, not general nominal/array/generic type support.
+Compared with passing SpecialType through each builder, the benefit is one shared
+value/no-result admission rule and explicit target-owned representation mapping. The
+cost is a small internal type vocabulary and mapper implementation per backend. CLR
+Reflection.Emit handles remain in its adapters; native metadata handles remain in
+its adapters. Ordinary .NET behavior and Runtime Contract configuration are unchanged.
+The temporary CLI declaration projection and deferred semantic import are unchanged.
+
+Validation: 44 focused C# compiler tests include rejection of unsupported signature
+shapes and selected-core inspection of Int32/Int64/Boolean locals and callable
+signatures. The existing native probe exercises both mappers by executing all supported
+primitive cases on .NET and binary assemblies loaded by neoCLR. The metadata format
+and API did not change; the prior 37 metadata contract groups remain applicable.
+
+Tested Raven consumer revision `649eeb851` on `codex/metadata-consumer`;
+[executable evidence](experiments/extended-cli-metadata/primitive-type-boundary-validation.json).
+The native metadata API remains a separate project on `codex/extended-cli-metadata`;
+no API or runtime change was needed for this compiler boundary.
