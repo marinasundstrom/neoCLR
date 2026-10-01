@@ -1,11 +1,11 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable owned generic class/interface construction with structural argument identity.</summary>
+/// <summary>An immutable owned generic nominal construction with structural argument identity.</summary>
 public sealed class GenericTypeInstance : IEquatable<GenericTypeInstance>
 {
     internal GenericTypeInstance(TypeBuilder definition, SignatureType[] arguments)
     { Definition = definition; TypeArguments = Array.AsReadOnly(arguments); }
-    /// <summary>Gets the owned generic class or interface definition.</summary>
+    /// <summary>Gets the owned generic nominal definition.</summary>
     public TypeBuilder Definition { get; }
     /// <summary>Gets copied arguments in declaration order.</summary>
     public IReadOnlyList<SignatureType> TypeArguments { get; }
@@ -22,16 +22,16 @@ public sealed class GenericTypeInstance : IEquatable<GenericTypeInstance>
 
 public sealed partial class TypeBuilder
 {
-    /// <summary>Constructs an immutable class/interface reference signature; caller scope is checked when used.</summary>
+    /// <summary>Constructs an immutable nominal signature; caller scope is checked when used.</summary>
     /// <param name="typeArguments">One non-Void supported argument per parameter; copied.</param>
-    /// <returns>A class or interface construction with structural argument identity.</returns>
+    /// <returns>A nominal construction with structural argument identity.</returns>
     /// <exception cref="ArgumentNullException">Null argument array.</exception>
     /// <exception cref="ArgumentException">Static/nongeneric owner, wrong arity, null/Void/foreign argument or nesting beyond 16 levels.</exception>
     public GenericTypeInstance MakeGenericInstance(params SignatureType[] typeArguments)
     {
         ArgumentNullException.ThrowIfNull(typeArguments);
         if (IsStatic || GenericParameterNames.Count == 0 || typeArguments.Length != GenericParameterNames.Count || typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16))
-            throw new ArgumentException("generic reference type arguments must match the definition");
+            throw new ArgumentException("generic type arguments must match the definition");
         foreach (var argument in typeArguments) argument.ValidateOwner(Assembly, 32, 32);
         ValidateTypeArguments(typeArguments);
         return new(this, (SignatureType[])typeArguments.Clone());

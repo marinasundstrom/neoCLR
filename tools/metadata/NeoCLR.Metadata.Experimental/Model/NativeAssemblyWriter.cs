@@ -200,7 +200,7 @@ public sealed partial class AssemblyBuilder
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { new { name = Identity.Name, full_name = IdentityText(Identity), modules = new[] { Identity.Name + ".dll" }, references = dependencies.Keys.Select(IdentityText).ToArray() } },
             types = types.Select((type, index) => new NativeTypeRow(
-                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface, type.IsStatic, type.IsStatic,
+                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType, type.IsStatic, type.IsStatic || type.IsValueType,
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
                 !type.InterfaceContracts.Any() ? null : type.InterfaceContracts.Select(b => (object)new { Named = TypeName(b) }).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,

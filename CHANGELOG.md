@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add bounded owned value-type declarations to the metadata producer, preserving
+  VALUETYPE/GENERICINST categories through CLI output, native loading and projection.
+  Defaults, primitive field reads, generic forwarding and arrays execute on CLR and
+  neoCLR (42); special constraints distinguish values from references. Generic payload
+  fields, addressed mutation, instance methods and value-type imports remain unsupported;
+  this does not yet advance the collections Option<Order> gate.
+
 - Import dependency-local reference types/constructions in static method signatures
   through the metadata producer and Raven target. CLR factory/reader and native Raven
   generic factory/payload-alias tests execute successfully. Bounded decoding rejects

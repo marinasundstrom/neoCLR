@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Value-type category prerequisite (2026-10-01):** the metadata producer now emits
+owned nongeneric/generic value definitions with primitive fields and preserves CLI
+VALUETYPE categories through native binary projection. Default values, field reads,
+generic forwarding and arrays verify/run on CLR and neoCLR (42). Raven admission and
+the collections Option<Order> gate remain unchanged. Next add generic payload storage,
+addressed mutation and explicit imported value-type/category mapping before union
+emission; do not represent value unions as classes.
+[Evidence](experiments/extended-cli-metadata/value-type-validation.json).
+
 **Nominal method imports (2026-10-01):** separately emitted Raven binaries now execute
 static factory/reader calls with Box<consumer Order>, payload alias mutation and nominal
 overload matching (42). Dependency-local reference signatures are imported through the

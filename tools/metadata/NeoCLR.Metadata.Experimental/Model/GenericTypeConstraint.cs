@@ -48,7 +48,7 @@ public sealed partial class TypeBuilder
     {
         ArgumentNullException.ThrowIfNull(baseType);
         if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) ||
-            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsInterface || baseType.GenericParameterNames.Count != 0)
+            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsInterface || baseType.IsValueType || baseType.GenericParameterNames.Count != 0)
             throw new ArgumentException("one owned nongeneric class bound per declared type parameter required");
         genericConstraints.Add(new(parameterIndex, baseType));
         genericConstraints.Sort((a, b) => a.ParameterIndex.CompareTo(b.ParameterIndex));
@@ -59,8 +59,9 @@ public sealed partial class TypeBuilder
         {
             var type = arguments[index];
             if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) continue;
-            bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean;
-            bool reference = type.Primitive == PrimitiveType.String || type.ClassType is not null || type.ImportedType is not null || type.GenericInstance is not null || type.ArrayElement is not null;
+            bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean ||
+                type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
+            bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is not null || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;
             var definition = type.ClassType ?? type.GenericInstance?.Definition;
             bool constructible = value || definition is not null && (!complete || definition.Methods.Any(m => m.IsConstructor && m.ParameterCount == 0 && m.Visibility == MethodVisibility.Public));
             if (flags.HasFlag(TypeParameterConstraints.ReferenceType) && !reference || flags.HasFlag(TypeParameterConstraints.ValueType) && !value ||

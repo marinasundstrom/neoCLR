@@ -2709,3 +2709,21 @@ then appropriate union operations and imported instance/generic-owner members. T
 current projection also omits nullable annotations; the factory boundary above uses
 nonnull references. Native semantic loading remains future work. Primitive-only reader
 recognizers/MemberReference resolution remain narrower than this producer import API.
+
+## Value-type category prerequisite (2026-10-01)
+
+The independent producer on codex/extended-cli-metadata now distinguishes owned value
+definitions from reference classes. CLI uses sealed sequential System.ValueType bases
+and VALUETYPE/GENERICINST signatures; native output uses its existing non-reference
+sealed type contract. C# tests prove default/field-read/array/generic-argument flow on
+CLR and direct neoCLR binaries, including value-category preservation in projection.
+The runtime format and Raven Runtime Contract configuration are unchanged.
+
+This slice changes no Raven admission rules. The unchanged collections gate remains
+Option<Order>, a value-type union in the CLI declaration bridge. Owned value declarations
+currently support only primitive fields/static methods. Payload VAR fields, addressed
+field mutation, instance members and imported value categories are separate required
+steps. The metadata API owns category-preserving encoding/projection; Raven will need
+explicit value-type capabilities and union lowering rather than class-based admission.
+The future native semantic loader must replace CLI input without carrying forward
+these temporary producer limits. [Evidence](experiments/extended-cli-metadata/value-type-validation.json).

@@ -241,11 +241,12 @@ public sealed partial class MethodBuilder
     /// <param name="opCode">Ldfld or Stfld.</param>
     /// <param name="operand">An instance field declared in this output assembly.</param>
     /// <exception cref="ArgumentNullException">Field is null.</exception>
-    /// <exception cref="ArgumentException">Wrong opcode, foreign field or generic definition field outside its declaring type.</exception>
+    /// <exception cref="ArgumentException">Wrong opcode, foreign field or generic definition field outside its declaring type. Value-type stores are unsupported pending addressed receiver support.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, FieldBuilder operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
+        if (opCode == OpCode.Stfld && operand.DeclaringType.IsValueType) throw new ArgumentException("value-type stores require addressed receiver support", nameof(operand));
         if (!ReferenceEquals(operand.DeclaringType.Assembly, Assembly)) throw new ArgumentException("field belongs to another output", nameof(operand));
         if (operand.DeclaringType.GenericParameterNames.Count > 0 && !ReferenceEquals(DeclaringType, operand.DeclaringType))
             throw new ArgumentException("generic definition fields require the declaring type scope");

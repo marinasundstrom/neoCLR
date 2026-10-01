@@ -1,12 +1,12 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned/imported reference type, scoped generic parameter or vector signature type.</summary>
+/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter or vector signature type.</summary>
 public sealed record SignatureType
 {
     private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null) { ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
-    /// <summary>Gets the exact owned CLI CLASS identity (class or interface), or null for other signatures.</summary>
+    /// <summary>Gets the exact owned nominal identity (class, interface or value type), or null for other signatures.</summary>
     public TypeBuilder? ClassType { get; }
     /// <summary>Gets the element type for a zero-based vector, or null for a scalar.</summary>
     public SignatureType? ArrayElement { get; }
@@ -35,9 +35,9 @@ public sealed record SignatureType
     /// <exception cref="ArgumentOutOfRangeException">Index outside the supported range.</exception>
     public static SignatureType TypeParameter(int index)
         => index is >= 0 and < 32 ? new(null, null, typeParameter: index) : throw new ArgumentOutOfRangeException(nameof(index));
-    /// <summary>Gets an owned constructed class/interface; imported constructions use ImportedType.</summary>
+    /// <summary>Gets an owned constructed nominal type; imported constructions use ImportedType.</summary>
     public GenericTypeInstance? GenericInstance { get; }
-    /// <summary>Creates a signature for an owned constructed generic reference type.</summary>
+    /// <summary>Creates a signature for an owned constructed generic type.</summary>
     public static implicit operator SignatureType(GenericTypeInstance type)
         => new(null, null, genericInstance: type ?? throw new ArgumentNullException(nameof(type)));
     /// <summary>Gets an external reference type or construction, or null for other signatures.</summary>
@@ -74,7 +74,7 @@ public sealed record SignatureType
     /// <summary>Creates a primitive signature type, including Void for results only.</summary>
     public static implicit operator SignatureType(PrimitiveType type)
         => Enum.IsDefined(type) ? new(type, null) : throw new ArgumentOutOfRangeException(nameof(type));
-    /// <summary>Creates a CLI CLASS reference to an owned nongeneric class or interface; generic definitions require construction.</summary>
+    /// <summary>Creates a signature for an owned nongeneric class, interface or value type; generic definitions require construction.</summary>
     public static implicit operator SignatureType(TypeBuilder type)
     {
         ArgumentNullException.ThrowIfNull(type);
@@ -89,7 +89,7 @@ public sealed record SignatureType
 public class MethodSignature
 {
     /// <summary>Copies up to 256 non-Void parameters. Ownership is checked when defining a method.</summary>
-    /// <param name="returnType">Supported primitive, Void or owned/imported reference type.</param>
+    /// <param name="returnType">Supported primitive, Void, owned nominal or imported reference type.</param>
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
     /// <exception cref="ArgumentNullException">Result or parameters are null.</exception>
     /// <exception cref="ArgumentException">Null/Void parameter or more than 256 parameters.</exception>

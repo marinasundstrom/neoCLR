@@ -375,3 +375,8 @@ Development static imports now include dependency-local nominal method signature
 A Raven library factory returns Box<consumer Order> and preserves the payload alias
 through native execution. Value-type unions and instance/generic-owner member imports
 remain open; this is not yet full collection-library compilation.
+
+The development metadata producer now preserves owned value-type categories in CLI
+and native binaries. Defaults, primitive fields, generic forwarding and arrays execute
+on both runtimes. Generic payload storage and imported union/value types remain open;
+Raven's collections sample is still blocked at Option<Order>.

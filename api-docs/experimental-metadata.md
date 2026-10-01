@@ -3156,3 +3156,56 @@ rejection. Nullable annotations are not retained by the current declaration proj
 these cross-assembly factory contracts use nonnullable references. Imported value/union
 contracts, constructors/instance calls and translated-System native identities remain
 unsupported. [Native evidence](../docs/experiments/extended-cli-metadata/nominal-method-validation.json).
+
+## Owned value types (development, 2026-10-01)
+
+```csharp
+TypeBuilder AssemblyBuilder.AddValueType(string @namespace, string name,
+    TypeVisibility visibility = TypeVisibility.Public);
+TypeBuilder AssemblyBuilder.AddGenericValueType(string @namespace, string name,
+    IEnumerable<string> genericParameterNames,
+    TypeVisibility visibility = TypeVisibility.Public);
+bool TypeBuilder.IsValueType { get; }
+bool TypeDefinition.IsValueType { get; }
+```
+
+AddValueType creates an owned, sealed sequential-layout CLI type deriving from the
+configured core's System.ValueType. AddGenericValueType adds one through 32 invariant,
+unconstrained parameters and appends the normal metadata arity suffix to the name.
+Names/visibility/duplicate and resource checks match AddClass/AddGenericClass; invalid
+inputs throw ArgumentException and null generic parameter collections throw
+ArgumentNullException. Neither method creates an instance constructor. The definition
+supports static methods, primitive instance fields, defaults, parameters/results,
+locals, vectors and generic construction/arguments. Public/internal visibility is
+preserved in both output formats.
+
+TypeBuilder.IsValueType reports the producer category. TypeDefinition.IsValueType
+reports whether the input directly extends a type named System.ValueType or System.Enum;
+this is metadata classification, not runtime loading or validation of the base assembly.
+SignatureType.ClassType is retained as the compatibility property name for an owned
+nongeneric nominal identity, including a value type. GenericTypeInstance.Definition
+likewise distinguishes classes, interfaces and value types using the definition flags.
+CLI encoding uses VALUETYPE and GENERICINST VALUETYPE for these types. Native output
+uses the existing non-reference, sealed type shape; native reading and CLI projection
+preserve it without a new instruction or format revision.
+
+ValueType and DefaultConstructor generic requirements admit these definitions;
+ReferenceType requirements and nominal class bounds reject them. Instance methods,
+constructors and interface implementation are not yet supported for producer value
+types (InvalidOperationException). Nonprimitive field storage, including generic
+payload fields, is rejected with ArgumentException, avoiding unsupported inline layout
+and recursive storage. StoreField/Emit(Stfld, ...) on a value-type owner reject with
+ArgumentException until addressed receiver support is implemented. Field reads of
+values are supported. Static properties may use static accessors as elsewhere.
+
+Imported value-type definitions still reject: importing them as reference types would
+corrupt signature/category semantics. Native reader checks the bounded shape and rejects
+unsupported field storage before projection. These are current producer limits, not
+permanent neoCLR rules; runtime value types already exist beyond this subset.
+
+The C# checks execute defaults, field reads, static/generic forwarding and vector
+storage on CLR and native neoCLR, both returning 42. They also test CLR reflection,
+read snapshots, native projection, constraints and invalid shape/storage rejection.
+[Evidence](../docs/experiments/extended-cli-metadata/value-type-validation.json).
+This is a prerequisite for Raven union emission, not support for Option<T> payloads or
+a completed collections gate.

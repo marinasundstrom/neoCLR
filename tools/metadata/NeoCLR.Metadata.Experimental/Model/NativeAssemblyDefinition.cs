@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, string[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, string[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
@@ -114,7 +114,9 @@ public sealed class NativeAssemblyDefinition
 
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
-                Require(type.GetProperty("is_reference_type").GetBoolean() == !isInterface && type.GetProperty("is_sealed").GetBoolean() == isStatic &&
+                var isValueType = !isInterface && !type.GetProperty("is_reference_type").GetBoolean();
+                Require((!isValueType || !isStatic && baseInterfaces.Length == 0) &&
+                    type.GetProperty("is_reference_type").GetBoolean() == (!isInterface && !isValueType) && type.GetProperty("is_sealed").GetBoolean() == (isStatic || isValueType) &&
                     (!isInterface || !type.GetProperty("is_abstract").GetBoolean() && Array(type, "fields", 256).Length == 0), "unsupported native type shape");
                 var fieldRows = new List<FieldRow>();
                 foreach (var field in Array(type, "fields", 256))
@@ -168,11 +170,11 @@ public sealed class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints));
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
-            var signatureOwners = types.Select(t => t.IsInterface ? (t.GenericNames.Length == 0 ? signatureGraph.AddInterface(t.Namespace, t.Name) : signatureGraph.AddGenericInterface(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames)) : t.GenericNames.Length > 0 ? (t.IsStatic ? signatureGraph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames) : signatureGraph.AddGenericClass(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames)) : t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
+            var signatureOwners = types.Select(t => DefineType(signatureGraph, t)).ToArray();
             for (int i = 0; i < types.Count; i++)
                 foreach (var inherited in types[i].BaseInterfaces)
                 {
@@ -184,7 +186,7 @@ public sealed class NativeAssemblyDefinition
             for (int i = 0; i < types.Count; i++)
                 foreach (var constraint in types[i].Constraints)
                 {
-                    int bound = types.FindIndex(t => t.NativeName == constraint.Bound && !t.IsStatic && !t.IsInterface && t.GenericNames.Length == 0);
+                    int bound = types.FindIndex(t => t.NativeName == constraint.Bound && !t.IsStatic && !t.IsInterface && !t.IsValueType && t.GenericNames.Length == 0);
                     Require(bound >= 0, "type bound requires owned nongeneric class");
                     signatureOwners[i].AddBaseTypeConstraint(constraint.Parameter, signatureOwners[bound]);
                 }
@@ -227,7 +229,11 @@ public sealed class NativeAssemblyDefinition
             foreach (var type in types)
             {
                 typeArity = type.GenericNames.Length;
-                foreach (var field in type.Fields) _ = ReadType(field.Type, false);
+                foreach (var field in type.Fields)
+                {
+                    var storage = ReadType(field.Type, false);
+                    Require(!type.IsValueType || storage.Primitive is not null, "value-type fields currently require primitive storage");
+                }
             }
             typeArity = 0;
             string TypeKey(SignatureType type) => type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
@@ -298,7 +304,7 @@ public sealed class NativeAssemblyDefinition
                 var resultType = ReadType(method.GetProperty("returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
-                Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a root class");
+                Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic && !types[ownerIndex].IsValueType, "instance method requires a root class");
                 var interfaceOwner = ownerIndex >= 0 && types[ownerIndex].IsInterface;
                 Require(isAbstract == interfaceOwner && isVirtual == interfaceOwner, "interface method flags mismatch");
                 Require(!interfaceOwner || instance && visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
@@ -390,7 +396,7 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => t.IsInterface ? (t.GenericNames.Length == 0 ? graph.AddInterface(t.Namespace, t.Name, t.Visibility) : graph.AddGenericInterface(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility)) : t.GenericNames.Length > 0 ? (t.IsStatic ? graph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility) : graph.AddGenericClass(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility)) : t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
+        var owners = types.Select(t => DefineType(graph, t)).ToArray();
         for (int i = 0; i < types.Length; i++)
             foreach (var inherited in types[i].BaseInterfaces)
                 if (types[i].IsInterface) owners[i].AddBaseInterface(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
@@ -440,6 +446,20 @@ public sealed class NativeAssemblyDefinition
             owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
         return graph.WriteReferenceImage();
     }
+    private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
+    {
+        if (type.GenericNames.Length == 0)
+            return type.IsValueType ? graph.AddValueType(type.Namespace, type.Name, type.Visibility)
+                : type.IsInterface ? graph.AddInterface(type.Namespace, type.Name, type.Visibility)
+                : type.IsStatic ? graph.AddType(type.Namespace, type.Name, type.Visibility)
+                : graph.AddClass(type.Namespace, type.Name, type.Visibility);
+        var name = type.Name[..type.Name.LastIndexOf('`')];
+        return type.IsValueType ? graph.AddGenericValueType(type.Namespace, name, type.GenericNames, type.Visibility)
+            : type.IsInterface ? graph.AddGenericInterface(type.Namespace, name, type.GenericNames, type.Visibility)
+            : type.IsStatic ? graph.AddGenericType(type.Namespace, name, type.GenericNames, type.Visibility)
+            : graph.AddGenericClass(type.Namespace, name, type.GenericNames, type.Visibility);
+    }
+
     private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references)
     {
         foreach (var identity in references)

@@ -64,7 +64,7 @@ public sealed partial class TypeBuilder
     public void AddInterfaceImplementation(TypeBuilder contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
-        if (IsInterface || IsStatic || GenericParameterNames.Count != 0)
+        if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count != 0)
             throw new InvalidOperationException("interface implementations require a nongeneric root class");
         if (!contract.IsInterface || contract.GenericParameterNames.Count != 0 || !ReferenceEquals(contract.Assembly, Assembly) ||
             implementedInterfaces.Contains(contract) || implementedInterfaces.Count >= 256)

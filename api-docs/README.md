@@ -574,3 +574,9 @@ calls are updated in the same host-only manual; guest signatures remain unchange
 Nominal method imports extend the existing host C# ImportReference contract; the
 [manual reference](experimental-metadata.md#imported-nominal-method-signatures-development-2026-10-01)
 records signature support and reader limitations. Guest RavenDoc selection is unchanged.
+
+AddValueType/AddGenericValueType and producer/snapshot IsValueType properties are
+host C# metadata APIs covered by the [manual reference](experimental-metadata.md#owned-value-types-development-2026-10-01).
+They remain explicitly excluded from guest RavenDoc selection; no guest reference
+assembly/signature changed. ClassType/GenericTypeInstance category semantics are
+updated in that same entry.
