@@ -29,7 +29,9 @@ constructors and primitive field/property initializers now share the compiler in
 plan and execute on both targets. Owned nominal parameters/results now flow through
 shared backend type mapping; factories, self-return, constructor arguments, overloads
 and alias mutation verify/run on .NET and binary neoCLR in both file orders. The current
-nominal-signature/default-constructor/primitive-initialization slices are complete. Next
+nominal-signature/default-constructor/primitive-initialization slices are complete. Explicit
+mutable primitive fields also preserve visibility, initialization and alias mutation
+through binary execution. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

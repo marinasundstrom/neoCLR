@@ -39,7 +39,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   optional backing storage. Explicit root constructors also admit expression bodies,
   with overload and argument-order runtime validation.
   Default root constructors and primitive field/property initializers now share
-  canonical initialization with .NET; nullable/external locals and chaining remain gaps.
+  canonical initialization with .NET. Explicit mutable primitive fields now preserve
+  public/internal/private access through Raven emission, without property rows.
+  Nullable/external locals and chaining remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor

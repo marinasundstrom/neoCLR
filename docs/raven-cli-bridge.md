@@ -2071,3 +2071,22 @@ slices are complete. Cross-assembly nominal importing, nullability, generic/stru
 signatures, nominal fields/properties, readonly storage and constructor chaining remain
 separate contracts. General metadata importing is still deferred; the broad consumer's
 49 native collection/LINQ/union binding errors are not hidden with substitute libraries.
+
+
+## Raven explicit primitive fields — 2026-10-01
+
+Native Raven declaration collection now accepts explicit mutable primitive instance
+fields on bounded root classes. It preserves public/internal/private access, canonical
+field identity and the shared initialization/load/store paths, producing field rows with
+no synthetic property/accessor rows. This fills a compiler collection gap in the existing
+CLI/native field contract; the independent metadata API and runtime require no changes.
+No Runtime Contract configuration is added. Ordinary private storage still uses idiomatic
+`private var`; explicit fields express intentional field identity or a public field API.
+
+Two C# Release/Debug tests pass after a seven-test constructor/reference-field baseline.
+The expanded Order consumer initializes public Int32, internal Int64 and private Boolean
+fields, mutates through an alias and reads the original instance. Both source orders
+verify/run to 42 on .NET and binary neoCLR; projection checks preserve access and the
+absence of properties. Static and nominal field rejection leaves output untouched.
+Readonly, by-reference and attributed field declarations remain later contracts.
+[Evidence](experiments/extended-cli-metadata/order-runtime-validation.json).

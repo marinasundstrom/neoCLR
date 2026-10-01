@@ -252,3 +252,7 @@ with overload selection and argument-order checks on both runtimes.
 
 Default root constructors and primitive field/property initializers now share compiler
 initialization with .NET and execute in the binary neoCLR consumer.
+
+Explicit mutable primitive instance fields now preserve public/internal/private access
+through Raven's native collector and the existing field metadata. Initialization and alias
+mutation run on both targets; readonly, static and nominal field storage remain future work.
