@@ -479,7 +479,6 @@ public sealed partial class TypeBuilder
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         signature.ValidateOwner(Assembly);
-        if (!isStatic && signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic instance methods are not yet supported", nameof(signature));
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");

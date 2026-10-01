@@ -208,10 +208,9 @@ public sealed class NativeAssemblyDefinition
                 var resultType = ReadType(method.GetProperty("returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
-                Require(!instance || genericArity == 0, "generic instance methods unsupported");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a root class");
                 var constructor = instance && name == ".ctor";
-                Require(!constructor || resultType == PrimitiveType.Void, "constructor must have no result");
+                Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
                 var expectedName = constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);

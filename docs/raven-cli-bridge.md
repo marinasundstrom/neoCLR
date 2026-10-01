@@ -2316,3 +2316,15 @@ values and object identity. Both source orders return 42 on .NET/native; five bi
 unsupported forms reject with source diagnostics and no output. [Recorded evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
 includes the tested runtime and consumer hashes. This is a bounded milestone; native
 generic types, constraints, instance methods and imported generic symbols are still open.
+
+### Generic class receivers (2026-10-01 development)
+
+The experimental metadata producer and native verifier now admit ordinary nonvirtual
+generic instance methods on owned root classes. CLI uses instance GenericParam/MVAR
+signatures and MethodSpec calls; native calls carry instance=true alongside generic
+arguments. Receiver slot zero is independent from method generic parameter zero.
+The C# producer binary verifies/runs (42) with receiver mutation and forwarded generic
+object identity; missing receivers reject before output. Generic constructors,
+by-reference class receivers and virtual generic dispatch remain unsupported. This
+continues the PE/#Neo execution bridge and its CLI projection rather than introducing
+a new metadata category. Raven integration follows in a separate slice.

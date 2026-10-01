@@ -2561,8 +2561,9 @@ invalid scope. Fields and property accessors cannot use method generic parameter
 The signature constructor copies up to 32 unique nonblank valid-Unicode names of at
 most 256 characters without controls; invalid names/counts throw ArgumentException.
 Names are immutable and preserved in CLI GenericParam rows and native generic_parameters.
-Only unconstrained ownerless functions and static methods are admitted. Constructors,
-instance generic methods, generic types and constraints remain outside this API slice.
+Unconstrained ownerless functions and static/ordinary instance methods on owned root
+classes are admitted. Generic constructors, generic types and constraints remain outside
+this API slice.
 
 For example, `new MethodSignature(SignatureType.MethodParameter(0),
 [SignatureType.MethodParameter(0)], ["T"])` defines `Identity<T>(T) -> T`.
@@ -2584,7 +2585,7 @@ substituted `Signature`. `Call(GenericMethodInstance)` and
 `Emit(OpCode.Call, GenericMethodInstance)` append an owned call. Null arguments throw
 ArgumentNullException; wrong arity, Void, foreign class/definition, wrong opcode,
 out-of-scope caller parameters and nested-array substitution throw ArgumentException.
-Body stack compatibility is validated on write. Only unconstrained static definitions
+Body stack compatibility is validated on write. Only unconstrained static or ordinary instance definitions
 in the current output are supported; imported generic methods remain unsupported.
 For example, `body.Call(identity.MakeGenericInstance(PrimitiveType.Int32))` consumes
 one Int32 for `Identity<T>(T)->T` and produces Int32. Forwarding may instead pass
@@ -2597,3 +2598,11 @@ Generic-call regression checks also confirm that caller mutation of the argument
 cannot alter an existing instance, and both writers reject a mismatched substituted
 stack argument before producing an image. Raw `Emit(Call, instance)` supports forwarded
 parameters with the same scope and stack contract as `Call(instance)`.
+
+Instance generic calls consume the exact owned declaring-class receiver before explicit
+arguments and return the substituted result. Receiver slot zero remains separate from
+MVAR parameter indices. `AddInstanceMethod(name, signature)` accepts named method
+parameters; `MakeGenericInstance`, typed `Call` and raw `Emit(Call, instance)` work as
+for static calls. No virtual-dispatch contract is introduced. Both writers validate
+receiver stack shape; native reference projection preserves instance/generic flags.
+Generic constructors and generic property accessors remain invalid.

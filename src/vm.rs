@@ -546,14 +546,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             && (function.receiver_byref
                 || function.receiver_readonly
                 || function.is_internal_call()
-                || function.pinvoke.is_some()
-                || (function.instance && !function.generic_parameters.is_empty()))
+                || function.pinvoke.is_some())
         {
             return Err(Fault::new("class methods require ordinary IL receivers"));
         }
         if class_owner
             && function.name.ends_with("..ctor")
-            && (!function.instance || !function.no_result)
+            && (!function.instance || !function.no_result || !function.generic_parameters.is_empty())
         {
             return Err(Fault::new(
                 "class constructors require instance no-result signatures",
@@ -652,7 +651,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         if !function.generic_parameters.is_empty() {
             let mut names = HashSet::new();
             if function.generic_parameters.len() > 1024
-                || function.instance
+                || (function.instance && !class_owner)
                 || function.is_virtual
                 || function.is_abstract
                 || function.is_internal_call()
@@ -660,7 +659,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || !function.interface_implementations.is_empty()
             {
                 return Err(Fault::new(
-                    "generic functions currently require static or free concrete IL bodies",
+                    "generic methods require concrete nonvirtual IL bodies and ordinary class receivers",
                 ));
             }
             for name in function.generic_parameters.iter().flatten() {

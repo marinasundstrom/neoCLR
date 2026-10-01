@@ -166,3 +166,48 @@ fn static_generic_class_method_has_no_receiver_restriction() {
         Value::Int32(42)
     );
 }
+
+#[test]
+fn generic_class_instance_calls_keep_receiver_identity() {
+    let module = assemble(
+        r#"
+.module Test
+.entry Main
+.type class Counter
+.field Value Int32
+.method instance Remember<T>(T value, Int32 number) -> T
+ldarg 0
+ldarg number
+stfld Counter::Value
+ldarg value
+ret
+.end
+.end
+.function Main() -> Int32
+.local Counter instance
+ldc.i4 1
+newobj Counter
+stloc instance
+ldloc instance
+ldloc instance
+ldc.i4 42
+call instance Counter::Remember<Counter>(Counter,Int32)
+ldfld Counter::Value
+ret
+.end
+"#,
+    )
+    .unwrap();
+    verify(&module).unwrap();
+    assert_eq!(
+        run(&module, Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+    let mut invalid = module.clone();
+    invalid.functions[0].receiver_byref = true;
+    assert!(verify(&invalid).is_err());
+    let mut constructor = module.clone();
+    constructor.functions[0].name = "Counter..ctor".into();
+    constructor.functions[0].no_result = true;
+    assert!(verify(&constructor).is_err());
+}

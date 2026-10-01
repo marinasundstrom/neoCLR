@@ -704,3 +704,8 @@ values and object identity. Both source orders return 42 on .NET/native; five bi
 unsupported forms reject with source diagnostics and no output. [Recorded evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
 includes the tested runtime and consumer hashes. This is a bounded milestone; native
 generic types, constraints, instance methods and imported generic symbols are still open.
+
+Next generic receiver slice (2026-10-01): ordinary owned class instance methods now
+preserve generic call signatures and receiver identity through API-produced CLI/native
+binaries (42). Raven adapter integration and broader receiver consumers follow; generic
+types/constraints and native symbol loading remain distinct next boundaries.

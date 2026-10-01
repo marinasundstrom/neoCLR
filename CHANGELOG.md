@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Extend generic metadata calls to ordinary instance methods on owned root classes.
+  Preserve receiver identity and generic parameter scope in CLI MethodSpec and native
+  call records/reference projections. Binary producer verification/execution returns 42;
+  native admission retains nonvirtual IL receiver and nongeneric-constructor limits.
+
 - Add unconstrained generic function/static-method declarations with named method
   parameters, CLI GenericParam/MVAR signatures and native MethodTypeParameter records.
   Generic locals and vector element tokens preserve scope and reference projections;

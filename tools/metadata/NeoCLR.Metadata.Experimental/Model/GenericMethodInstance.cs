@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable instantiation of an owned unconstrained generic static method or function.</summary>
+/// <summary>An immutable instantiation of an owned unconstrained generic method or function.</summary>
 public sealed class GenericMethodInstance
 {
     internal GenericMethodInstance(MethodBuilder definition, SignatureType[] arguments)
@@ -29,7 +29,7 @@ public sealed partial class MethodBuilder
     public GenericMethodInstance MakeGenericInstance(params SignatureType[] typeArguments)
     {
         ArgumentNullException.ThrowIfNull(typeArguments);
-        if (!IsStatic || Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Signature.GenericParameterNames.Count ||
+        if (IsConstructor || Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Signature.GenericParameterNames.Count ||
             typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void))
             throw new ArgumentException("generic type arguments must match the definition", nameof(typeArguments));
         foreach (var type in typeArguments) type.ValidateOwner(Assembly, 32);

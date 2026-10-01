@@ -70,7 +70,7 @@ public sealed partial class AssemblyBuilder
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
             "call.generic" => new { op = "call", arg = (object)new {
-                name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = false,
+                name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic,
                 generic_arguments = instruction.GenericTarget!.TypeArguments.Select(SignatureValue).ToArray(),
                 parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
             } },
