@@ -15,6 +15,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   CLI MethodSpec tokens and native generic arguments, including forwarding through
   caller parameters and typed array factories. API-produced binaries verify/run 42;
   permit generic static class methods without relaxing instance receiver restrictions.
+  Raven now shares generic signature/body planning for owned static calls; the Order
+  generic consumer executes on both targets in both source orders (42).
 
 - Extend metadata property associations to indexed signatures, inferring copied index
   parameters from accessors and validating getter/setter agreement. Preserve ordinary

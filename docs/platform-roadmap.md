@@ -694,4 +694,6 @@ coverage from the actual library instead of encoding permanent .NET restrictions
 Generic producer follow-through (2026-10-01, author-directed): unconstrained owned
 function/static-method instantiations now execute through ordinary CLI MethodSpec and
 native generic call arguments. C# producer tests cover forwarding, typed vectors and
-nominal identity; API binary verify/run returns 42. Raven source integration follows.
+nominal identity; API binary verify/run returns 42. Raven source integration now passes
+the Order generic consumer in both source orders and on both targets. Generic types,
+constraints, imported generic symbols and generic instance methods remain deferred.

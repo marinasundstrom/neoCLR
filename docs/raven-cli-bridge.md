@@ -2299,3 +2299,13 @@ parameters and generic array factories verify and execute from a binary PE/#Neo
 container (42). Raven source integration is the next slice; generic type/constraint/import
 support is not implied. The native loader admits generic static class methods while
 retaining its generic instance-method restriction.
+
+Raven shared generic source emission now connects this producer to unconstrained
+owned functions and static methods, including forwarded method parameters, locals,
+vector arguments and owned Order references. The `--generic-runtime` probe returns 42
+on .NET and binary neoCLR in both source orders. Generic capabilities are explicit;
+there is no new Runtime Contract switch. .NET generic declaration registration remains
+in its existing adapter path; shared Release bodies use those registered handles.
+Native imported generics, generic types, instance generics and constraints remain outside
+this milestone. Development branches: Raven `codex/metadata-consumer`, neoCLR
+`codex/extended-cli-metadata` (producer/runtime commit `2916fc3f`).

@@ -288,4 +288,5 @@ instantiated calls and Raven consumption are still in progress.
 
 The development metadata producer also emits unconstrained generic function/static
 method instantiations and forwarding, verified from binary assemblies on neoCLR.
-Generic types, constraints and Raven generic source integration remain separate work.
+Raven generic source emission now exercises this path with owned static functions and
+methods. Generic types, constraints and imported generic symbols remain separate work.
