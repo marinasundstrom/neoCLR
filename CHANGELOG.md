@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-02
+
+- Preserve imported value categories through CLI signatures, generic substitution,
+  native projection and runtime dependency validation. Separate library/consumer cases
+  execute on CLR and neoCLR (42), and a Raven consumer passes. Native manifests may now
+  include value_type_references; images using it require the updated runtime, while
+  legacy images remain supported. The unchanged collections sample advances past
+  Option<Order> declaration admission to an unsupported lowered invocation.
+
 ### 2026-10-01
 
 - Record the author's return to Raven/native end-to-end work: defer broad metadata API

@@ -122,7 +122,7 @@ internal static class ValueTypeChecks
                 snapshot.MainModule.Types.Single(t => t.Name == "Operations").IsValueType)
                 throw new Exception("snapshot value categories");
             var importer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), app.CoreLibrary);
-            Reject<InvalidDataException>(() => importer.ImportReference(snapshot.MainModule.Types.Single(t => t.Name == "Number"), app.CoreLibrary));
+            if (!importer.ImportReference(snapshot.MainModule.Types.Single(t => t.Name == "Number"), app.CoreLibrary).IsValueType) throw new Exception("imported value category");
         }
         var invalid = JsonNode.Parse(app.WriteNativeAssembly())!;
         invalid["types"]![0]!["is_sealed"] = false;

@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Imported-value checkpoint (2026-10-01):** public top-level unconstrained value signatures
+now retain their category across metadata import, native projection and loading. A Raven
+consumer of a metadata-produced native value library verifies/runs (42). The unchanged
+collections sample passes Option<Order> declaration admission and now stops at a lowered
+invocation. Next investigate that body/member operation; do not treat union execution,
+imported instance/generic-owner members or native System identities as complete.
+[Evidence](experiments/extended-cli-metadata/imported-value-validation.json).
+
 **Active author-directed priority (2026-10-01):** the author considers the metadata API
 architecture good enough for now. Resume the unchanged Raven/native end-to-end case;
 defer broad API migration, naming cleanup and encoding/PE extraction unless a concrete

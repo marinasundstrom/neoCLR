@@ -612,3 +612,7 @@ property collections/views are documented in the manual host reference; no guest
 
 The direct generic TypeDefinition overload and authored GenericParameterNames/constraint
 views are covered in the manual host reference; no guest RavenDoc selection changes apply.
+
+ImportedTypeReference.IsValueType and expanded value import behavior are host C# APIs
+covered in the manual reference. The native value_type_references annotation is documented
+there as a transport contract; guest RavenDoc selection is unchanged.

@@ -1240,6 +1240,7 @@ impl Module {
             };
             self.assemblies
                 .push(crate::metadata_origin::AssemblyMetadata {
+                    value_type_references: vec![],
                     name: identity.to_owned(),
                     full_name: identity.to_owned(),
                     modules: vec![self.name.clone()],

@@ -10,6 +10,9 @@ pub struct AssemblyMetadata {
     pub full_name: String,
     pub modules: Vec<String>,
     pub references: Vec<String>,
+    /// External nominal value categories required by metadata-only CLI projection.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub value_type_references: Vec<String>,
 }
 
 /// Original CLI member accessibility, independent of lowered helper visibility.
@@ -69,6 +72,27 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || assembly.references.iter().collect::<HashSet<_>>().len() != assembly.references.len()
         {
             return Err(Fault::new("invalid or duplicate assembly metadata"));
+        }
+    }
+    for assembly in &module.assemblies {
+        let mut seen = HashSet::new();
+        if assembly.value_type_references.len() > 4096 {
+            return Err(Fault::new("value type reference limit exceeded"));
+        }
+        for name in &assembly.value_type_references {
+            if !text(name) || !seen.insert(name) {
+                return Err(Fault::new("invalid or duplicate value type reference"));
+            }
+            let definition = module
+                .types
+                .iter()
+                .find(|ty| ty.name == *name)
+                .ok_or_else(|| Fault::new("missing imported value type declaration"))?;
+            if definition.is_reference_type
+                || definition.representation == crate::metadata::Representation::Interface
+            {
+                return Err(Fault::new("imported value type category mismatch"));
+            }
         }
     }
     let mut tokens = HashSet::new();

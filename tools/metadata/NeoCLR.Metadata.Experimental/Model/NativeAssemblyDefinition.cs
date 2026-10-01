@@ -13,11 +13,12 @@ public sealed class NativeAssemblyDefinition
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
+    private readonly HashSet<string> valueTypeReferences;
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references)
-    { Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences)
+    { this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
@@ -40,7 +41,16 @@ public sealed class NativeAssemblyDefinition
             Shape(root, "format", "name", "revision", "references", "entry", "assemblies", "types", "functions");
             Require(root.GetProperty("format").GetInt32() == 5, "unsupported native format");
             var manifests = Array(root, "assemblies", 1); Require(manifests.Length == 1, "one assembly manifest required");
-            var manifest = manifests[0]; Shape(manifest, "name", "full_name", "modules", "references");
+            var manifest = manifests[0];
+            var manifestFields = new List<string> { "name", "full_name", "modules", "references" };
+            var valueTypeReferences = new HashSet<string>(StringComparer.Ordinal);
+            if (manifest.TryGetProperty("value_type_references", out _))
+            {
+                manifestFields.Add("value_type_references");
+                foreach (var valueReference in Array(manifest, "value_type_references", 4096))
+                    Require(valueReference.ValueKind == JsonValueKind.String && valueTypeReferences.Add(valueReference.GetString()!), "invalid or duplicate value type reference");
+            }
+            Shape(manifest, manifestFields.ToArray());
             var identityText = Text(manifest, "full_name");
             var identity = ReadIdentity(identityText);
             CheckName(identity.Name);
@@ -174,6 +184,14 @@ public sealed class NativeAssemblyDefinition
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
+            foreach (var reference in valueTypeReferences)
+            {
+                var simpleName = Decode(reference[(reference.LastIndexOf('_') + 1)..]);
+                int marker = simpleName.LastIndexOf('`');
+                int importedArity = 0;
+                if (marker >= 0) Require(int.TryParse(simpleName[(marker + 1)..], out importedArity) && importedArity > 0, "invalid imported value arity");
+                _ = ImportExternalType(signatureGraph, reference, importedArity, referenceIdentities, valueTypeReferences);
+            }
             var signatureOwners = types.Select(t => DefineType(signatureGraph, t)).ToArray();
             for (int i = 0; i < types.Count; i++)
                 foreach (var inherited in types[i].BaseInterfaces)
@@ -219,12 +237,12 @@ public sealed class NativeAssemblyDefinition
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
                     var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray();
                     return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
-                        : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities).MakeGenericInstance(arguments);
+                        : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences).MakeGenericInstance(arguments);
                 }
                 Shape(element, "Named");
                 var index = types.FindIndex(t => t.NativeName == Text(element, "Named") && !t.IsStatic);
                 return index >= 0 ? (SignatureType)signatureOwners[index]
-                    : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities);
+                    : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences);
             }
             foreach (var type in types)
             {
@@ -379,7 +397,7 @@ public sealed class NativeAssemblyDefinition
                 var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray());
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences);
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -414,12 +432,12 @@ public sealed class NativeAssemblyDefinition
         SignatureType ProjectNamed(string name)
         {
             int index = System.Array.FindIndex(types, row => row.NativeName == name);
-            return index >= 0 ? (SignatureType)owners[index] : ImportExternalType(graph, name, 0, References);
+            return index >= 0 ? (SignatureType)owners[index] : ImportExternalType(graph, name, 0, References, valueTypeReferences);
         }
         SignatureType ProjectConstruction(string name, SignatureType[] arguments)
         {
             int index = System.Array.FindIndex(types, row => row.NativeName == name);
-            return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References).MakeGenericInstance(arguments);
+            return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References, valueTypeReferences).MakeGenericInstance(arguments);
         }
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
@@ -427,7 +445,7 @@ public sealed class NativeAssemblyDefinition
             : type.ClassType is { } c ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {
-            var definition = graph.ImportTypeIdentity(type.AssemblyIdentity, type.Namespace, type.Name, type.GenericArity);
+            var definition = graph.ImportTypeIdentity(type.AssemblyIdentity, type.Namespace, type.Name, type.GenericArity, type.IsValueType);
             return type.TypeArguments.Count == 0 ? definition : definition.MakeGenericInstance(type.TypeArguments.Select(Remap).ToArray());
         }
         var projectedMethods = new List<MethodBuilder>();
@@ -460,7 +478,7 @@ public sealed class NativeAssemblyDefinition
             : graph.AddGenericClass(type.Namespace, name, type.GenericNames, type.Visibility);
     }
 
-    private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references)
+    private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references, HashSet<string> valueTypeReferences)
     {
         foreach (var identity in references)
         {
@@ -469,7 +487,7 @@ public sealed class NativeAssemblyDefinition
             if (!name.StartsWith(prefix, StringComparison.Ordinal)) continue;
             var parts = name[prefix.Length..].Split('_');
             Require(parts.Length == 2, "invalid imported native type name");
-            return graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), arity);
+            return graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), arity, valueTypeReferences.Contains(name));
         }
         throw new InvalidDataException("signature type must be owned or scoped to a declared dependency");
     }

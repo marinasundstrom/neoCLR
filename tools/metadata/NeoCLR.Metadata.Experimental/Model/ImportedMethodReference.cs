@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An immutable callable reference imported into one output assembly.</summary>
-/// <remarks>Supports static primitive/vector, dependency-local reference types and bounded unconstrained generic signatures. Import does not load code or verify access or native dependency availability.</remarks>
+/// <remarks>Supports static primitive/vector, dependency-local nominal types and bounded unconstrained generic signatures. Import does not load code or verify access or native dependency availability.</remarks>
 public sealed partial class ImportedMethodReference
 {
     internal ImportedMethodReference(AssemblyBuilder owner, MethodBuilder target) { Owner = owner; Target = target; }
@@ -30,13 +30,13 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<AssemblyIdentity, (Guid Mvid, AssemblyBuilder Graph)> importedGraphs = [];
 
     /// <summary>Imports an immutable callable contract from a read-only definition.</summary>
-    /// <param name="definition">External static method or global function with primitives, vectors, dependency-local reference types and optional unconstrained generics.</param>
+    /// <param name="definition">External static method or global function with primitives, vectors, dependency-local nominal types and optional unconstrained generics.</param>
     /// <param name="dependencyCoreLibrary">Host-asserted dependency core contract; must equal this output's explicit core identity.</param>
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
     /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested/generic owners and signed dependencies are currently unsupported.
-    /// Nominal signature types must be public top-level unconstrained reference definitions in the same dependency; TypeRef/value-type signatures require further contracts.
+    /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; cross-dependency TypeRef signatures require further contracts.
     /// Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
     {

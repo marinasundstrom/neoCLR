@@ -2807,3 +2807,25 @@ Raven 80edf8fbe still stops at PendingOrder's Option<Order> return signature, wh
 control emission succeeds. Runtime Contract and native admission have not changed.
 Imported value categories, member/union operations and native System identity mapping
 remain open. Future metadata changes should serve those measured blockers.
+
+
+### Imported value signature integration (2026-10-01)
+
+Raven now opts into external value signatures separately from external reference signatures.
+Binding and Runtime Contract configuration are unchanged; the neoCLR adapter maps exact
+public external struct identities and validates metadata/symbol category agreement.
+Ordinary .NET shared admission remains at its defaults. Supported operations include
+imported value return/parameter/local/forwarding via static methods on nongeneric owners.
+Imported constructors/instance/generic-owner calls, unions and translated-System identity
+mapping remain open. Reference-only admission is not used for value unions.
+
+The temporary format-5 manifest value_type_references annotation preserves the CLI
+VALUETYPE category absent from bare Named/Constructed references. The metadata library
+writes/projects it; neoCLR validates it against loaded definitions. Older strict runtimes
+reject images containing the field; existing images without it remain supported. Native
+indexed signature metadata should eventually replace this projection annotation.
+
+Validation: 77 C# metadata groups; CLR/native separate value library/consumer execution
+(42) and runtime category-mismatch rejection; a Raven value consumer verifies/runs (42).
+The unchanged collections sample now rejects a lowered BoundInvocationExpression instead
+of PendingOrder's Option<Order> declaration. No broad compiler/union support is claimed.

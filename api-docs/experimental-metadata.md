@@ -3699,3 +3699,45 @@ separation are deferred unless required by an observed integration blocker. This
 supersedes the earlier migration-first sequencing, not the architectural direction.
 The current blocker remains imported Option<Order> value-category support; the
 reference-only import contract must not be widened by treating it as a class.
+
+
+### Imported value signatures (integration slice, 2026-10-01)
+
+AssemblyBuilder.ImportReference(TypeDefinition, core) now admits public top-level value
+definitions in addition to reference classes/interfaces. Values must directly extend
+System.ValueType through an AssemblyRef matching the explicit dependency core identity.
+Enums, local/fake ValueType bases, nested/nonpublic declarations and constrained/variant
+generic definitions remain unsupported. ImportedTypeReference.IsValueType is immutable
+and participates in identity, interning consistency and generic substitution. Special
+constraint checks distinguish imported values from references.
+
+CLI signatures encode imported values with VALUETYPE and GENERICINST VALUETYPE. The
+static method signature decoder accepts dependency-local value TypeDefs and rejects
+CLASS/VALUETYPE disagreement with the declaration. Cross-dependency TypeRef signatures,
+imported instance/constructor calls and generic declaring-owner member calls remain
+unsupported. Importing a type does not import its members or implement Raven unions.
+
+Native format-5 signatures still use Named/Constructed types resolved by the loader.
+To retain the CLI category in metadata-only projection, the assembly manifest now has
+an optional `value_type_references` array of canonical external native definition names.
+The writer emits it only for imported values. The reader bounds it to 4096 unique names,
+requires declared dependency scopes and restores value-category signatures in the PE
+projection. Native validation requires each listed name to resolve to a nonreference,
+noninterface loaded type, rejecting missing declarations/category mismatches.
+
+This is a temporary native projection annotation for information represented directly
+in CLI signatures. It adds no opcode or runtime representation. Existing payloads without
+the field retain their reference-only import interpretation. Payloads containing it
+require the updated runtime; older strict readers reject the new manifest field.
+The metadata library owns emission/projection and neoCLR owns dependency validation.
+The future native indexed metadata reader/writer should encode the category directly
+in signatures, removing the need for this annotation.
+
+C# tests (77 groups) cover cross-assembly nominal/generic value signatures, CLR factory/read
+and default/forward execution (42), projection category retention, category disagreement
+and explicit core rejection. `--imported-value-integration <runtime> <fresh-directory>`
+emits separate native library/consumer containers, verifies/runs (42), and checks that a
+reference-class substitution for an imported value rejects. Raven's dedicated consumer
+probe also returns 42 with imported returns, parameters, locals and forwarding. The
+unchanged collections sample advances to an unsupported lowered invocation; it does not
+execute yet.

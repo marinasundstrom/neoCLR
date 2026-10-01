@@ -147,7 +147,7 @@ public sealed partial class AssemblyDefinition
                     : type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Namespace) == "System" && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum");
                 bool unsupportedParameters = type.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0 || p.GetConstraints().Count != 0).Any();
                 rows.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(type.Namespace), ReadName(type.Name),
-                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !valueType && !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType));
+                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) == "ValueType" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : null));
             }
             var parents = rows.ToDictionary(row => row.Token, row => row.DeclaringToken);
             foreach (var row in rows)
@@ -245,7 +245,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -350,12 +350,13 @@ public sealed partial class TypeDefinition
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
     {
         Module = module; MetadataToken = row.Token; Namespace = row.Namespace;
-        Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
+        Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
     /// <summary>Gets whether the declaration directly extends System.ValueType or System.Enum in the input metadata.</summary>
     /// <remarks>This is a metadata classification, not runtime type loading or base-identity validation.</remarks>
     public bool IsValueType { get; }
     internal bool CanImportReference { get; }
+    internal AssemblyIdentity? ValueTypeCore { get; }
     /// <summary>Gets the physical TypeAttributes flags.</summary>
     public uint Attributes { get; }
     /// <summary>Gets properties declared directly by this type.</summary>

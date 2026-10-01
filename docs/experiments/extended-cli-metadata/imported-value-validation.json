@@ -1,0 +1,12 @@
+{
+  "verified": true,
+  "result": 42,
+  "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "3A254FAC354A0878DB897C17E46C66FDC19BDDF1136D6659274033B25D063F0D",
+  "scope": "Raven consumer of metadata-produced native value library; imported return/parameter/local/forwarding; missing dependency rejection; no imported instance members or union lowering",
+  "metadataBase": "2172fc8a",
+  "ravenBase": "80edf8fbe",
+  "csharpContractGroups": 77,
+  "nativeCategoryMismatchRejected": true,
+  "clrResult": 42
+}

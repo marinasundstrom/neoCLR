@@ -60,8 +60,8 @@ public sealed partial class TypeBuilder
             var type = arguments[index];
             if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null) continue;
             bool value = type.Primitive is PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean ||
-                type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
-            bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is not null || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;
+                type.ImportedType?.IsValueType == true || type.ClassType?.IsValueType == true || type.GenericInstance?.Definition.IsValueType == true;
+            bool reference = type.Primitive == PrimitiveType.String || type.ClassType is { IsValueType: false } || type.ImportedType is { IsValueType: false } || type.GenericInstance?.Definition is { IsValueType: false } || type.ArrayElement is not null;
             var definition = type.ClassType ?? type.GenericInstance?.Definition;
             bool constructible = value || definition is not null && (!complete || definition.Methods.Any(m => m.IsConstructor && m.ParameterCount == 0 && m.Visibility == MethodVisibility.Public));
             if (flags.HasFlag(TypeParameterConstraints.ReferenceType) && !reference || flags.HasFlag(TypeParameterConstraints.ValueType) && !value ||

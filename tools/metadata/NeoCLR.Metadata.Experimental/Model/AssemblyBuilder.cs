@@ -269,10 +269,10 @@ public sealed partial class AssemblyBuilder
             if (type.ImportedType is { } imported)
             {
                 var handle = ImportedTypeHandle(imported);
-                if (imported.TypeArguments.Count == 0) encoder.Type(handle, false);
+                if (imported.TypeArguments.Count == 0) encoder.Type(handle, imported.IsValueType);
                 else
                 {
-                    var arguments = encoder.GenericInstantiation(handle, imported.TypeArguments.Count, false);
+                    var arguments = encoder.GenericInstantiation(handle, imported.TypeArguments.Count, imported.IsValueType);
                     foreach (var argument in imported.TypeArguments) EncodeType(arguments.AddArgument(), argument);
                 }
                 return;

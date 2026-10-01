@@ -400,3 +400,9 @@ Direct generic declarations now share parameter names and constraint storage wit
 constrained calls execute on CLR and neoCLR. The intended architecture separates definitions,
 encoded metadata and PE packaging, with readers reversing those boundaries. Full separation
 and editable loaded definitions remain development work.
+
+Imported value-type signatures now preserve their category through the metadata API and
+native loading. A Raven consumer of a separately produced native value library executes
+successfully. The collections sample advances to a body-lowering invocation gap; full
+union/member support remains development work. New imported-value images require the
+updated runtime.

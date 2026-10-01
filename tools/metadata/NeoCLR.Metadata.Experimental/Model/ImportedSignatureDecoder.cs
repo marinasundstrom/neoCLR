@@ -36,10 +36,12 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
                 if (ordinal >= arity) throw new InvalidDataException("unscoped imported method parameter");
                 return SignatureType.MethodParameter(ordinal);
             case 0x1d: return SignatureType.ArrayOf(Type(false, depth + 1));
-            case 0x12: return Nominal();
+            case 0x12: return Nominal(false);
+            case 0x11: return Nominal(true);
             case 0x15:
-                if (Byte() != 0x12) throw new InvalidDataException("imported value-type construction is unsupported");
-                var definition = Nominal();
+                var category = Byte();
+                if (category is not (0x11 or 0x12)) throw new InvalidDataException("invalid nominal signature category");
+                var definition = Nominal(category == 0x11);
                 var count = Number();
                 if (count == 0 || count != definition.GenericArity) throw new InvalidDataException("imported construction arity mismatch");
                 var arguments = new SignatureType[count];
@@ -49,7 +51,7 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
         }
     }
 
-    private ImportedTypeReference Nominal()
+    private ImportedTypeReference Nominal(bool valueType)
     {
         var token = Number();
         // Cross-dependency TypeRefs need an explicit resolver contract; never guess scope.
@@ -57,6 +59,7 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             throw new InvalidDataException("imported nominal signature requires a dependency-local TypeDef");
         var definition = module.GetTypeDefinition(0x02000000u | (uint)(token >> 2))
             ?? throw new InvalidDataException("missing imported signature TypeDef");
+        if (definition.IsValueType != valueType) throw new InvalidDataException("nominal signature category disagrees with declaration");
         return consumer.ImportReference(definition, core);
     }
 

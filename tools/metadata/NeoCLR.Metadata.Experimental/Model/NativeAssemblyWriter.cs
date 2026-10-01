@@ -195,6 +195,9 @@ public sealed partial class AssemblyBuilder
                     if (flags.HasFlag(flag)) result.Add(new { parameter, kind = flag.ToString() });
             return result.Count == 0 ? null : result.ToArray();
         }
+        var manifest = new Dictionary<string, object> { ["name"] = Identity.Name, ["full_name"] = IdentityText(Identity), ["modules"] = new[] { Identity.Name + ".dll" }, ["references"] = dependencies.Keys.Select(IdentityText).ToArray() };
+        var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType).Select(ExternalName).Order().ToArray();
+        if (importedValues.Length != 0) manifest["value_type_references"] = importedValues;
         var artifact = new
         {
             format = 5,
@@ -202,7 +205,7 @@ public sealed partial class AssemblyBuilder
             revision = Identity.Version.ToString(),
             references = dependencies.Values.Select(d => new { name = ModuleName(d), revision = d.Identity.Version.ToString() }).ToArray(),
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
-            assemblies = new[] { new { name = Identity.Name, full_name = IdentityText(Identity), modules = new[] { Identity.Name + ".dll" }, references = dependencies.Keys.Select(IdentityText).ToArray() } },
+            assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType, type.IsStatic, type.IsStatic || type.IsValueType,
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
