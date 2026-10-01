@@ -118,7 +118,8 @@ The 2026-10-01 metadata experiment now reuses Raven's compiler-lowered bodies fo
 bounded .NET/neoCLR emission path, including implicit Int32 returns. Both bounded backends
 also share per-emission callable identity resolution and source callable plans,
 preserving overloads and assembly/type ownership. Public nongeneric static-type
-identity/naming plans also feed separate .NET and native type builders. Initialized
+identity/naming plans also feed separate .NET and native type builders. Partial static
+classes now produce one native type across files, preserving every part’s methods. Initialized
 Int32 locals and assignments now pass through the shared body path and metadata writer;
 signed/negated comparisons, if/else and while loops with break/continue now run on both runtimes.
 Broader value types and exception regions remain development work.

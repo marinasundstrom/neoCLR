@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Raven native emission now coalesces partial static classes by semantic identity,
+  preserving cross-part methods and rejecting unsupported members in any part.
+  C# end-to-end checks verify both file orders on .NET and binary neoCLR assemblies;
+  the independent metadata API and runtime format are unchanged.
+
 - Raven now shares an explicit primitive value/no-result type contract between
   callable signatures and locals, with separate .NET/native mappers. Native local
   emission no longer depends on the callable builder's mapping helper. Preserve the

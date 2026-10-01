@@ -1115,3 +1115,27 @@ Tested Raven consumer revision `649eeb851` on `codex/metadata-consumer`;
 [executable evidence](experiments/extended-cli-metadata/primitive-type-boundary-validation.json).
 The native metadata API remains a separate project on `codex/extended-cli-metadata`;
 no API or runtime change was needed for this compiler boundary.
+
+## Partial static declarations — 2026-10-01
+
+Raven `codex/metadata-consumer` at `c34f65e6f` coalesces public nongeneric partial
+static classes by the existing binder's symbol identity. All declaration parts are
+validated and all members collected before metadata builders/bodies are produced.
+Empty parts do not add types; unsupported members in any part reject output with
+NEOMETA001 at their source location and leave the output stream unchanged.
+
+Like .NET, native metadata erases the source-only partial boundary into one type.
+This reuses existing native format-5 ownership and the temporary CLI reference
+projection; the benefit is multi-file source organization without a new encoding,
+with the cost of explicit identity coalescing and per-part validation. The independent
+metadata API and runtime loader are unchanged. Runtime Contract configuration and
+binding semantics are unchanged; native emission remains opt-in, using hosted
+primitive binding. General instance/generic types, partial methods and the future
+native symbol provider remain outside this slice.
+
+Validation: four focused .NET static/partial declaration tests passed. The C# probe
+executes cross-part overloads and an empty part in both file orders on .NET and binary
+neoCLR, returning 42; it checks one projected type with three methods and rejects an
+unsupported property in either order. The existing integration probe also passes.
+This run did not repeat the optional compiler-driver checks.
+[Executable evidence](experiments/extended-cli-metadata/partial-static-types-validation.json).

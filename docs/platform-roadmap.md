@@ -20,7 +20,8 @@ author directed a staged codegen refactor. The first slice now feeds both bounde
 backends compiler-lowered bodies, including implicit value returns. The first callable reference table now shares symbol identity resolution with typed
 backend handles. Shared source callable plans separate native source validation from
 builder creation. Shared public nongeneric static-type plans now drive backend type
-builders. Primitive signatures/locals now share logical value/no-result types and
+builders, including partial declarations coalesced by symbol identity with every part
+validated. Primitive signatures/locals now share logical value/no-result types and
 backend-owned mappers; broader type/field references and full declaration traversal remain next,
 and the first paired body capability now supports initialized Int32 locals/assignments.
 Comparisons (including negated forms), if/else and lowered loops with break/continue now execute on both runtimes;
