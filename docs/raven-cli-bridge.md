@@ -1952,3 +1952,16 @@ initializers reject without writing output. See the [updated executable evidence
 Readonly storage, explicit field declarations, initializers and nominal signatures remain
 unsupported by this bounded native producer. The full native metadata/backend replacement
 and full consumer dependency coverage remain open.
+
+
+## Accessible val setters in Raven — 2026-10-01
+
+Raven commit `935598201` corrects a shared binding issue exposed while integrating
+computed properties: public read-only `val` semantics no longer block assignment,
+compound assignment or increment/decrement through an accessible explicit private
+setter inside its owner. Outside writes remain rejected and the semantic property's
+public mutability stays false. This restores Raven's documented property contract;
+it adds no native semantics, Runtime Contract option or metadata encoding. The native
+backend will consume the same bound setter calls as .NET. 60 focused property binding,
+execution and regression tests passed; explicit native accessor emission is a separate
+slice. This general fix is intended for Raven's shared line, not a permanent target fork.

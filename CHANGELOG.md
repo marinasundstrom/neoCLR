@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record the shared Raven fix for accessible explicit setters on `val` properties:
+  owner writes invoke the setter while outside writes remain rejected. This corrects
+  compiler binding without changing the runtime or metadata format.
+
 - Add owned root-class metadata locals with exact nominal stack validation and
   aliasing on CLI and binary neoCLR. Development API migration: LocalDefinition.Type
   is nullable; ClassType identifies nominal slots. Primitive local behavior is unchanged.
