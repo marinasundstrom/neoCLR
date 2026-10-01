@@ -68,12 +68,12 @@ internal static class InstanceObjectChecks
     {
         try { graph.Write(); throw new Exception("accepted " + detail); } catch (InvalidDataException) { }
     }
-    internal static async Task RunRuntime(string runtime, string output, bool nominalLocals = false)
+    internal static async Task RunRuntime(string runtime, string output, bool nominalLocals = false, bool nominalSignatures = false)
     {
-        if (nominalLocals) NominalLocalChecks.Run(); else Run();
+        if (nominalSignatures) NominalSignatureChecks.Run(); else if (nominalLocals) NominalLocalChecks.Run(); else Run();
         if (Directory.Exists(output)) throw new IOException("output must be fresh");
         Directory.CreateDirectory(output);
-        var graph = nominalLocals ? NominalLocalChecks.Create() : Create();
+        var graph = nominalSignatures ? NominalSignatureChecks.Create() : nominalLocals ? NominalLocalChecks.Create() : Create();
         graph.Types[0].AddProperty("Number", PrimitiveType.Int32, graph.Types[0].Methods[1], graph.Types[0].Methods[3]);
         graph.Types[0].AddProperty("Pending", PrimitiveType.Boolean, graph.Types[0].Methods[2]);
         var path = Path.Combine(output, "Order.dll");

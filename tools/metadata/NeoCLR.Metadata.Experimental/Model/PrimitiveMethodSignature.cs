@@ -16,7 +16,7 @@ public enum PrimitiveType
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>
-public sealed class PrimitiveMethodSignature
+public sealed class PrimitiveMethodSignature : MethodSignature
 {
     /// <summary>Copies parameter types and validates the bounded signature.</summary>
     /// <param name="returnType">Void, Int32, Int64, Boolean or String.</param>
@@ -24,17 +24,15 @@ public sealed class PrimitiveMethodSignature
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     /// <exception cref="ArgumentException">Invalid type or too many parameters.</exception>
     public PrimitiveMethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes)
+        : base(returnType, parameterTypes)
     {
-        ArgumentNullException.ThrowIfNull(parameterTypes);
-        var parameters = parameterTypes.Take(257).ToArray();
-        if (!Enum.IsDefined(returnType) || parameters.Length > 256 || parameters.Any(p => p is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String)))
-            throw new ArgumentException("invalid primitive signature");
-        ReturnType = returnType; ParameterTypes = Array.AsReadOnly(parameters);
+        ReturnType = returnType;
+        ParameterTypes = Array.AsReadOnly(base.ParameterTypes.Select(p => p.Primitive!.Value).ToArray());
     }
     /// <summary>Gets the declared result type, including Void for no result.</summary>
-    public PrimitiveType ReturnType { get; }
+    public new PrimitiveType ReturnType { get; }
     /// <summary>Gets the copied parameter types in declaration order.</summary>
-    public IReadOnlyList<PrimitiveType> ParameterTypes { get; }
+    public new IReadOnlyList<PrimitiveType> ParameterTypes { get; }
     internal bool Matches(PrimitiveMethodSignature other)
         => ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
     internal static PrimitiveMethodSignature Int32(int count, bool result)

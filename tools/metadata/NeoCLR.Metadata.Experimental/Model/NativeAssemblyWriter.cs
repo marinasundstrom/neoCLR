@@ -46,7 +46,8 @@ public sealed partial class AssemblyBuilder
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
-        static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
+        static object SignatureValue(SignatureType type) => type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
@@ -157,7 +158,7 @@ public sealed partial class AssemblyBuilder
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => local.ClassType is { } type ? (object)new { Named = TypeName(type) } : local.Type!.Value.ToString()).ToArray(),
-                method.Signature.ReturnType.ToString(), !method.ReturnsValue,
+                SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
@@ -167,8 +168,8 @@ public sealed partial class AssemblyBuilder
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
         return result;
     }
-    private sealed record NativeMethodRow(string name, object? owner, string[] parameters, object[] locals,
-        string returns, bool no_result, object origin, object[] body,
+    private sealed record NativeMethodRow(string name, object? owner, object[] parameters, object[] locals,
+        object returns, bool no_result, object origin, object[] body,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

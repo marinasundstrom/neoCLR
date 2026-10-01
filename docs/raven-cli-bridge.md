@@ -2022,3 +2022,25 @@ Chaining, primary constructors, readonly storage and lifecycle initialization bl
 explicitly outside this native slice. 44 focused C# tests pass; implicit and explicit
 initialization execute in both source orders to 42 on .NET and binary neoCLR.
 [Evidence](experiments/extended-cli-metadata/order-runtime-validation.json).
+
+
+## Owned nominal signature producer foundation — 2026-10-01
+
+The independent metadata library now accepts owned root-class parameter/result types in
+functions, static/instance methods and constructor parameters. MethodSignature carries
+immutable SignatureType values, preserving exact TypeBuilder identity. Existing primitive
+construction remains available through PrimitiveMethodSignature; the public builder and
+signature-property API types have widened and compiled consumers must be rebuilt.
+CLI output uses CLASS TypeDef signatures; native output uses existing Named records, with
+no new runtime schema or Runtime Contract option. The declaration reader remaps those
+references into each reference assembly. Imports remain primitive-only; foreign class
+signatures reject before mutation and external nominal calls reject before writing.
+
+53 C# metadata groups pass, including nominal CLI execution, raw signature projection
+comparison, rejection of unknown named types and wrong-class arguments/results. The
+API-generated binary loads, verifies and runs to 42 in neoCLR with factory/identity and
+self-return calls plus mutation through a nominal parameter. See the
+[API contract](../api-docs/experimental-metadata.md#nominal-signatures) and
+[design comparison](design/extended-cli-metadata.md#owned-nominal-callable-signatures--2026-10-01).
+Raven's shared logical signature mapping is the next consumer slice; this foundation
+does not introduce a general semantic importer or external nominal type contract.

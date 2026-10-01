@@ -39,37 +39,38 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid/duplicate signature or more than 256 functions.</exception>
     public MethodBuilder AddFunction(string name, int parameterCount = 0, bool returnsValue = true)
         => AddFunction(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
-    /// <summary>Adds a static assembly-owned function with an explicit primitive signature.</summary>
+    /// <summary>Adds a static assembly-owned function with an explicit primitive or owned-class signature.</summary>
     /// <param name="name">Nonempty metadata name.</param>
-    /// <param name="signature">Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String/Void result.</param>
+    /// <param name="signature">Primitive or owned root-class parameters/results; Void is allowed only as the result.</param>
     /// <returns>An assembly-owned method builder.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or function limit exceeded.</exception>
-    public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature)
+    public MethodBuilder AddFunction(string name, MethodSignature signature)
         => AddFunction(name, signature, MethodVisibility.Public);
     /// <summary>Adds an assembly-owned function with public or internal access.</summary>
     /// <param name="name">Nonempty function name, unique by name and parameter types.</param>
-    /// <param name="signature">Supported primitive signature.</param>
+    /// <param name="signature">Supported primitive/owned-class signature.</param>
     /// <param name="visibility">Public or Internal; private access requires a declaring type.</param>
     /// <returns>The owned function builder.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Visibility is not Public or Internal.</exception>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Name is invalid/duplicate or the function limit is exceeded.</exception>
-    public MethodBuilder AddFunction(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
+    public MethodBuilder AddFunction(string name, MethodSignature signature, MethodVisibility visibility)
         => AddFunction("", name, signature, visibility);
     /// <summary>Adds an ownerless function in an explicit namespace.</summary>
     /// <param name="namespace">Namespace, possibly empty; nonempty segments separated by dots.</param>
     /// <param name="name">Nonempty simple name. The CLI projection prefix &lt;NeoFunction&gt; is reserved.</param>
-    /// <param name="signature">Supported primitive signature.</param>
+    /// <param name="signature">Supported primitive/owned-class signature.</param>
     /// <param name="visibility">Public or Internal.</param>
     /// <returns>An assembly-owned function preserving namespace and simple name.</returns>
     /// <exception cref="ArgumentNullException">Namespace or signature is null.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Visibility is unsupported.</exception>
     /// <exception cref="ArgumentException">Invalid namespace/name, duplicate signature or exceeded limit.</exception>
-    public MethodBuilder AddFunction(string @namespace, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
+    public MethodBuilder AddFunction(string @namespace, string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
+        signature.ValidateOwner(this);
         FunctionNamespaceEncoding.Validate(@namespace);
         if (string.IsNullOrEmpty(name) || name.StartsWith(FunctionNamespaceEncoding.Prefix, StringComparison.Ordinal) || @namespace.Length + name.Length > 1024 || functions.Count >= 256 ||
             functions.Any(m => m.Namespace == @namespace && m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
@@ -78,7 +79,7 @@ public sealed partial class AssemblyBuilder
         functions.Add(function);
         return function;
     }
-    internal MethodBuilder[] ValidateGraph()
+    internal MethodBuilder[] ValidateGraph(bool validateBodies = true)
     {
         var methods = functions.Concat(types.SelectMany(t => t.Methods)).ToArray();
         if (methods.Sum(method => (long)method.Instructions.Count) > 131072) throw new InvalidDataException("assembly instruction limit exceeded");
@@ -88,9 +89,12 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
-        foreach (var method in methods) method.Validate();
+        foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
+            if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.ClassType is not null))
+                throw new InvalidDataException("external nominal method references require an import contract");
+        if (validateBodies) foreach (var method in methods) method.Validate();
         return methods;
     }
     /// <summary>Gets or sets a local parameterless Int32 or no-result entry point; null writes a library.</summary>
@@ -135,7 +139,7 @@ public sealed partial class AssemblyBuilder
 
     private byte[] WriteImage(bool referenceOnly)
     {
-        var methods = ValidateGraph();
+        var methods = ValidateGraph(validateBodies: !referenceOnly);
         var metadata = new MetadataBuilder();
         // A stable per-builder MVID preserves snapshot scope; PE content IDs/timestamps are deterministic.
         metadata.AddModule(0, metadata.GetOrAddString(Identity.Name + ".dll"), metadata.GetOrAddGuid(mvid), default, default);
@@ -163,6 +167,7 @@ public sealed partial class AssemblyBuilder
         var handles = methods.Select((method, index) => (method, handle: MetadataTokens.MethodDefinitionHandle(index + 1))).ToDictionary(pair => pair.method, pair => pair.handle);
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
+        var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
         BlobHandle Signature(MethodBuilder method)
         {
             var signature = new BlobBuilder();
@@ -170,6 +175,7 @@ public sealed partial class AssemblyBuilder
                 result =>
                 {
                     if (!method.ReturnsValue) result.Void();
+                    else if (method.Signature.ReturnType.ClassType is { } resultClass) result.Type().Type(typeHandles[resultClass], false);
                     else if (method.Signature.ReturnType == PrimitiveType.String) result.Type().String();
                     else if (method.Signature.ReturnType == PrimitiveType.Int64) result.Type().Int64();
                     else if (method.Signature.ReturnType == PrimitiveType.Boolean) result.Type().Boolean();
@@ -178,7 +184,8 @@ public sealed partial class AssemblyBuilder
                 {
                     foreach (var type in method.Signature.ParameterTypes)
                         {
-                        if (type == PrimitiveType.String) parameters.AddParameter().Type().String();
+                        if (type.ClassType is { } parameterClass) parameters.AddParameter().Type().Type(typeHandles[parameterClass], false);
+                        else if (type == PrimitiveType.String) parameters.AddParameter().Type().String();
                         else if (type == PrimitiveType.Boolean) parameters.AddParameter().Type().Boolean();
                         else if (type == PrimitiveType.Int64) parameters.AddParameter().Type().Int64();
                         else parameters.AddParameter().Type().Int32();
@@ -204,7 +211,6 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
-        var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
@@ -378,31 +384,31 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">Invalid or duplicate signature or more than 256 methods.</exception>
     public MethodBuilder AddMethod(string name, int parameterCount = 0, bool returnsValue = true)
         => AddMethod(name, PrimitiveMethodSignature.Int32(parameterCount, returnsValue));
-    /// <summary>Adds a public static method with an explicit primitive signature.</summary>
+    /// <summary>Adds a public static method with an explicit primitive or owned-class signature.</summary>
     /// <param name="name">Nonempty metadata name.</param>
-    /// <param name="signature">Int32/Int64/Boolean/String parameters and Int32/Int64/Boolean/String/Void result.</param>
+    /// <param name="signature">Primitive or owned root-class parameters/results; Void is allowed only as the result.</param>
     /// <returns>A method builder owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate name and parameter types or method limit exceeded.</exception>
-    public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature)
+    public MethodBuilder AddMethod(string name, MethodSignature signature)
         => AddMethod(name, signature, MethodVisibility.Public);
     /// <summary>Adds a static primitive method with explicit visibility.</summary>
     /// <param name="name">Nonempty metadata name.</param>
-    /// <param name="signature">The primitive parameter and result contract.</param>
+    /// <param name="signature">The primitive/owned-class parameter and result contract.</param>
     /// <param name="visibility">Public, internal or private access.</param>
     /// <returns>A method owned by this type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Invalid visibility/name, duplicate signature or method limit exceeded.</exception>
-    public MethodBuilder AddMethod(string name, PrimitiveMethodSignature signature, MethodVisibility visibility)
+    public MethodBuilder AddMethod(string name, MethodSignature signature, MethodVisibility visibility)
         => AddMethodCore(name, signature, visibility, isStatic: true, constructor: false);
-    /// <summary>Adds a nonvirtual instance method with primitive parameters/results.</summary>
+    /// <summary>Adds a nonvirtual instance method with primitive or owned-class parameters/results.</summary>
     /// <param name="name">Nonempty simple name; .ctor/.cctor are reserved.</param>
-    /// <param name="signature">Primitive declared parameters, excluding the receiver.</param>
+    /// <param name="signature">Primitive/owned-class declared parameters, excluding the receiver.</param>
     /// <param name="visibility">Public, Internal or Private.</param>
     /// <returns>An owned method whose argument zero is the declaring-class receiver.</returns>
     /// <exception cref="ArgumentException">Invalid or duplicate contract or exceeded limit.</exception>
     /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
-    public MethodBuilder AddInstanceMethod(string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
+    public MethodBuilder AddInstanceMethod(string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(name, signature, visibility, isStatic: false, constructor: false);
     /// <summary>Adds a root-class constructor with primitive declared parameters and no result.</summary>
     /// <param name="parameterTypes">At most 256 primitive parameters, excluding the receiver.</param>
@@ -413,12 +419,26 @@ public sealed partial class TypeBuilder
     /// <remarks>CLI emission initializes System.Object before this body. Native root construction requires no base call. Constructor chaining is unsupported.</remarks>
     public MethodBuilder AddConstructor(IEnumerable<PrimitiveType> parameterTypes, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(".ctor", new(PrimitiveType.Void, parameterTypes), visibility, isStatic: false, constructor: true);
-    private MethodBuilder AddMethodCore(string name, PrimitiveMethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor)
+    /// <summary>Adds a constructor with an owned nominal/primitive signature whose result must be Void.</summary>
+    /// <param name="signature">Void result and up to 256 primitive/owned-class declared parameters.</param>
+    /// <param name="visibility">Public, Internal or Private.</param>
+    /// <returns>A constructor owned by this root class.</returns>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Non-Void result, foreign class, duplicate signature or invalid visibility.</exception>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
+    public MethodBuilder AddConstructor(MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(signature);
+        if (signature.ReturnType != PrimitiveType.Void) throw new ArgumentException("constructor must have no result", nameof(signature));
+        return AddMethodCore(".ctor", signature, visibility, false, true);
+    }
+    private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor)
     {
         if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a reference class");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
+        signature.ValidateOwner(Assembly);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");
@@ -445,7 +465,7 @@ public sealed partial class MethodBuilder
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)
         : this(assembly, owner, name, PrimitiveMethodSignature.Int32(count, result)) { }
-    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "", bool isStatic = true)
+    internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public, string @namespace = "", bool isStatic = true)
     { Assembly = assembly; DeclaringType = owner; Name = name; Signature = signature; Visibility = visibility; Namespace = owner?.Namespace ?? @namespace; IsStatic = isStatic; }
     /// <summary>Gets whether the signature excludes an instance receiver.</summary>
     public bool IsStatic { get; }
@@ -457,8 +477,8 @@ public sealed partial class MethodBuilder
     internal string CliName => DeclaringType is null ? FunctionNamespaceEncoding.Encode(Namespace, Name) : Name;
     /// <summary>Gets declared method or assembly-function visibility.</summary>
     public MethodVisibility Visibility { get; }
-    /// <summary>Gets the immutable primitive method signature.</summary>
-    public PrimitiveMethodSignature Signature { get; }
+    /// <summary>Gets the immutable primitive/owned-class method signature.</summary>
+    public MethodSignature Signature { get; }
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declaring type, or null for a top-level function.</summary>
@@ -467,7 +487,7 @@ public sealed partial class MethodBuilder
     public string Name { get; }
     /// <summary>Gets the parameter count.</summary>
     public int ParameterCount => Signature.ParameterTypes.Count;
-    /// <summary>Gets whether the method has an Int32, Int64, Boolean or String result rather than no result.</summary>
+    /// <summary>Gets whether the method has a primitive or owned-class result rather than no result.</summary>
     public bool ReturnsValue => Signature.ReturnType != PrimitiveType.Void;
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>

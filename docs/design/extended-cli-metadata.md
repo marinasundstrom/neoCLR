@@ -1322,3 +1322,27 @@ field declarations reject. API-produced binary class/field metadata loads/verifi
 in neoCLR and its independent primitive entry returns 42. This is a metadata-load
 gate, not yet an object allocation/mutation test. Instance calls and field bodies
 are next, followed by property associations and Raven's real Order declaration.
+
+
+## Owned nominal callable signatures — 2026-10-01
+
+The root-object producer now carries exact owned class types in declared parameters
+and results. This extends the existing ECMA-335/Cecil comparison above: ordinary CLI
+method signatures encode CLASS plus TypeDef identity (Partition II, signature encodings),
+while the native payload uses its existing Named type representation. No new extension
+section or runtime instruction is required. Primitive signatures remain unchanged on disk.
+The reader remaps nominal identity into each independent reference projection.
+
+The selected alternative is a logical immutable signature model with backend-owned class
+handles, rather than encoding every object as System.Object or naming it with a string.
+This preserves overload distinction and exact stack validation at the cost of additional
+signature mapping and an API migration from primitive-only signature properties. No
+performance gain is claimed. Cross-assembly nominal imports, generic/subtyping/nullability
+and nominal field/property declarations remain provisional follow-up contracts, not rules
+of the platform. CLR-compatible TypeRef signatures are the later import boundary.
+
+Validation uses C# producer execution and raw signature snapshots, wrong-class and foreign
+builder rejection, native named-type reading and binary runtime execution. Raven's same
+source tests factory returns, aliases, nominal constructor arguments and overload identity
+in both source orders on .NET and neoCLR. The temporary CLI-reference/native-payload bridge
+remains; this does not claim the runtime executes ordinary CLI method bodies.

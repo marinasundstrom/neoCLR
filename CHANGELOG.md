@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add owned nominal method/function parameters and results with exact stack identity,
+  ordinary CLI CLASS signatures and existing native Named records. The native reader
+  preserves them in reference projections; API-produced binary assemblies execute on
+  neoCLR. Development API migration: builder methods and Signature properties now use
+  MethodSignature/SignatureType; PrimitiveMethodSignature remains a compatible primitive
+  construction helper. Rebuild consumers and inspect Primitive/ClassType explicitly.
+  External nominal imports, nullability and generic signatures remain unsupported.
+
 - Record the shared Raven fix for accessible explicit setters on `val` properties:
   owner writes invoke the setter while outside writes remain rejected. This corrects
   compiler binding without changing the runtime or metadata format.

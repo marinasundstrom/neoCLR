@@ -8,7 +8,7 @@ loader and code-generation adapters. It reads/writes **NEOX 0.1 framing, structu
 and derives structural identities/member contracts against an explicitly supplied host catalog.
 Bounded PE32 recognition and a read-only manifest-module/TypeDef model are implemented;
 explicit AssemblyRef, nominal TypeRef and bounded method MemberRef resolution are
-implemented. A controlled static-primitive builder writes ordinary CLI PE and native
+implemented. A controlled primitive/root-object builder writes ordinary CLI PE and native
 format-5 assemblies, including native top-level functions. Direct PE/#Neo runtime loading now uses a transitional native execution section
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
@@ -29,6 +29,7 @@ and guest Introspection assembly loading remain pending.
 - [MemberReference](#memberreference): physical references and explicit method resolution.
 - [Branch labels and control flow](#branch-labels-and-control-flow-development-2026-10-01): Boolean conditions, joins and loops.
 - [Int32 local slots](#int32-local-slots-development-2026-10-01): method-owned locals, raw indices and initialization checks.
+- [Nominal signatures](#nominal-signatures): MethodSignature, SignatureType and owned class parameters/results.
 - [Root-class locals](#root-class-locals): owned nominal slots and aliasing.
 - [Primitive property associations](#primitive-property-associations): static/instance getter and setter metadata.
 - [Root construction and instance bodies](#root-construction-and-instance-bodies): constructors, receiver calls and field operations.
@@ -1774,10 +1775,10 @@ public sealed class PrimitiveMethodSignature
     public PrimitiveType ReturnType { get; }
     public IReadOnlyList<PrimitiveType> ParameterTypes { get; }
 }
-MethodBuilder AssemblyBuilder.AddFunction(string name, PrimitiveMethodSignature signature);
-MethodBuilder TypeBuilder.AddMethod(string name, PrimitiveMethodSignature signature);
-PrimitiveMethodSignature MethodBuilder.Signature { get; }
-PrimitiveMethodSignature ImportedMethodReference.Signature { get; }
+MethodBuilder AssemblyBuilder.AddFunction(string name, MethodSignature signature);
+MethodBuilder TypeBuilder.AddMethod(string name, MethodSignature signature);
+MethodSignature MethodBuilder.Signature { get; }
+MethodSignature ImportedMethodReference.Signature { get; }
 bool MethodDefinition.TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded);
 ```
 
@@ -2051,7 +2052,7 @@ not insert that policy or change ordinary .NET codegen. The enum values are appe
 ```csharp
 public enum MethodVisibility { Public, Internal, Private }
 public MethodBuilder TypeBuilder.AddMethod(string name,
-    PrimitiveMethodSignature signature, MethodVisibility visibility);
+    MethodSignature signature, MethodVisibility visibility);
 public MethodVisibility MethodBuilder.Visibility { get; }
 ```
 
@@ -2075,7 +2076,7 @@ Raven binding and runtime verification enforce access. ImportReference retains t
 
 ### Assembly function access (development 2026-10-01)
 
-`AssemblyBuilder.AddFunction(string name, PrimitiveMethodSignature signature,
+`AssemblyBuilder.AddFunction(string name, MethodSignature signature,
 MethodVisibility visibility)` creates an ownerless function with Public or Internal
 access. Existing overloads remain Public. Name/signature bounds and duplicate checks
 are unchanged. A null signature raises ArgumentNullException; invalid names, duplicate
@@ -2097,7 +2098,7 @@ Development host APIs (2026-10-01):
 
 ```csharp
 MethodBuilder AssemblyBuilder.AddFunction(string @namespace, string name,
-    PrimitiveMethodSignature signature, MethodVisibility visibility = MethodVisibility.Public);
+    MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public);
 string MethodBuilder.Namespace { get; }
 ```
 
@@ -2201,7 +2202,7 @@ field output. Construction and field instructions are described below.
 Development host API (2026-10-01):
 
 ```csharp
-MethodBuilder TypeBuilder.AddInstanceMethod(string name, PrimitiveMethodSignature signature,
+MethodBuilder TypeBuilder.AddInstanceMethod(string name, MethodSignature signature,
     MethodVisibility visibility = MethodVisibility.Public);
 MethodBuilder TypeBuilder.AddConstructor(IEnumerable<PrimitiveType> parameterTypes,
     MethodVisibility visibility = MethodVisibility.Public);
@@ -2349,3 +2350,73 @@ and shape, then omits implementation locals from reference projections as before
 A matching reader is required for these new bodies. API C# tests and direct binary
 neoCLR execution validate local aliasing/mutation to 42. The subsequent Raven
 consumer validates source-level aliasing too; see the [integration record](../docs/raven-cli-bridge.md#raven-object-locals-and-aliasing--2026-10-01).
+
+
+## Nominal signatures
+
+**Development 2026-10-01.** `NeoCLR.Metadata.Experimental.Model` now exposes:
+
+```csharp
+public sealed record SignatureType {
+    public PrimitiveType? Primitive { get; }
+    public TypeBuilder? ClassType { get; }
+    public static implicit operator SignatureType(PrimitiveType type);
+    public static implicit operator SignatureType(TypeBuilder type);
+    public override string ToString();
+}
+public class MethodSignature {
+    public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes);
+    public MethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes);
+    public SignatureType ReturnType { get; }
+    public IReadOnlyList<SignatureType> ParameterTypes { get; }
+}
+MethodSignature MethodBuilder.Signature { get; }
+MethodSignature ImportedMethodReference.Signature { get; }
+MethodBuilder TypeBuilder.AddConstructor(MethodSignature signature,
+    MethodVisibility visibility = MethodVisibility.Public);
+```
+
+SignatureType has exactly one representation: a defined primitive (including Void only
+for results), or an exact nonstatic TypeBuilder identity. Invalid primitive values and
+static classes throw ArgumentException; a null class throws ArgumentNullException.
+Its diagnostic ToString is not a persistent identity. Record equality retains exact
+builder identity. MethodSignature copies at most 256 parameters; null input throws
+ArgumentNullException and null/Void parameters or too many parameters throw
+ArgumentException. Returned lists cannot be modified. Constructors require Void results.
+
+AddFunction (both global and namespaced overloads), AddMethod and AddInstanceMethod
+now take MethodSignature instead of PrimitiveMethodSignature. Before mutating declarations
+they reject class types from another builder, including another builder with the same
+assembly identity. Existing visibility, duplicate-parameter-signature and count limits
+remain. Method return type does not distinguish overloads. PrimitiveMethodSignature now
+derives from MethodSignature and retains its primitive-typed ReturnType/ParameterTypes
+properties; primitive consumers can continue constructing it. **Development API migration:**
+rebuild consumers against the changed method signatures. Code inspecting MethodBuilder
+or ImportedMethodReference signatures must use `.Primitive` or `.ClassType`, rather than
+assuming a primitive enum. Imported read-only method contracts remain primitive-only.
+
+CLI output uses CLASS TypeDef signatures; native output uses existing Named type records.
+Calls, argument stores and returns enforce exact class identity, just like nominal locals.
+No implicit base conversion, null literal, array, generic, structural or external nominal
+signature support is added. Cross-assembly builder calls with nominal signatures reject
+at write rather than fabricating a TypeRef. Entries remain parameterless Int32/Void.
+NativeAssemblyDefinition accepts owned nonstatic Named signature references and remaps
+them into each reference projection. MethodDefinition preserves CLI blobs, while its
+primitive recognizers correctly decline nominal signatures. Reference-only output still
+contains throwing placeholder bodies and must not be executed as the native implementation.
+
+Compiled consumer pattern (covered by NominalSignatureChecks):
+
+```csharp
+var identity = graph.AddFunction("Identity", new MethodSignature(order, [order]));
+identity.LoadArgument(0);
+identity.Return();
+var self = order.AddInstanceMethod("Self", new MethodSignature(order, []));
+self.LoadArgument(0);
+self.Return();
+```
+
+Here `order` is graph.AddClass's owned result. The C# contract test passes an allocated
+instance through both calls, mutates it through a nominal parameter and reads 42 through
+its alias on .NET and binary neoCLR. Wrong-class arguments/results and foreign signatures
+reject. Raven additionally validates owned nominal constructor parameters and overloads.

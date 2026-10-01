@@ -55,6 +55,7 @@ public sealed partial class MethodBuilder
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => new(PrimitiveType.Void, owner);
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
+        public static implicit operator BodyValueType(SignatureType type) => type.ClassType is { } c ? Receiver(c) : new(type.Primitive!.Value);
     }
     private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
         ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];

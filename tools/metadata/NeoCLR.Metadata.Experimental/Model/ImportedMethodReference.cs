@@ -21,7 +21,7 @@ public sealed class ImportedMethodReference
     /// <summary>Gets whether a result is present.</summary>
     public bool ReturnsValue => Target.ReturnsValue;
     /// <summary>Gets the immutable imported primitive signature.</summary>
-    public PrimitiveMethodSignature Signature => Target.Signature;
+    public MethodSignature Signature => Target.Signature;
 }
 
 public sealed partial class AssemblyBuilder

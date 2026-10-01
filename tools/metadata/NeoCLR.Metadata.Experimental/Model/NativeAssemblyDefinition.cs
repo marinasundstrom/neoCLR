@@ -11,7 +11,7 @@ public sealed class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
     private sealed record FieldRow(string Name, PrimitiveType Type, FieldVisibility Visibility);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, PrimitiveMethodSignature Signature, MethodVisibility Visibility, bool Instance);
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, PrimitiveType Type, int Getter, int Setter);
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
@@ -129,6 +129,17 @@ public sealed class NativeAssemblyDefinition
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
                 types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray()));
             }
+            // Private identity graph for immutable declaration signatures, remapped into each projection.
+            var signatureGraph = new AssemblyBuilder(identity, identity);
+            var signatureOwners = types.Select(t => t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
+            SignatureType ReadType(JsonElement element, bool allowVoid)
+            {
+                if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
+                Shape(element, "Named");
+                var index = types.FindIndex(t => t.NativeName == Text(element, "Named") && !t.IsStatic);
+                Require(index >= 0, "signature class must be an owned root");
+                return signatureOwners[index];
+            }
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
             var counts = new Dictionary<int, int>();
@@ -178,9 +189,9 @@ public sealed class NativeAssemblyDefinition
                         }
                     }
                 var parameters = Array(method, "parameters", 256);
-                var parameterTypes = parameters.Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
+                var parameterTypes = parameters.Select(p => ReadType(p, false)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
-                var resultType = ReadPrimitive(Text(method, "returns"), true);
+                var resultType = ReadType(method.GetProperty("returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a root class");
@@ -194,7 +205,7 @@ public sealed class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
-                Require(seenMethods.Add((ownerIndex, ns, name, string.Join(",", parameterTypes))), "duplicate native signature");
+                Require(seenMethods.Add((ownerIndex, ns, name, string.Join(",", parameterTypes.Select(t => t.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + t.Primitive)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
                 methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes), visibility, instance)); methodNames.Add(expectedName);
             }
@@ -220,7 +231,7 @@ public sealed class NativeAssemblyDefinition
                         Require(Text(referenceOwner, "Named") == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
                         var parameters = Array(reference, "parameters", 1).Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
                         Require(parameters.SequenceEqual(setter ? new[] { valueType } : []), "property accessor parameters mismatch");
-                        var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
+                        var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters.Select(p => (SignatureType)p))).ToArray();
                         Require(candidates.Length == 1, "missing or ambiguous property accessor");
                         var (method, index) = candidates[0];
                         Require(method.Instance == instance && method.Name != ".ctor" && method.Signature.ReturnType == (setter ? PrimitiveType.Void : valueType) && usedAccessors.Add(index), "incompatible or reused property accessor");
@@ -234,7 +245,7 @@ public sealed class NativeAssemblyDefinition
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray());
@@ -248,7 +259,7 @@ public sealed class NativeAssemblyDefinition
     /// <returns>Owned PE bytes containing declarations, a ReferenceAssemblyAttribute and throwing placeholder bodies.</returns>
     /// <exception cref="ArgumentNullException">Core identity is null.</exception>
     /// <exception cref="InvalidDataException">Projection exceeds writer limits.</exception>
-    /// <remarks>No native body is translated. Entry points and native dependency references are not projected: supported signatures contain only primitives.
+    /// <remarks>No native body is translated. Entry points and native dependency references are not projected: supported signatures contain primitives and owned root-class references.
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
@@ -257,18 +268,17 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, field.Type, field.Visibility);
+        SignatureType Remap(SignatureType type) => type.ClassType is { } c
+            ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
         var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)
         {
-            var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, method.Signature, method.Visibility)
-                : !method.Instance ? owners[method.Owner].AddMethod(method.Name, method.Signature, method.Visibility)
-                : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(method.Signature.ParameterTypes, method.Visibility)
-                : owners[method.Owner].AddInstanceMethod(method.Name, method.Signature, method.Visibility);
-            if (method.Signature.ReturnType == PrimitiveType.String) output.Emit(OpCode.Ldstr, "");
-            else if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
-            else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);
-            else if (method.Signature.ReturnType == PrimitiveType.Boolean) output.Emit(OpCode.Ldc_Bool, false);
-            output.Return();
+            var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap));
+            var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
+                : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
+                : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
+                : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
+            // Reference emission supplies throwing bodies; do not invent executable native behavior.
             projectedMethods.Add(output);
         }
         foreach (var property in properties)
