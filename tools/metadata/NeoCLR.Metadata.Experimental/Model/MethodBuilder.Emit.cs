@@ -8,11 +8,11 @@ public enum OpCode
     Ldc_I4,
     /// <summary>Loads a declared primitive argument by zero-based index; requires an Int32 operand.</summary>
     Ldarg,
-    /// <summary>Adds two Int32 values.</summary>
+    /// <summary>Adds two matching Int32 or Int64 values.</summary>
     Add,
-    /// <summary>Subtracts two Int32 values.</summary>
+    /// <summary>Subtracts two matching Int32 or Int64 values.</summary>
     Sub,
-    /// <summary>Multiplies two Int32 values.</summary>
+    /// <summary>Multiplies two matching Int32 or Int64 values.</summary>
     Mul,
     /// <summary>Calls a typed method reference; requires a supported method operand.</summary>
     Call,
@@ -22,11 +22,11 @@ public enum OpCode
     Ldloc,
     /// <summary>Stores a declared primitive local; requires a slot index or owned local.</summary>
     Stloc,
-    /// <summary>Compares matching Int32 or Boolean values for equality, pushing Boolean.</summary>
+    /// <summary>Compares matching Int32, Int64 or Boolean values for equality, pushing Boolean.</summary>
     Ceq,
-    /// <summary>Compares two signed Int32 values for less-than, pushing Boolean.</summary>
+    /// <summary>Compares two matching signed Int32 or Int64 values for less-than, pushing Boolean.</summary>
     Clt,
-    /// <summary>Compares two signed Int32 values for greater-than, pushing Boolean.</summary>
+    /// <summary>Compares two matching signed Int32 or Int64 values for greater-than, pushing Boolean.</summary>
     Cgt,
     /// <summary>Branches unconditionally to a BranchLabel.</summary>
     Br,
@@ -37,19 +37,25 @@ public enum OpCode
     /// <summary>Pushes a Boolean constant; requires a Boolean operand.</summary>
     Ldc_Bool,
     /// <summary>Discards the top evaluation-stack value.</summary>
-    Pop
+    Pop,
+    /// <summary>Pushes an Int64 constant; requires a long operand.</summary>
+    Ldc_I8,
+    /// <summary>Converts Int32/Int64 to signed Int64, sign-extending Int32.</summary>
+    Conv_I8,
+    /// <summary>Converts Int32/Int64 to Int32, retaining the low 32 bits.</summary>
+    Conv_I4
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt, Pop or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt, Pop, Conv_I4, Conv_I8 or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
-            OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
+            OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));
@@ -64,6 +70,17 @@ public sealed partial class MethodBuilder
             OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument",
             OpCode.Ldloc => "local.load", OpCode.Stloc => "local.store", _ => throw OperandError(opCode)
         }, operand));
+
+    /// <summary>Appends an exact signed Int64 constant.</summary>
+    /// <param name="opCode">Ldc_I8; other opcodes reject.</param>
+    /// <param name="operand">Constant value, including Int64 extrema.</param>
+    /// <exception cref="ArgumentException">Incorrect opcode.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void Emit(OpCode opCode, long operand)
+    {
+        if (opCode != OpCode.Ldc_I8) throw OperandError(opCode);
+        Append(new("constant64", LongValue: operand));
+    }
 
     /// <summary>Appends a call to a local or external builder method.</summary>
     /// <param name="opCode">Call.</param>

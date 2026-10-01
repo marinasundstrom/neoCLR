@@ -24,7 +24,8 @@ builders; broader type/field references and full declaration traversal remain ne
 and the first paired body capability now supports initialized Int32 locals/assignments.
 Comparisons (including negated forms), if/else and lowered loops with break/continue now execute on both runtimes;
 Int32/Boolean/no-result signatures now flow through both backends, native imports and
-reference projections, with Boolean local initialization/assignment, equality and short-circuit &&/|| and discarded primitive call results; conversions and general type/field references remain next;
+reference projections, with Boolean local initialization/assignment, equality and short-circuit &&/|| and discarded primitive call results. Int64 signatures/locals and signed Int32↔Int64
+conversions now share that path; broader conversions and general type/field references remain next;
 metadata loading remains a future slice. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

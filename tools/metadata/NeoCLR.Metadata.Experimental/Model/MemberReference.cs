@@ -23,7 +23,7 @@ public sealed class MemberReference
     /// <summary>Copies the original signature blob, including unsupported signatures.</summary>
     /// <returns>New owned signature bytes.</returns>
     public byte[] GetSignature() => (byte[])signature.Clone();
-    /// <summary>Resolves the static Int32/Boolean/no-result method subset through a nominal TypeDef or TypeRef parent.</summary>
+    /// <summary>Resolves the static Int32/Int64/Boolean/no-result method subset through a nominal TypeDef or TypeRef parent.</summary>
     /// <param name="resolver">Explicit assembly resolver required by external TypeRef scopes.</param>
     /// <returns>The unique matching method in the resolved type's owned snapshot.</returns>
     /// <exception cref="InvalidDataException">Unsupported signature/parent, missing or mismatched dependency, or absent/ambiguous method.</exception>

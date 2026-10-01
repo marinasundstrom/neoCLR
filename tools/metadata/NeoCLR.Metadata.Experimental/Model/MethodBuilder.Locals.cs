@@ -8,7 +8,7 @@ public sealed class LocalDefinition
     public MethodBuilder Method { get; }
     /// <summary>Gets the zero-based slot index.</summary>
     public int Index { get; }
-    /// <summary>Gets the declared Int32 or Boolean slot type.</summary>
+    /// <summary>Gets the declared Int32, Int64 or Boolean slot type.</summary>
     public PrimitiveType Type { get; }
 }
 
@@ -22,13 +22,13 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
     public LocalDefinition DeclareInt32Local() => DeclareLocal(PrimitiveType.Int32);
     /// <summary>Declares a typed primitive local. ClearBody retains the slot and type.</summary>
-    /// <param name="type">Int32 or Boolean; Void is not a local type.</param>
+    /// <param name="type">Int32, Int64 or Boolean; Void is not a local type.</param>
     /// <returns>A stable local handle owned by this method.</returns>
     /// <exception cref="ArgumentException">Type is Void or an invalid enum value.</exception>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
     public LocalDefinition DeclareLocal(PrimitiveType type)
     {
-        if (type is not (PrimitiveType.Int32 or PrimitiveType.Boolean)) throw new ArgumentException("unsupported local type", nameof(type));
+        if (type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean)) throw new ArgumentException("unsupported local type", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
     }

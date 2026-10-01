@@ -8,22 +8,24 @@ public enum PrimitiveType
     /// <summary>A signed 32-bit integer.</summary>
     Int32,
     /// <summary>A Boolean value, distinct from Int32 in native metadata.</summary>
-    Boolean
+    Boolean,
+    /// <summary>A signed 64-bit integer.</summary>
+    Int64
 }
 
 /// <summary>An immutable static nongeneric primitive method signature.</summary>
 public sealed class PrimitiveMethodSignature
 {
     /// <summary>Copies parameter types and validates the bounded signature.</summary>
-    /// <param name="returnType">Void, Int32 or Boolean.</param>
-    /// <param name="parameterTypes">At most 256 Int32/Boolean parameters in order.</param>
+    /// <param name="returnType">Void, Int32, Int64 or Boolean.</param>
+    /// <param name="parameterTypes">At most 256 Int32/Int64/Boolean parameters in order.</param>
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     /// <exception cref="ArgumentException">Invalid type or too many parameters.</exception>
     public PrimitiveMethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes)
     {
         ArgumentNullException.ThrowIfNull(parameterTypes);
         var parameters = parameterTypes.Take(257).ToArray();
-        if (!Enum.IsDefined(returnType) || parameters.Length > 256 || parameters.Any(p => p is not (PrimitiveType.Int32 or PrimitiveType.Boolean)))
+        if (!Enum.IsDefined(returnType) || parameters.Length > 256 || parameters.Any(p => p is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean)))
             throw new ArgumentException("invalid primitive signature");
         ReturnType = returnType; ParameterTypes = Array.AsReadOnly(parameters);
     }

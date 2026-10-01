@@ -96,7 +96,7 @@ public sealed class NativeAssemblyDefinition
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
                 if (method.TryGetProperty("locals", out _))
-                    Require(Array(method, "locals", 256).All(l => l.GetString() is "Int32" or "Boolean"), "unsupported native local");
+                    Require(Array(method, "locals", 256).All(l => l.GetString() is "Int32" or "Int64" or "Boolean"), "unsupported native local");
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
@@ -116,7 +116,7 @@ public sealed class NativeAssemblyDefinition
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType != PrimitiveType.Boolean).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), referenceIdentities.ToArray());
@@ -141,6 +141,7 @@ public sealed class NativeAssemblyDefinition
         {
             var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature) : owners[method.Owner].AddMethod(method.Name, method.Signature);
             if (method.Signature.ReturnType == PrimitiveType.Int32) output.LoadConstant(0);
+            else if (method.Signature.ReturnType == PrimitiveType.Int64) output.Emit(OpCode.Ldc_I8, 0L);
             else if (method.Signature.ReturnType == PrimitiveType.Boolean) output.Emit(OpCode.Ldc_Bool, false);
             output.Return();
         }
@@ -148,6 +149,7 @@ public sealed class NativeAssemblyDefinition
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
     {
+        "Int64" => PrimitiveType.Int64,
         "Int32" => PrimitiveType.Int32,
         "Boolean" => PrimitiveType.Boolean,
         "Void" when allowVoid => PrimitiveType.Void,

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add Int64 primitive signatures, locals and exact long constants to the experimental
+  metadata API, plus unchecked signed Int32/Int64 conversions and matching-width
+  arithmetic/comparisons. Preserve types through native projections and imports;
+  replace Boolean stack tags with explicit primitive types. Raven shares this support
+  across both backends. Int32-only convenience APIs and entrypoints stay unchanged;
+  older experimental readers may reject Int64 declarations.
+
 - Add checked operand-free Pop to the experimental metadata API. Raven's shared
   body path can discard Int32/Boolean call results in statement position while
   preserving call side effects and no-result Unit stack behavior. Native execution
