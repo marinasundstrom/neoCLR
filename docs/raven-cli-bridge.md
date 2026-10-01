@@ -2793,3 +2793,9 @@ by builder facades. CLR reflection and native execution return 42; Raven’s reb
 passes without Runtime Contract or admission changes. Definitions stay Cecil-like; the
 author clarified that generation builders should follow Reflection.Emit-style patterns
 without being a replacement API. CLI/native property encoding remains unchanged.
+
+Direct generic type declarations now share parameter names and special/nominal constraint
+storage with builders. Constructed value-constrained calls return 42; Runtime Contract,
+Raven admission and CLI/native generic encodings are unchanged. The author specified
+builders → definitions → metadata → PE, with reverse reader boundaries. Extracting the
+combined metadata/PE writer and editable reader materialization remains future work.

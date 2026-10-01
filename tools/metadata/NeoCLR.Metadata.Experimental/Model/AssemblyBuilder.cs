@@ -568,19 +568,19 @@ public sealed partial class TypeBuilder
     private readonly List<MethodBuilder> methods = [];
     internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null, bool isInterface = false, bool isValueType = false)
     {
-        Assembly = assembly; GenericParameterNames = genericNames ?? Array.Empty<string>();
+        Assembly = assembly; var parameterNames = genericNames ?? Array.Empty<string>();
         var attributes = (visibility == TypeVisibility.Public ? TypeAttributes.Public : 0) |
             (isInterface ? TypeAttributes.Interface | TypeAttributes.Abstract : isStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : isValueType ? TypeAttributes.Sealed | TypeAttributes.SequentialLayout : 0);
         Definition = new TypeDefinition(@namespace, name, (uint)attributes, isInterface ? null : assembly.Definition.MainModule.ImportReference(assembly.CoreLibrary, "System", isValueType ? "ValueType" : "Object"));
-        Definition.Producer = this; Definition.Module = assembly.Definition.MainModule; Definition.GenericArity = GenericParameterNames.Count;
+        Definition.Producer = this; Definition.Module = assembly.Definition.MainModule; Definition.GenericParameterNames = parameterNames; Definition.GenericArity = parameterNames.Count;
     }
     internal TypeBuilder(AssemblyBuilder assembly, TypeDefinition definition)
-    { Assembly = assembly; Definition = definition; GenericParameterNames = Array.Empty<string>(); definition.Producer = this; }
+    { Assembly = assembly; Definition = definition; definition.Producer = this; }
     /// <summary>Gets the same authored definition stored in the module's Types collection.</summary>
     public TypeDefinition Definition { get; }
 
     /// <summary>Gets immutable declaring-type parameter names in ordinal order.</summary>
-    public IReadOnlyList<string> GenericParameterNames { get; }
+    public IReadOnlyList<string> GenericParameterNames => Definition.GenericParameterNames!;
     /// <summary>Gets whether this is an abstract sealed static class.</summary>
     public bool IsStatic => (Definition.Attributes & 0x180) == 0x180 && !IsInterface;
     /// <summary>Gets whether this declaration is a CLI value type rather than a reference type.</summary>

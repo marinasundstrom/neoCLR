@@ -609,3 +609,6 @@ reference, including local/label views and clearing; guest RavenDoc selection is
 
 PropertyDefinition authored constructor/signatures, PropertyBuilder.Definition and authored
 property collections/views are documented in the manual host reference; no guest selection changes.
+
+The direct generic TypeDefinition overload and authored GenericParameterNames/constraint
+views are covered in the manual host reference; no guest RavenDoc selection changes apply.

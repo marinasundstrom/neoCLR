@@ -5,6 +5,12 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Layering (author clarification, 2026-10-01):** builders → definitions → metadata → PE,
+with readers reversing the encoding/container boundaries. Current combined encoding/PE
+packaging and immutable reader snapshots still need separation/materialization. This is
+an architectural target, not a new binary format. Direct generic types now share names
+and constraint storage with builders; constrained calls execute on both runtimes (42).
+
 **Builder direction (author clarification, 2026-10-01):** retain Cecil-like definitions,
 with generation builders inspired by Reflection.Emit, without replacement/drop-in claims.
 Both layers share one graph. Property declarations/accessor associations now participate

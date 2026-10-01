@@ -61,7 +61,7 @@ public sealed partial class TypeDefinition
     {
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 || (name + @namespace).Any(char.IsControl))
             throw new ArgumentException("invalid type name");
-        Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType;
+        Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType; GenericParameterNames = Array.Empty<string>();
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
         authoredProperties = new DefinitionCollection<PropertyDefinition>([], property =>
         {
@@ -138,7 +138,7 @@ public sealed partial class AssemblyBuilder
         {
             var attributes = definition.Attributes;
             var category = attributes & ~1u;
-            if (definition.Name.Contains('`') || category is not (0 or 0x180 or 0x108 or 0xa0)) throw new ArgumentException("unsupported manual type shape");
+            if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x180 or 0x108 or 0xa0)) throw new ArgumentException("unsupported manual type shape");
             if (category == 0xa0)
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
@@ -149,8 +149,8 @@ public sealed partial class AssemblyBuilder
             // Validate pending fields before attaching any ownership or writer handles.
             foreach (var field in definition.Fields)
             {
-                field.FieldType!.ValidateOwner(this);
-                if (category is 0x180 or 0xa0 || definition.IsValueType && field.FieldType.Primitive is null)
+                field.FieldType!.ValidateOwner(this, typeArity: definition.GenericArity);
+                if (category is 0x180 or 0xa0 || definition.IsValueType && field.FieldType.Primitive is null && field.FieldType.TypeParameterIndex is null)
                     throw new ArgumentException("unsupported field storage on manual type");
             }
             if (definition.Fields.Count > 256) throw new ArgumentException("field limit exceeded");

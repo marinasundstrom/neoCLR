@@ -395,3 +395,8 @@ that same body. Property/accessor declarations also share this graph. Definition
 generation builders are intended to follow Reflection.Emit-style convenience patterns.
 Arbitrary instruction editing and loaded assembly modification remain pending; this is not a
 published general-purpose assembly editor.
+
+Direct generic declarations now share parameter names and constraint storage with builders;
+constrained calls execute on CLR and neoCLR. The intended architecture separates definitions,
+encoded metadata and PE packaging, with readers reversing those boundaries. Full separation
+and editable loaded definitions remain development work.

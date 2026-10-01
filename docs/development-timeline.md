@@ -25,6 +25,18 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Explicit metadata and PE boundaries
+
+- **Author:** Specified “builders -> definitions -> metadata -> PE” and readers/writers
+  working in the corresponding directions.
+- **Assistant:** Interpreted the write path as definition encoding followed by PE
+  packaging, and the read path as PE extraction, metadata decoding and definition
+  materialization. Builders remain optional helpers over definitions.
+- **Action:** Recorded the target boundaries while completing direct generic type
+  authoring/shared constraint storage. Identified current combined WriteImage encoding
+  and packaging plus immutable reader snapshots as remaining architectural work.
+  No separate metadata/PE layer API or editable reader was claimed as implemented.
+
 ## 2026-10-01: Reflection.Emit-style builders over Cecil-like definitions
 
 - **Author:** Clarified that builder APIs should be much more similar to Reflection.Emit,

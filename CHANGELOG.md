@@ -17,9 +17,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Types, type Fields/Methods and module Functions expose IList (development API change).
   Properties and accessor associations now also share authored declarations with builders;
   CLR reflection and native execution return 42. Type.Properties changes to IList.
-  Arbitrary instruction editing, generic migration and loaded editing remain pending;
+  Direct generic type construction now shares parameter names and constraint storage
+  with builders; constrained constructed calls return 42 on CLR/neoCLR. Separate
+  generic-parameter objects, arbitrary instruction editing and loaded editing remain pending;
   CLI/CIL encoding is unchanged. Record the author’s distinction: Cecil-like definitions
   with Reflection.Emit-style convenience builders, without drop-in compatibility claims.
+  Record the clarified builders → definitions → metadata → PE pipeline and reverse
+  reader boundaries as architecture work; encoding/packaging separation remains incomplete.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

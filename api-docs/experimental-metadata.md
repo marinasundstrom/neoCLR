@@ -3644,3 +3644,48 @@ This is an architectural direction, not a completed API rename or compatibility 
 Future Define-style construction and body-helper decisions should follow that direction
 while preserving target-specific capability checks and explicit identities. The property
 migration here shares declarations; existing Add-style entry points remain supported.
+
+
+### Direct generic types and shared constraint storage
+
+`TypeDefinition(string namespace, string name, uint attributes, TypeReference? baseType,
+IEnumerable<string> genericParameterNames)` creates a detached generic root class,
+value type or interface. Supply a simple name without backtick/arity; the constructor
+appends the CLI arity suffix. One through 32 unique valid names are copied using the
+existing signature-name rules. Null input throws `ArgumentNullException`; invalid names,
+empty/duplicate/over-limit parameters throw `ArgumentException`. Attachment applies the
+existing category/base/ownership restrictions; generic static classes remain unsupported.
+Pending fields validate VAR references against the declaring arity, including supported
+generic value-type payload fields.
+
+`TypeDefinition.GenericParameterNames` is an immutable authored list shared by the builder;
+it is null for loaded snapshots whose names are not materialized. Existing GenericArity
+continues to report loaded arity. `SpecialConstraints` and `GenericConstraints` expose
+cached live read-only views of definition-owned storage. Loaded access throws
+`NotSupportedException`. Existing TypeBuilder.SetSpecialConstraints/AddBaseTypeConstraint
+helpers validate and update that storage. Nominal constraints retain their existing
+GenericTypeConstraint builder bound handles; independent generic-parameter/constraint
+reference objects and loaded constraint editing are future work.
+
+The manual executable declares Identity<T> directly, adds Pass(T):T directly, constrains T
+to a value type through the helper, and calls Identity<Int32>.Pass. CLR reflection confirms
+the parameter name and special constraint; CLR/native execution returns 42. A String
+instantiation rejects. All 76 C# groups and Raven's rebuilt native probe pass. Existing
+GenericParam/GenericParamConstraint and native encodings are unchanged.
+
+### Layered reader/writer direction (author clarification, 2026-10-01)
+
+The intended write pipeline is **builders → definitions → encoded metadata → PE**.
+Builders are optional generation helpers over the shared definitions. Metadata encoding
+owns CLI tables/heaps, signatures, method bodies and explicit neoCLR extensions; the PE
+layer packages the result. The read path reverses these boundaries: PE extraction,
+metadata decoding and definition materialization. Builders may then wrap editable loaded
+definitions. Readers and writers should expose complementary responsibilities at these
+boundaries, rather than making the object model depend on a particular packaging writer.
+
+This is the target architecture, not a claim that the separation is complete. Current
+AssemblyBuilder.WriteImage still combines metadata/body encoding and PE packaging;
+AssemblyDefinition reading returns bounded immutable snapshots. Native container handling
+also has its existing adapter path. No format change or new binary layer API is claimed
+by this record. The definition migration provides shared authoring state; extracting the
+encoding/packaging boundary and materializing editable loaded definitions remain work.

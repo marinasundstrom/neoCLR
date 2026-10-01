@@ -19,9 +19,9 @@ public enum TypeParameterConstraints
 
 public sealed partial class TypeBuilder
 {
-    private readonly Dictionary<int, TypeParameterConstraints> specialConstraints = [];
+    private Dictionary<int, TypeParameterConstraints> specialConstraints => Definition.SpecialConstraintStorage;
     /// <summary>Gets special requirements by parameter ordinal.</summary>
-    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(specialConstraints);
+    public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => Definition.SpecialConstraints;
     /// <summary>Sets special requirements without changing nominal bounds.</summary>
     /// <param name="parameterIndex">Declared parameter ordinal.</param>
     /// <param name="constraints">ReferenceType, ValueType, DefaultConstructor, or compatible combinations; None clears flags.</param>
@@ -35,9 +35,9 @@ public sealed partial class TypeBuilder
         if (constraints == TypeParameterConstraints.None) specialConstraints.Remove(parameterIndex);
         else specialConstraints[parameterIndex] = constraints;
     }
-    private readonly List<GenericTypeConstraint> genericConstraints = [];
+    private List<GenericTypeConstraint> genericConstraints => Definition.GenericConstraintStorage;
     /// <summary>Gets nominal bounds in parameter order.</summary>
-    public IReadOnlyList<GenericTypeConstraint> GenericConstraints => genericConstraints.AsReadOnly();
+    public IReadOnlyList<GenericTypeConstraint> GenericConstraints => Definition.GenericConstraints;
     /// <summary>Adds one owned nongeneric root-class bound for a declared parameter.</summary>
     /// <param name="parameterIndex">Zero-based declaring-type parameter index.</param>
     /// <param name="baseType">Owned nongeneric nonstatic class.</param>

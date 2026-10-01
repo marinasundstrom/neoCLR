@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; direct generic type declaration and constructed call; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -14,8 +14,8 @@
       "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
       "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
       "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-      "librarySha256": "490E280FA5503EFB013EC569F513901F93F8017EC2A0E8D0756E1091894E3ACF",
-      "applicationSha256": "F9D6318C6446DBB3B07D442935EEF70CAA204EA065420826140206ECEB8ADD89",
+      "librarySha256": "1BD9140D52E27A6C31181AC1F31CCE0B1A80A6BA0EBA45471D1C13B6490047DB",
+      "applicationSha256": "6163F98C7EF99C241B00BDD935CAE096EBDE7AB78839AEA2D324A54883172FB8",
       "verified": true,
       "result": 42,
       "coverage": [
@@ -62,5 +62,6 @@
   "interfaceDeclarationBaseCommit": "ddc5cb75",
   "relationshipBaseCommit": "a86113a4",
   "bodyStorageBaseCommit": "564b9cba",
-  "propertyBaseCommit": "dfcdecb8"
+  "propertyBaseCommit": "dfcdecb8",
+  "genericTypeBaseCommit": "d7e698cf"
 }

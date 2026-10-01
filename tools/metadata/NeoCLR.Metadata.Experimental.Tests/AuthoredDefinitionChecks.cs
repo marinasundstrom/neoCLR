@@ -32,6 +32,9 @@ internal static class AuthoredDefinitionChecks
         try
         {
             var loadedExecutable = executionContext.LoadFromStream(new MemoryStream(executable.Write()));
+            var parameter = loadedExecutable.GetType("Example.Identity`1")!.GetGenericArguments().Single();
+            if (parameter.Name != "T" || (parameter.GenericParameterAttributes & GenericParameterAttributes.NotNullableValueTypeConstraint) == 0)
+                throw new Exception("manual generic parameter/constraint metadata");
             var boxType = loadedExecutable.GetType("Example.Box")!;
             var box = Activator.CreateInstance(boxType, new object[] { 42 });
             if (!Equals(boxType.GetProperty("Value")!.GetValue(box), 42)) throw new Exception("manual property reflection");
@@ -144,6 +147,7 @@ internal static class AuthoredDefinitionChecks
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Add(type));
         Reject<InvalidOperationException>(() => snapshot.MainModule.Types.Single(t => t.Name == "MyStruct").Fields[0].Name = "Changed");
         Reject<InvalidOperationException>(() => AssemblyBuilder.ForDefinition(snapshot));
+        Reject<NotSupportedException>(() => _ = snapshot.MainModule.Types.Single(t => t.Name == "MyStruct").SpecialConstraints);
         var projection = RuntimeAssemblyContainer.ReadCliProjection(RuntimeAssemblyContainer.WriteBinary(assembly.WriteNativeAssembly(), builder.CoreLibrary));
         if (!projection.MainModule.Types.Single(t => t.Name == "MyStruct").IsValueType) throw new Exception("native category");
     }
@@ -221,7 +225,26 @@ internal static class AuthoredDefinitionChecks
         var unattachedInstance = new MethodDefinition("Read", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true));
         Reject<InvalidOperationException>(() => staticOwner.Definition.Methods.Add(unattachedInstance));
         Reject<InvalidOperationException>(() => MethodBuilder.ForDefinition(unattachedInstance));
-        helper.Call(answerBody); helper.Return();
+        var parameters = new[] { "T" };
+        var generic = new TypeDefinition("Example", "Identity", 1, assembly.MainModule.ImportReference(builder.CoreLibrary, "System", "Object"), parameters);
+        parameters[0] = "Changed";
+        assembly.MainModule.Types.Add(generic);
+        var identity = new MethodDefinition("Pass", (ushort)(MethodAttributes.Public | MethodAttributes.Static),
+            new MethodSignature(SignatureType.TypeParameter(0), new[] { SignatureType.TypeParameter(0) }));
+        generic.Methods.Add(identity);
+        var identityBody = MethodBuilder.ForDefinition(identity); identityBody.LoadArgument(0); identityBody.Return();
+        if (generic.Name != "Identity`1" || generic.GenericParameterNames!.Single() != "T" ||
+            !ReferenceEquals(generic.GenericParameterNames, builder.Types.Single(t => t.Name == "Identity`1").GenericParameterNames))
+            throw new Exception("generic parameter definition identity/copy");
+        var genericBuilder = builder.Types.Single(t => t.Name == "Identity`1");
+        var constraintView = generic.SpecialConstraints;
+        genericBuilder.SetSpecialConstraints(0, TypeParameterConstraints.ValueType);
+        if (!ReferenceEquals(constraintView, genericBuilder.SpecialConstraints) || constraintView[0] != TypeParameterConstraints.ValueType ||
+            !ReferenceEquals(generic.GenericConstraints, genericBuilder.GenericConstraints)) throw new Exception("constraint storage identity");
+        Reject<ArgumentException>(() => identityBody.MakeConstructedReference(new SignatureType[] { PrimitiveType.String }));
+        Reject<ArgumentException>(() => new TypeDefinition("Example", "Invalid`1", 1, generic.BaseType, new[] { "T" }));
+        Reject<ArgumentException>(() => new TypeDefinition("Example", "Invalid", 1, generic.BaseType, new[] { "T", "T" }));
+        helper.Call(answerBody); helper.Call(identityBody.MakeConstructedReference(new SignatureType[] { PrimitiveType.Int32 })); helper.Return();
         var entryDefinition = new MethodDefinition("Main", PrimitiveMethodSignature.Int32(0, true));
         assembly.MainModule.Functions.Add(entryDefinition);
         assembly.EntryPoint = entryDefinition;
@@ -249,7 +272,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; direct generic type declaration and constructed call; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }
