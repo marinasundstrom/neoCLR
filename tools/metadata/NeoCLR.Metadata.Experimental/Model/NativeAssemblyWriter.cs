@@ -73,6 +73,7 @@ public sealed partial class AssemblyBuilder
             "subtract" => new { op = "sub" },
             "multiply" => new { op = "mul" },
             "divide" => new { op = "div" },
+            "remainder" => new { op = "rem" },
             "return" => new { op = "ret" },
             _ => throw new InvalidDataException("unsupported instruction")
         };

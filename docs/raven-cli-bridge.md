@@ -1369,3 +1369,27 @@ Validation: 41 C# metadata contract groups and API snapshot check pass. Raven
 results and four Int32/Int64 zero/overflow execution cases on both .NET and neoCLR.
 The unchanged shared planner's 36 focused tests pass as the targeted baseline.
 [Binary evidence](experiments/extended-cli-metadata/division-validation.json).
+
+## Shared signed remainder — 2026-10-01
+
+The shared lowered-body planner now models signed remainder for Int32/Int64. Both
+backend profiles admit it and map to CLI/native rem; the separate metadata library
+adds OpCode.Rem and MethodBuilder.Remainder with matching-width stack validation.
+No binder/language semantics or Runtime Contract options change. Source '%' already
+worked through the general .NET generator; it now shares the bounded path and native
+emission. Debug/general fallback remains available on .NET.
+
+This follows the [.NET rem instruction contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.rem?view=net-10.0)
+(consulted 2026-10-01): ordinary remainder keeps the dividend's sign. Zero divisors
+fault. The existing native runtime also faults on minimum/-1, as does the tested CLR;
+.NET documents that overflow edge as platform-sensitive, so universal host equivalence
+is not claimed. Reusing rem avoids a division/multiplication expansion and extra
+intermediates, but performance is not benchmarked. Unsigned/floating operands and
+exception-region emission remain outside this bounded producer. Metadata signatures,
+the temporary reference projection and #Neo execution transport are unchanged.
+
+Validation: 42 C# metadata groups, API snapshot check, 38 focused Raven shared-body/
+capability tests and the complete binary runtime/rvnc probe pass. Raven `2e03b8dd0`
+runs both quotient and remainder result programs, plus eight Int32/Int64 zero/overflow
+fault programs against .NET and neoCLR. Native fault cases pass binary verification
+before failing execution. [Recorded evidence](experiments/extended-cli-metadata/remainder-validation.json).

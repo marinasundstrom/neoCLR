@@ -454,3 +454,5 @@ The host reference covers TypeVisibility, the explicit AddType overload and
 TypeBuilder.Visibility, including native/reference projection consistency.
 
 The host reference includes OpCode.Div and MethodBuilder.Divide with typed stack and execution-fault contracts.
+
+OpCode.Rem and MethodBuilder.Remainder are covered in the same host reference, including the CLR edge-case qualification.

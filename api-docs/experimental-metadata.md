@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Signed remainder](#signed-remainder-development-2026-10-01): dividend-signed Int32/Int64 remainder.
 - [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
 - [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
 - [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
@@ -1148,6 +1149,7 @@ public sealed class MethodBuilder
     public void Subtract();
     public void Multiply();
     public void Divide();
+    public void Remainder();
     public void Call(MethodBuilder target);
     public void Return();
     public void ClearBody();
@@ -1610,7 +1612,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div, Rem }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1625,7 +1627,7 @@ public sealed partial class MethodBuilder {
 | Ldc_I4 | int | Push a signed Int32 constant. |
 | Pop | none | Discard one value of either supported primitive type; empty stack rejects when writing. |
 | Ldarg | int | Load the zero-based declared primitive argument; bounds checked when writing. |
-| Add, Sub, Mul, Div | none | Consume matching Int32/Int64 values and push the same-width arithmetic result. |
+| Add, Sub, Mul, Div, Rem | none | Consume matching Int32/Int64 values and push the same-width arithmetic result. |
 | Call | MethodBuilder | Use the target signature; external core/identity constraints checked when writing. |
 | Call | ImportedMethodReference | Must belong to the consuming assembly builder. |
 | Call | NativeFunctionDefinition | Native-only static Int32 System callable; matching System must be supplied at runtime. |
@@ -1980,3 +1982,18 @@ signed value by -1 is legal to emit but faults when executed (CLR arithmetic
 exceptions; neoCLR DivideByZero/ArithmeticOverflow faults). Neither helper performs
 constant evaluation. No unsigned, floating or checked-context overload is provided.
 Existing signature metadata and native transport are unchanged.
+
+
+### Signed remainder (development 2026-10-01)
+
+`OpCode.Rem` and `void MethodBuilder.Remainder()` append operand-free signed remainder;
+`Emit(OpCode.Rem)` is equivalent. The typed stack rules and failures match Div: two
+matching Int32/Int64 operands become one value of the same width. Invalid stacks
+raise InvalidDataException when writing; operand-bearing overloads reject Rem with
+ArgumentException. Rem is appended to the enum without renumbering previous members.
+
+Ordinary nonzero results have the dividend's sign and smaller magnitude than the
+divisor. Both writers use existing rem instructions. Zero divisors fault at execution;
+neoCLR also faults on minimum/-1. CLI output follows the host CLR's rem behavior
+(the tested host faults for minimum/-1 too; .NET documents this edge as platform
+sensitive). No unsigned/floating remainder or new exception handling is added.
