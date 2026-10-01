@@ -65,6 +65,7 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Integer shifts and count width validation", ShiftChecks.Run),
     ("Integer bitwise operations and operand validation", BitOperationChecks.Run),
     ("Signed integer remainder results and faults", IntegerArithmeticChecks.Remainder),
     ("Signed integer division results and faults", IntegerArithmeticChecks.Division),

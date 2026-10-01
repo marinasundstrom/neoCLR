@@ -458,3 +458,5 @@ The host reference includes OpCode.Div and MethodBuilder.Divide with typed stack
 OpCode.Rem and MethodBuilder.Remainder are covered in the same host reference, including the CLR edge-case qualification.
 
 And/Or/Xor and BitwiseAnd/BitwiseOr/BitwiseXor are covered in the manual host reference.
+
+Shl/Shr and ShiftLeft/ShiftRight include count-width validation and the CLI/native out-of-range count distinction in the manual host reference.

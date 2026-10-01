@@ -1413,3 +1413,29 @@ Validation: 43 C# metadata groups and the API snapshot check pass. Raven `9885ca
 passes 41 focused shared-body/capability tests and the complete binary native/rvnc
 probe, including all three operators at both widths with negative and wide values.
 [Binary evidence](experiments/extended-cli-metadata/bitwise-validation.json).
+
+## Shared integer shifts — 2026-10-01
+
+Raven's shared planner and both capability profiles now admit left and signed-right
+shifts of Int32/Int64 by an Int32 count. The metadata API adds Shl/Shr and
+ShiftLeft/ShiftRight; its stack validator preserves the value width while consuming
+the narrower count. Existing CLI/native encodings are reused, without a Runtime
+Contract option or runtime change. The semantic intent is existing Raven shift
+behavior; this slice changes emission coverage, not binding or language policy.
+
+[CLI shift rules](https://download.microsoft.com/download/7/3/3/733ad403-90b2-4064-a81e-01035a7fe13c/ms%20partition%20iii.pdf)
+(Partition III, shl/shr; consulted 2026-10-01) leave out-of-range counts unspecified.
+neoCLR's existing runtime masks counts to the width. Preserve this difference rather
+than silently adding masks to ordinary .NET output. A caller can request portable
+masking explicitly with AND. In-range counts share discarded-bit/sign-extension
+behavior. Compared with synthesizing shifts using arithmetic or helper calls, direct
+instructions preserve the runtime contract and keep mapping small; no performance
+claim is made. Unsigned/native-sized shifts and portable count policy remain open.
+The native payload/reference bridge and deferred metadata importer remain unchanged.
+
+Validation: 44 C# metadata groups and API snapshot check pass. Raven `7f8d91b35`
+passes 45 focused shared-body/capability tests and the full binary native/rvnc probe.
+The paired program covers sign extension, lost high bits, zero and 31/63-bit counts,
+and Int64 values with Int32 counts. Unsupported floating conversion validates precise
+source diagnostics and preserved output after shifts become supported.
+[Binary evidence](experiments/extended-cli-metadata/shifts-validation.json).

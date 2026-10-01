@@ -9,7 +9,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-10-01
 
 - Add typed Int32/Int64 AND, OR and XOR to the metadata writer and shared Raven
-  emission on both targets, using existing CLI/native instructions.
+  emission on both targets, using existing CLI/native instructions. Add left and signed
+  right shifts with Int32 counts; retain CLI-unspecified/native-masked out-of-range counts.
 
 - Add typed signed division to the independent metadata API and Raven native emission.
   Reuse CLI/native div encodings and runtime zero/overflow faults for Int32 and Int64.

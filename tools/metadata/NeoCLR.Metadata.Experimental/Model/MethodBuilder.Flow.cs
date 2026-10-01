@@ -107,6 +107,11 @@ public sealed partial class MethodBuilder
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
                     stack.Add(locals[instruction.Value].Type); break;
                 case "local.store": Pop(locals[instruction.Value].Type); assigned[instruction.Value] = true; break;
+                case "shift.left": case "shift.right":
+                    Pop(PrimitiveType.Int32);
+                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                        throw new InvalidDataException("shift requires an Int32/Int64 value and Int32 count");
+                    break;
                 case "add": case "subtract": case "multiply": case "divide": case "remainder": case "and": case "or": case "xor": case "less": case "greater":
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("integer operands required");

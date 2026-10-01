@@ -216,6 +216,8 @@ public sealed partial class AssemblyBuilder
                     case "and": code.WriteByte(0x5f); break;
                     case "or": code.WriteByte(0x60); break;
                     case "xor": code.WriteByte(0x61); break;
+                    case "shift.left": code.WriteByte(0x62); break;
+                    case "shift.right": code.WriteByte(0x63); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
@@ -383,6 +385,12 @@ public sealed partial class MethodBuilder
     public void BitwiseOr() => Emit(OpCode.Or);
     /// <summary>Appends bitwise XOR of matching Int32/Int64 operands.</summary>
     public void BitwiseXor() => Emit(OpCode.Xor);
+    /// <summary>Appends an Int32/Int64 left shift with an Int32 count.</summary>
+    /// <remarks>CLI out-of-range counts are unspecified; native counts are masked to 5 or 6 bits.</remarks>
+    public void ShiftLeft() => Emit(OpCode.Shl);
+    /// <summary>Appends a sign-extending Int32/Int64 right shift with an Int32 count.</summary>
+    /// <remarks>CLI out-of-range counts are unspecified; native counts are masked to 5 or 6 bits.</remarks>
+    public void ShiftRight() => Emit(OpCode.Shr);
     /// <summary>Appends a call; foreign methods are imported during Write.</summary>
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>

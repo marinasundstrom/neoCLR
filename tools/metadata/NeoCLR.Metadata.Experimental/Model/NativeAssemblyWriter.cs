@@ -77,6 +77,8 @@ public sealed partial class AssemblyBuilder
             "and" => new { op = "and" },
             "or" => new { op = "or" },
             "xor" => new { op = "xor" },
+            "shift.left" => new { op = "shl" },
+            "shift.right" => new { op = "shr" },
             "return" => new { op = "ret" },
             _ => throw new InvalidDataException("unsupported instruction")
         };

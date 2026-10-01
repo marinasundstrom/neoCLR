@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Integer shifts](#integer-shifts-development-2026-10-01): Shl/Shr with Int32 counts.
 - [Integer bitwise operations](#integer-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
 - [Signed remainder](#signed-remainder-development-2026-10-01): dividend-signed Int32/Int64 remainder.
 - [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
@@ -1154,6 +1155,8 @@ public sealed class MethodBuilder
     public void BitwiseAnd();
     public void BitwiseOr();
     public void BitwiseXor();
+    public void ShiftLeft();
+    public void ShiftRight();
     public void Call(MethodBuilder target);
     public void Return();
     public void ClearBody();
@@ -1616,7 +1619,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div, Rem, And, Or, Xor }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg, Div, Rem, And, Or, Xor, Shl, Shr }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -2015,3 +2018,20 @@ Writing rejects underflow, mixed widths, Boolean or String operands with
 InvalidDataException. Operand-bearing Emit overloads reject these opcodes with
 ArgumentException; the instruction limit still applies. New enum values are appended.
 Boolean and enum bitwise semantics are not added to this bounded producer.
+
+
+### Integer shifts (development 2026-10-01)
+
+`OpCode.Shl`/`Shr` and `void MethodBuilder.ShiftLeft()`/`ShiftRight()` consume an
+Int32 count above an Int32 or Int64 value and leave a result with the value's width.
+`Emit(opCode)` is equivalent. Left shifts discard high bits; signed right shifts
+replicate the sign bit. No unsigned shift is included. Counts are stack values,
+not Emit operands. Operand-bearing overloads reject Shl/Shr with ArgumentException.
+Writing rejects missing operands, an Int64 count or a Boolean/String value with
+InvalidDataException; count values are not range-checked by the writer.
+
+These map directly to standard CLI/native shl/shr. For counts 0–31 or 0–63 respectively,
+results agree. CLI results for negative/oversized counts are unspecified; native
+execution keeps its existing count masking (low 5 or 6 bits). Callers needing portable
+masked semantics can emit an explicit AND on the count before shifting. The API does
+not insert that policy or change ordinary .NET codegen. The enum values are appended.
