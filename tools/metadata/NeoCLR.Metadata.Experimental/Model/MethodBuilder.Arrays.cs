@@ -14,12 +14,12 @@ public sealed partial class MethodBuilder
         if (opCode == OpCode.Initobj)
         {
             if (elementType.Primitive == PrimitiveType.Void) throw new ArgumentException("initialization requires a value type", nameof(elementType));
-            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count);
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
             Append(new("local.initialize", Type: elementType));
             return;
         }
         _ = SignatureType.ArrayOf(elementType);
-        elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count);
+        elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         Append(new(opCode switch
         {
             OpCode.Newarr => "array.new",

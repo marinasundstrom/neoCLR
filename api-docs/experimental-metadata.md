@@ -2628,3 +2628,39 @@ CLI uses ldloca/initobj/ldloc with TypeSpec for generic/vector operands; native 
 same logical operations. Numeric defaults are zero, Boolean false, and reference
 (string/class/vector) defaults are typed null references. This does not add nullable
 source syntax or general pointer/byref APIs.
+
+### Static generic owners (development)
+
+`AssemblyBuilder.AddGenericType(string namespace, string name,
+IEnumerable<string> genericParameterNames, TypeVisibility visibility = Public)` creates
+an owned static class with one through 32 copied, unique parameter names. It appends
+the CLI arity suffix to Name (for example Helpers`1); the input simple name must not
+contain a backtick. Invalid/duplicate names or limits throw ArgumentException; null
+parameter sequences throw ArgumentNullException. `TypeBuilder.GenericParameterNames`
+is an immutable ordinal list. Generic instance types, fields and properties are outside
+this slice; generic owners expose static methods only.
+
+`SignatureType.TypeParameter(int index)` and nullable `TypeParameterIndex` represent
+VAR independently from method MVAR. Index bounds are 0–31 (ArgumentOutOfRangeException);
+method signatures, locals and typed instruction operands validate the declaring-type
+scope. Assembly functions cannot use VAR. Entries cannot belong to a generic owner.
+
+`MethodBuilder.MakeConstructedReference(IEnumerable<SignatureType> declaringTypeArguments,
+IEnumerable<SignatureType>? methodArguments = null)` binds a static generic owner and
+all method parameters together. It returns immutable `ConstructedMethodReference`
+with `Definition`, copied `DeclaringTypeArguments`, copied `MethodArguments` and the
+simultaneously substituted `Signature`. Null owner argument sequences throw
+ArgumentNullException. Wrong arity, Void/null/foreign arguments, nonstatic/nongeneric
+owners or nested array substitution throw ArgumentException. Supplied caller parameters
+are validated in the caller scope when emitted; substitution does not capture them.
+`Call(ConstructedMethodReference)` and `Emit(OpCode.Call, ConstructedMethodReference)`
+require an owned target and supported caller scope; null throws ArgumentNullException,
+invalid opcode/ownership/scope throws ArgumentException, and instruction/stack failures
+use InvalidDataException. Open-owner Call and MakeGenericInstance are rejected: bind
+owner and method arguments together even when the method itself is nongeneric.
+
+CLI uses GenericParam/VAR and a MemberRef on a constructed TypeSpec, optionally wrapped
+in MethodSpec. Native definitions use open Constructed owners and explicit TypeParameter
+ordinals; calls substitute owner and method arguments independently. The native reader
+retains arities/names and validates open ownership before creating a reference projection.
+These are owned-output references; external generic imports are still unsupported.

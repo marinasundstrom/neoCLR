@@ -29,10 +29,10 @@ public sealed partial class MethodBuilder
     public GenericMethodInstance MakeGenericInstance(params SignatureType[] typeArguments)
     {
         ArgumentNullException.ThrowIfNull(typeArguments);
-        if (IsConstructor || Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Signature.GenericParameterNames.Count ||
+        if (DeclaringType?.GenericParameterNames.Count > 0 || IsConstructor || Signature.GenericParameterNames.Count == 0 || typeArguments.Length != Signature.GenericParameterNames.Count ||
             typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void))
             throw new ArgumentException("generic type arguments must match the definition", nameof(typeArguments));
-        foreach (var type in typeArguments) type.ValidateOwner(Assembly, 32);
+        foreach (var type in typeArguments) type.ValidateOwner(Assembly, 32, 32);
         return new(this, (SignatureType[])typeArguments.Clone());
     }
     /// <summary>Appends a call to an instantiated generic method in this output.</summary>
@@ -52,7 +52,7 @@ public sealed partial class MethodBuilder
         ArgumentNullException.ThrowIfNull(operand);
         RequireCall(opCode);
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("generic calls require an owned definition", nameof(operand));
-        foreach (var type in operand.TypeArguments) type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count);
+        foreach (var type in operand.TypeArguments) type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
         Append(new("call.generic", Target: operand.Definition, GenericTarget: operand));
     }
 }

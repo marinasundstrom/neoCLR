@@ -37,6 +37,7 @@ public sealed partial class TypeBuilder
     /// <remarks>At least one accessor is required. Index parameters are inferred from accessors and copied. Both must agree on index types and instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
     public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
+        if (GenericParameterNames.Count != 0) throw new ArgumentException("generic owner properties are not yet supported");
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||

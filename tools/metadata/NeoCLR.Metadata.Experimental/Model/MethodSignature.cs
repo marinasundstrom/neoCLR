@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An immutable primitive, owned root-class, method-parameter or vector signature type.</summary>
 public sealed record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null) { Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null) { Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
     /// <summary>Gets the exact owned class identity, or null for a primitive or vector.</summary>
@@ -28,10 +28,18 @@ public sealed record SignatureType
     /// <exception cref="ArgumentOutOfRangeException">Index is outside the supported range.</exception>
     public static SignatureType MethodParameter(int index)
         => index is >= 0 and < 32 ? new(null, null, methodParameter: index) : throw new ArgumentOutOfRangeException(nameof(index));
-    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0)
+    /// <summary>Gets the positional declaring-type parameter, or null.</summary>
+    public int? TypeParameterIndex { get; }
+    /// <summary>Creates a VAR reference scoped to a generic declaring type.</summary>
+    /// <param name="index">Zero-based index, 0 through 31.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Index outside the supported range.</exception>
+    public static SignatureType TypeParameter(int index)
+        => index is >= 0 and < 32 ? new(null, null, typeParameter: index) : throw new ArgumentOutOfRangeException(nameof(index));
+    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0)
     {
         if (MethodParameterIndex is { } index && index >= genericArity) throw new ArgumentException("method type parameter outside declared scope");
-        ArrayElement?.ValidateOwner(assembly, genericArity);
+        if (TypeParameterIndex is { } ordinal && ordinal >= typeArity) throw new ArgumentException("type parameter outside declared scope");
+        ArrayElement?.ValidateOwner(assembly, genericArity, typeArity);
         if ((ArrayElement?.ClassType ?? ClassType) is { } owner && !ReferenceEquals(owner.Assembly, assembly))
             throw new ArgumentException("signature requires a class owned by the output assembly");
     }
@@ -46,7 +54,7 @@ public sealed record SignatureType
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
@@ -83,9 +91,9 @@ public class MethodSignature
     public SignatureType ReturnType { get; }
     /// <summary>Gets declared parameters, excluding the receiver.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
-    internal void ValidateOwner(AssemblyBuilder assembly)
+    internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0)
     {
-        foreach (var type in ParameterTypes.Append(ReturnType)) type.ValidateOwner(assembly, GenericParameterNames.Count);
+        foreach (var type in ParameterTypes.Append(ReturnType)) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity);
     }
     internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
 }

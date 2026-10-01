@@ -2368,3 +2368,12 @@ Clearing an Order vector and dereferencing an element raises a null-reference fa
 both. C# Release/Debug tests validate defaults and capability denial. Reference-loading,
 nullable-source signatures and general byref contracts remain deferred; this is direct
 emission using the existing .NET binding bootstrap. [Evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
+
+Static generic owner producer slice (2026-10-01): independent declaring-type and method
+parameter scopes now emit ordinary CLI VAR/MVAR, constructed TypeSpec/MemberRef and
+MethodSpec calls. Native open/constructed owner records already support this behavior;
+C# producer binaries verify/run 42 without a runtime change. Reference projection
+retains type/method arities. This follows the existing [generic metadata contract](generic-metadata.md)
+rather than flattening owner parameters into method parameters, which would lose type
+identity. Generic instance type layouts and fields remain the next larger boundary;
+Raven source integration follows this API slice.

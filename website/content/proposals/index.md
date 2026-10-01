@@ -301,3 +301,7 @@ method parameters, with CLI/native execution tests and definite-assignment check
 Raven's shared emission path now uses that initialization contract for default(T)
 and generic array clearing; binary consumers verify numeric defaults and null-reference
 faults after clearing object elements on .NET and neoCLR.
+
+The development producer now supports static generic type owners with separate type/
+method parameter scopes and constructed method references. Generic instance layouts
+and fields remain future work in this direct emission API.

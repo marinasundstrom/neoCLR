@@ -89,7 +89,7 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
             if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null))
@@ -122,12 +122,26 @@ public sealed partial class AssemblyBuilder
     /// <remarks>CLI base is System.Object. Native root classes have no declared base. Constructors are not synthesized.</remarks>
     public TypeBuilder AddClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, isStatic: false);
-    private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic)
+    /// <summary>Adds an unconstrained static generic class, appending CLI arity to its name.</summary>
+    /// <param name="namespace">Namespace, possibly empty.</param>
+    /// <param name="name">Simple name without an arity suffix.</param>
+    /// <param name="genericParameterNames">One through 32 unique parameter names.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <exception cref="ArgumentException">Invalid name, parameters, duplicate type or limit exceeded.</exception>
+    /// <exception cref="ArgumentNullException">Parameter names are null.</exception>
+    public TypeBuilder AddGenericType(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(genericParameterNames);
+        var names = new MethodSignature(PrimitiveType.Void, [], genericParameterNames).GenericParameterNames;
+        if (string.IsNullOrEmpty(name) || name.Contains('`') || names.Count == 0) throw new ArgumentException("generic type requires a simple name and parameters");
+        return AddTypeCore(@namespace, name + "`" + names.Count, visibility, true, names);
+    }
+    private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic, IReadOnlyList<string>? genericNames = null)
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
             types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
-        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic); types.Add(type); return type;
+        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames); types.Add(type); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
@@ -172,7 +186,7 @@ public sealed partial class AssemblyBuilder
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
-            if (type.MethodParameterIndex is not null || type.ArrayElement is not null)
+            if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
             {
                 if (!elementSpecs.TryGetValue(type, out var spec))
                 {
@@ -192,6 +206,7 @@ public sealed partial class AssemblyBuilder
         }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.TypeParameterIndex is { } ordinal) { encoder.GenericTypeParameter(ordinal); return; }
             if (type.MethodParameterIndex is { } index) { encoder.GenericMethodTypeParameter(index); return; }
             if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
             if (type.ClassType is { } owner) { encoder.Type(typeHandles[owner], false); return; }
@@ -251,6 +266,29 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
+        var ownerSpecs = new Dictionary<BlobHandle, TypeSpecificationHandle>();
+        var ownerMembers = new Dictionary<(MethodBuilder Method, TypeSpecificationHandle Owner), MemberReferenceHandle>();
+        var ownerMethodSpecs = new Dictionary<(MemberReferenceHandle Member, BlobHandle Arguments), MethodSpecificationHandle>();
+        int ConstructedCallToken(ConstructedMethodReference reference)
+        {
+            var ownerBlob = new BlobBuilder();
+            var arguments = new BlobEncoder(ownerBlob).TypeSpecificationSignature().GenericInstantiation(typeHandles[reference.Definition.DeclaringType!], reference.DeclaringTypeArguments.Count, false);
+            foreach (var type in reference.DeclaringTypeArguments) EncodeType(arguments.AddArgument(), type);
+            var ownerKey = metadata.GetOrAddBlob(ownerBlob);
+            if (!ownerSpecs.TryGetValue(ownerKey, out var owner)) { owner = metadata.AddTypeSpecification(ownerKey); ownerSpecs.Add(ownerKey, owner); }
+            var memberKey = (reference.Definition, owner);
+            if (!ownerMembers.TryGetValue(memberKey, out var member))
+            {
+                member = metadata.AddMemberReference(owner, metadata.GetOrAddString(reference.Definition.CliName), Signature(reference.Definition));
+                ownerMembers.Add(memberKey, member);
+            }
+            if (reference.MethodArguments.Count == 0) return MetadataTokens.GetToken(member);
+            var methodBlob = new BlobBuilder(); var methodArguments = new BlobEncoder(methodBlob).MethodSpecificationSignature(reference.MethodArguments.Count);
+            foreach (var type in reference.MethodArguments) EncodeType(methodArguments.AddArgument(), type);
+            var methodKey = (member, metadata.GetOrAddBlob(methodBlob));
+            if (!ownerMethodSpecs.TryGetValue(methodKey, out var spec)) { spec = metadata.AddMethodSpecification(member, methodKey.Item2); ownerMethodSpecs.Add(methodKey, spec); }
+            return MetadataTokens.GetToken(spec);
+        }
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
@@ -259,6 +297,7 @@ public sealed partial class AssemblyBuilder
             MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
         int nextField = 1;
         int nextMethod = 1;
+        var genericRows = new List<(EntityHandle Owner, int Sort, IReadOnlyList<string> Names)>();
         void EmitMethod(MethodBuilder method)
         {
             var code = new BlobBuilder();
@@ -266,7 +305,7 @@ public sealed partial class AssemblyBuilder
             offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2, _ => 1
@@ -323,6 +362,7 @@ public sealed partial class AssemblyBuilder
                     case "xor": code.WriteByte(0x61); break;
                     case "shift.left": code.WriteByte(0x62); break;
                     case "shift.right": code.WriteByte(0x63); break;
+                    case "call.constructed": code.WriteByte(0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
@@ -341,8 +381,7 @@ public sealed partial class AssemblyBuilder
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
-            for (int i = 0; i < method.Signature.GenericParameterNames.Count; i++)
-                metadata.AddGenericParameter(handles[method], GenericParameterAttributes.None, metadata.GetOrAddString(method.Signature.GenericParameterNames[i]), i);
+            genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
             nextMethod++;
         }
         foreach (var function in functions) EmitMethod(function);
@@ -351,6 +390,7 @@ public sealed partial class AssemblyBuilder
             var typeHandle = metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
                 metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
+            genericRows.Add((typeHandle, MetadataTokens.GetRowNumber(typeHandle) * 2, type.GenericParameterNames));
             foreach (var field in type.Fields)
             {
                 var signature = new BlobBuilder();
@@ -382,6 +422,8 @@ public sealed partial class AssemblyBuilder
                 if (property.SetMethod is { } setter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Setter, handles[setter]);
             }
         }
+        foreach (var row in genericRows.OrderBy(r => r.Sort))
+            for (int i = 0; i < row.Names.Count; i++) metadata.AddGenericParameter(row.Owner, GenericParameterAttributes.None, metadata.GetOrAddString(row.Names[i]), i);
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),
             new MetadataRootBuilder(metadata), bodies, entryPoint: referenceOnly || EntryPoint is null ? default : handles[EntryPoint],
@@ -405,7 +447,9 @@ public enum TypeVisibility
 public sealed partial class TypeBuilder
 {
     private readonly List<MethodBuilder> methods = [];
-    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true) { Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null) { GenericParameterNames = genericNames ?? Array.Empty<string>(); Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
+    /// <summary>Gets immutable declaring-type parameter names in ordinal order.</summary>
+    public IReadOnlyList<string> GenericParameterNames { get; }
     /// <summary>Gets whether this is an abstract sealed static class.</summary>
     public bool IsStatic { get; }
     /// <summary>Gets the declared top-level visibility.</summary>
@@ -481,7 +525,7 @@ public sealed partial class TypeBuilder
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
-        signature.ValidateOwner(Assembly);
+        signature.ValidateOwner(Assembly, GenericParameterNames.Count);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");
@@ -503,7 +547,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null);
     internal List<Operation> Instructions { get; } = [];
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

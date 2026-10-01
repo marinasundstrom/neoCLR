@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields, string[] GenericNames);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
@@ -68,6 +68,8 @@ public sealed class NativeAssemblyDefinition
             foreach (var type in typeElements)
             {
                 var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
+                var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
+                if (type.TryGetProperty("generic_parameters", out _)) typeFields.Add("generic_parameters");
                 if (type.TryGetProperty("properties", out _)) typeFields.Add("properties");
                 var propertyElements = type.TryGetProperty("properties", out _) ? Array(type, "properties", 256) : [];
                 var visibility = TypeVisibility.Public;
@@ -83,6 +85,7 @@ public sealed class NativeAssemblyDefinition
                 Shape(type, typeFields.ToArray());
                 var isStatic = type.GetProperty("is_abstract").GetBoolean();
                 Require(type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_sealed").GetBoolean() == isStatic, "unsupported native type shape");
+                Require(typeNames.Length == 0 || isStatic && propertyElements.Length == 0, "only static generic owners without properties supported");
                 var fieldRows = new List<FieldRow>();
                 foreach (var field in Array(type, "fields", 256))
                 {
@@ -101,6 +104,7 @@ public sealed class NativeAssemblyDefinition
                 var parts = nativeName[prefix.Length..].Split('_'); Require(parts.Length == 2, "invalid native type name");
                 var ns = Decode(parts[0]); var name = Decode(parts[1]);
                 Require(name.Length > 0 && name != "<Module>" && ns.Length + name.Length <= 1024 && types.All(t => t.NativeName != nativeName), "invalid or duplicate native type");
+                Require(typeNames.Length == 0 || name.EndsWith("`" + typeNames.Length, StringComparison.Ordinal), "generic owner arity name mismatch");
                 CheckName(ns.Length == 0 ? name : ns + "." + name);
                 var origin = type.GetProperty("origin");
                 var originFields = new List<string> { "assembly", "module", "name", "token", "publicly_visible" };
@@ -130,15 +134,21 @@ public sealed class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray()));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, fieldRows.ToArray(), typeNames));
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
-            var signatureOwners = types.Select(t => t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
-            int genericArity = 0;
+            var signatureOwners = types.Select(t => t.GenericNames.Length > 0 ? signatureGraph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames) : t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
+            int genericArity = 0; int typeArity = 0;
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true)
             {
                 if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
+                if (element.TryGetProperty("TypeParameter", out var typeParameter))
+                {
+                    Shape(element, "TypeParameter");
+                    int ordinal = typeParameter.GetInt32(); Require(ordinal >= 0 && ordinal < typeArity, "type parameter outside scope");
+                    return SignatureType.TypeParameter(ordinal);
+                }
                 if (element.TryGetProperty("MethodTypeParameter", out var parameter))
                 {
                     Shape(element, "MethodTypeParameter");
@@ -157,7 +167,7 @@ public sealed class NativeAssemblyDefinition
             }
             foreach (var type in types)
                 foreach (var field in type.Fields) _ = ReadType(field.Type, false);
-            string TypeKey(SignatureType type) => type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -195,11 +205,23 @@ public sealed class NativeAssemblyDefinition
                 var owner = method.GetProperty("owner"); int ownerIndex = -1;
                 if (owner.ValueKind != JsonValueKind.Null)
                 {
-                    Shape(owner, "Named"); var ownerName = Text(owner, "Named");
+                    var constructed = owner.TryGetProperty("Constructed", out var construction);
+                    Shape(owner, constructed ? "Constructed" : "Named");
+                    if (constructed) Shape(construction, "definition", "arguments");
+                    var ownerName = constructed ? Text(construction, "definition") : Text(owner, "Named");
                     ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
+                    var arity = types[ownerIndex].GenericNames.Length;
+                    Require(constructed == (arity > 0), "open owner construction required");
+                    if (constructed)
+                    {
+                        var arguments = Array(construction, "arguments", 32);
+                        Require(arguments.Length == arity, "owner argument count mismatch");
+                        for (int i = 0; i < arguments.Length; i++) { Shape(arguments[i], "TypeParameter"); Require(arguments[i].GetProperty("TypeParameter").GetInt32() == i, "method owner must be open definition"); }
+                    }
                 }
                 else Require(methods.All(m => m.Owner < 0), "global functions must precede type methods");
                 Require(methods.Count == 0 || methods[^1].Owner <= ownerIndex, "native owner declaration order mismatch");
+                typeArity = ownerIndex < 0 ? 0 : types[ownerIndex].GenericNames.Length;
                 if (method.TryGetProperty("locals", out _))
                     foreach (var local in Array(method, "locals", 256)) _ = ReadType(local, false);
                 var parameters = Array(method, "parameters", 256);
@@ -223,7 +245,7 @@ public sealed class NativeAssemblyDefinition
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
                 methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames), visibility, instance)); methodNames.Add(expectedName);
             }
-            genericArity = 0;
+            genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
             var usedAccessors = new HashSet<int>();
             for (int owner = 0; owner < typeElements.Length; owner++)
@@ -260,7 +282,7 @@ public sealed class NativeAssemblyDefinition
             var entry = Text(root, "entry");
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
             return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray());
@@ -280,7 +302,7 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
+        var owners = types.Select(t => t.GenericNames.Length > 0 ? graph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility) : t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
             : owners[System.Array.FindIndex(types, row => row.NativeName == Text(type, "Named"))];

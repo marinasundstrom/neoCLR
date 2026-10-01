@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add bounded static generic type definitions and constructed-owner method references
+  to the metadata producer. Preserve independent VAR/MVAR scope, sorted GenericParam
+  rows, TypeSpec/MemberRef/MethodSpec calls and native constructed owners through CLI
+  reference projection. API binaries verify/run 42; generic object layouts remain out
+  of scope. No native runtime format change is required.
+
 - Add typed local addresses and initialization to the metadata API (`Ldloca`, `Initobj`,
   `LoadDefault`). Validate local identity, exact initialization type and definite
   assignment; addresses cannot escape through the bounded value signatures. Ordinary

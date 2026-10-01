@@ -508,3 +508,7 @@ RavenDoc input types.
 
 Host metadata local-address/default helpers and Ldloca/Initobj are documented in the
 manual experimental reference, outside RavenDoc's Raven type selection.
+
+The C# static-generic-owner APIs (AddGenericType, TypeParameter and
+ConstructedMethodReference) use the linked experimental manual reference and remain
+outside RavenDoc's Raven source type selection.
