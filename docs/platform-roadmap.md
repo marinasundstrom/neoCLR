@@ -47,7 +47,8 @@ through shared visibility admission and preserves access in compiler references.
 Block and expression bodies now share compiler lowering and execute on both targets.
 Eager Boolean AND/OR/XOR now share that path with exact Boolean metadata/runtime
 operands; mixed Boolean/integer inputs remain invalid.
-Primitive value-producing if/else now shares typed branch joins on both backends.
+Primitive value-producing if/else now shares typed branch joins on both backends;
+value blocks also permit initialized locals, assignments and calls before the result.
 General object/field and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 

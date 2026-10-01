@@ -10,6 +10,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add shared Raven emission of primitive conditional values; verify binary execution
   with typed branch joins, nested selections and skipped faulting/side-effecting branches.
+  Value blocks now permit initialized locals, assignments and calls before their result;
+  unsupported prefix control flow and disposal remain explicit bounded limitations.
 
 - Support exact Boolean operands for native and/or/xor in runtime execution and
   verification; retain mixed-type and Boolean arithmetic rejection. The independent

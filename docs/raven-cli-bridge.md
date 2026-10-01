@@ -1576,3 +1576,22 @@ Debug conditional tests pass. The full binary runtime/rvnc probe passes against
 metadata `83200ad6` and runtime `fa25609d`, covering both alternatives, nested values,
 all four primitive types and skipped faulting/side-effecting branches.
 [Recorded evidence](experiments/extended-cli-metadata/conditional-values-raven-validation.json).
+
+
+## Local computation in value blocks — 2026-10-01
+
+Raven `bccfd3507` extends the shared plan with initialized locals, local assignments
+and calls before a value block's trailing primitive expression. Existing statement
+emission handles these operations and discards unused call results. Symbol-based
+local identities keep same-named locals in different branches distinct. .NET and
+neoCLR execute only the selected branch, including updates to outer local storage.
+This reuses existing CLI/native local and branch operations; no metadata API/schema,
+runtime code or Runtime Contract configuration changes. Disposal and prefix control
+flow remain bounded-plan limitations; the ordinary .NET fallback remains available.
+Native symbol loading remains deferred and the CLI reference projection is unchanged.
+
+Validation: 52 focused Raven C# tests and the full binary runtime/rvnc probe pass.
+Both branches execute with distinct locals and outer assignments; prefix loops reject
+before output writes. [Recorded evidence](experiments/extended-cli-metadata/value-block-raven-validation.json).
+No performance improvement is claimed; metadata/runtime evidence from unchanged
+components remains applicable.
