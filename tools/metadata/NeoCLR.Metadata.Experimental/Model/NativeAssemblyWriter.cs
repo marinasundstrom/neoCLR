@@ -154,7 +154,7 @@ public sealed partial class AssemblyBuilder
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
                 TypeOrigin(type, index),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = System.Array.Empty<string>(), ty = p.PropertyType.ToString(), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray())).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = System.Array.Empty<string>(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => local.ClassType is { } type ? (object)new { Named = TypeName(type) } : local.Type!.Value.ToString()).ToArray(),

@@ -2261,10 +2261,11 @@ Reference projections preserve instance signatures and constructor flags with th
 bodies; executable native bodies still reside in the required #Neo payload.
 
 No constructor is synthesized. Inheritance, virtual dispatch, constructor chaining,
-indexed properties, nominal parameters/results/locals and instance snapshot
-imports remain outside this bounded producer. The C# fixture constructs an Order,
+indexed properties and external instance snapshot imports remain outside this bounded
+producer. Owned nominal parameters/results/locals, fields and properties are supported. The C# fixture constructs an Order,
 mutates it through one alias and reads through another; both targets return 42.
-This does not yet compile Raven's actual Order declaration.
+The separate Raven Order integration now compiles the unchanged declaration; see the
+[bridge evidence](../docs/raven-cli-bridge.md).
 
 ## Primitive property associations
 
@@ -2272,12 +2273,12 @@ Development host API (2026-10-01):
 
 ```csharp
 IReadOnlyList<PropertyBuilder> TypeBuilder.Properties { get; }
-PropertyBuilder TypeBuilder.AddProperty(string name, PrimitiveType type,
+PropertyBuilder TypeBuilder.AddProperty(string name, SignatureType type,
     MethodBuilder? getter = null, MethodBuilder? setter = null);
 ```
 
 PropertyBuilder exposes DeclaringType (TypeBuilder), Name (string), PropertyType
-(PrimitiveType), GetMethod/SetMethod (nullable MethodBuilder), and IsStatic (bool).
+(SignatureType), GetMethod/SetMethod (nullable MethodBuilder), and IsStatic (bool).
 These immutable associations add no storage or bodies. Accessors must already belong
 to the same type, be ordinary methods and agree on static/instance shape. The getter
 has no declared parameters and returns the property type; the setter takes one value
@@ -2285,7 +2286,10 @@ of that type and returns Void. At least one accessor is required. Accessor visib
 is preserved independently, including private setters. Ordinary accessor names are
 allowed; CLI emission adds SpecialName to associated methods.
 
-Only non-indexed Int32/Int64/Boolean/String properties are supported. A unique nonblank
+Non-indexed Int32/Int64/Boolean/String and owned root-class properties are supported.
+Nominal types must belong to the output assembly; null throws ArgumentNullException,
+and Void/foreign types throw ArgumentException before mutation. Accessor signatures
+must use the exact same owned class identity. A unique nonblank
 name has at most 1024 characters, no control characters or invalid Unicode. Invalid
 contracts, duplicate names, accessors already associated with another property and
 more than 256 properties per type throw ArgumentException before mutation. Writing
@@ -2298,7 +2302,14 @@ and exact origin Property tokens. The reader checks signature, owner, instance s
 accessor existence, uniqueness and origins before constructing a throwing reference
 projection. Outputs without properties retain their previous encoding. New property
 outputs require the matching bounded reader. Properties do not imply backing fields;
-indexed/generic/nominal properties, attributes and default values remain unsupported.
+indexed/generic/external nominal properties, attributes and default values remain unsupported.
+
+Development API migration (2026-10-01): rebuild consumers of AddProperty and
+PropertyBuilder.PropertyType and inspect SignatureType.Primitive/ClassType. Existing
+primitive construction calls use implicit conversion. Nominal properties retain standard
+CLI CLASS/TypeDef signatures and existing native Named records, including setter
+parameter references. Static, read-only, write-only and private accessor associations
+are supported without inventing storage or changing the native binary schema.
 
 ### Owned property snapshots
 

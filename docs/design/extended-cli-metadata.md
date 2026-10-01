@@ -1363,3 +1363,18 @@ runtime behavior; this does not add a source-level non-null initialization guara
 C# tests exercise CLI execution, alias mutation through a stored object, native
 reference projection, forward/self declarations and rejected foreign/wrong identities.
 The API-produced PE binary verifies and executes with result 42 on neoCLR.
+
+
+### Owned nominal property associations — 2026-10-01
+
+PropertyBuilder now shares SignatureType with fields and methods. Compared with CLR,
+property signatures and accessor associations retain ordinary Property/PropertyMap/
+MethodSemantics rows and CLASS TypeDef identities. The native bridge uses existing Named
+property types and setter parameter references; no binary schema extension is needed.
+This removes a primitive-only producer restriction while preserving exact owned type
+identity. The cost is a development API rebuild and continued limits on external,
+nullable, indexed and generic contracts. A property adds associations, not storage or
+runtime behavior: accessors remain independently declared methods with their own access.
+Reference projection validates nominal getter/result and setter/parameter identities.
+Static, read-only, write-only and private setters are covered by C# contract tests;
+API-produced binaries verify/run with result 42 on the current neoCLR runtime.

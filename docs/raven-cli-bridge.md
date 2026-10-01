@@ -2117,3 +2117,32 @@ Runtime remains revision e8611966 on codex/extended-cli-metadata; compiler work 
 codex/metadata-consumer. See the refreshed
 [record](experiments/extended-cli-metadata/order-runtime-validation.json) for hashes.
 The broad collection/LINQ/union consumer and native symbol imports remain incomplete.
+
+
+### Owned nominal property emission — 2026-10-01
+
+Raven's neoCLR adapter now maps owned root-class property types through SignatureType,
+reusing existing accessor plans and field mapping. Auto-properties with initializers,
+computed getters, block/arrow accessors and private setters retain property associations
+and exact class identity. Ordinary .NET remains the default; no new Runtime Contract
+option is required. The independent host API now exposes SignatureType through
+AddProperty/PropertyType, requiring development consumers to rebuild. CLI output uses
+ordinary CLASS property signatures; native property/accessor records use existing Named
+types. This extends the current #Neo/reference-projection bridge without a binary schema
+change. Eventual native extended-CLI emission replaces that bridge encoding.
+
+The .NET C# regression exposed a general Raven binding defect: a reused auto-property
+field retained a provisional BoundErrorExpression from before a forward constructor was
+bound. The binder now refreshes the field initializer while preserving canonical identity.
+This is a shared semantic/emission correction, independently validated on .NET, rather
+than a native-only workaround. It restores normal constructor-initializer behavior.
+
+Validation: 55 metadata contract groups, API-produced PE verification/execution (42),
+14 focused Raven C# tests in Release/Debug, and the Order consumer's native/CLI runs (42)
+in both source orders. Coverage includes property replacement, alias mutation, forward
+constructor initializers, accessor visibility and projected nominal signatures. Six
+unsupported fixtures reject before writing, including nullable nominal properties.
+[Evidence](experiments/extended-cli-metadata/order-runtime-validation.json) records hashes.
+Runtime remains e8611966 on codex/extended-cli-metadata, with compiler work on
+codex/metadata-consumer. Readonly/static storage, indexed/generic/nullable properties,
+external nominal imports, constructor chaining and the full broad consumer remain open.

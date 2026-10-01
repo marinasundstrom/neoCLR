@@ -332,9 +332,21 @@ public sealed partial class AssemblyBuilder
             bool firstProperty = true;
             foreach (var property in type.Properties)
             {
-                // PROPERTY | HASTHIS, zero index parameters, primitive return type.
-                var signature = new byte[] { property.IsStatic ? (byte)0x08 : (byte)0x28, 0,
-                    property.PropertyType switch { PrimitiveType.Boolean => 0x02, PrimitiveType.Int32 => 0x08, PrimitiveType.Int64 => 0x0a, PrimitiveType.String => 0x0e, _ => throw new InvalidDataException("unsupported property type") } };
+                var signature = new BlobBuilder();
+                new BlobEncoder(signature).PropertySignature(isInstanceProperty: !property.IsStatic)
+                    .Parameters(0, result =>
+                    {
+                        var encoder = result.Type();
+                        if (property.PropertyType.ClassType is { } propertyClass) encoder.Type(typeHandles[propertyClass], false);
+                        else switch (property.PropertyType.Primitive)
+                        {
+                            case PrimitiveType.Int32: encoder.Int32(); break;
+                            case PrimitiveType.Int64: encoder.Int64(); break;
+                            case PrimitiveType.Boolean: encoder.Boolean(); break;
+                            case PrimitiveType.String: encoder.String(); break;
+                            default: throw new InvalidDataException("unsupported property type");
+                        }
+                    }, _ => { });
                 var handle = metadata.AddProperty(PropertyAttributes.None, metadata.GetOrAddString(property.Name), metadata.GetOrAddBlob(signature));
                 if (firstProperty) { metadata.AddPropertyMap(typeHandle, handle); firstProperty = false; }
                 if (property.GetMethod is { } getter) metadata.AddMethodSemantics(handle, MethodSemanticsAttributes.Getter, handles[getter]);

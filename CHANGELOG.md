@@ -21,8 +21,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   now uses SignatureType; rebuild development consumers. API-produced binaries verify/run
   with stored-object alias mutation. Raven shares field load/store planning for explicit
   nominal fields and private storage, including initializers, validated on both runtimes
-  in both source orders. External nominal imports, nullability and generic
-  signatures remain unsupported.
+  in both source orders. Extend the same SignatureType model to property associations
+  and native accessor references, preserving CLI property signatures and private setters.
+  Raven emits nominal auto/computed/explicit properties and corrects stale provisional
+  auto-property initializers while retaining canonical field identity. External nominal
+  imports, nullability and generic signatures remain unsupported.
 
 - Record the shared Raven fix for accessible explicit setters on `val` properties:
   owner writes invoke the setter while outside writes remain rejected. This corrects

@@ -12,7 +12,7 @@ public sealed class NativeAssemblyDefinition
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, FieldRow[] Fields);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
-    private sealed record PropertyRow(int Owner, string Name, PrimitiveType Type, int Getter, int Setter);
+    private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
@@ -222,7 +222,7 @@ public sealed class NativeAssemblyDefinition
                     var name = Text(property, "name"); CheckName(name);
                     Require(name.Length <= 1024 && names.Add(name), "invalid or duplicate property");
                     Require(Array(property, "parameters", 0).Length == 0, "indexed properties unsupported");
-                    var valueType = ReadPrimitive(Text(property, "ty"), false);
+                    var valueType = ReadType(property.GetProperty("ty"), false);
                     var instance = property.GetProperty("instance").GetBoolean();
                     int Accessor(string key, bool setter)
                     {
@@ -231,9 +231,9 @@ public sealed class NativeAssemblyDefinition
                         Shape(reference, "name", "owner", "instance", "parameters");
                         var referenceOwner = reference.GetProperty("owner"); Shape(referenceOwner, "Named");
                         Require(Text(referenceOwner, "Named") == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
-                        var parameters = Array(reference, "parameters", 1).Select(p => ReadPrimitive(p.GetString(), false)).ToArray();
+                        var parameters = Array(reference, "parameters", 1).Select(p => ReadType(p, false)).ToArray();
                         Require(parameters.SequenceEqual(setter ? new[] { valueType } : []), "property accessor parameters mismatch");
-                        var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters.Select(p => (SignatureType)p))).ToArray();
+                        var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
                         Require(candidates.Length == 1, "missing or ambiguous property accessor");
                         var (method, index) = candidates[0];
                         Require(method.Instance == instance && method.Name != ".ctor" && method.Signature.ReturnType == (setter ? PrimitiveType.Void : valueType) && usedAccessors.Add(index), "incompatible or reused property accessor");
@@ -286,7 +286,7 @@ public sealed class NativeAssemblyDefinition
             projectedMethods.Add(output);
         }
         foreach (var property in properties)
-            owners[property.Owner].AddProperty(property.Name, property.Type, property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
+            owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
         return graph.WriteReferenceImage();
     }
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch

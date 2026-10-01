@@ -32,7 +32,10 @@ and alias mutation verify/run on .NET and binary neoCLR in both file orders. The
 nominal-signature/default-constructor/primitive-initialization slices are complete. Explicit
 mutable primitive fields also preserve visibility, initialization and alias mutation
 through binary execution. Mutable owned nominal fields and private storage now preserve
-class identity, initializers and alias mutation in both source orders on both runtimes. Next
+class identity, initializers and alias mutation in both source orders on both runtimes.
+Owned nominal properties now preserve auto/computed/explicit accessor associations,
+private setters and backing storage through the same pipeline. A shared binder fix
+also refreshes provisional auto-property initializers without replacing field identity. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

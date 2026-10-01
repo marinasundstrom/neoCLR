@@ -480,3 +480,8 @@ and owned accessor links are documented in that same host reference, outside Rav
 The manual host reference covers root-class DeclareLocal, nullable LocalDefinition.Type
 and ClassType, including the development API migration. These C# host APIs stay outside
 the RavenDoc guest assembly.
+
+PropertyBuilder.PropertyType and TypeBuilder.AddProperty also use the host-only
+SignatureType for owned nominal properties (2026-10-01). Their signatures, accessor
+identity rules and rebuild migration are covered in the manual host reference; the
+existing experimental .NET API exclusion from guest RavenDoc remains unchanged.

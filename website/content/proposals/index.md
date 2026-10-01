@@ -257,4 +257,6 @@ Explicit mutable primitive instance fields now preserve public/internal/private 
 through Raven's native collector and the existing field metadata. Initialization and alias
 mutation run on both targets. Mutable owned nominal fields and private storage now also
 preserve class identity, initialization and stored-object alias mutation on both targets.
-Readonly/static fields, nominal properties and external class imports remain future work.
+Owned nominal auto-properties, computed getters and explicit accessors now also round-trip
+and execute, including private setters and forward-declared constructor initializers.
+Readonly/static fields, indexed/generic properties and external class imports remain future work.

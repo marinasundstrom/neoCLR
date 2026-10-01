@@ -1,16 +1,16 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An owned non-indexed primitive property with explicit accessor associations.</summary>
+/// <summary>An owned non-indexed primitive or owned root-class property with explicit accessor associations.</summary>
 public sealed class PropertyBuilder
 {
-    internal PropertyBuilder(TypeBuilder owner, string name, PrimitiveType type, MethodBuilder? getter, MethodBuilder? setter)
+    internal PropertyBuilder(TypeBuilder owner, string name, SignatureType type, MethodBuilder? getter, MethodBuilder? setter)
     { DeclaringType = owner; Name = name; PropertyType = type; GetMethod = getter; SetMethod = setter; }
     /// <summary>Gets the declaring type.</summary>
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple property name.</summary>
     public string Name { get; }
-    /// <summary>Gets the primitive property value type.</summary>
-    public PrimitiveType PropertyType { get; }
+    /// <summary>Gets the primitive or owned root-class property value type.</summary>
+    public SignatureType PropertyType { get; }
     /// <summary>Gets the getter, or null for a write-only property.</summary>
     public MethodBuilder? GetMethod { get; }
     /// <summary>Gets the setter, or null for a read-only property.</summary>
@@ -24,18 +24,22 @@ public sealed partial class TypeBuilder
     private readonly List<PropertyBuilder> properties = [];
     /// <summary>Gets owned properties in declaration order.</summary>
     public IReadOnlyList<PropertyBuilder> Properties => properties.AsReadOnly();
-    /// <summary>Associates existing methods with a non-indexed primitive property; adds no storage or bodies.</summary>
+    /// <summary>Associates existing methods with a non-indexed primitive or owned root-class property; adds no storage or bodies.</summary>
     /// <param name="name">Unique nonblank name, at most 1024 characters, without controls or invalid Unicode.</param>
-    /// <param name="type">Int32, Int64, Boolean or String.</param>
+    /// <param name="type">Int32, Int64, Boolean, String or a nonstatic class owned by this assembly.</param>
     /// <param name="getter">Owned ordinary method with no declared parameters and the property result, or null.</param>
     /// <param name="setter">Owned ordinary method with one property-value parameter and Void result, or null.</param>
     /// <returns>An immutable association owned by this type.</returns>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type, missing or incompatible accessors, duplicate name, reused accessor or exceeded limit.</exception>
     /// <remarks>At least one accessor is required. Both must agree on instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
-    public PropertyBuilder AddProperty(string name, PrimitiveType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
+    public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
+        ArgumentNullException.ThrowIfNull(type);
+        if (type.ClassType is { } owner && !ReferenceEquals(owner.Assembly, Assembly))
+            throw new ArgumentException("property class belongs to another output", nameof(type));
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
-            type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String) ||
+            type.Primitive == PrimitiveType.Void ||
             properties.Count >= 256 || properties.Any(p => p.Name == name) || getter is null && setter is null)
             throw new ArgumentException("invalid or duplicate property");
         try { _ = new System.Text.UTF8Encoding(false, true).GetByteCount(name); }
