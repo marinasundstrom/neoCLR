@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add typed local addresses and initialization to the metadata API (`Ldloca`, `Initobj`,
+  `LoadDefault`). Validate local identity, exact initialization type and definite
+  assignment; addresses cannot escape through the bounded value signatures. Ordinary
+  CLI/native instructions initialize generic primitive, string, object and vector
+  defaults; producer binaries verify/run 42 on neoCLR.
+
 - Extend generic metadata calls to ordinary instance methods on owned root classes.
   Preserve receiver identity and generic parameter scope in CLI MethodSpec and native
   call records/reference projections. Binary producer verification/execution returns 42;

@@ -21,7 +21,7 @@ public sealed partial class MethodBuilder
     private readonly List<LocalDefinition> locals = [];
     /// <summary>Gets declared locals in slot order. ClearBody preserves these declarations.</summary>
     public IReadOnlyList<LocalDefinition> Locals => locals.AsReadOnly();
-    /// <summary>Declares an Int32 local. Loads require a store on every reachable path.</summary>
+    /// <summary>Declares an Int32 local. Loads require a store or typed initialization on every reachable path.</summary>
     /// <returns>A local handle owned by this method.</returns>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
     public LocalDefinition DeclareInt32Local() => DeclareLocal(PrimitiveType.Int32);
@@ -42,7 +42,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Class is null.</exception>
     /// <exception cref="ArgumentException">Class is static or belongs to another assembly.</exception>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
-    /// <remarks>Loads require a store on every path. No inheritance, null, boxing or external class locals are admitted.</remarks>
+    /// <remarks>Loads require a store or typed initialization on every path. No inheritance, boxing or external class locals are admitted.</remarks>
     public LocalDefinition DeclareLocal(TypeBuilder type)
     {
         ArgumentNullException.ThrowIfNull(type);
@@ -63,7 +63,7 @@ public sealed partial class MethodBuilder
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
     }
-    /// <summary>Loads a local previously stored in this body.</summary>
+    /// <summary>Loads a local previously stored or initialized in this body.</summary>
     /// <param name="local">Local owned by this method.</param>
     /// <exception cref="ArgumentNullException">Local is null.</exception>
     /// <exception cref="ArgumentException">Local belongs to another method.</exception>
@@ -76,7 +76,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void StoreLocal(LocalDefinition local) => Emit(OpCode.Stloc, local);
     /// <summary>Appends a typed local load or store. Stack/initialization validation occurs when writing.</summary>
-    /// <param name="opCode">Ldloc or Stloc.</param>
+    /// <param name="opCode">Ldloc, Ldloca or Stloc.</param>
     /// <param name="local">Local owned by this method.</param>
     /// <exception cref="ArgumentNullException">Local is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or owner.</exception>
@@ -84,7 +84,7 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, LocalDefinition local)
     {
         ArgumentNullException.ThrowIfNull(local);
-        if (opCode is not (OpCode.Ldloc or OpCode.Stloc) || !ReferenceEquals(local.Method, this))
+        if (opCode is not (OpCode.Ldloc or OpCode.Ldloca or OpCode.Stloc) || !ReferenceEquals(local.Method, this))
             throw new ArgumentException("invalid local operand", nameof(local));
         Emit(opCode, local.Index);
     }

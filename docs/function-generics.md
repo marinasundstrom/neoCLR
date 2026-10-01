@@ -1,7 +1,8 @@
-# Generic functions and static methods
+# Generic functions and methods
 
 neoCLR supports function-level generic parameters on concrete free functions and
-static IL methods. They are independent of the declaring type's parameters.
+static IL methods, and now ordinary nonvirtual instance IL methods on reference classes.
+They are independent of the declaring type's parameters.
 This fills a platform gap relative to CLR generic methods; it does not make functions
 into objects or introduce delegates.
 
@@ -153,3 +154,23 @@ other languages may make different syntax choices. Explicit addressing is not a
 requirement to repeat type names or manually dereference managed references. This
 keeps Neo a small explanation and testing tool for the platform, not a commitment
 to full C# inference or a complete compiler framework.
+
+## Ordinary generic class receivers (2026-10-01 development)
+
+The native verifier admits concrete nonvirtual instance generic IL methods on ordinary
+reference classes. Receivers remain slot zero, separate from explicit parameters and
+method type parameters. Calls retain ordinary `call instance` plus generic arguments;
+there is no new dispatch mechanism. Value/byref receivers, virtual/interface generic
+dispatch, native bodies and generic constructors remain excluded by this gate.
+This extends the original static/free subset; historical importer descriptions above
+do not imply support in every producer. The current direct Raven metadata emitter
+uses shared receiver planning and explicit instance-generic capability admission.
+
+This adopts the CLR generic-method receiver behavior covered by the existing comparison
+above, rather than inventing receiver specialization syntax. Reusing specialization and
+managed slot rooting preserves object identity without allocating a replacement receiver.
+The cost is additional verifier admission and producer coverage; no speedup is claimed.
+`tests/function_generics.rs` forces collection inside a generic class call, while C#
+metadata tests and Raven's binary consumer exercise forwarding, mutation, copy/reverse,
+recursive calls and receiver/argument order. Generic owners and constrained dispatch
+remain separate emitter milestones.

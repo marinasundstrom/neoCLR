@@ -294,3 +294,6 @@ methods. Generic types, constraints and imported generic symbols remain separate
 Development metadata producer support now includes unconstrained ordinary generic
 instance methods on owned root classes, verified through binary native execution.
 Generic types and virtual/constrained generic dispatch remain future work.
+
+The development metadata API also emits typed default initialization, including generic
+method parameters, with CLI/native execution tests and definite-assignment checks.

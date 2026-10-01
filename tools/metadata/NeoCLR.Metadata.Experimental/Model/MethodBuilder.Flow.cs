@@ -51,7 +51,7 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => new(PrimitiveType.Void, owner);
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
@@ -71,7 +71,7 @@ public sealed partial class MethodBuilder
         {
             if (instruction.Op is "branch" or "branch.true" or "branch.false" && !positions.ContainsKey(instruction.Value))
                 throw new InvalidDataException("unmarked branch label");
-            if (instruction.Op is "local.load" or "local.store" && (instruction.Value < 0 || instruction.Value >= locals.Count))
+            if (instruction.Op is "local.load" or "local.store" or "local.address" && (instruction.Value < 0 || instruction.Value >= locals.Count))
                 throw new InvalidDataException("local outside declarations");
             if (instruction.Op is "argument" or "argument.store" && (instruction.Value < 0 || instruction.Value >= ArgumentCount))
                 throw new InvalidDataException("argument outside signature");
@@ -99,7 +99,8 @@ public sealed partial class MethodBuilder
                 case "duplicate":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.Add(stack[^1]); break;
-                case "field.load": case "field.store":
+                case "field.load":
+                case "field.store":
                     if (instruction.Op == "field.store")
                     {
                         if (instruction.Field!.IsReadOnly && (!IsConstructor || !ReferenceEquals(DeclaringType, instruction.Field.DeclaringType)))
@@ -111,7 +112,8 @@ public sealed partial class MethodBuilder
                     break;
                 case "array.new":
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
-                case "array.load": case "array.store":
+                case "array.load":
+                case "array.store":
                     if (instruction.Op == "array.store") Pop(instruction.Type!);
                     Pop(PrimitiveType.Int32); Pop(SignatureType.ArrayOf(instruction.Type!));
                     if (instruction.Op == "array.load") stack.Add(instruction.Type!);
@@ -125,14 +127,16 @@ public sealed partial class MethodBuilder
                 case "pop":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.RemoveAt(stack.Count - 1); break;
-                case "negate": case "complement":
+                case "negate":
+                case "complement":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("unary integer operation requires Int32 or Int64");
                     break;
                 case "string": stack.Add(PrimitiveType.String); break;
                 case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
-                case "convert32": case "convert64":
+                case "convert32":
+                case "convert64":
                     if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
                         throw new InvalidDataException("integer conversion requires Int32/Int64 or array length for conv.i4");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
@@ -140,20 +144,34 @@ public sealed partial class MethodBuilder
                 case "argument.store": Pop(ArgumentType(instruction.Value)); break;
                 case "argument": stack.Add(ArgumentType(instruction.Value)); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
+                case "local.address": stack.Add(new BodyValueType(PrimitiveType.Void, AddressedLocal: instruction.Value)); break;
+                case "local.initialize":
+                    if (stack.Count == 0 || stack[^1].AddressedLocal is not { } initialized || locals[initialized].SignatureType != instruction.Type)
+                        throw new InvalidDataException("initobj requires an owned local address of the exact type");
+                    stack.RemoveAt(stack.Count - 1); assigned[initialized] = true; break;
                 case "local.load":
                     if (!assigned[instruction.Value]) throw new InvalidDataException("local loaded before store on some path");
                     stack.Add(LocalType(locals[instruction.Value])); break;
                 case "local.store": Pop(LocalType(locals[instruction.Value])); assigned[instruction.Value] = true; break;
-                case "shift.left": case "shift.right":
+                case "shift.left":
+                case "shift.right":
                     Pop(PrimitiveType.Int32);
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("shift requires an Int32/Int64 value and Int32 count");
                     break;
-                case "and": case "or": case "xor":
+                case "and":
+                case "or":
+                case "xor":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("bitwise operands require matching integer or Boolean types");
                     var bitwiseType = stack[^1]; Pop(bitwiseType); Pop(bitwiseType); stack.Add(bitwiseType); break;
-                case "add": case "subtract": case "multiply": case "divide": case "remainder": case "less": case "greater":
+                case "add":
+                case "subtract":
+                case "multiply":
+                case "divide":
+                case "remainder":
+                case "less":
+                case "greater":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("integer operands required");
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);
@@ -162,7 +180,8 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
-                case "call": case "call.generic":
+                case "call":
+                case "call.generic":
                     var callSignature = instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(callSignature.ParameterTypes[i]);
                     if (!instruction.Target.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));

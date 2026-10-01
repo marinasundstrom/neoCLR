@@ -2606,3 +2606,25 @@ parameters; `MakeGenericInstance`, typed `Call` and raw `Emit(Call, instance)` w
 for static calls. No virtual-dispatch contract is introduced. Both writers validate
 receiver stack shape; native reference projection preserves instance/generic flags.
 Generic constructors and generic property accessors remain invalid.
+
+### Typed local initialization (development)
+
+`OpCode.Ldloca` accepts an owned `LocalDefinition` or local index; `OpCode.Initobj`
+accepts `SignatureType`. `MethodBuilder.LoadLocalAddress(LocalDefinition)` and
+`InitializeObject(SignatureType)` expose the same operations. The address may designate
+an uninitialized local; initialization establishes definite assignment only for that
+exact local. Both writers reject a mismatched type, non-address operand, an address
+escaping through value storage/calls/returns, and later loads not initialized on every
+reachable path. General managed-reference signatures and indirect load/store are not
+part of this bounded API. Address values at joins must identify the same local.
+
+`MethodBuilder.LoadDefault(SignatureType)` declares one scratch local, initializes it
+and loads its value (three instructions). Types may be primitives, owned root classes,
+vectors or scoped method parameters; Void, foreign owners and invalid method scope
+throw ArgumentException. Null arguments throw ArgumentNullException. Local/instruction
+limits throw InvalidDataException before this helper changes the body; ClearBody retains
+scratch declarations. Invalid stack/definite-assignment contracts fail during writing.
+CLI uses ldloca/initobj/ldloc with TypeSpec for generic/vector operands; native uses the
+same logical operations. Numeric defaults are zero, Boolean false, and reference
+(string/class/vector) defaults are typed null references. This does not add nullable
+source syntax or general pointer/byref APIs.

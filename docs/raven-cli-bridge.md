@@ -2343,3 +2343,20 @@ on both targets (42). [Evidence](experiments/extended-cli-metadata/generic-runti
 records the consumer and runtime hashes. Runtime checks also preserve generic receiver
 and argument roots during forced collection; API validation rejects wrong/missing
 receivers and generic constructor projections.
+
+### Generic defaults (2026-10-01 development producer)
+
+The host metadata API now emits typed local addresses/initialization and LoadDefault.
+CLI ldloca/initobj/ldloc and native equivalents preserve generic primitive/reference
+zero/null defaults without a new bridge encoding. Flow validation tracks exact local
+address provenance and definite assignment; general byref signatures remain excluded.
+The C# default binary verifies/runs 42. Native instructions and generic substitution
+already support these operations, so no runtime semantic change is needed. Raven
+source lowering is the next integration slice.
+
+Default emission reuses the established [managed initialization](managed-initialization.md)
+and [intrinsic String defaults](string-default-storage.md) contracts and their .NET
+comparison. A new default opcode or special generic runtime intrinsic would duplicate
+existing typed storage semantics; scratch-local lowering is simpler and preserves
+backend independence, at the cost of one local and three instructions per default site.
+No performance improvement is claimed; scratch reuse is a possible later optimization.

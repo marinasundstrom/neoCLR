@@ -716,3 +716,8 @@ on both targets (42). [Evidence](experiments/extended-cli-metadata/generic-runti
 records the consumer and runtime hashes. Runtime checks also preserve generic receiver
 and argument roots during forced collection; API validation rejects wrong/missing
 receivers and generic constructor projections.
+
+Generic-storage follow-through (2026-10-01): typed default producer support now passes
+binary CLI/native execution. Local address/initobj/default helpers preserve method
+parameter scope and definite assignment. Raven default(T) and generic clearing are
+the next bounded integration, before generic owner/constraint and import work.

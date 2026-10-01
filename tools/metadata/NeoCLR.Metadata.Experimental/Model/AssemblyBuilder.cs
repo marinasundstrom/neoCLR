@@ -172,7 +172,7 @@ public sealed partial class AssemblyBuilder
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
-            if (type.MethodParameterIndex is not null)
+            if (type.MethodParameterIndex is not null || type.ArrayElement is not null)
             {
                 if (!elementSpecs.TryGetValue(type, out var spec))
                 {
@@ -267,7 +267,8 @@ public sealed partial class AssemblyBuilder
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
                     "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
-                    "argument" or "argument.store" or "local.load" or "local.store" => 4,
+                    "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
+                    "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
             var labels = method.LabelPositions();
@@ -308,6 +309,8 @@ public sealed partial class AssemblyBuilder
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "local.address": code.WriteByte(0xfe); code.WriteByte(0x0d); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "local.initialize": code.WriteByte(0xfe); code.WriteByte(0x15); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "local.load": code.WriteByte(0xfe); code.WriteByte(0x0c); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.store": code.WriteByte(0xfe); code.WriteByte(0x0e); code.WriteUInt16((ushort)instruction.Value); break;
                     case "add": code.WriteByte(0x58); break;

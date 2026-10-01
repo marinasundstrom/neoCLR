@@ -77,6 +77,8 @@ public sealed partial class AssemblyBuilder
             "call" or "new.object" => new { op = instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
+            "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
+            "local.initialize" => new { op = "initobj", arg = SignatureValue(instruction.Type!) },
             "local.load" => new { op = "ldloc", arg = (object)instruction.Value },
             "local.store" => new { op = "stloc", arg = (object)instruction.Value },
             "add" => new { op = "add" },

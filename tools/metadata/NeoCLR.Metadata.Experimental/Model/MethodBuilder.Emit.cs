@@ -81,7 +81,11 @@ public enum OpCode
     /// <summary>Stores an element; requires a scalar SignatureType operand.</summary>
     Stelem,
     /// <summary>Loads vector length as native unsigned integer; normalize with Conv_I4.</summary>
-    Ldlen
+    Ldlen,
+    /// <summary>Loads the managed address of an owned local for typed initialization.</summary>
+    Ldloca,
+    /// <summary>Initializes an addressed local to the default of its exact SignatureType.</summary>
+    Initobj
 }
 
 public sealed partial class MethodBuilder
@@ -92,21 +96,47 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
-        => Append(new(opCode switch {
-            OpCode.Ldlen => "array.length", OpCode.Dup => "duplicate", OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
-            OpCode.Shl => "shift.left", OpCode.Shr => "shift.right", OpCode.And => "and", OpCode.Or => "or", OpCode.Xor => "xor", OpCode.Rem => "remainder", OpCode.Div => "divide", OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
+        => Append(new(opCode switch
+        {
+            OpCode.Ldlen => "array.length",
+            OpCode.Dup => "duplicate",
+            OpCode.Neg => "negate",
+            OpCode.Not => "complement",
+            OpCode.Conv_I8 => "convert64",
+            OpCode.Conv_I4 => "convert32",
+            OpCode.Pop => "pop",
+            OpCode.Ceq => "equal",
+            OpCode.Clt => "less",
+            OpCode.Cgt => "greater",
+            OpCode.Shl => "shift.left",
+            OpCode.Shr => "shift.right",
+            OpCode.And => "and",
+            OpCode.Or => "or",
+            OpCode.Xor => "xor",
+            OpCode.Rem => "remainder",
+            OpCode.Div => "divide",
+            OpCode.Add => "add",
+            OpCode.Sub => "subtract",
+            OpCode.Mul => "multiply",
+            OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));
 
     /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
-    /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc or Stloc.</param>
+    /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc, Ldloca or Stloc.</param>
     /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, int operand)
-        => Append(new(opCode switch {
-            OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument", OpCode.Starg => "argument.store",
-            OpCode.Ldloc => "local.load", OpCode.Stloc => "local.store", _ => throw OperandError(opCode)
+        => Append(new(opCode switch
+        {
+            OpCode.Ldc_I4 => "constant",
+            OpCode.Ldarg => "argument",
+            OpCode.Starg => "argument.store",
+            OpCode.Ldloca => "local.address",
+            OpCode.Ldloc => "local.load",
+            OpCode.Stloc => "local.store",
+            _ => throw OperandError(opCode)
         }, operand));
 
     /// <summary>Appends an exact signed Int64 constant.</summary>

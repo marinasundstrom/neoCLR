@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--default-integration")
+{
+    await DefaultValueChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--generic-instance-integration")
 {
     await GenericInstanceChecks.RunRuntime(args[1], args[2]);
@@ -161,6 +167,7 @@ var tests = new (string Name, Action Body)[]
     ("Generic method declarations and projection", GenericSignatureChecks.Run),
     ("Generic instantiated and forwarded calls", GenericCallChecks.Run),
     ("Generic instance calls and projection", GenericInstanceChecks.Run),
+    ("Typed and generic default initialization", DefaultValueChecks.Run),
     ("Array instructions and execution", ArrayInstructionChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),

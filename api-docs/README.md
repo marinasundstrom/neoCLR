@@ -505,3 +505,6 @@ are host-only and covered by the [manual generic reference](experimental-metadat
 The experimental host C# `GenericMethodInstance` and generic call overloads are covered
 by [the manual metadata reference](experimental-metadata.md); these host APIs are not
 RavenDoc input types.
+
+Host metadata local-address/default helpers and Ldloca/Initobj are documented in the
+manual experimental reference, outside RavenDoc's Raven type selection.
