@@ -2811,3 +2811,59 @@ unknown, duplicate or conflicting flags and preserves accepted flags in referenc
 projections. Native execution needs the matching feature-branch runtime; old runtimes
 cannot decode these new kinds. Native notvoid/notreference keep their prior meaning.
 See the [integration assessment](../docs/experiments/extended-cli-metadata/state-assessment-2026-10-01.md).
+
+
+### Interface declarations (development)
+
+`NeoCLR.Metadata.Experimental.Model` exposes:
+
+```csharp
+public TypeBuilder AssemblyBuilder.AddInterface(string @namespace, string name,
+    TypeVisibility visibility = TypeVisibility.Public);
+public TypeBuilder AssemblyBuilder.AddGenericInterface(string @namespace, string name,
+    IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public);
+public bool TypeBuilder.IsInterface { get; }
+public MethodBuilder TypeBuilder.AddInterfaceMethod(string name, MethodSignature signature);
+public bool MethodBuilder.IsAbstract { get; }
+```
+
+The factories return owned interfaces with public/internal visibility. Generic names
+are copied (1–32 distinct names); CLI arity is appended to the supplied simple name.
+Ordinary type identity/256-type limits apply. Invalid identities, visibility, names or
+duplicates throw ArgumentException; null generic names throw ArgumentNullException.
+Interfaces are invariant in this API; inherited interfaces are not exposed yet.
+
+AddInterfaceMethod creates a public abstract instance contract, with supported
+primitive/owned-class/array/declaring-type-parameter signatures. A null signature throws
+ArgumentNullException; duplicate/invalid signatures, reserved constructor names,
+method-level generics or per-owner 256-method limits throw ArgumentException.
+Calling it on a class, or ordinary AddMethod/AddInstanceMethod/AddConstructor on an
+interface, throws InvalidOperationException. Interfaces cannot own storage fields or
+properties in this slice; those builder operations throw InvalidOperationException.
+Interface references/constructed interface values are not yet admitted as storage
+signatures, nominal class bounds or allocation targets. This is an API coverage limit.
+
+```csharp
+var comparer = assembly.AddGenericInterface("Example", "Comparer", ["T"]);
+var t = SignatureType.TypeParameter(0);
+var compare = comparer.AddInterfaceMethod("Compare",
+    new MethodSignature(PrimitiveType.Int32, [t, t]));
+// compare.IsAbstract is true; no instructions or locals belong to this declaration.
+```
+
+Writing rejects abstract methods with instructions/locals and direct calls to them
+with InvalidDataException. Implementations, interface dispatch, default/static interface
+methods and property contracts are subsequent work. An abstract method has no CLI
+body (RVA zero), including in a reference projection: no throwing placeholder is used.
+CLI uses Interface/Abstract type flags with no base class, and public abstract virtual
+new-slot method flags. These are ordinary CLI contracts, not extensions; see
+[ECMA-335](https://ecma-international.org/wp-content/uploads/ECMA-335_6th_edition_june_2012.pdf),
+Partition II, interface and method-definition rules.
+
+The existing native Interface representation carries contract identity. Its separate
+type is_abstract field applies to records and remains false; methods carry explicit
+abstract/virtual flags and empty bodies. No runtime format or instruction change is
+needed. The native reader validates this shape and preserves interfaces through CLI
+reference projection. Unknown/mismatched flags, bodies/locals, storage and invalid
+owner contracts reject with InvalidDataException. Matching reader/producers are
+required; older experimental readers reject the additional declaration category.

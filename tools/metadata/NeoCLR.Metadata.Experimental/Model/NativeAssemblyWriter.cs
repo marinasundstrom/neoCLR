@@ -193,15 +193,15 @@ public sealed partial class AssemblyBuilder
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { new { name = Identity.Name, full_name = IdentityText(Identity), modules = new[] { Identity.Name + ".dll" }, references = dependencies.Keys.Select(IdentityText).ToArray() } },
             types = types.Select((type, index) => new NativeTypeRow(
-                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), true, type.IsStatic, type.IsStatic,
-                TypeOrigin(type, index),
+                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface, type.IsStatic, type.IsStatic,
+                TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type))).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
                 SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
-                Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
+                Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsAbstract ? true : null,
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray())).ToArray()
@@ -213,6 +213,10 @@ public sealed partial class AssemblyBuilder
     private sealed record NativeMethodRow(string name, object? owner, object[] parameters, object[] locals,
         object returns, bool no_result, object origin, object[] body,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        bool? is_abstract,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        bool? is_virtual,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? @namespace,
@@ -222,6 +226,8 @@ public sealed partial class AssemblyBuilder
         string[]? generic_parameters);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        string? representation,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

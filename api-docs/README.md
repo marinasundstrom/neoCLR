@@ -534,3 +534,8 @@ with explicit guest RavenDoc exclusion as for the other C# producer APIs.
 TypeParameterConstraints and TypeBuilder.SpecialConstraints/SetSpecialConstraints are
 covered in the [host-only metadata manual](experimental-metadata.md#special-type-parameter-requirements-development).
 They remain explicitly excluded from guest RavenDoc selection because they are C# producer APIs.
+
+AddInterface/AddGenericInterface, TypeBuilder.IsInterface/AddInterfaceMethod and
+MethodBuilder.IsAbstract are covered by the [host-only metadata manual](experimental-metadata.md#interface-declarations-development).
+These C# producer types remain outside guest RavenDoc selection; abstract interface
+methods retain no body in the native reader's CLI reference projection.

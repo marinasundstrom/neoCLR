@@ -48,7 +48,7 @@ public sealed partial class TypeBuilder
     {
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
-        if (IsStatic) throw new InvalidOperationException("instance fields require a reference class");
+        if (IsStatic || IsInterface) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||
             !Enum.IsDefined(visibility) || fields.Count >= 256 || fields.Any(f => f.Name == name))

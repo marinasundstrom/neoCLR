@@ -5,6 +5,11 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Interface declaration checkpoint (2026-10-01):** unchanged Comparer<T> and
+EqualityComparer<T> now emit ordinary CLI/native interface contracts and load/verify
+in both file orders. This does not yet prove interface dispatch. Next cover the
+iterator's properties/inherited contracts. [Evidence](experiments/extended-cli-metadata/interface-library-runtime-validation.json).
+
 **Whole-source checkpoint (2026-10-01):** complete, unchanged
 System.Globalization.Language now executes on .NET and neoCLR in both file orders
 (und/sv/he; result 42), using shared static-property accessor calls. No new opcode or

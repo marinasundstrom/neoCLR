@@ -105,6 +105,8 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true)
+                        throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstructedTarget is { } target)
                     {
                         target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments, complete: true);
@@ -115,7 +117,11 @@ public sealed partial class AssemblyBuilder
                     if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                     instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 }
-                if (validateBodies) method.Validate();
+                if (method.IsAbstract)
+                {
+                    if (method.Instructions.Count != 0 || method.Locals.Count != 0) throw new InvalidDataException("abstract interface methods must have no body or locals");
+                }
+                else if (validateBodies) method.Validate();
             }
         }
         catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract", error); }
@@ -167,19 +173,19 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentException">Invalid names, visibility, duplicate type or exceeded limits.</exception>
     public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
         => AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, false);
-    private TypeBuilder AddGenericTypeCore(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility, bool isStatic)
+    private TypeBuilder AddGenericTypeCore(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility, bool isStatic, bool isInterface = false)
     {
         ArgumentNullException.ThrowIfNull(genericParameterNames);
         var names = new MethodSignature(PrimitiveType.Void, [], genericParameterNames).GenericParameterNames;
         if (string.IsNullOrEmpty(name) || name.Contains('`') || names.Count == 0) throw new ArgumentException("generic type requires a simple name and parameters");
-        return AddTypeCore(@namespace, name + "`" + names.Count, visibility, isStatic, names);
+        return AddTypeCore(@namespace, name + "`" + names.Count, visibility, isStatic, names, isInterface);
     }
-    private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic, IReadOnlyList<string>? genericNames = null)
+    private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic, IReadOnlyList<string>? genericNames = null, bool isInterface = false)
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
             types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
-        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames); types.Add(type); return type;
+        var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames, isInterface); types.Add(type); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
@@ -358,6 +364,13 @@ public sealed partial class AssemblyBuilder
         var genericRows = new List<(EntityHandle Owner, int Sort, IReadOnlyList<string> Names)>();
         void EmitMethod(MethodBuilder method)
         {
+            if (method.IsAbstract)
+            {
+                metadata.AddMethodDefinition(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot | MethodAttributes.HideBySig,
+                    MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), -1, MetadataTokens.ParameterHandle(1));
+                nextMethod++;
+                return;
+            }
             var code = new BlobBuilder();
             var offsets = new int[method.Instructions.Count + 1];
             offsets[0] = method.IsConstructor ? 6 : 0;
@@ -454,8 +467,8 @@ public sealed partial class AssemblyBuilder
         foreach (var function in functions) EmitMethod(function);
         foreach (var type in types)
         {
-            var typeHandle = metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
+            var typeHandle = metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsInterface ? TypeAttributes.Interface | TypeAttributes.Abstract : type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : 0),
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             genericRows.Add((typeHandle, MetadataTokens.GetRowNumber(typeHandle) * 2, type.GenericParameterNames));
             foreach (var field in type.Fields)
@@ -525,7 +538,7 @@ public enum TypeVisibility
 public sealed partial class TypeBuilder
 {
     private readonly List<MethodBuilder> methods = [];
-    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null) { GenericParameterNames = genericNames ?? Array.Empty<string>(); Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public, bool isStatic = true, IReadOnlyList<string>? genericNames = null, bool isInterface = false) { IsInterface = isInterface; GenericParameterNames = genericNames ?? Array.Empty<string>(); Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; IsStatic = isStatic; }
     /// <summary>Gets immutable declaring-type parameter names in ordinal order.</summary>
     public IReadOnlyList<string> GenericParameterNames { get; }
     /// <summary>Gets whether this is an abstract sealed static class.</summary>
@@ -597,8 +610,9 @@ public sealed partial class TypeBuilder
         if (signature.ReturnType != PrimitiveType.Void) throw new ArgumentException("constructor must have no result", nameof(signature));
         return AddMethodCore(".ctor", signature, visibility, false, true);
     }
-    private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor)
+    private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor, bool abstractContract = false)
     {
+        if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
         if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a reference class");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));

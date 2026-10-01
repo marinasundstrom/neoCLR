@@ -332,3 +332,7 @@ The development metadata target now compiles the complete unchanged Language
 class-library source and executes it on both .NET and neoCLR. Shared static-property
 accessor calls use ordinary CLI semantics; full collection/library emission remains
 in progress. Supported behavior follows .NET unless a divergence is explicitly chosen.
+
+The experimental producer and Raven target now also preserve invariant comparer
+interface declarations through native assembly loading and CLI reference projection.
+Interface dispatch and full collection compilation are not covered by that checkpoint.

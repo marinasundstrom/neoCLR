@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add invariant interface declarations and public abstract instance contracts to the
+  metadata producer. Preserve standard CLI flags/bodyless methods and existing native
+  Interface identity through reference projection. Raven now emits unchanged Comparer
+  and EqualityComparer sources; binary loading/verification passes. The independent
+  entry returns 42; interface implementation/dispatch is not yet exercised by this API.
+
 - Compile the whole unchanged Raven Language class through the metadata target after
   shared static-property accessor support. Both runtimes print und/sv/he and return
   42 in both source orders. Refresh library inventory: comparer interfaces bind but

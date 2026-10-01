@@ -62,7 +62,7 @@ public sealed record SignatureType
     public static implicit operator SignatureType(TypeBuilder type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (type.IsStatic || type.GenericParameterNames.Count > 0) throw new ArgumentException("signature class must be a nonstatic root", nameof(type));
+        if (type.IsStatic || type.IsInterface || type.GenericParameterNames.Count > 0) throw new ArgumentException("signature class must be a nonstatic root", nameof(type));
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>

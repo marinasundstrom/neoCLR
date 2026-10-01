@@ -48,7 +48,7 @@ public sealed partial class TypeBuilder
     {
         ArgumentNullException.ThrowIfNull(baseType);
         if (parameterIndex < 0 || parameterIndex >= GenericParameterNames.Count || genericConstraints.Any(c => c.ParameterIndex == parameterIndex) || specialConstraints.GetValueOrDefault(parameterIndex).HasFlag(TypeParameterConstraints.ValueType) ||
-            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.GenericParameterNames.Count != 0)
+            !ReferenceEquals(baseType.Assembly, Assembly) || baseType.IsStatic || baseType.IsInterface || baseType.GenericParameterNames.Count != 0)
             throw new ArgumentException("one owned nongeneric class bound per declared type parameter required");
         genericConstraints.Add(new(parameterIndex, baseType));
         genericConstraints.Sort((a, b) => a.ParameterIndex.CompareTo(b.ParameterIndex));

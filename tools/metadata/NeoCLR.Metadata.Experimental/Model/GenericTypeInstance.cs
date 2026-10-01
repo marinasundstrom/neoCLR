@@ -30,7 +30,7 @@ public sealed partial class TypeBuilder
     public GenericTypeInstance MakeGenericInstance(params SignatureType[] typeArguments)
     {
         ArgumentNullException.ThrowIfNull(typeArguments);
-        if (IsStatic || GenericParameterNames.Count == 0 || typeArguments.Length != GenericParameterNames.Count || typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16))
+        if (IsStatic || IsInterface || GenericParameterNames.Count == 0 || typeArguments.Length != GenericParameterNames.Count || typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16))
             throw new ArgumentException("generic reference class arguments must match the definition");
         foreach (var argument in typeArguments) argument.ValidateOwner(Assembly, 32, 32);
         ValidateTypeArguments(typeArguments);

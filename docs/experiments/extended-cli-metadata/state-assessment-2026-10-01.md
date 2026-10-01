@@ -96,3 +96,10 @@ The author reaffirmed that .NET behavior and CLI instruction semantics are the d
 unless an alternative is explicitly chosen. The native payload is a temporary storage
 and loader bridge, not a separate instruction-set design. Unsupported features such
 as exception handling limit coverage rather than changing supported semantics.
+
+
+The next declaration gate is now closed: unchanged Comparer<T> and EqualityComparer<T>
+emit, project and load as abstract interface contracts on both targets. The test entry
+is independent (42); [evidence](interface-library-runtime-validation.json) explicitly
+sets interfaceDispatch and entryUsesInterfaces to false. Properties, inherited contracts,
+implementation and dispatch remain separate gates; no runtime/ISA change was needed.

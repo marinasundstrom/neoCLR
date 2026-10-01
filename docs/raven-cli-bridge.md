@@ -2492,3 +2492,22 @@ behavior and CLI instruction semantics are the default for supported facilities.
 Unsupported exceptions/other features limit coverage; the temporary #Neo storage
 bridge does not justify a different instruction set. Native backend/metadata replacement
 must preserve these semantics and only deliberately chosen extensions.
+
+
+Interface declaration slice (2026-10-01): unchanged Comparer<T> and
+EqualityComparer<T> now compile through an explicit bounded interface declaration
+plan and capability categories. The producer preserves ordinary CLI interface/type
+and public abstract virtual new-slot method flags, with RVA zero and no fake bodies.
+Native metadata reuses Interface identity and bodyless method contracts; native
+record is_abstract storage is not reused for interface type identity. No runtime or
+instruction-set change. [API contract](../api-docs/experimental-metadata.md#interface-declarations-development).
+
+The matching experimental reader projects the same declarations. The producer owns
+metadata flags/identity; Raven owns source admission. No Runtime Contract configuration
+change; host-core bootstrap remains. Generic variance, inherited interfaces, properties,
+implementations, interface value signatures and dispatch remain subsequent slices.
+The two complete source files verify/load in both file orders on .NET/native; an
+independent entry returns 42. This is metadata-loading evidence, not dispatch evidence.
+[Consumer evidence](experiments/extended-cli-metadata/interface-library-runtime-validation.json).
+68 API test groups and 13 focused compiler tests pass; API-produced interface binaries
+also load/verify/run the independent entry. Both feature branches remain experimental.
