@@ -2386,3 +2386,8 @@ on `codex/extended-cli-metadata`; Raven `codex/metadata-consumer`. No Runtime Co
 configuration change. Generic owner arrays/defaults and alias mutation pass; generic
 instance layouts/fields, constraints, imported owners and full class-library compilation
 remain open. See [binary evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
+
+The final owner consumer also permutes two owner arguments and forwards a caller
+method parameter into a callee owner while forwarding an owner parameter back into
+its result. Both source orders execute 42 on CLI/native. Native reader contract tests
+reject out-of-range VAR, closed/noncanonical declaration owners and arity/name mismatch.

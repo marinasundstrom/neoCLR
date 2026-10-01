@@ -14,7 +14,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference projection. API binaries verify/run 42; generic object layouts remain out
   of scope. Raven now shares static generic owner planning and calls across targets;
   its consumer runs 42 in both source orders with owner arrays/defaults and independent
-  method arguments. No native runtime format change is required.
+  method arguments. Cross-scope forwarding and reordered owner arguments also pass;
+  malformed native owner scopes are rejected. No native runtime format change is required.
 
 - Add typed local addresses and initialization to the metadata API (`Ldloca`, `Initobj`,
   `LoadDefault`). Validate local identity, exact initialization type and definite

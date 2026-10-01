@@ -1,5 +1,7 @@
 using System.Reflection;
 using System.Diagnostics;
+using System.Text;
+using System.Text.Json.Nodes;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyBuilder = NeoCLR.Metadata.Experimental.Model.AssemblyBuilder;
@@ -40,6 +42,20 @@ internal static class GenericOwnerChecks
             if (declaration.GenericArity != copy.GenericArity) throw new Exception("type arity projection");
             if (!declaration.Methods.Zip(copy.Methods).All(p => p.First.GetSignature().SequenceEqual(p.Second.GetSignature()))) throw new Exception("owner signature projection");
         }
+        // Reject malformed declaration scopes before producing a CLI reference image.
+        void RejectNative(Action<JsonNode> mutate)
+        {
+            var document = JsonNode.Parse(graph.WriteNativeAssembly())!;
+            mutate(document);
+            try { NativeAssemblyDefinition.ReadAssembly(Encoding.UTF8.GetBytes(document.ToJsonString())); }
+            catch (InvalidDataException) { return; }
+            throw new Exception("invalid native owner contract accepted");
+        }
+        JsonNode First(JsonNode document) => document["functions"]!.AsArray().Single(m => m!["origin"]!["name"]!.GetValue<string>() == "First" && m["owner"]?["Constructed"] is not null)!;
+        RejectNative(document => First(document)["returns"] = new JsonObject { ["TypeParameter"] = 1 });
+        RejectNative(document => First(document)["owner"]!["Constructed"]!["arguments"]![0] = new JsonObject { ["TypeParameter"] = 1 });
+        RejectNative(document => First(document)["owner"]!["Constructed"]!["arguments"]![0] = "I32");
+        RejectNative(document => document["types"]!.AsArray().Last()!["generic_parameters"] = new JsonArray("T", "U"));
         var method = graph.Types.Last().Methods[0];
         void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new Exception("invalid owner contract accepted"); }
         Reject(() => method.MakeConstructedReference([]));

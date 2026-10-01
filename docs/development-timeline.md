@@ -9667,3 +9667,23 @@ the broad class-library/collection consumer or metadata importing is complete. S
 - **Still open:** generic type owners, constraints/virtual dispatch, imported generics,
   native symbol loading and compiling the full runtime class library. These bounded
   slices do not establish complete System/collection support.
+
+
+### 2026-10-01 — Static generic owner emission milestone
+
+- **Author direction:** continue with another substantial set of slices and commit
+  each slice, preserving the Raven-to-neoCLR emission objective. Earlier direction
+  identified generics as a likely next area; no new full-library completion was claimed.
+- **Assistant action:** implemented bounded static generic type owners in the separate
+  metadata API, preserving independent CLI VAR/MVAR and native owner/method scopes.
+  Integrated shared Raven type/call capabilities and both adapters. The .NET executable
+  exposed an open declaring-type call bug; the source-method resolver now constructs
+  the owner before the generic method.
+- **Validation/outcome:** 64 C# metadata contract groups pass; API-produced native
+  binary verifies/runs 42. Focused Raven Release/Debug tests and the expanded Order
+  consumer pass both targets/source orders, including reordered owner arguments and
+  cross-scope forwarding. See [recorded binary evidence](experiments/extended-cli-metadata/generic-runtime-validation.json),
+  neoCLR producer commit `0da5a3b0`, and Raven integration commit `339587142`.
+- **Open:** generic instance layouts/fields, constraints, imported generics and full
+  class-library compilation remain unimplemented boundaries. The native binary payload
+  plus CLI projection is still a bridge, not the final native compiler backend.

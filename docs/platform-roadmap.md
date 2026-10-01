@@ -745,3 +745,8 @@ on `codex/extended-cli-metadata`; Raven `codex/metadata-consumer`. No Runtime Co
 configuration change. Generic owner arrays/defaults and alias mutation pass; generic
 instance layouts/fields, constraints, imported owners and full class-library compilation
 remain open. See [binary evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
+
+Static generic owner milestone complete: multiple/reordered owner arguments and
+method-to-owner forwarding execute across targets; native reader scope/name checks
+reject malformed declarations. Next bounded emission work remains generic instance
+layouts and fields before constraints/imports/full class-library acceptance.
