@@ -26,7 +26,7 @@ ordinary compiler-required metadata coverage is next.
 author directed a staged codegen refactor. The first slice now feeds both bounded
 backends compiler-lowered bodies, including implicit value returns. The first callable reference table now shares symbol identity resolution with typed
 backend handles. Shared source callable plans separate native source validation from
-builder creation. Shared public nongeneric static-type plans now drive backend type
+builder creation. Shared public/internal nongeneric static-type plans now drive backend type
 builders, including partial declarations coalesced by symbol identity with every part
 validated. Primitive signatures/locals now share logical value/no-result types and
 backend-owned mappers; broader type/field references and full declaration traversal remain next,
@@ -40,7 +40,8 @@ with computed console output on both runtimes. The independent metadata API also
 isolation; ordinary Raven source parameters remain immutable. Backend-owned instruction/built-in-type capability profiles now admit shared bodies
 before native builder allocation, with .NET division/native rejection validating
 selective admission. Logical assembly-function/static-method/static-type categories now share those
-profiles. General object/field, visibility and broader metadata-category contracts and
+profiles. Public/internal static type visibility is also preserved across both targets.
+General object/field, member visibility and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

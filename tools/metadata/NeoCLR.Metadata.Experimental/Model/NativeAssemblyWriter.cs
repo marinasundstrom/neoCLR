@@ -47,8 +47,8 @@ public sealed partial class AssemblyBuilder
         static string FunctionName(MethodBuilder method) => (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.Name);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
         static string[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(t => t.ToString()).ToArray();
-        object Origin(string name, int token, MethodBuilder? method = null) => method is null
-            ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = true }
+        object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
+            ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = "Public", parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
@@ -122,10 +122,11 @@ public sealed partial class AssemblyBuilder
             references = dependencies.Values.Select(d => new { name = ModuleName(d), revision = d.Identity.Version.ToString() }).ToArray(),
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { new { name = Identity.Name, full_name = IdentityText(Identity), modules = new[] { Identity.Name + ".dll" }, references = dependencies.Keys.Select(IdentityText).ToArray() } },
-            types = types.Select((type, index) => new {
-                name = TypeName(type), fields = Array.Empty<object>(), is_reference_type = true, is_abstract = true, is_sealed = true,
-                origin = Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name, 0x02000002 + index)
-            }).ToArray(),
+            types = types.Select((type, index) => new NativeTypeRow(
+                TypeName(type), [], true, true, true,
+                Origin(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name,
+                    0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public),
+                type.Visibility == TypeVisibility.Internal ? "internal" : null)).ToArray(),
             functions = methods.Select((method, index) => new {
                 name = FunctionName(method), owner = Owner(method), parameters = Parameters(method),
                 locals = method.Locals.Select(local => local.Type.ToString()).ToArray(),
@@ -137,4 +138,9 @@ public sealed partial class AssemblyBuilder
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
         return result;
     }
+    private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
+        bool is_abstract, bool is_sealed, object origin,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        string? visibility);
+
 }

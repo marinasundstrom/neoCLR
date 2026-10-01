@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility);
     private sealed record MethodRow(string Name, int Owner, PrimitiveMethodSignature Signature);
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
@@ -62,7 +62,17 @@ public sealed class NativeAssemblyDefinition
             var types = new List<TypeRow>();
             foreach (var type in typeElements)
             {
-                Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin");
+                var visibility = TypeVisibility.Public;
+                if (type.TryGetProperty("visibility", out var access))
+                {
+                    Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin", "visibility");
+                    visibility = access.GetString() switch {
+                        "public" => TypeVisibility.Public,
+                        "internal" => TypeVisibility.Internal,
+                        _ => throw new InvalidDataException("unsupported native type visibility")
+                    };
+                }
+                else Shape(type, "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin");
                 Require(Array(type, "fields", 0).Length == 0 && type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean() && type.GetProperty("is_sealed").GetBoolean(), "unsupported native type shape");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
                 Require(nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
@@ -72,8 +82,8 @@ public sealed class NativeAssemblyDefinition
                 CheckName(ns.Length == 0 ? name : ns + "." + name);
                 var origin = type.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "publicly_visible");
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
-                Require(origin.GetProperty("publicly_visible").GetBoolean(), "nonpublic native type unsupported");
-                types.Add(new(ns, name, nativeName));
+                Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
+                types.Add(new(ns, name, nativeName, visibility));
             }
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -136,7 +146,7 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => graph.AddType(t.Namespace, t.Name)).ToArray();
+        var owners = types.Select(t => graph.AddType(t.Namespace, t.Name, t.Visibility)).ToArray();
         foreach (var method in methods)
         {
             var output = method.Owner < 0 ? graph.AddFunction(method.Name, method.Signature) : owners[method.Owner].AddMethod(method.Name, method.Signature);

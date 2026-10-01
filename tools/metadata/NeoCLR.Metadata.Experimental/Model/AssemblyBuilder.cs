@@ -75,11 +75,19 @@ public sealed partial class AssemblyBuilder
     /// <param name="name">Nonempty metadata name.</param>
     /// <returns>A type owned by this builder.</returns>
     /// <exception cref="ArgumentException">Null/invalid names, duplicate type or more than 256 types.</exception>
-    public TypeBuilder AddType(string @namespace, string name)
+    public TypeBuilder AddType(string @namespace, string name) => AddType(@namespace, name, TypeVisibility.Public);
+    /// <summary>Adds a unique top-level static class with explicit public or assembly visibility.</summary>
+    /// <param name="namespace">Namespace, possibly empty.</param>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <param name="visibility">Public or internal visibility.</param>
+    /// <returns>A type owned by this builder.</returns>
+    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or more than 256 types.</exception>
+    public TypeBuilder AddType(string @namespace, string name, TypeVisibility visibility)
     {
+        if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
             types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
-        var type = new TypeBuilder(this, @namespace, name); types.Add(type); return type;
+        var type = new TypeBuilder(this, @namespace, name, visibility); types.Add(type); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
     /// <returns>Owned PE bytes suitable for conventional readers and the supported neoCLR CLI import bridge.</returns>
@@ -231,7 +239,7 @@ public sealed partial class AssemblyBuilder
         foreach (var function in functions) EmitMethod(function);
         foreach (var type in types)
         {
-            metadata.AddTypeDefinition(TypeAttributes.Public | TypeAttributes.Abstract | TypeAttributes.Sealed,
+            metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | TypeAttributes.Abstract | TypeAttributes.Sealed,
                 metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), objectType,
                 MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(nextMethod));
             foreach (var method in type.Methods) EmitMethod(method);
@@ -246,11 +254,22 @@ public sealed partial class AssemblyBuilder
     }
 }
 
-/// <summary>An editable public static class owned by an AssemblyBuilder.</summary>
+/// <summary>Supported visibility for top-level static types.</summary>
+public enum TypeVisibility
+{
+    /// <summary>Accessible outside the defining assembly.</summary>
+    Public,
+    /// <summary>Accessible only within the defining assembly.</summary>
+    Internal
+}
+
+/// <summary>An editable top-level static class owned by an AssemblyBuilder.</summary>
 public sealed class TypeBuilder
 {
     private readonly List<MethodBuilder> methods = [];
-    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name) { Assembly = assembly; Namespace = @namespace; Name = name; }
+    internal TypeBuilder(AssemblyBuilder assembly, string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public) { Assembly = assembly; Namespace = @namespace; Name = name; Visibility = visibility; }
+    /// <summary>Gets the declared top-level visibility.</summary>
+    public TypeVisibility Visibility { get; }
     /// <summary>Gets the owning assembly.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declared namespace.</summary>

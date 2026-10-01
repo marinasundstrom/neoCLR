@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [TypeVisibility](#typevisibility-development-2026-10-01): public/internal static types and projection.
 - [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
 - [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
 - [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Int64/Boolean/String parameters and results.
@@ -1019,6 +1020,7 @@ public sealed class AssemblyBuilder
                                      bool returnsValue = true);
     public MethodBuilder? EntryPoint { get; set; }
     public TypeBuilder AddType(string @namespace, string name);
+    public TypeBuilder AddType(string @namespace, string name, TypeVisibility visibility);
     public byte[] Write();
     public byte[] WriteNativeAssembly();
 }
@@ -1088,6 +1090,24 @@ is checked between builder call targets, but no core assembly is loaded for this
 primitive-only subset. This format-specific backend is provisional and will evolve
 with the native metadata format.
 
+### TypeVisibility (development 2026-10-01)
+
+`public enum TypeVisibility { Public, Internal }` describes top-level static type
+visibility. `AssemblyBuilder.AddType(namespace, name)` remains public by default;
+its three-argument overload accepts only these two values and throws
+`ArgumentOutOfRangeException` for other values, before adding a type. Names,
+uniqueness and the 256-type bound retain the existing contract. `TypeBuilder.Visibility`
+is a read-only `TypeVisibility` property set at creation. Methods remain public static.
+
+CLI output uses standard Public/NotPublic TypeDef flags. Native output retains the
+existing runtime `visibility: "internal"` and `origin.publicly_visible: false` for
+internal types; public output retains its omitted visibility default. The bounded
+native reader accepts old public artifacts and preserves visibility in its reference
+projection; unknown visibility or inconsistent origin flags raise `InvalidDataException`.
+Internal helpers can be called within the assembly but are inaccessible to external
+Raven consumers through the projection. No nested visibility, friend assemblies or
+nonpublic methods are added. This host API is separate from the guest API reference.
+
 ### TypeBuilder
 
 ```csharp
@@ -1096,6 +1116,7 @@ public sealed class TypeBuilder
     public AssemblyBuilder Assembly { get; }
     public string Namespace { get; }
     public string Name { get; }
+    public TypeVisibility Visibility { get; }
     public IReadOnlyList<MethodBuilder> Methods { get; }
     public MethodBuilder AddMethod(string name, int parameterCount = 0,
                                    bool returnsValue = true);
@@ -1273,7 +1294,7 @@ verifier before execution. Disposing JSON parsing state or changing the input bu
 has no effect on the snapshot. No native file is loaded into a runtime by either API.
 
 Supported declarations are public static Int32/Int64/Boolean/String/no-result functions (including globals)
-and public static classes with no fields. The reader checks canonical identity tuples,
+and public/internal static classes with no fields. The reader checks canonical identity tuples,
 encoded module/type/function names, references, origins, tokens, owner order, entry
 point signature, duplicate declarations and unsupported declaration fields. Unknown
 root/declaration fields and duplicate JSON properties are rejected. It accepts at most

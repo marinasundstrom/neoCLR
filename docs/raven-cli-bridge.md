@@ -1304,3 +1304,44 @@ capability checks. Native binary/driver acceptance is recorded with the matching
 compiler revision below. This is feature-branch development, not published support.
 
 Raven revision `e5b462e74`: [binary runtime and compiler-driver evidence](experiments/extended-cli-metadata/declaration-capabilities-validation.json).
+
+## Internal static helpers on both targets — 2026-10-01
+
+The shared Raven static type plan now carries Public/Internal accessibility, admitted
+explicitly by each backend profile. Both .NET emission and neoCLR emission accept
+internal static helpers. The independent metadata library adds TypeVisibility,
+AddType(namespace, name, visibility) and TypeBuilder.Visibility. The two-argument
+API retains public behavior. No Runtime Contract configuration change is needed.
+
+This adopts the conventional top-level CLI Public/NotPublic distinction rather than
+inventing a new extension ([.NET TypeAttributes reference](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.typeattributes?view=net-10.0),
+consulted 2026-10-01). Native output reuses the runtime's internal type access checks
+and origin.publicly_visible flag; the reference projection preserves NotPublic.
+Compared with keeping all producer types public, this supports implementation helpers
+without exposing them to consumers. It costs an explicit visibility mapping in each
+adapter and consistency validation in the bounded reader. No execution speedup is
+claimed; the shared contract contains no Reflection.Emit or metadata builder handles.
+
+Public artifacts keep their existing omitted visibility default. Old bounded readers
+reject new internal declarations; the updated reader accepts both and rejects
+inconsistent visibility/origin flags. Methods remain public static and primitive-only;
+private/nested types, nonpublic methods and friend assemblies are not added. The
+compiler backend owns source admission, the independent metadata project owns encoding,
+and the runtime owns access enforcement. CLI reference bodies still throw; #Neo remains
+the executable payload. Native metadata/semantic loading and broader backend coverage
+remain subsequent work, not completed by this bridge.
+
+External-access validation also exposed a shared Raven binder gap: qualified type
+expressions skipped accessibility checks even for ordinary .NET metadata. The fix
+uses existing accessibility policy at both qualified type-expression and namespace
+receiver paths. Its regression fails against the previous compiler and is independent
+of neoCLR. Treat this as a general candidate for the shared compiler line, not a
+permanent experiment; the current integration/evidence remain on feature branches.
+
+Validation: 40 C# metadata contract groups pass (including CLI execution, visibility
+projection and malformed declarations); the guest API snapshot check passes. Raven
+`ee07a991e` passes 90 focused codegen/accessibility tests and the full binary runtime
+and rvnc probe. The paired executable runs an internal helper on both targets and a
+separate native consumer through a public facade. A raw API-produced external call
+bypassing source checks fails native verification with `type access denied` in both
+library file orders. [Recorded binary/driver evidence](experiments/extended-cli-metadata/internal-types-validation.json).

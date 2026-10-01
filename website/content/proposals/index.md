@@ -128,7 +128,9 @@ writer also supports typed argument stores; Raven source parameters remain immut
 object/field support and exception regions remain development work.
 Backend instruction/type profiles now admit shared bodies selectively: .NET supports
 shared division while the native writer still rejects it explicitly. The profiles
-also admit assembly functions, static methods and static types independently. General metadata
+also admit assembly functions, static methods and static types independently.
+Public/internal static helpers preserve visibility in CLI and native output and in
+the temporary compiler reference projection. General metadata
 category contracts, codegen portability and metadata importer work remain development
 tasks on the feature branches.
 

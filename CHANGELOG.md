@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add public/internal static type visibility to the independent metadata builder,
+  CLI output and native reference projection. Raven emits internal helpers through
+  its shared type plan; native runtime loading uses the existing visibility contract.
+  Integration also fixes Raven qualified-type accessibility for ordinary .NET references.
+
 - Raven backend profiles now admit logical declaration categories independently:
   assembly functions, static methods and static types. Preserve native ownership
   and the temporary CLI carrier representation without a metadata format change.

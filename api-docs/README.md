@@ -449,3 +449,6 @@ Emit(OpCode, string), Ldstr and the stack-consuming WriteConsoleLine() overload.
 These remain host-only APIs under the same explicit guest-reference exclusion above.
 
 The host reference includes Starg/StoreArgument and its typed by-value slot contract.
+
+The host reference covers TypeVisibility, the explicit AddType overload and
+TypeBuilder.Visibility, including native/reference projection consistency.
