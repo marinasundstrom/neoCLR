@@ -1461,5 +1461,33 @@ Validation: 45 C# contract groups and API snapshot check pass. A directly produc
 binary runs legal same-type private and same-assembly internal calls to 42. Native
 verification rejects external private/internal calls and same-assembly private calls
 from another owner. [Independent API/runtime evidence](experiments/extended-cli-metadata/method-visibility-api-validation.json).
-Raven source support is the next slice; this foundation does not yet alter its native
-source admission or Runtime Contract configuration.
+The foundation commit was followed by the Raven integration below; no Runtime Contract
+configuration changes are required.
+
+
+## Raven static method access integration — 2026-10-01
+
+Raven `7fa72b67b` on `codex/metadata-consumer` consumes the separate metadata API at
+`5ccc41e8` on `codex/extended-cli-metadata`. Shared callable plans carry source access
+and backend capabilities explicitly admit public/internal/private static methods.
+The native declaration adapter maps access; .NET retains its established MethodAttributes
+and carrier policy. This enables hidden implementation helpers on both targets using
+CLR-style visibility, with explicit mapping as the maintenance cost. No new runtime
+instruction, format version or Runtime Contract configuration is introduced.
+
+The compiler owns source admission and diagnostics; the metadata library owns CLI/native
+serialization; the existing runtime verifier owns resolved access enforcement. PE/#Neo
+still carries a throwing CLI reference projection plus native execution payload. The
+existing Raven semantic importer consumes that projection; replacing it with native
+metadata loading is deferred. Assembly-function access remains the bounded public
+encoding, with nonpublic library functions rejected. Protected and instance native
+methods remain unsupported. No performance claim or per-call cache redesign is made.
+
+Validation: 83 focused Raven C# tests and the complete binary runtime/rvnc probe pass.
+Private same-owner and internal cross-owner helper calls execute to 42 on both targets.
+Separate libraries in both source orders retain access; Raven rejects external private/
+internal calls and native verification rejects raw API callers independently.
+[Recorded Raven/runtime evidence](experiments/extended-cli-metadata/method-visibility-raven-validation.json)
+includes artifact hashes and runtime identity. The independent metadata foundation's
+45 C# contract groups and direct binary access tests remain applicable. These are
+feature-branch revisions, not main or published support.

@@ -130,7 +130,8 @@ Backend instruction/type profiles now admit shared bodies selectively. Signed In
 backends, including truncation and zero/overflow fault cases. The profiles
 also admit assembly functions, static methods and static types independently.
 The separate metadata API also preserves public/internal/private static method access;
-Raven source integration is subsequent work.
+Raven emits these helpers through shared declaration plans, with compiler and runtime
+checks rejecting inaccessible dependency calls.
 Public/internal static helpers preserve visibility in CLI and native output and in
 the temporary compiler reference projection. General metadata
 category contracts, codegen portability and metadata importer work remain development

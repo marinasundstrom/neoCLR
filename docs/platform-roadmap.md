@@ -42,7 +42,8 @@ before native builder allocation, with restricted-profile tests validating
 selective admission. Signed Int32/Int64 division, remainder, bitwise AND/OR/XOR and signed shifts now execute on both backends. Logical assembly-function/static-method/static-type categories now share those
 profiles. Public/internal static type visibility is also preserved across both targets.
 The independent metadata API now preserves public/internal/private static method
-visibility, with direct binary runtime enforcement; Raven integration is the next slice.
+visibility, with direct binary runtime enforcement. Raven now emits these methods
+through shared visibility admission and preserves access in compiler references.
 General object/field and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
