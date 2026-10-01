@@ -25,6 +25,23 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Integrating independently proven Raven fixes
+
+- **Author:** Requested a specific fix branch based on main for binding and other
+  fixes that benefit Raven independently, except where already isolated and committed.
+  Added: “If we can prove these fixes, we can integrate them into main.”
+- **Assistant:** Extracted six fixes from the metadata-consumer branch into
+  `codex/compiler-fixes-from-neoclr`, preserving individual commits and replacing
+  integration-only test assertions with ordinary C# compiler/runtime regressions.
+- **Observed outcome:** Original main fails 16 of 23 regression cases; all 23 pass
+  with the fixes, alongside 174 surrounding cases. Local Raven main was fast-forwarded
+  from `d7040e21d` to `e5607ca17`. No push was performed. Modern .NET validation does
+  not establish native neoCLR execution or full-suite qualification.
+- **Still open:** Broader shared lowering/initialization abstractions require separate
+  isolation and validation. The order-collections Option constructor mismatch is
+  still unfixed. Native backend/metadata work remains on feature branches.
+- **Evidence:** [Readiness assessment and independent commit inventory](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md#independent-raven-fixes-integrated-into-local-main).
+
 ## 2026-09-30: Measuring JSON versus native assemblies
 
 - **Author:** “We will have to benchmark this. JSON vs Assembly”.

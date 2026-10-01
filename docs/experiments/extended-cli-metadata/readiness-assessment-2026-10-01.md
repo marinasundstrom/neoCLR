@@ -146,3 +146,32 @@ python3 docs/experiments/raven-target/verify_readiness_controls.py \
 The inventory/control commands record expected gaps; their successful process exit
 means the report was produced, not that all source programs passed. No full test suite,
 website build, new benchmark or release qualification was performed.
+
+## Independent Raven fixes integrated into local main
+
+At the author's direction, `codex/compiler-fixes-from-neoclr` was created from
+Raven main `d7040e21d`. Six general fixes were extracted by behavior, retaining
+ordinary .NET tests and excluding native metadata/backend dependencies:
+
+| Fix | Independent commit |
+| --- | --- |
+| Complete assignment RHS parsing | `43adcfca1` |
+| Accessible setters on public read-only properties | `ea0f91399` |
+| Stable property/accessor/backing-field identity and initializers | `1bca614cb` |
+| Qualified external type accessibility | `85cb7f316` |
+| Generic methods on constructed declaring types | `854adde3d` |
+| Implied default-constructor metadata flag for struct constraints | `b4052b0aa` |
+
+The new C# regression cases fail 16/23 on original main and pass 23/23 after
+extraction; 174 surrounding tests also pass. Fresh-worktree build and focused
+compiler build pass. Execution validation uses modern .NET/net11.0, not native
+neoCLR, .NET Framework or NanoFramework. Runtime Contract configuration and target
+selection remain unchanged. Raven's `docs/compiler/general-fixes-from-neoclr.md`
+records provenance and reproduction filters.
+
+Local Raven main was fast-forwarded to `e5607ca17`, including the validation record.
+No remote push was performed. The native metadata API and backend remain on their
+feature branches; main integration of these compiler fixes does not imply native
+target readiness. Shared vector-loop/transfer lowering (`a9defade8`), shared field
+initialization plans and backend abstractions still need separate extraction and
+validation. The order-collections Option constructor mismatch remains unfixed.

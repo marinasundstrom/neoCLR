@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record six independent Raven parser, binding and CLR-emission fixes extracted into
+  a dedicated main-based branch and integrated into local Raven main (`e5607ca17`).
+  All 23 regression and 174 surrounding cases pass; 16 regressions fail on the base.
+  Native target work and broader lowering candidates remain separate; no push performed.
+
 - Assess direct metadata-backend readiness with unchanged library/application sources
   and reproducible legacy-bridge controls. Record the native target-profile gate,
   missing implementation-bootstrap declarations and an emitted Option constructor
