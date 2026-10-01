@@ -25,6 +25,29 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Definitions are the editable metadata model
+
+- **Author:** Clarified the expected layering: “Builders -> Definitions -> Encoded
+  assembly”. Definitions should be directly constructible; builders facilitate creating
+  types and members. Supplied a Mono.Cecil example creating an assembly, a struct based
+  on System.ValueType, a public field, and writing the assembly through definitions.
+- **Assistant:** Acknowledged that the current implementation does not meet that model:
+  loaded AssemblyDefinition objects are immutable snapshots while AssemblyBuilder owns
+  a separate mutable graph consumed by the writers. Described the split as temporary,
+  not the intended Cecil-like abstraction.
+- **Assistant action:** Finished the already-running value-payload/address slice
+  (633a4a4a), validated by 75 C# groups and CLR/native execution, then recorded unifying
+  the definition model as the next priority before adding more builder-only features.
+- **Proposed implementation sequence:** Make definitions authoritative for the editable
+  assembly graph, make builders thin facades over the same objects, route writers through
+  definitions, and progressively materialize supported loaded metadata/bodies into that
+  same model. Validate direct definition construction and builder/definition mutation
+  identity, retaining existing Raven/native executable checks. Unsupported loaded content
+  must not be silently discarded during editing.
+- **Open:** This conversation records a correction and a refactor plan, not completion
+  of the unified model. Full runtime-library emission and the collections union/import
+  gate remain open. See the [API direction](../api-docs/experimental-metadata.md#definition-first-model-author-direction-2026-10-01).
+
 ## 2026-10-01: Existing samples remain the end-to-end acceptance target
 
 - **Author:** Clarified that the main goal is Raven compiling neoCLR assemblies which

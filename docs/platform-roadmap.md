@@ -5,13 +5,24 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Author-directed architecture correction (2026-10-01):** definitions must be the
+canonical editable assembly graph, usable directly; builders must be optional facades
+that mutate the same definitions, and writers must consume definitions. The current
+immutable-snapshot/separate-builder graph does not meet this requirement. After finishing
+the in-progress value payload/address slice (633a4a4a), prioritize this refactor before
+more builder-only capability expansion. The first acceptance case is direct definition
+construction of the author's struct/field example plus preserved builder compatibility.
+[Plan and current gap](../api-docs/experimental-metadata.md#definition-first-model-author-direction-2026-10-01)
+and [conversation](development-timeline.md#2026-10-01-definitions-are-the-editable-metadata-model).
+This changes the immediate implementation sequence, not the Raven/native end-to-end goal.
+
 **Value-type category prerequisite (2026-10-01):** the metadata producer now emits
 owned nongeneric/generic value definitions with primitive fields and preserves CLI
 VALUETYPE categories through native binary projection. Default values, field reads,
 generic forwarding and arrays verify/run on CLR and neoCLR (42). Raven admission and
-the collections Option<Order> gate remain unchanged. Next add generic payload storage,
-addressed mutation and explicit imported value-type/category mapping before union
-emission; do not represent value unions as classes.
+the collections Option<Order> gate remain unchanged. Generic payload storage and addressed local mutation now pass (633a4a4a); explicit
+imported value-type/category mapping and union emission remain open. The newer
+definition-model direction above takes priority; do not represent value unions as classes.
 [Evidence](experiments/extended-cli-metadata/value-type-validation.json).
 
 **Nominal method imports (2026-10-01):** separately emitted Raven binaries now execute

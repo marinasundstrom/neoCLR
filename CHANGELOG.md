@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record the author's definition-first metadata architecture and planned refactor:
+  directly editable definitions, optional builders over the same graph, and definition-
+  driven writers. The current snapshot/producer split remains an acknowledged gap;
+  prioritize unification before further builder-only features.
+
 - Add generic payload fields and initialized local-address field access for producer
   value types. CLR/native tests preserve value and array copies plus reference payload
   aliases. Invalid receiver types, uninitialized locals and stores into value copies

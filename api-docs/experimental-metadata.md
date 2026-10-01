@@ -3215,3 +3215,46 @@ payloads and arrays retain copies, while reference payloads retain their aliases
 The legacy native managed-reference store returns an inhabited Void value; the native
 writer appends a pop (and adjusts branch offsets) to preserve CLI stfld stack behavior.
 No runtime opcode or format change is introduced.
+
+## Definition-first model (author direction, 2026-10-01)
+
+**Planned refactor, not implemented API:** definitions are the canonical editable
+metadata model. Builders are optional convenience facades over those exact objects;
+writers consume definitions. A caller must be able to construct an assembly/module,
+a TypeDefinition with attributes and an explicit base-type reference, and field/method
+members, then write it without using a builder. A builder must expose its definition
+and preserve object identity: editing that definition affects subsequent output without
+copying or synchronizing a second graph.
+
+The current implementation instead uses immutable loaded definition snapshots and a
+separate mutable producer graph. This is an architectural gap. The earlier bounded
+builder APIs are compatibility surfaces, not the long-term source of truth. The
+Cecil comparison is about the editable graph and ownership model, not dependence on
+host reflection or an identical API spelling. Value-type classification follows the
+base-type/category contract; sealed/layout attributes alone do not establish that a
+type is a value type. Explicit target core identities remain essential for neoCLR.
+
+The next implementation slices are:
+
+1. Establish constructible assembly/module/type/field definitions and explicit type
+   references with ownership-aware member collections. Use the author's manual struct
+   example as a C# contract test. Encode a sealed sequential value type based on the
+   configured core's ValueType and inspect/load the produced CLI/native assembly.
+2. Move existing producer state into definitions and adapt builders into facades.
+   Keep existing Raven-facing calls compatible where practical. Check that a builder
+   and direct edits see the same definition objects and encode equivalent output;
+   temporary adapters must not become a second authoritative graph.
+3. Move method signatures, locals and instructions into definition/body objects, retain
+   type-safe/raw Emit helpers, and make both writers consume that representation.
+   Preserve symbolic branch targets and recalculate offsets on encoding; an ILProcessor
+   can then provide insertion helpers without requiring a separate body model.
+4. Materialize supported read metadata and bodies into the same definitions for
+   read–edit–write. Preserve opaque unchanged input where possible and explicitly reject
+   edits that would discard unsupported metadata. Do not claim arbitrary loaded assembly
+   editing until preservation and executable roundtrip tests establish it.
+
+Validation must cover manual construction, ownership/identity, edits made through both
+surfaces, repeated writing and supported loaded roundtrips, plus existing C# tests and
+Raven-to-native consumers. The roadmap's unchanged collections/runtime-library acceptance
+remains the overall goal; this author-directed refactor precedes more builder-only
+feature expansion. No new constructor or mutation API in this plan is shipped yet.
