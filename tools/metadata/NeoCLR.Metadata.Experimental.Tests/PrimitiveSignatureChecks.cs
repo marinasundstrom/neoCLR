@@ -22,6 +22,8 @@ internal static class PrimitiveSignatureChecks
         choose.LoadArgument(0); choose.Return();
         choose.MarkLabel(otherwise); choose.LoadConstant(0); choose.Return();
         var main = graph.AddFunction("Main"); graph.EntryPoint = main;
+        main.Emit(OpCode.Ldc_Bool, false); main.Call(identity); main.Emit(OpCode.Pop);
+        main.LoadConstant(7); main.Call(integer); main.Emit(OpCode.Pop);
         main.LoadConstant(42); main.Emit(OpCode.Ldc_Bool, true); main.Call(identity); main.Call(choose); main.Return();
         if (!Equals(System.Reflection.Assembly.Load(graph.Write()).EntryPoint!.Invoke(null, null), 42)) throw new Exception("primitive CLI execution");
         var projection = RuntimeAssemblyContainer.ReadCliProjection(RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), core));
@@ -45,6 +47,13 @@ internal static class PrimitiveSignatureChecks
         Reject<ArgumentException>(() => new PrimitiveMethodSignature(PrimitiveType.Void, Enumerable.Repeat(PrimitiveType.Int32, 257)));
         entry.ClearBody(); entry.LoadConstant(1); entry.Call(imported); entry.Return();
         Reject<InvalidDataException>(() => consumer.Write());
+        entry.ClearBody(); entry.Emit(OpCode.Pop); entry.LoadConstant(42); entry.Return();
+        Reject<InvalidDataException>(() => consumer.Write());
+        Reject<InvalidDataException>(() => consumer.WriteNativeAssembly());
+        var finish = consumer.AddFunction("Finish", returnsValue: false); finish.Return();
+        entry.ClearBody(); entry.Call(finish); entry.Emit(OpCode.Pop); entry.LoadConstant(42); entry.Return();
+        Reject<InvalidDataException>(() => consumer.WriteNativeAssembly());
+        Reject<ArgumentException>(() => entry.Emit(OpCode.Pop, 0));
         graph.EntryPoint = graph.AddFunction("BooleanEntry", new(PrimitiveType.Boolean, []));
         graph.EntryPoint.Emit(OpCode.Ldc_Bool, true); graph.EntryPoint.Return();
         Reject<InvalidDataException>(() => graph.WriteNativeAssembly());

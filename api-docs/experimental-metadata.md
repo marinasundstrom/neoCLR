@@ -1585,7 +1585,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1598,6 +1598,7 @@ public sealed partial class MethodBuilder {
 | Opcode | Operand | Contract |
 | --- | --- | --- |
 | Ldc_I4 | int | Push a signed Int32 constant. |
+| Pop | none | Discard one value of either supported primitive type; empty stack rejects when writing. |
 | Ldarg | int | Load the zero-based declared primitive argument; bounds checked when writing. |
 | Add, Sub, Mul | none | Consume two Int32 values and push the arithmetic result. |
 | Call | MethodBuilder | Use the target signature; external core/identity constraints checked when writing. |
@@ -1808,3 +1809,16 @@ The C# local contracts execute Boolean locals in CLI, inspect their reflected ty
 roundtrip native projections and reject cross-type stores and uninitialized loads.
 Raven's shared planner now carries local types to each backend and validates a program
 that stores a predicate result, reassigns it and compares Boolean locals on both runtimes.
+
+
+### Discarding call results (development, 2026-10-01)
+
+`MethodBuilder.Emit(OpCode.Pop)` removes one evaluation-stack value, preserving all
+values below it. It accepts no operand and works for Int32 or Boolean. Emission with
+an operand throws ArgumentException without appending an instruction. Writer flow
+validation throws InvalidDataException on underflow, including popping after a
+no-result call. A no-result call has no value to discard. CLI emission uses `pop`;
+native emission uses neoIL `pop`, with no schema change. Existing limits and branch
+join checks continue to apply. Tests execute discarded Boolean and Int32 calls in
+CLI and verify native writer rejection of underflow; Raven's binary-assembly consumer
+also executes local and imported statement calls in neoCLR.

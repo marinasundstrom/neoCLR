@@ -53,6 +53,7 @@ public sealed partial class AssemblyBuilder
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
+            "pop" => new { op = "pop" },
             "equal" => new { op = "ceq" },
             "less" => new { op = "clt" },
             "greater" => new { op = "cgt" },

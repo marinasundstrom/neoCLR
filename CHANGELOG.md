@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add checked operand-free Pop to the experimental metadata API. Raven's shared
+  body path can discard Int32/Boolean call results in statement position while
+  preserving call side effects and no-result Unit stack behavior. Native execution
+  uses the existing pop instruction; no metadata schema change is required.
+
 - Add immutable Int32/Boolean/no-result primitive signatures to the experimental
   metadata API, with typed declarations, imports, MemberRef resolution and native
   reference projections. Keep Int32-only convenience/recognition contracts and

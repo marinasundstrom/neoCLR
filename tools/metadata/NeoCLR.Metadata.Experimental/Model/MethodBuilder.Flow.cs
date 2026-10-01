@@ -85,6 +85,9 @@ public sealed partial class MethodBuilder
             switch (instruction.Op)
             {
                 case "label": case "console.line": break;
+                case "pop":
+                    if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
+                    stack.RemoveAt(stack.Count - 1); break;
                 case "constant": stack.Add(false); break;
                 case "argument": stack.Add(Signature.ParameterTypes[instruction.Value] == PrimitiveType.Boolean); break;
                 case "boolean": stack.Add(true); break;

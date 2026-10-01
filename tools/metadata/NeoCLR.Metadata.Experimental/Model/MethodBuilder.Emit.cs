@@ -6,7 +6,7 @@ public enum OpCode
 {
     /// <summary>Pushes an Int32 constant; requires an Int32 operand.</summary>
     Ldc_I4,
-    /// <summary>Loads an Int32 argument by zero-based index; requires an Int32 operand.</summary>
+    /// <summary>Loads a declared primitive argument by zero-based index; requires an Int32 operand.</summary>
     Ldarg,
     /// <summary>Adds two Int32 values.</summary>
     Add,
@@ -18,9 +18,9 @@ public enum OpCode
     Call,
     /// <summary>Returns with the method's declared stack shape.</summary>
     Ret,
-    /// <summary>Loads an Int32 local; requires a slot index or owned local.</summary>
+    /// <summary>Loads a declared primitive local; requires a slot index or owned local.</summary>
     Ldloc,
-    /// <summary>Stores an Int32 local; requires a slot index or owned local.</summary>
+    /// <summary>Stores a declared primitive local; requires a slot index or owned local.</summary>
     Stloc,
     /// <summary>Compares matching Int32 or Boolean values for equality, pushing Boolean.</summary>
     Ceq,
@@ -35,19 +35,21 @@ public enum OpCode
     /// <summary>Consumes Boolean and branches when false.</summary>
     Brfalse,
     /// <summary>Pushes a Boolean constant; requires a Boolean operand.</summary>
-    Ldc_Bool
+    Ldc_Bool,
+    /// <summary>Discards the top evaluation-stack value.</summary>
+    Pop
 }
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Appends an operand-free arithmetic, comparison or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt or Ret.</param>
+    /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
+    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt, Pop or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
-            OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
+            OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));

@@ -197,3 +197,6 @@ Development on the metadata branches also preserves Boolean parameters/results a
 Raven declarations, native reference projections and imported overloads. Typed Boolean
 locals, assignment, equality and short-circuit &&/|| now share the same body path. Int32/no-result
 entrypoints and the existing System bootstrap limits remain unchanged.
+
+The shared compiler body path also supports value-returning calls in statement position,
+using checked stack discards while retaining call side effects and no-result Unit behavior.
