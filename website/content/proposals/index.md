@@ -245,4 +245,6 @@ The development metadata API now represents root classes, primitive mutable inst
 Development checkpoint (2026-10-01): Raven private mutable primitive storage now
 emits as a field without property/accessor rows. The selected Order consumer and its
 private-storage helper verify and execute on both .NET and binary neoCLR; this is
-bounded emission coverage, not a complete class-library build.
+bounded emission coverage, not a complete class-library build. Computed getters and
+implemented property accessors now share the same pipeline, including private setters
+and optional backing storage.

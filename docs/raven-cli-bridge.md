@@ -1965,3 +1965,25 @@ it adds no native semantics, Runtime Contract option or metadata encoding. The n
 backend will consume the same bound setter calls as .NET. 60 focused property binding,
 execution and regression tests passed; explicit native accessor emission is a separate
 slice. This general fix is intended for Raven's shared line, not a permanent target fork.
+
+
+## Raven computed properties and explicit accessors — 2026-10-01
+
+The native compiler producer now accepts primitive computed property expressions and
+implemented get/set block or arrow accessors on bounded root classes. Shared callable
+plans feed existing body lowering and field/call adapters on .NET and neoCLR. Optional
+backing fields preserve Raven's `field` semantics; computed-only properties acquire no
+storage. Property associations and accessor access remain standard CLI reference rows
+with matching native execution metadata. This is coverage of the existing format,
+not a new metadata category, Runtime Contract switch or schema. It builds on the existing
+root/property design comparison and the shared setter-binding correction above.
+
+The executable Gauge helper covers computed-only getters, block accessors, a private
+setter on `val`, setter branching and `field` reads/writes. Both source orders verify/run
+to 42 on .NET and binary neoCLR alongside unchanged Order source. Projection assertions
+check two Gauge fields, four properties and nine methods, including private/getter-only
+accessor shapes. Independent C# Release/Debug tests check behavior and metadata; the
+60-test focused emission set passes. The [saved evidence](experiments/extended-cli-metadata/order-runtime-validation.json)
+includes the consumer and runtime hashes. Explicit accessor lists without bodies still
+reject before output; initializers, init-only accessors, indexers, virtual dispatch,
+nominal signatures and full native metadata/backend replacement remain future slices.

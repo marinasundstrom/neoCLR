@@ -24,7 +24,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   property mutation through aliases on both runtimes. Ordinary nonvirtual instance
   calls now share receiver-first evaluation, including private nested calls and
   no-result mutation. Private mutable primitive storage now emits only a field,
-  with qualified reads shared across backends. Nullable/external locals,
+  with qualified reads shared across backends. Computed properties and implemented
+  get/set accessors now share body lowering, preserving private setter visibility and
+  optional backing storage. Nullable/external locals,
   implicit constructors, initializers and nominal signatures remain gaps.
 
 - Add non-indexed primitive property associations to the metadata producer and native
