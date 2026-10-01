@@ -16,6 +16,9 @@ internal static class DefaultValueChecks
         var vector = graph.AddFunction("EmptyVector", new MethodSignature(vectorType, []));
         vector.LoadDefault(vectorType); vector.Return();
         var main = graph.EntryPoint!; main.ClearBody();
+        var skip = main.DefineLabel();
+        main.Emit(OpCode.Ldc_Bool, true); main.Emit(OpCode.Brtrue, skip);
+        main.LoadDefault(PrimitiveType.Int32); main.Emit(OpCode.Pop); main.MarkLabel(skip);
         main.Call(vector); main.Emit(OpCode.Pop);
         main.Call(empty.MakeGenericInstance(PrimitiveType.String)); main.Emit(OpCode.Pop);
         main.Call(empty.MakeGenericInstance(graph.Types[0])); main.Emit(OpCode.Pop);

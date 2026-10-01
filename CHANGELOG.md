@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   `LoadDefault`). Validate local identity, exact initialization type and definite
   assignment; addresses cannot escape through the bounded value signatures. Ordinary
   CLI/native instructions initialize generic primitive, string, object and vector
-  defaults; producer binaries verify/run 42 on neoCLR.
+  defaults; producer binaries verify/run 42 on neoCLR. Raven shares default-value
+  planning and capability admission across adapters. Generic clearing executes on both
+  runtimes; dereferencing a cleared reference element raises a null-reference fault.
 
 - Extend generic metadata calls to ordinary instance methods on owned root classes.
   Preserve receiver identity and generic parameter scope in CLI MethodSpec and native

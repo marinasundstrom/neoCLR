@@ -297,3 +297,7 @@ Generic types and virtual/constrained generic dispatch remain future work.
 
 The development metadata API also emits typed default initialization, including generic
 method parameters, with CLI/native execution tests and definite-assignment checks.
+
+Raven's shared emission path now uses that initialization contract for default(T)
+and generic array clearing; binary consumers verify numeric defaults and null-reference
+faults after clearing object elements on .NET and neoCLR.

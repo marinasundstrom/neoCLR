@@ -721,3 +721,9 @@ Generic-storage follow-through (2026-10-01): typed default producer support now 
 binary CLI/native execution. Local address/initobj/default helpers preserve method
 parameter scope and definite assignment. Raven default(T) and generic clearing are
 the next bounded integration, before generic owner/constraint and import work.
+
+Typed default integration now passes Raven-to-.NET/neoCLR execution, including generic
+numeric clearing and null-reference faults after clearing object vectors. The producer
+API also preserves branch offsets around initialization and rejects invalid local-address
+provenance. This completes the bounded receiver/default milestone; generic owners,
+constraints, imported generics and full class-library compilation remain open.

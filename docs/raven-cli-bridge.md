@@ -2360,3 +2360,11 @@ comparison. A new default opcode or special generic runtime intrinsic would dupl
 existing typed storage semantics; scratch-local lowering is simpler and preserves
 backend independence, at the cost of one local and three instructions per default site.
 No performance improvement is claimed; scratch reuse is a possible later optimization.
+
+Raven now lowers supported default values through a shared DefaultValue operation with
+backend-owned scratch locals. Generic numeric array clearing and typed primitive/
+reference defaults pass the expanded binary consumer on both source orders and runtimes.
+Clearing an Order vector and dereferencing an element raises a null-reference fault on
+both. C# Release/Debug tests validate defaults and capability denial. Reference-loading,
+nullable-source signatures and general byref contracts remain deferred; this is direct
+emission using the existing .NET binding bootstrap. [Evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).

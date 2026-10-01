@@ -9645,3 +9645,25 @@ the broad class-library/collection consumer or metadata importing is complete. S
   source diagnostics without output. See the [generic evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).
   This completes the unconstrained owned static-generic milestone, not generic types,
   constrained dispatch, native symbol imports or full System collection compilation.
+
+## 2026-10-01 — generic receivers and typed defaults
+
+- **Author:** requested another large set of slices to a reasonable stopping point,
+  then reiterated continuation after the active slice.
+- **Assistant:** selected ordinary generic class instance methods as the next connected
+  metadata/runtime/compiler boundary. Extended owned API calls and native verifier
+  admission, keeping virtual/byref and generic-constructor restrictions. Raven shares
+  receiver-aware planning through an explicit instance-generic capability.
+- **Performed validation:** generic forwarding and mutation, no-result copy/reverse,
+  recursion, receiver/argument order and independent receivers execute from binary
+  assemblies on .NET and neoCLR. A native test forces collection inside a generic call
+  to exercise receiver/argument rooting. Wrong receivers and generic constructor
+  projections reject.
+- **Assistant follow-through on continuation:** added typed local address/initobj/default
+  producer support, then shared Raven default(T) emission and generic array clearing.
+  Primitive/reference defaults execute on both runtimes; cleared object elements fault
+  when dereferenced. The [updated evidence](experiments/extended-cli-metadata/generic-runtime-validation.json)
+  records source/runtime hashes and source-order coverage.
+- **Still open:** generic type owners, constraints/virtual dispatch, imported generics,
+  native symbol loading and compiling the full runtime class library. These bounded
+  slices do not establish complete System/collection support.
