@@ -12,11 +12,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Add the explicit namespace overload and namespaced import contract. The temporary
   CLI projection reserves `<NeoFunction>` names; existing global encodings are unchanged.
   New namespace-bearing artifacts require the matching runtime/metadata reader.
+  Raven now emits namespace functions through shared admission and executes the
+  original integer Math declarations on both .NET and binary neoCLR.
 
 
 - Record actual Raven class-library emission probes and select order-collections as
-  the broad acceptance target. Selected integer Math functions bind but need native
-  namespace-function metadata; whole-file dependency binding remains incomplete.
+  the broad acceptance target. Selected integer Math functions now emit and execute;
+  whole-file dependency binding remains incomplete.
 
 
 - Add public/internal assembly-function visibility to the independent metadata API,

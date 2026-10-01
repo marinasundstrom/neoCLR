@@ -6,15 +6,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 ## Current work
 
 **Latest author-directed acceptance (2026-10-01):** compile real Raven class-library
-parts before broader metadata loading. The source inventory now isolates namespace
-function metadata as the first emission gap: unchanged Int32 Math Min/Max/Sign
-bind but cannot emit. Whole Math/UnicodeScalar/GC first require native dependencies.
-The metadata API/runtime now support ownerless namespace identity; compiler integration
-and real-source execution are the next gate. After this baseline, use the [order-collections application](experiments/raven-target/samples/application-order-collections.rvn)
-as the broad codegen/metadata acceptance case, compiling its library dependencies
-incrementally. This is a selected target, not a passing native source build.
-[Evidence and next slice](raven-cli-bridge.md#class-library-emission-acceptance--2026-10-01).
-
+parts before broader metadata loading. The original integer Math Min/Max/Sign
+functions now emit with native namespace identity and execute 11 boundary cases on
+.NET and binary neoCLR in both source orders. This is selected-source coverage under
+the host-core bootstrap, not a full System build. Whole Math/UnicodeScalar/GC still
+require native dependencies. Next use the [order-collections application](experiments/raven-target/samples/application-order-collections.rvn)
+to drive constructor/property, object, generic and delegate contracts incrementally.
+[Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 
 **Compatibility baseline reaffirmed (2026-10-01):** preserve ordinary .NET/CLI metadata
 and instruction encodings, with explicit neoCLR extensions. The current native #Neo

@@ -234,6 +234,7 @@ The compiler now uses one primitive value/no-result contract for signatures and 
 with separate .NET/native type mappers. This is an internal migration boundary; general
 nominal, generic and array type support remains pending in the native backend.
 
-Development metadata/runtime support now preserves namespaces on ownerless functions;
-the temporary CLI projection uses encoded global names. Real class-library source
-compilation remains incremental, with full native symbol import deferred.
+Development metadata/runtime/compiler support now preserves namespaces on ownerless
+functions; the temporary CLI projection uses encoded global names. Original integer
+Math declarations execute on both .NET and binary neoCLR. Full class-library source
+compilation and native symbol import remain incomplete.
