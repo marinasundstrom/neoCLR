@@ -50,7 +50,9 @@ array emission milestone is complete: [evidence](experiments/extended-cli-metada
 The next connected milestone is indexed properties: metadata producer/projection
 support now preserves index parameters and overloaded accessor associations.
 API-produced binaries verify and execute indexed accessors on neoCLR (42); shared
-Raven consumption follows. Broader field/constructor shapes and
+Raven now emits indexed accessor calls and associations; overloads, multiple indices
+and read-only getters execute on both targets in both source orders (42). A richer
+Order collection consumer is the next acceptance slice. Broader field/constructor shapes and
 generic/delegate/union contracts remain subsequent work. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

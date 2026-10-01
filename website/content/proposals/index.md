@@ -279,4 +279,5 @@ and the full runtime class-library build remain incomplete.
 
 Development metadata work now includes indexed property signatures and overloads,
 preserving CLI/native accessor associations. API-produced indexed assemblies now
-verify and execute on neoCLR; Raven consumption is the next slice.
+verify and execute on neoCLR; Raven also emits shared indexed accessor calls, including
+overloads and multiple indices.

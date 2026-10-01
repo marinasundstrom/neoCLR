@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   CLI property parameters and native parameter lists, including overloaded indexers
   and read-only associations, through reference projections. API-produced binary
   assemblies now verify and execute overloaded getters and multi-index setter-only
-  associations on neoCLR, returning 42. Existing runtime instructions suffice.
+  associations on neoCLR, returning 42. Existing runtime instructions suffice. Raven
+  now consumes indexed properties through shared accessor planning and explicit
+  capabilities; overloads and multi-index properties execute on both targets.
 
 - Add bounded vector signatures for primitive and owned root-class elements across
   parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native
