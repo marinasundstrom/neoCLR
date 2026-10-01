@@ -490,3 +490,8 @@ FieldBuilder.IsReadOnly and AddField's optional isReadOnly argument (2026-10-01)
 also covered in the manual host reference under the same RavenDoc exclusion. The
 reference documents writer restrictions, native runtime enforcement and rebuild/runtime
 compatibility requirements; no guest Raven public API is added by this slice.
+
+The same host-only exclusion covers SignatureType.ArrayOf/ArrayElement,
+LocalDefinition.SignatureType and MethodBuilder vector helpers/raw typed Emit overload
+(2026-10-01). Their signatures, errors, CLI/native representations and current element
+limits are documented in the [manual metadata reference](experimental-metadata.md#vector-declarations-development-2026-10-01).

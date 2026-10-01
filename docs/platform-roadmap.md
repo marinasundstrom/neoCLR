@@ -40,13 +40,14 @@ including private stored properties. Explicit root `base()` uses the existing in
 contract after semantic validation; side-effecting initializers and both body forms execute
 on both runtimes. Readonly instance storage now preserves CLI/native flags and rejects
 ordinary direct/managed-address writes in verification and execution; Raven consumes it
-for private `val` storage and stored `val` properties. The next connected milestone is
-vector emission: metadata declarations now preserve CLI SZARRAY/native ArrayRef for
+for private `val` storage and stored `val` properties. The connected vector milestone
+is now implemented: metadata declarations now preserve CLI SZARRAY/native ArrayRef for
 primitive and owned-class arrays. API-produced binaries now allocate, index, mutate
 and measure arrays on neoCLR, including aliasing and bounds faults. Raven now emits
 array literals, storage, calls, indexing and Length on both targets; Order-array alias
-mutation returns 42 in both source orders. Array iteration follows. Next
-are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
+mutation and nested/labeled iteration return 42 in both source orders. This bounded
+array emission milestone is complete: [evidence](experiments/extended-cli-metadata/array-runtime-validation.json).
+Next are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

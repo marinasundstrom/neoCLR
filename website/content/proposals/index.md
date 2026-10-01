@@ -274,4 +274,5 @@ Development metadata API: vector declarations now round-trip primitive and owned
 arrays as CLI SZARRAY/native ArrayRef, including locals and property storage. Executable
 array allocation/indexing now passes C# API-produced binary runtime checks; Raven
 consumption now executes Order arrays, indexed mutation and Length on both targets.
-Array iteration is the next slice.
+Shared array iteration now also executes nested/labeled control flow; generic collections
+and the full runtime class-library build remain incomplete.

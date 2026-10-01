@@ -9597,3 +9597,24 @@ results. C# contracts and .NET/binary neoCLR consumers passed; the author has no
 responded to these outcomes. These are bounded producer/codegen slices, not a claim that
 the broad class-library/collection consumer or metadata importing is complete. See
 [the integration evidence](raven-cli-bridge.md#raven-owned-nominal-signature-integration--2026-10-01).
+
+## 2026-10-01 — a connected array emission milestone
+
+- **Author directive:** “Continue with a big set of slices. Don’t stop until you reach
+  a reasonable point”. Earlier directions retained independent metadata ownership,
+  shared .NET/neoCLR codegen and executable class-library/consumer-driven acceptance.
+- **Assistant proposal:** complete a connected vector milestone: metadata declarations,
+  typed/raw instruction production, Raven adapters, then shared array iteration using
+  the Order declaration and batch expression from the broad consumer.
+- **Actions/results:** committed each bounded slice. CLI SZARRAY and native ArrayRef
+  signatures now cover calls, locals and storage. C# API-produced binary tests execute
+  arrays on neoCLR, including alias mutation and length/bounds failures; 58 API test
+  groups pass. Raven shares literal/index/Length/storage emission and array for lowering.
+  The expanded separate consumer returns 42 on .NET and binary neoCLR in both source
+  orders; 39 focused loop/array tests pass, including mixed general enumerator nesting.
+  [Evidence](experiments/extended-cli-metadata/array-runtime-validation.json).
+- **Open:** full collections/System source compilation, generic/delegate/union contracts,
+  broader constructors/static storage and native metadata symbol imports. Executable
+  native payload plus CLI projection remains a temporary bridge. No complete emission
+  story or measured performance improvement is claimed; no author reply to these
+  results is recorded yet.

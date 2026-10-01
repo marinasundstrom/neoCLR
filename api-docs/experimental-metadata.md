@@ -2408,7 +2408,8 @@ MethodBuilder TypeBuilder.AddConstructor(MethodSignature signature,
 ```
 
 SignatureType has exactly one representation: a defined primitive (including Void only
-for results), or an exact nonstatic TypeBuilder identity. Invalid primitive values and
+for results), an exact nonstatic TypeBuilder identity, or a bounded vector (see
+[vector declarations](#vector-declarations-development-2026-10-01)). Invalid primitive values and
 static classes throw ArgumentException; a null class throws ArgumentNullException.
 Its diagnostic ToString is not a persistent identity. Record equality retains exact
 builder identity. MethodSignature copies at most 256 parameters; null input throws
