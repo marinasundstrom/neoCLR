@@ -2377,3 +2377,12 @@ retains type/method arities. This follows the existing [generic metadata contrac
 rather than flattening owner parameters into method parameters, which would lose type
 identity. Generic instance type layouts and fields remain the next larger boundary;
 Raven source integration follows this API slice.
+
+Raven static generic owner integration now verifies/runs 42 on both targets and in
+both source orders. Explicit capabilities preserve independent owner/method arguments;
+the .NET resolver also fixes source method calls that previously left their declaring
+type open. Tested matching producer: `0da5a3b0`, receiver runtime `6a7a0dd2` or later
+on `codex/extended-cli-metadata`; Raven `codex/metadata-consumer`. No Runtime Contract
+configuration change. Generic owner arrays/defaults and alias mutation pass; generic
+instance layouts/fields, constraints, imported owners and full class-library compilation
+remain open. See [binary evidence](experiments/extended-cli-metadata/generic-runtime-validation.json).

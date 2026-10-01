@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to the metadata producer. Preserve independent VAR/MVAR scope, sorted GenericParam
   rows, TypeSpec/MemberRef/MethodSpec calls and native constructed owners through CLI
   reference projection. API binaries verify/run 42; generic object layouts remain out
-  of scope. No native runtime format change is required.
+  of scope. Raven now shares static generic owner planning and calls across targets;
+  its consumer runs 42 in both source orders with owner arrays/defaults and independent
+  method arguments. No native runtime format change is required.
 
 - Add typed local addresses and initialization to the metadata API (`Ldloca`, `Initobj`,
   `LoadDefault`). Validate local identity, exact initialization type and definite
