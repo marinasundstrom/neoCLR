@@ -11,7 +11,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Extend metadata property associations to indexed signatures, inferring copied index
   parameters from accessors and validating getter/setter agreement. Preserve ordinary
   CLI property parameters and native parameter lists, including overloaded indexers
-  and read-only associations, through reference projections.
+  and read-only associations, through reference projections. API-produced binary
+  assemblies now verify and execute overloaded getters and multi-index setter-only
+  associations on neoCLR, returning 42. Existing runtime instructions suffice.
 
 - Add bounded vector signatures for primitive and owned root-class elements across
   parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native

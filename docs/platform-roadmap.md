@@ -48,8 +48,9 @@ array literals, storage, calls, indexing and Length on both targets; Order-array
 mutation and nested/labeled iteration return 42 in both source orders. This bounded
 array emission milestone is complete: [evidence](experiments/extended-cli-metadata/array-runtime-validation.json).
 The next connected milestone is indexed properties: metadata producer/projection
-support now preserves index parameters and overloaded accessor associations. Native
-execution and shared Raven consumption follow. Broader field/constructor shapes and
+support now preserves index parameters and overloaded accessor associations.
+API-produced binaries verify and execute indexed accessors on neoCLR (42); shared
+Raven consumption follows. Broader field/constructor shapes and
 generic/delegate/union contracts remain subsequent work. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).

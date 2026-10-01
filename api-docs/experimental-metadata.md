@@ -2537,3 +2537,9 @@ Example: define `GetItem(Int32) -> Int32` and `SetItem(Int32, Int32) -> Void`, t
 `owner.AddProperty("Item", PrimitiveType.Int32, get, set)`. The resulting ParameterTypes
 contains one Int32. The same name may have a separate Int64-index getter. C# tests
 execute these accessor associations on .NET and inspect native reference projections.
+
+The C# `--indexer-integration <runtime> <fresh-output>` check also writes a binary
+assembly with overloaded getters and a two-index setter-only association. neoCLR
+loads and verifies its property contracts and executes the accessor calls to 42.
+This uses existing runtime metadata validation and call instructions, not an indexer
+opcode or a new runtime introspection invocation API.
