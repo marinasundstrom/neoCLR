@@ -45,6 +45,8 @@ The independent metadata API now preserves public/internal/private static method
 visibility, with direct binary runtime enforcement. Raven now emits these methods
 through shared visibility admission and preserves access in compiler references.
 Block and expression bodies now share compiler lowering and execute on both targets.
+Eager Boolean AND/OR/XOR now share that path with exact Boolean metadata/runtime
+operands; mixed Boolean/integer inputs remain invalid.
 General object/field and broader metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 

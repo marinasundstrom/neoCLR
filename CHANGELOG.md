@@ -11,7 +11,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Support exact Boolean operands for native and/or/xor in runtime execution and
   verification; retain mixed-type and Boolean arithmetic rejection. The independent
   metadata writer now accepts exact Boolean operands through raw emits and helpers.
-  Raven producer admission follows separately.
+  Raven now emits eager Boolean operators through the shared body plan, with paired
+  truth-table and operand-evaluation-order checks on .NET and binary neoCLR.
 
 - Enable Raven expression-bodied functions and static methods through shared compiler
   lowering on .NET and neoCLR. Verify binary loading/execution, separate-library

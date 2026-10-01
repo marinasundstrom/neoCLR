@@ -1535,4 +1535,24 @@ result and rejects mixed operands and mismatched returns. Native output requires
 runtime `fa25609d` or later on this feature branch. CLI output retains standard
 encodings and executes on .NET. All 45 C# metadata contract groups and the guest API
 snapshot check pass, including raw/helper truth tables and native reference projection.
-Raven source admission is the next integration slice.
+Raven source admission was completed in the integration below.
+
+
+## Raven eager Boolean integration — 2026-10-01
+
+Raven `88495dbd7` on `codex/metadata-consumer` consumes metadata `83200ad6` and native
+runtime `fa25609d` on `codex/extended-cli-metadata`. Built-in Boolean &, | and ^ now
+pass through the shared body planner and existing instruction adapters. Ordinary
+.NET remains the default; no Runtime Contract setting or binder semantics change.
+The planner evaluates left then right; && and || retain separate short-circuit
+lowering. Enum/nullable Boolean and user-defined operator contracts remain deferred.
+PE/#Neo reference projection and the future native metadata importer boundary remain.
+
+Validation: all 45 C# metadata contract groups, 52 focused Raven C# tests, the 8-test
+Rust integer suite (with the two new verifier cases rerun after explicit verification
+assertions), and the API snapshot check pass. The complete binary runtime/rvnc probe
+executes all twelve Boolean truth-table cases and printed left/right markers for
+all three eager operators on both targets. Existing short-circuit and integer bitwise
+cases pass against the rebuilt runtime. [Artifact/runtime evidence](experiments/extended-cli-metadata/boolean-bitwise-raven-validation.json).
+Older native runtimes reject Boolean operands; these feature-branch revisions must
+be deployed together. No throughput or allocation improvement is claimed.
