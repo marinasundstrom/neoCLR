@@ -94,7 +94,7 @@ public sealed partial class AssemblyBuilder
                     parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
                 }
             },
-            "call" or "new.object" => new { op = instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
+            "call.virtual" or "call" or "new.object" => new { op = instruction.Op == "call.virtual" ? "callvirt" : instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
@@ -195,7 +195,7 @@ public sealed partial class AssemblyBuilder
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface, type.IsStatic, type.IsStatic,
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
-                type.BaseInterfaces.Count == 0 ? null : type.BaseInterfaces.Select(b => (object)new { Named = TypeName(b) }).ToArray(),
+                !type.InterfaceContracts.Any() ? null : type.InterfaceContracts.Select(b => (object)new { Named = TypeName(b) }).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type))).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(

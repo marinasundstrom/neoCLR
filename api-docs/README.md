@@ -547,3 +547,7 @@ remains separate from the guest RavenDoc snapshot.
 The host-only metadata manual also covers interface-valued SignatureType identities
 and MakeGenericInstance constructions; these remain within the same explicit C#
 RavenDoc exclusion. No guest runtime public API was added.
+
+ImplementedInterfaces/AddInterfaceImplementation, CallVirtual and OpCode.Callvirt
+are documented in the host-only metadata manual; the existing explicit RavenDoc C#
+producer exclusion still applies. Guest runtime API selection is unchanged.

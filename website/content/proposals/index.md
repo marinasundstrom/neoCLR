@@ -344,3 +344,7 @@ an interface remains a separate acceptance gate.
 The development producer also supports owned interface signatures and constructions.
 Unchanged Iterable<T> loads, and nullable interface references pass through parameters,
 results and array storage on both targets. Interface dispatch remains the next gate.
+
+Owned nongeneric interface method/property dispatch now executes through two concrete
+classes on .NET and native neoCLR. Generic dispatch and full class-library compilation
+remain development gaps; this uses ordinary CLI callvirt and existing runtime lookup.

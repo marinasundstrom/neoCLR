@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add owned nongeneric interface implementations and CallVirtual/raw Callvirt to the
+  metadata API. Preserve standard CLI InterfaceImpl and virtual/final implementation
+  flags; use existing native interface lookup and callvirt. Raven shared emission now
+  executes interface methods/properties through two classes and array references in
+  both file orders; missing implementations and invalid receivers reject, null faults.
+
 - Extend owned nominal signatures and generic constructions to interfaces; preserve
   CLI/native projection and execute typed default-reference flow. Raven now compiles
   unchanged Iterable<T> alongside iterator contracts in both file orders. Interface

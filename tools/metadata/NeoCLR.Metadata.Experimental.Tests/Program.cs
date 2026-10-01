@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--interface-dispatch-integration")
+{
+    await InterfaceDispatchChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--interface-integration")
 {
     await InterfaceChecks.RunRuntime(args[1], args[2]);
@@ -194,6 +198,7 @@ var tests = new (string Name, Action Body)[]
     ("Nominal type constraints", TypeConstraintChecks.Run),
     ("Special type constraints", SpecialConstraintChecks.Run),
     ("Interface declarations", InterfaceChecks.Run),
+    ("Interface dispatch", InterfaceDispatchChecks.Run),
     ("Array instructions and execution", ArrayInstructionChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),

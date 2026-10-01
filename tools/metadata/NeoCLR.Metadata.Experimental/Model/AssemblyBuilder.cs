@@ -96,6 +96,12 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {
+            foreach (var type in types.Where(t => !t.IsInterface))
+                foreach (var contract in type.InterfaceMethods)
+                    if (!type.Methods.Any(m => !m.IsStatic && m.Visibility == MethodVisibility.Public && m.Name == contract.Name &&
+                        m.Signature.GenericParameterNames.Count == 0 && m.Signature.ReturnType == contract.Signature.ReturnType &&
+                        m.Signature.ParameterTypes.SequenceEqual(contract.Signature.ParameterTypes)))
+                        throw new InvalidDataException("missing public interface implementation: " + contract.Name);
             foreach (var type in types)
                 foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
             foreach (var method in methods)
@@ -105,7 +111,7 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
-                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true)
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op != "call.virtual")
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstructedTarget is { } target)
                     {
@@ -379,7 +385,7 @@ public sealed partial class AssemblyBuilder
                 {
                     "constant64" => 9,
                     "label" => 0,
-                    "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -444,7 +450,7 @@ public sealed partial class AssemblyBuilder
                     case "shift.right": code.WriteByte(0x63); break;
                     case "new.constructed": case "call.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
-                    case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                    case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
                 }
@@ -459,7 +465,7 @@ public sealed partial class AssemblyBuilder
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
-            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | MethodAttributes.HideBySig,
+            metadata.AddMethodDefinition((method.Visibility switch { MethodVisibility.Internal => MethodAttributes.Assembly, MethodVisibility.Private => MethodAttributes.Private, _ => MethodAttributes.Public }) | (method.IsStatic ? MethodAttributes.Static : 0) | (method.IsConstructor ? MethodAttributes.SpecialName | MethodAttributes.RTSpecialName : accessors.Contains(method) ? MethodAttributes.SpecialName : 0) | (method.DeclaringType?.Implements(method) == true ? MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot : 0) | MethodAttributes.HideBySig,
                 MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
             genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
             nextMethod++;
@@ -484,7 +490,7 @@ public sealed partial class AssemblyBuilder
                 }) | (field.IsReadOnly ? FieldAttributes.InitOnly : 0), metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
                 nextField++;
             }
-            foreach (var inherited in type.BaseInterfaces) metadata.AddInterfaceImplementation(typeHandle, typeHandles[inherited]);
+            foreach (var inherited in type.InterfaceContracts) metadata.AddInterfaceImplementation(typeHandle, typeHandles[inherited]);
             foreach (var method in type.Methods) EmitMethod(method);
             bool firstProperty = true;
             foreach (var property in type.Properties)

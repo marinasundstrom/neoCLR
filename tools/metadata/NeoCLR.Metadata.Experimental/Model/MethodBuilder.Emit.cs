@@ -85,7 +85,9 @@ public enum OpCode
     /// <summary>Loads the managed address of an owned local for typed initialization.</summary>
     Ldloca,
     /// <summary>Initializes an addressed local to the default of its exact SignatureType.</summary>
-    Initobj
+    Initobj,
+    /// <summary>Dispatches an owned nongeneric interface instance method; requires a MethodBuilder operand.</summary>
+    Callvirt
 }
 
 public sealed partial class MethodBuilder
@@ -165,7 +167,7 @@ public sealed partial class MethodBuilder
     }
 
     /// <summary>Appends a call or allocation using a local or external builder method.</summary>
-    /// <param name="opCode">Call or Newobj; constructors require Newobj.</param>
+    /// <param name="opCode">Call, Callvirt or Newobj; Callvirt currently requires an owned interface method.</param>
     /// <param name="operand">Method with a supported signature; external identity/core contracts are checked when writing.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or constructor usage.</exception>
@@ -174,7 +176,13 @@ public sealed partial class MethodBuilder
     {
         ArgumentNullException.ThrowIfNull(operand);
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic calls require an instantiation", nameof(operand));
-        if (opCode == OpCode.Newobj)
+        if (opCode == OpCode.Callvirt)
+        {
+            if (!operand.IsAbstract || !ReferenceEquals(operand.Assembly, Assembly))
+                throw new ArgumentException("callvirt requires an owned interface method", nameof(operand));
+            Append(new("call.virtual", Target: operand));
+        }
+        else if (opCode == OpCode.Newobj)
         {
             if (!operand.IsConstructor) throw new ArgumentException("newobj requires a constructor", nameof(operand));
             Append(new("new.object", Target: operand));

@@ -111,7 +111,7 @@ public sealed class NativeAssemblyDefinition
                 if (isInterface) { typeFields.Add("representation"); Require(representation.GetString() == "Interface", "unsupported native representation"); }
                 var baseInterfaces = type.TryGetProperty("implements", out _) ? Array(type, "implements", 256).Select(b => { Shape(b, "Named"); return Text(b, "Named"); }).ToArray() : [];
                 if (type.TryGetProperty("implements", out _)) typeFields.Add("implements");
-                Require(isInterface || baseInterfaces.Length == 0, "class interface implementations unsupported");
+
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
                 Require(type.GetProperty("is_reference_type").GetBoolean() == !isInterface && type.GetProperty("is_sealed").GetBoolean() == isStatic &&
@@ -178,7 +178,8 @@ public sealed class NativeAssemblyDefinition
                 {
                     int parent = types.FindIndex(t => t.NativeName == inherited);
                     Require(parent >= 0, "missing inherited interface");
-                    signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
+                    if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
+                    else signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent]);
                 }
             for (int i = 0; i < types.Count; i++)
                 foreach (var constraint in types[i].Constraints)
@@ -391,7 +392,8 @@ public sealed class NativeAssemblyDefinition
         var owners = types.Select(t => t.IsInterface ? (t.GenericNames.Length == 0 ? graph.AddInterface(t.Namespace, t.Name, t.Visibility) : graph.AddGenericInterface(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility)) : t.GenericNames.Length > 0 ? (t.IsStatic ? graph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility) : graph.AddGenericClass(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility)) : t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         for (int i = 0; i < types.Length; i++)
             foreach (var inherited in types[i].BaseInterfaces)
-                owners[i].AddBaseInterface(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
+                if (types[i].IsInterface) owners[i].AddBaseInterface(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
+                else owners[i].AddInterfaceImplementation(owners[System.Array.FindIndex(types, t => t.NativeName == inherited)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);

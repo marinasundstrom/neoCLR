@@ -45,6 +45,33 @@ public sealed partial class TypeBuilder
         baseInterfaces.Add(baseInterface);
     }
 
+    private readonly List<TypeBuilder> implementedInterfaces = [];
+    /// <summary>Gets the directly implemented nongeneric interfaces of a root class.</summary>
+    public IReadOnlyList<TypeBuilder> ImplementedInterfaces => implementedInterfaces.AsReadOnly();
+    internal IEnumerable<TypeBuilder> InterfaceContracts => baseInterfaces.Concat(implementedInterfaces);
+    internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InterfaceContracts.Any(i => i.ConformsTo(contract));
+    internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
+    internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
+        InterfaceMethods.Any(c => c.Name == method.Name && c.Signature.ReturnType == method.Signature.ReturnType &&
+            c.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
+
+    /// <summary>Declares implicit public implementation of an owned nongeneric interface.</summary>
+    /// <param name="contract">An interface from this assembly, including its inherited contracts.</param>
+    /// <exception cref="ArgumentNullException">Contract is null.</exception>
+    /// <exception cref="ArgumentException">Foreign, generic, duplicate or noninterface contract, or limit exceeded.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not a nongeneric root class.</exception>
+    /// <remarks>Writing requires an exact public instance implementation for every inherited method.</remarks>
+    public void AddInterfaceImplementation(TypeBuilder contract)
+    {
+        ArgumentNullException.ThrowIfNull(contract);
+        if (IsInterface || IsStatic || GenericParameterNames.Count != 0)
+            throw new InvalidOperationException("interface implementations require a nongeneric root class");
+        if (!contract.IsInterface || contract.GenericParameterNames.Count != 0 || !ReferenceEquals(contract.Assembly, Assembly) ||
+            implementedInterfaces.Contains(contract) || implementedInterfaces.Count >= 256)
+            throw new ArgumentException("invalid or duplicate interface implementation", nameof(contract));
+        implementedInterfaces.Add(contract);
+    }
+
     /// <summary>Gets whether this is an interface declaration rather than a class.</summary>
     public bool IsInterface { get; }
 
@@ -65,6 +92,13 @@ public sealed partial class TypeBuilder
 
 public sealed partial class MethodBuilder
 {
+    /// <summary>Appends virtual dispatch to an owned nongeneric interface method.</summary>
+    /// <param name="target">A public abstract interface instance method.</param>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void CallVirtual(MethodBuilder target) => Emit(OpCode.Callvirt, target);
+
     /// <summary>Gets whether this is a bodyless abstract interface method.</summary>
     public bool IsAbstract => DeclaringType?.IsInterface == true;
 }

@@ -2849,8 +2849,8 @@ parameter and result signatures, including vector elements and typed defaults. T
 existing SignatureType.ClassType property denotes a CLI CLASS identity and can refer
 to a class or interface. MakeGenericInstance now accepts invariant generic interfaces
 with the existing arity, scope, ownership and argument validation. Interfaces remain
-invalid nominal class bounds and allocation targets. No implementation or dispatch
-support is implied by using an interface signature.
+invalid nominal class bounds and allocation targets. A signature alone does not declare an implementation; the bounded dispatch API is
+described below.
 
 ```csharp
 var comparer = assembly.AddGenericInterface("Example", "Comparer", ["T"]);
@@ -2861,8 +2861,8 @@ var compare = comparer.AddInterfaceMethod("Compare",
 ```
 
 Writing rejects abstract methods with instructions/locals and direct calls to them
-with InvalidDataException. Implementations, interface dispatch and default/static interface methods remain
-subsequent work. An abstract method has no CLI
+with InvalidDataException. Direct interface dispatch and implicit nongeneric implementations are now supported
+as described below; default/static interface methods remain subsequent work. An abstract method has no CLI
 body (RVA zero), including in a reference projection: no throwing placeholder is used.
 CLI uses Interface/Abstract type flags with no base class, and public abstract virtual
 new-slot method flags. These are ordinary CLI contracts, not extensions; see
@@ -2900,3 +2900,52 @@ Native reading validates inherited identities, cycles and accessor associations 
 preserves them in reference projection. Property-only declarations with zero fields
 may include the writer's empty field-origin arrays; all three arrays must be present
 and empty when that form is used. Partial/inconsistent field-origin metadata rejects.
+
+
+### Interface implementation and dispatch (development)
+
+```csharp
+IReadOnlyList<TypeBuilder> TypeBuilder.ImplementedInterfaces { get; }
+void TypeBuilder.AddInterfaceImplementation(TypeBuilder contract);
+void MethodBuilder.CallVirtual(MethodBuilder target);
+void MethodBuilder.Emit(OpCode.Callvirt, MethodBuilder target);
+```
+
+AddInterfaceImplementation declares an owned nongeneric interface on a nongeneric
+root class. Its inherited nongeneric contracts are included. The list is read-only;
+null throws ArgumentNullException. Static/interface/generic owners throw
+InvalidOperationException; foreign/generic/noninterface contracts, duplicates or more
+than 256 direct contracts throw ArgumentException. Writing requires every inherited
+contract to have a public instance method with the same name, parameter and result
+signature; missing or incompatible members throw InvalidDataException. Member order
+does not matter. Explicit MethodImpl mappings are not yet exposed. CLI implementations
+are virtual/final/new-slot; native implicit matching uses the existing runtime rules.
+
+CallVirtual and raw Emit(Callvirt, target) consume a receiver followed by declared
+arguments, dispatch to its implementation and push any result. Targets must be owned
+nongeneric abstract interface methods. Null targets throw ArgumentNullException;
+foreign/generic/noninterface targets throw ArgumentException without appending an
+instruction. The existing instruction limit throws InvalidDataException. Stack checking
+accepts exact references and declared interface upcasts, including inherited contracts;
+unrelated receivers reject when writing. Arrays remain invariant. Null references can
+be stored but fault when dispatched; no exception-handling instructions are introduced.
+Direct Call to an abstract contract still rejects. CLI uses callvirt 0x6f; native output
+uses the existing callvirt opcode. Reference projections preserve implementations but
+retain placeholder bodies and must not be executed as native code.
+
+```csharp
+var contract = assembly.AddInterface("Example", "Value");
+var get = contract.AddInterfaceMethod("Get", new MethodSignature(PrimitiveType.Int32, []));
+var concrete = assembly.AddClass("Example", "Answer");
+concrete.AddInterfaceImplementation(contract);
+var implementation = concrete.AddInstanceMethod("Get", new MethodSignature(PrimitiveType.Int32, []));
+implementation.LoadConstant(42);
+implementation.Return();
+// In a body with a Value-typed receiver on the stack:
+body.CallVirtual(get);
+```
+
+C# contract/integration tests exercise two implementations, inherited contracts,
+reference arguments and null faults on .NET and the binary neoCLR loader. Generic
+interface instances are legal signatures but not yet legal targets of this dispatch
+API. Default/static interface members and class virtual overrides remain separate work.
