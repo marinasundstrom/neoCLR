@@ -2778,3 +2778,7 @@ existing interface implementation helpers (CLR/neoCLR: 42). This authoring chang
 CLI InterfaceImpl/abstract-method/callvirt and existing native encodings; Runtime Contract
 and Raven admission are unchanged. Relationship definitions and canonical bodies remain
 pending. The rebuilt Raven external-signature probe continues to verify/run (42).
+
+Authored InterfaceImplementation edges now back interface inheritance/implementation
+helpers. Native inherited dispatch returns 42; CLI/native encodings, Runtime Contract
+and Raven target admission remain unchanged. Loaded relationship decoding is pending.

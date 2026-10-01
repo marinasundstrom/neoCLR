@@ -3536,3 +3536,31 @@ All 76 C# groups pass, including existing multi-implementation/inherited interfa
 and new invalid-owner/flags/interface-storage checks. Raven's rebuilt external-signature
 probe also passes. Canonical bodies, relationship definitions and loaded editing remain
 pending; this does not resolve the collections Option<Order> import gap.
+
+
+### Authored interface relationships
+
+`InterfaceImplementation(TypeReference interfaceType)` creates an unattached relationship;
+null throws `ArgumentNullException`. `InterfaceType` retains the exact immutable reference.
+`DeclaringType` is null until successful attachment. Append to the new
+`TypeDefinition.Interfaces : IList<InterfaceImplementation>` on an attached authored type.
+For interfaces this declares inheritance; for nongeneric root classes it declares implicit
+implementation. Builders add to this same collection; their existing handle lists are
+encoding caches over these immutable edges.
+
+Targets must resolve locally to attached, same-assembly nongeneric interfaces. Foreign,
+noninterface, detached, unresolved, duplicate or cyclic targets and reused edge objects
+throw `ArgumentException`; unsupported/detached owners throw `InvalidOperationException`.
+Replacement, removal and clearing throw `NotSupportedException`. Loaded `Interfaces`
+access also throws `NotSupportedException` until reader materialization is implemented.
+No resolver/host loading occurs during attachment. Existing implementation completeness,
+256-edge limits and cycle checks remain in force.
+
+```csharp
+derivedInterface.Interfaces.Add(new InterfaceImplementation(baseInterface.ToReference()));
+implementingClass.Interfaces.Add(new InterfaceImplementation(derivedInterface.ToReference()));
+```
+
+The manual inherited-interface dispatch case executes on CLR/neoCLR (42). All 76 C#
+groups pass, including duplicate/cycle/category rejection. CLI InterfaceImpl and native
+encoding remain unchanged. Generic relationships and loaded editing remain unsupported.

@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual interface declaration and virtual dispatch; body definition migration and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; body definition migration and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -59,5 +59,6 @@
   "continuationBaseCommit": "09166c9a",
   "staticTypeMethodBaseCommit": "7d4f5cb5",
   "instanceMethodBaseCommit": "f7e715a0",
-  "interfaceDeclarationBaseCommit": "ddc5cb75"
+  "interfaceDeclarationBaseCommit": "ddc5cb75",
+  "relationshipBaseCommit": "a86113a4"
 }

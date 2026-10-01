@@ -600,3 +600,6 @@ and limitations are documented in the manual reference; guest RavenDoc remains u
 
 Direct nongeneric interface TypeDefinition and abstract MethodDefinition construction
 are covered in the manual host reference; guest RavenDoc selection is unchanged.
+
+InterfaceImplementation and TypeDefinition.Interfaces are host C# APIs documented in
+the manual metadata reference; they are excluded from guest RavenDoc selection.

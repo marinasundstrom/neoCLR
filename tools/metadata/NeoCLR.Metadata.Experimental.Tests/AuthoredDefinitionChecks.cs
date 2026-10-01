@@ -160,8 +160,19 @@ internal static class AuthoredDefinitionChecks
         var contractRead = new MethodDefinition("Read", (ushort)(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot), PrimitiveMethodSignature.Int32(0, true));
         Reject<InvalidOperationException>(() => objectType.Methods.Add(contractRead));
         contract.Methods.Add(contractRead);
-        var contractBuilder = builder.Types.Single(t => t.Name == "IRead");
-        builder.Types.Single(t => t.Name == "Box").AddInterfaceImplementation(contractBuilder);
+        var derivedContract = new TypeDefinition("Example", "IDerivedRead", 0xa1, null);
+        assembly.MainModule.Types.Add(derivedContract);
+        var baseEdge = new InterfaceImplementation(contract.ToReference());
+        derivedContract.Interfaces.Add(baseEdge);
+        var implementation = new InterfaceImplementation(derivedContract.ToReference());
+        objectType.Interfaces.Add(implementation);
+        if (!ReferenceEquals(implementation.DeclaringType, objectType) || !ReferenceEquals(baseEdge.DeclaringType, derivedContract) ||
+            !ReferenceEquals(implementation.InterfaceType.Resolve(), derivedContract)) throw new Exception("interface relationship identity");
+        Reject<ArgumentException>(() => objectType.Interfaces.Add(implementation));
+        Reject<ArgumentException>(() => objectType.Interfaces.Add(new InterfaceImplementation(derivedContract.ToReference())));
+        Reject<ArgumentException>(() => contract.Interfaces.Add(new InterfaceImplementation(derivedContract.ToReference())));
+        Reject<ArgumentException>(() => contract.Interfaces.Add(new InterfaceImplementation(objectType.ToReference())));
+        Reject<NotSupportedException>(() => objectType.Interfaces.Clear());
         answerBody.LoadConstant(42); answerBody.NewObject(constructorBody); answerBody.CallVirtual(MethodBuilder.ForDefinition(contractRead)); answerBody.Return();
         Reject<InvalidOperationException>(() => contract.Methods.Add(new MethodDefinition("Concrete", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true))));
         Reject<ArgumentException>(() => new MethodDefinition("Incomplete", (ushort)(MethodAttributes.Public | MethodAttributes.Abstract), PrimitiveMethodSignature.Int32(0, true)));
@@ -205,7 +216,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual interface declaration and virtual dispatch; body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; body definition migration and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

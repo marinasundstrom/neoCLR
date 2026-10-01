@@ -389,6 +389,7 @@ The development metadata API supports direct assembly/type/field/function declar
 static and instance methods, and root-class constructors, with builders sharing those
 declarations. Manual CLR/native execution covers function calls, object creation,
 readonly-field initialization and struct storage. Direct nongeneric interface contracts also dispatch through existing implementation
-helpers. Canonical body editing, relationship definitions and loaded assembly modification
+helpers. Interface relationship definitions now support direct inherited/implemented
+edges. Canonical body editing and loaded assembly modification
 remain pending; this is not a
 published general-purpose assembly editor.

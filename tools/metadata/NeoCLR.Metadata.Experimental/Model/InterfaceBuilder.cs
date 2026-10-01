@@ -37,6 +37,10 @@ public sealed partial class TypeBuilder
     {
         ArgumentNullException.ThrowIfNull(baseInterface);
         if (!IsInterface) throw new InvalidOperationException("base-interface declarations require an interface owner");
+        Definition.Interfaces.Add(new InterfaceImplementation(baseInterface.Definition.ToReference()));
+    }
+    internal void AttachBaseInterface(TypeBuilder baseInterface)
+    {
         var seen = new HashSet<TypeBuilder>();
         bool ReachesOwner(TypeBuilder current) => ReferenceEquals(current, this) || seen.Add(current) && current.BaseInterfaces.Any(ReachesOwner);
         if (!baseInterface.IsInterface || baseInterface.GenericParameterNames.Count != 0 || !ReferenceEquals(baseInterface.Assembly, Assembly) ||
@@ -64,6 +68,12 @@ public sealed partial class TypeBuilder
     public void AddInterfaceImplementation(TypeBuilder contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
+        if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count != 0)
+            throw new InvalidOperationException("interface implementations require a nongeneric root class");
+        Definition.Interfaces.Add(new InterfaceImplementation(contract.Definition.ToReference()));
+    }
+    internal void AttachInterfaceImplementation(TypeBuilder contract)
+    {
         if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count != 0)
             throw new InvalidOperationException("interface implementations require a nongeneric root class");
         if (!contract.IsInterface || contract.GenericParameterNames.Count != 0 || !ReferenceEquals(contract.Assembly, Assembly) ||

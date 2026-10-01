@@ -62,6 +62,18 @@ public sealed partial class TypeDefinition
             throw new ArgumentException("invalid type name");
         Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType;
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
+        authoredInterfaces = new DefinitionCollection<InterfaceImplementation>([], relationship =>
+        {
+            if (Producer is null) throw new InvalidOperationException("attach the owner before adding interface relationships");
+            if (relationship.DeclaringType is not null) throw new ArgumentException("interface relationship already attached");
+            TypeDefinition target;
+            try { target = relationship.InterfaceType.Resolve(); }
+            catch (InvalidDataException error) { throw new ArgumentException("interface relationship requires an owned definition reference", error); }
+            if (target.Producer is not { } targetBuilder) throw new ArgumentException("interface relationship requires an attached authored target");
+            if (Producer.IsInterface) Producer.AttachBaseInterface(targetBuilder);
+            else Producer.AttachInterfaceImplementation(targetBuilder);
+            relationship.DeclaringType = this;
+        });
         authoredMethods = new DefinitionCollection<MethodDefinition>([], method =>
         {
             if (Producer is null) throw new InvalidOperationException("attach the declaring type before adding methods");

@@ -27,7 +27,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   owners and constructor signatures reject. Direct nongeneric interface and abstract
   method declarations now dispatch through the existing implementation helper on both
   runtimes (42); invalid owner/flag/storage shapes reject. Canonical bodies and
-  relationship definitions remain pending.
+  interface relationship definitions now support direct inherited/implemented edges,
+  sharing ownership with builder facades; inherited dispatch returns 42 on both runtimes.
+  Canonical bodies and loaded relationship materialization remain pending.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-
