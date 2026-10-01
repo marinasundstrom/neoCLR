@@ -15,6 +15,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and element instructions now expose typed helpers and raw Newarr/Ldelem/Stelem/Ldlen
   emits. Binary runtime tests cover primitive/nominal aliasing, empty arrays, negative
   lengths and bounds faults; raw ldlen retains native unsigned width before conv.i4.
+  Raven now consumes vectors through shared signature/storage/body contracts; the
+  Order-array consumer executes on both runtimes in both source orders, returning 42.
 
 - Support readonly primitive/nominal instance fields in the independent metadata API,
   CLI InitOnly flags and native reference projections. Enforce declaring-constructor
