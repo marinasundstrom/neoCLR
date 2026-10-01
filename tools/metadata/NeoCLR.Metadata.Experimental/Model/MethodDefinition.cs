@@ -71,7 +71,26 @@ public sealed class MethodDefinition
         return IsStatic && GenericArity == 0 && TryDecodeStaticPrimitiveSignature(signature, out decoded);
     }
 
+    /// <summary>Recognizes static nongeneric primitive and zero-based primitive-vector signatures.</summary>
+    /// <param name="decoded">An immutable signature on success; otherwise null.</param>
+    /// <returns>False for malformed or unsupported signatures, including nested arrays, nominal types and byrefs.</returns>
+    /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
+    public bool TryGetStaticValueSignature(out MethodSignature? decoded)
+    {
+        decoded = null;
+        return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded);
+    }
+
     internal static bool TryDecodeStaticPrimitiveSignature(ReadOnlySpan<byte> signature, out PrimitiveMethodSignature? decoded)
+    {
+        decoded = null;
+        if (!TryDecodeStaticValueSignature(signature, out var value) || value!.ReturnType.Primitive is not { } result ||
+            value.ParameterTypes.Any(p => p.Primitive is null)) return false;
+        decoded = new(result, value.ParameterTypes.Select(p => p.Primitive!.Value));
+        return true;
+    }
+
+    internal static bool TryDecodeStaticValueSignature(ReadOnlySpan<byte> signature, out MethodSignature? decoded)
     {
         decoded = null;
         if (signature.Length < 3 || signature[0] != 0) return false;
@@ -83,17 +102,40 @@ public sealed class MethodDefinition
             count = ((count & 0x3f) << 8) | signature[position++];
             if (count < 128) return false;
         }
-        if (count > 256 || position >= signature.Length) return false;
-        byte result = signature[position++];
-        if (result is not (0x01 or 0x02 or 0x08 or 0x0a or 0x0e) || signature.Length - position != count) return false;
-        var parameters = new PrimitiveType[count];
+        if (count > 256 || !ReadType(signature, ref position, true, out var result)) return false;
+        var parameters = new SignatureType[count];
         for (int i = 0; i < count; i++)
         {
-            byte type = signature[position++];
-            if (type is not (0x02 or 0x08 or 0x0a or 0x0e)) return false;
-            parameters[i] = type == 0x0e ? PrimitiveType.String : type == 0x02 ? PrimitiveType.Boolean : type == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32;
+            if (!ReadType(signature, ref position, false, out var parameter)) return false;
+            parameters[i] = parameter!;
         }
-        decoded = new(result == 0x0e ? PrimitiveType.String : result == 0x01 ? PrimitiveType.Void : result == 0x02 ? PrimitiveType.Boolean : result == 0x0a ? PrimitiveType.Int64 : PrimitiveType.Int32, parameters);
+        if (position != signature.Length) return false;
+        decoded = new(result!, parameters);
+        return true;
+    }
+
+    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type)
+    {
+        type = null;
+        if (position >= signature.Length) return false;
+        var code = signature[position++];
+        var vector = code == 0x1d;
+        if (vector)
+        {
+            if (position >= signature.Length) return false;
+            code = signature[position++];
+        }
+        PrimitiveType? primitive = code switch
+        {
+            0x01 when allowVoid && !vector => PrimitiveType.Void,
+            0x02 => PrimitiveType.Boolean,
+            0x08 => PrimitiveType.Int32,
+            0x0a => PrimitiveType.Int64,
+            0x0e => PrimitiveType.String,
+            _ => null
+        };
+        if (primitive is null) return false;
+        type = vector ? SignatureType.ArrayOf(primitive.Value) : primitive.Value;
         return true;
     }
 }

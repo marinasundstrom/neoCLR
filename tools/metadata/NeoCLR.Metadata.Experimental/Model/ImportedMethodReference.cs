@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An immutable callable reference imported into one output assembly.</summary>
-/// <remarks>Supports static primitive signatures only. Import does not load code or verify access or native dependency availability.</remarks>
+/// <remarks>Supports static primitive and primitive-vector signatures only. Import does not load code or verify access or native dependency availability.</remarks>
 public sealed class ImportedMethodReference
 {
     internal ImportedMethodReference(AssemblyBuilder owner, MethodBuilder target) { Owner = owner; Target = target; }
@@ -20,7 +20,7 @@ public sealed class ImportedMethodReference
     public int ParameterCount => Target.ParameterCount;
     /// <summary>Gets whether a result is present.</summary>
     public bool ReturnsValue => Target.ReturnsValue;
-    /// <summary>Gets the immutable imported primitive signature.</summary>
+    /// <summary>Gets the immutable imported value signature.</summary>
     public MethodSignature Signature => Target.Signature;
 }
 
@@ -30,7 +30,7 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<AssemblyIdentity, (Guid Mvid, AssemblyBuilder Graph)> importedGraphs = [];
 
     /// <summary>Imports an immutable callable contract from a read-only definition.</summary>
-    /// <param name="definition">External static nongeneric primitive method or global function.</param>
+    /// <param name="definition">External static nongeneric primitive/vector method or global function.</param>
     /// <param name="dependencyCoreLibrary">Host-asserted dependency core contract; must equal this output's explicit core identity.</param>
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -47,7 +47,7 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
             throw new InvalidDataException("unsupported external assembly identity");
-        if (!definition.TryGetStaticPrimitiveSignature(out var signature) ||
+        if (!definition.TryGetStaticValueSignature(out var signature) ||
             type is { GenericArity: not 0 } || type?.DeclaringType is not null)
             throw new InvalidDataException("unsupported imported method signature or owner");
         if (!importedGraphs.TryGetValue(identity, out var imported))

@@ -92,7 +92,7 @@ public sealed partial class AssemblyBuilder
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
-            if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null))
+            if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null && t.ArrayElement?.Primitive is null))
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {

@@ -348,3 +348,9 @@ results and array storage on both targets. Interface dispatch remains the next g
 Owned nongeneric interface method/property dispatch now executes through two concrete
 classes on .NET and native neoCLR. Generic dispatch and full class-library compilation
 remain development gaps; this uses ordinary CLI callvirt and existing runtime lookup.
+
+Development metadata now supports static primitive-vector calls between separately
+emitted Raven library and application binaries. The native-profile runtime probe
+checks overloads and shared array mutation. Nominal/generic dependency imports and
+a native compiler symbol loader remain future work; CLI declaration projection is
+still the temporary input bridge.

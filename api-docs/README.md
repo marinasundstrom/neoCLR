@@ -551,3 +551,8 @@ RavenDoc exclusion. No guest runtime public API was added.
 ImplementedInterfaces/AddInterfaceImplementation, CallVirtual and OpCode.Callvirt
 are documented in the host-only metadata manual; the existing explicit RavenDoc C#
 producer exclusion still applies. Guest runtime API selection is unchanged.
+
+TryGetStaticValueSignature and the primitive-vector import/resolution extensions are
+covered by the [host metadata manual](experimental-metadata.md#imported-primitive-vectors-development-2026-10-01).
+These C# producer APIs remain explicitly excluded from guest RavenDoc selection;
+no guest API reference assembly change is needed.

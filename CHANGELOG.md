@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Extend the experimental read-only callable decoder, imports and member resolution
+  to Int32/Int64/Boolean/String vectors using standard CLI SZARRAY signatures.
+  Preserve scalar-only recognizers and reject malformed, nominal and generic imports.
+  C# tests execute separate ordinary CLR images; Raven's native-profile library and
+  application verify/run through binary loading, including array alias mutation.
+
 - Integrate Raven's independent union-case contextual-typing correction into local
   compiler main (`46491585e`) and the target branch. The unchanged collections sample
   now imports, verifies and matches expected output; assembled binary App and System

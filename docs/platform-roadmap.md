@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Imported vector checkpoint (2026-10-01):** direct Raven emission now supports
+static primitive-vector calls across separately emitted library/application assemblies.
+The neoCLR-profile binary pair verifies and returns 42, including overload selection
+and shared array mutation. This establishes a bounded external signature path;
+nominal/generic collection imports remain the next gap, and native symbol loading
+remains deferred. [Evidence](experiments/extended-cli-metadata/vector-library-validation.json).
+
 **Collections binding checkpoint (2026-10-01):** the imported carrier-constructor
 bug is fixed in Raven binding and integrated into local main (`46491585e`). The
 unchanged order-collections sample now imports, verifies and runs with exact output;

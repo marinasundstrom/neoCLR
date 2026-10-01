@@ -50,11 +50,19 @@ internal static class CallableChecks
             [0, 1, 8], // Missing parameter.
             [0, 0, 8, 8], // Trailing data.
             [0], // Truncation.
-            [0, 0, 0x10, 8] // Managed-reference result.
+            [0, 0, 0x10, 8], // Managed-reference result.
+            [0, 0, 0x1d], // Truncated vector.
+            [0, 0, 0x1d, 0x1d, 8], // Nested vector.
+            [0, 0, 0x1d, 1], // Void vector result.
+            [0, 1, 1, 0x1d, 1], // Void vector parameter.
+            [0, 1, 1, 0x1d, 0x1c], // Unsupported element.
+            [0, 0, 0x1d, 8, 8], // Trailing vector signature data.
+            [0, 1, 0x1d, 8] // Missing vector parameter.
         })
         {
             var method = AssemblyDefinition.ReadAssembly(Image(1, signature), false).MainModule.Functions.Single();
             Check(!method.TryGetStaticInt32Signature(out var count, out var result) && count == 0 && !result, "unsupported signature cannot masquerade as Int32");
+            Check(!method.TryGetStaticValueSignature(out var value) && value is null, "unsupported value signature rejected");
             var consumer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), new("Core", new Version(1, 0, 0, 0)));
             try { consumer.ImportReference(method, consumer.CoreLibrary); throw new Exception("unsupported signature imported"); }
             catch (InvalidDataException) { }

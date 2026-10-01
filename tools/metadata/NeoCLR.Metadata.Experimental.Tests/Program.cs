@@ -228,6 +228,7 @@ var tests = new (string Name, Action Body)[]
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
+    ("Primitive vector imported signatures", VectorImportChecks.Run),
     ("Producer MemberRef dependency and overload resolution", MemberReferenceChecks.ProducerReferences),
     ("Local MemberRef resolution and unsupported contracts", MemberReferenceChecks.LocalAndUnsupported),
     ("MemberRef reader bounds and parent validation", MemberReferenceChecks.Bounds),

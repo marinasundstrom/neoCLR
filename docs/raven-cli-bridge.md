@@ -2571,3 +2571,25 @@ for consumers do not supply RuntimeServices/CheckedStorage for compiling System 
 Three legacy-bridge samples run; order-collections produces invalid Option constructor
 CLI and is correctly rejected before execution. These are explicit integration gaps,
 not changes to runtime contracts or acceptance claims for the native backend.
+
+## Direct primitive-vector imports (2026-10-01)
+
+On `codex/extended-cli-metadata` with Raven `codex/metadata-consumer`, a separately
+emitted Raven library returns arrays to a native-profile application. Static nongeneric
+Int32/Int64/Boolean/String vector signatures use ordinary CLI SZARRAY in the declaration
+projection and existing native array identities in the executable payload. Both binaries
+load directly into neoCLR; neither body goes through the CLI-to-JSON importer.
+
+Runtime Contract configuration remains `CompilationOptions.NeoCLR` with the matching
+NeoCLR.CoreProbe reference and explicit core/dependency bindings. Raven still loads
+symbols through projected CLI declarations; arbitrary nominal/generic imports, nested
+vectors and native semantic metadata loading remain unsupported. The projection loses
+native semantic categories and is not an executable replacement for the original image.
+The independent metadata API owns signature encoding; Raven's target adapter owns
+mapping and capability checks. Native semantic-data loading must eventually replace
+this declaration bridge. No default .NET binding or emission path changes.
+
+The C# `--vector-library-runtime <neoclr-root> <fresh-output> <runtime>` probe in Raven
+checks four element overloads, alias mutation, void calls, iteration, missing bindings
+and mismatched signatures. See [validation](experiments/extended-cli-metadata/vector-library-validation.json)
+for tested core/runtime identities. Imported generic collections remain open.

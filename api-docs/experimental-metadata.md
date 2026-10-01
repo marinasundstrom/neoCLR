@@ -819,6 +819,7 @@ public sealed class MethodDefinition
     public byte[] GetSignature();
     public bool TryGetStaticInt32Signature(out int parameterCount, out bool returnsValue);
     public bool TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded);
+    public bool TryGetStaticValueSignature(out MethodSignature? decoded);
 }
 ```
 
@@ -867,7 +868,7 @@ the physical MemberRefParent token, and Name is the referenced name. GetSignatur
 returns a fresh copy, including opaque field or unsupported method signatures.
 
 ResolveMethod supports the writer's static, nongeneric default-convention Int32/Int64/Boolean/String
-parameters (0–256) and Int32/Int64/Boolean/String/no-result contract. It resolves a local TypeDef or nominal
+scalar/vector parameters (0–256) and scalar/vector/no-result contract. It resolves a local TypeDef or nominal
 TypeRef parent, requiring the explicit resolver for external scopes. It then selects
 exactly one directly declared method by ordinal name and decoded parameter/result
 contract, returning that target snapshot's owned MethodDefinition. There is no implicit
@@ -1244,7 +1245,7 @@ public sealed class ImportedMethodReference
 }
 ```
 
-`ImportReference` copies a static, nongeneric primitive signature from an external
+`ImportReference` copies a static, nongeneric primitive or primitive-vector signature from an external
 read-only definition. No producer builder, body, runtime load or resolver is needed.
 `Owner` is the consuming builder; `AssemblyIdentity` is the exact dependency identity.
 The namespace and type name are null for a global function. `ReturnsValue` is false
@@ -1803,7 +1804,7 @@ The primitive recognizer returns a fresh signature on success or null/false for
 unsupported or malformed encodings. It accepts only static nongeneric default CLI
 calling convention, canonical parameter counts and exact primitive encodings.
 TryGetStaticInt32Signature keeps its earlier stricter behavior and rejects Boolean.
-MemberReference.ResolveMethod and AssemblyBuilder.ImportReference match full primitive
+MemberReference.ResolveMethod and AssemblyBuilder.ImportReference match full primitive/vector
 signatures, including ordered parameter types and result. Existing explicit resolver,
 identity, core-contract and snapshot checks remain in force.
 
@@ -2426,7 +2427,7 @@ derives from MethodSignature and retains its primitive-typed ReturnType/Paramete
 properties; primitive consumers can continue constructing it. **Development API migration:**
 rebuild consumers against the changed method signatures. Code inspecting MethodBuilder
 or ImportedMethodReference signatures must use `.Primitive` or `.ClassType`, rather than
-assuming a primitive enum. Imported read-only method contracts remain primitive-only.
+assuming a primitive enum. Imported read-only method contracts accept primitives and primitive vectors; nominal imports remain unsupported.
 
 CLI output uses CLASS TypeDef signatures; native output uses existing Named type records.
 Calls, argument stores and returns enforce exact class identity, just like nominal locals.
@@ -2949,3 +2950,32 @@ C# contract/integration tests exercise two implementations, inherited contracts,
 reference arguments and null faults on .NET and the binary neoCLR loader. Generic
 interface instances are legal signatures but not yet legal targets of this dispatch
 API. Default/static interface members and class virtual overrides remain separate work.
+
+
+## Imported primitive vectors (development, 2026-10-01)
+
+```csharp
+bool MethodDefinition.TryGetStaticValueSignature(out MethodSignature? decoded);
+```
+
+Recognizes static nongeneric methods with Int32, Int64, Boolean or String scalar or
+one-dimensional zero-based vector parameters/results, plus Void only as a scalar
+result. Success returns an immutable copied `MethodSignature`; malformed or unsupported
+encodings return false with null. Parameter counts are canonical CLI compressed integers,
+bounded to 256. Exact consumption rejects trailing/truncated bytes, Void elements,
+jagged/multidimensional arrays, byrefs, nominal/generic types and other conventions.
+This reads declarations only; it neither resolves types nor validates bodies.
+
+`AssemblyBuilder.ImportReference` and `MemberReference.ResolveMethod` now use this
+contract and distinguish full vector element signatures when resolving overloads.
+The existing explicit dependency/core identity, ownership and resolver restrictions
+remain. For example, a read-only `Identity(int[]) -> int[]` definition can be imported,
+called with `MethodBuilder.Call`, and emitted as ordinary CLI AssemblyRef/TypeRef/MemberRef
+metadata or as a native assembly. Primitive-only recognition APIs remain narrower.
+
+Vectors retain .NET CLI `SZARRAY` signatures; no extension or semantic divergence is
+introduced. Imported nominal and generic signatures still need a separate identity
+contract. The C# vector checks execute ordinary CLR library/application images and
+check exact overload resolution, native declaration projection and malformed encodings.
+The Raven [runtime probe](../docs/experiments/extended-cli-metadata/vector-library-validation.json)
+executes independently emitted native library/application images with the neoCLR profile.
