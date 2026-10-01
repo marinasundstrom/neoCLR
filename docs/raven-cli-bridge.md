@@ -2523,3 +2523,17 @@ property-only types. No runtime or instruction change. 68 API groups and 13 focu
 compiler tests pass, plus native binary verification. The entry remains independent;
 interface calls/implementations, generic base instantiations and interface-valued
 signatures remain next. Runtime Contract options and host-core bootstrap are unchanged.
+
+
+Interface reference extension (2026-10-01): unchanged Iterable<T> now emits beside
+Comparer, EqualityComparer, Disposable and Iterator. Owned interface identities and
+constructions share CLI CLASS/GenericInst and native Named/Constructed signatures.
+The shared compiler descriptor is nominal rather than class-specific, with an explicit
+interface-signature capability; nullable reference annotations retain binder semantics
+and map to the same reference storage. Parameters, results, locals, defaults and arrays
+execute on .NET and binary neoCLR in both source orders (42). The host-core bootstrap
+and Runtime Contract configuration are unchanged. No runtime or ISA changes are needed.
+Interface invocation/implementation remains the next author-directed acceptance gate;
+generic interface inheritance remains deferred. Seven focused C# interface tests and
+68 metadata API test groups pass. The evidence exercises null/default reference flow,
+not dynamic dispatch.

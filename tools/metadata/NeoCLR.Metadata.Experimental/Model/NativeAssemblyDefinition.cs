@@ -213,8 +213,8 @@ public sealed class NativeAssemblyDefinition
                 if (element.TryGetProperty("Constructed", out var construction))
                 {
                     Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
-                    var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && !t.IsInterface && t.GenericNames.Length > 0);
-                    Require(definition >= 0, "constructed signature requires owned generic class");
+                    var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
+                    Require(definition >= 0, "constructed signature requires owned generic reference type");
                     return signatureOwners[definition].MakeGenericInstance(Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
                 }
                 Shape(element, "Named");

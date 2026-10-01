@@ -9740,3 +9740,10 @@ what we don't support - like exceptions”. The assistant accepted .NET behavior
 CLI instruction semantics as the default and recorded that unsupported coverage is
 not a semantic divergence. The temporary #Neo storage/loading bridge does not imply
 a separate instruction-set design. No new divergence was proposed or implemented.
+
+### 2026-10-01 — Interface dispatch as the next acceptance gate
+
+The author directed: “After this, implement dispatch for interfaces”. The assistant
+will follow interface-valued signature validation with concrete class implementations
+and calls through interface references. This supersedes generic interface inheritance
+as the immediate next slice; it does not claim dispatch is implemented yet.

@@ -543,3 +543,7 @@ methods retain no body in the native reader's CLI reference projection.
 The same interface manual section now covers TypeBuilder.BaseInterfaces/AddBaseInterface
 and AddProperty associations for abstract interface accessors. Host-only C# coverage
 remains separate from the guest RavenDoc snapshot.
+
+The host-only metadata manual also covers interface-valued SignatureType identities
+and MakeGenericInstance constructions; these remain within the same explicit C#
+RavenDoc exclusion. No guest runtime public API was added.

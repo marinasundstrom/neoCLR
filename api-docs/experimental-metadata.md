@@ -2844,8 +2844,13 @@ Calling it on a class, or ordinary AddMethod/AddInstanceMethod/AddConstructor on
 interface, throws InvalidOperationException. Interfaces cannot own storage fields; AddField throws InvalidOperationException.
 AddProperty now associates abstract getter/setter declarations, including declaring-type
 parameter values and index signatures, using the same validation as class properties.
-Interface references/constructed interface values are not yet admitted as storage
-signatures, nominal class bounds or allocation targets. This is an API coverage limit.
+Owned interface references and constructed interface values are admitted as storage,
+parameter and result signatures, including vector elements and typed defaults. The
+existing SignatureType.ClassType property denotes a CLI CLASS identity and can refer
+to a class or interface. MakeGenericInstance now accepts invariant generic interfaces
+with the existing arity, scope, ownership and argument validation. Interfaces remain
+invalid nominal class bounds and allocation targets. No implementation or dispatch
+support is implied by using an interface signature.
 
 ```csharp
 var comparer = assembly.AddGenericInterface("Example", "Comparer", ["T"]);

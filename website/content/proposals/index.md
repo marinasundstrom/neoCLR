@@ -340,3 +340,7 @@ Interface dispatch and full collection compilation are not covered by that check
 That declaration coverage now includes unchanged Disposable and Iterator<T> sources,
 with inherited nongeneric interfaces and abstract property metadata. Execution through
 an interface remains a separate acceptance gate.
+
+The development producer also supports owned interface signatures and constructions.
+Unchanged Iterable<T> loads, and nullable interface references pass through parameters,
+results and array storage on both targets. Interface dispatch remains the next gate.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Extend owned nominal signatures and generic constructions to interfaces; preserve
+  CLI/native projection and execute typed default-reference flow. Raven now compiles
+  unchanged Iterable<T> alongside iterator contracts in both file orders. Interface
+  implementation/dispatch remains separate work.
+
 - Add invariant interface declarations and public abstract instance contracts to the
   metadata producer. Preserve standard CLI flags/bodyless methods and existing native
   Interface identity through reference projection. Raven now emits unchanged Comparer

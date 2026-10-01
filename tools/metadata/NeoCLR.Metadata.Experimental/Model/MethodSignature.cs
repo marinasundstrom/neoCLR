@@ -1,12 +1,12 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned class/construction, scoped generic parameter or vector signature type.</summary>
+/// <summary>An immutable primitive, owned class/interface construction, scoped generic parameter or vector signature type.</summary>
 public sealed record SignatureType
 {
     private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null) { GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
-    /// <summary>Gets the exact owned class identity, or null for a primitive or vector.</summary>
+    /// <summary>Gets the exact owned CLI CLASS identity (class or interface), or null for other signatures.</summary>
     public TypeBuilder? ClassType { get; }
     /// <summary>Gets the element type for a zero-based vector, or null for a scalar.</summary>
     public SignatureType? ArrayElement { get; }
@@ -35,9 +35,9 @@ public sealed record SignatureType
     /// <exception cref="ArgumentOutOfRangeException">Index outside the supported range.</exception>
     public static SignatureType TypeParameter(int index)
         => index is >= 0 and < 32 ? new(null, null, typeParameter: index) : throw new ArgumentOutOfRangeException(nameof(index));
-    /// <summary>Gets the constructed class identity, or null for other signatures.</summary>
+    /// <summary>Gets the constructed class or interface identity, or null for other signatures.</summary>
     public GenericTypeInstance? GenericInstance { get; }
-    /// <summary>Creates a signature for an owned constructed generic reference class.</summary>
+    /// <summary>Creates a signature for an owned constructed generic reference type.</summary>
     public static implicit operator SignatureType(GenericTypeInstance type)
         => new(null, null, genericInstance: type ?? throw new ArgumentNullException(nameof(type)));
     internal int NestingDepth => GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
@@ -58,11 +58,11 @@ public sealed record SignatureType
     /// <summary>Creates a primitive signature type, including Void for results only.</summary>
     public static implicit operator SignatureType(PrimitiveType type)
         => Enum.IsDefined(type) ? new(type, null) : throw new ArgumentOutOfRangeException(nameof(type));
-    /// <summary>Creates a reference to a nongeneric nonstatic root class; generic definitions require construction.</summary>
+    /// <summary>Creates a CLI CLASS reference to an owned nongeneric class or interface; generic definitions require construction.</summary>
     public static implicit operator SignatureType(TypeBuilder type)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (type.IsStatic || type.IsInterface || type.GenericParameterNames.Count > 0) throw new ArgumentException("signature class must be a nonstatic root", nameof(type));
+        if (type.IsStatic || type.GenericParameterNames.Count > 0) throw new ArgumentException("signature requires a nonstatic class or interface", nameof(type));
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>

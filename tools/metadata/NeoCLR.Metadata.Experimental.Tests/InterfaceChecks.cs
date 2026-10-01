@@ -26,7 +26,11 @@ internal static class InterfaceChecks
         var get = iterator.AddInterfaceMethod("get_Current", new(t, []));
         var set = iterator.AddInterfaceMethod("set_Current", new(PrimitiveType.Void, [t]));
         iterator.AddProperty("Current", t, get, set);
-        var main = graph.AddFunction("Main"); main.LoadConstant(42); main.Return(); graph.EntryPoint = main;
+        var iterable = graph.AddGenericInterface("Example", "Iterable", ["T"]);
+        iterable.AddInterfaceMethod("GetIterator", new(iterator.MakeGenericInstance(t), []));
+        var forward = graph.AddFunction("Forward", new MethodSignature(iterator.MakeGenericInstance(PrimitiveType.Int32), [iterator.MakeGenericInstance(PrimitiveType.Int32)]));
+        forward.LoadArgument(0); forward.Return();
+        var main = graph.AddFunction("Main"); main.LoadDefault(iterator.MakeGenericInstance(PrimitiveType.Int32)); main.Call(forward); main.Emit(OpCode.Pop); main.LoadConstant(42); main.Return(); graph.EntryPoint = main;
         return graph;
     }
     internal static void Run()
@@ -37,6 +41,9 @@ internal static class InterfaceChecks
             !type.GetMethod("Compare")!.IsVirtual || type.GetMethod("Compare")!.GetMethodBody() is not null ||
             type.MakeGenericType(typeof(int)).GetMethod("Compare")!.GetParameters()[0].ParameterType != typeof(int))
             throw new Exception("CLI interface contract");
+        var iterable = loaded.GetType("Example.Iterable`1")!.MakeGenericType(typeof(int));
+        if (iterable.GetMethod("GetIterator")!.ReturnType != loaded.GetType("Example.Iterator`1")!.MakeGenericType(typeof(int)))
+            throw new Exception("CLI interface-valued generic signature");
         var iterator = loaded.GetType("Example.Iterator`1")!.MakeGenericType(typeof(int));
         if (iterator.GetInterfaces().Single().Name != "Disposable" || iterator.GetProperty("Current")!.PropertyType != typeof(int) ||
             !iterator.GetProperty("Current")!.GetMethod!.IsSpecialName || !iterator.GetProperty("Current")!.SetMethod!.IsAbstract)
@@ -60,13 +67,12 @@ internal static class InterfaceChecks
         Reject(() => owner.AddConstructor(Array.Empty<PrimitiveType>()));
         Reject(() => owner.AddMethod("Static", new(PrimitiveType.Void, [])));
         Reject(() => owner.AddField("Value", PrimitiveType.Int32));
-        Reject(() => owner.MakeGenericInstance(PrimitiveType.Int32));
         Reject(() => graph.Types[1].AddInterfaceMethod("Generic", new(PrimitiveType.Void, [], ["U"])));
         owner.Methods[0].LoadConstant(0); owner.Methods[0].Return();
         Reject(() => graph.Write()); Reject(() => graph.WriteNativeAssembly());
         foreach (var change in new Action<JsonNode>[] {
-            n => n["functions"]![1]!["is_abstract"] = false,
-            n => n["functions"]![1]!["body"]!.AsArray().Add(new JsonObject { ["op"] = "ret" }),
+            n => n["functions"]![2]!["is_abstract"] = false,
+            n => n["functions"]![2]!["body"]!.AsArray().Add(new JsonObject { ["op"] = "ret" }),
             n => n["types"]![0]!["is_reference_type"] = true,
             n => n["types"]![3]!["implements"]![0]!["Named"] = n["types"]![3]!["name"]!.GetValue<string>(),
             n => n["types"]![3]!["properties"]![0]!["instance"] = false
@@ -89,6 +95,6 @@ internal static class InterfaceChecks
             await process.WaitForExitAsync(); var text = await stdout + await stderr;
             if (process.ExitCode != (command == "verify" ? 0 : 42)) throw new Exception(command + ": " + text);
         }
-        Console.WriteLine("PASS interface declarations: CLI/native binary load, verify and unrelated entry result 42; dispatch not exercised");
+        Console.WriteLine("PASS interface declarations: CLI/native binary load, verify and default-reference forwarding entry result 42; dispatch not exercised");
     }
 }

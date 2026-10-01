@@ -8,8 +8,9 @@ milestone sequencing and scope. Explicit author directions take precedence.
 **Interface declaration checkpoint (2026-10-01):** unchanged Comparer<T> and
 EqualityComparer<T> now emit ordinary CLI/native interface contracts and load/verify
 in both file orders. This does not yet prove interface dispatch. Disposable and Iterator<T> now join that evidence with abstract properties and
-nongeneric inherited contracts. Interface-valued signatures and generic inheritance
-remain next. [Evidence](experiments/extended-cli-metadata/interface-library-runtime-validation.json).
+nongeneric inherited contracts. Iterable<T> and interface-valued reference/default
+flow now execute too. The author directs implementation and interface dispatch next;
+generic inheritance remains deferred. [Evidence](experiments/extended-cli-metadata/interface-library-runtime-validation.json).
 
 **Whole-source checkpoint (2026-10-01):** complete, unchanged
 System.Globalization.Language now executes on .NET and neoCLR in both file orders
