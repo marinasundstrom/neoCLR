@@ -18,7 +18,9 @@ implementation has begun: the independent API now writes/reads root classes and
 primitive instance fields, constructors and instance methods; construction, field
 mutation and aliasing execute on both .NET and binary neoCLR. Property associations now round-trip through native metadata and CLI projections.
 Read-only property snapshots preserve accessor identity and owned signatures. Next
-are shared Raven nominal type/receiver contracts, including object locals. Its full consumer still
+are shared Raven field/property/constructor bodies and nominal object locals. Raven's
+shared root/instance declaration categories and receiver argument slots now run on
+.NET; native source class admission still rejects incomplete member emission. Its full consumer still
 has missing native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

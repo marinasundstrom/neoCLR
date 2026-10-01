@@ -1831,3 +1831,22 @@ helper. It rejects associations to another declaring type and bounds property an
 MethodSemantics counts. 51 C# groups pass, including input/signature mutation isolation,
 empty type ranges, native projection and an intentionally corrupted CLI accessor.
 No runtime or Raven compiler behavior changes in this snapshot slice.
+
+
+## Shared root and instance declaration contracts — 2026-10-01
+
+Raven now shares root/static type categories and nonvirtual instance/static callable
+categories, with backend-owned mapping. Ordinary .NET Release methods use shared
+primitive signatures and receiver-aware argument slots; Debug/general fallback remains.
+The native type/method adapters map AddClass/AddInstanceMethod, while native source
+admission stays closed until complete constructor/member bodies are available. No
+Runtime Contract setting changes or structural Function experiments are involved.
+
+Compared with CLR metadata, the common contract separates logical source categories
+from TypeAttributes/HasThis and native builder handles; .NET preserves those physical
+encodings in its adapter. The cost is explicit capability checks and a currently
+bounded root-class shape. This is groundwork for complete Order emission, not evidence
+that the unchanged Order source now runs natively. PE/#Neo transport remains temporary;
+constructor/field/property body plans and nominal locals are next. 56 focused Raven
+C# tests pass (54 baseline), including Release/Debug instance execution and existing
+Order symbol stability. The existing native emission probe passes; it checks supported static/assembly-function regressions, not native instance source coverage. Raven revision: `8036b3404`.

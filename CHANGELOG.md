@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record Raven's shared root-class and instance-method declaration contracts and
+  receiver-aware primitive body planning, validated on .NET. Native adapters map
+  AddClass/AddInstanceMethod, but source admission remains gated on complete
+  constructor/member bodies; this does not claim native Order emission.
+
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor
   visibility; reject incompatible, reused or missing accessors. Add owned read-only

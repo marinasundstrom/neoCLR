@@ -9555,3 +9555,19 @@ remote synchronization does not publish a runtime bundle or website.
   the consumer's real library source closure. Broader metadata importing stays deferred.
   [Evidence](experiments/extended-cli-metadata/class-library-validation.json) and
   [scope](raven-cli-bridge.md#class-library-emission-acceptance--2026-10-01).
+
+
+### 2026-10-01 — Fill emission gaps against executable cases
+
+- **Author:** “We are going to fill the gaps so we can complete the emission story.”
+- **Assistant response:** keep the actual Order declaration as the next acceptance
+  case, then construction/mutation and the broader consumer's generics, delegates and
+  unions. Metadata additions should serve executable compiler cases.
+- **Actions/results:** the independent API's property/accessor producer and owned
+  snapshots were implemented and committed, with binary runtime execution and C#
+  tests. Raven shared root/instance declaration contracts and receiver argument slots
+  were implemented and tested on .NET. Native source class admission remains gated;
+  no full Order or broad consumer emission is claimed.
+- **Open:** shared field/property/constructor bodies, object locals and the broader
+  consumer gaps. Broad symbol importing remains deferred. See the
+  [current integration record](raven-cli-bridge.md#shared-root-and-instance-declaration-contracts--2026-10-01).
