@@ -37,7 +37,9 @@ reference projections, with Boolean local initialization/assignment, equality an
 conversions and signed unary +/−/~ now share that path; broader conversions and general type/field references remain next;
 String signatures, locals, literals and imported text helpers now share the path,
 with computed console output on both runtimes. The independent metadata API also supports typed argument stores with caller
-isolation; ordinary Raven source parameters remain immutable. General object/field contracts and
+isolation; ordinary Raven source parameters remain immutable. Backend-owned instruction/built-in-type capability profiles now admit shared bodies
+before native builder allocation, with .NET division/native rejection validating
+selective admission. General object/field and metadata-category contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

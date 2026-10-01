@@ -1239,3 +1239,45 @@ logical operations separate from Reflection.Emit/native metadata handles; target
 capabilities govern extra categories. The current bounded plan implements only part
 of that architecture. General types/fields and explicit capability composition remain
 open, rather than silently assuming the intersection or union of both target formats.
+
+## Selective body capability admission — 2026-10-01
+
+Tested Raven `codex/metadata-consumer` revision: `3fb50ed79`.
+
+Raven now owns an immutable capability contract for logical instructions and built-in
+value/no-result types. Each adapter lists admitted operations/types explicitly; new
+planner operations are not implicitly enabled on every backend. Shared signature,
+call, local, expression and instruction checks use the selected profile, while target
+handles and encodings remain inside adapters. All native bodies now pass these
+checks before assembly/type/method builder allocation. Later dependency and writer
+validation still runs before output is committed.
+
+Signed Int32/Int64 division demonstrates selective admission. The shared planner
+understands it and .NET emits standard [CLI div](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.div?view=net-10.0)
+(Microsoft .NET 10 documentation reviewed 2026-10-01). The native profile rejects the
+instruction at its source expression with NEOMETA001 because the independent metadata
+writer has not exposed it. This is a producer capability limit, not a restriction on
+neoCLR's existing runtime or a new metadata extension. .NET runtime tests preserve
+signed truncation and divide-by-zero/overflow faults in Debug and Release.
+
+Compared with a shared planner limited to the intersection of both backends, explicit
+profiles allow one adapter to support more while preserving diagnostics in the other.
+The cost is maintaining admitted sets and an instruction admission pass. Profiles
+are copied once and reused; native preflight retains body plans for the assembly.
+Allocation/time tradeoffs are not measured yet; no speedup is claimed.
+
+No Runtime Contract option, semantic-loader, metadata-library API, native schema or
+runtime change is introduced. Ordinary .NET and its unsupported-body/Debug fallback
+remain default. The native backend override and hosted primitive/projection binding
+remain temporary. General nominal types, fields, metadata category capabilities and
+full target composition remain open. The current reference projection/native payload
+bridge still does not establish full extended-CLI executable compatibility.
+
+Validation: 48 focused Raven tests pass, including restricted capability profiles,
+immutable configuration, selected-core types and both .NET generator paths. The native
+probe checks the specific division-capability diagnostic, source location and unchanged
+output, alongside existing binary load/execute and compiler-driver acceptance cases.
+
+[Binary runtime and driver evidence](experiments/extended-cli-metadata/emission-capabilities-validation.json).
+The metadata API and runtime implementation are unchanged in this slice; their prior
+39 C# contract groups and native argument-store evidence remain applicable.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Raven now uses immutable backend instruction/type capability profiles to admit
+  shared body plans before native builders are allocated. .NET admits shared signed
+  division; the native producer explicitly rejects it until its writer supports it.
+  This changes no metadata encoding or runtime format.
+
 - Add checked Starg/StoreArgument to the independent metadata writer, preserving
   by-value slot types and caller values. Raven source parameters stay immutable. Use the
   existing CLI/native instructions without a schema extension. Record the author’s

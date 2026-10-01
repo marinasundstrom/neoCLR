@@ -126,8 +126,10 @@ String signatures, locals and helper results now support computed Unicode consol
 output and separately compiled native text helpers. The independent metadata
 writer also supports typed argument stores; Raven source parameters remain immutable. Nulls, text operators, general
 object/field support and exception regions remain development work.
-General codegen
-portability and metadata importer work remain development tasks on the feature branches.
+Backend instruction/type profiles now admit shared bodies selectively: .NET supports
+shared division while the native writer still rejects it explicitly. General metadata
+category contracts, codegen portability and metadata importer work remain development
+tasks on the feature branches.
 
 [Metadata proposal](https://github.com/marinasundstrom/neoCLR/blob/main/docs/proposals/metadata-format.md)
 
