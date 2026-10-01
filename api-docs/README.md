@@ -473,3 +473,6 @@ excluded from the RavenDoc guest assembly; no guest runtime API was added.
 
 PropertyBuilder, TypeBuilder.Properties and AddProperty are also covered by the
 manual host reference; they are C# host APIs outside the RavenDoc guest assembly.
+
+PropertyDefinition and module/type property collections, token lookup, copied signatures
+and owned accessor links are documented in that same host reference, outside RavenDoc.

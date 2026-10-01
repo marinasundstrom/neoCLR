@@ -17,7 +17,8 @@ field symbols; native emission stops at the nonstatic-class gate. The next bound
 implementation has begun: the independent API now writes/reads root classes and
 primitive instance fields, constructors and instance methods; construction, field
 mutation and aliasing execute on both .NET and binary neoCLR. Property associations now round-trip through native metadata and CLI projections.
-Next are read-only property snapshots and shared Raven nominal type/receiver contracts, including object locals. Its full consumer still
+Read-only property snapshots preserve accessor identity and owned signatures. Next
+are shared Raven nominal type/receiver contracts, including object locals. Its full consumer still
 has missing native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
 

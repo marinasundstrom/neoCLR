@@ -10,7 +10,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 - Add non-indexed primitive property associations to the metadata producer and native
   reference projection. Preserve CLI Property/PropertyMap/MethodSemantics and accessor
-  visibility; reject incompatible, reused or missing accessors. Property-bearing
+  visibility; reject incompatible, reused or missing accessors. Add owned read-only
+  Property snapshots with copied signatures and exact local accessor identity. Reject
+  out-of-owner accessor associations and bound property/semantics counts. Property-bearing
   binary assemblies verify and execute in neoCLR. Raven source property emission is
   still pending; new property output requires the matching bounded metadata reader.
 

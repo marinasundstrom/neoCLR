@@ -2289,3 +2289,30 @@ accessor existence, uniqueness and origins before constructing a throwing refere
 projection. Outputs without properties retain their previous encoding. New property
 outputs require the matching bounded reader. Properties do not imply backing fields;
 indexed/generic/nominal properties, attributes and default values remain unsupported.
+
+### Owned property snapshots
+
+```csharp
+IReadOnlyList<PropertyDefinition> ModuleDefinition.Properties { get; }
+PropertyDefinition? ModuleDefinition.GetPropertyDefinition(uint metadataToken);
+IReadOnlyList<PropertyDefinition> TypeDefinition.Properties { get; }
+```
+
+The module lists physical Property rows in metadata order; types list their declared
+properties. Lookup returns null for absent/wrong-kind tokens. PropertyDefinition
+exposes Module, MetadataToken, DeclaringType, Name, ushort Attributes (PropertyAttributes),
+nullable GetMethod/SetMethod and IReadOnlyList<MethodDefinition> OtherMethods. Accessors
+are the same owned objects returned by Module.GetMethodDefinition, with no assembly
+loading or resolution. OtherMethods preserves ordinary Other associations.
+
+GetSignature() returns new owned bytes, including unsupported signature encodings.
+TryGetPrimitiveSignature(out PrimitiveType type, out bool isStatic) recognizes exact
+non-indexed Int32/Int64/Boolean/String signatures; failure returns Void/false. This
+helper decodes the property signature, not accessor compatibility. The general CLI
+snapshot retains broader signatures opaquely; full CLI verification is not claimed.
+Default values/custom attributes are not exposed by this snapshot.
+
+Reading enforces at most 4096 Property rows, 16384 MethodSemantics rows and the shared
+4 MiB aggregate signature budget. Missing/ambiguous owners, absent signatures and
+accessors outside the declaring type fail with InvalidDataException. Input buffers
+and returned signature arrays can be changed without affecting the snapshot.

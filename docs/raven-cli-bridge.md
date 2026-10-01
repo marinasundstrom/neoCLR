@@ -1822,3 +1822,12 @@ read-only/write-only projection, private setter preservation and malformed acces
 origin rejection. The binary Order fixture with Number/Pending properties verifies
 and executes in neoCLR e8611966, returning 42. See
 [property evidence](experiments/extended-cli-metadata/property-validation.json).
+
+
+The subsequent read-only slice exposes owned Property rows and getter/setter/Other
+links through the Cecil-like snapshot. Accessor identity is shared with the module's
+method inventory; signatures remain copied and opaque when outside the primitive
+helper. It rejects associations to another declaring type and bounds property and
+MethodSemantics counts. 51 C# groups pass, including input/signature mutation isolation,
+empty type ranges, native projection and an intentionally corrupted CLI accessor.
+No runtime or Raven compiler behavior changes in this snapshot slice.
