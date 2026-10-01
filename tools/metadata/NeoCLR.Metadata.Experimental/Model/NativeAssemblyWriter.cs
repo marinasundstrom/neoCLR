@@ -46,7 +46,7 @@ public sealed partial class AssemblyBuilder
         static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? new { Named = TypeName(type) } : null;
-        static object SignatureValue(SignatureType type) => type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static object SignatureValue(SignatureType type) => type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
@@ -157,7 +157,7 @@ public sealed partial class AssemblyBuilder
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = System.Array.Empty<string>(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
-                method.Locals.Select(local => local.ClassType is { } type ? (object)new { Named = TypeName(type) } : local.Type!.Value.ToString()).ToArray(),
+                method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
                 SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
                 Origin(method.Name, 0x06000001 + index, method), NativeBody(method),
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),

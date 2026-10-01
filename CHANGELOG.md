@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add bounded vector signatures for primitive and owned root-class elements across
+  parameters, results, locals, fields and properties. Preserve CLI SZARRAY and native
+  ArrayRef identities in reference projections. LocalDefinition.SignatureType exposes
+  the full slot type; primitive/class projections are null for array slots. Allocation
+  and element instruction support follows separately.
+
 - Support readonly primitive/nominal instance fields in the independent metadata API,
   CLI InitOnly flags and native reference projections. Enforce declaring-constructor
   direct stores and readonly managed addresses in verification and execution. Existing

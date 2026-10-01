@@ -2428,7 +2428,7 @@ assuming a primitive enum. Imported read-only method contracts remain primitive-
 
 CLI output uses CLASS TypeDef signatures; native output uses existing Named type records.
 Calls, argument stores and returns enforce exact class identity, just like nominal locals.
-No implicit base conversion, null literal, array, generic, structural or external nominal
+No implicit base conversion, null literal, generic, structural or external nominal
 signature support is added. Cross-assembly builder calls with nominal signatures reject
 at write rather than fabricating a TypeRef. Entries remain parameterless Int32/Void.
 NativeAssemblyDefinition accepts owned nonstatic Named signature references and remaps
@@ -2451,3 +2451,30 @@ Here `order` is graph.AddClass's owned result. The C# contract test passes an al
 instance through both calls, mutates it through a nominal parameter and reads 42 through
 its alias on .NET and binary neoCLR. Wrong-class arguments/results and foreign signatures
 reject. Raven additionally validates owned nominal constructor parameters and overloads.
+
+## Vector declarations (development, 2026-10-01)
+
+```csharp
+SignatureType SignatureType.ArrayOf(SignatureType elementType);
+SignatureType? SignatureType.ArrayElement { get; }
+LocalDefinition MethodBuilder.DeclareLocal(SignatureType type);
+SignatureType LocalDefinition.SignatureType { get; }
+```
+
+`ArrayOf` creates a one-dimensional zero-based vector of Int32, Int64, Boolean,
+String or an owned non-static root class. Null throws ArgumentNullException; Void
+and nested arrays throw ArgumentException. Declaration APIs reject foreign element
+owners before mutation. Method, field and property signatures share this contract;
+`DeclareLocal` also rejects Void and enforces the existing 256-slot limit.
+`SignatureType.ArrayElement` is null for scalar types. `LocalDefinition.Type` and
+`ClassType` are both null for vectors; use `SignatureType` to inspect all slot kinds.
+For example, `method.DeclareLocal(SignatureType.ArrayOf(PrimitiveType.Int32))`
+creates an integer-array slot. Stack joins, calls and stores require exact element
+identity; covariance is not admitted by this bounded writer.
+
+CLI output uses standard SZARRAY signatures; native output uses ArrayRef, preserving
+reference identity. The native reader validates elements and reconstructs the same
+CLI signatures for reference assemblies. These host-only C# APIs remain covered by
+this manual reference, not the RavenDoc runtime snapshot. This declaration slice
+does not yet expose allocation/indexing instructions. C# contract tests execute array
+parameter/result/local and property/field aliasing on .NET and compare native projections.

@@ -92,7 +92,7 @@ public sealed partial class AssemblyBuilder
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
-            if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.ClassType is not null))
+            if (!ReferenceEquals(target.Assembly, this) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null))
                 throw new InvalidDataException("external nominal method references require an import contract");
         if (validateBodies) foreach (var method in methods) method.Validate();
         return methods;
@@ -168,6 +168,19 @@ public sealed partial class AssemblyBuilder
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
         var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
+        void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
+        {
+            if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
+            if (type.ClassType is { } owner) { encoder.Type(typeHandles[owner], false); return; }
+            switch (type.Primitive)
+            {
+                case PrimitiveType.Int32: encoder.Int32(); break;
+                case PrimitiveType.Int64: encoder.Int64(); break;
+                case PrimitiveType.Boolean: encoder.Boolean(); break;
+                case PrimitiveType.String: encoder.String(); break;
+                default: throw new InvalidDataException("unsupported value type");
+            }
+        }
         BlobHandle Signature(MethodBuilder method)
         {
             var signature = new BlobBuilder();
@@ -175,21 +188,11 @@ public sealed partial class AssemblyBuilder
                 result =>
                 {
                     if (!method.ReturnsValue) result.Void();
-                    else if (method.Signature.ReturnType.ClassType is { } resultClass) result.Type().Type(typeHandles[resultClass], false);
-                    else if (method.Signature.ReturnType == PrimitiveType.String) result.Type().String();
-                    else if (method.Signature.ReturnType == PrimitiveType.Int64) result.Type().Int64();
-                    else if (method.Signature.ReturnType == PrimitiveType.Boolean) result.Type().Boolean();
-                    else result.Type().Int32();
+                    else EncodeType(result.Type(), method.Signature.ReturnType);
                 }, parameters =>
                 {
-                    foreach (var type in method.Signature.ParameterTypes)
-                        {
-                        if (type.ClassType is { } parameterClass) parameters.AddParameter().Type().Type(typeHandles[parameterClass], false);
-                        else if (type == PrimitiveType.String) parameters.AddParameter().Type().String();
-                        else if (type == PrimitiveType.Boolean) parameters.AddParameter().Type().Boolean();
-                        else if (type == PrimitiveType.Int64) parameters.AddParameter().Type().Int64();
-                        else parameters.AddParameter().Type().Int32();
-                    }
+                    foreach (var type in method.Signature.ParameterTypes) EncodeType(parameters.AddParameter().Type(), type);
+
                 });
             return metadata.GetOrAddBlob(signature);
         }
@@ -286,14 +289,7 @@ public sealed partial class AssemblyBuilder
             {
                 var signature = new BlobBuilder();
                 var variables = new BlobEncoder(signature).LocalVariableSignature(method.Locals.Count);
-                foreach (var local in method.Locals)
-                {
-                    if (local.ClassType is { } classType) variables.AddVariable().Type().Type(typeHandles[classType], isValueType: false);
-                    else if (local.Type == PrimitiveType.String) variables.AddVariable().Type().String();
-                    else if (local.Type == PrimitiveType.Boolean) variables.AddVariable().Type().Boolean();
-                    else if (local.Type == PrimitiveType.Int64) variables.AddVariable().Type().Int64();
-                    else variables.AddVariable().Type().Int32();
-                }
+                foreach (var local in method.Locals) EncodeType(variables.AddVariable().Type(), local.SignatureType);
                 locals = metadata.AddStandaloneSignature(metadata.GetOrAddBlob(signature));
             }
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
@@ -312,15 +308,7 @@ public sealed partial class AssemblyBuilder
             {
                 var signature = new BlobBuilder();
                 var encoder = new BlobEncoder(signature).FieldSignature();
-                if (field.FieldType.ClassType is { } fieldClass) encoder.Type(typeHandles[fieldClass], false);
-                else switch (field.FieldType.Primitive)
-                {
-                    case PrimitiveType.Int32: encoder.Int32(); break;
-                    case PrimitiveType.Int64: encoder.Int64(); break;
-                    case PrimitiveType.Boolean: encoder.Boolean(); break;
-                    case PrimitiveType.String: encoder.String(); break;
-                    default: throw new InvalidDataException("unsupported field type");
-                }
+                EncodeType(encoder, field.FieldType);
                 metadata.AddFieldDefinition((field.Visibility switch {
                     FieldVisibility.Public => FieldAttributes.Public,
                     FieldVisibility.Internal => FieldAttributes.Assembly,
@@ -336,16 +324,7 @@ public sealed partial class AssemblyBuilder
                 new BlobEncoder(signature).PropertySignature(isInstanceProperty: !property.IsStatic)
                     .Parameters(0, result =>
                     {
-                        var encoder = result.Type();
-                        if (property.PropertyType.ClassType is { } propertyClass) encoder.Type(typeHandles[propertyClass], false);
-                        else switch (property.PropertyType.Primitive)
-                        {
-                            case PrimitiveType.Int32: encoder.Int32(); break;
-                            case PrimitiveType.Int64: encoder.Int64(); break;
-                            case PrimitiveType.Boolean: encoder.Boolean(); break;
-                            case PrimitiveType.String: encoder.String(); break;
-                            default: throw new InvalidDataException("unsupported property type");
-                        }
+                        EncodeType(result.Type(), property.PropertyType);
                     }, _ => { });
                 var handle = metadata.AddProperty(PropertyAttributes.None, metadata.GetOrAddString(property.Name), metadata.GetOrAddBlob(signature));
                 if (firstProperty) { metadata.AddPropertyMap(typeHandle, handle); firstProperty = false; }

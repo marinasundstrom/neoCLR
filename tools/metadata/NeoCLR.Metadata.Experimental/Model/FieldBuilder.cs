@@ -47,8 +47,7 @@ public sealed partial class TypeBuilder
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (type.ClassType is { } owner && !ReferenceEquals(owner.Assembly, Assembly))
-            throw new ArgumentException("field class belongs to another output", nameof(type));
+        type.ValidateOwner(Assembly);
         if (IsStatic) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||

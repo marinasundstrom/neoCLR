@@ -36,8 +36,7 @@ public sealed partial class TypeBuilder
     public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (type.ClassType is { } owner && !ReferenceEquals(owner.Assembly, Assembly))
-            throw new ArgumentException("property class belongs to another output", nameof(type));
+        type.ValidateOwner(Assembly);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||
             properties.Count >= 256 || properties.Any(p => p.Name == name) || getter is null && setter is null)

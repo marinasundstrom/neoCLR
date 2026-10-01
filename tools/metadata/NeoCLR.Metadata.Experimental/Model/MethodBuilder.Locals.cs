@@ -3,16 +3,17 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An immutable primitive or root-class local-slot identity owned by one method builder.</summary>
 public sealed class LocalDefinition
 {
-    internal LocalDefinition(MethodBuilder method, int index, PrimitiveType type) { Method = method; Index = index; Type = type; }
-    internal LocalDefinition(MethodBuilder method, int index, TypeBuilder type) { Method = method; Index = index; ClassType = type; }
+    internal LocalDefinition(MethodBuilder method, int index, SignatureType type) { Method = method; Index = index; SignatureType = type; }
     /// <summary>Gets the owning method.</summary>
     public MethodBuilder Method { get; }
     /// <summary>Gets the zero-based slot index.</summary>
     public int Index { get; }
     /// <summary>Gets the primitive slot type, or null for a class local.</summary>
-    public PrimitiveType? Type { get; }
+    public PrimitiveType? Type => SignatureType.Primitive;
     /// <summary>Gets the root-class declaration, or null for a primitive local.</summary>
-    public TypeBuilder? ClassType { get; }
+    public TypeBuilder? ClassType => SignatureType.ClassType;
+    /// <summary>Gets the complete scalar or array slot type.</summary>
+    public SignatureType SignatureType { get; }
 }
 
 public sealed partial class MethodBuilder
@@ -46,6 +47,19 @@ public sealed partial class MethodBuilder
     {
         ArgumentNullException.ThrowIfNull(type);
         if (type.IsStatic || !ReferenceEquals(type.Assembly, Assembly)) throw new ArgumentException("local requires an owned root class", nameof(type));
+        if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
+        var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
+    }
+    /// <summary>Declares a primitive, owned root-class or vector local with exact type identity.</summary>
+    /// <param name="type">Non-Void type; all classes must belong to this output.</param>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
+    /// <exception cref="ArgumentException">Void or foreign class type.</exception>
+    /// <exception cref="InvalidDataException">Local limit exceeded.</exception>
+    public LocalDefinition DeclareLocal(SignatureType type)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        type.ValidateOwner(Assembly);
+        if (type.Primitive == PrimitiveType.Void) throw new ArgumentException("local cannot be Void", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(this, locals.Count, type); locals.Add(local); return local;
     }

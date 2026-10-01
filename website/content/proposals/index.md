@@ -269,3 +269,7 @@ The development Raven target also accepts explicit parameterless root `base()` a
 checking its bound System.Object identity. It reuses existing root initialization on
 both targets; side-effecting initializers execute before block or expression bodies.
 User-defined base initialization and general constructor delegation remain future work.
+
+Development metadata API: vector declarations now round-trip primitive and owned-class
+arrays as CLI SZARRAY/native ArrayRef, including locals and property storage. Executable
+array instructions and Raven consumption remain the next slices.

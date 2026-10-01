@@ -132,6 +132,7 @@ var tests = new (string Name, Action Body)[]
     ("Assembly function namespaces", FunctionNamespaceChecks.Run),
     ("Root class and instance field metadata", ClassFieldChecks.Run),
     ("Nominal local identity and aliasing", NominalLocalChecks.Run),
+    ("Array signatures, slots and projection", ArraySignatureChecks.Run),
     ("Readonly field construction and projection", ReadOnlyFieldChecks.Run),
     ("Nominal property identity and accessors", NominalPropertyChecks.Run),
     ("Nominal field identity and alias storage", NominalFieldChecks.Run),

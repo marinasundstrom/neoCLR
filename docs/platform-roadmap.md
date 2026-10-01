@@ -40,7 +40,9 @@ including private stored properties. Explicit root `base()` uses the existing in
 contract after semantic validation; side-effecting initializers and both body forms execute
 on both runtimes. Readonly instance storage now preserves CLI/native flags and rejects
 ordinary direct/managed-address writes in verification and execution; Raven consumes it
-for private `val` storage and stored `val` properties. Next
+for private `val` storage and stored `val` properties. The next connected milestone is
+vector emission: metadata declarations now preserve CLI SZARRAY/native ArrayRef for
+primitive and owned-class arrays; allocation, indexing and Raven consumption follow. Next
 are broader field/constructor shapes and generic/delegate/union contracts. The full consumer still has 49 binding errors
 from native collection/LINQ/union dependencies under the host-only bootstrap.
 [Evidence](raven-cli-bridge.md#namespaced-functions-and-real-math-source--2026-10-01).
