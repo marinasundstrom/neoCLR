@@ -1188,3 +1188,54 @@ prints its returned Unicode text from the binary native application.
 [Executable evidence](experiments/extended-cli-metadata/string-values-validation.json).
 Older bounded metadata readers reject the newly admitted String declarations; use
 the matching metadata library and compiler adapter. Existing artifacts remain readable.
+
+## Metadata argument stores and compiler boundary — 2026-10-01
+
+Raven `codex/metadata-consumer` records the matching architecture/spec clarification
+at `a9ed7b24b`; its String integration remains at `86d4fed0f`.
+
+The independent metadata library exposes OpCode.Starg through Emit(OpCode, int)
+and StoreArgument(int), validating slot bounds and exact stack type before output.
+Stores replace only the callee's by-value slot, leaving the caller's variable intact.
+Parameters start initialized. Ref/out/in and receiver stores remain outside this
+bounded writer API.
+
+This is not a new Raven source feature. Investigation found a stale specification
+paragraph permitting var on ordinary parameters, but the binder and diagnostic
+regressions reject it. The paragraph was corrected; ordinary Raven source parameters
+remain immutable. The proposed shared source-level store path was withdrawn before
+commit rather than introducing an unrelated language change. Current compiler
+adapters do not expose this operation; it is available to metadata producers and
+future compiler-generated bodies through a deliberate capability boundary.
+
+This matches the ordinary [CLI starg](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.starg?view=net-10.0)
+slot operation (Microsoft .NET 10 documentation reviewed 2026-10-01), using its
+UInt16 operand for CLI output and the existing native starg for runtime execution.
+Reusing those instructions avoids introducing a new format concept. Native stack
+checking keeps Boolean distinct from Int32; this bounded API admits no small integer
+or floating-point storage conversions. No Runtime Contract setting, native schema
+or semantic importer change is involved. General object/field support remains open.
+
+The author reaffirmed extended CLI compatibility while this slice was underway.
+Standard metadata/IL remains the baseline; today's throwing CLI reference projection
+plus separate native execution payload is still a bridge, not completed executable
+.NET/neoCLR interchange. See the [compatibility boundary](design/extended-cli-metadata.md#compatibility-baseline-reaffirmed--2026-10-01).
+
+The author also asked to keep codegen performance in view for a later revisit.
+The shared plan's allocations and fallback work need measurement; no codegen speedup
+is claimed. A later phase/allocation benchmark should separate collection, planning,
+reference resolution and serialization from end-to-end emission, comparing supported
+.NET/native cases without weakening diagnostics or output contracts.
+
+Validation: 39 metadata C# contract groups pass, covering all four types, the last
+slot, invalid indices, underflow and type mismatch. A direct API producer's binary
+assembly verifies and executes in neoCLR with result 42 and reassigned Unicode text.
+Three existing Raven diagnostic tests confirm ordinary var/val parameter rejection.
+[Native evidence](experiments/extended-cli-metadata/argument-stores-validation.json).
+
+The author further directs a target-neutral shared codegen abstraction with selectively
+exposed instruction/metadata categories. Keep compiler-owned typed references and
+logical operations separate from Reflection.Emit/native metadata handles; target
+capabilities govern extra categories. The current bounded plan implements only part
+of that architecture. General types/fields and explicit capability composition remain
+open, rather than silently assuming the intersection or union of both target formats.

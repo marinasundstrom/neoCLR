@@ -123,7 +123,8 @@ classes now produce one native type across files, preserving every part’s meth
 Int32 locals and assignments now pass through the shared body path and metadata writer;
 signed/negated comparisons, if/else and while loops with break/continue now run on both runtimes.
 String signatures, locals and helper results now support computed Unicode console
-output and separately compiled native text helpers. Nulls, text operators, general
+output and separately compiled native text helpers. The independent metadata
+writer also supports typed argument stores; Raven source parameters remain immutable. Nulls, text operators, general
 object/field support and exception regions remain development work.
 General codegen
 portability and metadata importer work remain development tasks on the feature branches.

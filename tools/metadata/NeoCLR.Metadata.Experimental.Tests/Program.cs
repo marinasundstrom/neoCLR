@@ -4,6 +4,12 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--argument-store-integration")
+{
+    await ArgumentStoreChecks.RunRuntime(args[1], args[2]);
+    return 0;
+}
+
 if (args.Length == 3 && args[0] == "--compare-native")
 {
     var decoded = NeoCLR.Metadata.Experimental.NativeModuleContainer.Read(File.ReadAllBytes(args[1]));
@@ -59,6 +65,7 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Typed argument stores bounds and caller isolation", ArgumentStoreChecks.Run),
     ("String signatures literals locals and rejected operands", StringChecks.Run),
     ("Signed unary integer operations and boundaries", UnaryIntegerChecks.Run),
     ("Int64 signatures constants conversions and locals", Int64Checks.Run),

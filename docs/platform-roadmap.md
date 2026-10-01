@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Compatibility baseline reaffirmed (2026-10-01):** preserve ordinary .NET/CLI metadata
+and instruction encodings, with explicit neoCLR extensions. The current native #Neo
+execution payload plus CLI reference projection is a working bridge, not yet full
+extended-CLI executable compatibility. Keep that gap visible while adding ordinary
+compiler coverage; do not treat this bridge as a permanent replacement format.
+[Design boundary](design/extended-cli-metadata.md#compatibility-baseline-reaffirmed--2026-10-01).
+
 **Author-directed metadata exploration (2026-09-30).** Begin extended CLI metadata
 on `codex/extended-cli-metadata`, based on main, with later Raven integration. The
 author confirms the Cecil-style metadata API remains an independent project, consumed
@@ -29,7 +36,8 @@ Int32/Boolean/no-result signatures now flow through both backends, native import
 reference projections, with Boolean local initialization/assignment, equality and short-circuit &&/|| and discarded primitive call results. Int64 signatures/locals and signed Int32↔Int64
 conversions and signed unary +/−/~ now share that path; broader conversions and general type/field references remain next;
 String signatures, locals, literals and imported text helpers now share the path,
-with computed console output on both runtimes. General object/field contracts and
+with computed console output on both runtimes. The independent metadata API also supports typed argument stores with caller
+isolation; ordinary Raven source parameters remain immutable. General object/field contracts and
 metadata loading remain future slices. See [integration scope and validation](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
 
 **Shared compiler pipeline:** Raven's explicit native backend now participates in

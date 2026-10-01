@@ -64,7 +64,7 @@ public sealed partial class MethodBuilder
                 throw new InvalidDataException("unmarked branch label");
             if (instruction.Op is "local.load" or "local.store" && (instruction.Value < 0 || instruction.Value >= locals.Count))
                 throw new InvalidDataException("local outside declarations");
-            if (instruction.Op == "argument" && (instruction.Value < 0 || instruction.Value >= ParameterCount))
+            if (instruction.Op is "argument" or "argument.store" && (instruction.Value < 0 || instruction.Value >= ParameterCount))
                 throw new InvalidDataException("argument outside signature");
         }
         MaxStack = 0;
@@ -100,6 +100,7 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("integer conversion requires Int32 or Int64");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
+                case "argument.store": Pop(Signature.ParameterTypes[instruction.Value]); break;
                 case "argument": stack.Add(Signature.ParameterTypes[instruction.Value]); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.load":

@@ -49,7 +49,9 @@ public enum OpCode
     /// <summary>Complements every bit of Int32/Int64, preserving width.</summary>
     Not,
     /// <summary>Pushes a Unicode string literal; requires a string operand.</summary>
-    Ldstr
+    Ldstr,
+    /// <summary>Stores into a declared argument by zero-based index; requires an Int32 operand.</summary>
+    Starg
 }
 
 public sealed partial class MethodBuilder
@@ -67,13 +69,13 @@ public sealed partial class MethodBuilder
         }));
 
     /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
-    /// <param name="opCode">Ldc_I4, Ldarg, Ldloc or Stloc.</param>
+    /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc or Stloc.</param>
     /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void Emit(OpCode opCode, int operand)
         => Append(new(opCode switch {
-            OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument",
+            OpCode.Ldc_I4 => "constant", OpCode.Ldarg => "argument", OpCode.Starg => "argument.store",
             OpCode.Ldloc => "local.load", OpCode.Stloc => "local.store", _ => throw OperandError(opCode)
         }, operand));
 

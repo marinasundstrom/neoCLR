@@ -171,7 +171,7 @@ public sealed partial class AssemblyBuilder
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
                     "constant64" => 9, "label" => 0, "string" or "constant" or "call" or "branch" or "branch.true" or "branch.false" => 5,
-                    "argument" or "local.load" or "local.store" => 4,
+                    "argument" or "argument.store" or "local.load" or "local.store" => 4,
                     "equal" or "less" or "greater" => 2, _ => 1
                 });
             var labels = method.LabelPositions();
@@ -196,6 +196,7 @@ public sealed partial class AssemblyBuilder
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
+                    case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.load": code.WriteByte(0xfe); code.WriteByte(0x0c); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.store": code.WriteByte(0xfe); code.WriteByte(0x0e); code.WriteUInt16((ushort)instruction.Value); break;
@@ -335,6 +336,11 @@ public sealed partial class MethodBuilder
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Zero-based parameter index.</param>
     public void LoadArgument(int index) => Emit(OpCode.Ldarg, index);
+    /// <summary>Stores a value into a by-value argument slot in this invocation.</summary>
+    /// <param name="index">Zero-based declared argument index; bounds and exact type are checked when writing.</param>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded, or invalid index/stack type when writing.</exception>
+    /// <remarks>Does not update caller storage. This bounded API has no implicit receiver or by-reference parameters.</remarks>
+    public void StoreArgument(int index) => Emit(OpCode.Starg, index);
     /// <summary>Appends matching-width Int32/Int64 addition.</summary>
     public void Add() => Emit(OpCode.Add);
     /// <summary>Appends matching-width Int32/Int64 subtraction.</summary>

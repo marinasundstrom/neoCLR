@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-01",
+  "producer": "independent .NET metadata API",
+  "result": 42,
+  "int32Int64BooleanStringStores": true,
+  "callerLocalPreserved": true,
+  "nativeBinaryLoadedAndVerified": true,
+  "runtimeSchemaChanged": false,
+  "ravenSourceParameterMutation": false,
+  "runtimeSha256": "929b169bab427e67d18c052cabe130cab14b651d72e64c0d25da49ae90586150",
+  "assemblySha256": "5777ce87477b2583564232670232e7d77a56759c8134588527ee041987f76803"
+}

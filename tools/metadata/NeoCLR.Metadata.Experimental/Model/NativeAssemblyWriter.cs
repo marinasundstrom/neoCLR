@@ -64,6 +64,7 @@ public sealed partial class AssemblyBuilder
             "less" => new { op = "clt" },
             "greater" => new { op = "cgt" },
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
+            "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
             "call" => new { op = "call", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), parameters = Parameters(instruction.Target!) } },
             "local.load" => new { op = "ldloc", arg = (object)instruction.Value },

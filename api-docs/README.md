@@ -447,3 +447,5 @@ are introduced, add those actual types and members to the matching guest referen
 The host reference also covers the development String signature/local contract,
 Emit(OpCode, string), Ldstr and the stack-consuming WriteConsoleLine() overload.
 These remain host-only APIs under the same explicit guest-reference exclusion above.
+
+The host reference includes Starg/StoreArgument and its typed by-value slot contract.

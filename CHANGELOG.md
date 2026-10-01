@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add checked Starg/StoreArgument to the independent metadata writer, preserving
+  by-value slot types and caller values. Raven source parameters stay immutable. Use the
+  existing CLI/native instructions without a schema extension. Record the author’s
+  CLI compatibility baseline and deferred codegen performance measurement.
+
 - Add String signatures/locals and typed Ldstr emission to the experimental metadata
   API, including Unicode validation, native reference projection and imports. A native
   stack-consuming WriteConsoleLine overload enables Raven text helpers and computed

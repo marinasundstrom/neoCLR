@@ -9489,3 +9489,49 @@ remote synchronization does not publish a runtime bundle or website.
   composition remain. The independent metadata library stays separate. Metadata loading
   and the known translated-System driver collision remain deferred as previously directed.
   See [the implemented scope](raven-cli-bridge.md#compiler-lowered-native-bodies--2026-10-01).
+
+## 2026-10-01 — extended CLI compatibility baseline reaffirmed
+
+- **Author question:** “You do still try to make sure our metadata format is a basically
+  compatible with .NET metadata, except for the extensions we have already implemented?”
+- **Assistant response:** Reaffirmed standard CLI metadata as the baseline with explicit
+  neoCLR extensions. Explained that String signatures/ldstr and argument stores/starg
+  use ordinary CLI constructs rather than new extensions.
+- **Assistant qualification:** Current native PE artifacts carry conventional CLI reference
+  declarations but execute a separate #Neo payload. Their CLI bodies are placeholders;
+  these artifacts are not interchangeable executable .NET/neoCLR assemblies. This is
+  a compatibility gap in the prototype, not evidence that extended CLI compatibility
+  has been achieved.
+- **Action:** Made this baseline and gap explicit in the metadata design, roadmap and
+  both compiler integration documents. Continued the bounded argument-store slice
+  using existing CLI/native instructions without adding a format extension.
+- **Open:** Reconcile the native execution payload/reference projection bridge with
+  compatible standard CLI metadata/body representation plus intentional extensions.
+  No native CLI body loader or lossless general assembly roundtrip is claimed.
+
+## 2026-10-01 — codegen performance consideration
+
+- **Author:** “Also think about performance in the code gen, we might revisit that later.”
+- **Assistant proposal:** Keep performance in view and record a later measurement of
+  declaration collection, body planning, reference resolution and writing, including
+  allocation costs. Avoid claiming that abstractions themselves make emission faster.
+- **Action:** Recorded the follow-up in Raven's migration plan and neoCLR integration
+  documentation while continuing the current correctness slice. No new benchmark was
+  run; the earlier JSON-versus-assembly runtime benchmark does not measure compiler
+  codegen and is not evidence for its performance.
+
+## 2026-10-01 — shared abstraction and selective target capabilities
+
+- **Author:** Emphasized a shared codegen abstraction fitting .NET and neoCLR without
+  locking the compiler to either, with extra instructions and metadata categories
+  selectively exposed by target.
+- **Assistant response/action:** Recorded compiler-owned references, declarations and
+  logical operations with backend-owned encoding/handles and explicit capability
+  admission in Raven's migration plan. The existing bounded plan is partial progress,
+  not completed general type/field or capability composition.
+- **Investigation correction:** The assistant initially proposed source var-parameter
+  stores based on an outdated parameter-spec paragraph. Focused tests exposed that
+  the current binder and newer spec section reject var/val outside primary-constructor
+  promotion. The source-emitter prototype was removed before commit, the stale text
+  corrected, and typed stores were scoped to the independent metadata API with direct
+  CLI/native execution tests. No language change was made to create a consumer.

@@ -8,6 +8,24 @@ writer and inspector. A bounded [PE/CLI container probe](../experiments/extended
 now transports #Neo and tests ordinary reader behavior. No production format, runtime
 feature or Raven integration is implemented. Production numeric encodings remain unassigned.
 
+## Compatibility baseline reaffirmed — 2026-10-01
+
+The author reaffirmed that the format should remain basically compatible with .NET
+metadata except for intentional neoCLR extensions. Standard CLI tables, signatures
+and IL are the baseline for ordinary constructs; new built-in coverage such as String
+and argument assignment uses the existing CLI encodings, not new extensions.
+
+The native PE/#Neo execution experiment described later in this document has not yet
+met that full compatibility target: its conventional CLI declarations are a reference
+projection with throwing bodies, while neoCLR executes the separate native payload.
+The extension stream's transport compatibility is not executable compatibility or a
+lossless extended-CLI assembly implementation. Preserve that distinction when claiming
+progress. The bridge must be reconciled with the intended compatible representation;
+it must not silently become a permanent parallel format for ordinary CLI constructs.
+This clarification records the baseline, not a completed loader redesign or approval
+of every exploratory proposal. Existing structural/native semantic extensions retain
+their explicitly documented status and limits.
+
 ## Purpose and inputs
 
 Define a CLI-derived metadata format that can carry neoCLR semantics across compiler,

@@ -16,6 +16,7 @@ and guest Introspection assembly loading remain pending.
 ## Namespace and types
 
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
+- [Argument stores](#argument-stores-development-2026-10-01): typed by-value slot reassignment.
 - [String values](#string-values-development-2026-10-01): literals, signatures, locals and computed console output.
 - [Primitive signatures](#primitive-signatures-development-2026-10-01): Int32/Int64/Boolean/String parameters and results.
 - [MethodDefinition](#methoddefinition): callable declarations and bounded signature recognition.
@@ -1586,7 +1587,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not, Ldstr, Starg }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1914,3 +1915,29 @@ members are outside this bounded writer API; no interning/identity guarantee is 
 The C# StringChecks consumer covers CLI execution, native projection and imports,
 Unicode/empty/NUL literals, exact UTF-8 bounds and rejected operations. Raven's native
 probe additionally executes computed Unicode text and a separately compiled library.
+
+### Argument stores (development, 2026-10-01)
+
+```csharp
+// NeoCLR.Metadata.Experimental.Model
+void MethodBuilder.StoreArgument(int index);
+void MethodBuilder.Emit(OpCode opCode, int operand); // now also accepts Starg
+```
+
+`Starg` consumes a value of the parameter's exact declared Int32/Int64/Boolean/String
+type and replaces that by-value argument slot in the current invocation. StoreArgument
+is a convenience for the same instruction. Parameters begin initialized; subsequent
+Ldarg observes the replacement. Caller storage is not changed. Indices are zero-based
+with no implicit receiver, bounded by the method signature (at most 256 parameters).
+
+Invalid indices, including negative values, are rejected at writing even in unreachable
+code. Stack underflow and mismatched stored types throw InvalidDataException before
+bytes are returned. The general instruction limit applies at emission. The int Emit
+overload retains its existing opcode/operand validation; Starg with other operand
+kinds rejects with ArgumentException.
+
+CLI output uses standard starg (FE 0B plus UInt16 slot); native output uses existing
+format-5 starg. No signature or container schema changes are required. Mutability is
+a source binding rule, not additional parameter metadata. Ref/out/in and receiver
+assignment are outside this bounded API. C# contracts cover all four admitted types,
+caller isolation, the last slot, bounds, empty stack and type mismatch.
