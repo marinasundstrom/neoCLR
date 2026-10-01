@@ -512,3 +512,8 @@ manual experimental reference, outside RavenDoc's Raven type selection.
 The C# static-generic-owner APIs (AddGenericType, TypeParameter and
 ConstructedMethodReference) use the linked experimental manual reference and remain
 outside RavenDoc's Raven source type selection.
+
+The host-only experimental metadata manual also covers GenericTypeInstance (identity,
+arguments, equality/hash), AddGenericClass, TypeBuilder.MakeGenericInstance, constructed
+class signatures and constructed NewObject/Emit overloads. These C# producer APIs remain
+excluded from RavenDoc's guest reference assembly; see [manual reference](experimental-metadata.md#generic-reference-classes-development).

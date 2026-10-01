@@ -47,7 +47,7 @@ public sealed partial class AssemblyBuilder
         static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
-        static object SignatureValue(SignatureType type) => type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
+        static object SignatureValue(SignatureType type) => type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
@@ -70,8 +70,8 @@ public sealed partial class AssemblyBuilder
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
-            "call.constructed" => new { op = "call", arg = (object)new {
-                name = FunctionName(instruction.Target!), owner = TypeOwner(instruction.Target!.DeclaringType!, instruction.ConstructedTarget!.DeclaringTypeArguments), instance = false,
+            "new.constructed" or "call.constructed" => new { op = instruction.Op == "new.constructed" ? "newobj.ctor" : "call", arg = (object)new {
+                name = FunctionName(instruction.Target!), owner = TypeOwner(instruction.Target!.DeclaringType!, instruction.ConstructedTarget!.DeclaringTypeArguments), instance = !instruction.Target.IsStatic,
                 generic_arguments = instruction.ConstructedTarget.MethodArguments.Select(SignatureValue).ToArray(),
                 parameters = instruction.ConstructedTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
             } },

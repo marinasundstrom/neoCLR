@@ -85,7 +85,7 @@ public sealed class NativeAssemblyDefinition
                 Shape(type, typeFields.ToArray());
                 var isStatic = type.GetProperty("is_abstract").GetBoolean();
                 Require(type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_sealed").GetBoolean() == isStatic, "unsupported native type shape");
-                Require(typeNames.Length == 0 || isStatic && propertyElements.Length == 0, "only static generic owners without properties supported");
+                Require(typeNames.Length == 0 || propertyElements.Length == 0, "generic owner properties unsupported");
                 var fieldRows = new List<FieldRow>();
                 foreach (var field in Array(type, "fields", 256))
                 {
@@ -138,7 +138,7 @@ public sealed class NativeAssemblyDefinition
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
-            var signatureOwners = types.Select(t => t.GenericNames.Length > 0 ? signatureGraph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames) : t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
+            var signatureOwners = types.Select(t => t.GenericNames.Length > 0 ? (t.IsStatic ? signatureGraph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames) : signatureGraph.AddGenericClass(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames)) : t.IsStatic ? signatureGraph.AddType(t.Namespace, t.Name) : signatureGraph.AddClass(t.Namespace, t.Name)).ToArray();
             int genericArity = 0; int typeArity = 0;
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true)
             {
@@ -160,14 +160,25 @@ public sealed class NativeAssemblyDefinition
                     Require(allowArray, "nested arrays unsupported"); Shape(element, "ArrayRef");
                     return SignatureType.ArrayOf(ReadType(arrayElement, false, false));
                 }
+                if (element.TryGetProperty("Constructed", out var construction))
+                {
+                    Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
+                    var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
+                    Require(definition >= 0, "constructed signature requires owned generic class");
+                    return signatureOwners[definition].MakeGenericInstance(Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
+                }
                 Shape(element, "Named");
                 var index = types.FindIndex(t => t.NativeName == Text(element, "Named") && !t.IsStatic);
                 Require(index >= 0, "signature class must be an owned root");
                 return signatureOwners[index];
             }
             foreach (var type in types)
+            {
+                typeArity = type.GenericNames.Length;
                 foreach (var field in type.Fields) _ = ReadType(field.Type, false);
-            string TypeKey(SignatureType type) => type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            }
+            typeArity = 0;
+            string TypeKey(SignatureType type) => type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -302,13 +313,15 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => t.GenericNames.Length > 0 ? graph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility) : t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
+        var owners = types.Select(t => t.GenericNames.Length > 0 ? (t.IsStatic ? graph.AddGenericType(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility) : graph.AddGenericClass(t.Namespace, t.Name[..t.Name.LastIndexOf('`')], t.GenericNames, t.Visibility)) : t.IsStatic ? graph.AddType(t.Namespace, t.Name, t.Visibility) : graph.AddClass(t.Namespace, t.Name, t.Visibility)).ToArray();
         SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
+            : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
+            : type.TryGetProperty("Constructed", out var instance) ? owners[System.Array.FindIndex(types, row => row.NativeName == Text(instance, "definition"))].MakeGenericInstance(Array(instance, "arguments", 32).Select(ProjectType).ToArray())
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
             : owners[System.Array.FindIndex(types, row => row.NativeName == Text(type, "Named"))];
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
-        SignatureType Remap(SignatureType type) => type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.GenericInstance is { } instance ? owners[System.Array.FindIndex(types, t => t.Namespace == instance.Definition.Namespace && t.Name == instance.Definition.Name)].MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
         var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)

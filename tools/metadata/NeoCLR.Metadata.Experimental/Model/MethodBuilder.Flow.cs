@@ -51,11 +51,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null)
     {
-        internal static BodyValueType Receiver(TypeBuilder owner) => new(PrimitiveType.Void, owner);
+        internal static BodyValueType Receiver(TypeBuilder owner) => owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
-        public static implicit operator BodyValueType(SignatureType type) => type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? Receiver(c) : new(type.Primitive!.Value);
+        public static implicit operator BodyValueType(SignatureType type) => type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
     private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
         ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];
@@ -121,6 +121,10 @@ public sealed partial class MethodBuilder
                 case "array.length":
                     if (stack.Count == 0 || stack[^1].ArrayElement is null) throw new InvalidDataException("array length requires a vector");
                     stack[^1] = new(PrimitiveType.Void, NativeLength: true); break;
+                case "new.constructed":
+                    var constructor = instruction.ConstructedTarget!;
+                    for (int i = constructor.Signature.ParameterTypes.Count - 1; i >= 0; i--) Pop(constructor.Signature.ParameterTypes[i]);
+                    stack.Add((SignatureType)constructor.Definition.DeclaringType!.MakeGenericInstance(constructor.DeclaringTypeArguments.ToArray())); break;
                 case "new.object":
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
                     stack.Add(BodyValueType.Receiver(instruction.Target.DeclaringType!)); break;
@@ -185,7 +189,7 @@ public sealed partial class MethodBuilder
                 case "call.generic":
                     var callSignature = instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(callSignature.ParameterTypes[i]);
-                    if (!instruction.Target.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));
+                    if (!instruction.Target.IsStatic) Pop(instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
                     if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
                     break;
                 case "native.call":

@@ -305,3 +305,8 @@ faults after clearing object elements on .NET and neoCLR.
 The development producer now supports static generic type owners with separate type/
 method parameter scopes and constructed method references. Generic instance layouts
 and fields remain future work in this direct emission API.
+
+Development metadata producer work also supports generic reference classes with typed
+fields, constructors and instance calls. API-produced CLI/native binaries execute the
+same storage case. Generic properties, constraints and full class-library compilation
+remain future work; see the [experimental metadata API](/docs/experimental-metadata/).

@@ -750,3 +750,12 @@ Static generic owner milestone complete: multiple/reordered owner arguments and
 method-to-owner forwarding execute across targets; native reader scope/name checks
 reject malformed declarations. Next bounded emission work remains generic instance
 layouts and fields before constraints/imports/full class-library acceptance.
+
+Generic instance class producer slice (2026-10-01): AddGenericClass and constructed
+class signatures now support instance constructors, owner-typed fields and calls on
+exact constructed receivers. CLI uses standard GENERICINST/VAR/member references;
+native uses the existing generic record/reference contract, preserving field layout
+and type identity. API-produced binaries verify/run 42 without runtime changes.
+Raven integration follows. External constructed fields, generic properties, constraints
+and full class-library emission remain open. This reuses the [generic metadata design](generic-metadata.md)
+rather than creating a second generic storage representation.

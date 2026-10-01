@@ -11,7 +11,7 @@ public enum FieldVisibility
     Private
 }
 
-/// <summary>An owned primitive or root-class instance-field declaration.</summary>
+/// <summary>An owned instance-field declaration with a supported value signature.</summary>
 public sealed class FieldBuilder
 {
     internal FieldBuilder(TypeBuilder owner, string name, SignatureType type, FieldVisibility visibility, int index, bool isReadOnly)
@@ -21,7 +21,7 @@ public sealed class FieldBuilder
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple metadata name.</summary>
     public string Name { get; }
-    /// <summary>Gets the primitive or owned root-class storage type.</summary>
+    /// <summary>Gets the storage signature, including scoped VAR and constructed owned classes.</summary>
     public SignatureType FieldType { get; }
     /// <summary>Gets declared accessibility.</summary>
     public FieldVisibility Visibility { get; }
@@ -34,9 +34,9 @@ public sealed partial class TypeBuilder
     private readonly List<FieldBuilder> fields = [];
     /// <summary>Gets owned instance fields in declaration order.</summary>
     public IReadOnlyList<FieldBuilder> Fields => fields.AsReadOnly();
-    /// <summary>Adds a primitive or owned root-class instance field to a nonstatic root class.</summary>
+    /// <summary>Adds an instance field to an owned nonstatic root class.</summary>
     /// <param name="name">Nonempty unique field name, at most 1024 characters.</param>
-    /// <param name="type">Int32, Int64, Boolean, String or a nonstatic class owned by this assembly.</param>
+    /// <param name="type">Supported non-Void type, including vectors, owned constructed classes and declaring-type VAR. Method parameters are invalid.</param>
     /// <param name="visibility">Public, Internal or Private; defaults to Private.</param>
     /// <param name="isReadOnly">Restrict stores to declaring instance constructors; defaults to false.</param>
     /// <returns>A field handle owned by this type.</returns>
@@ -47,7 +47,7 @@ public sealed partial class TypeBuilder
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
         ArgumentNullException.ThrowIfNull(type);
-        type.ValidateOwner(Assembly);
+        type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (IsStatic) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||

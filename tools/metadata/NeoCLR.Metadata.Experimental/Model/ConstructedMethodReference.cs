@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>A static method on a constructed owned generic type, optionally with method arguments.</summary>
+/// <summary>A method or constructor on a constructed owned generic type, optionally with method arguments.</summary>
 public sealed class ConstructedMethodReference
 {
     internal ConstructedMethodReference(MethodBuilder definition, SignatureType[] ownerArguments, SignatureType[] methodArguments)
@@ -10,6 +10,7 @@ public sealed class ConstructedMethodReference
         MethodArguments = Array.AsReadOnly(methodArguments);
         SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } owner ? ownerArguments[owner]
             : type.MethodParameterIndex is { } method ? methodArguments[method]
+            : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
         Signature = new(Substitute(definition.Signature.ReturnType), definition.Signature.ParameterTypes.Select(Substitute));
     }
@@ -25,7 +26,7 @@ public sealed class ConstructedMethodReference
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Binds a static generic owner and all method parameters in one immutable reference.</summary>
+    /// <summary>Binds a generic owner and all method parameters in one immutable reference.</summary>
     /// <param name="declaringTypeArguments">One supported non-Void value type per owner parameter.</param>
     /// <param name="methodArguments">One per method parameter; null denotes none.</param>
     /// <returns>A constructed call reference, with copied arguments.</returns>
@@ -36,8 +37,8 @@ public sealed partial class MethodBuilder
         ArgumentNullException.ThrowIfNull(declaringTypeArguments);
         var owners = declaringTypeArguments.Take(33).ToArray();
         var methods = (methodArguments ?? []).Take(33).ToArray();
-        if (!IsStatic || DeclaringType is not { GenericParameterNames.Count: > 0 } owner || owners.Length != owner.GenericParameterNames.Count || methods.Length != Signature.GenericParameterNames.Count)
-            throw new ArgumentException("constructed reference requires matching static owner and method arities");
+        if (DeclaringType is not { GenericParameterNames.Count: > 0 } owner || owners.Length != owner.GenericParameterNames.Count || methods.Length != Signature.GenericParameterNames.Count)
+            throw new ArgumentException("constructed reference requires matching owner and method arities");
         foreach (var type in owners.Concat(methods))
         {
             if (type is null || type.Primitive == PrimitiveType.Void) throw new ArgumentException("invalid generic argument");
@@ -45,20 +46,27 @@ public sealed partial class MethodBuilder
         }
         return new(this, owners, methods);
     }
-    /// <summary>Calls a static method on a constructed generic owner.</summary>
+    /// <summary>Allocates and invokes a constructor on a constructed generic class.</summary>
+    /// <param name="constructor">Owned constructed constructor reference.</param>
+    /// <exception cref="ArgumentException">Not a constructor, foreign owner or invalid caller scope.</exception>
+    /// <exception cref="ArgumentNullException">Null reference.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    public void NewObject(ConstructedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
+    /// <summary>Calls a method on a constructed generic owner.</summary>
     public void Call(ConstructedMethodReference method) => Emit(OpCode.Call, method);
-    /// <summary>Appends Call with a constructed owner/method reference.</summary>
-    /// <param name="opCode">Call only.</param>
+    /// <summary>Appends Call or Newobj with a constructed owner/method reference.</summary>
+    /// <param name="opCode">Newobj for constructors; Call otherwise.</param>
     /// <param name="operand">Owned reference, valid in the caller's type/method scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Foreign owner, wrong opcode or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
     public void Emit(OpCode opCode, ConstructedMethodReference operand)
     {
-        ArgumentNullException.ThrowIfNull(operand); RequireCall(opCode);
+        ArgumentNullException.ThrowIfNull(operand);
+        if (opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : OpCode.Call)) throw new ArgumentException("constructor requires Newobj; other members require Call");
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("constructed calls require an owned definition");
         foreach (var type in operand.DeclaringTypeArguments.Concat(operand.MethodArguments))
             type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new("call.constructed", Target: operand.Definition, ConstructedTarget: operand));
+        Append(new(operand.Definition.IsConstructor ? "new.constructed" : "call.constructed", Target: operand.Definition, ConstructedTarget: operand));
     }
 }

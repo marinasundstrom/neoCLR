@@ -131,10 +131,24 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">Parameter names are null.</exception>
     public TypeBuilder AddGenericType(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
     {
+        return AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, true);
+    }
+    /// <summary>Adds an unconstrained generic reference class with explicit constructors.</summary>
+    /// <param name="namespace">Namespace, possibly empty.</param>
+    /// <param name="name">Simple name without CLI arity.</param>
+    /// <param name="genericParameterNames">One through 32 unique names, copied.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An owned root class; no constructor is synthesized.</returns>
+    /// <exception cref="ArgumentNullException">Null parameter names.</exception>
+    /// <exception cref="ArgumentException">Invalid names, visibility, duplicate type or exceeded limits.</exception>
+    public TypeBuilder AddGenericClass(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility = TypeVisibility.Public)
+        => AddGenericTypeCore(@namespace, name, genericParameterNames, visibility, false);
+    private TypeBuilder AddGenericTypeCore(string @namespace, string name, IEnumerable<string> genericParameterNames, TypeVisibility visibility, bool isStatic)
+    {
         ArgumentNullException.ThrowIfNull(genericParameterNames);
         var names = new MethodSignature(PrimitiveType.Void, [], genericParameterNames).GenericParameterNames;
         if (string.IsNullOrEmpty(name) || name.Contains('`') || names.Count == 0) throw new ArgumentException("generic type requires a simple name and parameters");
-        return AddTypeCore(@namespace, name + "`" + names.Count, visibility, true, names);
+        return AddTypeCore(@namespace, name + "`" + names.Count, visibility, isStatic, names);
     }
     private TypeBuilder AddTypeCore(string @namespace, string name, TypeVisibility visibility, bool isStatic, IReadOnlyList<string>? genericNames = null)
     {
@@ -186,7 +200,7 @@ public sealed partial class AssemblyBuilder
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
-            if (type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
+            if (type.GenericInstance is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
             {
                 if (!elementSpecs.TryGetValue(type, out var spec))
                 {
@@ -206,6 +220,12 @@ public sealed partial class AssemblyBuilder
         }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.GenericInstance is { } instance)
+            {
+                var arguments = encoder.GenericInstantiation(typeHandles[instance.Definition], instance.TypeArguments.Count, false);
+                foreach (var argument in instance.TypeArguments) EncodeType(arguments.AddArgument(), argument);
+                return;
+            }
             if (type.TypeParameterIndex is { } ordinal) { encoder.GenericTypeParameter(ordinal); return; }
             if (type.MethodParameterIndex is { } index) { encoder.GenericMethodTypeParameter(index); return; }
             if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
@@ -305,7 +325,7 @@ public sealed partial class AssemblyBuilder
             offsets[0] = method.IsConstructor ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch {
-                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "constant64" => 9, "label" => 0, "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.generic" or "call.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2, _ => 1
@@ -362,7 +382,7 @@ public sealed partial class AssemblyBuilder
                     case "xor": code.WriteByte(0x61); break;
                     case "shift.left": code.WriteByte(0x62); break;
                     case "shift.right": code.WriteByte(0x63); break;
-                    case "call.constructed": code.WriteByte(0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
+                    case "new.constructed": case "call.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call": code.WriteByte(0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "return": code.WriteByte(0x2a); break;

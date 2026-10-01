@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add generic reference-class construction to the metadata producer: typed fields,
+  constructors, instance methods and nested constructed signatures preserve distinct
+  owner/method scopes. CLI/native binaries verify and return 42; native reference
+  projection retains generic field signatures. Exact receiver/field scope and 16-level
+  nesting limits reject unsupported contracts. External constructed field handles,
+  generic properties and constraints remain deferred.
+
 - Add bounded static generic type definitions and constructed-owner method references
   to the metadata producer. Preserve independent VAR/MVAR scope, sorted GenericParam
   rows, TypeSpec/MemberRef/MethodSpec calls and native constructed owners through CLI

@@ -2637,8 +2637,8 @@ an owned static class with one through 32 copied, unique parameter names. It app
 the CLI arity suffix to Name (for example Helpers`1); the input simple name must not
 contain a backtick. Invalid/duplicate names or limits throw ArgumentException; null
 parameter sequences throw ArgumentNullException. `TypeBuilder.GenericParameterNames`
-is an immutable ordinal list. Generic instance types, fields and properties are outside
-this slice; generic owners expose static methods only.
+is an immutable ordinal list. AddGenericType creates static owners; AddGenericClass
+(below) creates instance owners. Generic owner properties are not admitted yet.
 
 `SignatureType.TypeParameter(int index)` and nullable `TypeParameterIndex` represent
 VAR independently from method MVAR. Index bounds are 0–31 (ArgumentOutOfRangeException);
@@ -2646,11 +2646,11 @@ method signatures, locals and typed instruction operands validate the declaring-
 scope. Assembly functions cannot use VAR. Entries cannot belong to a generic owner.
 
 `MethodBuilder.MakeConstructedReference(IEnumerable<SignatureType> declaringTypeArguments,
-IEnumerable<SignatureType>? methodArguments = null)` binds a static generic owner and
+IEnumerable<SignatureType>? methodArguments = null)` binds a generic owner and
 all method parameters together. It returns immutable `ConstructedMethodReference`
 with `Definition`, copied `DeclaringTypeArguments`, copied `MethodArguments` and the
 simultaneously substituted `Signature`. Null owner argument sequences throw
-ArgumentNullException. Wrong arity, Void/null/foreign arguments, nonstatic/nongeneric
+ArgumentNullException. Wrong arity, Void/null/foreign arguments, nongeneric
 owners or nested array substitution throw ArgumentException. Supplied caller parameters
 are validated in the caller scope when emitted; substitution does not capture them.
 `Call(ConstructedMethodReference)` and `Emit(OpCode.Call, ConstructedMethodReference)`
@@ -2664,3 +2664,44 @@ in MethodSpec. Native definitions use open Constructed owners and explicit TypeP
 ordinals; calls substitute owner and method arguments independently. The native reader
 retains arities/names and validates open ownership before creating a reference projection.
 These are owned-output references; external generic imports are still unsupported.
+
+
+### Generic reference classes (development)
+
+`AssemblyBuilder.AddGenericClass(string namespace, string name,
+IEnumerable<string> genericParameterNames, TypeVisibility visibility = Public)` uses
+AddGenericType's naming, ownership, arity and error rules, but creates a nonabstract,
+nonsealed reference class rooted at System.Object in CLI. No constructor is synthesized.
+
+`TypeBuilder.MakeGenericInstance(params SignatureType[] typeArguments)` returns an
+immutable `GenericTypeInstance` with `Definition` and copied `TypeArguments`.
+`Equals(GenericTypeInstance?)`, `Equals(object?)` and `GetHashCode()` compare the exact
+owned definition and arguments structurally; `ToString()` is diagnostic only.
+Null arrays throw ArgumentNullException; static/nongeneric owners, arity mismatch,
+null/Void/foreign arguments or nesting beyond 16 levels throw ArgumentException.
+Implicit conversion to SignatureType and `SignatureType.GenericInstance` preserve
+this identity in parameters, results, fields, locals, arrays and typed initialization.
+Bare generic TypeBuilder-to-SignatureType conversion is rejected: construct the owner,
+including with VAR arguments for an open self-reference. Scope is checked on use.
+
+AddField now accepts declaring-type VAR and constructed owned classes (including
+nested constructions). MVAR in fields is rejected. Generic definition field handles
+can be emitted only inside their declaring type; constructed external field references
+are deferred. This keeps CLI/native field access equivalent without losing the owner
+instantiation. Readonly fields retain declaring-constructor store checks.
+
+MakeConstructedReference now accepts instance methods and constructors as well as
+static methods. `NewObject(ConstructedMethodReference)` and
+`Emit(OpCode.Newobj, ConstructedMethodReference)` consume substituted constructor
+parameters and produce the exact constructed class. Call is required for other
+methods, Newobj for constructors; wrong opcodes, ownership or caller scope throw
+ArgumentException, null throws ArgumentNullException, and instruction/stack failures
+throw InvalidDataException. Instance calls require an exactly matching constructed
+receiver. Constructor chaining remains unsupported. Generic method parameters remain
+independent of the declaring type, including nested signature substitution.
+
+CLI emits standard GENERICINST, VAR and MemberRef/MethodSpec; native output uses the
+existing Constructed type and field contracts. The native declaration reader validates
+field scope and preserves generic fields/constructed signatures in its non-executable
+CLI reference projection. Constraints, generic properties, inheritance, external
+owners and external constructed field handles remain outside this bounded API.

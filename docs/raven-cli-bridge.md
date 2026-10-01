@@ -2391,3 +2391,12 @@ The final owner consumer also permutes two owner arguments and forwards a caller
 method parameter into a callee owner while forwarding an owner parameter back into
 its result. Both source orders execute 42 on CLI/native. Native reader contract tests
 reject out-of-range VAR, closed/noncanonical declaration owners and arity/name mismatch.
+
+Generic instance class producer slice (2026-10-01): AddGenericClass and constructed
+class signatures now support instance constructors, owner-typed fields and calls on
+exact constructed receivers. CLI uses standard GENERICINST/VAR/member references;
+native uses the existing generic record/reference contract, preserving field layout
+and type identity. API-produced binaries verify/run 42 without runtime changes.
+Raven integration follows. External constructed fields, generic properties, constraints
+and full class-library emission remain open. This reuses the [generic metadata design](generic-metadata.md)
+rather than creating a second generic storage representation.
