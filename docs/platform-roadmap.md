@@ -5,11 +5,16 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Builder direction (author clarification, 2026-10-01):** retain Cecil-like definitions,
+with generation builders inspired by Reflection.Emit, without replacement/drop-in claims.
+Both layers share one graph. Property declarations/accessor associations now participate
+in that graph; existing Add-style builder APIs remain available.
+
 **Definition migration checkpoint (2026-10-01):** authored assembly/type/field construction
 now shares declaration objects with builder facades and retains existing CLI/native
 encoding. Manual struct execution returns 42 on both runtimes; Raven cross-assembly
 probes remain green. Canonical method declarations and authored entry/function views now follow; direct
-full instruction editing, remaining property/generic migration and reader materialization
+full instruction editing, remaining generic migration and reader materialization
 remain open. Method definitions now own instruction/local/label storage, with existing
 helpers using that same body and cached read-only local/label views. Interface relationships
 now have append-only authored definitions; inherited dispatch executes on both runtimes.

@@ -25,6 +25,17 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Reflection.Emit-style builders over Cecil-like definitions
+
+- **Author:** Clarified that builder APIs should be much more similar to Reflection.Emit,
+  easing generation without being a replacement for the Emit APIs.
+- **Assistant:** Distinguished the Cecil-like definition/reference model from the
+  Reflection.Emit-inspired generation convenience layer, with both sharing one graph.
+  Did not infer a drop-in compatibility promise or a host Reflection.Emit dependency.
+- **Action:** Recorded this direction alongside the property-definition migration.
+  Existing Add-style entry points remain; future builder naming and generation patterns
+  should follow the clarified direction. No wholesale API rename was performed.
+
 ## 2026-10-01: CLI/CIL baseline and first definition migration
 
 - **Author:** “neoCLR CIL format will build on the same format. Extend or modify it.”

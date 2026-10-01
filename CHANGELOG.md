@@ -15,8 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   object creation, readonly initialization, inherited dispatch and struct storage (42).
   Body clearing preserves local/label handles. Authored collections are append-only;
   Types, type Fields/Methods and module Functions expose IList (development API change).
-  Arbitrary instruction editing, remaining property/generic migration and loaded
-  editing remain pending; CLI/CIL encoding is unchanged.
+  Properties and accessor associations now also share authored declarations with builders;
+  CLR reflection and native execution return 42. Type.Properties changes to IList.
+  Arbitrary instruction editing, generic migration and loaded editing remain pending;
+  CLI/CIL encoding is unchanged. Record the author’s distinction: Cecil-like definitions
+  with Reflection.Emit-style convenience builders, without drop-in compatibility claims.
 
 - Record the author's definition-first metadata architecture and planned refactor:
   directly editable definitions, optional builders over the same graph, and definition-

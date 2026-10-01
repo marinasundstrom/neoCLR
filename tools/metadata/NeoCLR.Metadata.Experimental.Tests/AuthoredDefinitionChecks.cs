@@ -31,7 +31,11 @@ internal static class AuthoredDefinitionChecks
         var executionContext = new AssemblyLoadContext("manual-execution", isCollectible: true);
         try
         {
-            if ((int)executionContext.LoadFromStream(new MemoryStream(executable.Write())).EntryPoint!.Invoke(null, null)! != 42)
+            var loadedExecutable = executionContext.LoadFromStream(new MemoryStream(executable.Write()));
+            var boxType = loadedExecutable.GetType("Example.Box")!;
+            var box = Activator.CreateInstance(boxType, new object[] { 42 });
+            if (!Equals(boxType.GetProperty("Value")!.GetValue(box), 42)) throw new Exception("manual property reflection");
+            if ((int)loadedExecutable.EntryPoint!.Invoke(null, null)! != 42)
                 throw new Exception("manual definition CLR execution");
         }
         finally { executionContext.Unload(); }
@@ -175,6 +179,15 @@ internal static class AuthoredDefinitionChecks
         objectType.Methods.Add(read);
         var readBody = MethodBuilder.ForDefinition(read);
         readBody.LoadArgument(0); readBody.LoadField(valueBuilder); readBody.Return();
+        var property = new PropertyDefinition("Value", PrimitiveType.Int32, read);
+        objectType.Properties.Add(property);
+        if (!ReferenceEquals(property.DeclaringType, objectType) || !ReferenceEquals(property.GetMethod, read) ||
+            !ReferenceEquals(builder.Types.Single(t => t.Name == "Box").Properties.Single().Definition, property) ||
+            !ReferenceEquals(assembly.MainModule.Properties.Single(), property)) throw new Exception("property definition identity");
+        Reject<ArgumentException>(() => objectType.Properties.Add(property));
+        Reject<ArgumentException>(() => objectType.Properties.Add(new PropertyDefinition("Again", PrimitiveType.Int32, read)));
+        Reject<InvalidOperationException>(() => property.GetSignature());
+        Reject<NotSupportedException>(() => objectType.Properties.Clear());
         var contract = new TypeDefinition("Example", "IRead", (uint)(TypeAttributes.Public | TypeAttributes.Interface | TypeAttributes.Abstract), null);
         assembly.MainModule.Types.Add(contract);
         var contractRead = new MethodDefinition("Read", (ushort)(MethodAttributes.Public | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot), PrimitiveMethodSignature.Int32(0, true));
@@ -236,7 +249,7 @@ internal static class AuthoredDefinitionChecks
             if (process.ExitCode != expected) throw new Exception(command + ": " + process.ExitCode + " " + text + error);
         }
         File.WriteAllText(Path.Combine(output, "validation.json"), JsonSerializer.Serialize(new { verified = true, result = 42,
-            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned body storage and clearing; arbitrary instruction editing and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
+            scope = "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending" }, new JsonSerializerOptions { WriteIndented = true }) + "\n");
     }
     private static void Reject<T>(Action action) where T : Exception
     { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }

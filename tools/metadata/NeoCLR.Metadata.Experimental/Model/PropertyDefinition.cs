@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An owned Property row and local accessor associations; no code is loaded.</summary>
-public sealed class PropertyDefinition
+public sealed partial class PropertyDefinition
 {
     private readonly byte[] signature;
     private readonly uint owner, getter, setter;
@@ -12,24 +12,24 @@ public sealed class PropertyDefinition
         OtherMethods = Array.AsReadOnly(row.Others.Select(token => module.GetMethodDefinition(token)!).ToArray());
     }
     /// <summary>Gets the owning module snapshot.</summary>
-    public ModuleDefinition Module { get; }
+    public ModuleDefinition Module { get; internal set; } = null!;
     /// <summary>Gets the physical Property token.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the exact declaring type in this snapshot.</summary>
-    public TypeDefinition DeclaringType => Module.GetTypeDefinition(owner)!;
+    public TypeDefinition DeclaringType => PropertyType is null ? Module.GetTypeDefinition(owner)! : AuthoredOwner ?? throw new InvalidOperationException("property is detached");
     /// <summary>Gets the stored metadata name.</summary>
     public string Name { get; }
     /// <summary>Gets physical PropertyAttributes flags.</summary>
     public ushort Attributes { get; }
     /// <summary>Gets the getter from this snapshot, or null when absent.</summary>
-    public MethodDefinition? GetMethod => Module.GetMethodDefinition(getter);
+    public MethodDefinition? GetMethod => PropertyType is null ? Module.GetMethodDefinition(getter) : authoredGetter;
     /// <summary>Gets the setter from this snapshot, or null when absent.</summary>
-    public MethodDefinition? SetMethod => Module.GetMethodDefinition(setter);
+    public MethodDefinition? SetMethod => PropertyType is null ? Module.GetMethodDefinition(setter) : authoredSetter;
     /// <summary>Gets other associated methods in metadata order.</summary>
     public IReadOnlyList<MethodDefinition> OtherMethods { get; }
     /// <summary>Copies the signature, preserving unsupported encodings opaquely.</summary>
     /// <returns>New owned signature bytes.</returns>
-    public byte[] GetSignature() => (byte[])signature.Clone();
+    public byte[] GetSignature() => PropertyType is null ? (byte[])signature.Clone() : throw new InvalidOperationException("use authored PropertyType and ParameterTypes before encoding");
     /// <summary>Recognizes an exact non-indexed primitive property signature, without resolving types or validating accessor signatures.</summary>
     /// <param name="type">Int32/Int64/Boolean/String on success; Void otherwise.</param>
     /// <param name="isStatic">True for a recognized static signature; false for instance or unrecognized signatures.</param>

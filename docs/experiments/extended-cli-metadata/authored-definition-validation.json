@@ -1,7 +1,7 @@
 {
   "verified": true,
   "result": 42,
-  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned body storage and clearing; arbitrary instruction editing and loaded editing remain pending",
+  "scope": "manual assembly/type/field/function construction and entry-point assignment; helper call through same definitions in body builders; native write/load/execute; manual static type-method construction; manual root-class constructor, readonly field initialization and instance call; manual inherited interface relationship and virtual dispatch; definition-owned property/accessor association and body storage/clearing; arbitrary instruction editing and loaded editing remain pending",
   "date": "2026-10-01",
   "branch": "codex/extended-cli-metadata",
   "baseCommit": "1d100ce6",
@@ -14,8 +14,8 @@
       "bindingProfile": "CompilationOptions.NeoCLR; projected CLI declarations; no host core",
       "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
       "runtimeSha256": "193B7F995EE4FC92A086439FB1FDBDAFC3A0C58139F0CAF30CB4A2D8640A432D",
-      "librarySha256": "EB76C799C279499FCF3D6E70CB08C09352B153819860D2CD47A26D2F71346A44",
-      "applicationSha256": "AFD347CBD4CDCE21EF10EAADDD06DF6DFB8493409D7652E56F9F20AC4F3E59FF",
+      "librarySha256": "490E280FA5503EFB013EC569F513901F93F8017EC2A0E8D0756E1091894E3ACF",
+      "applicationSha256": "F9D6318C6446DBB3B07D442935EEF70CAA204EA065420826140206ECEB8ADD89",
       "verified": true,
       "result": 42,
       "coverage": [
@@ -61,5 +61,6 @@
   "instanceMethodBaseCommit": "f7e715a0",
   "interfaceDeclarationBaseCommit": "ddc5cb75",
   "relationshipBaseCommit": "a86113a4",
-  "bodyStorageBaseCommit": "564b9cba"
+  "bodyStorageBaseCommit": "564b9cba",
+  "propertyBaseCommit": "dfcdecb8"
 }

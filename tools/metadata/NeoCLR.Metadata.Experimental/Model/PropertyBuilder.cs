@@ -3,20 +3,22 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An owned supported value property with explicit accessor associations.</summary>
 public sealed class PropertyBuilder
 {
-    internal PropertyBuilder(TypeBuilder owner, string name, SignatureType type, MethodBuilder? getter, MethodBuilder? setter, SignatureType[] parameters)
-    { DeclaringType = owner; Name = name; PropertyType = type; GetMethod = getter; SetMethod = setter; ParameterTypes = Array.AsReadOnly(parameters); }
+    internal PropertyBuilder(TypeBuilder owner, PropertyDefinition definition)
+    { DeclaringType = owner; Definition = definition; }
+    /// <summary>Gets the exact authored declaration shared with the type's Properties collection.</summary>
+    public PropertyDefinition Definition { get; }
     /// <summary>Gets the declaring type.</summary>
     public TypeBuilder DeclaringType { get; }
     /// <summary>Gets the simple property name.</summary>
-    public string Name { get; }
+    public string Name => Definition.Name;
     /// <summary>Gets the value signature, including declaring-type parameters and constructed classes.</summary>
-    public SignatureType PropertyType { get; }
+    public SignatureType PropertyType => Definition.PropertyType!;
     /// <summary>Gets copied index parameter types, excluding receiver and setter value.</summary>
-    public IReadOnlyList<SignatureType> ParameterTypes { get; }
+    public IReadOnlyList<SignatureType> ParameterTypes => Definition.ParameterTypes!;
     /// <summary>Gets the getter, or null for a write-only property.</summary>
-    public MethodBuilder? GetMethod { get; }
+    public MethodBuilder? GetMethod => Definition.GetMethod?.Producer;
     /// <summary>Gets the setter, or null for a read-only property.</summary>
-    public MethodBuilder? SetMethod { get; }
+    public MethodBuilder? SetMethod => Definition.SetMethod?.Producer;
     /// <summary>Gets whether the accessor contract has no receiver.</summary>
     public bool IsStatic => (GetMethod ?? SetMethod)!.IsStatic;
 }
@@ -37,7 +39,17 @@ public sealed partial class TypeBuilder
     /// <remarks>At least one accessor is required. Index parameters are inferred from accessors and copied. Both must agree on index types and instance/static shape; visibility stays on each accessor. At most 256 properties per type and 4096 per assembly.</remarks>
     public PropertyBuilder AddProperty(string name, SignatureType type, MethodBuilder? getter = null, MethodBuilder? setter = null)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        var definition = new PropertyDefinition(name, type, getter?.Definition, setter?.Definition);
+        Definition.Properties.Add(definition);
+        return definition.Producer!;
+    }
+    internal void AttachProperty(PropertyDefinition definition)
+    {
+        if (definition.PropertyType is not { } type || definition.AuthoredOwner is not null)
+            throw new ArgumentException("property must be an unattached authored definition");
+        if (definition.GetMethod is { Producer: null } || definition.SetMethod is { Producer: null })
+            throw new ArgumentException("attach property accessors before the property");
+        var name = definition.Name; var getter = definition.GetMethod?.Producer; var setter = definition.SetMethod?.Producer;
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||
@@ -58,8 +70,8 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("incompatible property accessor signature");
         if (properties.Any(p => p.Name == name && p.ParameterTypes.SequenceEqual(indices)))
             throw new ArgumentException("duplicate property signature");
-        var property = new PropertyBuilder(this, name, type, getter, setter, indices);
+        var property = new PropertyBuilder(this, definition);
         properties.Add(property);
-        return property;
+        definition.AuthoredOwner = Definition; definition.Module = Definition.Module; definition.Producer = property;
     }
 }

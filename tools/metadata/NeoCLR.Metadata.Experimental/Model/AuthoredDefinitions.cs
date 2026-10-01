@@ -54,6 +54,7 @@ public sealed partial class TypeDefinition
     internal TypeBuilder? Producer { get; set; }
     private readonly IList<FieldDefinition>? authoredFields;
     private readonly IList<MethodDefinition>? authoredMethods;
+    private readonly IList<PropertyDefinition>? authoredProperties;
     /// <summary>Creates a detached type declaration with CLI attributes and an explicit base reference.</summary>
     /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric interfaces, static/root classes and sealed sequential value types.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
@@ -62,6 +63,11 @@ public sealed partial class TypeDefinition
             throw new ArgumentException("invalid type name");
         Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType;
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
+        authoredProperties = new DefinitionCollection<PropertyDefinition>([], property =>
+        {
+            if (Producer is null) throw new InvalidOperationException("attach the owner before adding properties");
+            Producer.AttachProperty(property);
+        });
         authoredInterfaces = new DefinitionCollection<InterfaceImplementation>([], relationship =>
         {
             if (Producer is null) throw new InvalidOperationException("attach the owner before adding interface relationships");

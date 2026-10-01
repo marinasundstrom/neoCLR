@@ -391,5 +391,7 @@ declarations. Manual CLR/native execution covers function calls, object creation
 readonly-field initialization and struct storage. Direct nongeneric interface contracts also dispatch through existing implementation
 helpers. Interface relationship definitions now support direct inherited/implemented
 edges. Method definitions now own instruction/local/label storage; helpers operate on
-that same body. Arbitrary instruction editing and loaded assembly modification remain pending; this is not a
+that same body. Property/accessor declarations also share this graph. Definitions are Cecil-like;
+generation builders are intended to follow Reflection.Emit-style convenience patterns.
+Arbitrary instruction editing and loaded assembly modification remain pending; this is not a
 published general-purpose assembly editor.

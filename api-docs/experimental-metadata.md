@@ -3595,3 +3595,52 @@ The native manual object/interface/struct case replaces a body through the defin
 API before emission and returns 42. All 76 contract groups and the rebuilt Raven
 external-signature probe pass. Property/generic-definition migration and loaded editing
 remain open, as does the collections Option<Order> target gap.
+
+
+### Shared authored property declarations
+
+`PropertyDefinition(string name, SignatureType propertyType, MethodDefinition? getter = null,
+MethodDefinition? setter = null)` creates a detached association. It requires a nonnull
+value type and at least one authored accessor; null type throws `ArgumentNullException`,
+missing/loaded accessors throw `ArgumentException`. Append to the attached owner's
+`TypeDefinition.Properties : IList<PropertyDefinition>` after attaching accessors.
+The collection is append-only; loaded collections remain read-only. Changing its former
+IReadOnlyList return type is a development API compatibility change.
+
+Attachment reuses name/Unicode, non-Void signature, scope/ownership, accessor reuse,
+getter/setter shape, index parameters, duplicate and limit validation. Invalid associations
+throw `ArgumentException` without attaching; detached owners throw `InvalidOperationException`.
+Accessors must be nongeneric ordinary methods on that owner. Their access and staticness
+remain on method definitions. Authored property flags are zero; custom attributes, defaults
+and arbitrary PropertyAttributes authoring are not introduced.
+
+`PropertyType` and `ParameterTypes` expose authored value/index signatures (null for loaded
+opaque signatures). GetMethod/SetMethod return the exact authored declarations. Accessing
+DeclaringType before attachment throws `InvalidOperationException`. Authored GetSignature
+throws `InvalidOperationException`; encode and read for physical blobs. Raw primitive
+recognition remains a loaded-signature operation. PropertyBuilder.Definition returns this
+same object; the builder delegates its state. ModuleDefinition.Properties includes authored
+properties. Loaded raw rows and their preservation behavior remain unchanged.
+
+```csharp
+var property = new PropertyDefinition("Value", PrimitiveType.Int32, getterDefinition);
+attachedType.Properties.Add(property);
+```
+
+The manual executable associates its instance reader with Value. CLR reflection constructs
+the class and reads Value as 42; native execution still returns 42. All 76 contract groups,
+including existing getter/setter/indexer tests, pass; Raven's rebuilt external-signature
+probe passes. No property wire encoding or compiler admission change is introduced.
+
+### Builder direction clarified by the author (2026-10-01)
+
+Definitions/references and inspection/manipulation remain Cecil-like. Builders are a
+separate convenience layer over those same definitions and should increasingly follow
+Reflection.Emit-style generation patterns. They are not a replacement or drop-in
+implementation of System.Reflection.Emit, and this direction does not require a host
+Reflection.Emit dependency. Typed helpers and raw emits remain complementary.
+
+This is an architectural direction, not a completed API rename or compatibility claim.
+Future Define-style construction and body-helper decisions should follow that direction
+while preserving target-specific capability checks and explicit identities. The property
+migration here shares declarations; existing Add-style entry points remain supported.

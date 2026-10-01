@@ -282,7 +282,7 @@ public sealed partial class ModuleDefinition
             .GroupBy(method => method.DeclaringType!.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<MethodDefinition>)Array.AsReadOnly(group.ToArray()));
         var propertyDefinitions = propertyRows.Select(row => new PropertyDefinition(this, row)).ToArray();
-        Properties = Array.AsReadOnly(propertyDefinitions);
+        snapshotProperties = Array.AsReadOnly(propertyDefinitions);
         properties = propertyDefinitions.ToDictionary(property => property.MetadataToken);
         declaredProperties = propertyDefinitions.GroupBy(property => property.DeclaringType.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<PropertyDefinition>)Array.AsReadOnly(group.ToArray()));
@@ -299,7 +299,8 @@ public sealed partial class ModuleDefinition
     /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
     public IList<TypeDefinition> Types { get; }
     /// <summary>Gets physical Property rows in metadata order.</summary>
-    public IReadOnlyList<PropertyDefinition> Properties { get; }
+    public IReadOnlyList<PropertyDefinition> Properties => Assembly.Producer is null ? snapshotProperties : Types.SelectMany(t => t.Properties).ToArray();
+    private readonly IReadOnlyList<PropertyDefinition> snapshotProperties;
     /// <summary>Looks up a property in this snapshot.</summary>
     /// <param name="metadataToken">Property token; wrong-kind or missing rows return null.</param>
     /// <returns>The owned property or null.</returns>
@@ -358,7 +359,7 @@ public sealed partial class TypeDefinition
     /// <summary>Gets the physical TypeAttributes flags.</summary>
     public uint Attributes { get; }
     /// <summary>Gets properties declared directly by this type.</summary>
-    public IReadOnlyList<PropertyDefinition> Properties => authoredFields is null ? Module.GetDeclaredProperties(MetadataToken) : throw new NotSupportedException("authored property definitions are pending; use builder properties");
+    public IList<PropertyDefinition> Properties => authoredProperties ?? (IList<PropertyDefinition>)Module.GetDeclaredProperties(MetadataToken);
     /// <summary>Gets fields declared directly by this type.</summary>
     public IList<FieldDefinition> Fields => authoredFields ?? (IList<FieldDefinition>)Module.GetDeclaredFields(MetadataToken);
     /// <summary>Gets the owning module snapshot.</summary>

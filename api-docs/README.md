@@ -606,3 +606,6 @@ the manual metadata reference; they are excluded from guest RavenDoc selection.
 
 MethodBodyDefinition and MethodDefinition.Body are host C# APIs documented in the manual
 reference, including local/label views and clearing; guest RavenDoc selection is unchanged.
+
+PropertyDefinition authored constructor/signatures, PropertyBuilder.Definition and authored
+property collections/views are documented in the manual host reference; no guest selection changes.

@@ -2787,3 +2787,9 @@ Method definitions now own instruction/local/label storage. Existing Raven body 
 and CLI/native writers use that same storage; body clearing and inherited-dispatch
 execution remain valid (42). Runtime Contract, emission admission and encodings are
 unchanged. Arbitrary instruction editing and loaded body decoding remain pending.
+
+Property declarations/accessor associations now belong to definitions and are shared
+by builder facades. CLR reflection and native execution return 42; Raven’s rebuilt probe
+passes without Runtime Contract or admission changes. Definitions stay Cecil-like; the
+author clarified that generation builders should follow Reflection.Emit-style patterns
+without being a replacement API. CLI/native property encoding remains unchanged.
