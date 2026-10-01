@@ -175,3 +175,53 @@ feature branches; main integration of these compiler fixes does not imply native
 target readiness. Shared vector-loop/transfer lowering (`a9defade8`), shared field
 initialization plans and backend abstractions still need separate extraction and
 validation. The order-collections Option constructor mismatch remains unfixed.
+
+## Native profile gate and refactor-parity follow-up
+
+The author clarified that fixing behavior changes introduced by codegen refactoring
+comes before continuing end-to-end emission, and that semantic decisions should move
+into binding where appropriate rather than moving all backend work there.
+Raven `87ff03d3f` records a bounded comparison against shared main `e5607ca17`:
+21 existing constructor/field/loop/receiver cases pass on main, and 25 on integration
+(four additional integration cases). Both pass 99 invocation/iteration cases; use
+serial test collections for console-output cases. An initial parallel decimal-loop
+output failure passes isolated and serial checks, so no codegen regression is established.
+Five added parity cases pass on both lines, covering Debug/Release evaluation order,
+short-circuit side effects, array collection replacement and null receiver faults.
+This does not replace full regression or release qualification.
+
+Two issues remain explicit: imported `Choice<Item>(None())` selects the Some constructor
+in the semantic model on shared main; loop-variable callbacks return 0 on main and
+333 on integration instead of 123. Both lines are incorrect in the capture probe;
+shared array lowering changes its manifestation. These are not passing acceptance
+cases and are not claimed fixed. Do not move constructor selection into the backend
+to disguise the binding problem or claim all refactoring risks are closed.
+
+Raven `6f46bbade` then implements explicit native profile admission. The temporary
+CLI snapshot provides symbols under `CompilationOptions.NeoCLR`; primitive and Unit
+symbols must originate from one imported core with the exact configured identity.
+The independent metadata API still encodes native signatures and instructions, and
+the runtime loads/verifies/executes the binary. Unlike ordinary .NET assembly execution,
+no host core or declaration-snapshot method bodies execute here. The benefit is reuse
+of existing binding with native output; the cost is dependence on the CLI declaration
+snapshot and its PE identity provider until native metadata importing is implemented.
+No binder or general .NET codegen policy changes in this slice.
+
+[Native profile evidence](native-profile-validation-2026-10-01.json) records exact
+core/runtime hashes and results: Hello World/function return 42, Unit entry return 0,
+array iteration return 42 and owned interface dispatch return 42. All four binaries
+verify and run. Wrong core names/versions reject without changing the output stream.
+The existing host-bootstrap interface control still verifies and returns 42 on .NET
+and neoCLR in both source orders. Build and run the C# probe with:
+
+```sh
+dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll \
+  --native-profile-runtime /absolute/neoclr /tmp/fresh-profile /absolute/neoclr/target/release/neoclr
+```
+
+The historical inventory's blanket profile rejection is superseded for this subset.
+Its other unsupported-source results have not been rerun or declared solved. The
+implementation-bootstrap seed, native symbol importing, generic interface dispatch,
+imported nominal/generic member emission and broad collections/union/callback bodies
+remain open. The API and compiler target stay on their respective feature branches;
+only the independently proven compiler fixes were integrated into local Raven main.

@@ -5,6 +5,17 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Native profile checkpoint (2026-10-01):** after independently proven general Raven
+fixes reached local main and a bounded .NET refactor-parity audit, direct emission now
+accepts the real neoCLR semantic profile with a validated CLI declaration core.
+Hello World via another function, Unit entry, array iteration and owned interface
+dispatch verify and run as native binaries without host core references. Core-name
+and version mismatches reject before output. This completes the bounded profile gate,
+not the implementation seed or native metadata importer. Next prepare implementation
+bootstrap dependencies and generic collection/imported-member contracts; keep the
+known imported-carrier and loop-capture issues explicit when expanding samples.
+[Evidence and scope](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md#native-profile-gate-and-refactor-parity-follow-up).
+
 **Post-dispatch assessment (2026-10-01):** the author requested a broader library/app
 readiness check. Owned nongeneric interface dispatch now executes through the direct
 binary pipeline. All twelve selected existing samples bind and emit ordinary CLI with

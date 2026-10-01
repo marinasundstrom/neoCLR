@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Record Raven's bounded .NET refactor-parity audit and validated neoCLR-profile
+  binary emission: Hello World/function calls, Unit entry, arrays and owned interface
+  dispatch verify/run without a host core reference. Exact primitive/Unit core
+  identity is checked before output. Preserve open carrier-binding/capture issues;
+  implementation bootstrap and native metadata symbol loading remain unimplemented.
+
 - Record six independent Raven parser, binding and CLR-emission fixes extracted into
   a dedicated main-based branch and integrated into local Raven main (`e5607ca17`).
   All 23 regression and 174 surrounding cases pass; 16 regressions fail on the base.

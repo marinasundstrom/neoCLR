@@ -25,6 +25,27 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-01: Refactor parity before expanding native emission
+
+- **Author:** Worried that codegen refactoring changed behavior. Suggested moving
+  suitable semantic work into binding, then clarified: “I don't say that we should
+  push everything up to the binder” and “the main task is to fix the issues due to
+  the refactoring.” Directed continued end-to-end native emission after regressions.
+- **Assistant:** Compared the shared compiler and integration branch with existing
+  runtime cases and new Debug/Release return-value/fault tests. Corrected an initial
+  regression claim when the decimal-loop console test passed isolated and serial runs.
+  Recorded imported-carrier binding and loop-capture problems on both lines as open;
+  did not claim full parity or that these problems were fixed.
+- **Action/outcome:** Committed the bounded parity audit (`87ff03d3f`), then validated
+  the real neoCLR CLI declaration profile for direct binary emission (`6f46bbade`).
+  Four native binary cases verify/run, covering Hello World/function calls, Unit entry,
+  arrays and owned interface dispatch without a host core reference. Mismatched core
+  identities reject before output; the host-bootstrap control continues to pass.
+- **Still open:** Implementation bootstrap, native metadata symbol loading, broader
+  collection/generic imports and known carrier/capture defects. Feature branch work
+  is not merged into main merely because the independent fixes were integrated.
+- **Evidence:** [Assessment follow-up](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md#native-profile-gate-and-refactor-parity-follow-up).
+
 ## 2026-10-01: Integrating independently proven Raven fixes
 
 - **Author:** Requested a specific fix branch based on main for binding and other
