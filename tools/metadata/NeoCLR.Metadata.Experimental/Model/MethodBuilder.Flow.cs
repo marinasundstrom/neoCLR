@@ -88,6 +88,10 @@ public sealed partial class MethodBuilder
                 case "pop":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.RemoveAt(stack.Count - 1); break;
+                case "negate": case "complement":
+                    if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                        throw new InvalidDataException("unary integer operation requires Int32 or Int64");
+                    break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
                 case "convert32": case "convert64":
                     if (stack.Count == 0 || stack[^1] is not (PrimitiveType.Int32 or PrimitiveType.Int64))

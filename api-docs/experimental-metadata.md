@@ -1585,7 +1585,7 @@ instructions supported by both writer backends; its numeric values are **not** p
 CLI or native opcode bytes.
 
 ```csharp
-public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4 }
+public enum OpCode { Ldc_I4, Ldarg, Add, Sub, Mul, Call, Ret, Ldloc, Stloc, Ceq, Clt, Cgt, Br, Brtrue, Brfalse, Ldc_Bool, Pop, Ldc_I8, Conv_I8, Conv_I4, Neg, Not }
 public sealed partial class MethodBuilder {
     public void Emit(OpCode opCode);
     public void Emit(OpCode opCode, int operand);
@@ -1860,3 +1860,21 @@ C# tests cover extrema, sign extension, truncation, local types, native projecti
 imports, strict legacy recognition and invalid conversions/mixed arithmetic. Raven's
 consumer executes long locals and signed conversion boundaries in neoCLR and imports
 an Int64 callable from a separately compiled binary library.
+
+
+### Signed unary integer operations (development, 2026-10-01)
+
+`MethodBuilder.Emit(OpCode.Neg)` negates the top Int32/Int64 value without changing
+its width. Negating the minimum signed value wraps to that same value, matching the
+CLI neg operation. `Emit(OpCode.Not)` complements every bit at the operand's width;
+it is not Boolean logical negation. Neither opcode accepts an operand: other Emit
+overloads reject with ArgumentException without appending an instruction. Existing
+instruction bounds throw InvalidDataException.
+
+Both writers reject empty stacks and Boolean operands with InvalidDataException
+during flow validation. CLI emission uses neg/not; native emission uses the existing
+neoIL neg/not operations without a format change. Checked, unsigned and floating-point
+unary support is not implied. Native verification remains required. C# contracts check
+both widths, extrema, invalid stack operands and native projections. Raven's shared
+body path handles built-in signed unary + (identity), - and ~; the native consumer
+executes minimum-value wrapping and complements in binary assemblies.

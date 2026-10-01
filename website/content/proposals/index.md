@@ -204,3 +204,6 @@ using checked stack discards while retaining call side effects and no-result Uni
 Development metadata also preserves Int64 parameters/results/locals and exact constants.
 Raven shares signed widening and unchecked narrowing with native assembly execution;
 entrypoints remain Int32/Unit, and broader type/conversion support is still pending.
+
+Signed unary +, - and ~ now use the shared compiler path for Int32/Int64, including
+minimum-value wrapping tests against binary assemblies executed by neoCLR.

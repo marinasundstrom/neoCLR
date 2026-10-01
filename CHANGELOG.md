@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-01
 
+- Add operand-free Neg/Not to the experimental metadata API for signed Int32/Int64
+  values, with wrapping negation and width-preserving complement. Reject Boolean and
+  empty-stack operands before writing. Raven shares unary +, - and ~ across both
+  backends; native emission reuses existing runtime instructions without a schema change.
+
 - Add Int64 primitive signatures, locals and exact long constants to the experimental
   metadata API, plus unchecked signed Int32/Int64 conversions and matching-width
   arithmetic/comparisons. Preserve types through native projections and imports;

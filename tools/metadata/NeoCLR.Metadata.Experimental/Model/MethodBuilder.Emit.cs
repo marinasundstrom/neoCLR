@@ -43,19 +43,23 @@ public enum OpCode
     /// <summary>Converts Int32/Int64 to signed Int64, sign-extending Int32.</summary>
     Conv_I8,
     /// <summary>Converts Int32/Int64 to Int32, retaining the low 32 bits.</summary>
-    Conv_I4
+    Conv_I4,
+    /// <summary>Negates Int32/Int64 with wrapping signed overflow.</summary>
+    Neg,
+    /// <summary>Complements every bit of Int32/Int64, preserving width.</summary>
+    Not
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt, Pop, Conv_I4, Conv_I8 or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Ceq, Clt, Cgt, Pop, Conv_I4, Conv_I8, Neg, Not or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     public void Emit(OpCode opCode)
         => Append(new(opCode switch {
-            OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
+            OpCode.Neg => "negate", OpCode.Not => "complement", OpCode.Conv_I8 => "convert64", OpCode.Conv_I4 => "convert32", OpCode.Pop => "pop", OpCode.Ceq => "equal", OpCode.Clt => "less", OpCode.Cgt => "greater",
             OpCode.Add => "add", OpCode.Sub => "subtract", OpCode.Mul => "multiply", OpCode.Ret => "return",
             _ => throw OperandError(opCode)
         }));

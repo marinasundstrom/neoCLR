@@ -53,6 +53,8 @@ public sealed partial class AssemblyBuilder
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
+            "negate" => new { op = "neg" },
+            "complement" => new { op = "not" },
             "constant64" => new { op = "ldc.i8", arg = (object)instruction.LongValue },
             "convert64" => new { op = "conv.i8" },
             "convert32" => new { op = "conv.i4" },

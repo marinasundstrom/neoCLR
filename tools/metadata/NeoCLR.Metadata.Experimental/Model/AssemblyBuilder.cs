@@ -179,6 +179,8 @@ public sealed partial class AssemblyBuilder
                 switch (instruction.Op)
                 {
                     case "label": break;
+                    case "negate": code.WriteByte(0x65); break;
+                    case "complement": code.WriteByte(0x66); break;
                     case "pop": code.WriteByte(0x26); break;
                     case "boolean": code.WriteByte(instruction.Value == 0 ? (byte)0x16 : (byte)0x17); break;
                     case "equal": code.WriteByte(0xfe); code.WriteByte(0x01); break;

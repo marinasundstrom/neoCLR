@@ -1057,3 +1057,28 @@ Tested Raven consumer revision `ab3c262ce` on `codex/metadata-consumer`;
 [executable evidence](experiments/extended-cli-metadata/int64-conversions-validation.json).
 Runtime behavior reuses the existing signed conversion implementation in `src/numeric.rs`
 and its typed verifier contracts in `src/verifier.rs`; no Rust change was required.
+
+## Signed unary integer operations — 2026-10-01
+
+The shared body planner now handles built-in unary +, - and ~ for Int32/Int64.
+Unary + evaluates its operand unchanged; negation and bitwise complement preserve
+width. Logical Boolean ! remains separate. .NET uses its existing neg/not semantics;
+neoCLR emits the corresponding native operations through the independent metadata API.
+Negating the minimum signed value wraps to itself on both targets, matching the
+existing general .NET emitter and native numeric implementation.
+
+This slice changes no Runtime Contract configuration, symbol projection or metadata
+schema. The writer checks integer operand type/stack presence before encoding. Checked,
+unsigned and floating-point unary support is not implied. Native semantic metadata
+import, broader types and full target composition remain pending. The CLI reference
+projection stays temporary and metadata-library-owned.
+
+Validation: 43 focused C# compiler tests and 37 independent metadata contract groups,
+plus the native binary-assembly probe. Release/Debug cases cover both widths, extrema,
+identity and complement. The same source executes on .NET and neoCLR, checks wrapping
+at both signed minima and returns 42. Writer tests reject Boolean operands and underflow.
+
+Tested Raven consumer revision `0f2743fb2` on `codex/metadata-consumer`;
+[executable evidence](experiments/extended-cli-metadata/unary-integers-validation.json).
+This reuses `src/numeric.rs` unary behavior and `src/verifier.rs` operand checks.
+The independent metadata API remains on `codex/extended-cli-metadata`.
