@@ -445,5 +445,7 @@ full application and runtime-library compilation remain incomplete.
 
 Metadata value-instance calls now preserve managed receiver addresses and caller mutation.
 Separate generic value/out library consumers execute on CLR and neoCLR (42); constructors
-and constrained interface dispatch remain outside this development slice. Raven adoption
-is the next integration step.
+and constrained interface dispatch remain outside this development slice. Raven now consumes these contracts through an explicit value-receiver capability: a
+separate native-library consumer verifies and executes mutation and generic out calls
+(42). The unchanged collections sample advances to a lowered throw guard; terminal
+failure support, full application execution and runtime-library compilation remain open.

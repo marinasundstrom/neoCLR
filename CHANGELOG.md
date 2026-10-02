@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Integrate managed value receivers into Raven's shared emission plan and native adapter.
+  A Raven consumer verifies and executes value mutation and generic output calls against
+  a separate native library (42). The unchanged collections sample advances to a lowered
+  throw guard; full propagation execution remains pending. Record the explicit receiver
+  capability, unchanged .NET defaults and next terminal-failure contract requirement.
+
 - Support initialized managed receivers on metadata-authored value instance methods and
   imported nongeneric methods on ordinary/generic value owners. Preserve receiver_byref
   through native projection and direct CLI calls; value constructors and constrained

@@ -1553,3 +1553,40 @@ native projection. Negative checks cover value/uninitialized receivers, Callvirt
 value constructors and receiver/output aliasing. The native runtime is unchanged from
 the prior checkpoints. Raven integration is the next step; this metadata slice alone
 does not advance the unchanged collections application.
+
+
+### Raven imported value receivers (2026-10-02)
+
+Raven's metadata-consumer line (`bfd6578ea`) now opts into imported value-instance calls explicitly.
+The shared plan takes an owned local address or forwards a ref/out receiver; concrete
+public methods must be nongeneric and nonvirtual or final. Constructed value-owner
+arguments are preserved. The metadata adapter matches both managed receiver and output
+contracts before direct call emission, using the value-receiver metadata support in
+`2276745b`. This follows CLI value-instance address semantics and preserves mutation.
+
+Runtime Contract Propagation/Self/Unit configuration and binding are unchanged. The
+ordinary .NET shared profile retains its existing fallback. The temporary CLI declaration
+snapshot supplies symbols; this is not a native semantic importer. Source value
+declarations, constructors, constrained dispatch and addresses of by-value parameters,
+fields, arrays or temporary values remain unsupported in this bounded native path.
+Shared emission capability changes remain a deferred shared-line port candidate; there
+is no independent binder fix in this slice.
+
+The separately authored native library and Raven consumer verify and run with result 42,
+covering mutation, generic value setters and generic output calls. Missing dependency
+registration rejects without modifying output. See the
+[native evidence](../experiments/extended-cli-metadata/raven-value-receiver-validation-2026-10-02.json).
+The [unchanged collections case](../experiments/extended-cli-metadata/collections-after-value-receivers-2026-10-02.json)
+now rejects a lowered throw statement, with its 7168-byte CLI control unchanged.
+`Lowerer.Propagate.CreatePropagateFailureBlock` synthesizes a throw when the carrier
+provides neither output nor residual. The runtime does not currently have a producer
+contract for that terminal failure. Do not remove the guard or silently return a default.
+A subsequent slice must distinguish compiler-generated invalid-carrier failure from
+general exception handling, preserve ordinary CLR behavior and validate both success
+and deliberate invalid-carrier execution. Full application execution remains pending.
+
+All 28 focused Raven external-signature/capability/shared-emission C# tests pass on .NET
+11. An initial inline-output scope diagnostic in the ordinary .NET control is recorded
+as an unclassified independent investigation in Raven's compiler documentation; it has
+not been isolated against main or fixed in this slice. Native execution still tests
+inline output locals.

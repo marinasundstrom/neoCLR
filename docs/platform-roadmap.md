@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Raven value-receiver checkpoint (2026-10-02):** imported value methods now consume
+managed local/ref receiver addresses through explicit shared emission capabilities.
+A separate native-library Raven consumer verifies and executes mutation and generic out
+calls (42). The unchanged collections sample advances to a lowered throw guard; CLI
+control still emits 7168 bytes. Next define terminal failure handling for compiler-generated
+invalid propagation carriers before following remaining union/System dependencies.
+[Native control](experiments/extended-cli-metadata/raven-value-receiver-validation-2026-10-02.json),
+[collections](experiments/extended-cli-metadata/collections-after-value-receivers-2026-10-02.json).
+
 **Value-receiver metadata checkpoint (2026-10-02):** owned/authored and imported value
 instance methods now preserve initialized managed receivers through CLI/native emission
 and reference projection. Separate generic value/out consumers execute on both runtimes

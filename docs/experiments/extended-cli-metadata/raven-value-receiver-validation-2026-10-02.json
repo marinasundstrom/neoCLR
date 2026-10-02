@@ -1,0 +1,18 @@
+{
+  "verified": true,
+  "result": 42,
+  "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "3A254FAC354A0878DB897C17E46C66FDC19BDDF1136D6659274033B25D063F0D",
+  "scope": "Raven imported value-receiver mutation and generic value-owner out calls; no union lowering or native System mapping",
+  "ravenRevision": "bfd6578ea",
+  "metadataRevision": "2276745b",
+  "focusedCSharpTests": {
+    "passed": 28,
+    "failed": 0,
+    "targetFramework": "net11.0"
+  },
+  "receiverStorage": [
+    "owned local",
+    "forwarded ref parameter"
+  ]
+}
