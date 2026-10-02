@@ -495,3 +495,7 @@ does not yet compile the entire System library with the native backend.
 Unchanged callback comparer classes also compile and execute through native Function
 fields and interface dispatch. Noncapturing callbacks are covered; closure environments
 and complete library compilation remain outside this checkpoint.
+
+HashMap and its source dependencies now compile together and execute native PE, covering
+collisions, growth, updates, independent key snapshots and Option lookups through map
+interfaces. Translated System still supplies remaining library dependencies.

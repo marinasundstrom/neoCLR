@@ -1,0 +1,19 @@
+{
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "cases": [
+    {
+      "Name": "collisions-growth-update",
+      "command": "verify",
+      "passed": true,
+      "exitCode": 0,
+      "text": "NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366: typed-stack/control-flow verification passed (3878 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "Name": "collisions-growth-update",
+      "command": "run",
+      "passed": true,
+      "exitCode": 42,
+      "text": ""
+    }
+  ]
+}

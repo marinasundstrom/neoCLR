@@ -3193,3 +3193,27 @@ capturing closures remain unsupported. The explicit implementation seed and tran
 System dependency are still required. Native importing will replace the CLI signatures.
 [Consumer/source hashes](experiments/extended-cli-metadata/comparer-source-2026-10-02.json)
 and [runtime results](experiments/extended-cli-metadata/comparer-execution-2026-10-02.json).
+
+### HashMap source checkpoint (2026-10-02)
+
+Thirteen unchanged library source units, including HashMap, ArrayList, source interfaces
+and FunctionEqualityComparer, now compile together and execute native PE (42). The test
+forces all keys into one hash bucket, grows beyond initial capacity, rejects duplicates,
+updates/inserts through MutableMap, checks independent Keys snapshots and absent/present
+Option results through inherited Map dispatch. The policy-constructor case verifies
+equivalent distinct keys using callback equality and hashing.
+
+Raven's shared interface planner now propagates the selected target capabilities to
+method return/parameter and property types, admitting the explicitly supported imported
+Option<V> signature. This isolated general correction leaves ordinary .NET shared
+capabilities unchanged; CLR imported reference/value interface contracts are independently
+checked. The bridge still uses CLI seed signatures and translated System dependencies;
+native semantic importing will replace that representation. No metadata/runtime changes
+are needed for this slice. Capturing closures, full System source compilation and native
+symbol importing remain open.
+
+[Source and consumer evidence](experiments/extended-cli-metadata/hashmap-source-2026-10-02.json)
+and [native execution](experiments/extended-cli-metadata/hashmap-execution-2026-10-02.json)
+include source, seed, System and runtime hashes. All 14 focused Raven interface tests
+pass, and the ArrayList source success/failure consumers still pass after this change.
+This is feature-branch evidence only.

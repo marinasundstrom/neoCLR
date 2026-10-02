@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Compile unchanged HashMap, its collection interfaces, ArrayList and equality-policy
+  implementation together into native PE and execute collision/growth, duplicate,
+  update, key-snapshot and Option lookup checks (42). Shared interface planning now
+  respects explicit imported signature capabilities; .NET defaults are unchanged.
+  Translated System remains a dependency, so this is not full library bootstrap.
+
 - Validate unchanged Raven callback comparer sources through native PE execution (42).
   Raven now applies target capabilities to explicit instance field declarations, using
   existing generic Function storage and interface dispatch. Capturing closures remain
