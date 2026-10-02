@@ -621,3 +621,8 @@ The same development path now authors public native root-class identities, inclu
 unconstrained generic types, directly from Raven symbols. Other type profiles and member
 references still use reader-backed imports; this is a bounded architecture migration,
 not a new metadata format or complete reader/emitter independence.
+
+
+Native namespace-function signatures now also reconstruct root-class constructions
+and vectors from Raven symbols, including cross-dependency Box<T> forwarding. Member
+references and richer type profiles remain on the earlier reader-backed route.

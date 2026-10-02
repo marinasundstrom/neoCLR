@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Extend authored native namespace-function references to output-owned external root-class
+  signatures, including recursive generic constructions and vectors. Raven reconstructs
+  these call signatures from symbols; member calls and richer type profiles retain the
+  reader-backed route. Foreign output types and out-of-scope generic parameters reject.
+  Graph validation now recognizes authored nominal call contracts. All 107 C# groups
+  and seven native consumers pass (42); API snapshot validation passes.
+
 - Author native top-level root-class references from resolved assembly/name/arity and
   artifact values without input definitions; generic construction keeps copied arguments
   and output ownership. Raven uses this path for public unconstrained root classes.

@@ -23,6 +23,20 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, core, hash, "Example", "Box", 1));
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, new("OtherCore", new Version(1, 0, 0, 0)), hash, "Example", "Item"));
         Reject<InvalidDataException>(() => app.CreateTypeReference(app.Identity, core, hash, "Example", "Item"));
+        SignatureType nominal = constructed;
+        var nominalCall = app.CreateFunctionReference(dependency, core, hash, "Example", "EchoBox", new MethodSignature(nominal, [nominal]));
+        var forwarding = app.AddFunction("ForwardBox", new MethodSignature(nominal, [nominal]));
+        forwarding.LoadArgument(0); forwarding.Call(nominalCall); forwarding.Return();
+        if (nominalCall.Signature.ReturnType != nominal) throw new Exception("nominal signature identity");
+        SignatureType open = box.MakeGenericInstance(SignatureType.MethodParameter(0));
+        var vectors = SignatureType.ArrayOf(open);
+        SignatureType wrongScope = box.MakeGenericInstance(SignatureType.MethodParameter(1));
+        Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "WrongScope",
+            new MethodSignature(SignatureType.ArrayOf(wrongScope), [], ["T"])));
+        _ = app.CreateFunctionReference(dependency, core, hash, "Example", "EchoBoxes", new MethodSignature(vectors, [vectors], ["T"]));
+        var foreign = new AssemblyBuilder(new("Foreign", new Version(1, 0, 0, 0)), core);
+        SignatureType foreignType = foreign.CreateTypeReference(dependency, core, hash, "Example", "Item");
+        Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "Foreign", new MethodSignature(foreignType, [])));
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.LoadConstant(42); main.Call(reference); main.Return();
         _ = app.WriteNativeAssembly();

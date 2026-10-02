@@ -2325,3 +2325,15 @@ Types requiring interface conversions or inheritance, interfaces, nested/value t
 and member imports retain the existing reader-backed route. This guard avoids losing
 conversion facts while migrating nominal identity. Member references and nominal
 namespace-function signatures are the next boundary to migrate.
+
+
+### Nominal namespace-function signatures (2026-10-02)
+
+CreateFunctionReference now accepts output-owned external top-level reference-class
+signatures and their generic constructions/vectors. Ownership and parameter scope are
+validated recursively. Raven uses the same root-class predicate for declaration identity
+and signature admission, then reconstructs the full signature from symbols. Thus a
+namespace function forwarding Box<T> from another dependency needs neither a method
+definition nor a type-row lookup on this path. Type-owned members, interfaces, inheritance,
+value/nested profiles and host setup remain outside this migration. The independent
+library body-generator API is still pending; no metadata format change is required.

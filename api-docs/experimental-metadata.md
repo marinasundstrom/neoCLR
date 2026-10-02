@@ -4761,8 +4761,12 @@ for the truth and completeness of the contract and for supplying the matching ru
 artifact. No image loading, accessibility checking or dependency verification occurs.
 
 Supported signatures contain Int32, Int64, Boolean, String, a Void result, method-owned
-generic parameters and single-dimensional vectors of supported non-Void scalars.
-Nominal types, owner parameters, byrefs and out parameters are rejected. Function names
+generic parameters, output-owned external top-level reference-class signatures (including
+closed/open constructions), and single-dimensional vectors of supported non-Void scalars.
+Construction arguments are checked recursively, including method-parameter scope and
+output ownership. Value/nested types, owner parameters, byrefs and out parameters are
+rejected. The caller must supply the nominal declaration facts; this does not import
+inheritance or interface conversion information. Function names
 and namespaces obey the existing authored declaration rules. A required null argument
 throws ArgumentNullException; malformed digests, names/namespaces or parameter scope
 throw ArgumentException. Unsupported contracts, incompatible core/identity, snapshot

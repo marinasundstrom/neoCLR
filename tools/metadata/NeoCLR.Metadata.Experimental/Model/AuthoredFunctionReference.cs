@@ -10,7 +10,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="artifactSha256">64 hexadecimal digits identifying the selected native dependency image.</param>
     /// <param name="namespace">Function namespace; empty for global functions.</param>
     /// <param name="name">Simple function name.</param>
-    /// <param name="signature">Primitive, method-parameter and single-vector signature; no nominal types or byrefs.</param>
+    /// <param name="signature">Primitive, method-parameter, external top-level reference-class construction and single-vector signature; no byrefs.</param>
     /// <returns>An interned output-owned callable reference.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid name, namespace, digest or signature scope.</exception>
@@ -32,7 +32,7 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary) || dependency.Equals(Identity) || dependency.PublicKeyToken.Length != 0 || dependency.Flags != 0)
             throw new InvalidDataException("unsupported dependency identity or core contract");
         if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t, false)) || signature.OutParameters.Count != 0)
-            throw new InvalidDataException("function reference requires primitive, method-parameter or vector signature");
+            throw new InvalidDataException("unsupported authored function signature");
         signature.ReturnType.ValidateOwner(this, signature.GenericParameterNames.Count, 0);
         foreach (var parameter in signature.ParameterTypes) parameter.ValidateOwner(this, signature.GenericParameterNames.Count, 0);
         // Validate declaration spelling before adding anything to the output's reference state.
@@ -61,6 +61,8 @@ public sealed partial class AssemblyBuilder
 
         static bool Supported(SignatureType type, bool result) =>
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
+            type.ImportedType is { IsValueType: false, DeclaringType: null } nominal
+                ? nominal.TypeArguments.All(argument => Supported(argument, false)) :
             type.MethodParameterIndex is not null || type.ArrayElement is { ArrayElement: null } element && Supported(element, false);
     }
 }

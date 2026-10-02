@@ -3691,3 +3691,15 @@ profiles and member references remain reader-backed; their conversion/dispatch d
 is not discarded. Explicit Runtime Contract and bootstrap requirements are unchanged.
 All seven consumers execute; the metadata generic-owner check executes with the new
 reference on CLR and both native containers. See [evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json).
+
+
+### Symbol-owned nominal namespace calls (2026-10-02)
+
+Raven `269c60b07` reconstructs namespace-function signatures carrying external root
+classes, including open/closed constructions and vectors, from symbols. The writer
+recognizes these authored calls during graph validation. The three-assembly generic
+forwarding case and all seven runtime consumers execute (42); 107 C# groups pass.
+Type-owned methods/constructors/fields and richer type profiles remain reader-backed,
+as do host setup and lazy symbol materialization. Explicit Runtime Contract selection,
+CLI primitive core and translated System bootstrap are unchanged. See
+[evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json).

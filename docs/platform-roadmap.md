@@ -7,7 +7,9 @@ slice now emits primitive/method-generic/vector namespace-function references fr
 symbols and artifact values (seven consumers execute; 107 metadata C# groups pass).
 Public top-level root-class identities, including unconstrained generics, now also
 author directly from symbols; other type profiles retain their existing conversion
-metadata path. Next migrate nominal callable references. See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
+metadata path. Namespace-function signatures now also carry root-class constructions and vectors
+through symbol-only reference authoring. Next migrate type-owned callable references.
+See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json). See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
