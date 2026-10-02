@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Record the author-directed priority of native metadata semantic import into Raven,
+  fulfilling the existing builders/definitions/metadata/PE architecture. Audit native
+  reader materialization and reflection-owned compiler setup; sequence definition
+  reading, direct symbol import and cross-assembly execution. This is an implementation
+  plan, not completed native importing. Reuse the existing exact-identity resolver;
+  dependency loading must not recreate the .NET reflection API.
+
 - Extend unchanged source collection execution to internal reference payloads, proving
   map/list/filter identity, mutation visibility, replacement independence and iteration
   after growth (42). Record broad application assessments with translated and source

@@ -1728,3 +1728,112 @@ bridge: byref/out callable shapes, receiver binding and inhabited Void callbacks
 admitted. C# tests execute a callback through separately emitted library methods, a generic
 higher-order call and a no-result callback on both CLR and neoCLR (42). Native PE reference
 projection preserves the signature. Raven's direct shared-plan Function lowering is next.
+
+## Direct native semantic import: implementation alignment (2026-10-02)
+
+The author now prioritizes reading neoCLR metadata into Raven's semantic model over
+expanding CLI translation, and explicitly reaffirms the existing reader/writer vision.
+This changes the next integration task, not the architecture documented above or in the
+roadmap's 2026-10-01 layering clarification: **builders → definitions → metadata → PE**,
+with readers reversing those boundaries. Builders are optional facades over definitions;
+Raven and eventual Introspection are separate consumers of that library.
+
+### Audited gaps, not new architecture
+
+- NativeAssemblyDefinition validates bounded writer-produced native declarations, but
+  retains private rows and builder-backed signature references. Its public consumption
+  path primarily materializes a CLI reference image through CreateReferenceAssembly.
+  NativeLibraryDefinition separately inventories standalone/translated modules, with
+  most signature information opaque. Neither is yet the complete definition reader
+  required by the compiler. Avoid making either private row format a Raven contract.
+- AssemblyDefinition/ModuleDefinition already serve the Cecil-like authoring and CLI
+  snapshot paths. Loaded signatures still differ from AuthoredSignature, and references
+  such as SignatureType can retain builder ownership. Finish that migration where
+  native importing needs it: canonical definitions/references must be readable without
+  authoring a placeholder body or serializing and rereading a CLI assembly.
+- RuntimeAssemblyContainer already validates/extracts the authoritative native payload
+  from PE/#Neo. Container reading, declaration decoding and dependency resolution remain
+  separate responsibilities. The CLI projection must not supply missing native semantics.
+- Raven's ISemanticDataLoader and IImportedAssemblySymbol are useful existing boundaries,
+  but Compilation still owns DotNetCompilationTarget, whose setup unconditionally opens
+  a .NET metadata session. PE symbols and ReflectionTypeLoader require reflection
+  objects. This is not yet a selectable native importer despite the neutral interface.
+
+### Next bounded implementation sequence
+
+1. **Materialize native definitions.** Complete the read side of the existing definition
+   model for API-produced PE/#Neo, initially exact assembly/module identity, references,
+   namespace functions and primitive signatures. Preserve namespace ownership directly.
+   Keep unsupported native declarations explicit rather than silently dropping or
+   approximating them. Remove builder dependence from any signature/reference used by
+   this read path; do not introduce a parallel compiler-only metadata object model.
+   Native bodies can remain opaque initially, but must not become fabricated executable
+   bodies. Distinguish a declaration-only read from a writable, lossless loaded graph.
+2. **Import one native dependency into Raven.** Select a native semantic loader through
+   the target boundary, using compilation-owned assembly/module/namespace/member symbols
+   over those definitions. Test lookup, GetSymbolInfo/GetTypeInfo, accessibility and
+   overload diagnostics for a small native function library. An explicitly identified
+   CLI core may remain a bootstrap dependency for this first test; the imported native
+   library itself must never be converted to CLI or loaded through reflection. This
+   proves a bounded importer, not a complete native core.
+3. **Bind and execute across assemblies.** Preserve definition identity into the native
+   emitter so a call targets the original library. Compile a Raven consumer, load both
+   assemblies in neoCLR and return 42. Reject a missing/mismatched dependency and
+   unsupported required metadata before successful emission. Preserve .NET defaults.
+4. **Expand the same model and importer.** Add nominal types, members, properties,
+   interfaces, generic owners/substitution/constraints, arrays and structural Function
+   signatures as required by tested library consumers. Import the real native System
+   declarations and move core/iteration/propagation contract resolution onto native
+   symbols. The standalone translated library's inventory limitations are reader work,
+   not a reason to convert it back into a CLI semantic input.
+5. **Return to source bootstrap.** Re-run source collections and the broad application
+   with native dependencies, then compile more of System. The current mixed source/seed
+   identity failure is not permission to equate distinct assemblies by type name.
+
+Use immutable imported snapshots and compilation-local symbol caches, with explicit
+reference resolution. Snapshot identity plus definition ownership must survive repeated
+lookup and generic substitution; physical tokens remain module-local addresses. Unsupported
+required semantics fail with diagnostics. Preserve unknown data only under a documented
+round-trip policy; do not imply general loaded editing before it exists.
+
+Acceptance for the first two slices includes C# reader/semantic tests, an assembly
+produced by the API, exact scopes, repeated lookup identity, namespace functions,
+missing references and malformed/unsupported input. Merely producing a reference PE
+does not meet acceptance. Body decoding, broad editing and full System importing are
+later increments, not prerequisites to the first honest native-reference test.
+
+This follows the existing Cecil 0.11.6 and .NET MetadataReader comparison above: reuse
+Cecil-like definition/reference navigation and keep low-level metadata below it. The
+benefit is a single library contract for authoring, Raven and future Introspection; costs
+are finishing ownership/signature migration and separating reflection-specific Raven
+setup. No performance improvement is claimed. This section records the audit and next
+work; it does not claim an implemented native semantic importer.
+
+### Dependency resolution without a reflection API
+
+The author explicitly rejects recreating .NET reflection while requiring dependency
+resolution during symbol loading. Retain the existing IAssemblyResolver contract:
+exact AssemblyIdentity to AssemblyDefinition, with AssemblyReference/TypeReference
+rechecking scope. Native definition materialization must make this same resolver usable
+for native assemblies. No System.Reflection.Assembly, Type, MemberInfo or execution-host
+assembly loading is required by this contract.
+
+The planned compiler import session supplies an explicit catalog/source policy and owns
+resolution state. Establish an assembly identity and declaration index before recursively
+resolving its referenced signatures, so ordinary cyclic assembly dependencies can reuse
+one definition identity without publishing half-populated semantic results. Track loading,
+ready and failed states; reject actual invalid declaration cycles separately. Keep caches
+scoped to the supplied snapshot/configuration, including failed lookups, rather than
+using global filename or simple-name caches.
+
+Validate the requested full identity against the artifact. Missing dependencies, two
+conflicting artifacts with one identity, unsupported required capabilities and malformed
+metadata remain distinguishable failures that Raven maps to diagnostics. Version roll
+forward, package search and filesystem probing are caller policy, not hidden resolver
+behavior. The initial resolver can require exact registered inputs. A diamond dependency
+must produce one shared definition and one symbol per compilation, while equal type
+names in distinct assembly scopes remain distinct. Add missing/version-mismatch,
+diamond, legal-cycle and conflicting-input C# tests as the native session is connected.
+
+The existing resolver is implemented for current definitions; native materialization,
+cycle-aware import sessions and these native semantic tests are planned follow-on work.

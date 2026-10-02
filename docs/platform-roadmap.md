@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Author-directed priority (2026-10-02): proceed with direct native metadata import into
+Raven, developing the reader/writer library toward its existing builders → definitions
+→ metadata → PE architecture. Native definition materialization and semantic import
+now precede further source-library/bootstrap expansion. CLI projections remain existing
+controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
+
 Development checkpoint (2026-10-02): the metadata feature branch integrates the
 structural Function runtime and direct Raven Function emission. The unchanged collections
 application now compiles to native PE/#Neo, verifies and executes with exact expected

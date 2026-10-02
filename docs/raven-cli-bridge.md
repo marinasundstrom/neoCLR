@@ -3241,3 +3241,13 @@ remains deferred, and the previously working translated-System application is un
 [translated query assessment](experiments/extended-cli-metadata/source-reference-2026-10-02/translated-queries.json)
 and [source query assessment](experiments/extended-cli-metadata/source-reference-2026-10-02/source-queries.json)
 record consumers, diagnostics and matching source/bundle hashes.
+
+### Native importer priority (2026-10-02)
+
+The author now directs native semantic importing before further CLI bootstrap expansion.
+The [existing metadata architecture and implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02)
+govern this work. Materialize native declarations into the shared definition model,
+then adapt Raven's semantic loader and preserve native identities into emission.
+Projection APIs remain existing compatibility/test tools; no new projection constitutes
+native import. Current runtime contract configuration and shipped behavior are unchanged.
+The importer and native System contract resolution remain unimplemented.

@@ -10012,3 +10012,28 @@ access checks and keeps explicit foreign internal-type use rejected. See the
 This meets the requested broad application execution checkpoint. Complete native runtime
 library source emission and native semantic metadata loading remain open; System is still
 the explicitly matched translated implementation, and the input symbols use CLI metadata.
+
+## 2026-10-02 — Direct native semantic importing takes priority
+
+**Author:** preferred reading neoCLR metadata into Raven's semantic model to translating
+it into .NET metadata; said integration must develop the metadata-library foundation.
+The author then clarified that the architecture is already documented and further work
+should fulfill that vision, rather than establish a new direction.
+
+**Assistant:** inspected the native readers, shared definition model, Raven semantic
+loader interface and reflection-owned target setup. Initially discussed declaration
+model needs, then explicitly anchored the work in the existing builders → definitions
+→ metadata → PE direction. Recorded concrete gaps and an incremental sequence under
+the existing design, beginning with native definition materialization and a native
+function-library semantic import, then cross-assembly execution and broader System types.
+
+**Outcome:** priority and implementation alignment documented in both repositories.
+No native semantic importer is claimed implemented by this audit. Existing source
+collection/reference tests remain evidence; expanding the mixed CLI bootstrap is no
+longer the immediate task. See [the alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
+
+**Author clarification:** “We don't want to recreate the .NET reflection API,” while
+requiring dependency resolution during symbol loading. **Assistant audit:** found the
+existing exact-identity IAssemblyResolver and reference identity checks. Recorded use
+of that contract with native definitions and explicit compiler import-session dependency
+policy, rather than reflection emulation. Native cycle/session work remains planned.
