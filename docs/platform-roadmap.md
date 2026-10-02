@@ -5,6 +5,15 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Sample reassessment (2026-10-02):** four small native execution controls pass; the
+31-case inventory has four library emit/verify successes, eighteen emission rejections
+and nine binding failures. All twelve selected applications emit their CLI controls but
+none reaches native execution. Next connect ref/out locals and calls through Raven's
+portable emission contract, then follow the unchanged collections sample into imported
+value receivers and exact System dependencies. Whole-library compilation requires an
+implementation seed; its 700 binding diagnostics are not 700 independent codegen gaps.
+[Assessment and evidence](experiments/extended-cli-metadata/readiness-assessment-2026-10-02.md).
+
 **Out-call checkpoint (2026-10-02):** explicit output contracts now map CLI Param Out
 flags to existing native out_parameters metadata. Generic forwarding, imported calls
 and native CLI projection preserve them; producer validation requires assignment on

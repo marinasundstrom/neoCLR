@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Reassess unchanged Raven samples after ref/out metadata support: all four small native
+  execution controls pass, four library inventory attempts emit and verify, but all twelve
+  selected applications still stop before native execution. Record the collections
+  out-local admission gap, dependency configuration and implementation-bootstrap limits;
+  the assessment does not claim new compiler support.
+
 - Add explicit out-parameter contracts to experimental method signatures, CLI Param
   Out flags and native out_parameters metadata. Readers, imports, generic substitution
   and reference projections retain the contract. Producer flow validation requires

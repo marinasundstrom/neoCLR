@@ -1,0 +1,39 @@
+{
+  "selection": "library-propagation-workflow",
+  "targetReference": "api-docs/reference/NeoCLR.CoreProbe.dll",
+  "targetReferenceSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "3A254FAC354A0878DB897C17E46C66FDC19BDDF1136D6659274033B25D063F0D",
+  "targetProfile": "CompilationOptions.NeoCLR plus native Self marker; CLI declaration snapshot, not a native symbol importer",
+  "hostProfile": "Existing direct-emitter .NET primitive bootstrap; no native library dependencies",
+  "methodology": "Unchanged sources; grouped foundational contracts, individual library units, selected applications and entire library. Binding failures stop emission. Target configuration rejection is recorded, not bypassed. No application with failed emission is run. Ordinary CLI bridge emission is a nonexecuted control using a reference-only core. Full diagnostics saved per case; report retains first 12.",
+  "cases": [
+    {
+      "id": "library-propagation-workflow-target",
+      "profile": "target",
+      "sources": [
+        {
+          "path": "docs/experiments/raven-target/samples/library-propagation-workflow.rvn",
+          "sha256": "119342A12123821D018F4C4538B01FB3AFE80170A2D449830B62FBA16F29BD49"
+        }
+      ],
+      "phase": "emission",
+      "bytes": 0,
+      "diagnosticCount": 1,
+      "diagnostics": [
+        "error NEOMETA001: Native emission does not support lowered expression BoundObjectCreationExpression."
+      ],
+      "cliBridgeEmission": {
+        "success": true,
+        "bytes": 4096,
+        "diagnostics": []
+      },
+      "execution": null
+    }
+  ],
+  "revisions": {
+    "metadata": "1c284c9412b12e3ac4eee3f16ed8ed8bff5f6e2b",
+    "raven": "532fc049fb730ec1a1810a41704f99288c4c402a",
+    "metadataBranch": "codex/extended-cli-metadata",
+    "ravenBranch": "codex/metadata-consumer"
+  }
+}
