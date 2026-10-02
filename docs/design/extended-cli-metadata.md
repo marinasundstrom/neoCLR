@@ -2296,3 +2296,20 @@ consumer branch). The existing .NET Reflection/Reflection.Emit path motivates ex
 identity/signature mapping: more mapping code and caches, but input and output no longer
 need shared reflection objects. This is not a performance claim or a promise of lossless
 assembly rewriting through compiler symbols; definition readers/writers retain that role.
+
+
+### First symbol-only function-reference implementation (2026-10-02)
+
+AssemblyBuilder.CreateFunctionReference now accepts resolved identity, native image
+digest, namespace/name and a bounded signature without a reader definition or resolver.
+Primitive, method-generic and vector signatures reuse format-5 name/signature linking;
+no ordinal is necessary for this profile. Conflicting snapshots and incompatible
+contracts reject. The digest is an output-local consistency assertion, not encoded
+runtime integrity. See the [API contract](../../api-docs/experimental-metadata.md#authored-function-references-development-2026-10-02).
+
+Raven reconstructs these references from IMethodSymbol and compiler-owned assembly
+identity/artifact values, with host snapshot checks preserved. Nominal signatures and
+type-owned members still depend on loaded definitions. Host configuration also still
+accepts metadata snapshots. This does not complete importer/emitter independence,
+reader lifetime separation, or the independent library generator API. Next migrate
+nominal type-reference authoring, then callable/field references using those types.

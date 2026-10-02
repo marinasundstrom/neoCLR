@@ -40,7 +40,10 @@ internal static class NativeGenericMethodChecks
         Reject<ArgumentException>(() => imported.MakeGenericInstance(PrimitiveType.Void));
         Check(imported.Signature.GenericParameterNames[0] == "TItem", "import preserves generic names");
         Check(ReferenceEquals(imported, app.ImportReference(method, core)), "generic reference interning");
-        var importedArray = app.ImportReference(function, core).MakeGenericInstance(PrimitiveType.Int32);
+        // Reconstruct a reference from semantic values, with no reader definition passed.
+        var importedArray = app.CreateFunctionReference(library.Identity, core,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "ArrayIdentity",
+            new MethodSignature(vector, [vector], ["TElement"])).MakeGenericInstance(PrimitiveType.Int32);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var values = main.DeclareLocal(SignatureType.ArrayOf(PrimitiveType.Int32));
         main.LoadConstant(1); main.NewArray(PrimitiveType.Int32); main.StoreLocal(values);

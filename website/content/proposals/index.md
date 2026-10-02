@@ -607,3 +607,11 @@ remain pending.
 Development checkpoint (2026-10-02): external generic constructions now preserve exact
 assembly scope through native metadata and Raven. A three-assembly generic consumer
 executes successfully. Constraint import and full native core/bootstrap remain pending.
+
+
+Development checkpoint (2026-10-02, metadata feature branch): Raven now authors native
+namespace-function references from compiler symbols for primitive, method-generic and
+vector signatures, without reading imported method definitions on that path. Seven
+native consumers execute (42); 107 metadata C# groups pass. Nominal signatures and
+type-owned members still use the earlier reader-backed route. The independent library
+instruction-generator API remains planned. No native format change is required.

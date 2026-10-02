@@ -105,7 +105,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("conflicting imported method contract");
             return existing;
         }
-        if (importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
+        if (importedReferences.Count + authoredFunctionReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
         // Private reference-only nodes reuse both backends' existing exact-identity call encoding.
         // No producer bodies or mutable definition graph are retained or exposed.
         TypeBuilder? MakeOwner(TypeDefinition? declaration)

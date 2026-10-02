@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Authored function references](#authored-function-references-development-2026-10-02): native call contracts without input definitions.
+
 - [ReferencedGenericType](#referencedgenerictype-development-2026-10-02): immutable constructed signatures in loaded snapshots.
 
 - [Imported type signatures](#imported-type-signatures-development-2026-10-01): external nominal and constructed reference types.
@@ -4737,3 +4739,45 @@ authored method fails ownership validation with ArgumentException. Import the co
 declaration using AssemblyBuilder.ImportReference; that recursively imports the owner
 and arguments into output-owned references. Existing CLI/native constructed-call
 encoding is reused. No synthetic CLI blobs or reflection types are introduced.
+
+
+## Authored function references (development, 2026-10-02)
+
+`AssemblyBuilder.CreateFunctionReference(AssemblyIdentity dependency,
+AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
+string name, MethodSignature signature) -> ImportedMethodReference` creates a native
+assembly/namespace-function reference from resolved values. It needs no reader,
+MethodDefinition or resolver. The returned reference is owned by the output builder;
+matching name/parameter/arity contracts are interned. Use Call or MakeGenericInstance
+on the result through the existing emission API.
+
+The dependency must be unsigned, distinct from the output, and use the same explicit
+core identity. The digest must contain 64 hexadecimal SHA-256 digits; its comparison
+is case-insensitive. It identifies the host-selected native image for conflict checks
+within the output, not an encoded runtime integrity guarantee. The caller is responsible
+for the truth and completeness of the contract and for supplying the matching runtime
+artifact. No image loading, accessibility checking or dependency verification occurs.
+
+Supported signatures contain Int32, Int64, Boolean, String, a Void result, method-owned
+generic parameters and single-dimensional vectors of supported non-Void scalars.
+Nominal types, owner parameters, byrefs and out parameters are rejected. Function names
+and namespaces obey the existing authored declaration rules. A required null argument
+throws ArgumentNullException; malformed digests, names/namespaces or parameter scope
+throw ArgumentException. Unsupported contracts, incompatible core/identity, snapshot
+conflicts, inconsistent result signatures and resource limits throw InvalidDataException.
+Native output retains the existing format-5 name/signature linking contract; ordinary
+CLI output rejects references to assembly-level functions.
+
+```csharp
+var signature = new MethodSignature(PrimitiveType.Int32, [PrimitiveType.Int32]);
+var call = output.CreateFunctionReference(dependencyIdentity, coreIdentity,
+    dependencyImageSha256, "Example", "Identity", signature);
+main.LoadConstant(42);
+main.Call(call);
+main.Return();
+```
+
+The C# AuthoredFunctionReferenceChecks exercises creation without a reader and rejection
+contracts. NativeGenericMethodChecks reconstructs a generic vector reference from
+values and executes it in both native containers. The separate library IILGenerator
+API remains planned; the snippet uses the current MethodBuilder operations.

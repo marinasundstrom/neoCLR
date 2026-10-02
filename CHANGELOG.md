@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add native function-reference authoring from explicit identity, artifact digest,
+  namespace/name and signature values, without reader definitions or resolvers.
+  Primitive, method-generic and vector contracts retain existing name/signature linking;
+  digest checks detect output-local snapshot conflicts, not runtime integrity.
+  C# contracts and native execution cover the new path; nominal signatures remain pending.
+
 - Record planned independent compiler import/emission contracts through Raven symbols
   and a separate metadata-library instruction-generator API. Inventory current loader
   coupling and scope the next symbol-only function-reference slice. This records
