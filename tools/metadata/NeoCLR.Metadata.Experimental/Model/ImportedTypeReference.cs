@@ -64,9 +64,9 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("unsupported imported type or core contract: " + definition.Namespace + "." + definition.Name + " (value core " + definition.ValueTypeCore?.Name + ", expected " + dependencyCoreLibrary.Name + ")");
         var identity = definition.Module.Assembly.Identity;
         NativeBindingFor(identity)?.ValidateType(definition);
-        if (importedGraphs.TryGetValue(identity, out var prior) && prior.Mvid != definition.Module.Mvid) throw new InvalidDataException("conflicting dependency module snapshots");
+        if (importedGraphs.TryGetValue(identity, out var prior) && prior.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
-        if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Mvid, new AssemblyBuilder(identity, dependencyCoreLibrary)));
+        if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));
         return result;
     }
     private ImportedTypeReference? ImportDeclaringScope(TypeDefinition? type, AssemblyIdentity core, int depth = 0)

@@ -121,7 +121,13 @@ public sealed partial class MethodDefinition
 
     internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
     {
-        if (nativeSignature is not null) throw new InvalidDataException("native declarations require a native import adapter");
+        if (nativeSignature is not null)
+        {
+            if (!IsStatic || DeclaringType is not null || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
+                nativeSignature.ParameterTypes.Any(p => p.Primitive is null))
+                throw new InvalidDataException("unsupported native callable import");
+            return nativeSignature;
+        }
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");
         try

@@ -24,7 +24,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("native binding requires a matching core, distinct dependency and no prior imports");
         var binding = new NativeImportBinding(reference, implementation, coreLibrary);
         nativeBindings.Add(reference.Identity, binding);
-        importedGraphs.Add(reference.Identity, (reference.MainModule.Mvid, new AssemblyBuilder(reference.Identity, coreLibrary) { NativeBinding = binding }));
+        importedGraphs.Add(reference.Identity, (reference.ImportSnapshotIdentity, new AssemblyBuilder(reference.Identity, coreLibrary) { NativeBinding = binding }));
     }
 }
 
@@ -47,7 +47,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         (type.Namespace.Length == 0 ? "" : type.Namespace + ".") + SimpleName(type.Name);
     internal void ValidateType(TypeDefinition type)
     {
-        if (type.Module.Mvid != reference.MainModule.Mvid) throw new InvalidDataException("native binding snapshot mismatch");
+        if (type.Module.Assembly.ImportSnapshotIdentity != reference.ImportSnapshotIdentity) throw new InvalidDataException("native binding snapshot mismatch");
         var name = TypeName(type);
         var matches = Library.Declarations.GetProperty("types").EnumerateArray().Where(t =>
             t.GetProperty("name").GetString() == name && Count(t, "generic_parameters") == type.GenericArity).Take(2).ToArray();
@@ -62,7 +62,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     internal void ValidateMethod(MethodDefinition definition, MethodBuilder target)
     {
         if (definition.DeclaringType is not { } owner) throw new InvalidDataException("translated free-function binding is not yet supported");
-        if (owner.Module.Mvid != reference.MainModule.Mvid) throw new InvalidDataException("native binding snapshot mismatch");
+        if (owner.Module.Assembly.ImportSnapshotIdentity != reference.ImportSnapshotIdentity) throw new InvalidDataException("native binding snapshot mismatch");
         if (!namespaceContainers.TryGetValue(owner.MetadataToken, out var namespaceContainer))
         {
             namespaceContainer = owner.DeclaringType is null && owner.GenericArity == 0 && (owner.Attributes & 0x1a7) == 0x181 &&

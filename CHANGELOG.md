@@ -8,11 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
-- Raven now imports bounded primitive namespace-function libraries directly from native
-  definitions into compiler-owned symbols, without a CLI projection. Exact dependency
-  identities, overload/accessibility checks and compilation isolation are validated;
-  67 .NET target/symbol-equality regressions pass. An explicit CLI core remains the
-  bootstrap. Native call emission and broader declaration importing remain pending.
+- Raven imports bounded primitive namespace-function libraries directly from native
+  definitions into compiler-owned symbols and emits their calls through the metadata
+  builder's callable-reference API. Preserve exact identity, overloads and accessibility;
+  reject conflicting native snapshots using cached image fingerprints instead of absent
+  MVIDs. API-authored and Raven-authored library consumers execute in neoCLR (42)
+  without a CLI dependency projection. C# metadata, target-emission and symbol checks
+  pass. The explicit CLI primitive core remains a bootstrap; broader native importing
+  is pending.
 
 - Read native primitive namespace functions directly into the existing assembly/module/
   method definitions through ReadNativeAssembly, without a CLI projection round trip.

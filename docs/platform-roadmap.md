@@ -5,8 +5,10 @@ Raven, developing the reader/writer library toward its existing builders → def
 → metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
 (96 metadata groups pass). Raven now binds these native functions directly with
 exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
-Next import native call references into emission and execute across that boundary. Native reading/import
-now precede further source-library/bootstrap expansion. CLI projections remain existing
+Native calls now import and execute across that boundary, including a Raven-produced
+library read directly and consumed by Raven (42). Next broaden native definition
+materialization to nominal declarations and signatures before full System loading.
+Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 
 Development checkpoint (2026-10-02): the metadata feature branch integrates the

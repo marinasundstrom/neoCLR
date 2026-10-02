@@ -9,6 +9,10 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyDefinition
 {
     private readonly byte[] image;
+    private string? importSnapshotIdentity;
+    internal string ImportSnapshotIdentity => importSnapshotIdentity ??= IsNative
+        ? "native:" + Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image))
+        : "cli:" + MainModule.Mvid.ToString();
     /// <summary>Whether declarations were read from authoritative native metadata rather than CLI tables.</summary>
     public bool IsNative { get; private set; }
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,

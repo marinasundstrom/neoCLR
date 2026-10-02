@@ -4280,7 +4280,41 @@ foreach (var function in assembly.MainModule.Functions) {
 }
 ```
 
-Raven semantic loading, type/member materialization, structural signatures and native
-call imports are subsequent slices. Standalone translated System inventory is not
+Raven primitive function loading and call imports are implemented in the bounded
+development path below. Type/member materialization and structural signatures remain pending. Standalone translated System inventory is not
 admitted by this PE function-only entry point. Existing CLI readers/writers remain
 unchanged. These host C# APIs are covered here rather than the guest RavenDoc selection.
+
+
+### Native callable imports (development, 2026-10-02)
+
+`AssemblyBuilder.ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)`
+now accepts primitive nongeneric native namespace-function definitions obtained from
+ReadNativeAssembly. It returns the existing immutable ImportedMethodReference; Call
+and raw call operands use the same native reference encoding. Namespace, overload
+signature and exact dependency identity are retained. No producer body is copied.
+
+The explicit dependency core must match the output core. Existing identity/resource
+limits apply. InvalidDataException reports unsupported contracts, incompatible cores
+or conflicting snapshots. Native snapshots are compared by a cached SHA-256 of the
+complete owned PE, since their Mvid is empty; identical rereads share an import, while
+byte-different images under one identity are rejected even if logically equivalent.
+CLI snapshots retain their MVID comparison. Snapshot fingerprints are not public or
+persistent assembly identity and do not change the encoded metadata format.
+
+```csharp
+var dependency = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes("Library.dll"));
+var target = dependency.MainModule.Functions.Single(f => f.Name == "Twice");
+var imported = output.ImportReference(target, explicitCoreIdentity);
+var main = output.AddFunction("Main");
+main.LoadConstant(21);
+main.Call(imported);
+main.Return();
+output.EntryPoint = main;
+```
+
+Global/native namespace calls support native emission, not ordinary CLI output.
+Import does not perform source accessibility checking or discover/load dependencies;
+Raven performs semantic access checks and neoCLR resolves explicit runtime modules.
+Nominal/generic native callable imports remain outside this read profile. These host
+C# APIs continue to use this manual reference instead of the guest RavenDoc inventory.

@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-02",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "9BD8C864D1E9800C035EF3CB2D3338AACDC8B9327841C006BF835CBD254A6437",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "699B92E58C34323CE295CA2CEA162624E469A464BE4452AA63501ABA53B4E137",
+        "dependencySha256": "9BD8C864D1E9800C035EF3CB2D3338AACDC8B9327841C006BF835CBD254A6437"
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "96BF446E1FD036B7811BF36A73A2E336DBDAC002DB4AE2173BE0C1E79C0EDC39",
+        "dependencySha256": "9638B7CB5F83652E48E99C58B971D57AE53517D4901CB22376D4ADF895714373"
+      }
+    ],
+    "scope": "native primitive namespace function import and cross-assembly execution; explicit CLI primitive core retained"
+  },
+  "checks": {
+    "metadataContractGroups": 96,
+    "ravenTargetMetadataEmissionTests": 22,
+    "apiSnapshot": "passed"
+  },
+  "reproduce": "NeoClrMetadataProbe --native-symbols-runtime <core.dll> <neoclr> <System.neox> <fresh-output>"
+}

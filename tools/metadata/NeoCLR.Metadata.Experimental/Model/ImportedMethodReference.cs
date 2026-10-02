@@ -38,7 +38,7 @@ public sealed partial class ImportedMethodReference
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity Identity, uint Token), ImportedMethodReference> importedReferences = [];
-    private readonly Dictionary<AssemblyIdentity, (Guid Mvid, AssemblyBuilder Graph)> importedGraphs = [];
+    private readonly Dictionary<AssemblyIdentity, (string Snapshot, AssemblyBuilder Graph)> importedGraphs = [];
 
     /// <summary>Imports an immutable callable contract from a read-only definition.</summary>
     /// <param name="definition">External static method/global function, public nonvirtual/final class member or concrete value member, or public abstract interface member with bounded nominal signatures.</param>
@@ -48,14 +48,18 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
     /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
     /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; cross-dependency TypeRef signatures require further contracts.
-    /// Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
+    /// Native primitive namespace functions are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
     {
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
-        var function = type is null ? FunctionNamespaceEncoding.Decode(definition.Name) : (Namespace: type.Namespace, Name: definition.Name);
+        var function = type is not null
+            ? (Namespace: type.Namespace, Name: definition.Name)
+            : definition.Module.Assembly.IsNative
+                ? (Namespace: definition.Namespace, Name: definition.Name)
+                : FunctionNamespaceEncoding.Decode(definition.Name);
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
             throw new InvalidDataException("unsupported external assembly identity");
@@ -80,10 +84,10 @@ public sealed partial class AssemblyBuilder
         if (!importedGraphs.TryGetValue(identity, out var imported))
         {
             if (importedGraphs.Count >= 256) throw new InvalidDataException("too many imported assemblies");
-            imported = (definition.Module.Mvid, new AssemblyBuilder(identity, dependencyCoreLibrary));
+            imported = (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary));
             importedGraphs.Add(identity, imported);
         }
-        else if (imported.Mvid != definition.Module.Mvid) throw new InvalidDataException("conflicting dependency module snapshots");
+        else if (imported.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var key = (identity, definition.MetadataToken);
         if (importedReferences.TryGetValue(key, out var existing))
         {

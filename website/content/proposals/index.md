@@ -506,8 +506,10 @@ iteration contract boundary; its existing translated-library execution is separa
 
 Direct native metadata reading has begun: the experimental host library now materializes
 primitive namespace functions into shared definitions without a CLI projection. Broader
-metadata coverage and Raven native symbol importing remain development work.
+metadata coverage remains development work.
 
 Raven now binds a bounded native function library directly into its semantic model,
 including overloads and exact dependency identities. Its primitive core still comes
-from an explicit CLI bootstrap; direct native call emission is the next integration step.
+from an explicit CLI bootstrap. Native call emission now runs across assembly boundaries,
+including a Raven-produced library read directly and consumed by another Raven program.
+Both tested consumers return 42; nominal/generic native importing remains open.

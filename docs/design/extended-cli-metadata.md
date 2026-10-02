@@ -1873,3 +1873,27 @@ collapse under simple-name symbol equality. Unsupported emission leaves output e
 Next add direct native call references to the metadata library and Raven adapter, then
 execute the imported call. Nominal/generic native importing and full core replacement
 remain open. This advances the existing read → definitions → symbols direction.
+
+### Direct native call execution checkpoint (2026-10-02)
+
+The first native semantic provider now feeds actual cross-assembly emission. Raven
+imports the exact MethodDefinition already owned by the bound native symbol through
+AssemblyBuilder.ImportReference. The host supplies the registered native reference,
+its exact Definition and matching explicit core in NeoClrMetadataDependency; mismatched
+snapshots or translated implementation mappings are rejected without output.
+
+Both an API-authored native overload library and a Raven-authored namespace-function
+library are read directly, consumed by Raven and executed in neoCLR, returning
+Int32(42). The primitive core remains the explicit CLI bootstrap. This follows the
+shared definitions/reader/writer direction; neither a reflection facade nor a native
+library-to-CLI symbol projection is involved. Compared with the CLI import path, native
+snapshot consistency uses a cached SHA-256 of the owned image because native manifests
+have no MVID. This conservatively rejects byte-different snapshots under one identity,
+including equivalent containers encoded differently; it is not a persistent assembly ID.
+
+C# metadata checks cover repeated identical-snapshot imports, namespace identity,
+conflicting snapshots and incompatible core contracts: 96 metadata contract groups
+and 22 Raven target-emission tests pass; the API snapshot check passes. See
+[native call runtime evidence](../experiments/extended-cli-metadata/native-calls-2026-10-02.json).
+Broader nominal/generic importing, native System symbols and source bootstrap remain
+open. Existing CLI loading/emission continues through its current provider/backend.

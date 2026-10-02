@@ -7,7 +7,7 @@ public sealed partial class AssemblyDefinition
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including nominal types and nonprimitive signatures.</exception>
     /// <remarks>This first materialization profile admits primitive nongeneric namespace functions and exact dependency identities.
-    /// Bodies remain opaque. Write copies the original image; editing and native-to-native call imports remain pending.
+    /// Bodies remain opaque. Write copies the original image; editing remains pending. Primitive function definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
     {
