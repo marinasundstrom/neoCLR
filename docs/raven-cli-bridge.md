@@ -3668,3 +3668,15 @@ separate from the metadata library's proposed IILGenerator body-authoring API. S
 No APIs have moved yet. Explicit Runtime Contract configuration and CLI primitive/
 translated System bootstrap remain unchanged; seven executing consumers establish
 current behavior, not completion of the planned separation.
+
+
+### Symbol-only namespace-function emission (2026-10-02)
+
+Raven `2197fc2a2` and metadata `19a164d0` now author primitive/method-generic/vector
+namespace calls from semantic symbols and captured assembly/artifact values. The
+backend does not read the method definition or use the metadata resolver on this path.
+Host snapshot checks remain, and no runtime format change is necessary. Nominal
+signatures and type-owned methods/fields still use loaded definitions; host setup and
+lazy symbol loading are not yet independent of readers. The library generator remains
+planned. Explicit Runtime Contract selection, CLI primitive core and translated System
+requirements remain unchanged. See [107 C# groups and seven runtime consumers](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json).

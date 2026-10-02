@@ -2,9 +2,11 @@
 
 Author clarification (2026-10-02): importer and emitter must communicate through Raven
 symbols, without emission reusing loader objects. Raven compiler contracts and the
-metadata library body-generator API are independent boundaries. The next bounded
-architecture slice is a symbol-only namespace-function output reference; broader
-generic import continues afterward. See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
+metadata library body-generator API are independent boundaries. The first bounded
+slice now emits primitive/method-generic/vector namespace-function references from
+symbols and artifact values (seven consumers execute; 107 metadata C# groups pass).
+Next migrate nominal type-reference authoring before broadening this separation to
+members. See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions

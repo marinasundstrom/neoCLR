@@ -12,7 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   namespace/name and signature values, without reader definitions or resolvers.
   Primitive, method-generic and vector contracts retain existing name/signature linking;
   digest checks detect output-local snapshot conflicts, not runtime integrity.
-  C# contracts and native execution cover the new path; nominal signatures remain pending.
+  All 107 C# groups pass and the generic vector reference executes in both native
+  containers (42). Raven now uses symbol-owned contracts on this path; all seven native
+  consumers execute (42). Nominal signatures and reader-independent host setup remain
+  pending; recorded exact revisions and artifact evidence.
 
 - Record planned independent compiler import/emission contracts through Raven symbols
   and a separate metadata-library instruction-generator API. Inventory current loader
