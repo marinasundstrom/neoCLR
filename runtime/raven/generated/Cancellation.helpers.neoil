@@ -3,30 +3,30 @@
 newobj instance System.Option.None::.ctor()
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion1(System.Option.None arg0) -> System.Option<System.Func<Void>>
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion1(System.Option.None arg0) -> System.Option<fn<Void>>
 ldarg arg0
-newobj instance System.Option<System.Func<Void>>::.ctor(System.Option.None)
+newobj instance System.Option<fn<Void>>::.ctor(System.Option.None)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion2(System.Func<Void> arg0) -> System.Option.Some<System.Func<Void>>
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion2(fn<Void> arg0) -> System.Option.Some<fn<Void>>
 ldarg arg0
-newobj instance System.Option.Some<System.Func<Void>>::.ctor(System.Func<Void>)
+newobj instance System.Option.Some<fn<Void>>::.ctor(fn<Void>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion3(System.Option.Some<System.Func<Void>> arg0) -> System.Option<System.Func<Void>>
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion3(System.Option.Some<fn<Void>> arg0) -> System.Option<fn<Void>>
 ldarg arg0
-newobj instance System.Option<System.Func<Void>>::.ctor(System.Option.Some<System.Func<Void>>)
+newobj instance System.Option<fn<Void>>::.ctor(System.Option.Some<fn<Void>>)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion4(System.Option<System.Func<Void>>& arg0,out(true) System.Option.Some<System.Func<Void>>& arg1) -> Boolean
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion4(System.Option<fn<Void>>& arg0,out(true) System.Option.Some<fn<Void>>& arg1) -> Boolean
 ldarg arg0
 ldarg arg1
-call instance System.Option<System.Func<Void>>::TryGetValue(System.Option.Some<System.Func<Void>>&)
+call instance System.Option<fn<Void>>::TryGetValue(System.Option.Some<fn<Void>>&)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion5(System.Option.Some<System.Func<Void>>& arg0) -> System.Func<Void>
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion5(System.Option.Some<fn<Void>>& arg0) -> fn<Void>
 ldarg arg0
-call instance System.Option.Some<System.Func<Void>>::get_Value()
+call instance System.Option.Some<fn<Void>>::get_Value()
 ret
 .end
 .function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeBooleanFromInt32(Int32 value) -> Boolean
@@ -59,7 +59,7 @@ ldarg arg1
 call System.Object::ReferenceEquals(System.Object,System.Object)
 ret
 .end
-.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<System.Func<Void>> arg1) -> System.Concurrency.CancellationRegistration
+.function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<fn<Void>> arg1) -> System.Concurrency.CancellationRegistration
 .local System.Concurrency.CancellationTokenSource null0
 .local System.Concurrency.CancellationRegistration null2
 ldloca null0
@@ -69,7 +69,7 @@ ldarg arg1
 ldloca null2
 initobj System.Concurrency.CancellationRegistration
 ldloc null2
-newobj instance System.Concurrency.CancellationRegistration::.ctor(System.Concurrency.CancellationTokenSource,System.Option<System.Func<Void>>,System.Concurrency.CancellationRegistration)
+newobj instance System.Concurrency.CancellationRegistration::.ctor(System.Concurrency.CancellationTokenSource,System.Option<fn<Void>>,System.Concurrency.CancellationRegistration)
 ret
 .end
 .function neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall1(System.Concurrency.CancellationRegistration arg0,System.Concurrency.CancellationRegistration arg1) -> Boolean
@@ -241,7 +241,7 @@ M00000005_IL_002a:
 call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeBooleanFromInt32(Int32)
 ret
 .end
-.method instance byref Register(System.Func<Void> callback) -> System.Concurrency.CancellationRegistration
+.method instance byref Register(fn<Void> callback) -> System.Concurrency.CancellationRegistration
 .local System.Concurrency.CancellationTokenSource local0
 .local System.Concurrency.CancellationTokenSource local1
 ldloca local0
@@ -281,7 +281,7 @@ ldloc local1
 M00000006_IL_0021:
 ldarg 1
 M00000006_IL_0022:
-callvirt instance System.Concurrency.CancellationTokenSource::Register(System.Func<Void>)
+callvirt instance System.Concurrency.CancellationTokenSource::Register(fn<Void>)
 M00000006_IL_0027:
 ret
 M00000006_IL_0028:
@@ -292,7 +292,7 @@ M00000006_IL_002f:
 call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion1(System.Option.None)
 M00000006_IL_0034:
 M00000006_IL_0035:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<System.Func<Void>>)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<fn<Void>>)
 M00000006_IL_003a:
 ret
 .end
@@ -301,12 +301,12 @@ ret
 .sealed
 .implements System.Disposable
 .field private owner System.Concurrency.CancellationTokenSource
-.field private callback System.Option<System.Func<Void>>
+.field private callback System.Option<fn<Void>>
 .field private next System.Concurrency.CancellationRegistration
 .property instance Next() -> System.Concurrency.CancellationRegistration
 .get instance System.Concurrency.CancellationRegistration::get_Next()
 .end
-.method internal instance .ctor(System.Concurrency.CancellationTokenSource owner,System.Option<System.Func<Void>> callback,System.Concurrency.CancellationRegistration next) -> noresult
+.method internal instance .ctor(System.Concurrency.CancellationTokenSource owner,System.Option<fn<Void>> callback,System.Concurrency.CancellationRegistration next) -> noresult
 M0000000f_IL_0000:
 M0000000f_IL_0001:
 ldarg 0
@@ -385,22 +385,22 @@ M00000012_IL_0013:
 ret
 .end
 .method internal instance Invoke() -> noresult
-.local System.Option<System.Func<Void>> local0
+.local System.Option<fn<Void>> local0
 .local System.Concurrency.CancellationTokenSource local1
 .local System.Concurrency.CancellationTokenSource local2
-.local System.Func<Void> local3
-.local System.Option<System.Func<Void>> local4
-.local System.Option.Some<System.Func<Void>> local5
+.local fn<Void> local3
+.local System.Option<fn<Void>> local4
+.local System.Option.Some<fn<Void>> local5
 ldloca local0
-initobj System.Option<System.Func<Void>>
+initobj System.Option<fn<Void>>
 ldloca local1
 initobj System.Concurrency.CancellationTokenSource
 ldloca local2
 initobj System.Concurrency.CancellationTokenSource
 ldloca local4
-initobj System.Option<System.Func<Void>>
+initobj System.Option<fn<Void>>
 ldloca local5
-initobj System.Option.Some<System.Func<Void>>
+initobj System.Option.Some<fn<Void>>
 M00000013_IL_0000:
 M00000013_IL_0001:
 M00000013_IL_0002:
@@ -473,19 +473,19 @@ stloc local4
 M00000013_IL_0057:
 ldloca local5
 M00000013_IL_0059:
-initobj System.Option.Some<System.Func<Void>>
+initobj System.Option.Some<fn<Void>>
 M00000013_IL_005f:
 ldloca local4
 M00000013_IL_0061:
 ldloca local5
 M00000013_IL_0063:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion4(System.Option<System.Func<Void>>&,System.Option.Some<System.Func<Void>>&)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion4(System.Option<fn<Void>>&,System.Option.Some<fn<Void>>&)
 M00000013_IL_0068:
 brfalse M00000013_IL_0081
 M00000013_IL_006d:
 ldloca local5
 M00000013_IL_006f:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion5(System.Option.Some<System.Func<Void>>&)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion5(System.Option.Some<fn<Void>>&)
 M00000013_IL_0074:
 stloc local3
 M00000013_IL_0075:
@@ -496,7 +496,7 @@ br M00000013_IL_008d
 M00000013_IL_0086:
 ldloc local3
 M00000013_IL_0087:
-callvirt instance System.Func<Void>::Invoke()
+callvirt instance fn<Void>::Invoke()
 M00000013_IL_008c:
 pop
 M00000013_IL_008d:

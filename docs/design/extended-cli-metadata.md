@@ -1692,3 +1692,26 @@ Extension/delegate signatures and the native System dependency mapping remain op
 Evidence: [Raven nested consumer](../experiments/extended-cli-metadata/nested-imports-2026-10-02.json)
 and [unchanged collections assessment](../experiments/extended-cli-metadata/collections-after-nested-imports-2026-10-02.json),
 Raven revision 942a0dce5 on codex/metadata-consumer.
+
+
+### Function branch integration (2026-10-02)
+
+At the author's direction, reuse structural Function runtime work from a081c6e3 rather
+than add a new nominal delegate backend. Its existing design/research is documented in
+[Function types](../function-types.md) and [the CLR comparison](../delegate-contract.md).
+The benefit is reuse of checked signature binding, closure lifetime and migrated library
+APIs; the cost is a feature-branch ABI change requiring matching generated references,
+runtime and applications. Main and ordinary .NET delegate behavior are unchanged.
+
+The runtime merge preserves binary PE loading and System.Fail. A synthetic Function.Invoke
+contract now supplies the metadata branch's explicit empty namespace. Class-library snapshots
+and API references are regenerated from the combined source. Existing Raven target settings
+already select inhabited callback result transport; no new Runtime Contract option is needed.
+CLI Func/Action remain temporary compiler carriers. The native metadata API will expose
+structural signatures directly, preserving no-result and parameter/return contracts; shared
+codegen must lower callback creation without Reflection.Emit. The unchanged collections
+sample is still the direct native backend acceptance case, not the older CLI importer control.
+
+The [combined-bundle validation record](../experiments/extended-cli-metadata/function-branch-integration-2026-10-02.json)
+records 65 focused native tests, 86 metadata groups, five direct native controls and
+Function CLI-import consumers. Full library source/bootstrap hashes and API snapshots match.

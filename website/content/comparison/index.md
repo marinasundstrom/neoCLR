@@ -66,3 +66,15 @@ The linked feature pages own detailed contracts and limitations. This comparison
 is reviewed when those contracts or release availability change; its review date
 records the last check, not a release date. Microsoft references above were
 consulted on 27 September 2026.
+
+## Function types: delegates evolved (development)
+
+[Function types](../features/functions/) preserve the familiar target and receiver
+binding of a single-target delegate while making the callable signature a structural
+type. Matching signatures share a Function type, so callbacks can use that contract
+directly without sharing a named delegate declaration. .NET delegate types instead
+have nominal identity.
+
+Function objects support value equality, typed Invoke and target inspection through
+the Function property, which returns MethodInfo. FunctionTypeInfo describes the
+signature independently of the bound target.

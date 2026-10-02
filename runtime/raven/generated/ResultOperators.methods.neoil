@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/ResultOperators.rvn. Regenerate with build_runtime_library.py.
-.method static Map<T0,T1,T2>(System.Result<T0,T1> self,System.Func<T0,T2> mapper) -> System.Result<T2,T1>
+.method static Map<T0,T1,T2>(System.Result<T0,T1> self,fn<T0,T2> mapper) -> System.Result<T2,T1>
 .local System.Result<T0,T1> local0
 .local System.Result<T2,T1> local1
 .local T0 local2
@@ -62,7 +62,7 @@ ldarg 1
 M00000001_IL_003c:
 ldloc local2
 M00000001_IL_003d:
-callvirt instance System.Func<T0,T2>::Invoke(T0)
+callvirt instance fn<T0,T2>::Invoke(T0)
 M00000001_IL_0042:
 call neoCLR.Library.System.ResultOperators.RuntimeUnion3<T2>(T2)
 M00000001_IL_0047:
@@ -120,7 +120,7 @@ ldloc local1
 M00000001_IL_0099:
 ret
 .end
-.method static Then<T0,T1,T2>(System.Result<T0,T1> self,System.Func<T0,System.Result<T2,T1>> binder) -> System.Result<T2,T1>
+.method static Then<T0,T1,T2>(System.Result<T0,T1> self,fn<T0,System.Result<T2,T1>> binder) -> System.Result<T2,T1>
 .local System.Result<T0,T1> local0
 .local System.Result<T2,T1> local1
 .local T0 local2
@@ -183,7 +183,7 @@ ldarg 1
 M00000002_IL_003c:
 ldloc local2
 M00000002_IL_003d:
-callvirt instance System.Func<T0,System.Result<T2,T1>>::Invoke(T0)
+callvirt instance fn<T0,System.Result<T2,T1>>::Invoke(T0)
 M00000002_IL_0042:
 stloc local1
 M00000002_IL_0043:
@@ -237,7 +237,7 @@ ldloc local1
 M00000002_IL_008f:
 ret
 .end
-.method static MapError<T0,T1,T2>(System.Result<T0,T1> self,System.Func<T1,T2> mapper) -> System.Result<T0,T2>
+.method static MapError<T0,T1,T2>(System.Result<T0,T1> self,fn<T1,T2> mapper) -> System.Result<T0,T2>
 .local System.Result<T0,T1> local0
 .local System.Result<T0,T2> local1
 .local T0 local2
@@ -337,7 +337,7 @@ ldarg 1
 M00000003_IL_007c:
 ldloc local3
 M00000003_IL_007d:
-callvirt instance System.Func<T1,T2>::Invoke(T1)
+callvirt instance fn<T1,T2>::Invoke(T1)
 M00000003_IL_0082:
 call neoCLR.Library.System.ResultOperators.RuntimeUnion10<T2>(T2)
 M00000003_IL_0087:
@@ -358,7 +358,7 @@ ldloc local1
 M00000003_IL_0099:
 ret
 .end
-.method static Match<T0,T1,T2>(System.Result<T0,T1> self,System.Func<T0,T2> ok,System.Func<T1,T2> error) -> T2
+.method static Match<T0,T1,T2>(System.Result<T0,T1> self,fn<T0,T2> ok,fn<T1,T2> error) -> T2
 .local System.Result<T0,T1> local0
 .local T2 local1
 .local T0 local2
@@ -415,7 +415,7 @@ ldarg 1
 M00000004_IL_0034:
 ldloc local2
 M00000004_IL_0035:
-callvirt instance System.Func<T0,T2>::Invoke(T0)
+callvirt instance fn<T0,T2>::Invoke(T0)
 M00000004_IL_003a:
 stloc local1
 M00000004_IL_003b:
@@ -452,7 +452,7 @@ ldarg 2
 M00000004_IL_0070:
 ldloc local3
 M00000004_IL_0071:
-callvirt instance System.Func<T1,T2>::Invoke(T1)
+callvirt instance fn<T1,T2>::Invoke(T1)
 M00000004_IL_0076:
 stloc local1
 M00000004_IL_0077:
@@ -469,7 +469,7 @@ ldloc local1
 M00000004_IL_0083:
 ret
 .end
-.method static Tap<T0,T1>(System.Result<T0,T1> self,System.Func<T0,Void> action) -> System.Result<T0,T1>
+.method static Tap<T0,T1>(System.Result<T0,T1> self,fn<T0,Void> action) -> System.Result<T0,T1>
 .local T0 local0
 .local System.Result<T0,T1> local1
 .local System.Result.Ok<T0> local2
@@ -512,7 +512,7 @@ ldarg 1
 M00000005_IL_0035:
 ldloc local0
 M00000005_IL_0036:
-callvirt instance System.Func<T0,Void>::Invoke(T0)
+callvirt instance fn<T0,Void>::Invoke(T0)
 M00000005_IL_003b:
 pop
 M00000005_IL_003c:
@@ -522,7 +522,7 @@ ldarg 0
 M00000005_IL_003f:
 ret
 .end
-.method static TapError<T0,T1>(System.Result<T0,T1> self,System.Func<T1,Void> action) -> System.Result<T0,T1>
+.method static TapError<T0,T1>(System.Result<T0,T1> self,fn<T1,Void> action) -> System.Result<T0,T1>
 .local T1 local0
 .local System.Result<T0,T1> local1
 .local System.Result.Error<T1> local2
@@ -565,7 +565,7 @@ ldarg 1
 M00000006_IL_0035:
 ldloc local0
 M00000006_IL_0036:
-callvirt instance System.Func<T1,Void>::Invoke(T1)
+callvirt instance fn<T1,Void>::Invoke(T1)
 M00000006_IL_003b:
 pop
 M00000006_IL_003c:
@@ -575,7 +575,7 @@ ldarg 0
 M00000006_IL_003f:
 ret
 .end
-.method static OrElse<T0,T1>(System.Result<T0,T1> self,System.Func<T1,System.Result<T0,T1>> recover) -> System.Result<T0,T1>
+.method static OrElse<T0,T1>(System.Result<T0,T1> self,fn<T1,System.Result<T0,T1>> recover) -> System.Result<T0,T1>
 .local System.Result<T0,T1> local0
 .local System.Result<T0,T1> local1
 .local T1 local2
@@ -670,7 +670,7 @@ ldarg 1
 M00000007_IL_0071:
 ldloc local2
 M00000007_IL_0072:
-callvirt instance System.Func<T1,System.Result<T0,T1>>::Invoke(T1)
+callvirt instance fn<T1,System.Result<T0,T1>>::Invoke(T1)
 M00000007_IL_0077:
 stloc local1
 M00000007_IL_0078:
@@ -687,7 +687,7 @@ ldloc local1
 M00000007_IL_0084:
 ret
 .end
-.method static UnwrapOrElse<T0,T1>(System.Result<T0,T1> self,System.Func<T0> factory) -> T0
+.method static UnwrapOrElse<T0,T1>(System.Result<T0,T1> self,fn<T0> factory) -> T0
 .local System.Result<T0,T1> local0
 .local T0 local1
 .local T0 local2
@@ -773,7 +773,7 @@ br M00000008_IL_0067
 M00000008_IL_0067:
 ldarg 1
 M00000008_IL_0068:
-callvirt instance System.Func<T0>::Invoke()
+callvirt instance fn<T0>::Invoke()
 M00000008_IL_006d:
 stloc local1
 M00000008_IL_006e:

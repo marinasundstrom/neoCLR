@@ -26,7 +26,7 @@ Use `Equals` to compare type identity. Names are useful for display, but do not 
 
 TypeInfo compares represented types through both typed equality and Object.Equals. Repeated queries may allocate different descriptors; ReferenceEquals still compares those allocations. Generic arguments and array element types participate in type identity.
 
-Object.GetHashCode is consistent with that equality, and ToString displays the represented FullName. Different types can have colliding hashes; neither names nor hashes are persistent identity keys. EquatableTo&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.
+Object.GetHashCode is consistent with that equality, and ToString displays the represented DisplayName in development (FullName in Preview 11). Different types can have colliding hashes; neither names nor hashes are persistent identity keys. EquatableTo&lt;TypeInfo&gt; takes a non-null TypeInfo. Object.Equals(Object?) is the explicitly null-aware boundary.
 
 Assembly descriptors compare full catalog identities; module descriptors compare that identity plus their module name. Their Object hashes use the same keys, and display returns the assembly FullName or module Name. This is scoped to one loaded program, without CLR loader-context semantics. Field, method and property descriptors compare their kind, closed declaring type and definition index, with matching hashes and Name display. Parameter descriptors retain owner kind, closed declaring type, definition index and position for equality and hashing. Tokens may be zero; a property index parameter remains distinct from its accessor parameter. Owner resolution through a public Member property is still future work. See the [introspection guide](../../docs/introspection.html) and [TypeInfo API reference](../../docs/api/System.Introspection.TypeInfo.html) for current contracts.
 
@@ -91,7 +91,7 @@ The public Info contracts are sealed interfaces. The current `MemberInfo` hierar
 {{TOUR_MATCH}}
 ```
 
-Callers work with those public cases, without matching private runtime implementation classes. `TypeInfo` is a member case, so a nested type can be described as a member. `DeclaringType` returns `Option<TypeInfo>`: nested types and ordinary members have an owner; top-level types do not. `ParameterInfo` remains separate.
+Callers work with those public cases, without matching private runtime implementation classes. `NominalTypeInfo` is the development type member case, replacing Preview 11’s `TypeInfo`, so a nested nominal type can be described as a member. `DeclaringType` returns `Option<TypeInfo>`: nested types and ordinary members have an owner; top-level types do not. `ParameterInfo` remains separate.
 
 ```raven
 {{TOUR_MEMBERS}}
@@ -136,7 +136,7 @@ Sequence states the collection capability without requiring an array in the publ
 - There is one loaded-program context. Dynamic assembly loading and resolution belong to future RuntimeContext work.
 - Queries cover retained metadata. Development includes application instance properties and accessor tokens; static application properties and generic method-definition reflection remain limited.
 - Open generic definitions can report identity, shape, arguments, tokens and module. Their member, base-type and interface queries require a closed type and fault otherwise.
-- Emit and offline metadata contexts remain future work; bounded invocation is covered by [Reflection](../reflection/). TypeInfo is part of the sealed MemberInfo hierarchy.
+- Emit and offline metadata contexts remain future work; bounded invocation is covered by [Reflection](../reflection/). NominalTypeInfo is part of the development sealed MemberInfo hierarchy.
 
 Constructor discovery adds `GetConstructors()` and the `ConstructorInfo`
 member case. It returns declared public instance constructors by default; explicit
@@ -176,6 +176,25 @@ The [record sample](../../samples/records.zip) checks record classes and structs
 The descriptive model supports the bounded development reflection extensions above. Broader invocation and emit remain future work. Dynamic assembly loading belongs with RuntimeContext; offline metadata could use a different resolution context. These are directions to explore, not implemented APIs or release commitments. Identity, resolution and lifetime rules need further work.
 
 [See the proposals and their tradeoffs →](../../proposals/#introspection)
+
+The selected Function type direction introduces `NominalTypeInfo` for names,
+namespaces and declaration metadata, alongside `TypeInfo.IsNominalType`.
+Structural Function types describe callable shapes, with Function objects
+as their instances. The descriptor split is implemented on the development feature branch: common
+TypeInfo exposes DisplayName, IsNominalType and IsFunctionType; declaration metadata requires
+NominalTypeInfo. Structural types can still have members and extension members;
+member discovery stays on common TypeInfo. Raven callbacks now import into structural
+Function shapes, and a tested extension can target a function shape. Legacy
+delegate declarations and opcodes are removed. FunctionTypeInfo.InvokeMethod and
+GetMethods expose the same synthesized public instance Invoke signature. Member
+and parameter Module/MetadataToken, and MethodInfo.DefinitionIndex, are optional;
+synthesized descriptors return None. Typed invocation is supported; dynamic
+reflection invocation of this descriptor remains future work. See the [Function API reference](/docs/functions.html). Named function
+types may follow later.
+
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
 
 <a id="feedback"></a>
 
@@ -262,3 +281,6 @@ conversions. Source generation remains a future alternative.
 The [retained constructor case](../reflection/#development-case-preparing-union-constructors-for-routes)
 uses these attribute descriptions to select case/carrier constructors once, then
 constructs ordinary union values through checked Reflection extensions.
+
+See [Function types and objects](../functions/) for signature identity, value bindings
+and the transitional bound-target Function property.

@@ -4,6 +4,7 @@ use crate::{Fault, FaultCode, Value, metadata::Type, value::ObjectReference};
 enum Identity<'a> {
     Object(&'a ObjectReference),
     Text(crate::StringValue),
+    Function(&'a crate::Function),
 }
 fn reference(value: &Value) -> Result<Option<Identity<'_>>, Fault> {
     match value {
@@ -18,6 +19,7 @@ fn reference(value: &Value) -> Result<Option<Identity<'_>>, Fault> {
             }
             Ok(Some(Identity::Object(object)))
         }
+        Value::Function(binding) => Ok(Some(Identity::Function(binding))),
         Value::String(text) => Ok(Some(Identity::Text(text.clone()))),
         _ => Err(Fault::new("object identity requires an object reference")),
     }
@@ -30,6 +32,9 @@ pub(crate) fn reference_equals(left: &Value, right: &Value) -> Result<bool, Faul
             left.reference.same_location(&right.reference)
         }
         (Some(Identity::Text(left)), Some(Identity::Text(right))) => left.same_owner(&right),
+        (Some(Identity::Function(left)), Some(Identity::Function(right))) => {
+            std::sync::Arc::ptr_eq(&left.identity, &right.identity)
+        }
         _ => false,
     })
 }
@@ -54,6 +59,9 @@ pub(crate) fn hash(value: &Value) -> Result<i32, Fault> {
     Ok(match object {
         Identity::Object(object) => mix_hash(object.allocation_id() as u64),
         Identity::Text(text) => text.identity_hash(),
+        Identity::Function(binding) => {
+            mix_hash(std::sync::Arc::as_ptr(&binding.identity) as usize as u64)
+        }
     })
 }
 

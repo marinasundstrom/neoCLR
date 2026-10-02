@@ -6,6 +6,8 @@
       href: comparison/index.md
     - name: Namespaces
       href: docs/namespaces.md
+    - name: Function types
+      href: features/functions/index.md
     - name: Collections and queries
       href: features/collections/index.md
     - name: Public reference coverage
@@ -38,5 +40,18 @@
   items:
     - name: "Building a Http server app"
       href: cases/http-server/index.md
+- name: Structural types
+  href: docs/structural-types.md
+  items:
+    - name: Array
+      href: docs/arrays.md
+    - name: Function
+      href: docs/functions.md
+    - name: Tuple
+      href: docs/tuples.md
+    - name: Union
+      href: docs/unions.md
+    - name: Intersection (proposed)
+      href: docs/intersections.md
 - name: API reference
   href: api/

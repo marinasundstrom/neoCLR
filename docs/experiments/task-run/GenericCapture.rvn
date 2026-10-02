@@ -3,7 +3,7 @@ import System.Tasks.*
 
 async func Read<T>(initial: T, replacement: T) -> Task<T> {
     var value = initial
-    let read: Func<T> = () => value
+    let read: () -> T = () => value
     await Task.Run(() => ())
     value = replacement
     return read()

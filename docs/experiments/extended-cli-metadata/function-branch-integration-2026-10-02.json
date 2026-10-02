@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-02",
+  "runtimeFeatureRevision": "a081c6e3",
+  "runtimeFeatureBranch": "codex/structural-types",
+  "integrationBranch": "codex/extended-cli-metadata",
+  "ravenRevision": "f32efefad",
+  "ravenBranch": "codex/metadata-consumer",
+  "runtimeSha256": "4b18a856e78da581713be4228ec6f4096b2a80f2fc7f941a3c1c5fbb251641bf",
+  "referenceSha256": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad",
+  "nativeContractTests": 65,
+  "metadataContractGroups": 86,
+  "directNativeControls": 5,
+  "cliBridgeControls": [
+    "descriptor-provider-selection: passed",
+    "oftype-query-contracts: passed",
+    "structural-function-callbacks: passed",
+    "structural-function-async: passed",
+    "function-comparer-adapters: passed",
+    "named-delegate-admission-rejected: passed",
+    "common-type-rejects-Name: passed",
+    "common-type-rejects-Namespace: passed",
+    "common-type-rejects-FullName: passed",
+    "common-type-rejects-Module: passed",
+    "common-type-rejects-MetadataToken: passed",
+    "common-type-rejects-DeclaringType: passed",
+    "common-type-rejects-GetCustomAttributesData(): passed"
+  ],
+  "limitations": [
+    "Direct metadata Function signature/binding API remains pending",
+    "Unchanged broad collections application still fails direct native emission",
+    "CLI importer controls do not establish direct backend completion"
+  ]
+}

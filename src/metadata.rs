@@ -25,6 +25,8 @@ pub enum Type {
     Value,
     /// Opaque read-only metadata descriptor, with no native address or payload storage.
     RuntimeTypeHandle,
+    /// Structural managed invocation contract, independent of any named declaration.
+    Function(Box<FunctionType>),
     Named(String),
     /// An explicit source-module scope, checked and bound during preparation.
     Scoped {
@@ -54,6 +56,66 @@ pub enum Type {
     InterfaceRef(Box<Type>),
     /// Fundamental unmanaged pointer signature; no ownership policy is implied.
     Ptr(Box<Type>),
+}
+
+/// Canonical callable shape. Parameter labels and target identity are not type identity.
+/// Readonly references use ReadOnlyByRef; output indices are sorted and disjoint.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FunctionType {
+    pub parameters: Vec<Type>,
+    pub returns: Type,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub no_result: bool,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub out_parameters: Vec<usize>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub out_when_true: Vec<usize>,
+}
+
+impl FunctionType {
+    pub(crate) fn map_types(
+        &self,
+        mut map: impl FnMut(&Type) -> Result<Type, crate::Fault>,
+    ) -> Result<Self, crate::Fault> {
+        Ok(Self {
+            parameters: self
+                .parameters
+                .iter()
+                .map(&mut map)
+                .collect::<Result<_, _>>()?,
+            returns: map(&self.returns)?,
+            no_result: self.no_result,
+            out_parameters: self.out_parameters.clone(),
+            out_when_true: self.out_when_true.clone(),
+        })
+    }
+
+    pub(crate) fn validate(&self) -> Result<(), crate::Fault> {
+        if self.no_result && self.returns != Type::Void {
+            return Err(crate::Fault::new("no-result Function must return Void"));
+        }
+        for indices in [&self.out_parameters, &self.out_when_true] {
+            if indices.windows(2).any(|p| p[0] >= p[1])
+                || indices
+                    .iter()
+                    .any(|i| !matches!(self.parameters.get(*i), Some(Type::ByRef(_))))
+            {
+                return Err(crate::Fault::new("invalid Function output contract"));
+            }
+        }
+        if self
+            .out_parameters
+            .iter()
+            .any(|i| self.out_when_true.contains(i))
+            || (!self.out_when_true.is_empty() && self.returns != Type::Boolean)
+        {
+            return Err(crate::Fault::new(
+                "invalid Function conditional output contract",
+            ));
+        }
+        Ok(())
+    }
 }
 
 impl Type {
@@ -314,7 +376,6 @@ pub enum Representation {
     Record,
     Runtime,
     Interface,
-    Delegate,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -720,8 +781,12 @@ pub enum Instruction {
     Switch(Vec<usize>),
     #[serde(rename = "call")]
     Call(FunctionRef),
-    #[serde(rename = "delegate.bind")]
-    BindDelegate { delegate: Type, target: FunctionRef },
+    #[serde(rename = "function.bind")]
+    BindFunction {
+        #[serde(rename = "function_type")]
+        function_type: Type,
+        target: FunctionRef,
+    },
     #[serde(rename = "newobj.ctor")]
     Construct(FunctionRef),
     #[serde(rename = "value.pack")]
@@ -834,7 +899,7 @@ pub enum Instruction {
 
 impl Module {
     pub fn is_reference_type(&self, ty: &Type) -> bool {
-        matches!(ty, Type::ArrayRef(_))
+        matches!(ty, Type::ArrayRef(_) | Type::Function(_))
             || self
                 .type_definition(ty)
                 .is_some_and(|definition| definition.is_reference_type)
@@ -970,6 +1035,9 @@ impl Type {
             Self::Constructed { arguments, .. } | Self::Scoped { arguments, .. } => {
                 arguments.iter().any(Self::contains_self)
             }
+            Self::Function(shape) => {
+                shape.parameters.iter().any(Self::contains_self) || shape.returns.contains_self()
+            }
             Self::ByRef(t)
             | Self::ReadOnlyByRef(t)
             | Self::Array(t)
@@ -1007,6 +1075,7 @@ impl Type {
             let nested = |ty: &Type| substitute(ty, types, methods, implementing_type, depth + 1);
             Ok(match ty {
                 Type::SelfType if implementing_type.is_some() => implementing_type.unwrap().clone(),
+                Type::Function(shape) => Type::Function(Box::new(shape.map_types(nested)?)),
                 Type::TypeParameter(index) if types.is_some() => types
                     .unwrap()
                     .get(*index as usize)
@@ -1113,8 +1182,11 @@ impl Function {
         }
         for op in &mut result.body {
             match op {
-                Instruction::BindDelegate { delegate, target } => {
-                    *delegate = map(delegate)?;
+                Instruction::BindFunction {
+                    function_type,
+                    target,
+                } => {
+                    *function_type = map(function_type)?;
                     if let Some(owner) = &mut target.owner {
                         *owner = map(owner)?;
                     }

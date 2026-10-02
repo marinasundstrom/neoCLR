@@ -10,21 +10,21 @@ pub(super) fn submit(
     callback: Value,
     mut options: ExecutionOptions,
 ) -> Result<usize, Fault> {
-    let Value::Delegate(binding) = &callback else {
-        return Err(Fault::new("task submission requires a delegate"));
+    let Value::Function(binding) = &callback else {
+        return Err(Fault::new("task submission requires a Function object"));
     };
-    let contract = crate::delegates::contract(&module, &binding.ty)?;
+    let contract = crate::function_objects::contract(&module, &binding.ty)?;
     if !contract.parameters.is_empty() {
         return Err(Fault::new("task callback must have no parameters"));
     }
     let function = resolve(&module, &binding.target)?;
-    crate::delegates::compatible(&contract, &function)?;
+    crate::function_objects::compatible(&contract, &function)?;
     options.limits = invocation.limits;
     let worker_invocation = invocation.clone();
     invocation
         .work
         .submit(heap, vec![callback], move |context, mut captures, _| {
-            let Value::Delegate(binding) = captures.pop().expect("registered callback") else {
+            let Value::Function(binding) = captures.pop().expect("registered callback") else {
                 unreachable!()
             };
             let args = binding
@@ -91,19 +91,15 @@ mod tests {
             crate::assemble(&format!(
                 r#"
 .module System
-.delegate Callback
-.method instance Invoke() -> {result}
-.end
-.end
 .type class Capture
 .field Value Int32
 .method instance Run() -> {result}
 {body}
 .end
 .end
-.function Bind(Capture capture) -> Callback
+.function Bind(Capture capture) -> fn<{result}>
 ldarg capture
-delegate.bind Callback = instance Capture::Run()
+function.bind fn<{result}> = instance Capture::Run()
 ret
 .end
 .function neoCLR.Runtime.WriteLine(String value) -> Void
@@ -211,11 +207,11 @@ ldloc job
 ldfld Job::Source
 callvirt instance System.Tasks.Promise<Int32>::get_Task()
 ldloc job
-delegate.bind System.Func<Void> = instance Job::Observe()
-callvirt instance System.Tasks.Task<Int32>::OnCompleted(System.Func<Void>)
+function.bind fn<Void> = instance Job::Observe()
+callvirt instance System.Tasks.Task<Int32>::OnCompleted(fn<Void>)
 ldloc job
-delegate.bind System.Func<Void> = instance Job::Run()
-call neoCLR.Runtime.ScheduleTask(System.Func<Void>)
+function.bind fn<Void> = instance Job::Run()
+call neoCLR.Runtime.ScheduleTask(fn<Void>)
 pop
 ldloc job
 ret
@@ -355,7 +351,7 @@ ret
     }
 
     #[test]
-    fn guest_delegate_shares_capture_budget_and_does_not_wait_for_dispatch_owner() {
+    fn guest_function_object_shares_capture_budget_and_does_not_wait_for_dispatch_owner() {
         let module = fixture(
             "ldarg 0\nldarg 0\nldfld Capture::Value\nldc.i4 2\nadd\nstfld Capture::Value\nldarg 0\nret",
             "Capture",
@@ -472,7 +468,7 @@ ret
         assert!(owner.participant().is_ok());
     }
     #[test]
-    fn blocking_guest_delegate_permits_caller_collection_and_capture_mutation() {
+    fn blocking_guest_function_object_permits_caller_collection_and_capture_mutation() {
         #[derive(Debug)]
         struct BlockingConsole {
             started: std::sync::mpsc::Sender<()>,

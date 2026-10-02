@@ -82,7 +82,7 @@ fn generic_storage_can_contain_void_inside_a_no_result_method() {
 #[test]
 fn inhabited_void_delegate_cannot_bind_a_no_result_target() {
     let mut m = module(
-        ".delegate Action\n.method instance Invoke() -> Void\n.end\n.end\n.function Main() -> Void\ndelegate.bind Action = Empty()\npop\nldvoid\nret\n.end\n.function Empty() -> Void\nldvoid\nret\n.end",
+        ".function Main() -> Void\nfunction.bind fn<Void> = Empty()\npop\nldvoid\nret\n.end\n.function Empty() -> Void\nldvoid\nret\n.end",
     );
     let empty = m.functions.iter_mut().find(|f| f.name == "Empty").unwrap();
     empty.no_result = true;

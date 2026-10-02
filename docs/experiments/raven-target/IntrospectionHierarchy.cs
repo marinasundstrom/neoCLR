@@ -9,9 +9,11 @@ static class IntrospectionHierarchy
     {
         ["AssemblyInfo"] = ["RuntimeAssemblyInfo"],
         ["ModuleInfo"] = ["RuntimeModuleInfo"],
-        ["TypeInfo"] = ["RuntimeTypeInfo"],
+        ["TypeInfo"] = ["RuntimeTypeInfo", "NominalTypeInfo", "FunctionTypeInfo"],
+        ["FunctionTypeInfo"] = ["RuntimeFunctionTypeInfo"],
+        ["NominalTypeInfo"] = ["RuntimeNominalTypeInfo"],
         ["ParameterInfo"] = ["RuntimeParameterInfo"],
-        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "ConstructorInfo", "PropertyInfo", "TypeInfo"],
+        ["MemberInfo"] = ["FieldInfo", "MethodInfo", "ConstructorInfo", "PropertyInfo", "NominalTypeInfo"],
         ["FieldInfo"] = ["RuntimeFieldInfo"],
         ["MethodInfo"] = ["RuntimeMethodInfo"],
         ["ConstructorInfo"] = ["RuntimeConstructorInfo"],

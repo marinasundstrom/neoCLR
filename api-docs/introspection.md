@@ -7,10 +7,21 @@ generic arguments and member queries. The [type reference](xref:System.Introspec
 lists each supported operation. These APIs describe metadata; they do not invoke
 methods, read fields or construct arbitrary objects.
 
+## Development: nominal and structural type descriptors
+
+The development reference introduces [NominalTypeInfo](xref:System.Introspection.NominalTypeInfo).
+TypeInfo no longer inherits MemberInfo. Common code uses DisplayName and
+IsNominalType; only a NominalTypeInfo view exposes Name, FullName, Namespace,
+module/token, declaring type and custom attributes. Arrays and structural Function
+shapes do not implement NominalTypeInfo or MemberInfo. Named declarations, including
+constructed generic types, do. General shape and member queries remain on TypeInfo.
+This is a breaking change from Preview 11: narrow to NominalTypeInfo for declaration
+metadata, or use DisplayName when only diagnostic text is needed.
+
 ## Type identity
 
-Repeated queries can allocate different descriptors of the same type. RuntimeTypeInfo
-now applies represented-type identity through both `Equals(TypeInfo)` and
+Repeated queries can allocate different descriptors of the same type. Both runtime descriptor providers
+apply represented-type identity through both `Equals(TypeInfo)` and
 `Object.Equals(Object?)`. Generic arguments, element shape and loaded definition
 identity participate; a name or metadata token alone is insufficient.
 
@@ -20,7 +31,7 @@ unrelated objects compare false. `Object.ReferenceEquals` still compares descrip
 allocations. This follows the distinction between type identity and wrapper identity
 in .NET's Type APIs, without requiring CLR wrapper caching.
 
-`GetHashCode`, called through Object, hashes the represented FullName with System.HashCode.
+`GetHashCode`, called through Object, hashes the represented DisplayName with System.HashCode.
 Equal represented types have equal hashes. Distinct definitions with matching display
 names may collide; hashing never substitutes for equality. Hashes are not persistent
 identifiers and may change between runtime versions. `ToString` returns the represented
@@ -74,7 +85,7 @@ for the same declaration compare equal even with separate wrappers. Different ge
 owners, different declarations and different descriptor kinds compare unequal. Null
 and unrelated objects compare false. There is no new nullable typed equality operand.
 
-Their hashes combine kind, declaring FullName and definition index. Equal members
+Their hashes combine kind, declaring DisplayName and definition index. Equal members
 have equal hashes; distinct type definitions with matching names may collide. Neither
 the hash nor DefinitionIndex is a persistent key. ToString returns the member Name;
 it does not format a .NET-style signature or uniquely distinguish overloads.

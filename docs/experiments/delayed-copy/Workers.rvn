@@ -6,13 +6,13 @@ import System.Tasks.*
 import System.Runtime.CompilerServices.*
 
 public class Thread {
-    private field callback: Func<string, string>
+    private field callback: (string) -> string
     private field input: string
     private field source: Promise<string>
     private field started: bool
     private field queue: TaskQueue
 
-    init(callback: Func<string, string>, input: string) {
+    init(callback: (string) -> string, input: string) {
         self.callback = callback
         self.input = input
         source = Promise<string>()
@@ -33,7 +33,7 @@ public class Thread {
         RuntimeServices.NotifyWorker(handle, completion.Complete)
     }
 
-    static func Run(callback: Func<string, string>, input: string) -> Task<string> {
+    static func Run(callback: (string) -> string, input: string) -> Task<string> {
         let thread = Thread(callback, input)
         thread.Start()
         return thread.Task
@@ -41,7 +41,7 @@ public class Thread {
 }
 
 public class ThreadPool {
-    static func Queue(callback: Func<string, string>, input: string) -> Task<string> {
+    static func Queue(callback: (string) -> string, input: string) -> Task<string> {
         let source = Promise<string>()
         let queue = RuntimeServices.CurrentTaskQueue
         let handle = RuntimeServices.QueueWorker(callback, input)

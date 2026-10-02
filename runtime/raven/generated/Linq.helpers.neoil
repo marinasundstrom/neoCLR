@@ -119,8 +119,8 @@ ret
 .sealed
 .implements System.Collections.Iterable<T0>
 .field private source System.Collections.Iterable<T0>
-.field private callback System.Func<T0,Boolean>
-.method instance .ctor(System.Collections.Iterable<T0> input,System.Func<T0,Boolean> action) -> noresult
+.field private callback fn<T0,Boolean>
+.method instance .ctor(System.Collections.Iterable<T0> input,fn<T0,Boolean> action) -> noresult
 M00000017_IL_0000:
 M00000017_IL_0001:
 ldarg 0
@@ -157,7 +157,7 @@ ldarg 0
 M00000018_IL_000e:
 ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E576865726553657175656E63656031<T0>::callback
 M00000018_IL_0013:
-newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::.ctor(System.Collections.Iterator<T0>,System.Func<T0,Boolean>)
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::.ctor(System.Collections.Iterator<T0>,fn<T0,Boolean>)
 M00000018_IL_0018:
 ret
 .end
@@ -166,8 +166,8 @@ ret
 .sealed
 .implements System.Collections.Iterable<T1>
 .field private source System.Collections.Iterable<T0>
-.field private callback System.Func<T0,T1>
-.method instance .ctor(System.Collections.Iterable<T0> input,System.Func<T0,T1> action) -> noresult
+.field private callback fn<T0,T1>
+.method instance .ctor(System.Collections.Iterable<T0> input,fn<T0,T1> action) -> noresult
 M00000019_IL_0000:
 M00000019_IL_0001:
 ldarg 0
@@ -204,7 +204,7 @@ ldarg 0
 M0000001a_IL_000e:
 ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65637453657175656E63656032<T0,T1>::callback
 M0000001a_IL_0013:
-newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::.ctor(System.Collections.Iterator<T0>,System.Func<T0,T1>)
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::.ctor(System.Collections.Iterator<T0>,fn<T0,T1>)
 M0000001a_IL_0018:
 ret
 .end
@@ -348,8 +348,8 @@ ret
 .sealed
 .implements System.Collections.Iterable<T1>
 .field private source System.Collections.Iterable<T0>
-.field private callback System.Func<T0,System.Collections.Iterable<T1>>
-.method instance .ctor(System.Collections.Iterable<T0> input,System.Func<T0,System.Collections.Iterable<T1>> selector) -> noresult
+.field private callback fn<T0,System.Collections.Iterable<T1>>
+.method instance .ctor(System.Collections.Iterable<T0> input,fn<T0,System.Collections.Iterable<T1>> selector) -> noresult
 M00000021_IL_0000:
 M00000021_IL_0001:
 ldarg 0
@@ -384,7 +384,7 @@ ldarg 0
 M00000022_IL_0009:
 ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D617053657175656E63656032<T0,T1>::callback
 M00000022_IL_000e:
-newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D61704974657261746F726032<T0,T1>::.ctor(System.Collections.Iterable<T0>,System.Func<T0,System.Collections.Iterable<T1>>)
+newobj instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D61704974657261746F726032<T0,T1>::.ctor(System.Collections.Iterable<T0>,fn<T0,System.Collections.Iterable<T1>>)
 M00000022_IL_0013:
 ret
 .end
@@ -655,14 +655,14 @@ ret
 .implements System.Collections.Iterator<T0>
 .implements System.Disposable
 .field private source System.Collections.Iterator<T0>
-.field private callback System.Func<T0,Boolean>
+.field private callback fn<T0,Boolean>
 .field private cached arrayref<T0>
 .field private active Boolean
 .field private finished Boolean
 .property instance Current() -> T0
 .get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572654974657261746F726031<T0>::get_Current()
 .end
-.method instance .ctor(System.Collections.Iterator<T0> input,System.Func<T0,Boolean> action) -> noresult
+.method instance .ctor(System.Collections.Iterator<T0> input,fn<T0,Boolean> action) -> noresult
 M00000027_IL_0000:
 M00000027_IL_0001:
 ldarg 0
@@ -768,7 +768,7 @@ ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E57686572
 M00000028_IL_0049:
 ldloc local0
 M00000028_IL_004a:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.Linq.Operators.RuntimeBooleanToInt32(Boolean)
 M00000028_IL_004f:
 brtrue M00000028_IL_0059
@@ -908,14 +908,14 @@ ret
 .implements System.Collections.Iterator<T1>
 .implements System.Disposable
 .field private source System.Collections.Iterator<T0>
-.field private callback System.Func<T0,T1>
+.field private callback fn<T0,T1>
 .field private cached arrayref<T1>
 .field private active Boolean
 .field private finished Boolean
 .property instance Current() -> T1
 .get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C6563744974657261746F726032<T0,T1>::get_Current()
 .end
-.method instance .ctor(System.Collections.Iterator<T0> input,System.Func<T0,T1> action) -> noresult
+.method instance .ctor(System.Collections.Iterator<T0> input,fn<T0,T1> action) -> noresult
 M0000002b_IL_0000:
 M0000002b_IL_0001:
 ldarg 0
@@ -1020,7 +1020,7 @@ ldfld neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E53656C65
 M0000002c_IL_0048:
 callvirt instance System.Collections.Iterator<T0>::get_Current()
 M0000002c_IL_004d:
-callvirt instance System.Func<T0,T1>::Invoke(T0)
+callvirt instance fn<T0,T1>::Invoke(T0)
 M0000002c_IL_0052:
 stelem T1
 M0000002c_IL_0057:
@@ -2299,7 +2299,7 @@ ret
 .implements System.Collections.Iterator<T1>
 .implements System.Disposable
 .field private input System.Collections.Iterable<T0>
-.field private callback System.Func<T0,System.Collections.Iterable<T1>>
+.field private callback fn<T0,System.Collections.Iterable<T1>>
 .field private outer arrayref<System.Collections.Iterator<T0>>
 .field private inner arrayref<System.Collections.Iterator<T1>>
 .field private cached arrayref<T1>
@@ -2308,7 +2308,7 @@ ret
 .property instance Current() -> T1
 .get instance neoCLR.Library.System.Linq.Operators.Type_53797374656D2E4C696E712E466C61744D61704974657261746F726032<T0,T1>::get_Current()
 .end
-.method instance .ctor(System.Collections.Iterable<T0> source,System.Func<T0,System.Collections.Iterable<T1>> selector) -> noresult
+.method instance .ctor(System.Collections.Iterable<T0> source,fn<T0,System.Collections.Iterable<T1>> selector) -> noresult
 M0000003b_IL_0000:
 M0000003b_IL_0001:
 ldarg 0
@@ -2592,7 +2592,7 @@ ldelem System.Collections.Iterator<T0>
 M0000003c_IL_010a:
 callvirt instance System.Collections.Iterator<T0>::get_Current()
 M0000003c_IL_010f:
-callvirt instance System.Func<T0,System.Collections.Iterable<T1>>::Invoke(T0)
+callvirt instance fn<T0,System.Collections.Iterable<T1>>::Invoke(T0)
 M0000003c_IL_0114:
 stloc local0
 M0000003c_IL_0115:

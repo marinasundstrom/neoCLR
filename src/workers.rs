@@ -143,7 +143,7 @@ impl Workers {
                 "Worker submission limit exceeded (64 per invocation)",
             ));
         }
-        let [Value::Delegate(callback), Value::String(input)] = args.as_slice() else {
+        let [Value::Function(callback), Value::String(input)] = args.as_slice() else {
             return Err(Fault::new(
                 "Worker requires a static String-to-String callback and input",
             ));
@@ -251,12 +251,12 @@ impl Workers {
     // Experimental notification path. It retains the callback until the VM
     // transfers it into a TaskQueue.Post frame; no guest Value enters a worker.
     pub(crate) fn notify(&mut self, args: Vec<Value>) -> Result<Value, Fault> {
-        let [Value::Int32(id), callback @ Value::Delegate(_)] = args.as_slice() else {
+        let [Value::Int32(id), callback @ Value::Function(_)] = args.as_slice() else {
             return Err(Fault::new(
                 "Worker notification requires a handle and callback",
             ));
         };
-        if callback.ty() != crate::assembler::parse_type("System.Func<Void>")? {
+        if callback.ty() != crate::assembler::parse_type("fn<Void>")? {
             return Err(Fault::new(
                 "Worker notification callback must be Func<Void>",
             ));

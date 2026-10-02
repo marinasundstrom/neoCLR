@@ -9975,3 +9975,27 @@ Raven 5bc0d567e), then implemented nested declaration ownership with CLR/native 
 returning 42. The unchanged collections application still requires nested imports and
 further native codegen/dependency support; its successful execution is not yet reported.
 See the [metadata design checkpoints](design/extended-cli-metadata.md).
+
+The author subsequently requested that neoCLR also have a `codex` structural-types
+branch on top of main. Preserve the existing Function implementation/history on
+`codex/structural-types`, merge the Self-integrated main, validate its structural
+ABI, and retire the old branch name after remote synchronization. The author's
+uncommitted structural-types proposal remains outside these integration commits.
+
+
+## 2026-10-02 — Reuse the Function feature branches
+
+**Author:** “We should perhaps also think whether we should try to implement function
+types for the neoCLR target. We already have branches for that” and “We can integrate
+compiler and runtime work.”
+
+**Assistant proposal/action:** inspected neoCLR codex/structural-types (a081c6e3) and
+Raven codex/neoclr-structural-types (b92a0d4a7). The runtime branch already implements
+structural Function shapes, checked binding, retained captures and a migrated library;
+the current Raven metadata branch already contains the target's inhabited-result policy.
+Integrated the runtime feature work into codex/extended-cli-metadata, retaining System.Fail
+and the metadata branch's PE loader and constructor/byref changes. Regenerated the library
+and reference bundle and ran focused runtime/metadata checks. This is feature-branch
+integration, not a main merge or a declaration that direct native Raven callback emission
+is complete. Next: expose Function signatures and binding through the metadata API and
+shared compiler emission plan, then run the unchanged broad collections sample directly.

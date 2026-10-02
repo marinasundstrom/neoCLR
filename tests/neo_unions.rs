@@ -142,7 +142,7 @@ fn union_name_can_be_shadowed_by_a_callable_local() {
         r#"
 union Choice { case Number(value: int) }
 func Main() -> int {
-    let Choice: System.Func<int,int> = value => value + 1
+    let Choice: fn<int,int> = value => value + 1
     return Choice(41)
 }
 "#,

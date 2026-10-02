@@ -7,6 +7,57 @@ foundation sweep. Useful API coverage is now selected in the
 expansion below remains deferred unless that work exposes a concrete dependency
 or later author direction selects it.
 
+## Function types and objects — 2026-09-28
+
+**Structural replacement implemented and validated on the feature branch.**
+The author directs structural Function types describing callable shape, Function
+objects holding the invocation target, removal of delegates, and a
+`NominalTypeInfo`/`TypeInfo.IsNominalType` split. Named function types may follow
+later. The author proposes distinct nominal function types inheriting an explicitly
+eligible structural Function shape, without direct conversion between different
+nominal types merely because their signatures match. Non-nominal types are not
+generally inheritable.
+The [design and migration plan](../function-types.md) separates author decisions
+from assistant recommendations and records the existing execution/introspection
+dependencies. Native structural shape identity and checked Function binding/Invoke
+now run without a nominal declaration; [focused tests](../../tests/function_types.rs)
+cover substitution, artifacts, captures and signature rejection. Legacy delegate declarations and binding encodings are now rejected. The Raven descriptor API now separates
+TypeInfo (DisplayName/IsNominalType/IsFunctionType) from NominalTypeInfo (declaration metadata);
+[executable and negative cases](../experiments/function-types/README.md) cover this split.
+Library callback source and imported signatures now use structural Function shapes;
+runtime Func declarations are removed. CLI delegate metadata remains an explicitly
+bounded compiler transport. Function/extension and Task.Run/async consumers execute with the independently
+fixed Raven generic-construction binder.
+
+The bounded object contract compares shape/target/receiver, shares captures, uses
+null defaults and checks constructor initialization. FunctionTypeInfo describes one
+specific signature: InvokeMethod and GetMethods expose its synthesized public
+instance Invoke, distinct from an object's bound target. Module/token metadata is
+optional for members and parameters, and MethodInfo.DefinitionIndex is optional.
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
+
+Function objects now expose Function: MethodInfo for the closed bound target and
+inherit Object without becoming nominal. Object views preserve GetType, exact-shape
+cast-back, value equality/hash and diagnostic qualified-target ToString. Copies
+preserve reference identity; separate equal bindings have distinct reference identity.
+GetProperties exposes Function; GetMethods also exposes its getter and Object
+overrides. Dynamic invocation of synthetic reflection descriptors and general
+structural member enumeration remain follow-up work. Current member/extension
+documentation includes the manual Function family page and generated FunctionTypeInfo
+reference; a general RavenDoc structural renderer remains future work.
+
+Validation: the replacement checkpoint passed 157 native cases and twelve Raven
+checks. The descriptor/OfType follow-up passes sixty selected native cases and thirteen
+Raven checks, plus the six migrated reflection consumers. Matching API/bootstrap
+snapshots and the earlier unaffected GC/queue/debugger evidence remain recorded.
+See the [evidence record](../experiments/function-types/README.md). Subsequent work
+returns to the active roadmap milestone unless directed otherwise.
+Other structural families are direction, not part of this Function replacement's
+completion claim. Acceptance requires the full migration and focused positive and
+negative cases listed in the plan; a renamed delegate carrier is insufficient.
+
 ## Value tuples — 2026-09-28
 
 Author-selected naming and capability: `System.Tuple` corresponds to .NET's value

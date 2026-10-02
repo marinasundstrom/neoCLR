@@ -1,5 +1,5 @@
 ; Generated from runtime/raven/src/System/OptionOperators.rvn. Regenerate with build_runtime_library.py.
-.method static Map<T0,T1>(System.Option<T0> self,System.Func<T0,T1> mapper) -> System.Option<T1>
+.method static Map<T0,T1>(System.Option<T0> self,fn<T0,T1> mapper) -> System.Option<T1>
 .local System.Option<T0> local0
 .local System.Option<T1> local1
 .local T0 local2
@@ -61,7 +61,7 @@ ldarg 1
 M00000001_IL_003b:
 ldloc local2
 M00000001_IL_003c:
-callvirt instance System.Func<T0,T1>::Invoke(T0)
+callvirt instance fn<T0,T1>::Invoke(T0)
 M00000001_IL_0041:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion3<T1>(T1)
 M00000001_IL_0046:
@@ -111,7 +111,7 @@ ldloc local1
 M00000001_IL_008a:
 ret
 .end
-.method static Then<T0,T1>(System.Option<T0> self,System.Func<T0,System.Option<T1>> binder) -> System.Option<T1>
+.method static Then<T0,T1>(System.Option<T0> self,fn<T0,System.Option<T1>> binder) -> System.Option<T1>
 .local System.Option<T0> local0
 .local System.Option<T1> local1
 .local T0 local2
@@ -173,7 +173,7 @@ ldarg 1
 M00000002_IL_003b:
 ldloc local2
 M00000002_IL_003c:
-callvirt instance System.Func<T0,System.Option<T1>>::Invoke(T0)
+callvirt instance fn<T0,System.Option<T1>>::Invoke(T0)
 M00000002_IL_0041:
 stloc local1
 M00000002_IL_0042:
@@ -219,7 +219,7 @@ ldloc local1
 M00000002_IL_0080:
 ret
 .end
-.method static Filter<T0>(System.Option<T0> self,System.Func<T0,Boolean> predicate) -> System.Option<T0>
+.method static Filter<T0>(System.Option<T0> self,fn<T0,Boolean> predicate) -> System.Option<T0>
 .local T0 local0
 .local System.Option<T0> local1
 .local System.Option.Some<T0> local2
@@ -262,7 +262,7 @@ ldarg 1
 M00000003_IL_0035:
 ldloc local0
 M00000003_IL_0036:
-callvirt instance System.Func<T0,Boolean>::Invoke(T0)
+callvirt instance fn<T0,Boolean>::Invoke(T0)
 call neoCLR.Library.System.OptionOperators.RuntimeBooleanToInt32(Boolean)
 M00000003_IL_003b:
 brtrue M00000003_IL_0045
@@ -282,7 +282,7 @@ call neoCLR.Library.System.OptionOperators.RuntimeUnion7<T0>(System.Option.None)
 M00000003_IL_0054:
 ret
 .end
-.method static OrElse<T0>(System.Option<T0> self,System.Func<System.Option<T0>> alternative) -> System.Option<T0>
+.method static OrElse<T0>(System.Option<T0> self,fn<System.Option<T0>> alternative) -> System.Option<T0>
 .local System.Option<T0> local0
 .local System.Option<T0> local1
 .local System.Option<T0> local2
@@ -368,7 +368,7 @@ br M00000004_IL_0063
 M00000004_IL_0063:
 ldarg 1
 M00000004_IL_0064:
-callvirt instance System.Func<System.Option<T0>>::Invoke()
+callvirt instance fn<System.Option<T0>>::Invoke()
 M00000004_IL_0069:
 stloc local1
 M00000004_IL_006a:
@@ -385,7 +385,7 @@ ldloc local1
 M00000004_IL_0076:
 ret
 .end
-.method static UnwrapOrElse<T0>(System.Option<T0> self,System.Func<T0> factory) -> T0
+.method static UnwrapOrElse<T0>(System.Option<T0> self,fn<T0> factory) -> T0
 .local System.Option<T0> local0
 .local T0 local1
 .local T0 local2
@@ -466,7 +466,7 @@ br M00000005_IL_005b
 M00000005_IL_005b:
 ldarg 1
 M00000005_IL_005c:
-callvirt instance System.Func<T0>::Invoke()
+callvirt instance fn<T0>::Invoke()
 M00000005_IL_0061:
 stloc local1
 M00000005_IL_0062:
@@ -579,7 +579,7 @@ ldloc local1
 M00000006_IL_0069:
 ret
 .end
-.method static Match<T0,T1>(System.Option<T0> self,System.Func<T0,T1> some,System.Func<T1> none) -> T1
+.method static Match<T0,T1>(System.Option<T0> self,fn<T0,T1> some,fn<T1> none) -> T1
 .local System.Option<T0> local0
 .local T1 local1
 .local T0 local2
@@ -635,7 +635,7 @@ ldarg 1
 M00000007_IL_0033:
 ldloc local2
 M00000007_IL_0034:
-callvirt instance System.Func<T0,T1>::Invoke(T0)
+callvirt instance fn<T0,T1>::Invoke(T0)
 M00000007_IL_0039:
 stloc local1
 M00000007_IL_003a:
@@ -664,7 +664,7 @@ br M00000007_IL_0061
 M00000007_IL_0061:
 ldarg 2
 M00000007_IL_0062:
-callvirt instance System.Func<T1>::Invoke()
+callvirt instance fn<T1>::Invoke()
 M00000007_IL_0067:
 stloc local1
 M00000007_IL_0068:
@@ -681,7 +681,7 @@ ldloc local1
 M00000007_IL_0074:
 ret
 .end
-.method static Tap<T0>(System.Option<T0> self,System.Func<T0,Void> action) -> System.Option<T0>
+.method static Tap<T0>(System.Option<T0> self,fn<T0,Void> action) -> System.Option<T0>
 .local T0 local0
 .local System.Option<T0> local1
 .local System.Option.Some<T0> local2
@@ -724,7 +724,7 @@ ldarg 1
 M00000008_IL_0035:
 ldloc local0
 M00000008_IL_0036:
-callvirt instance System.Func<T0,Void>::Invoke(T0)
+callvirt instance fn<T0,Void>::Invoke(T0)
 M00000008_IL_003b:
 pop
 M00000008_IL_003c:
@@ -734,7 +734,7 @@ ldarg 0
 M00000008_IL_003f:
 ret
 .end
-.method static TapNone<T0>(System.Option<T0> self,System.Func<Void> action) -> System.Option<T0>
+.method static TapNone<T0>(System.Option<T0> self,fn<Void> action) -> System.Option<T0>
 .local System.Option<T0> local0
 .local System.Option.None local1
 ldloca local0
@@ -767,7 +767,7 @@ br M00000009_IL_002c
 M00000009_IL_0025:
 ldarg 1
 M00000009_IL_0026:
-callvirt instance System.Func<Void>::Invoke()
+callvirt instance fn<Void>::Invoke()
 M00000009_IL_002b:
 pop
 M00000009_IL_002c:
@@ -835,7 +835,7 @@ ldloc local0
 M0000000a_IL_0044:
 ret
 .end
-.method static ThenResult<T0,T1,T2>(System.Option<T0> self,System.Func<T0,System.Result<T1,T2>> binder,System.Func<T2> noneError) -> System.Result<T1,T2>
+.method static ThenResult<T0,T1,T2>(System.Option<T0> self,fn<T0,System.Result<T1,T2>> binder,fn<T2> noneError) -> System.Result<T1,T2>
 .local System.Option<T0> local0
 .local System.Result<T1,T2> local1
 .local T0 local2
@@ -897,7 +897,7 @@ ldarg 1
 M0000000b_IL_003b:
 ldloc local2
 M0000000b_IL_003c:
-callvirt instance System.Func<T0,System.Result<T1,T2>>::Invoke(T0)
+callvirt instance fn<T0,System.Result<T1,T2>>::Invoke(T0)
 M0000000b_IL_0041:
 stloc local1
 M0000000b_IL_0042:
@@ -926,7 +926,7 @@ br M0000000b_IL_0069
 M0000000b_IL_0069:
 ldarg 2
 M0000000b_IL_006a:
-callvirt instance System.Func<T2>::Invoke()
+callvirt instance fn<T2>::Invoke()
 M0000000b_IL_006f:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
 M0000000b_IL_0074:
@@ -947,7 +947,7 @@ ldloc local1
 M0000000b_IL_0086:
 ret
 .end
-.method static MapResult<T0,T1,T2>(System.Option<T0> self,System.Func<T0,T1> mapper,System.Func<T2> noneError) -> System.Result<T1,T2>
+.method static MapResult<T0,T1,T2>(System.Option<T0> self,fn<T0,T1> mapper,fn<T2> noneError) -> System.Result<T1,T2>
 .local System.Option<T0> local0
 .local System.Result<T1,T2> local1
 .local T0 local2
@@ -1009,7 +1009,7 @@ ldarg 1
 M0000000c_IL_003b:
 ldloc local2
 M0000000c_IL_003c:
-callvirt instance System.Func<T0,T1>::Invoke(T0)
+callvirt instance fn<T0,T1>::Invoke(T0)
 M0000000c_IL_0041:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion10<T1>(T1)
 M0000000c_IL_0046:
@@ -1042,7 +1042,7 @@ br M0000000c_IL_0073
 M0000000c_IL_0073:
 ldarg 2
 M0000000c_IL_0074:
-callvirt instance System.Func<T2>::Invoke()
+callvirt instance fn<T2>::Invoke()
 M0000000c_IL_0079:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion8<T2>(T2)
 M0000000c_IL_007e:
@@ -1173,7 +1173,7 @@ ldloc local1
 M0000000d_IL_0085:
 ret
 .end
-.method static OkOr<T0,T1>(System.Option<T0> self,System.Func<T1> errorFactory) -> System.Result<T0,T1>
+.method static OkOr<T0,T1>(System.Option<T0> self,fn<T1> errorFactory) -> System.Result<T0,T1>
 .local System.Option<T0> local0
 .local System.Result<T0,T1> local1
 .local T0 local2
@@ -1264,7 +1264,7 @@ br M0000000e_IL_006d
 M0000000e_IL_006d:
 ldarg 1
 M0000000e_IL_006e:
-callvirt instance System.Func<T1>::Invoke()
+callvirt instance fn<T1>::Invoke()
 M0000000e_IL_0073:
 call neoCLR.Library.System.OptionOperators.RuntimeUnion14<T1>(T1)
 M0000000e_IL_0078:

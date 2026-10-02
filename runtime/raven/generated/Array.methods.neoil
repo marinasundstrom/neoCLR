@@ -81,7 +81,7 @@ M00000005_IL_000f:
 M00000005_IL_0010:
 ret
 .end
-.method instance ForEach(System.Func<T0,Void> action) -> noresult
+.method instance ForEach(fn<T0,Void> action) -> noresult
 .local arrayref<T0> local0
 .local Int32 local1
 ldloca local0
@@ -126,7 +126,7 @@ ldloc local1
 M00000006_IL_0025:
 ldelem T0
 M00000006_IL_002a:
-callvirt instance System.Func<T0,Void>::Invoke(T0)
+callvirt instance fn<T0,Void>::Invoke(T0)
 M00000006_IL_002f:
 pop
 M00000006_IL_0030:

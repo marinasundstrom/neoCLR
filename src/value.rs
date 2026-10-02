@@ -4,7 +4,7 @@ use crate::metadata::Type;
 pub enum Value {
     /// Internal reserved array slot; guest element reads fault until initialized.
     Uninitialized(Type),
-    Delegate(crate::Delegate),
+    Function(crate::Function),
     Void,
     Single(f32),
     Double(f64),
@@ -102,7 +102,7 @@ impl Value {
         while let Some(value) = pending.pop() {
             match value {
                 Self::ObjectReference(object) => object.reference.assigned()?,
-                Self::Delegate(d) => pending.extend(d.receiver.as_deref()),
+                Self::Function(d) => pending.extend(d.receiver.as_deref()),
                 Self::SlotReference(reference)
                 | Self::SlotInterface {
                     receiver: reference,
@@ -167,7 +167,13 @@ impl Value {
     pub fn ty(&self) -> Type {
         match self {
             Self::Uninitialized(ty) => ty.clone(),
-            Self::Delegate(d) => d.ty.clone(),
+            Self::Function(d) => {
+                if d.object_view {
+                    Type::from_name("System.Object")
+                } else {
+                    d.ty.clone()
+                }
+            }
             Self::Void => Type::Void,
             Self::Single(_) => Type::Single,
             Self::Double(_) => Type::Double,
@@ -238,6 +244,10 @@ impl Value {
                     object.reference.assigned()?;
                     object.view = Some(ty.clone());
                     return Ok(Self::ObjectReference(object));
+                }
+                Self::Function(mut binding) if *ty == Type::from_name("System.Object") => {
+                    binding.object_view = true;
+                    return Ok(Self::Function(binding));
                 }
                 Self::NullObjectReference(_) => return Ok(Self::NullObjectReference(ty.clone())),
                 other => return other.for_storage(ty),

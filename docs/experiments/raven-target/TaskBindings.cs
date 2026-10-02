@@ -161,7 +161,7 @@ static class TaskBindings
             ("TaskQueue", "get_Default") => ("", Queue),
             ("TaskQueue", "get_Current") when library => ("", Queue),
             ("TaskQueue", ".ctor") => ("", "noresult"),
-            ("TaskQueue", "Post" or "Run") => ("System.Func<Void>", "noresult"),
+            ("TaskQueue", "Post" or "Run") => ("fn<Void>", "noresult"),
             ("TaskQueue", "Drain") => ("", "noresult"),
             ("Task", ".ctor") => (Prefix + "Promise<" + payload + ">", "noresult"),
             ("Task", "get_State") => ("", EnumBindings.TaskState),
@@ -170,7 +170,7 @@ static class TaskBindings
             ("Task" or "Promise", "Dispatcher") when library => ("", Queue),
             ("Task", "GetAwaiter") => ("", owner),
             ("Task", "GetResult") => ("", payload),
-            ("Task", "OnCompleted") => ("System.Func<Void>", "noresult"),
+            ("Task", "OnCompleted") => ("fn<Void>", "noresult"),
             ("Promise", ".ctor") when definition.Parameters.Count == 0 => ("", "noresult"),
             ("Promise", ".ctor") => (Queue, "noresult"),
             ("Promise", "get_Task") => ("", Prefix + "Task<" + payload + ">"),
@@ -178,7 +178,7 @@ static class TaskBindings
             ("Promise", "Complete") => (payload, "Boolean"),
             ("Promise", "Completed" or "Cancelled") when library => ("", "Boolean"),
             ("Promise", "Read") when library => ("", payload),
-            ("Promise", "Register") when library => ("System.Func<Void>", "noresult"),
+            ("Promise", "Register") when library => ("fn<Void>", "noresult"),
             _ => throw new InvalidDataException("Unsupported Task member: " + definition.FullName)
         };
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
@@ -208,8 +208,8 @@ static class TaskBindings
         var (args, result) = RuntimeSignatures.Match(reference, definition, GenericUnionBindings.Type,
             allowOpenMethodParameters: library || GenericUnionBindings.ParameterMap is not null);
         if (args.Length != 1 || result != Prefix + "Task<" + payload + ">"
-            || (args[0] != "System.Func<" + payload + ">"
-                && (generic is null || args[0] != "System.Func<" + result + ">")))
+            || (args[0] != "fn<" + payload + ">"
+                && (generic is null || args[0] != "fn<" + result + ">")))
             throw new InvalidDataException("Unsupported Task.Run signature.");
         var method = "Run" + (generic is null ? "" : "<" + payload + ">");
         return new(args, result, $"call {Prefix}Task::{method}({args[0]})");

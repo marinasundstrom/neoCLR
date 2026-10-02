@@ -1,5 +1,9 @@
 # Local SDK snapshot — 27 September 2026
 
+For the newer Function types build, see [the 30 September local setup](local-function-types-build.md).
+The snapshot below remains the historical HTTP/JSON installation.
+
+
 Installed local development tools, not a published release:
 
 - Raven SDK and VS Code extension: `0.1.12-neoclr.20260927.cpu1`.

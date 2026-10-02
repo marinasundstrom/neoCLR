@@ -66,7 +66,7 @@ fn library() -> &'static crate::Module {
             .args(["-c", "import runpy; m=runpy.run_path('docs/experiments/raven-target/collection_library.py'); print(m['build'](m['ROOT'] / 'runtime/System.neoil'))"])
             .output().unwrap();
         assert!(output.status.success());
-        let source = String::from_utf8(output.stdout).unwrap() + "\n.function neoCLR.Runtime.TestSocketReceive(arrayref<Byte> destination,Int32 offset,Int32 count,System.Func<Void> callback) -> Void\n.methodimpl InternalCall\n.end\n";
+        let source = String::from_utf8(output.stdout).unwrap() + "\n.function neoCLR.Runtime.TestSocketReceive(arrayref<Byte> destination,Int32 offset,Int32 count,fn<Void> callback) -> Void\n.methodimpl InternalCall\n.end\n";
         crate::assemble(&source).unwrap()
     })
 }
@@ -108,8 +108,8 @@ ldc.i4 72
 beq Done
 call System.Tasks.TaskQueue::get_Default()
 ldarg this
-delegate.bind System.Func<Void> = instance SocketCompletion::Busy()
-call instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+function.bind fn<Void> = instance SocketCompletion::Busy()
+call instance System.Tasks.TaskQueue::Post(fn<Void>)
 Done:
 ldvoid
 ret
@@ -139,8 +139,8 @@ ldc.i4 1
 ldc.i4 1
 ldloc buffer
 newobj SocketCompletion
-delegate.bind System.Func<Void> = instance SocketCompletion::Complete()
-call neoCLR.Runtime.TestSocketReceive(arrayref<Byte>,Int32,Int32,System.Func<Void>)
+function.bind fn<Void> = instance SocketCompletion::Complete()
+call neoCLR.Runtime.TestSocketReceive(arrayref<Byte>,Int32,Int32,fn<Void>)
 pop
 ldvoid
 ret
@@ -231,7 +231,7 @@ fn tcp_completion_survives_both_vm_collection_paths_and_empty_queue_wait() {
             assert_eq!(peer.read(&mut [0]).unwrap(), 0);
         });
         let body = format!(
-            ".local Int32 index\ncall Launch()\npop\n{PRESSURE}\ncall System.Tasks.TaskQueue::get_Default()\ndelegate.bind System.Func<Void> = Ready()\ncall instance System.Tasks.TaskQueue::Post(System.Func<Void>)\nldstr \"entry\""
+            ".local Int32 index\ncall Launch()\npop\n{PRESSURE}\ncall System.Tasks.TaskQueue::get_Default()\nfunction.bind fn<Void> = Ready()\ncall instance System.Tasks.TaskQueue::Post(fn<Void>)\nldstr \"entry\""
         );
         let result = execute(
             &body,
@@ -300,9 +300,8 @@ fn socket_completes_while_default_queue_remains_busy() {
         begin.recv().unwrap();
         peer.write_all(b"H").unwrap();
     });
-    let launch =
-        "call neoCLR.Runtime.TestSocketReceive(arrayref<Byte>,Int32,Int32,System.Func<Void>)\npop";
-    let types = TYPES.replace(launch, &(launch.to_string() + "\ncall System.Tasks.TaskQueue::get_Default()\nldloc buffer\nnewobj SocketCompletion\ndelegate.bind System.Func<Void> = instance SocketCompletion::Busy()\ncall instance System.Tasks.TaskQueue::Post(System.Func<Void>)"));
+    let launch = "call neoCLR.Runtime.TestSocketReceive(arrayref<Byte>,Int32,Int32,fn<Void>)\npop";
+    let types = TYPES.replace(launch, &(launch.to_string() + "\ncall System.Tasks.TaskQueue::get_Default()\nldloc buffer\nnewobj SocketCompletion\nfunction.bind fn<Void> = instance SocketCompletion::Busy()\ncall instance System.Tasks.TaskQueue::Post(fn<Void>)"));
     let result = execute_types(
         "call Launch()\npop\ncall Ready()\npop\nldstr \"entry\"",
         crate::ExecutionOptions {
@@ -385,7 +384,7 @@ fn pending_worker_does_not_prevent_socket_dispatch() {
     });
     let types = TYPES.to_string()
         + "\n.function Spin(String input) -> String\nAgain:\nbr Again\n.end\n.function WorkerDone() -> Void\nldvoid\nret\n.end\n";
-    let body = "call Launch()\npop\ndelegate.bind System.Func<String,String> = Spin(String)\nldstr \"\"\ncall neoCLR.Runtime.StartWorker(System.Func<String,String>,String)\ndelegate.bind System.Func<Void> = WorkerDone()\ncall neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop\ncall Ready()\npop\nldstr \"entry\"";
+    let body = "call Launch()\npop\nfunction.bind fn<String,String> = Spin(String)\nldstr \"\"\ncall neoCLR.Runtime.StartWorker(fn<String,String>,String)\nfunction.bind fn<Void> = WorkerDone()\ncall neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop\ncall Ready()\npop\nldstr \"entry\"";
     let fault = execute_types(
         body,
         crate::ExecutionOptions {

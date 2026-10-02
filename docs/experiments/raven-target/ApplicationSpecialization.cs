@@ -32,6 +32,19 @@ sealed class ApplicationSpecialization(ModuleDefinition core, IEnumerable<Module
     MethodDefinition Specialize(GenericInstanceMethod call)
     {
         var source = call.Resolve();
+        // Cecil may classify the target's inhabited System.Void token as CLI VOID.
+        // Normalize only closed generic storage from this exact empty target type;
+        // literal no-result returns and foreign/malformed void arguments stay distinct.
+        for (var index = 0; index < call.GenericArguments.Count; index++)
+        {
+            var argument = call.GenericArguments[index];
+            if (argument.MetadataType == MetadataType.Void && argument.FullName == "System.Void"
+                && argument.IsValueType && RuntimeSignatures.IsCore(argument.Scope)
+                && argument.Resolve() is { IsValueType: true } definition
+                && definition.Module.Assembly.Name.FullName == core.Assembly.Name.FullName
+                && !definition.Fields.Any(field => !field.IsStatic))
+                call.GenericArguments[index] = new TypeReference("System", "Void", source.Module, argument.Scope, true);
+        }
         var key = source.Module.Mvid + ":" + call.FullName + ":" +
             string.Join(";", call.GenericArguments.Select(MetadataIdentity.TypeKey));
         if (copies.TryGetValue(key, out var previous)) return previous;

@@ -5,6 +5,9 @@ use crate::{
 };
 
 pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
+    if matches!(ty, Type::Function(_)) {
+        return Ok(Some(Type::from_name("System.Object")));
+    }
     let Some(definition) = module.type_definition(ty) else {
         return Ok(None);
     };
@@ -155,6 +158,10 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
 
 /// Only same-type or ancestor projections; no downcasts or value slicing.
 pub(crate) fn require_base(module: &Module, from: &Type, to: &Type) -> Result<(), Fault> {
+    if matches!(from, Type::Function(_)) && (from == to || *to == Type::from_name("System.Object"))
+    {
+        return Ok(());
+    }
     if lineage(module, from)?.contains(to) {
         Ok(())
     } else {
@@ -227,7 +234,7 @@ fn validate_methods(module: &Module) -> Result<(), Fault> {
     }
     for method in &module.functions {
         if crate::interfaces::is_contract(module, method)
-            || crate::delegates::is_contract(module, method)
+            || crate::function_objects::is_contract(module, method)
         {
             continue;
         }

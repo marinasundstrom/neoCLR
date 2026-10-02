@@ -31,10 +31,18 @@ extension signature `static func self`; both overloads and their XML description
 remain present. The [manual reflection guide](reflection.md)
 provides the intended Invoke spelling. This renderer naming limitation adds no exclusion.
 
-Development adds the lazy `System.Linq.Operators.OfType<T, U>` extension, written
-`source.OfType<U>()`. Its XML member entry and matching reference document filtering,
-ordering, disposal and the existing Object conversion limits. Function syntax in
-Raven library callbacks remains backed by main's nominal Func metadata contracts.
+The Function descriptor slice includes FunctionTypeInfo.InvokeMethod and
+TypeInfo.IsFunctionType in the generated reference. The [Function family page](functions.md)
+documents synthetic Invoke, optional declaration metadata and the dynamic invocation
+limit. The API browser now includes authored Array, Function, Tuple, Union and
+Intersection family pages through RavenDoc's existing table-of-contents support.
+Current nominal Tuple/union declarations and proposed structural forms are explicitly
+distinguished. Automatic extraction of arbitrary structural shape members remains
+future publisher work; the authored family member references cover current APIs.
+
+Development FunctionTypeInfo also exposes Parameters and ReturnType directly.
+InvokeMethod remains the member-reflection view; no generalized function-info
+interface is introduced.
 
 Development (2026-10-02) renames the terminal namespace function to `System.Fail`.
 The selected namespace container and XML member entry include the new name; host Fault
@@ -116,7 +124,7 @@ including String construction and its read-only grapheme indexer. String Count i
 an explicit Collection implementation, visible through Sequence/Collection only.
 
 The current audit covers every public reference type through generated type pages,
-three explicit manual entries and ten explicitly excluded metadata scaffolds. Collections, arrays, delegates, query operators,
+explicit manual entries and explicitly excluded metadata scaffolds. Collections, arrays, functions, query operators,
 Option/Result, TaskOutcome, numeric types, text/encoding, environment, time/calendar,
 resource capabilities and interop now have type/member descriptions. Compiler-reference
 scaffolds are identified as such; they do not promise executable CLR services.
@@ -413,13 +421,13 @@ automatic public type selection. [The guide](tuples.md) records the bounded surf
 and naming difference from .NET. TupleElementNamesAttribute is a compiler-reference
 scaffold with an exact exclusion, not an executable guest API.
 
-## Native Self integration
+### Structural family documentation direction (2026-09-28)
 
 The development reference exposes nongeneric System.Number and System.Clonable,
 using the fieldless Self transport marker for implementing-type signatures.
 These APIs require matching Raven neoCLR target settings and the updated runtime.
-Structural Function metadata remains excluded from main. The snapshot is rebuilt
-from the nominal main-based bridge, not copied from the Function feature branch.
+Structural Function metadata remains excluded from main. On codex/extended-cli-metadata,
+the snapshot is now regenerated from the merged Function bridge with System.Fail preserved.
 
 ## Experimental .NET metadata tooling (2026-09-30)
 
@@ -665,3 +673,28 @@ They remain host C# APIs outside the guest RavenDoc selection.
 
 The same host manual covers ImportedTypeReference.DeclaringType and
 AddNestedGenericValueType; neither is a guest RavenDoc API.
+
+Structural types can have members and extension members without a declared type
+name. TypeInfo member queries remain common; NominalTypeInfo adds declaration
+identity. Future RavenDoc support should describe Array, Tuple, Union, Intersection
+and Function families, including their members, extensions and shape signatures,
+with ordinary API-reference detail. Family page titles and navigation keys are
+documentation identities, not synthesized nominal type names. The current snapshot
+covers the implemented common/nominal interfaces; generic structural-family rendering
+remains open. See [the Function design](../docs/function-types.md#structural-members-and-documentation).
+
+The Function family's current manual member reference is [functions.md](functions.md).
+CLI Delegate/MulticastDelegate, Func (one through five generic arguments) and
+Action (zero through four arguments) remain in the complete reference inventory
+but have explicit scaffold exclusions: they carry compiler metadata and do not
+define nominal runtime types. Their public callback signatures remain documented
+under their actual CLI IDs. Their target-only synthesized Function property is
+documented in the manual Function family page, including MethodInfo results and
+GetProperties/GetMethods discovery. This is distinct from omitting a runtime API.
+
+
+The development Number reference is nongeneric and uses the public fieldless
+`System.Runtime.CompilerServices.Self` transport marker. Both types are included
+in the inventory and XML documentation. RavenDoc displays that metadata marker;
+[text and numbers](text-numbers.md) explains Raven's `Self` spelling and migration.
+The marker is not an executable CLR API or a native value constructor.

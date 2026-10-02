@@ -99,7 +99,7 @@ impl Invocation {
         }
         // A real bridge must also bind/validate the callback signature. This
         // harness constructs delegates internally and checks their receiver root.
-        let Value::Delegate(delegate) = &callback else {
+        let Value::Function(delegate) = &callback else {
             return Err(Fault::new("expected callback"));
         };
         let Some(Value::ObjectReference(receiver)) = delegate.receiver.as_deref() else {
@@ -243,8 +243,10 @@ fn callback(heap: &mut ManagedHeap, captured: Value) -> Value {
             fields: vec![captured],
         },
     );
-    Value::Delegate(crate::Delegate {
-        ty: Type::from_name("Completion"),
+    Value::Function(crate::Function {
+        object_view: false,
+        identity: std::sync::Arc::new(()),
+        ty: crate::assembler::parse_type("fn<Int32,Void>").unwrap(),
         target: crate::assembler::parse_function_ref("instance CopyConsumer::Complete(Int32)")
             .unwrap(),
         receiver: Some(Box::new(receiver)),

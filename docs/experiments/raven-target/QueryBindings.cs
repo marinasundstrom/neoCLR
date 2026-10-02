@@ -43,25 +43,25 @@ static class QueryBindings
             throw new InvalidDataException("Unsupported query type arguments.");
         var source = $"System.Collections.Iterable<{types[0]}>";
         var terminalArguments = definition.Parameters.Count == 2
-            ? new[] { source, $"System.Func<{types[0]},Boolean>" } : new[] { source };
+            ? new[] { source, $"fn<{types[0]},Boolean>" } : new[] { source };
         var (expected, returns) = reference.Name switch {
             "OfType" => (new[] { source }, $"System.Collections.Iterable<{types[1]}>"),
-            "Filter" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, source),
-            "Map" => (new[] { source, $"System.Func<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
+            "Filter" => (new[] { source, $"fn<{types[0]},Boolean>" }, source),
+            "Map" => (new[] { source, $"fn<{types[0]},{types[1]}>" }, $"System.Collections.Iterable<{types[1]}>"),
             "First" or "Last" => (terminalArguments, $"System.Option<{types[0]}>"),
             "Single" => (terminalArguments, $"System.Result<{types[0]},System.Linq.SingleError>"),
             "Any" => (terminalArguments, "Boolean"),
-            "All" => (new[] { source, $"System.Func<{types[0]},Boolean>" }, "Boolean"),
+            "All" => (new[] { source, $"fn<{types[0]},Boolean>" }, "Boolean"),
             "Count" => (terminalArguments, "Int32"),
-            "Fold" => (new[] { source, types[1]!, $"System.Func<{types[1]},{types[0]},{types[1]}>" }, types[1]!),
+            "Fold" => (new[] { source, types[1]!, $"fn<{types[1]},{types[0]},{types[1]}>" }, types[1]!),
             "Take" or "Skip" => (new[] { source, "Int32" }, source),
             "Concat" => (new[] { source, source }, source),
-            "FlatMap" => (new[] { source, $"System.Func<{types[0]},System.Collections.Iterable<{types[1]}>>" }, $"System.Collections.Iterable<{types[1]}>"),
+            "FlatMap" => (new[] { source, $"fn<{types[0]},System.Collections.Iterable<{types[1]}>>" }, $"System.Collections.Iterable<{types[1]}>"),
             "ToList" => (new[] { source }, $"System.Collections.ArrayList<{types[0]}>"),
             _ => throw new InvalidDataException("Unsupported query operator.")
         };
         var (args, result) = RuntimeSignatures.Match(reference, definition,
-            t => CollectionBindings.Type(t) ?? DelegateBindings.Type(t) ?? GenericUnionBindings.Type(t));
+            t => CollectionBindings.Type(t) ?? FunctionBindings.Type(t) ?? GenericUnionBindings.Type(t));
         if (!args.SequenceEqual(expected) || result != returns)
             throw new InvalidDataException("Unsupported query contract.");
         return new($"System.Linq.Operators::{reference.Name}<{string.Join(',', types)}>", args, result);

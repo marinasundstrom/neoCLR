@@ -245,6 +245,8 @@ def main():
         shutil.copyfile(SOURCE / name, OUTPUT / name)
     raven = 'docs/experiments/raven-target/samples/'
     samples = {
+        'FUNCTION_OPERATIONS': ('docs/experiments/function-types/Callbacks.rvn', 'public func AddOne', '\npublic func Forward', False),
+        'FUNCTION_BINDINGS': ('docs/experiments/function-types/Callbacks.rvn', '    let first:', '\n    let repeated:', False),
         'ATTRIBUTE_ROUTE_DECLARATION': ('docs/experiments/attribute-introspection/Routes.rvn', 'public union CatalogRoutes {', '\n}', True),
         'ATTRIBUTE_ROUTE_READING': ('docs/experiments/attribute-introspection/Routes.rvn', 'func ReadRouteDeclarations()', '\n}', True),
         'COMPARER_MAP_SAMPLE': (raven + 'library-comparers.rvn', '    let files = HashMap<string, int>(StringComparer.Ordinal)', '\n    files.Set', False),
@@ -318,8 +320,8 @@ def main():
     tour = raven + 'library-introspection-tour.rvn'
     samples.update({
         'TOUR_ACQUISITION': (tour, '    let widget:', '\n    let assembly', False),
-        'TOUR_DISCOVERY': (tour, '    let assembly', '\n    if description.MetadataToken', False),
-        'TOUR_TOKENS': (tour, '    if description.MetadataToken', '\n    let methods:', False),
+        'TOUR_DISCOVERY': (tour, '    let assembly', '\n    if let Some(token) = description.MetadataToken', False),
+        'TOUR_TOKENS': (tour, '    if let Some(token) = description.MetadataToken', '\n    let methods:', False),
         'TOUR_SEQUENCES': (tour, '    let methods:', '\n    let flags', False),
         'TOUR_MATCH': (tour, 'func MemberKind', '\n}', True),
         'TOUR_MEMBERS': (tour, '    let flags', '\n}', False),

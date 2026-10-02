@@ -144,3 +144,12 @@ See [the changelog workflow](docs/changelog.md) for consolidation and release ha
 - Validate the API snapshot before committing API changes; local website builds
   follow the focused-validation rule above. Follow the
   [maintenance procedure](api-docs/README.md); publication remains a separate manual operation.
+
+## Temporary Raven bridge behavior
+
+- Document neoCLR CLI bridge changes with native semantic intent, temporary CLI
+  representation, lost/restricted information, owners, validation and the native
+  metadata/codegen replacement. See `docs/raven-cli-bridge.md` and Raven's
+  `docs/compiler/neoclr-cli-bridge.md`. Bridge limits are not permanent platform rules.
+- Identify runtime feature branches and tested bundle revisions explicitly. Raven
+  compiler support on main does not imply the corresponding neoCLR feature is on main.

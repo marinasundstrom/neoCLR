@@ -8,7 +8,7 @@ import System.Runtime.CompilerServices.*
 
 public extension TypeReflectionExtensions for TypeInfo {
     func CreateInstance(params arguments: Object?[]) -> Result<Object, ReflectionError> {
-        if self is RuntimeTypeInfo implementation {
+        if self is RuntimeNominalTypeInfo implementation {
             let handle = implementation.ExecutionHandle
             let status = RuntimeServices.ReflectionConstructArgsCheck(handle, 0, null, arguments)
             if status == 0 {
@@ -43,7 +43,7 @@ public extension TypeReflectionExtensions for TypeInfo {
     }
 
     func CreateInstance<T>(params arguments: Object?[]) -> Result<T, ReflectionError> {
-        if self is RuntimeTypeInfo implementation {
+        if self is RuntimeNominalTypeInfo implementation {
             if !RuntimeServices.ReflectionAssignable(implementation.ExecutionHandle, RuntimeServices.TypeHandle<T>()) {
                 return Error(ReflectionError.InvalidResultType)
             }
@@ -55,7 +55,7 @@ public extension TypeReflectionExtensions for TypeInfo {
 
 
     func CreateInstance() -> Result<Object, ReflectionError> {
-        if self is RuntimeTypeInfo implementation {
+        if self is RuntimeNominalTypeInfo implementation {
             let handle = implementation.ExecutionHandle
             let status = RuntimeServices.ReflectionConstructionCheck(handle)
             if status == 0 {
@@ -80,7 +80,7 @@ public extension PropertyReflectionExtensions for PropertyInfo {
     func GetValue(receiver: Object?) -> Result<Object?, ReflectionError> {
         if self is RuntimePropertyInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
                     let status = RuntimeServices.ReflectionPropertyGetCheck(handle, implementation.DefinitionIndex, receiver)
                     if status == 0 {
@@ -109,7 +109,7 @@ public extension PropertyReflectionExtensions for PropertyInfo {
     func SetValue(receiver: Object?, value: Object?) -> Result<(), ReflectionError> {
         if self is RuntimePropertyInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
                     let status = RuntimeServices.ReflectionPropertySetCheck(handle, implementation.DefinitionIndex, receiver, value)
                     if status == 0 {
@@ -143,11 +143,11 @@ public extension MethodReflectionExtensions for MethodInfo {
     func Invoke(receiver: Object?, params arguments: Object?[]) -> Result<Object?, ReflectionError> {
         if self is RuntimeMethodInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner && implementation.DefinitionIndex is Some(let index) {
                     let handle = runtimeOwner.ExecutionHandle
-                    let status = RuntimeServices.ReflectionInvokeCheck(handle, implementation.DefinitionIndex, receiver, arguments)
+                    let status = RuntimeServices.ReflectionInvokeCheck(handle, index, receiver, arguments)
                     if status == 0 {
-                        let value: Object? = RuntimeServices.ReflectionInvoke(handle, implementation.DefinitionIndex, receiver, arguments)
+                        let value: Object? = RuntimeServices.ReflectionInvoke(handle, index, receiver, arguments)
                         return Ok(value)
                     }
                     if status == 1 {
@@ -185,7 +185,7 @@ public extension FieldReflectionExtensions for FieldInfo {
     func GetValue(receiver: Object?) -> Result<Object?, ReflectionError> {
         if self is RuntimeFieldInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
                     let status = RuntimeServices.ReflectionFieldGetCheck(handle, implementation.DefinitionIndex, receiver, [])
                     if status == 0 {
@@ -224,7 +224,7 @@ public extension FieldReflectionExtensions for FieldInfo {
     func SetValue(receiver: Object?, value: Object?) -> Result<(), ReflectionError> {
         if self is RuntimeFieldInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
                     let status = RuntimeServices.ReflectionFieldSetCheck(handle, implementation.DefinitionIndex, receiver, [value])
                     if status == 0 {
@@ -274,7 +274,7 @@ public extension ConstructorReflectionExtensions for ConstructorInfo {
     func Invoke(params arguments: Object?[]) -> Result<Object, ReflectionError> {
         if self is RuntimeConstructorInfo implementation {
             if let Some(owner) = implementation.DeclaringType {
-                if owner is RuntimeTypeInfo runtimeOwner {
+                if owner is RuntimeNominalTypeInfo runtimeOwner {
                     let handle = runtimeOwner.ExecutionHandle
                     let status = RuntimeServices.ReflectionConstructorInvokeCheck(handle, implementation.DefinitionIndex, null, arguments)
                     if status == 0 {

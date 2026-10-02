@@ -13,7 +13,7 @@ class Holder<T> {
 
 async func Read<T>(initial: T, replacement: T, first: Task<int>, second: Task<int>) -> Task<T> {
     var value = initial
-    let read: Func<T> = () => value
+    let read: () -> T = () => value
     _ = await first
     value = replacement
     _ = await second

@@ -6,80 +6,88 @@ import System.Option.*
 class First { }
 class Second { }
 
-func Check(value: bool, message: string) {
+public func Check(value: bool, message: string) {
     if !value {
         System.Fail(message)
     }
 }
 
-func Same(left: Object, right: Object?) -> bool => left.Equals(right)
-func Hash(value: Object) -> int => value.GetHashCode()
-func Display(value: Object) -> string => value.ToString()
+public func Same(left: Object, right: Object?) -> bool => left.Equals(right)
+public func Hash(value: Object) -> int => value.GetHashCode()
+public func Display(value: Object) -> string => value.ToString()
 
 func Main() {
     let first = typeof(First)
     let second = typeof(First)
     let different = typeof(Second)
     let contract: EquatableTo<TypeInfo> = first
-    let member: MemberInfo = first
+    let firstNominal = (NominalTypeInfo)first
+    let secondNominal = (NominalTypeInfo)second
+    let member: MemberInfo = firstNominal
     Check(!Object.ReferenceEquals(first, second), "Descriptors have separate allocation identity")
     Check(first.Equals(second) && contract.Equals(second), "Typed represented-type equality")
     Check(Same(first, second) && Same(second, member), "Object represented-type equality")
     Check(!Same(first, different) && !Same(first, null) && !Same(first, 42), "Reject another type, null and non-descriptor")
     Check(Hash(first) == Hash(second), "Equal type hashes")
-    Check(Display(first) == first.FullName, "Represented-type display")
+    Check(Display(first) == first.DisplayName, "Represented-type display")
 
-    let module = first.Module
-    let repeatedModule = second.Module
-    let assembly = module.Assembly
-    let repeatedAssembly = repeatedModule.Assembly
-    Check(!Object.ReferenceEquals(module, repeatedModule), "Separate module wrappers")
-    Check(!Object.ReferenceEquals(assembly, repeatedAssembly), "Separate assembly wrappers")
-    Check(Same(module, repeatedModule) && Same(repeatedModule, module), "Module identity")
-    Check(Same(assembly, repeatedAssembly) && Same(repeatedAssembly, assembly), "Assembly identity")
-    Check(!Same(module, assembly) && !Same(assembly, module), "Descriptor kinds differ")
-    Check(!Same(module, null) && !Same(assembly, null), "Null is not a descriptor")
-    Check(Hash(module) == Hash(repeatedModule) && Hash(assembly) == Hash(repeatedAssembly), "Descriptor hashes")
-    Check(Display(module) == module.Name && Display(assembly) == assembly.FullName, "Descriptor display")
-    let assemblies = HashMap<AssemblyInfo, int>((left, right) => Same(left, right), key => Hash(key))
-    let modules = HashMap<ModuleInfo, int>((left, right) => Same(left, right), key => Hash(key))
-    Check(assemblies.TryAdd(assembly, 1) && !assemblies.TryAdd(repeatedAssembly, 2), "Assembly map key")
-    Check(modules.TryAdd(module, 1) && !modules.TryAdd(repeatedModule, 2), "Module map key")
+    if let Some(module) = firstNominal.Module {
+        if let Some(repeatedModule) = secondNominal.Module {
+            let assembly = module.Assembly
+            let repeatedAssembly = repeatedModule.Assembly
+            Check(!Object.ReferenceEquals(module, repeatedModule), "Separate module wrappers")
+            Check(!Object.ReferenceEquals(assembly, repeatedAssembly), "Separate assembly wrappers")
+            Check(Same(module, repeatedModule) && Same(repeatedModule, module), "Module identity")
+            Check(Same(assembly, repeatedAssembly) && Same(repeatedAssembly, assembly), "Assembly identity")
+            Check(!Same(module, assembly) && !Same(assembly, module), "Descriptor kinds differ")
+            Check(!Same(module, null) && !Same(assembly, null), "Null is not a descriptor")
+            Check(Hash(module) == Hash(repeatedModule) && Hash(assembly) == Hash(repeatedAssembly), "Descriptor hashes")
+            Check(Display(module) == module.Name && Display(assembly) == assembly.FullName, "Descriptor display")
+            let assemblies = HashMap<AssemblyInfo, int>((left, right) => Same(left, right), key => Hash(key))
+            let modules = HashMap<ModuleInfo, int>((left, right) => Same(left, right), key => Hash(key))
+            Check(assemblies.TryAdd(assembly, 1) && !assemblies.TryAdd(repeatedAssembly, 2), "Assembly map key")
+            Check(modules.TryAdd(module, 1) && !modules.TryAdd(repeatedModule, 2), "Module map key")
 
-    let boxed: Object = 42
-    let actual = boxed.GetType()
-    Check(Same(actual, typeof(int)) && Hash(actual) == Hash(typeof(int)), "Object and metadata type acquisition agree")
+            let boxed: Object = 42
+            let actual = boxed.GetType()
+            Check(Same(actual, typeof(int)) && Hash(actual) == Hash(typeof(int)), "Object and metadata type acquisition agree")
 
-    let numbers = typeof(ArrayList<int>)
-    let strings = typeof(ArrayList<string>)
-    Check(Same(numbers, typeof(ArrayList<int>)) && !Same(numbers, strings), "Constructed generic identity")
-    let array = typeof(int[])
-    Check(Same(array, typeof(int[])) && !Same(array, typeof(string[])), "Array element identity")
-    Check(Hash(array) == Hash(typeof(int[])), "Repeated array hashes")
+            let numbers = typeof(ArrayList<int>)
+            let strings = typeof(ArrayList<string>)
+            Check(Same(numbers, typeof(ArrayList<int>)) && !Same(numbers, strings), "Constructed generic identity")
+            let array = typeof(int[])
+            Check(Same(array, typeof(int[])) && !Same(array, typeof(string[])), "Array element identity")
+            Check(Hash(array) == Hash(typeof(int[])), "Repeated array hashes")
 
-    let index = HashMap<TypeInfo, int>((left, right) => Same(left, right), key => Hash(key))
-    Check(index.TryAdd(numbers, 1) && !index.TryAdd(typeof(ArrayList<int>), 2), "Type-keyed lookup")
-    index.Set(typeof(ArrayList<int>), 3)
-    var n = 0
-    while n < 180 {
-        _ = typeof(Second)
-        n += 1
-    }
-    if let Some(value) = index.Find(typeof(ArrayList<int>)) {
-        Check(value == 3 && index.Count == 1, "Type identity survives collection")
+            let index = HashMap<TypeInfo, int>((left, right) => Same(left, right), key => Hash(key))
+            Check(index.TryAdd(numbers, 1) && !index.TryAdd(typeof(ArrayList<int>), 2), "Type-keyed lookup")
+            index.Set(typeof(ArrayList<int>), 3)
+            var n = 0
+            while n < 180 {
+                _ = typeof(Second)
+                n += 1
+            }
+            if let Some(value) = index.Find(typeof(ArrayList<int>)) {
+                Check(value == 3 && index.Count == 1, "Type identity survives collection")
+            } else {
+                System.Fail("Repeated descriptor missed map entry")
+            }
+            Check(Same(first, typeof(First)) && Display(first) == first.DisplayName, "Retained descriptor survives collection")
+            if let Some(value) = assemblies.Find(module.Assembly) {
+                Check(value == 1, "Assembly identity survives collection")
+            } else {
+                System.Fail("Assembly lookup failed after collection")
+            }
+            if let Some(value) = modules.Find(module) {
+                Check(value == 1, "Module identity survives collection")
+            } else {
+                System.Fail("Module lookup failed after collection")
+            }
+            Console.WriteLine("TypeInfo, AssemblyInfo and ModuleInfo equality, hash, display and map lookup: passed")
+        } else {
+            System.Fail("Missing nominal module")
+        }
     } else {
-        System.Fail("Repeated descriptor missed map entry")
+        System.Fail("Missing nominal module")
     }
-    Check(Same(first, typeof(First)) && Display(first) == first.FullName, "Retained descriptor survives collection")
-    if let Some(value) = assemblies.Find(first.Module.Assembly) {
-        Check(value == 1, "Assembly identity survives collection")
-    } else {
-        System.Fail("Assembly lookup failed after collection")
-    }
-    if let Some(value) = modules.Find(first.Module) {
-        Check(value == 1, "Module identity survives collection")
-    } else {
-        System.Fail("Module lookup failed after collection")
-    }
-    Console.WriteLine("TypeInfo, AssemblyInfo and ModuleInfo equality, hash, display and map lookup: passed")
 }

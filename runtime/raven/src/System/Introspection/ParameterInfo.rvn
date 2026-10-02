@@ -1,13 +1,14 @@
 namespace System.Introspection
 
 import System.*
+import System.Option.*
 import System.Collections.*
 import System.Runtime.CompilerServices.*
 
 public sealed interface ParameterInfo {
     func GetCustomAttributesData() -> Sequence<CustomAttributeData>
-    val MetadataToken: int { get }
-    val Module: ModuleInfo { get }
+    val MetadataToken: Option<int> { get }
+    val Module: Option<ModuleInfo> { get }
     val Name: string { get }
     val Position: int { get }
     val ParameterType: TypeInfo { get }
@@ -24,13 +25,14 @@ internal class RuntimeParameterInfo : ParameterInfo {
     private field StoredIsOutWhenTrue: bool
     private field StoredIsReadOnly: bool
     private field StoredMetadataToken: int
-    private field StoredModule: ModuleInfo
+    private field StoredModule: Option<ModuleInfo>
     private field StoredDeclaringType: TypeInfo
     private field StoredMemberKind: int
     private field StoredMemberIndex: int
+    private field StoredMemberIdentity: string
 
     private init(name: string, position: int, parameterType: TypeInfo,
-        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: ModuleInfo,
+        isOut: bool, isOutWhenTrue: bool, isReadOnly: bool, metadataToken: int, module: Option<ModuleInfo>,
         declaringType: TypeInfo, memberKind: int, memberIndex: int) {
         StoredName = name
         StoredPosition = position
@@ -43,14 +45,21 @@ internal class RuntimeParameterInfo : ParameterInfo {
         StoredDeclaringType = declaringType
         StoredMemberKind = memberKind
         StoredMemberIndex = memberIndex
+        StoredMemberIdentity = ""
     }
 
     func GetCustomAttributesData() -> Sequence<CustomAttributeData> {
-        return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, MetadataToken)
+        if StoredDeclaringType.IsNominalType {
+            return RuntimeServices.MemberCustomAttributes(StoredDeclaringType, StoredMetadataToken)
+        }
+        return CheckedStorage.Reserve<CustomAttributeData>(0)
     }
 
-    val MetadataToken: int => StoredMetadataToken
-    val Module: ModuleInfo => StoredModule
+    val MetadataToken: Option<int> => if StoredMetadataToken == 0 { None } else { Some(StoredMetadataToken) }
+    val Module: Option<ModuleInfo> => StoredModule match {
+        Some(let module) => Some(module)
+        None => None
+    }
     val Name: string => StoredName
     val Position: int => StoredPosition
     val ParameterType: TypeInfo => StoredParameterType
@@ -60,9 +69,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     override func Equals(other: Object?) -> bool {
         if other is RuntimeParameterInfo implementation {
-            return StoredDeclaringType.Equals(implementation.StoredDeclaringType)
-                && StoredMemberKind == implementation.StoredMemberKind
-                && StoredMemberIndex == implementation.StoredMemberIndex
+            return StoredMemberIdentity == implementation.StoredMemberIdentity
                 && Position == implementation.Position
         }
         return false
@@ -70,9 +77,7 @@ internal class RuntimeParameterInfo : ParameterInfo {
 
     override func GetHashCode() -> int {
         var hash = HashCode()
-        hash.Add(StoredDeclaringType.FullName)
-        hash.Add(StoredMemberKind)
-        hash.Add(StoredMemberIndex)
+        hash.Add(StoredMemberIdentity)
         hash.Add(Position)
         return hash.ToHashCode()
     }

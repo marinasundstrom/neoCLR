@@ -76,11 +76,9 @@ def build(path: Path) -> str:
         return build(ROOT / 'runtime/raven/CollectionContracts.neoil') + build(ROOT / 'runtime/raven/List.neoil')
     if path == ROOT / 'runtime/System/Array.neoil':
         return build(ROOT / 'runtime/raven/Array.neoil') + build(ROOT / 'runtime/raven/NativeMemory.neoil') + build(ROOT / 'runtime/raven/Tuple.neoil')
-    if path.stem == 'Func':
-        # The Raven profile declares instance ForEach on the managed Array<T> shape.
-        text = text[:text.index('; Managed-array callback consumer')]
-        text = text.replace('-> Void', '-> noresult')
-        text = re.sub(r'^\s*ldvoid\n', '\n', text, flags=re.M)
+    if path.stem == 'Function':
+        # Array<T> owns ForEach in the Raven profile. There is no nominal callable declaration.
+        return ''
     if path.parent == ROOT / 'runtime/neoCLR/Runtime':
         text = re.sub(r'System\.Type\b', 'System.Introspection.TypeInfo', text)
     lines = []

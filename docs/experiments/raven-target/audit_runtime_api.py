@@ -21,7 +21,7 @@ groups = {
     'interfaces': ('EquatableTo ComparableTo Disposable', ['library-value-interfaces.rvn', 'library-interfaces.rvn']),
     'unimplemented-contracts': ('Clonable Closable ConvertibleInto', []),
     'collections': ('Array ArrayList List Iterable Iterator', ['library-managed-array-metadata.rvn', 'library-array-shapes.rvn', 'library-reference-payloads.rvn', 'library-generic-collections.rvn']),
-    'delegates': ('Func', ['library-delegates.rvn', 'library-array-callbacks.rvn']),
+    'functions': ('Function', ['library-delegates.rvn', 'library-array-callbacks.rvn']),
     'calendar': ('Date Time LocalDateTime Clock SystemClock', ['library-calendar.rvn', 'library-clock.rvn']),
     'process': ('Environment Console', ['library-environment.rvn', 'library-console.rvn']),
     'files': ('File Path', ['library-files.rvn', 'library-paths.rvn']),
@@ -68,12 +68,6 @@ for file in source['sourceFiles']:
                      'samples': ['library-flags.rvn', 'library-reflection.rvn'],
                      'tests': ['tests/enums.rs', 'docs/experiments/raven-target/verify_flags_library.py'],
                      'note': 'A normal Raven enum owns the named Int32 values and Flags attribute. Checked compiler lowering supplies intrinsic enum operations using the existing nominal runtime ABI, preserving unknown bits.'})
-        continue
-    if file.startswith('runtime/raven/generated/Func.'):
-        rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-delegate-declarations',
-                     'samples': ['library-delegates.rvn'],
-                     'tests': ['tests/delegates.rs', 'docs/experiments/raven-target/verify_delegate_library.py'],
-                     'note': 'All five invariant Func arities are checked against CLI runtime delegate signatures; invocation and closure lifetime remain runtime-owned.'})
         continue
     if file.startswith('runtime/raven/generated/Fault.'):
         rows.append({'file': file, 'declarations': len(entries), 'disposition': 'raven-authored-terminal-namespace-function',

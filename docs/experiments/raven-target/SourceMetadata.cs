@@ -32,6 +32,8 @@ static class SourceMetadata
         assembly = method.Module.Assembly.Name.FullName,
         module = method.Module.Name,
         name = method.Name,
+        full_name = string.IsNullOrEmpty(NamespaceFunctions.Owner(method.DeclaringType)) ? method.Name
+            : NamespaceFunctions.Owner(method.DeclaringType) + "." + method.Name,
         token = method.MetadataToken.ToUInt32(),
         member_access = method.IsPublic ? "Public" : method.IsPrivate ? "Private"
             : method.IsAssembly ? "Assembly" : method.IsFamily ? "Family"

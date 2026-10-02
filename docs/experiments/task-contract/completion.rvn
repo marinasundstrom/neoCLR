@@ -5,14 +5,14 @@ import System.Console.*
 
 // Experimental, single-executor model. Not the public Task API.
 public class Executor {
-    var Pending: ArrayList<Func<System.Void>>
+    var Pending: ArrayList<() -> System.Void>
     var Running: bool
 
     init() {
-        Pending = ArrayList<Func<System.Void>>()
+        Pending = ArrayList<() -> System.Void>()
     }
 
-    func Post(callback: Func<System.Void>) {
+    func Post(callback: () -> System.Void) {
         Pending.Add(callback)
     }
 
@@ -23,7 +23,7 @@ public class Executor {
         Running = true
         while Pending.Count != 0 {
             let batch = Pending
-            Pending = ArrayList<Func<System.Void>>()
+            Pending = ArrayList<() -> System.Void>()
             for callback in batch {
                 callback()
             }
@@ -35,18 +35,18 @@ public class Executor {
 public interface Awaitable {
     val IsCompleted: bool { get }
     func GetResult() -> Result<int, string>
-    func OnCompleted(callback: Func<System.Void>)
+    func OnCompleted(callback: () -> System.Void)
 }
 
 public class Completion : Awaitable {
     var Owner: Executor
     var ResultSlot: ArrayList<Result<int, string>>
-    var Continuations: ArrayList<Func<System.Void>>
+    var Continuations: ArrayList<() -> System.Void>
 
     init(owner: Executor) {
         Owner = owner
         ResultSlot = ArrayList<Result<int, string>>(1)
-        Continuations = ArrayList<Func<System.Void>>()
+        Continuations = ArrayList<() -> System.Void>()
     }
 
     val IsCompleted: bool => ResultSlot.Count != 0
@@ -58,7 +58,7 @@ public class Completion : Awaitable {
         return ResultSlot[0]
     }
 
-    func OnCompleted(callback: Func<System.Void>) {
+    func OnCompleted(callback: () -> System.Void) {
         if IsCompleted {
             Owner.Post(callback)
         } else {
@@ -72,7 +72,7 @@ public class Completion : Awaitable {
         }
         ResultSlot.Add(result)
         let callbacks = Continuations
-        Continuations = ArrayList<Func<System.Void>>()
+        Continuations = ArrayList<() -> System.Void>()
         for callback in callbacks {
             Owner.Post(callback)
         }

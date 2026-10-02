@@ -218,9 +218,9 @@ fn concrete_find_avoids_query_chain_allocations_for_the_same_result() {
     let mut allocations = Vec::new();
     for query in [false, true] {
         let operation = if query {
-            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::First<Int32>(System.Collections.Iterable<Int32>)"
+            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,fn<Int32,Boolean>)\ncall System.Linq.Operators::First<Int32>(System.Collections.Iterable<Int32>)"
         } else {
-            "call instance System.Collections.ArrayList<Int32>::Find(System.Func<Int32,Boolean>)"
+            "call instance System.Collections.ArrayList<Int32>::Find(fn<Int32,Boolean>)"
         };
         let source = format!(
             r#"
@@ -240,7 +240,7 @@ ldloc values
 ldc.i4 42
 call instance System.Collections.ArrayList<Int32>::Add(Int32)
 ldloc values
-delegate.bind System.Func<Int32,Boolean> = Match(Int32)
+function.bind fn<Int32,Boolean> = Match(Int32)
 {operation}
 call UnwrapSome<Int32>(System.Option<Int32>)
 ret
@@ -271,17 +271,17 @@ fn predicate_start(count: i32, mode: i32, fail_move: i32, fail_dispose: bool) ->
     ".local Predicate callback\n".to_string()
         + &start(count, fail_move, fail_dispose)
         + &format!(
-            "ldc.i4 {mode}\nldc.i4 0\nldc.i4 0\nnewobj Predicate\nstloc callback\nldloc probe\nldloc callback\ndelegate.bind System.Func<Int32,Boolean> = instance Predicate::Check(Int32)\n"
+            "ldc.i4 {mode}\nldc.i4 0\nldc.i4 0\nnewobj Predicate\nstloc callback\nldloc probe\nldloc callback\nfunction.bind fn<Int32,Boolean> = instance Predicate::Check(Int32)\n"
         )
 }
 fn predicate_call(operator: &str, via_where: bool) -> String {
     if via_where {
         format!(
-            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
+            "call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,fn<Int32,Boolean>)\ncall System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>)\n"
         )
     } else {
         format!(
-            "call System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)\n"
+            "call System.Linq.Operators::{operator}<Int32>(System.Collections.Iterable<Int32>,fn<Int32,Boolean>)\n"
         )
     }
 }

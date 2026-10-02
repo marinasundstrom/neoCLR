@@ -45,6 +45,7 @@ static class ApplicationSpecializationChecks
         if (Close(firstType) == Close(secondType))
             throw new Exception("Type arguments from distinct assemblies must not share a specialization.");
 
+        Reject(() => Close(module.TypeSystem.Void), "Unsupported application specialization argument");
         Reject(() => Close(parameter), "Unsupported metadata identity signature");
         Reject(() => Close(new ByReferenceType(module.TypeSystem.Int32)), "Unsupported application specialization argument");
         parameter.Attributes = GenericParameterAttributes.ReferenceTypeConstraint;

@@ -280,7 +280,7 @@ M0000000c_IL_0059:
 M0000000c_IL_005a:
 ret
 .end
-.method internal instance Register(System.Func<Void> callback) -> System.Concurrency.CancellationRegistration
+.method internal instance Register(fn<Void> callback) -> System.Concurrency.CancellationRegistration
 .local System.Concurrency.CancellationRegistration local0
 ldloca local0
 initobj System.Concurrency.CancellationRegistration
@@ -315,7 +315,7 @@ br M0000000d_IL_0048
 M0000000d_IL_002f:
 ldarg 1
 M0000000d_IL_0030:
-callvirt instance System.Func<Void>::Invoke()
+callvirt instance fn<Void>::Invoke()
 M0000000d_IL_0035:
 pop
 M0000000d_IL_0036:
@@ -325,7 +325,7 @@ M0000000d_IL_003c:
 call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion1(System.Option.None)
 M0000000d_IL_0041:
 M0000000d_IL_0042:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<System.Func<Void>>)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeCliCall0(System.Option<fn<Void>>)
 M0000000d_IL_0047:
 ret
 M0000000d_IL_0048:
@@ -335,15 +335,15 @@ ldarg 0
 M0000000d_IL_004b:
 ldarg 1
 M0000000d_IL_004c:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion2(System.Func<Void>)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion2(fn<Void>)
 M0000000d_IL_0051:
-call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion3(System.Option.Some<System.Func<Void>>)
+call neoCLR.Library.System.Concurrency.CancellationTokenSource.RuntimeUnion3(System.Option.Some<fn<Void>>)
 M0000000d_IL_0056:
 ldarg 0
 M0000000d_IL_0057:
 ldfld System.Concurrency.CancellationTokenSource::head
 M0000000d_IL_005c:
-newobj instance System.Concurrency.CancellationRegistration::.ctor(System.Concurrency.CancellationTokenSource,System.Option<System.Func<Void>>,System.Concurrency.CancellationRegistration)
+newobj instance System.Concurrency.CancellationRegistration::.ctor(System.Concurrency.CancellationTokenSource,System.Option<fn<Void>>,System.Concurrency.CancellationRegistration)
 M0000000d_IL_0061:
 stloc local0
 M0000000d_IL_0062:

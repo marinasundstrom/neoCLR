@@ -26,6 +26,7 @@ They need only enough application context to explain the choices and results.
 | --- | --- |
 | [Raven for neoCLR](../raven/) | Read the language examples and distinguish the two targets |
 | [Option and Result](../features/outcomes/) | Match and propagate absence or expected errors |
+| [Function types](../features/functions/) | Delegates evolved: bind methods to structural signature types (development) |
 | [Arrays](../features/arrays/) | Use shared array storage, bounds and collection capabilities |
 | [Collections and queries](../features/collections/) | Read, replace, grow, filter and transform collections |
 | [Strings and UTF-8](../features/strings/) | Distinguish graphemes, scalars and bytes |

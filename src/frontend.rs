@@ -215,6 +215,29 @@ impl Ty {
             Type::ReadOnlyByRef(target) => {
                 Self::ReadOnlyRef(Box::new(Self::from_metadata(target)?))
             }
+            Type::Function(shape) => {
+                let mut parts = shape
+                    .parameters
+                    .iter()
+                    .enumerate()
+                    .map(|(index, ty)| {
+                        let mode = if shape.out_parameters.contains(&index) {
+                            "out "
+                        } else if shape.out_when_true.contains(&index) {
+                            "outtrue "
+                        } else {
+                            ""
+                        };
+                        Ok(format!("{mode}{}", Self::from_metadata(ty)?.il()))
+                    })
+                    .collect::<Result<Vec<_>, Fault>>()?;
+                parts.push(format!(
+                    "{}{}",
+                    if shape.no_result { "noresult " } else { "" },
+                    Self::from_metadata(&shape.returns)?.il()
+                ));
+                Self::Record(format!("fn<{}>", parts.join(",")))
+            }
             Type::Constructed {
                 definition,
                 arguments,
@@ -319,15 +342,9 @@ struct Function {
     returns: Ty,
     body: Vec<Stmt>,
 }
-struct DelegateDeclaration {
-    name: Token,
-    parameters: Vec<Field>,
-    returns: Ty,
-}
 struct Source {
     enums: Vec<enums::Enum>,
     unions: Vec<unions::Union>,
-    delegates: Vec<DelegateDeclaration>,
     interfaces: Vec<Interface>,
     records: Vec<Record>,
     functions: Vec<Function>,
@@ -645,6 +662,9 @@ impl Parser {
         result
     }
     fn ty_inner(&mut self) -> Result<Ty, Fault> {
+        if self.eat("out") {
+            return Ok(Ty::Record(format!("out {}", self.ty()?.il())));
+        }
         if self.eat("readonly") {
             return match self.ty()? {
                 Ty::Ref(target) => Ok(Ty::ReadOnlyRef(target)),
@@ -951,7 +971,6 @@ impl Parser {
         let mut source = Source {
             enums: Vec::new(),
             unions: Vec::new(),
-            delegates: Vec::new(),
             interfaces: Vec::new(),
             records: Vec::new(),
             functions: Vec::new(),
@@ -983,16 +1002,9 @@ impl Parser {
             } else if self.eat("union") {
                 unions::parse(self, &mut source)?;
             } else if self.eat("delegate") {
-                let name = self.name()?;
-                let parameters = self.fields(true)?;
-                self.expect("->")?;
-                let returns = self.ty()?;
-                self.end_statement()?;
-                source.delegates.push(DelegateDeclaration {
-                    name,
-                    parameters,
-                    returns,
-                });
+                return Err(self.current().error(
+                    "delegate declarations have been removed; use structural Function types",
+                ));
             } else if self.eat("interface") {
                 let name = self.name()?;
                 self.newlines();
@@ -1111,7 +1123,6 @@ impl Parser {
             if source.records.len()
                 + source.functions.len()
                 + source.interfaces.len()
-                + source.delegates.len()
                 + source.enums.len()
                 + source.unions.len()
                 > 1024
@@ -1812,10 +1823,10 @@ impl Lowerer<'_> {
         body: &ArmBody,
         expected: &Ty,
     ) -> Result<Ty, Fault> {
-        let (mut signature, returns) = self.delegate_signature(expected)?.ok_or_else(|| {
+        let (mut signature, returns) = self.function_signature(expected)?.ok_or_else(|| {
             expression
                 .at
-                .error("lambda requires an expected delegate type")
+                .error("lambda requires an expected Function type")
         })?;
         if signature.len() != parameters.len() {
             return Err(expression.at.error("lambda parameter count mismatch"));
@@ -1935,7 +1946,7 @@ impl Lowerer<'_> {
             format!("instance {owner}::Invoke")
         };
         self.body.push(format!(
-            "delegate.bind {} = {target}({})",
+            "function.bind {} = {target}({})",
             expected.il(),
             signature
                 .iter()
@@ -2003,7 +2014,7 @@ impl Lowerer<'_> {
         if let ExprKind::Lambda(parameters, body) = &expression.kind {
             return self.lambda_expression(expression, parameters, body, expected);
         }
-        if self.delegate_signature(expected)?.is_some()
+        if self.function_signature(expected)?.is_some()
             && matches!(
                 expression.kind,
                 ExprKind::Name(_) | ExprKind::Field(_, _) | ExprKind::Generic(_, _)
@@ -2014,7 +2025,7 @@ impl Lowerer<'_> {
                 *self = probe;
                 return self.convert_reference(actual, expected, &expression.at);
             }
-            return self.bind_delegate(&expected.il(), expression);
+            return self.bind_function(&expected.il(), expression);
         }
 
         if matches!(expected, Ty::ReadOnlyRef(_)) {
@@ -2367,7 +2378,7 @@ impl Lowerer<'_> {
             }
             ExprKind::Lambda(_, _) => Err(expression
                 .at
-                .error("lambda requires an expected delegate type")),
+                .error("lambda requires an expected Function type")),
             ExprKind::Generic(_, _) => Err(expression
                 .at
                 .error("generic function arguments require an invocation")),
@@ -2567,16 +2578,8 @@ impl Lowerer<'_> {
                 .map(|(ty, _)| ty),
         }
     }
-    fn delegate_signature(&self, ty: &Ty) -> Result<Option<(Vec<Field>, Ty)>, Fault> {
-        if let Some(d) = self
-            .source
-            .delegates
-            .iter()
-            .find(|d| d.name.text == ty.il())
-        {
-            return Ok(Some((d.parameters.clone(), d.returns.clone())));
-        }
-        let Some(f) = library::delegate(ty)? else {
+    fn function_signature(&self, ty: &Ty) -> Result<Option<(Vec<Field>, Ty)>, Fault> {
+        let Some(f) = library::function(ty)? else {
             return Ok(None);
         };
         let parameters = f
@@ -2594,7 +2597,7 @@ impl Lowerer<'_> {
             .collect::<Result<Vec<_>, Fault>>()?;
         Ok(Some((parameters, Ty::from_metadata(&f.returns)?)))
     }
-    fn invoke_delegate(&mut self, ty: &Ty, arguments: &[Expr], at: &Token) -> Result<Ty, Fault> {
+    fn invoke_function(&mut self, ty: &Ty, arguments: &[Expr], at: &Token) -> Result<Ty, Fault> {
         let target = match ty {
             Ty::Ref(t) | Ty::ReadOnlyRef(t) => {
                 self.body.push(format!("ldobj {}", t.il()));
@@ -2603,8 +2606,8 @@ impl Lowerer<'_> {
             _ => ty,
         };
         let (parameters, returns) = self
-            .delegate_signature(target)?
-            .ok_or_else(|| at.error("expected delegate"))?;
+            .function_signature(target)?
+            .ok_or_else(|| at.error("expected Function"))?;
         if parameters.len() != arguments.len() {
             return Err(at.error("argument count mismatch"));
         }
@@ -2616,24 +2619,13 @@ impl Lowerer<'_> {
             target.il(),
             parameters
                 .iter()
-                .map(|p| {
-                    if self
-                        .source
-                        .delegates
-                        .iter()
-                        .any(|d| d.name.text == target.il())
-                    {
-                        p.ty.parameter_il()
-                    } else {
-                        p.ty.il()
-                    }
-                })
+                .map(|p| p.ty.il())
                 .collect::<Vec<_>>()
                 .join(",")
         ));
         Ok(returns)
     }
-    fn bind_delegate(&mut self, name: &str, expression: &Expr) -> Result<Ty, Fault> {
+    fn bind_function(&mut self, name: &str, expression: &Expr) -> Result<Ty, Fault> {
         let (expression, arguments) = match &expression.kind {
             ExprKind::Generic(e, types) => (e.as_ref(), types.as_slice()),
             _ => (expression, &[][..]),
@@ -2679,8 +2671,8 @@ impl Lowerer<'_> {
                 };
                 if let Some((owner, member)) = path.rsplit_once('.') {
                     let (parameters, _) = self
-                        .delegate_signature(&Ty::Record(name.into()))?
-                        .ok_or_else(|| expression.at.error("expected delegate"))?;
+                        .function_signature(&Ty::Record(name.into()))?
+                        .ok_or_else(|| expression.at.error("expected Function"))?;
                     let generic = if arguments.is_empty() {
                         String::new()
                     } else {
@@ -2699,7 +2691,7 @@ impl Lowerer<'_> {
                     );
                     library::resolve(&signature).map_err(|e| expression.at.error(e.message))?;
                     self.body
-                        .push(format!("delegate.bind {name} = {signature}"));
+                        .push(format!("function.bind {name} = {signature}"));
                     return Ok(Ty::Record(name.into()));
                 }
             }
@@ -2710,11 +2702,11 @@ impl Lowerer<'_> {
             let ExprKind::Field(receiver, member) = &expression.kind else {
                 return Err(expression
                     .at
-                    .error("delegate binding requires a source method group"));
+                    .error("Function binding requires a source method group"));
             };
             let ty = self.expression(receiver)?;
             let (Ty::Ref(target) | Ty::ReadOnlyRef(target)) = &ty else {
-                return Err(expression.at.error("bound delegate requires an explicit managed receiver; values are not implicitly copied"));
+                return Err(expression.at.error("bound Function requires an explicit managed receiver; values are not implicitly copied"));
             };
             let interface = self
                 .source
@@ -2726,7 +2718,7 @@ impl Lowerer<'_> {
             } else {
                 self.source.record_method(target, &member.text)
             }
-            .ok_or_else(|| member.error("unknown delegate target method"))?;
+            .ok_or_else(|| member.error("unknown Function target method"))?;
             if method.is_static {
                 return Err(member.error("static method requires type qualification"));
             }
@@ -2745,7 +2737,7 @@ impl Lowerer<'_> {
         if method.generic_parameters.len() != arguments.len() {
             return Err(expression
                 .at
-                .error("delegate binding requires explicit closed generic arguments"));
+                .error("Function binding requires explicit closed generic arguments"));
         }
         let names = method
             .generic_parameters
@@ -2778,7 +2770,7 @@ impl Lowerer<'_> {
             )
         };
         self.body.push(format!(
-            "delegate.bind {name} = {target}{generic}({})",
+            "function.bind {name} = {target}{generic}({})",
             parameters.join(",")
         ));
         Ok(Ty::Record(name.into()))
@@ -3000,13 +2992,13 @@ impl Lowerer<'_> {
                 };
                 if crate::assembler::parse_type(&name).is_ok()
                     && self
-                        .delegate_signature(&Ty::Record(name.clone()))?
+                        .function_signature(&Ty::Record(name.clone()))?
                         .is_some()
                 {
                     if arguments.len() != 1 {
                         return Err(callee
                             .at
-                            .error("delegate construction requires one method group"));
+                            .error("Function construction requires one method group"));
                     }
                     return self.expression_for(&arguments[0], &Ty::Record(name));
                 }
@@ -3019,12 +3011,12 @@ impl Lowerer<'_> {
                 Ty::Ref(t) | Ty::ReadOnlyRef(t) => t.as_ref(),
                 t => t,
             };
-            if self.delegate_signature(target)?.is_some() {
+            if self.function_signature(target)?.is_some() {
                 if !type_arguments.is_empty() {
-                    return Err(callee.at.error("delegate invocation is not generic"));
+                    return Err(callee.at.error("Function invocation is not generic"));
                 }
                 *self = probe;
-                return self.invoke_delegate(&ty, arguments, &callee.at);
+                return self.invoke_function(&ty, arguments, &callee.at);
             }
         }
         if let Some(ty) = self.source_function_call(callee, type_arguments, arguments)? {
@@ -3101,11 +3093,11 @@ impl Lowerer<'_> {
                 if let Some(result) = self.constrained_call(&ty, owner, saved, member, arguments)? {
                     return Ok(result);
                 }
-                if self.delegate_signature(target)?.is_some() {
+                if self.function_signature(target)?.is_some() {
                     if member.text != "Invoke" {
-                        return Err(member.error("delegate exposes Invoke"));
+                        return Err(member.error("Function exposes Invoke"));
                     }
-                    return self.invoke_delegate(&ty, arguments, member);
+                    return self.invoke_function(&ty, arguments, member);
                 }
                 let contract = self
                     .source
@@ -3318,7 +3310,7 @@ impl Lowerer<'_> {
                     format!("System.{owner}")
                 };
                 // A unique static signature supplies argument context, just as an
-                // instance signature does. Preserve managed references and delegates.
+                // instance signature does. Preserve managed references and Function objects.
                 if let Ok(function) = library::generic_static(&owner, member, &[], arguments.len())
                 {
                     let parameters = function
@@ -4311,7 +4303,6 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         .map(|record| &record.name)
         .chain(source.functions.iter().map(|function| &function.name))
         .chain(source.interfaces.iter().map(|interface| &interface.name))
-        .chain(source.delegates.iter().map(|delegate| &delegate.name))
         .chain(source.unions.iter().map(|union| &union.name))
         .chain(source.enums.iter().map(|e| &e.name))
     {
@@ -4336,27 +4327,6 @@ pub fn lower_to_il_named(source: &str, document: &str) -> Result<String, Fault> 
         il.push_str(&crate::enums::emit(
             &enumeration.name.text,
             &enumeration.info,
-        ));
-    }
-    for delegate in &source.delegates {
-        let parameters = delegate
-            .parameters
-            .iter()
-            .map(|p| {
-                format!(
-                    "{}{}{} {}",
-                    if p.readonly { "readonly " } else { "" },
-                    if p.output { "out " } else { "" },
-                    p.ty.il(),
-                    p.name.text
-                )
-            })
-            .collect::<Vec<_>>()
-            .join(",");
-        il.push_str(&format!(
-            ".delegate {}\n.method instance Invoke({parameters}) -> {}\n.end\n.end\n",
-            delegate.name.text,
-            delegate.returns.il()
         ));
     }
     for interface in &source.interfaces {

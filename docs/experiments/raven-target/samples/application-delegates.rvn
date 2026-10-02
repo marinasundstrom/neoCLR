@@ -31,7 +31,7 @@ class Counter {
     }
 }
 
-func MakeCounter(start: int) -> Func<int, int> {
+func MakeCounter(start: int) -> (int) -> int {
     var current = start
     return step => {
         current = current + step
@@ -41,29 +41,29 @@ func MakeCounter(start: int) -> Func<int, int> {
 
 func Main() {
     let counter = Counter(7)
-    let add: Func<int, int> = counter.Add
+    let add: (int) -> int = counter.Add
     WriteLine(add(1))
-    let set: Func<int, System.Void> = counter.Set
+    let set: (int) -> System.Void = counter.Set
     set(42)
     WriteLine(counter.Age)
-    let identity: Func<int, int> = value => value
+    let identity: (int) -> int = value => value
     WriteLine(identity(99))
     let next = MakeCounter(10)
     WriteLine(next(2))
     WriteLine(next(3))
     var shared = 7
-    let read: Func<int> = () => shared
-    let write: Func<int, System.Void> = value => {
+    let read: () -> int = () => shared
+    let write: (int) -> System.Void = value => {
         shared = value
     }
     write(42)
     WriteLine(read())
     WriteLine(shared)
     let reader: Reader = Derived()
-    let readInterface: Func<int> = reader.Read
+    let readInterface: () -> int = reader.Read
     WriteLine(readInterface())
     let parent: Base = Derived()
-    let readVirtual: Func<int> = parent.Read
+    let readVirtual: () -> int = parent.Read
     WriteLine(readVirtual())
     let values = ArrayList<int>()
     values.Add(7)
@@ -72,6 +72,6 @@ func Main() {
         Some(let index) => WriteLine(index)
         None => WriteLine("No index")
     }
-    let increment: Func<int, int> = value => value + 1
+    let increment: (int) -> int = value => value + 1
     WriteLine(increment(2147483647))
 }

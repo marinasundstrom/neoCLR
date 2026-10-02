@@ -28,10 +28,10 @@ pub struct ReachableFunction {
     pub implementation: FunctionImplementation,
     /// Every syntactic call in the specialized IL body, including unreachable code.
     pub calls: Vec<ReachableCall>,
-    /// Code retained by delegate binding, including possible virtual implementations.
+    /// Code retained by Function binding, including possible virtual implementations.
     pub bindings: Vec<ReachableCall>,
     /// Typed indirect call sites; targets are retained at binding sites, not guessed here.
-    pub delegate_invocations: Vec<(usize, Type)>,
+    pub function_invocations: Vec<(usize, Type)>,
     /// Logical runtime services used directly by this body or import declaration.
     pub services: Vec<crate::ServiceUse>,
 }
@@ -58,9 +58,9 @@ pub(crate) fn analyze(
     let mut functions = Vec::<Function>::new();
     let mut seen = HashMap::<(MemberId, Option<Type>, Vec<Type>), usize>::new();
     let mut intern = |function: Function, functions: &mut Vec<Function>| -> Result<usize, Fault> {
-        if crate::delegates::is_contract(module, &function) {
+        if crate::function_objects::is_contract(module, &function) {
             return Err(Fault::new(
-                "delegate Invoke is an indirect call contract, not a concrete graph root",
+                "Function Invoke is an indirect call contract, not a concrete graph root",
             ));
         }
         let definition = function
@@ -118,17 +118,19 @@ pub(crate) fn analyze(
         };
         let mut calls = Vec::new();
         let mut bindings = Vec::new();
-        let mut delegate_invocations = Vec::new();
+        let mut function_invocations = Vec::new();
         for (instruction, op) in function.body.iter().enumerate() {
             if let Instruction::Call(target) | Instruction::CallVirtual(target) = op {
                 let callee = crate::vm::resolve(module, target)?;
-                if crate::delegates::is_contract(module, &callee) {
-                    delegate_invocations.push((instruction, callee.owner.unwrap()));
+                if crate::function_objects::is_contract(module, &callee) {
+                    if callee.name == "$Function.Invoke" {
+                        function_invocations.push((instruction, callee.owner.unwrap()));
+                    }
                     continue;
                 }
             }
             let callees = match op {
-                Instruction::BindDelegate { target, .. } => crate::vm::resolve(module, target)
+                Instruction::BindFunction { target, .. } => crate::vm::resolve(module, target)
                     .and_then(|callee| {
                         if crate::interfaces::is_contract(module, &callee) {
                             crate::interfaces::dispatch_targets(module, &callee)
@@ -181,7 +183,7 @@ pub(crate) fn analyze(
                     fault.instruction = Some(instruction);
                     fault
                 })?;
-                let edges = if matches!(op, Instruction::BindDelegate { .. }) {
+                let edges = if matches!(op, Instruction::BindFunction { .. }) {
                     &mut bindings
                 } else {
                     &mut calls
@@ -212,7 +214,7 @@ pub(crate) fn analyze(
             implementation,
             calls,
             bindings,
-            delegate_invocations,
+            function_invocations,
             services,
         });
     }

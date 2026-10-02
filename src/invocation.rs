@@ -226,8 +226,10 @@ mod dispatch_tests {
             let mut dispatch = invocation.dispatch.lock().unwrap();
             dispatch.bind(&mut heap).unwrap();
             dispatch.default_task_queue = Some(object(&mut heap));
-            let callback = Value::Delegate(crate::Delegate {
-                ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+            let callback = Value::Function(crate::Function {
+                object_view: false,
+                identity: std::sync::Arc::new(()),
+                ty: crate::assembler::parse_type("fn<Void>").unwrap(),
                 target: crate::assembler::parse_function_ref("instance Capture::Callback()")
                     .unwrap(),
                 receiver: Some(Box::new(object(&mut heap))),
@@ -286,7 +288,7 @@ mod dispatch_tests {
                     .scheduler
                     .install_ready(|destination, callback| {
                         assert_eq!(Some(destination), queue.as_ref());
-                        let Value::Delegate(callback) = callback else {
+                        let Value::Function(callback) = callback else {
                             panic!()
                         };
                         let Some(receiver) = &callback.receiver else {

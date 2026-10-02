@@ -302,7 +302,7 @@ fn instruction_services(op: &Op) -> &'static [RuntimeService] {
     use RuntimeService::*;
     // Exhaustive so additions to IL require an explicit service classification.
     match op {
-        Op::BindDelegate { .. } => &[ValueStorage, SlotReferences],
+        Op::BindFunction { .. } => &[ValueStorage, SlotReferences],
         Op::ReserveArray(_) | Op::NewArray(_) | Op::NewValueArray(_) | Op::AllocateArray(_) => {
             &[ManagedArrays, ManagedHeap, SlotReferences]
         }

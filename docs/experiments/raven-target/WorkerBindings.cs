@@ -41,8 +41,8 @@ static class WorkerBindings
         var expected = (owner, definition.Name) switch {
             (Prefix + "WorkerCompletion", ".ctor") when library => ("Int32,System.Tasks.Promise<String>", "noresult", false),
             (Prefix + "WorkerCompletion", "Complete") when library => ("", "noresult", false),
-            (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("System.Func<String,String>,String", "System.Tasks.Task<String>", true),
-            (Prefix + "Thread", ".ctor") => ("System.Func<String,String>,String", "noresult", false),
+            (Prefix + "Thread", "Run") or (Prefix + "ThreadPool", "Queue") => ("fn<String,String>,String", "System.Tasks.Task<String>", true),
+            (Prefix + "Thread", ".ctor") => ("fn<String,String>,String", "noresult", false),
             (Prefix + "Thread", "Start") => ("", "noresult", false),
             (Prefix + "Thread", "get_Task") => ("", "System.Tasks.Task<String>", false),
             (Prefix + "Thread", "get_IsStarted") => ("", "Boolean", false),

@@ -29,8 +29,6 @@ pub(super) fn library() -> Module {
         "runtime/neoCLR/Runtime/Tasks.neoil",
         "runtime/System/Fault.neoil",
         "runtime/neoCLR/Runtime/Fault.neoil",
-        "runtime/raven/generated/Func.methods.neoil",
-        "runtime/raven/generated/Func.helpers.neoil",
     ] {
         source.push_str(&crate::source::read_source(path).unwrap());
         source.push('\n');
@@ -73,8 +71,8 @@ ret
 .function Post(System.Tasks.TaskQueue queue, Counter counter) -> Void
 ldarg queue
 ldarg counter
-delegate.bind System.Func<Void> = instance Counter::Tick()
-callvirt instance System.Tasks.TaskQueue::Post(System.Func<Void>)
+function.bind fn<Void> = instance Counter::Tick()
+callvirt instance System.Tasks.TaskQueue::Post(fn<Void>)
 ldvoid
 ret
 .end
@@ -88,8 +86,8 @@ ret
 ldarg source
 callvirt instance System.Tasks.Promise<Int32>::get_Task()
 ldarg counter
-delegate.bind System.Func<Void> = instance Counter::Tick()
-callvirt instance System.Tasks.Task<Int32>::OnCompleted(System.Func<Void>)
+function.bind fn<Void> = instance Counter::Tick()
+callvirt instance System.Tasks.Task<Int32>::OnCompleted(fn<Void>)
 ldvoid
 ret
 .end

@@ -7,8 +7,20 @@ toc: false
 [Experimental .NET metadata tooling](experimental-metadata.md) documents the
 feature-branch host library for future Raven adapters; it is not a guest API or release.
 
+[Cloning with Self](cloning.md) documents the development nongeneric Clonable contract.
+
+Browse [structural type families](structural-types.md): Array, Function, Tuple,
+Union and Intersection, with current member contracts and explicit proposal status.
+
+
+[Function shapes and objects](functions.md) document the development structural
+callable family and its Invoke/extension-member contracts.
+
 [Value tuples](tuples.md) are a development addition after Preview 11, using
 `System.Tuple<T1,...,TN>` as the value-type family.
+
+[Native numeric Self](text-numbers.md) is a development addition after Preview 11:
+Number is nongeneric and uses the implementing type for its operands and results.
 
 **Preview 11 API.** Comparer policies, explicit String comparison modes and the
 HashMap policy constructor are included. Rebuild applications
@@ -76,7 +88,7 @@ walks through the compiled hostname/echo POC.
 | Area | Read the guide | Browse types and members |
 | --- | --- | --- |
 | Collections and arrays | [Collections and queries](/features/collections/) · [Arrays](/features/arrays/) | [ArrayList](xref:System.Collections.ArrayList`1) · [HashMap](xref:System.Collections.HashMap`2) · [System.Collections](xref:System.Collections) · [Array](xref:System.Array`1) |
-| Outcomes and callbacks | [Outcomes](/features/outcomes/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Func](xref:System.Func`2) |
+| Outcomes and callbacks | [Outcomes](/features/outcomes/) · [Function types](/features/functions/) | [Option](xref:System.Option`1) · [Result](xref:System.Result`2) · [Function shapes](functions.md) |
 | Queries | [Collections and queries](/features/collections/) | [System.Linq](xref:System.Linq) |
 | Time and clocks | [Dates and clocks](/features/time/) | [Date](xref:System.Date) · [Time](xref:System.Time) · [Instant](xref:System.Instant) · [Clock](xref:System.Clock) |
 | Text and encoding | [Strings](/features/strings/) | [String](xref:System.String) · [Char](xref:System.Char) · [System.Text](xref:System.Text) · [Encoding](xref:System.Text.Encoding) · [Decoder](xref:System.Text.Decoder) · [Encoder](xref:System.Text.Encoder) |

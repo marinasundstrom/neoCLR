@@ -7,6 +7,13 @@ use crate::{
 /// An identity within the resolved modules of one build, not a cross-build cache key.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TypeIdentity {
+    Function {
+        parameters: Vec<TypeIdentity>,
+        returns: Box<TypeIdentity>,
+        no_result: bool,
+        out_parameters: Vec<usize>,
+        out_when_true: Vec<usize>,
+    },
     GenericParameter {
         definition: TypeDefId,
         index: u16,
@@ -44,6 +51,7 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
     crate::vm::check_type(normalized, module)?;
     let identity = build(module, normalized)?;
     let name = match normalized {
+        Type::Function(_) => signature_name(normalized)?,
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
@@ -84,6 +92,29 @@ pub(crate) fn describe_loaded(module: &Module, normalized: &Type) -> Result<Type
 pub(crate) fn signature_name(ty: &Type) -> Result<String, Fault> {
     Ok(match ty {
         Type::SelfType => "Self".into(),
+        Type::Function(shape) => {
+            let mut parts = shape
+                .parameters
+                .iter()
+                .enumerate()
+                .map(|(i, ty)| {
+                    let mode = if shape.out_parameters.contains(&i) {
+                        "out "
+                    } else if shape.out_when_true.contains(&i) {
+                        "outtrue "
+                    } else {
+                        ""
+                    };
+                    Ok(format!("{mode}{}", signature_name(ty)?))
+                })
+                .collect::<Result<Vec<_>, Fault>>()?;
+            parts.push(format!(
+                "{}{}",
+                if shape.no_result { "noresult " } else { "" },
+                signature_name(&shape.returns)?
+            ));
+            format!("fn<{}>", parts.join(","))
+        }
         Type::ByRef(element) => reference_name(element, false)?,
         Type::ReadOnlyByRef(element) => reference_name(element, true)?,
         Type::Array(element) => format!("{}[]", signature_name(element)?),
@@ -134,6 +165,17 @@ pub(crate) fn resolve(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault>
 fn build(module: &Module, ty: &Type) -> Result<TypeIdentity, Fault> {
     let nested = |ty: &Type| build(module, ty).map(Box::new);
     Ok(match ty {
+        Type::Function(shape) => TypeIdentity::Function {
+            parameters: shape
+                .parameters
+                .iter()
+                .map(|t| build(module, t))
+                .collect::<Result<_, _>>()?,
+            returns: nested(&shape.returns)?,
+            no_result: shape.no_result,
+            out_parameters: shape.out_parameters.clone(),
+            out_when_true: shape.out_when_true.clone(),
+        },
         Type::ByRef(t) => TypeIdentity::ByRef(nested(t)?),
         Type::ReadOnlyByRef(t) => TypeIdentity::ReadOnlyByRef(nested(t)?),
         Type::Array(t) => TypeIdentity::Array(nested(t)?),

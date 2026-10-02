@@ -13,7 +13,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
     private field busy: bool
 
     init(equal: (K, K) -> bool, hash: (K) -> int) {
-        comparer = DelegateEqualityComparer<K>(equal, hash)
+        comparer = FunctionEqualityComparer<K>(equal, hash)
         buckets = [0, 0, 0, 0]
         keys = ArrayList<K>()
         values = ArrayList<V>()

@@ -225,13 +225,13 @@ M00000040_IL_0060:
 ret
 .end
 .function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonText<T0>(System.Web.Http.HttpClient self,String url) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
-.local System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
+.local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 M00000042_IL_0000:
 M00000042_IL_0001:
 M00000042_IL_0002:
 M00000042_IL_0003:
 M00000042_IL_0009:
-delegate.bind System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
+function.bind fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
 M00000042_IL_000e:
 stloc local0
 M00000042_IL_000f:
@@ -252,13 +252,13 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000042_IL_002b:
 ldloc local0
 M00000042_IL_002c:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000042_IL_0031:
 ret
 .end
 .function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonTextWithToken<T0>(System.Web.Http.HttpClient self,String url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 .local System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
-.local System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
+.local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
 ldloca local0
 initobj System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 M00000043_IL_0000:
@@ -296,7 +296,7 @@ M00000043_IL_002a:
 M00000043_IL_002b:
 M00000043_IL_002c:
 M00000043_IL_0032:
-delegate.bind System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
+function.bind fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
 M00000043_IL_0037:
 stloc local1
 M00000043_IL_0038:
@@ -317,18 +317,18 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000043_IL_0050:
 ldloc local1
 M00000043_IL_0051:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000043_IL_0056:
 ret
 .end
 .function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUri<T0>(System.Web.Http.HttpClient self,System.Uri url) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
-.local System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
+.local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
 M00000044_IL_0000:
 M00000044_IL_0001:
 M00000044_IL_0002:
 M00000044_IL_0003:
 M00000044_IL_0009:
-delegate.bind System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
+function.bind fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
 M00000044_IL_000e:
 stloc local0
 M00000044_IL_000f:
@@ -349,13 +349,13 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000044_IL_002b:
 ldloc local0
 M00000044_IL_002c:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000044_IL_0031:
 ret
 .end
 .function System.Web.Http.Json.HttpClientJsonExtensions.GetFromJsonUriWithToken<T0>(System.Web.Http.HttpClient self,System.Uri url,System.Concurrency.CancellationToken cancellationToken) -> System.Tasks.Task<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 .local System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>> local0
-.local System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
+.local fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> local1
 ldloca local0
 initobj System.Tasks.Promise<System.Result<T0,System.Web.Http.Json.HttpJsonError>>
 M00000045_IL_0000:
@@ -393,7 +393,7 @@ M00000045_IL_002a:
 M00000045_IL_002b:
 M00000045_IL_002c:
 M00000045_IL_0032:
-delegate.bind System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
+function.bind fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Convert<T0>(System.Result<System.Object,System.Web.Http.Json.HttpJsonError>)
 M00000045_IL_0037:
 stloc local1
 M00000045_IL_0038:
@@ -414,7 +414,7 @@ call System.Web.Http.Json.JsonClientOperations::Get(System.Web.Http.HttpClient,S
 M00000045_IL_0050:
 ldloc local1
 M00000045_IL_0051:
-call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,System.Func<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>,fn<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>,System.Result<T0,System.Web.Http.Json.HttpJsonError>>)
 M00000045_IL_0056:
 ret
 .end
@@ -12080,9 +12080,9 @@ M0000004d_IL_000b:
 newobj instance System.Web.Http.Json.JsonClientRead::.ctor(System.Introspection.TypeInfo)
 M0000004d_IL_0010:
 M0000004d_IL_0016:
-delegate.bind System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::DelegateTarget_Application_V1_M_363A6D6574686F643131383A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31343A4A736F6E436C69656E7452656164363A4465636F6465343A54727565353A46616C7365313A30313A303334313A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323232373A3130303A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D363A4F626A6563743131393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31333A487474704A736F6E4572726F723334383A3334343A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323233303A3131333A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A48747470526573706F6E73653130393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E48747470393A487474704572726F72Direct(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::Decode(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004d_IL_001b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
 M0000004d_IL_0020:
 ret
 .end
@@ -12194,9 +12194,9 @@ call instance System.Web.Http.HttpClient::Post(String,System.Web.Http.HttpConten
 M0000004e_IL_006f:
 M0000004e_IL_0070:
 M0000004e_IL_0076:
-delegate.bind System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004e_IL_007b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
 M0000004e_IL_0080:
 ret
 M0000004e_IL_0087:
@@ -12282,9 +12282,9 @@ M0000004f_IL_000b:
 newobj instance System.Web.Http.Json.JsonClientRead::.ctor(System.Introspection.TypeInfo)
 M0000004f_IL_0010:
 M0000004f_IL_0016:
-delegate.bind System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::DelegateTarget_Application_V1_M_363A6D6574686F643131383A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31343A4A736F6E436C69656E7452656164363A4465636F6465343A54727565353A46616C7365313A30313A303334313A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323232373A3130303A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D363A4F626A6563743131393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31333A487474704A736F6E4572726F723334383A3334343A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323233303A3131333A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A48747470526573706F6E73653130393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E48747470393A487474704572726F72Direct(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>> = instance System.Web.Http.Json.JsonClientRead::Decode(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M0000004f_IL_001b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>)
 M0000004f_IL_0020:
 ret
 .end
@@ -12396,9 +12396,9 @@ call instance System.Web.Http.HttpClient::Post(System.Uri,System.Web.Http.HttpCo
 M00000050_IL_006f:
 M00000050_IL_0070:
 M00000050_IL_0076:
-delegate.bind System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
+function.bind fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>> = System.Web.Http.Json.JsonClientOperations.Adapt(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 M00000050_IL_007b:
-call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,System.Func<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
+call System.Tasks.TaskOperators::Map<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>(System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>,fn<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>,System.Result<System.Web.Http.HttpResponse,System.Web.Http.Json.HttpJsonError>>)
 M00000050_IL_0080:
 ret
 M00000050_IL_0087:
@@ -12748,12 +12748,6 @@ M00000052_IL_017a:
 M00000052_IL_017b:
 ldloc local3
 M00000052_IL_017c:
-ret
-.end
-.method instance DelegateTarget_Application_V1_M_363A6D6574686F643131383A343A7479706536393A53797374656D2E52756E74696D652C2056657273696F6E3D312E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31343A4A736F6E436C69656E7452656164363A4465636F6465343A54727565353A46616C7365313A30313A303334313A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323232373A3130303A343A7479706537353A6D73636F726C69622C2056657273696F6E3D342E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D62373761356335363139333465303839363A53797374656D363A4F626A6563743131393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C32303A53797374656D2E5765622E487474702E4A736F6E31333A487474704A736F6E4572726F723334383A3334343A373A67656E6572696339383A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C363A53797374656D383A526573756C7460323233303A3131333A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E4874747031323A48747470526573706F6E73653130393A343A7479706537313A4E656F434C522E436F726550726F62652C2056657273696F6E3D302E302E302E302C2043756C747572653D6E65757472616C2C205075626C69634B6579546F6B656E3D6E756C6C31353A53797374656D2E5765622E48747470393A487474704572726F72Direct(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>) -> System.Result<System.Object,System.Web.Http.Json.HttpJsonError>
-ldarg 0
-ldarg 1
-call instance System.Web.Http.Json.JsonClientRead::Decode(System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>)
 ret
 .end
 .end

@@ -25,7 +25,6 @@ fn runtime_library_is_assembled_platform_code() {
                     .is_some_and(|d| matches!(
                         d.representation,
                         neoclr::metadata::Representation::Interface
-                            | neoclr::metadata::Representation::Delegate
                     )))
             .all(|f| !f.body.is_empty())
     );

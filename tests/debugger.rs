@@ -413,22 +413,22 @@ fn default_interface_breakpoint_shows_original_receiver_and_steps_into_explicit_
 }
 
 #[test]
-fn delegate_call_enters_target_and_next_preserves_caller_source() {
-    let source = "delegate Reader() -> int
-class Counter { var Value: int = 42; readonly func Read() -> int { return this.Value } }
+fn function_call_enters_target_and_next_preserves_caller_source() {
+    let source =
+        "class Counter { var Value: int = 42; readonly func Read() -> int { return this.Value } }
 func Main() -> int {
  let counter = new Counter()
- let callback = Reader(counter.Read)
+ let callback = fn<int>(counter.Read)
  let result = callback()
  return result
 }";
-    let module = frontend::compile_named(source, "delegates.neo").unwrap();
+    let module = frontend::compile_named(source, "functions.neo").unwrap();
     let main = module.functions.iter().find(|f| f.name == "Main").unwrap();
     let pc = main
         .body
         .iter()
         .position(
-            |op| matches!(op, neoclr::metadata::Instruction::Call(t) if t.name == "Reader.Invoke"),
+            |op| matches!(op, neoclr::metadata::Instruction::Call(t) if t.name == "$Function.Invoke"),
         )
         .unwrap();
     for step in [true, false] {
@@ -443,21 +443,21 @@ func Main() -> int {
         let callback = stopped.frames[0]
             .locals
             .iter()
-            .find(|(_, v)| v.value.contains("delegate Counter.Read"))
+            .find(|(_, v)| v.value.contains("Function Counter.Read"))
             .unwrap();
-        assert!(callback.1.value.contains("delegate Counter.Read"));
+        assert!(callback.1.value.contains("Function Counter.Read"));
         assert!(callback.1.children[0].1.value.contains("heap#"));
         debugger.command(DebugCommand::ClearBreakpoints).unwrap();
         if step {
             let entered = act(&debugger, DebugCommand::Step);
             assert_eq!(entered.frames[0].function, "Counter.Read");
             assert_eq!(entered.frames.len(), 2);
-            assert_eq!(entered.frames[1].source.as_ref().unwrap().line, 6);
+            assert_eq!(entered.frames[1].source.as_ref().unwrap().line, 5);
             act(&debugger, DebugCommand::Out);
         } else {
             let next = act(&debugger, DebugCommand::Next);
             assert_eq!(next.frames.len(), 1);
-            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 7);
+            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 6);
         }
         assert_eq!(act(&debugger, DebugCommand::Continue).status, "completed");
         worker.join().unwrap();
@@ -466,7 +466,7 @@ func Main() -> int {
 
 #[test]
 fn closure_step_uses_lambda_source_and_exposes_capture_heap() {
-    let source = "delegate Reader() -> int\nfunc Main() -> int {\n var value = 42\n let callback: Reader = () => value\n let result = callback()\n return result\n}";
+    let source = "func Main() -> int {\n var value = 42\n let callback: fn<int> = () => value\n let result = callback()\n return result\n}";
     let module = frontend::compile_named(source, "closures.neo").unwrap();
     let main = module.functions.iter().find(|f| f.name == "Main").unwrap();
     let pc = main
@@ -474,7 +474,7 @@ fn closure_step_uses_lambda_source_and_exposes_capture_heap() {
         .iter()
         .position(|op| {
             matches!(op,
-        neoclr::metadata::Instruction::Call(t) if t.name == "Reader.Invoke")
+        neoclr::metadata::Instruction::Call(t) if t.name == "$Function.Invoke")
         })
         .unwrap();
     for step in [true, false] {
@@ -495,7 +495,7 @@ fn closure_step_uses_lambda_source_and_exposes_capture_heap() {
                     .function
                     .starts_with("neoCLR.Compiler.Environment")
             );
-            assert_eq!(entered.frames[0].source.as_ref().unwrap().line, 4);
+            assert_eq!(entered.frames[0].source.as_ref().unwrap().line, 3);
             assert_eq!(
                 entered.frames[0].source.as_ref().unwrap().document,
                 "closures.neo"
@@ -505,7 +505,7 @@ fn closure_step_uses_lambda_source_and_exposes_capture_heap() {
         } else {
             let next = act(&debugger, DebugCommand::Next);
             assert_eq!(next.frames.len(), 1);
-            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 6);
+            assert_eq!(next.frames[0].source.as_ref().unwrap().line, 5);
         }
         assert_eq!(act(&debugger, DebugCommand::Continue).status, "completed");
         worker.join().unwrap();

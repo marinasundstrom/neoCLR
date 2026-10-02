@@ -40,7 +40,7 @@ func Main() {
             .Error(let error) => WriteLine("Stored error")
         }
     }
-    let functions = ArrayList<Func<int,int>>()
+    let functions = ArrayList<(int) -> int>()
     functions.Add(Identity)
     WriteLine(functions[0](42))
     let result = Result<TypeInfo, OverflowError>.Ok(kind)

@@ -254,8 +254,8 @@ impl Sockets {
         if !self.listeners.contains_key(&listener) {
             return Err(Error::Closed);
         }
-        if !matches!(&callback, Value::Delegate(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+        if !matches!(&callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -326,8 +326,8 @@ impl Sockets {
                 remaining.push_back(endpoint);
             }
         }
-        if !matches!(&callback, Value::Delegate(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+        if !matches!(&callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -665,8 +665,8 @@ impl Sockets {
         if offset > elements.len() || count > elements.len() - offset {
             return Err(Error::InvalidRange);
         }
-        if !matches!(&callback, Value::Delegate(_))
-            || callback.ty() != crate::assembler::parse_type("System.Func<Void>").unwrap()
+        if !matches!(&callback, Value::Function(_))
+            || callback.ty() != crate::assembler::parse_type("fn<Void>").unwrap()
         {
             return Err(Error::InvalidCallback);
         }
@@ -1006,8 +1006,10 @@ mod tests {
         })
     }
     fn callback() -> Value {
-        Value::Delegate(crate::Delegate {
-            ty: crate::assembler::parse_type("System.Func<Void>").unwrap(),
+        Value::Function(crate::Function {
+            object_view: false,
+            identity: std::sync::Arc::new(()),
+            ty: crate::assembler::parse_type("fn<Void>").unwrap(),
             target: crate::assembler::parse_function_ref("Ready()").unwrap(),
             receiver: None,
         })

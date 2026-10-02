@@ -1,4 +1,5 @@
 import System.*
+import System.Linq.*
 import System.Collections.*
 import System.Introspection.*
 import System.Option.*
@@ -71,88 +72,91 @@ public class RouteUnionMapper {
         if !type.IsVisible || !type.IsUnion || !type.IsValueType || type.IsOpen || type.GenericArgumentCount != 0 {
             return Error("Expected a public nongeneric value union")
         }
+        let nominal = (NominalTypeInfo)type
         let prepared = ArrayList<BoundRoute>()
         let carriers = type.GetConstructors()
-        for candidate in type.Module.GetTypes() {
-            if let Some(parent) = candidate.DeclaringType {
-                if parent.Equals(type) {
-                    if !candidate.IsVisible || !candidate.IsValueType || candidate.IsEnum || candidate.IsOpen {
-                        return Error("Unsupported nested route case")
-                    }
-                    var template = ""
-                    var markers = 0
-                    for attribute in candidate.GetCustomAttributesData() {
-                        if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
-                            markers += 1
-                            let arguments = attribute.GetConstructorArguments()
-                            if arguments.Count != 1 {
-                                return Error("RoutePattern requires one string")
-                            }
-                            if arguments[0].Value is string text {
-                                template = text
-                            } else {
-                                return Error("RoutePattern requires a non-null string")
-                            }
+        if let Some(module) = nominal.Module {
+            for candidate in module.GetTypes().OfType<NominalTypeInfo>() {
+                if let Some(parent) = candidate.DeclaringType {
+                    if parent.Equals(type) {
+                        if !candidate.IsVisible || !candidate.IsValueType || candidate.IsEnum || candidate.IsOpen {
+                            return Error("Unsupported nested route case")
                         }
-                    }
-                    if markers != 1 {
-                        return Error("Each case requires exactly one RoutePattern")
-                    }
-                    let pattern = RoutePattern.Parse(template)?
-                    for existing in prepared {
-                        if existing.Pattern.Overlaps(pattern) {
-                            return Error("Overlapping route patterns")
-                        }
-                    }
-                    let constructors = candidate.GetConstructors()
-                    if constructors.Count != 1 {
-                        return Error("Expected one public case constructor")
-                    }
-                    let parameters = constructors[0].GetParameters()
-                    let captures = pattern.GetParameterNames()
-                    if captures.Count != parameters.Count {
-                        return Error("Capture names must match case parameters")
-                    }
-                    let names = ArrayList<string>()
-                    let integers = ArrayList<bool>()
-                    for parameter in parameters {
-                        var found = false
-                        for capture in captures {
-                            if capture == parameter.Name {
-                                found = true
+                        var template = ""
+                        var markers = 0
+                        for attribute in candidate.GetCustomAttributesData() {
+                            if attribute.AttributeType.Equals(typeof(RoutePatternAttribute)) {
+                                markers += 1
+                                let arguments = attribute.GetConstructorArguments()
+                                if arguments.Count != 1 {
+                                    return Error("RoutePattern requires one string")
+                                }
+                                if arguments[0].Value is string text {
+                                    template = text
+                                } else {
+                                    return Error("RoutePattern requires a non-null string")
+                                }
                             }
                         }
-                        for name in names {
-                            if name == parameter.Name {
-                                return Error("Duplicate case parameter name")
+                        if markers != 1 {
+                            return Error("Each case requires exactly one RoutePattern")
+                        }
+                        let pattern = RoutePattern.Parse(template)?
+                        for existing in prepared {
+                            if existing.Pattern.Overlaps(pattern) {
+                                return Error("Overlapping route patterns")
                             }
                         }
-                        if !found {
+                        let constructors = candidate.GetConstructors()
+                        if constructors.Count != 1 {
+                            return Error("Expected one public case constructor")
+                        }
+                        let parameters = constructors[0].GetParameters()
+                        let captures = pattern.GetParameterNames()
+                        if captures.Count != parameters.Count {
                             return Error("Capture names must match case parameters")
                         }
-                        let integer = parameter.ParameterType.Equals(typeof(int))
-                        if !integer && !parameter.ParameterType.Equals(typeof(string)) {
-                            return Error("Only String and Int32 route parameters are supported")
-                        }
-                        names.Add(parameter.Name)
-                        integers.Add(integer)
-                    }
-                    var bound = false
-                    for carrier in carriers {
-                        let payloads = carrier.GetParameters()
-                        if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
-                            if bound {
-                                return Error("Ambiguous union constructor")
+                        let names = ArrayList<string>()
+                        let integers = ArrayList<bool>()
+                        for parameter in parameters {
+                            var found = false
+                            for capture in captures {
+                                if capture == parameter.Name {
+                                    found = true
+                                }
                             }
-                            if prepared.Count == 16 {
-                                return Error("Route union exceeds 16 cases")
+                            for name in names {
+                                if name == parameter.Name {
+                                    return Error("Duplicate case parameter name")
+                                }
                             }
-                            prepared.Add(BoundRoute(pattern, constructors[0], carrier, names, integers))
-                            bound = true
+                            if !found {
+                                return Error("Capture names must match case parameters")
+                            }
+                            let integer = parameter.ParameterType.Equals(typeof(int))
+                            if !integer && !parameter.ParameterType.Equals(typeof(string)) {
+                                return Error("Only String and Int32 route parameters are supported")
+                            }
+                            names.Add(parameter.Name)
+                            integers.Add(integer)
                         }
-                    }
-                    if !bound {
-                        return Error("Public union constructor missing")
+                        var bound = false
+                        for carrier in carriers {
+                            let payloads = carrier.GetParameters()
+                            if payloads.Count == 1 && payloads[0].ParameterType.Equals(candidate) {
+                                if bound {
+                                    return Error("Ambiguous union constructor")
+                                }
+                                if prepared.Count == 16 {
+                                    return Error("Route union exceeds 16 cases")
+                                }
+                                prepared.Add(BoundRoute(pattern, constructors[0], carrier, names, integers))
+                                bound = true
+                            }
+                        }
+                        if !bound {
+                            return Error("Public union constructor missing")
+                        }
                     }
                 }
             }

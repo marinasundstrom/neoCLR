@@ -1,8 +1,5 @@
 use neoclr::{Limits, Value, assemble, run_with_library, verify_with_library};
 
-const CALLBACK: &str =
-    ".delegate System.Func<T,R>\n.method instance Invoke(T value) -> R\n.end\n.end";
-
 const ITERATION: &str = r#"
 .interface System.Collections.Iterable<T>
 .method instance GetIterator() -> System.Collections.Iterator<T>
@@ -54,7 +51,7 @@ fn array_source() -> String {
 
 fn library() -> neoclr::Module {
     assemble(&format!(
-        ".module System\n{CALLBACK}\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
+        ".module System\n{ITERATION}\n{COLLECTION_CONTRACTS}\n{}",
         array_source()
     ))
     .unwrap()
@@ -315,8 +312,8 @@ call System.Array<Int32>::get_Empty()
 dup
 call instance System.Array<Int32>::get_Length()
 brtrue Bad
-delegate.bind System.Func<Int32,Void> = Check(Int32)
-call instance System.Array<Int32>::ForEach(System.Func<Int32,Void>)
+function.bind fn<Int32,Void> = Check(Int32)
+call instance System.Array<Int32>::ForEach(fn<Int32,Void>)
 ldc.i4 1
 newarr Int32
 stloc data
@@ -325,8 +322,8 @@ ldc.i4 0
 ldc.i4 42
 stelem Int32
 ldloc data
-delegate.bind System.Func<Int32,Void> = Check(Int32)
-callvirt instance System.Array<Int32>::ForEach(System.Func<Int32,Void>)
+function.bind fn<Int32,Void> = Check(Int32)
+callvirt instance System.Array<Int32>::ForEach(fn<Int32,Void>)
 ldloc data
 ldc.i4 0
 ldelem Int32

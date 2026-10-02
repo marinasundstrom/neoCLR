@@ -1,3 +1,8 @@
+> 2026-10-02 metadata-branch update: codex/extended-cli-metadata now integrates
+> structural Functions from codex/structural-types at the author's direction. The
+> nominal baseline descriptions below are historical. Use the regenerated Function
+> bundle for this branch; direct native metadata callback emission remains in progress.
+
 # Raven CLI bridge
 
 ## Self integration on nominal main (2026-09-30)
@@ -2881,3 +2886,12 @@ propagation protocol can execute. Do not replace out parameters with unrelated v
 calls or silently initialize them to bypass the capability check. Existing CLR/CIL
 byref and address semantics remain the baseline. No new metadata encoding or runtime
 support is claimed by this checkpoint, and the complete application has not executed.
+
+## Structural experiment branch
+
+The source experiment is `codex/structural-types`, based on the Self-integrated main.
+Its Function work is now integrated into `codex/extended-cli-metadata` for direct codegen development.
+Its existing structural Function implementation and API are retained, independently
+of main's nominal delegates. Function identity/metadata work is still experimental;
+Self support is inherited from main. Use this branch's matching generated core,
+bridge and native library, not a nominal main bundle.

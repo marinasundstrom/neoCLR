@@ -10,6 +10,6 @@
 .methodimpl InternalCall
 .end
 
-.function neoCLR.Runtime.ScheduleTask(System.Func<Void> callback) -> Void
+.function neoCLR.Runtime.ScheduleTask(fn<Void> callback) -> Void
 .methodimpl InternalCall
 .end

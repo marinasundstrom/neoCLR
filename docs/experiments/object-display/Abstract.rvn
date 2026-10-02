@@ -2,5 +2,5 @@ import System.*
 
 func Main() {
     let value = Object()
-    Console.WriteLine(value.GetType().FullName)
+    Console.WriteLine(value.GetType().DisplayName)
 }

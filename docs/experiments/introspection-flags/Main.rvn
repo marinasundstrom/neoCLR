@@ -14,7 +14,7 @@ func CheckFlags(info: TypeInfo, abstractType: bool, openType: bool, closedHierar
     if info.IsAbstract != abstractType || info.IsOpen != openType ||
         info.IsClosedHierarchy != closedHierarchy || info.IsUnion != unionType ||
         info.IsEnum != enumType || info.IsValueType != valueType {
-        System.Fail(info.FullName)
+        System.Fail(info.DisplayName)
     }
 }
 

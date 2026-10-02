@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Integrate structural Function runtime/library work from codex/structural-types into
+  the metadata feature branch at the author's direction. Preserve System.Fail and
+  binary PE loading; regenerate the matching class library/reference. Native Function
+  signatures replace nominal delegates here; ordinary .NET remains delegate-based.
+  65 focused native tests, 86 metadata groups, five direct native controls and the existing
+  Function CLI-import consumer controls pass. Direct Raven metadata emission of Function
+  values remains the next integration step.
+
 - Import nested public metadata identities with enclosing TypeRef scopes, and author
   generic nested value types under nongeneric owners. Preserve scope in equality,
   substitution, native references and CLI projections. Separate-library metadata and
@@ -800,6 +808,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   C# metadata contract groups pass; the existing native loader/verifier/VM runs the
   chain to 42 without runtime implementation changes.
 
+
+- Continue the structural Function experiment as `codex/structural-types` on top
+  of shared main. Retain structural signatures/objects and Function introspection
+  alongside main's integrated Self; the experiment remains outside main. Resolve
+  nominal-versus-structural merge conflicts in favor of this branch's Function ABI
+  and regenerate matching library and API artifacts. Validate 80 focused native
+  tests, identical regenerated native bodies, metadata/audit checks and a structural
+  unit callback executing through function.bind. Self cloning and all six negative
+  consumer cases also pass on the structural bundle.
 - Preserve the deferred Function/structural experiment as `codex/structural-types`
   on top of the Self-integrated main. Retire the previous branch name after
   synchronization; this organizational change does not enable structural types on main.

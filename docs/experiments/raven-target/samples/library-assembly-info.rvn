@@ -1,4 +1,6 @@
+import System.Option.*
 import System.*
+import System.Linq.*
 import System.Introspection.*
 import System.Runtime.*
 
@@ -19,16 +21,24 @@ func Main() {
     for module in assembly.GetModules() {
         Console.WriteLine(module.Name)
         Console.WriteLine(module.MetadataToken)
-        for typeInfo in module.GetTypes() {
+        for typeInfo in module.GetTypes().OfType<NominalTypeInfo>() {
             Console.WriteLine(typeInfo.Name)
-            if typeInfo.MetadataToken > 0 {
+            if typeInfo.MetadataToken is Some(let token) && token > 0 {
                 Console.WriteLine("Type token available")
             }
         }
     }
-    let description = widget.GetType()
-    Console.WriteLine(description.Module.Assembly.Name)
-    if description.MetadataToken == typeof(Widget).MetadataToken {
-        Console.WriteLine("Same definition token")
+    let description = (NominalTypeInfo)widget.GetType()
+    if let Some(module) = description.Module {
+        Console.WriteLine(module.Assembly.Name)
+    } else {
+        System.Fail("Missing nominal module")
+    }
+    if let Some(token) = description.MetadataToken {
+        if let Some(declaredToken) = ((NominalTypeInfo)typeof(Widget)).MetadataToken {
+            if token == declaredToken {
+                Console.WriteLine("Same definition token")
+            }
+        }
     }
 }

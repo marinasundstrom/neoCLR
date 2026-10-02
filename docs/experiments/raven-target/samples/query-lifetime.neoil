@@ -85,10 +85,10 @@ Good:
     ldloc state
     newobj Source
     castclass System.Collections.Iterable<Int32>
-    delegate.bind System.Func<Int32,Boolean> = Keep(Int32)
-    call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Boolean>)
-    delegate.bind System.Func<Int32,Int32> = Increment(Int32)
-    call System.Linq.Operators::Map<Int32,Int32>(System.Collections.Iterable<Int32>,System.Func<Int32,Int32>)
+    function.bind fn<Int32,Boolean> = Keep(Int32)
+    call System.Linq.Operators::Filter<Int32>(System.Collections.Iterable<Int32>,fn<Int32,Boolean>)
+    function.bind fn<Int32,Int32> = Increment(Int32)
+    call System.Linq.Operators::Map<Int32,Int32>(System.Collections.Iterable<Int32>,fn<Int32,Int32>)
     stloc query
     ldloc state
     ldfld Tracker::Acquired

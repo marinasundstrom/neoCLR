@@ -282,9 +282,6 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Fault'">
     <Compile Include="src/System/Functions.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Func'">
-    <Compile Include="src/System/Func.rvn" />
-  </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'BindingFlags'">
     <Compile Include="src/System/Introspection/BindingFlags.rvn" />
   </ItemGroup>
@@ -386,11 +383,11 @@
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'Comparer'">
     <Compile Include="src/System/Collections/Comparer.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DelegateEqualityComparer'">
-    <Compile Include="src/System/Collections/DelegateEqualityComparer.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FunctionEqualityComparer'">
+    <Compile Include="src/System/Collections/FunctionEqualityComparer.rvn" />
   </ItemGroup>
-  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'DelegateComparer'">
-    <Compile Include="src/System/Collections/DelegateComparer.rvn" />
+  <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'FunctionComparer'">
+    <Compile Include="src/System/Collections/FunctionComparer.rvn" />
   </ItemGroup>
   <ItemGroup Condition="'$(NeoCLRLibrarySlice)' == 'StringComparison'">
     <Compile Include="src/System/StringComparison.rvn" />

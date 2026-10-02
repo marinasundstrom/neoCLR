@@ -1,5 +1,12 @@
 # Func and collection predicates from Raven
 
+**Historical bridge milestones.** Development after Preview 11 uses structural
+Function types and objects, with arrow syntax and inhabited unit results. The old
+nominal Func source API and delegate.bind opcode below are superseded. See the
+[current Function API](../api-docs/functions.md) and
+[validated source consumers](experiments/function-types/README.md).
+
+
 The target surface exposes the five existing System.Func delegate types, from
 Func<TResult> to Func<T1,T2,T3,T4,TResult>. The bounded importer binds static
 application functions and supports ordinary callback invocation syntax. It checks

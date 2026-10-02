@@ -164,10 +164,10 @@ virtual calls; it introduces no opcode or Runtime Contract switch.
 | --- | --- |
 | `System.Collections.EqualityComparer<T>` | Invariant interface: `Equals(T left, T right): bool`, `GetHashCode(T value): int`. |
 | `System.Collections.Comparer<T>` | Invariant interface: `Compare(T left, T right): int`; negative/zero/positive means less/equivalent/greater. |
-| `DelegateEqualityComparer<T>(equal, hash)` | Retains both callbacks; invokes them synchronously without suppressing faults. |
-| `DelegateComparer<T>(compare)` | Retains an ordering callback with the same sign contract. |
+| `FunctionEqualityComparer<T>(equal, hash)` | Retains both callbacks; invokes them synchronously without suppressing faults. |
+| `FunctionComparer<T>(compare)` | Retains an ordering callback with the same sign contract. |
 | `System.StringComparer.Ordinal` | Stateless policy implementing both string interfaces; exact equality, existing String Object content hash, unsigned UTF-8/scalar ordering. A new policy instance is returned; do not rely on identity. |
-| `HashMap<K,V>(EqualityComparer<K> comparer)` | Retains the policy. Existing callback constructor adapts to DelegateEqualityComparer and remains source-compatible. |
+| `HashMap<K,V>(EqualityComparer<K> comparer)` | Retains the policy. Existing callback constructor adapts to FunctionEqualityComparer and remains source-compatible. |
 
 Equality must be reflexive, symmetric and transitive; equal values must have equal
 hashes. Ordering must be transitive with opposite signs on reversed unequal inputs.
@@ -208,7 +208,7 @@ Primary sources reviewed 2026-09-27 against .NET 10:
   UTF-8 ordering and non-null string domain. This simplifies consistency with existing
   String methods at the cost of different supplementary-character order and null behavior.
 - [.NET EqualityComparer.Create](https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.equalitycomparer-1.create?view=net-10.0)
-  supports callback adaptation. Explicit Delegate* classes keep construction ordinary
+  supports callback adaptation. Explicit Function comparer classes keep construction ordinary
   in the current target. Requiring a hash callback prevents accidentally selecting a
   different default hash for custom equality; it cannot guarantee the callbacks agree.
 

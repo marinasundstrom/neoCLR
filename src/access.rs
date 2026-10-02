@@ -206,6 +206,15 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
         }
         let nested = |ty| visit(module, source, ty, depth + 1);
         match ty {
+            Type::Function(shape) => {
+                for part in shape
+                    .parameters
+                    .iter()
+                    .chain(std::iter::once(&shape.returns))
+                {
+                    nested(part)?;
+                }
+            }
             Type::Constructed { arguments, .. } => {
                 for argument in arguments {
                     nested(argument)?;
@@ -229,6 +238,9 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
 }
 
 fn check_owner(module: &Module, source: Scope<'_>, owner: &Type) -> Result<(), Fault> {
+    if matches!(owner, Type::Function(_)) {
+        return check_type(module, source, owner);
+    }
     // Runtime specialization does not revoke access to caller-supplied generic arguments.
     // Explicit signature/operand types were checked in their open declaring context.
     let definition = module
@@ -306,7 +318,7 @@ pub(crate) fn validate_types(module: &Module) -> Result<(), Fault> {
             if let crate::metadata::Instruction::Call(target)
             | crate::metadata::Instruction::CallVirtual(target)
             | crate::metadata::Instruction::Construct(target)
-            | crate::metadata::Instruction::BindDelegate { target, .. } = op
+            | crate::metadata::Instruction::BindFunction { target, .. } = op
             {
                 check_signature(module, source, &crate::vm::resolve(module, target)?)?;
             }

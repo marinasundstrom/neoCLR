@@ -1,3 +1,4 @@
+import System.Option.*
 import System.*
 import System.Collections.*
 import System.Introspection.*
@@ -9,14 +10,15 @@ func MemberKind(member: MemberInfo) -> string {
     return match member {
         FieldInfo => "Field"
         MethodInfo => "Method"
+        ConstructorInfo => "Constructor"
         PropertyInfo => "Property"
-        TypeInfo => "Type"
+        NominalTypeInfo => "Type"
     }
 }
 
 func Main() {
     let widget: Object = Widget()
-    let description = widget.GetType()
+    let description = (NominalTypeInfo)widget.GetType()
     if description.Equals(typeof(Widget)) {
         Console.WriteLine("Instance and declared type agree")
     }
@@ -29,14 +31,22 @@ func Main() {
     for module in assembly.GetModules() {
         Console.WriteLine(module.Name)
         for discovered in module.GetTypes() {
-            Console.WriteLine(discovered.Name)
+            Console.WriteLine(discovered.DisplayName)
         }
     }
 
-    if description.MetadataToken == typeof(Widget).MetadataToken {
-        Console.WriteLine("Same definition token")
+    if let Some(token) = description.MetadataToken {
+        if let Some(declaredToken) = ((NominalTypeInfo)typeof(Widget)).MetadataToken {
+            if token == declaredToken {
+                Console.WriteLine("Same definition token")
+            }
+        }
     }
-    Console.WriteLine(description.Module.Name)
+    if let Some(module) = description.Module {
+        Console.WriteLine(module.Name)
+    } else {
+        System.Fail("Missing nominal module")
+    }
 
     let methods: Sequence<MethodInfo> = typeof(int).GetMethods()
     Console.WriteLine(methods.Count)

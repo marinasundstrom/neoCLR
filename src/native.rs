@@ -431,7 +431,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Boolean,
         ),
         ("neoCLR.Runtime.DnsLookupUntil", [Type::String, Type::Int64, callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Resolve(crate::name_resolution::Operation::LookupUntil),
@@ -442,7 +442,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             "neoCLR.Runtime.SocketConnectAddressesUntil",
             [addresses, Type::Int32, Type::Int64, callback],
         ) if *addresses == Type::ArrayRef(Box::new(Type::String))
-            && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::ConnectAddressesUntil),
@@ -460,7 +460,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 callback,
             ],
         ) if *buffer == crate::assembler::parse_type("arrayref<Byte>")?
-            && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::ReceiveUntil),
@@ -478,7 +478,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 callback,
             ],
         ) if *buffer == crate::assembler::parse_type("arrayref<Byte>")?
-            && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::SendUntil),
@@ -486,7 +486,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             )
         }
         ("neoCLR.Runtime.DnsLookup", [Type::String, callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Resolve(crate::name_resolution::Operation::Lookup),
@@ -502,7 +502,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Value,
         ),
         ("neoCLR.Runtime.SocketAccept", [Type::Int64, callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::Accept),
@@ -514,7 +514,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Value,
         ),
         ("neoCLR.Runtime.SocketConnect", [Type::String, Type::Int32, callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::Connect),
@@ -523,7 +523,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.SocketConnectAddresses", [addresses, Type::Int32, callback])
             if *addresses == Type::ArrayRef(Box::new(Type::String))
-                && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+                && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::ConnectAddresses),
@@ -534,7 +534,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             "neoCLR.Runtime.SocketReceive",
             [Type::Int64, buffer, Type::Int32, Type::Int32, callback],
         ) if *buffer == crate::assembler::parse_type("arrayref<Byte>")?
-            && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::Receive),
@@ -545,7 +545,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             "neoCLR.Runtime.SocketSend",
             [Type::Int64, buffer, Type::Int32, Type::Int32, callback],
         ) if *buffer == crate::assembler::parse_type("arrayref<Byte>")?
-            && *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            && *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (
                 Binding::Socket(crate::socket_io::Operation::Send),
@@ -657,28 +657,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ) if **element == Type::Byte => (Binding::ConsoleWriteBytes, Type::Value),
         ("neoCLR.Runtime.ConsoleFlush", [Type::Boolean]) => (Binding::ConsoleFlush, Type::Value),
         ("neoCLR.Runtime.ConsoleReadByte", []) => (Binding::ConsoleReadByte, Type::Value),
-        (
-            "neoCLR.Runtime.StartWorker",
-            [
-                Type::Constructed {
-                    definition,
-                    arguments,
-                },
-                Type::String,
-            ],
-        ) if definition == "System.Func" && arguments == &[Type::String, Type::String] => {
+        ("neoCLR.Runtime.StartWorker", [callback, Type::String])
+            if *callback == crate::assembler::parse_type("fn<String,String>")? =>
+        {
             (Binding::StartWorker(false), Type::Int32)
         }
-        (
-            "neoCLR.Runtime.QueueWorker",
-            [
-                Type::Constructed {
-                    definition,
-                    arguments,
-                },
-                Type::String,
-            ],
-        ) if definition == "System.Func" && arguments == &[Type::String, Type::String] => {
+        ("neoCLR.Runtime.QueueWorker", [callback, Type::String])
+            if *callback == crate::assembler::parse_type("fn<String,String>")? =>
+        {
             (Binding::StartWorker(true), Type::Int32)
         }
         ("neoCLR.Runtime.RequestWorkerCancellation", [Type::Int32]) => {
@@ -691,19 +677,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         (
             "neoCLR.Runtime.TestSocketReceive",
             [Type::ArrayRef(element), Type::Int32, Type::Int32, callback],
-        ) if **element == Type::Byte
-            && callback == &crate::assembler::parse_type("System.Func<Void>")? =>
-        {
+        ) if **element == Type::Byte && callback == &crate::assembler::parse_type("fn<Void>")? => {
             (Binding::TestSocketReceive, Type::Void)
         }
         ("neoCLR.Runtime.JoinWorker", [Type::Int32]) => (Binding::JoinWorker, Type::String),
         ("neoCLR.Runtime.NotifyWorker", [Type::Int32, callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (Binding::NotifyWorker, Type::Void)
         }
         ("neoCLR.Runtime.ScheduleTask", [callback])
-            if *callback == crate::assembler::parse_type("System.Func<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")? =>
         {
             (Binding::ScheduleTask, Type::Void)
         }
@@ -828,6 +812,7 @@ impl Binding {
                         object.concrete_type()
                     }
                     Value::String(_) => Type::String,
+                    Value::Function(binding) => binding.ty.clone(),
                     Value::NullObjectReference(_) => {
                         return Err(Fault::coded(
                             crate::FaultCode::NullReference,

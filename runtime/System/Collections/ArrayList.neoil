@@ -218,7 +218,7 @@
     .end
 
     ; Predicate searches retain the same initial buffer/extent as GetIterator.
-    .method instance readonly byref FindIndex(System.Func<T,Boolean> match) -> Int32
+    .method instance readonly byref FindIndex(fn<T,Boolean> match) -> Int32
         .local System.Collections.Iterator<T>& iterator
         .local Int32 index
         ldarg this
@@ -233,7 +233,7 @@
         ldarg match
         ldloc iterator
         callvirt instance System.Collections.Iterator<T>::get_Current()
-        call instance System.Func<T,Boolean>::Invoke(T)
+        call instance fn<T,Boolean>::Invoke(T)
         brtrue Found
         ldloc index
         ldc.i4 1
@@ -256,10 +256,10 @@
         ret
     .end
 
-    .method instance readonly byref Exists(System.Func<T,Boolean> match) -> Boolean
+    .method instance readonly byref Exists(fn<T,Boolean> match) -> Boolean
         ldarg this
         ldarg match
-        call instance System.Collections.ArrayList<T>::FindIndex(System.Func<T,Boolean>)
+        call instance System.Collections.ArrayList<T>::FindIndex(fn<T,Boolean>)
         ldc.i4 0
         clt
         ldc.bool false
@@ -267,7 +267,7 @@
         ret
     .end
 
-    .method instance readonly byref Find(System.Func<T,Boolean> match) -> System.Option<T>
+    .method instance readonly byref Find(fn<T,Boolean> match) -> System.Option<T>
         .local System.Collections.Iterator<T>& iterator
         .local T value
         ldarg this
@@ -282,7 +282,7 @@
         stloc value
         ldarg match
         ldloc value
-        call instance System.Func<T,Boolean>::Invoke(T)
+        call instance fn<T,Boolean>::Invoke(T)
         brtrue Found
         br Next
     Found:

@@ -48,7 +48,7 @@ func Next(calls: int&) -> Counter& {
 func Main() -> int {
     let first = new Counter(1)
     var selected = first
-    let read: System.Func<int> = () => selected.Age
+    let read: fn<int> = () => selected.Age
     var calls = 0
     selected = Next(&calls)
     selected.Age = selected.Age + 1

@@ -1,4 +1,12 @@
-# Raven delegates and lambdas on neoCLR
+# Raven Functions and lambdas on neoCLR
+
+Development after Preview 11 imports Raven function syntax as structural Function
+shapes and checked Function objects. CLI Func/Action are transport metadata only;
+no nominal delegate declarations enter runtime artifacts. The tested source forms,
+extensions and async behavior are in the [Function migration evidence](experiments/function-types/README.md)
+and [API reference](../api-docs/functions.md). The remaining text records earlier
+bridge milestones; nominal Func terminology is historical.
+
 
 The post-Preview-4 source bridge supports the existing `Func` family with static
 application functions, class instance method groups, virtual/interface method groups,
@@ -74,7 +82,7 @@ this does not yet supply full nested-type reflection metadata.
 The application checks exercise shared mutable captures, escaping callbacks, a
 collection predicate, arithmetic wrapping, and failure at null interface binding.
 They also insert allocation pressure and require a real GC collection while an
-escaping callback remains usable. `tests/nominal_delegates.rs` separately checks
+escaping callback remains usable. `tests/function_receivers.rs` separately checks
 receiver lifetime across returns, copies and GC, virtual/interface targets, and null
 binding. Legacy delegate/closure tests remain in the validation set.
 

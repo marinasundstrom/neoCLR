@@ -613,12 +613,12 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                                 serde_json::json!({"borrowed": borrowed, "self_type": parse_type(ty)?, "target": parse_function_ref(target.trim())?}),
                             )
                         }
-                        "delegate.bind" => {
+                        "function.bind" => {
                             let (ty, target) = rest.split_once(" = ").ok_or_else(|| {
-                                Fault::new("expected delegate.bind Type = Target(...)")
+                                Fault::new("expected function.bind Type = Target(...)")
                             })?;
                             Some(
-                                serde_json::json!({"delegate": parse_type(ty.trim())?, "target": parse_function_ref(target.trim())?}),
+                                serde_json::json!({"function_type": parse_type(ty.trim())?, "target": parse_function_ref(target.trim())?}),
                             )
                         }
                         "call" | "callvirt" | "newobj.ctor" => Some(
@@ -708,7 +708,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                     }
                     module.revision = Some(rest.into());
                 }
-                ".type" | ".interface" | ".delegate" => {
+                ".type" | ".interface" => {
                     let (visibility, rest) = match rest.split_once(char::is_whitespace) {
                         Some(("public", rest)) => {
                             (crate::metadata::Visibility::Public, rest.trim())
@@ -774,9 +774,7 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         properties: vec![],
                         packing: None,
                         minimum_size: None,
-                        representation: if word == ".delegate" {
-                            Representation::Delegate
-                        } else if word == ".interface" {
+                        representation: if word == ".interface" {
                             Representation::Interface
                         } else if ty.is_primitive() {
                             Representation::Runtime
@@ -1150,6 +1148,36 @@ pub fn parse_type(text: &str) -> Result<Type, Fault> {
             }
             parts.push(&args[start..]);
             return match (name.trim(), parts.as_slice()) {
+                ("fn", parts) => {
+                    let (result, parameters) = parts
+                        .split_last()
+                        .ok_or_else(|| Fault::new("Function requires a result type"))?;
+                    let mut shape = crate::metadata::FunctionType {
+                        parameters: vec![],
+                        returns: parse(
+                            result.trim().strip_prefix("noresult ").unwrap_or(result),
+                            depth + 1,
+                        )?,
+                        no_result: result.trim().starts_with("noresult "),
+                        out_parameters: vec![],
+                        out_when_true: vec![],
+                    };
+                    for (i, part) in parameters.iter().enumerate() {
+                        let part = part.trim();
+                        let part = if let Some(rest) = part.strip_prefix("out ") {
+                            shape.out_parameters.push(i);
+                            rest
+                        } else if let Some(rest) = part.strip_prefix("outtrue ") {
+                            shape.out_when_true.push(i);
+                            rest
+                        } else {
+                            part
+                        };
+                        shape.parameters.push(parse(part, depth + 1)?);
+                    }
+                    shape.validate()?;
+                    Ok(Type::Function(Box::new(shape)))
+                }
                 ("InterfaceRef", [t]) => Ok(Type::InterfaceRef(Box::new(parse(t, depth + 1)?))),
                 ("Ptr", [t]) => Ok(Type::Ptr(Box::new(parse(t, depth + 1)?))),
                 ("Ref" | "Ptr" | "InterfaceRef", _) => {
@@ -1244,6 +1272,7 @@ fn parse_callable(text: &str, named: bool) -> Result<Callable, Fault> {
             match &owner {
                 Type::Constructed { definition, .. } => definition.as_str(),
                 Type::Scoped { name, .. } => name.as_str(),
+                Type::Function(_) => "$Function",
                 _ => owner
                     .definition_name()
                     .ok_or_else(|| Fault::new("invalid method owner"))?,
@@ -1480,6 +1509,15 @@ fn bind_type_parameters(ty: Type, names: &[Option<String>]) -> Type {
 }
 pub(crate) fn bind_parameters(ty: Type, names: &[Option<String>], method: bool) -> Type {
     match ty {
+        Type::Function(mut shape) => {
+            shape.parameters = shape
+                .parameters
+                .into_iter()
+                .map(|ty| bind_parameters(ty, names, method))
+                .collect();
+            shape.returns = bind_parameters(shape.returns, names, method);
+            Type::Function(shape)
+        }
         Type::Scoped {
             module,
             name,

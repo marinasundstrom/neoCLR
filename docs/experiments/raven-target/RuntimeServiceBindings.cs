@@ -12,21 +12,21 @@ static class RuntimeServiceBindings
         .Concat(BinaryMath.Select(n => ("Math" + n, new[] { "Double", "Double" }, "Double"))).Concat(new (string Name, string[] Args, string Result)[] {
             ("SocketDeadlineAfter", ["Int32"], "Int64"),
             ("SocketDeadlineExpired", ["Int64"], "Boolean"),
-            ("DnsLookupUntil", ["String", "Int64", "System.Func<Void>"], "Value"),
-            ("SocketConnectAddressesUntil", ["arrayref<String>", "Int32", "Int64", "System.Func<Void>"], "Value"),
-            ("SocketReceiveUntil", ["Int64", "arrayref<Byte>", "Int32", "Int32", "Int64", "System.Func<Void>"], "Value"),
-            ("SocketSendUntil", ["Int64", "arrayref<Byte>", "Int32", "Int32", "Int64", "System.Func<Void>"], "Value"),
-            ("DnsLookup", ["String", "System.Func<Void>"], "Value"),
+            ("DnsLookupUntil", ["String", "Int64", "fn<Void>"], "Value"),
+            ("SocketConnectAddressesUntil", ["arrayref<String>", "Int32", "Int64", "fn<Void>"], "Value"),
+            ("SocketReceiveUntil", ["Int64", "arrayref<Byte>", "Int32", "Int32", "Int64", "fn<Void>"], "Value"),
+            ("SocketSendUntil", ["Int64", "arrayref<Byte>", "Int32", "Int32", "Int64", "fn<Void>"], "Value"),
+            ("DnsLookup", ["String", "fn<Void>"], "Value"),
             ("DnsResult", ["Int64"], "Value"),
             ("DnsAddresses", ["Value"], "arrayref<String>"),
             ("SocketListen", ["String", "Int32", "Int32"], "Value"),
-            ("SocketAccept", ["Int64", "System.Func<Void>"], "Value"),
+            ("SocketAccept", ["Int64", "fn<Void>"], "Value"),
             ("SocketLocalPort", ["Int64"], "Value"),
-            ("SocketConnect", ["String", "Int32", "System.Func<Void>"], "Value"),
-            ("SocketConnectAddresses", ["arrayref<String>", "Int32", "System.Func<Void>"], "Value"),
+            ("SocketConnect", ["String", "Int32", "fn<Void>"], "Value"),
+            ("SocketConnectAddresses", ["arrayref<String>", "Int32", "fn<Void>"], "Value"),
             ("SocketConnectResult", ["Int64"], "Value"),
-            ("SocketReceive", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
-            ("SocketSend", ["Int64", "arrayref<Byte>", "Int32", "Int32", "System.Func<Void>"], "Value"),
+            ("SocketReceive", ["Int64", "arrayref<Byte>", "Int32", "Int32", "fn<Void>"], "Value"),
+            ("SocketSend", ["Int64", "arrayref<Byte>", "Int32", "Int32", "fn<Void>"], "Value"),
             ("SocketTransferResult", ["Int64"], "Value"),
             ("SocketCancel", ["Int64"], "Boolean"),
             ("DnsCancel", ["Int64"], "Boolean"),
@@ -42,12 +42,12 @@ static class RuntimeServiceBindings
             ("FileWriteChunk", ["Int32", "arrayref<Byte>", "Int32", "Int32"], "Value"),
             ("FileFlush", ["Int32"], "Value"),
             ("FileClose", ["Int32"], "Value"),
-            ("StartWorker", ["System.Func<String,String>", "String"], "Int32"),
-            ("QueueWorker", ["System.Func<String,String>", "String"], "Int32"),
+            ("StartWorker", ["fn<String,String>", "String"], "Int32"),
+            ("QueueWorker", ["fn<String,String>", "String"], "Int32"),
             ("JoinWorker", ["Int32"], "String"),
             ("RequestWorkerCancellation", ["Int32"], "Boolean"),
             ("JoinWorkerResult", ["Int32"], "Value"),
-            ("NotifyWorker", ["Int32", "System.Func<Void>"], "noresult"),
+            ("NotifyWorker", ["Int32", "fn<Void>"], "noresult"),
             ("LocalDateTime", ["Int64"], "System.LocalDateTime"),
             ("TimeZoneExists", ["String"], "Boolean"),
             ("TimeZoneOffset", ["String", "Int64"], "Int32"),
@@ -147,7 +147,7 @@ static class RuntimeServiceBindings
             ("TypeShape", ["System.RuntimeTypeHandle", "Int32"], "Boolean"),
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
             ("DefaultTaskQueue", [], "System.Tasks.TaskQueue"),
-            ("ScheduleTask", ["System.Func<Void>"], "noresult"),
+            ("ScheduleTask", ["fn<Void>"], "noresult"),
             ("RegisterDefaultTaskQueue", ["System.Tasks.TaskQueue"], "noresult"),
             ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
@@ -180,8 +180,8 @@ static class RuntimeServiceBindings
         "UInt32" => "uint", "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
         "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
         "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
-        "System.Func<String,String>" => "System.Func<string,string>",
-        "System.Func<Void>" => "System.Func<System.PropagationUnit>",
+        "fn<String,String>" => "System.Func<string,string>",
+        "fn<Void>" => "System.Func<System.PropagationUnit>",
         _ when type.StartsWith("System.") => type,
         _ when type.StartsWith("arrayref<") => CSharp(type[9..^1]) + "[]",
         _ => throw new InvalidDataException("Unsupported runtime service declaration.")
@@ -218,9 +218,9 @@ static class RuntimeServiceBindings
         if (reference.Name is "GCCollect" or "GCKeepAlive")
             return new("", args, result, Instruction: $"call neoCLR.Runtime.{reference.Name}({string.Join(',', args)})\npop");
         if (reference.Name == "NotifyWorker")
-            return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,System.Func<Void>)\npop");
+            return new("", args, result, Instruction: "call neoCLR.Runtime.NotifyWorker(Int32,fn<Void>)\npop");
         if (reference.Name == "ScheduleTask")
-            return new("", args, result, Instruction: "call neoCLR.Runtime.ScheduleTask(System.Func<Void>)\npop");
+            return new("", args, result, Instruction: "call neoCLR.Runtime.ScheduleTask(fn<Void>)\npop");
         if (reference.Name == "RegisterDefaultTaskQueue")
             return new("", args, result, Instruction: "call neoCLR.Runtime.RegisterDefaultTaskQueue(System.Tasks.TaskQueue)\npop");
         if (reference.Name == "ReflectionPropertySet")
