@@ -4017,3 +4017,42 @@ owner; their earlier stack and ownership checks still apply.
 C# fixtures execute nested imported nongeneric/generic value and class constructors on
 both CLR and neoCLR (42). Native reference projection remaps owned types by declaration
 identity instead of namespace/name, preventing collisions between equal child short names.
+
+
+## Structural Function bodies (development, 2026-10-02)
+
+`SignatureType.Function(MethodSignature signature)` creates a structural callable type.
+`SignatureType.FunctionSignature` is null for other categories, otherwise exposes
+`FunctionSignature.ParameterTypes`, `ReturnType` and `NoResult`. Shape equality/hash use
+ordered parameter/result identities, including scoped generic parameters and nominal
+owners; target methods and parameter names do not participate. The signature is immutable.
+Up to sixteen value parameters are supported; Void means explicitly no stack result.
+Byref/out callback contracts, generic callback declarations and inhabited Void results
+are outside this initial slice. Generic enclosing method/type parameters can occur in
+shapes and are substituted recursively. Nesting is limited to sixteen levels.
+Null signatures throw ArgumentNullException; unsupported contracts throw ArgumentException.
+
+`FunctionBinding(SignatureType functionType, MethodBuilder target)` checks a nongeneric
+static target against the exact shape. Its FunctionType and Target properties are read-only.
+`MethodBuilder.BindFunction(functionType, target)` and
+`Emit(OpCode.BindFunction, FunctionBinding)` push a callable value; the target must belong
+to the output assembly. `InvokeFunction(functionType)` and
+`Emit(OpCode.Callvirt, SignatureType)` consume the Function receiver and ordered arguments,
+then push the result unless NoResult. Invalid operands, target kinds, ownership or scope
+throw ArgumentException, null operands ArgumentNullException. Instruction limits and
+invalid evaluation stacks fail with InvalidDataException (stack validation on write).
+Bound receivers/captures and external binding targets remain future overloads; ordinary
+imported methods can accept/return Function values now.
+
+Native output uses the runtime's structural Function shape, function.bind and ordinary
+instance Invoke. CLI output uses core-scoped Func/Action carriers with ldftn/newobj and
+callvirt, including generic signature variables on Invoke MemberRefs. This is a bridge
+representation; native Function identity is independent of a nominal delegate declaration.
+The imported-signature reader recognizes those carriers only in the explicit core scope.
+Ordinary CLI delegates retain their .NET behavior; native static binding follows the
+existing Function runtime contract. This API does not expose native method pointers.
+
+C# validation executes static bindings across an assembly boundary on CLR and native
+binary PE, including generic higher-order calls and a no-result callback (42). Exact
+shape equality, wrong results, wrong receivers and reference projection are checked.
+The separate Raven backend still needs shared Function body lowering to consume this API.

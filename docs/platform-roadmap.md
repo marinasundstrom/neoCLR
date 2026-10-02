@@ -2,8 +2,8 @@
 
 Development checkpoint (2026-10-02): nested metadata imports execute through Raven
 and neoCLR (42). Author-directed integration now reuses the structural Function runtime
-branch for callback support on the metadata feature branch. Native Function API/codegen
-and System binding remain active work for the unchanged collections sample. This does
+branch for callback support on the metadata feature branch. Native Function API binding/invocation now executes across libraries (CLR/native 42);
+Raven Function codegen and System binding remain active work for the unchanged collections sample. This does
 not merge the feature into main or complete the integration milestone.
 
 **Updated 2026-10-02.** This is the authoritative default for work priorities,

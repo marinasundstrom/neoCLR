@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add structural Function signatures and checked static binding/invocation to the
+  metadata API, including raw typed operands, exact shape identity, generic substitution,
+  native Function encoding and CLI Func/Action transport. Imported callable signatures
+  round-trip across the explicit core scope. C# consumers execute callbacks across a
+  library boundary on CLR and neoCLR (42), including generic calls and no-result callbacks.
+
 - Integrate structural Function runtime/library work from codex/structural-types into
   the metadata feature branch at the author's direction. Preserve System.Fail and
   binary PE loading; regenerate the matching class library/reference. Native Function

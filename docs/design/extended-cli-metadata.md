@@ -1715,3 +1715,16 @@ sample is still the direct native backend acceptance case, not the older CLI imp
 The [combined-bundle validation record](../experiments/extended-cli-metadata/function-branch-integration-2026-10-02.json)
 records 65 focused native tests, 86 metadata groups, five direct native controls and
 Function CLI-import consumers. Full library source/bootstrap hashes and API snapshots match.
+
+
+### Structural Function producer checkpoint (2026-10-02)
+
+The .NET metadata API now carries ordered Function shapes separately from bound targets.
+Exact signature equality, generic substitution and checked static binding reuse the native
+runtime contracts integrated above. CLI transport is core-scoped Func/Action, with existing
+ldftn/newobj/callvirt conventions; native output carries Function directly. This retains the
+CLI baseline for readers while making the native shape explicit. The tradeoff is a bounded
+bridge: byref/out callable shapes, receiver binding and inhabited Void callbacks are not yet
+admitted. C# tests execute a callback through separately emitted library methods, a generic
+higher-order call and a no-result callback on both CLR and neoCLR (42). Native PE reference
+projection preserves the signature. Raven's direct shared-plan Function lowering is next.

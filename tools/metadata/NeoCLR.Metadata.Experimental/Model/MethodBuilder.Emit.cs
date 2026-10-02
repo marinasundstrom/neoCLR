@@ -4,6 +4,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Numeric enum values are not serialized opcodes. This is not the complete CLI or neoIL instruction set.</remarks>
 public enum OpCode
 {
+    /// <summary>Pushes a Function bound through a FunctionBinding operand.</summary>
+    BindFunction,
     /// <summary>Pushes an Int32 constant; requires an Int32 operand.</summary>
     Ldc_I4,
     /// <summary>Loads a declared primitive argument by zero-based index; requires an Int32 operand.</summary>

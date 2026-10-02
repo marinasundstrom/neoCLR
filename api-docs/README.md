@@ -698,3 +698,8 @@ The development Number reference is nongeneric and uses the public fieldless
 in the inventory and XML documentation. RavenDoc displays that metadata marker;
 [text and numbers](text-numbers.md) explains Raven's `Self` spelling and migration.
 The marker is not an executable CLR API or a native value constructor.
+
+FunctionSignature, FunctionBinding, SignatureType.Function/FunctionSignature and
+MethodBuilder BindFunction/InvokeFunction/raw operands are host C# development APIs,
+covered in [the structural Function manual](experimental-metadata.md#structural-function-bodies-development-2026-10-02).
+They are not omitted guest RavenDoc types.

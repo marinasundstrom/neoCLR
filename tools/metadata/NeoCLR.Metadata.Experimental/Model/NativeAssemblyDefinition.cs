@@ -244,6 +244,14 @@ public sealed class NativeAssemblyDefinition
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false)
             {
                 if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
+                if (element.TryGetProperty("Function", out var function))
+                {
+                    Shape(element, "Function"); Shape(function, "parameters", "returns", "no_result");
+                    bool noResult = function.GetProperty("no_result").GetBoolean();
+                    var returns = ReadType(function.GetProperty("returns"), noResult);
+                    Require(noResult == (returns.Primitive == PrimitiveType.Void), "function result convention mismatch");
+                    return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false))));
+                }
                 if (element.TryGetProperty("ByRef", out var target))
                 {
                     Require(allowByReference, "byref only supported in method parameters");
@@ -290,7 +298,7 @@ public sealed class NativeAssemblyDefinition
                 }
             }
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -461,6 +469,7 @@ public sealed class NativeAssemblyDefinition
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
         SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
+            : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
@@ -491,7 +500,7 @@ public sealed class NativeAssemblyDefinition
                 foreach (var (owner, index) in original.Assembly.Types.Select((owner, index) => (owner, index))) mappedOwners.Add(owner, owners[index]);
             return mappedOwners[original];
         }
-        SignatureType Remap(SignatureType type) => type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? RemapOwner(c) : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {

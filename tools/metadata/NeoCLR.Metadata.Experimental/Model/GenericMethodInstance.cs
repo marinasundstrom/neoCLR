@@ -7,7 +7,7 @@ public sealed class GenericMethodInstance
     {
         Definition = definition;
         TypeArguments = Array.AsReadOnly(arguments);
-        SignatureType Substitute(SignatureType type) => type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.MethodParameterIndex is { } index ? arguments[index]
+        SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.MethodParameterIndex is { } index ? arguments[index]
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
         Signature = new(Substitute(definition.Signature.ReturnType), definition.Signature.ParameterTypes.Select(Substitute), outParameters: definition.Signature.OutParameters);

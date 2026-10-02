@@ -51,11 +51,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
-        public static implicit operator BodyValueType(SignatureType type) => type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
+        public static implicit operator BodyValueType(SignatureType type) => type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
     private BodyValueType ArgumentType(int index)
     {
@@ -261,6 +261,14 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
+                case "function.bind":
+                    stack.Add(instruction.Type!); MaxStack = Math.Max(MaxStack, stack.Count + 1); break;
+                case "function.invoke":
+                    var function = instruction.Type!.FunctionSignature!;
+                    for (int i = function.ParameterTypes.Count - 1; i >= 0; i--) Pop(function.ParameterTypes[i]);
+                    Pop(instruction.Type);
+                    if (!function.NoResult) stack.Add(function.ReturnType);
+                    break;
                 case "call.virtual.constructed":
                 case "call.virtual":
                 case "call":

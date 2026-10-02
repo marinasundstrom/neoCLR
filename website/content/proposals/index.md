@@ -473,3 +473,7 @@ Nested imports and the broad Raven collections application remain in progress.
 Nested imports and generic value children now execute through Raven and native metadata
 (42). The unchanged collections application has advanced to extension/delegate signature
 support; it is not yet an executable integration milestone.
+
+The experimental host metadata API now emits structural Function values and checked static
+bindings, with CLI Func/Action projection and cross-assembly CLR/native execution (42).
+Raven's direct Function body emission remains under development.

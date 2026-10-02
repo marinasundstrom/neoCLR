@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-02",
+  "behavior": "Structural Function signatures, static binding and invocation through metadata API",
+  "validation": {
+    "csharp_contract_groups": "87/87 passed",
+    "cross_assembly_clr_result": 42,
+    "cross_assembly_neoclr_verify": "passed",
+    "cross_assembly_neoclr_result": 42,
+    "api_snapshot": "passed"
+  },
+  "coverage": [
+    "exact structural identity",
+    "Func/Action explicit core CLI transport",
+    "native Function shape",
+    "generic higher-order signature substitution",
+    "no-result callbacks",
+    "invalid receiver and incompatible binding rejection"
+  ],
+  "limitations": [
+    "owned nongeneric static binding targets",
+    "no captured receiver or byref function shapes",
+    "inhabited Void not represented",
+    "Raven native callback emission remains pending"
+  ]
+}

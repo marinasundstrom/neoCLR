@@ -41,12 +41,25 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
                 if (ordinal >= arity) throw new InvalidDataException("unscoped imported method parameter");
                 return SignatureType.MethodParameter(ordinal);
             case 0x1d: return SignatureType.ArrayOf(Type(false, depth + 1));
-            case 0x12: return Nominal(false);
-            case 0x11: return Nominal(true);
+            case 0x12:
+                var classToken = Number();
+                if (FunctionCarrier(classToken, out var actionArity, out var action) && action && actionArity == 0)
+                    return SignatureType.Function(new MethodSignature(PrimitiveType.Void, []));
+                return Nominal(false, classToken);
+            case 0x11: return Nominal(true, Number());
             case 0x15:
                 var category = Byte();
                 if (category is not (0x11 or 0x12)) throw new InvalidDataException("invalid nominal signature category");
-                var definition = Nominal(category == 0x11);
+                var definitionToken = Number();
+                if (category == 0x12 && FunctionCarrier(definitionToken, out var carrierArity, out var noResult))
+                {
+                    var argumentCount = Number();
+                    if (argumentCount == 0 || argumentCount != carrierArity) throw new InvalidDataException("function carrier arity mismatch");
+                    var carrierArguments = new SignatureType[argumentCount];
+                    for (int i = 0; i < argumentCount; i++) carrierArguments[i] = Type(false, depth + 1);
+                    return SignatureType.Function(new MethodSignature(noResult ? PrimitiveType.Void : carrierArguments[^1], noResult ? carrierArguments : carrierArguments[..^1]));
+                }
+                var definition = Nominal(category == 0x11, definitionToken);
                 var count = Number();
                 if (count == 0 || count != definition.GenericArity) throw new InvalidDataException("imported construction arity mismatch");
                 var arguments = new SignatureType[count];
@@ -56,9 +69,8 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
         }
     }
 
-    private ImportedTypeReference Nominal(bool valueType)
+    private ImportedTypeReference Nominal(bool valueType, int token)
     {
-        var token = Number();
         // Cross-dependency TypeRefs need an explicit resolver contract; never guess scope.
         if ((token & 3) != 0 || token >> 2 == 0)
             throw new InvalidDataException("imported nominal signature requires a dependency-local TypeDef");
@@ -66,6 +78,21 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             ?? throw new InvalidDataException("missing imported signature TypeDef");
         if (definition.IsValueType != valueType) throw new InvalidDataException("nominal signature category disagrees with declaration");
         return consumer.ImportReference(definition, core);
+    }
+
+    private bool FunctionCarrier(int token, out int count, out bool action)
+    {
+        count = 0; action = false;
+        if ((token & 3) != 1 || token >> 2 == 0) return false;
+        var coreIdentity = core;
+        var reference = module.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | (uint)(token >> 2)));
+        if (reference is null || reference.Namespace != "System" ||
+            !module.AssemblyReferences.Any(a => a.MetadataToken == reference.ResolutionScopeToken && a.Identity.Equals(coreIdentity))) return false;
+        action = reference.Name == "Action" || reference.Name.StartsWith("Action`", StringComparison.Ordinal);
+        if (reference.Name == "Action") return true;
+        var prefix = action ? "Action`" : "Func`";
+        return reference.Name.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(reference.Name[prefix.Length..], out count) &&
+            count >= 1 && count <= (action ? 16 : 17) && reference.Name == prefix + count;
     }
 
     private byte Byte()

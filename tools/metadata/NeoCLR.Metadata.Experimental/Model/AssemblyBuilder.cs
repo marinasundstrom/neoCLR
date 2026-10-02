@@ -257,11 +257,24 @@ public sealed partial class AssemblyBuilder
             }
             return handle;
         }
+        var functionCarriers = new Dictionary<(int, bool), TypeReferenceHandle>();
+        TypeReferenceHandle FunctionCarrier(FunctionSignature shape)
+        {
+            int arity = shape.ParameterTypes.Count + (shape.NoResult ? 0 : 1);
+            var key = (arity, shape.NoResult);
+            if (!functionCarriers.TryGetValue(key, out var handle))
+            {
+                var name = (shape.NoResult ? "Action" : "Func") + (arity == 0 ? "" : "`" + arity);
+                handle = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString(name));
+                functionCarriers.Add(key, handle);
+            }
+            return handle;
+        }
         var primitiveTokens = new Dictionary<PrimitiveType, TypeReferenceHandle>();
         var elementSpecs = new Dictionary<SignatureType, TypeSpecificationHandle>();
         int ElementToken(SignatureType type)
         {
-            if (type.ImportedType is { TypeArguments.Count: > 0 } || type.GenericInstance is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
+            if (type.FunctionSignature is not null || type.ImportedType is { TypeArguments.Count: > 0 } || type.GenericInstance is not null || type.TypeParameterIndex is not null || type.MethodParameterIndex is not null || type.ArrayElement is not null)
             {
                 if (!elementSpecs.TryGetValue(type, out var spec))
                 {
@@ -282,6 +295,17 @@ public sealed partial class AssemblyBuilder
         }
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.FunctionSignature is { } function)
+            {
+                var arguments = function.NoResult ? function.ParameterTypes.ToArray() : function.ParameterTypes.Append(function.ReturnType).ToArray();
+                if (arguments.Length == 0) encoder.Type(FunctionCarrier(function), isValueType: false);
+                else
+                {
+                    var encoded = encoder.GenericInstantiation(FunctionCarrier(function), arguments.Length, isValueType: false);
+                    foreach (var argument in arguments) EncodeType(encoded.AddArgument(), argument);
+                }
+                return;
+            }
             if (type.ImportedType is { } imported)
             {
                 var handle = ImportedTypeHandle(imported);
@@ -399,6 +423,26 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(member);
         }
+        var functionMembers = new Dictionary<(SignatureType, bool), MemberReferenceHandle>();
+        int FunctionMember(SignatureType type, bool constructor)
+        {
+            var key = (type, constructor);
+            if (!functionMembers.TryGetValue(key, out var handle))
+            {
+                var blob = new BlobBuilder();
+                if (constructor) blob.WriteBytes(new byte[] { 0x20, 2, 1, 0x1c, 0x18 });
+                else
+                {
+                    var shape = type.FunctionSignature!;
+                    new BlobEncoder(blob).MethodSignature(SignatureCallingConvention.Default, 0, true).Parameters(shape.ParameterTypes.Count,
+                        result => { if (shape.NoResult) result.Void(); else result.Type().GenericTypeParameter(shape.ParameterTypes.Count); },
+                        parameters => { for (int i = 0; i < shape.ParameterTypes.Count; i++) parameters.AddParameter().Type().GenericTypeParameter(i); });
+                }
+                handle = metadata.AddMemberReference(MetadataTokens.EntityHandle(ElementToken(type)), metadata.GetOrAddString(constructor ? ".ctor" : "Invoke"), metadata.GetOrAddBlob(blob));
+                functionMembers.Add(key, handle);
+            }
+            return MetadataTokens.GetToken(handle);
+        }
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var failureConstructor = default(MemberReferenceHandle);
         if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "fail")))
@@ -439,6 +483,8 @@ public sealed partial class AssemblyBuilder
                 {
                     "constant64" => 9,
                     "fail" => 11,
+                    "function.bind" => 12,
+                    "function.invoke" => 5,
                     "label" => 0,
                     "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
@@ -508,6 +554,11 @@ public sealed partial class AssemblyBuilder
                     case "new.constructed": case "call.constructed": case "call.virtual.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : instruction.Op == "call.virtual.constructed" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                    case "function.bind":
+                        code.WriteByte(0x14); code.WriteByte(0xfe); code.WriteByte(0x06); code.WriteInt32(ImportMethod(instruction.Target!));
+                        code.WriteByte(0x73); code.WriteInt32(FunctionMember(instruction.Type!, true)); break;
+                    case "function.invoke":
+                        code.WriteByte(0x6f); code.WriteInt32(FunctionMember(instruction.Type!, false)); break;
                     case "fail":
                         code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!)));
                         code.WriteByte(0x73); code.WriteInt32(MetadataTokens.GetToken(failureConstructor));
