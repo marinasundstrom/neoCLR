@@ -4243,8 +4243,8 @@ not a general public custom-attribute API or native semantic importer.
 
 `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image)` reads API-produced
 PE/#Neo schema-1/2 containers into the existing definition model. This first profile
-admits assemblies containing only nongeneric namespace functions with Int32, Int64,
-Boolean, String or no-result signatures. It rejects nominal types and all unsupported
+admits nongeneric namespace functions and fieldless top-level static classes with
+Int32, Int64, Boolean, String or no-result method signatures. It rejects other types and unsupported
 signatures with InvalidDataException rather than silently returning a partial assembly.
 Input/container limits and required-schema/binding checks still apply. No dependency
 is loaded, CLI assembly generated, method body translated or host reflection used.
@@ -4281,7 +4281,7 @@ foreach (var function in assembly.MainModule.Functions) {
 ```
 
 Raven primitive function loading and call imports are implemented in the bounded
-development path below. Type/member materialization and structural signatures remain pending. Standalone translated System inventory is not
+development path below. Instance type/member materialization and structural signatures remain pending. Standalone translated System inventory is not
 admitted by this PE function-only entry point. Existing CLI readers/writers remain
 unchanged. These host C# APIs are covered here rather than the guest RavenDoc selection.
 
@@ -4316,5 +4316,24 @@ output.EntryPoint = main;
 Global/native namespace calls support native emission, not ordinary CLI output.
 Import does not perform source accessibility checking or discover/load dependencies;
 Raven performs semantic access checks and neoCLR resolves explicit runtime modules.
-Nominal/generic native callable imports remain outside this read profile. These host
+Instance/generic native callable imports remain outside this read profile. These host
 C# APIs continue to use this manual reference instead of the guest RavenDoc inventory.
+
+
+### Direct native static types (development, 2026-10-02)
+
+ReadNativeAssembly additionally admits fieldless, nongeneric top-level static classes
+with primitive static method signatures. Module.Types contains canonical TypeDefinition
+objects; each TypeDefinition.Methods member links back through DeclaringType. These
+members do not appear in Module.Functions. Public/internal type visibility and
+public/internal/private member visibility are preserved using the existing CLI-shaped
+attributes. Type tokens retain validated native origin tokens (the first is 0x02000002).
+TypeReference.Resolve returns the same owned definition. Loaded collections remain
+read-only and Write preserves the original complete image.
+
+AssemblyBuilder.ImportReference accepts these primitive static methods through the
+existing callable overload. Instance/value/interface/nested/generic types, fields,
+properties and nonprimitive signatures still reject the entire read with
+InvalidDataException; no partial type inventory is silently exposed. This adds no new
+encoding or public API surface. Compared with .NET metadata, ownership and access flags
+use the same shape; the supported native declaration profile remains narrower.

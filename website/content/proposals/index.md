@@ -513,3 +513,7 @@ including overloads and exact dependency identities. Its primitive core still co
 from an explicit CLI bootstrap. Native call emission now runs across assembly boundaries,
 including a Raven-produced library read directly and consumed by another Raven program.
 Both tested consumers return 42; nominal/generic native importing remains open.
+
+The direct-reader development profile now also includes fieldless nongeneric static
+classes and primitive static methods. Instance types and richer native signatures are
+still pending; the general writer/runtime support is broader than this reader profile.

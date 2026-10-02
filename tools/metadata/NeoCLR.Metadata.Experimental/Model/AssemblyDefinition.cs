@@ -303,7 +303,7 @@ public sealed partial class ModuleDefinition
     public string Name { get; }
     /// <summary>Gets the declared MVID; this is not the experimental catalog's module scope UUID.</summary>
     public Guid Mvid { get; }
-    /// <summary>Gets all TypeDefs in metadata row order, including nested types and the module pseudo-type.</summary>
+    /// <summary>Gets nominal definitions in declaration order, including nested types and the CLI module pseudo-type when present.</summary>
     public IList<TypeDefinition> Types { get; }
     /// <summary>Gets physical Property rows in metadata order.</summary>
     public IReadOnlyList<PropertyDefinition> Properties => Assembly.Producer is null ? snapshotProperties : Types.SelectMany(t => t.Properties).ToArray();
@@ -350,7 +350,7 @@ public sealed partial class ModuleDefinition
     public TypeDefinition? GetTypeDefinition(uint metadataToken) => definitions.GetValueOrDefault(metadataToken);
 }
 
-/// <summary>A nominal declaration read from a physical TypeDef row.</summary>
+/// <summary>A nominal declaration read from CLI or supported native metadata.</summary>
 public sealed partial class TypeDefinition
 {
     private readonly uint declaringToken;
@@ -364,7 +364,7 @@ public sealed partial class TypeDefinition
     public bool IsValueType { get; }
     internal bool CanImportReference { get; }
     internal AssemblyIdentity? ValueTypeCore { get; }
-    /// <summary>Gets the physical TypeAttributes flags.</summary>
+    /// <summary>Gets the CLI-shaped TypeAttributes flags.</summary>
     public uint Attributes { get; }
     /// <summary>Gets properties declared directly by this type.</summary>
     public IList<PropertyDefinition> Properties => authoredProperties ?? (IList<PropertyDefinition>)Module.GetDeclaredProperties(MetadataToken);
@@ -372,7 +372,7 @@ public sealed partial class TypeDefinition
     public IList<FieldDefinition> Fields => authoredFields ?? (IList<FieldDefinition>)Module.GetDeclaredFields(MetadataToken);
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; internal set; } = null!;
-    /// <summary>Gets this image's TypeDef token; tokens are not cross-module identity.</summary>
+    /// <summary>Gets the TypeDef or validated native origin token; tokens are not cross-module identity.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the stored namespace, without constructing a display identity.</summary>
     public string Namespace { get; }

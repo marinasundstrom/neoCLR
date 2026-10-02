@@ -123,7 +123,7 @@ public sealed partial class MethodDefinition
     {
         if (nativeSignature is not null)
         {
-            if (!IsStatic || DeclaringType is not null || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
+            if (!IsStatic || (DeclaringType is { } owner && (owner.Attributes & 0x180) != 0x180) || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
                 nativeSignature.ParameterTypes.Any(p => p.Primitive is null))
                 throw new InvalidDataException("unsupported native callable import");
             return nativeSignature;

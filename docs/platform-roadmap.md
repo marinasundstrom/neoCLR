@@ -6,8 +6,10 @@ Raven, developing the reader/writer library toward its existing builders → def
 (96 metadata groups pass). Raven now binds these native functions directly with
 exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
 Native calls now import and execute across that boundary, including a Raven-produced
-library read directly and consumed by Raven (42). Next broaden native definition
-materialization to nominal declarations and signatures before full System loading.
+library read directly and consumed by Raven (42). Fieldless nongeneric static classes
+and primitive static methods now also load directly into Raven; Boolean/Int32 overload
+calls execute in neoCLR (42). Next broaden nominal signatures and instance declarations
+before full System loading.
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 

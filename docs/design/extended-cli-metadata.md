@@ -1897,3 +1897,26 @@ and 22 Raven target-emission tests pass; the API snapshot check passes. See
 [native call runtime evidence](../experiments/extended-cli-metadata/native-calls-2026-10-02.json).
 Broader nominal/generic importing, native System symbols and source bootstrap remain
 open. Existing CLI loading/emission continues through its current provider/backend.
+
+### Direct native static-type consumer (2026-10-02)
+
+The shared definition reader now materializes fieldless nongeneric top-level static
+classes and their primitive methods, retaining native type origin tokens, namespace,
+visibility and canonical method ownership. Raven supplies compilation-owned nominal
+symbols, normal type lookup and primitive overload resolution. The emitter imports the
+bound native method definition through the same route as namespace functions; there is
+no synthetic CLI dependency or reflection representation.
+
+The C# native-symbol runtime probe adds a Raven-produced static class library and a
+consumer using both Boolean and Int32 overloads. The explicit CLI primitive core and
+explicit matching native emission bindings remain required. Instance types, nominal
+signatures, fields, properties, nested declarations and generics remain unsupported by
+this direct-reader profile, even where existing writer/runtime paths support them.
+This is the first nominal ownership slice, not full class-library metadata loading.
+
+Validation: three native consumers return 42; all 96 metadata contract groups and
+39 Raven accessibility tests pass. Evidence is recorded in
+[native static-type runtime results](../experiments/extended-cli-metadata/native-static-types-2026-10-02.json).
+A .NET-only regression reproduced an identifier-expression access-check omission;
+Raven's general binder fix is isolated in e3afed13c for independent integration.
+No merge to main is claimed.
