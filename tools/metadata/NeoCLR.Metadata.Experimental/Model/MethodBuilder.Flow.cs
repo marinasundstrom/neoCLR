@@ -160,6 +160,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
                     break;
                 case "array.new":
+                case "array.reserve":
                     Pop(PrimitiveType.Int32); stack.Add(SignatureType.ArrayOf(instruction.Type!)); break;
                 case "array.load":
                 case "array.store":

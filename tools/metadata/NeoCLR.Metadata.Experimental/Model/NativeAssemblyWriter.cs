@@ -64,6 +64,7 @@ public sealed partial class AssemblyBuilder
             "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), parameters = instruction.Target!.Signature.ParameterTypes.Select(SignatureValue).ToArray() } } },
             "function.invoke" => new { op = "call", arg = new { name = "$Function.Invoke", owner = SignatureValue(instruction.Type!), instance = true, parameters = instruction.Type!.FunctionSignature!.ParameterTypes.Select(SignatureValue).ToArray() } },
             "array.length" => new { op = "ldlen" },
+            "array.reserve" => new { op = "array.reserve", arg = SignatureValue(instruction.Type!) },
             "array.new" or "array.load" or "array.store" => new { op = instruction.Op == "array.new" ? "newarr" : instruction.Op == "array.load" ? "ldelem" : "stelem", arg = SignatureValue(instruction.Type!) },
             "string" => new { op = "ldstr", arg = (object)instruction.Text! },
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },

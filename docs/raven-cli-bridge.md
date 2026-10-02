@@ -3112,3 +3112,44 @@ the metadata library must preserve the operation, and neoCLR already owns its ch
 execution semantics. This boundary is not evidence that ArrayList or all System sources
 now execute through the native producer. Native semantic importing remains future work;
 CLI authoring declarations and translated System still supply the temporary bootstrap.
+
+### Native checked reservation (2026-10-02, development)
+
+Raven commit `f1b85fa14` on `codex/metadata-consumer` adds optional
+`NeoClrEmitOptions.BootstrapReference`, which binds the exact registered
+implementation core reference for CheckedStorage.Reserve<T>. Null disables mapping.
+The native adapter validates the static owner's public generic method signature and
+preserves actual element arguments, including caller generic parameters. Shared body
+lowering still emits a normal call; target recognition stays in the native adapter.
+Ordinary .NET emission is unchanged, and consumer references still omit the intrinsic.
+The experimental constructor adds an optional argument; source calls remain valid, but
+compiled host consumers must rebuild against the matching compiler package.
+
+The metadata API now provides `MethodBuilder.ReserveArray(SignatureType)` and
+`Emit(OpCode.ReserveArray, SignatureType)`. Native writing retains existing array.reserve
+through PE/#Neo; executable CLI writing rejects it because newarr's default initialization
+is not equivalent. Declaration-only CLI projection remains available. The
+[API contract](../api-docs/experimental-metadata.md#checked-uninitialized-reservation-development-2026-10-02)
+and [existing .NET comparison](reserved-array-capacity.md) describe errors, read checks,
+tracked-state cost and lack of a performance claim. Runtime encoding and behavior are
+unchanged; this closes a producer gap.
+
+Validation: all 94 metadata groups pass; C# metadata and Raven-generated generic helpers
+return 42 from a written slot and fault on an unread slot. Raven tests reject default
+intrinsic mapping and an unregistered reference without output. Reproduce with metadata
+`--reserved-array-runtime <runtime> <output>` and Raven
+`--reserved-storage-runtime <seed.dll> <fresh-output> <runtime>`. The seed is generated
+by the existing raven-target `--reference-library-core` mode. Runtime configuration is
+CompilationOptions.NeoCLR with the matching CoreProbe Self marker. See
+[metadata evidence](experiments/extended-cli-metadata/reserved-array-metadata-2026-10-02.json)
+and [Raven evidence](experiments/extended-cli-metadata/reserved-array-raven-2026-10-02.json).
+
+The unchanged ArrayList source now passes Reserve and stops at importing System.Fail
+from the CLI namespace container; it still does not emit or execute as a complete native
+implementation ([report](experiments/extended-cli-metadata/array-list-after-reservation-2026-10-02.json)).
+The broader collections application remains executable with exact output
+([regression evidence](experiments/extended-cli-metadata/collections-after-reservation-2026-10-02.json)).
+Next is namespace-function dependency mapping. The CLI seed and translated System remain
+explicit temporary dependencies; native metadata importing remains their eventual
+replacement. Compiler support on its feature branch does not imply runtime publication
+or a main-branch merge.

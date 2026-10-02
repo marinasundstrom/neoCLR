@@ -205,6 +205,8 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "array.reserve")))
+            throw new InvalidDataException("checked uninitialized array reservation requires native emission; executable CLI has no equivalent operation");
         var metadata = new MetadataBuilder();
         // A stable per-builder MVID preserves snapshot scope; PE content IDs/timestamps are deterministic.
         metadata.AddModule(0, metadata.GetOrAddString(Identity.Name + ".dll"), metadata.GetOrAddGuid(mvid), default, default);

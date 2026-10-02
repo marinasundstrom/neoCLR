@@ -1,0 +1,50 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330E194DC665A65A4A3A31CAE18C6FFB5473CB0086B14D02DF05D6DC69D8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101D76F2F4D2B950BC59ABD89938CB2E9EBEA1D6E43087E80309B0DE963A22D2"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262EA7362DE107EBC583E6887578F3FA69ECEF905DA52A8C0A9D718B535DD4"
+    }
+  ],
+  "phase": "emission",
+  "bytes": 0,
+  "bindingDiagnosticCount": 0,
+  "cliBridgeEmission": {
+    "success": true,
+    "bytes": 6144,
+    "diagnostics": []
+  },
+  "diagnostics": [
+    "error NEOMETA001: Native emission does not support dependency method contract unavailable or ambiguous: static func Fail(message: string) -\u003E () (native type missing or ambiguous: System.NamespaceMembers)."
+  ],
+  "scope": "unchanged collection source hierarchy and ArrayList implementation; explicit authoring seed; emission inventory only, no runtime execution"
+}

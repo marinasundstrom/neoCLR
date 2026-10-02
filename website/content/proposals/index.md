@@ -487,4 +487,5 @@ through Sequence<T>, including constructed interface bases and its indexer. An i
 property/indexer consumer runs on CLR and neoCLR with both source orders; the real
 neoCLR target profile also passes, including generic provider and iterator classes.
 The unchanged ArrayList source now binds against the implementation seed, but native
-emission still needs the checked-uninitialized storage reservation mapping. This does not yet compile the entire System library with the native backend.
+emission now preserves checked-uninitialized storage reservation. Its next blocker is
+the System.Fail namespace-function dependency mapping. This does not yet compile the entire System library with the native backend.

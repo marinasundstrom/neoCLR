@@ -1,0 +1,29 @@
+{
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "cases": [
+    {
+      "unread": false,
+      "command": "verify",
+      "exitCode": 0,
+      "text": "NeoMetadata_0CEEAF7C237B96799D62D0F718D3670FE754434FD9B90D5180DE787F189774DA: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n"
+    },
+    {
+      "unread": false,
+      "command": "run",
+      "exitCode": 42,
+      "text": ""
+    },
+    {
+      "unread": true,
+      "command": "verify",
+      "exitCode": 0,
+      "text": "NeoMetadata_0CEEAF7C237B96799D62D0F718D3670FE754434FD9B90D5180DE787F189774DA: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n"
+    },
+    {
+      "unread": true,
+      "command": "run",
+      "exitCode": 1,
+      "text": "Fault: read of uninitialized array element [code=RuntimeError] at NeoMetadata_0CEEAF7C237B96799D62D0F718D3670FE754434FD9B90D5180DE787F189774DA.F_4D61696E:9\n  at NeoMetadata_0CEEAF7C237B96799D62D0F718D3670FE754434FD9B90D5180DE787F189774DA.F_4D61696E() [NeoMetadata_0CEEAF7C237B96799D62D0F718D3670FE754434FD9B90D5180DE787F189774DA#1.0.0.0:1] IL instruction 9\n"
+    }
+  ]
+}

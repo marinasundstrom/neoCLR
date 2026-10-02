@@ -3,14 +3,16 @@
 Development checkpoint (2026-10-02): the metadata feature branch integrates the
 structural Function runtime and direct Raven Function emission. The unchanged collections
 application now compiles to native PE/#Neo, verifies and executes with exact expected
-output against the explicitly bound translated System library. 93 metadata contract
+output against the explicitly bound translated System library. 94 metadata contract
 groups and native binary fixture checks pass. This establishes the requested broad
 application end-to-end case; it does not complete native class-library source emission
 or native semantic symbol loading. Unchanged library interfaces through Sequence<T> now
 emit with constructed inheritance and an executable inherited-property/indexer consumer
 (42); both source orders and target profiles pass. 32 focused Raven interface tests pass,
 and the broad application retains exact output after general binding fixes. Next support
-the native CheckedStorage.Reserve producer mapping needed by ArrayList<T>. An explicit
+the namespace-function dependency mapping for ArrayList<T>'s System.Fail calls.
+CheckedStorage.Reserve now emits through an explicit authoring contract, and native
+PE tests confirm stored values and unread-slot faults. An explicit
 implementation seed now binds ArrayList and its source interface hierarchy; the CLI
 control emits successfully. Generic provider/iterator implementations already execute
 against Sequence<T> on CLR/native in both source orders. Author-directed integration stays on the feature branches;

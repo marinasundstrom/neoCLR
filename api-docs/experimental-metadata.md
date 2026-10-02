@@ -4197,3 +4197,32 @@ unchanged collection interfaces additionally execute with generic provider and i
 implementations, including constructor fields and inherited property/indexer calls.
 Loaded CLI `TypeDefinition.Interfaces` enumeration remains an explicit reader limitation;
 this change expands authored definitions and native round trips, not that reader view.
+
+
+### Checked uninitialized reservation (development, 2026-10-02)
+
+`MethodBuilder.ReserveArray(SignatureType elementType)` and
+`Emit(OpCode.ReserveArray, SignatureType elementType)` consume an Int32 length and push
+an ordinary vector of that exact element type. Supported scalar elements include
+caller-scoped type/method parameters. Null throws `ArgumentNullException`; unsupported
+Void/vector elements or invalid owner/parameter scope throw `ArgumentException`.
+Instruction limits and invalid stack shapes throw `InvalidDataException` on construction
+or writing as appropriate. `OpCode.ReserveArray` is appended to the public opcode enum.
+
+This is a native-only extension. Native writing encodes existing `array.reserve`, and
+PE/#Neo loading retains checked uninitialized slots. Stores publish typed values; direct
+or addressed reads before publication fault in the runtime. Negative lengths and runtime
+allocation limits retain the existing array-reservation checks. `NewArray`/`Newarr` keep
+ordinary default initialization. See [the storage contract](../docs/reserved-array-capacity.md).
+
+`AssemblyBuilder.Write()` (and executable CLI writing through definitions) rejects a
+body containing reservation with `InvalidDataException`: CLI newarr is not an equivalent
+encoding. Native container reference projections remain available and do not promise
+executable CLI bodies. No native format version, runtime opcode or guest public API
+changes are required. This host-only builder API is covered by this manual reference,
+not the guest RavenDoc assembly.
+
+C# checks cover generic raw emission, native verification/execution (stored slot 42,
+unread slot fault), projection loading, executable CLI refusal, invalid element and
+parameter scope, and an invalid length stack type. Raven separately tests the matched
+explicit authoring-seed mapping and its default-disabled configuration.

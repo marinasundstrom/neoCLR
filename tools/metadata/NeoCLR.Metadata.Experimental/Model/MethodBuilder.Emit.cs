@@ -97,7 +97,9 @@ public enum OpCode
     /// <summary>Stores through an owned local address or byref parameter of the exact SignatureType; local stores establish assignment.</summary>
     Stobj,
     /// <summary>Terminates with a literal diagnostic: native UserFault, or CLI InvalidOperationException.</summary>
-    Fail
+    Fail,
+    /// <summary>Native-only checked uninitialized vector reservation; requires a SignatureType operand and Int32 length.</summary>
+    ReserveArray
 }
 
 public sealed partial class MethodBuilder

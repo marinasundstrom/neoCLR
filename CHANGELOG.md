@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add native-only MethodBuilder.ReserveArray and typed raw ReserveArray emission,
+  preserving checked uninitialized slots through PE/#Neo loading. Executable CLI writing
+  rejects the operation; reference projections remain supported. Explicit Raven bootstrap
+  binding emits the operation, with stored-slot execution returning 42 and unread slots
+  faulting. All 94 metadata groups pass. Unchanged ArrayList emission now reaches its
+  System.Fail namespace dependency; the broader collections sample retains exact output.
+
 - Admit generic root-class implementations of owned interfaces, including constructed
   owner arguments and transitive substitution. Metadata stack checks validate the
   actual generic receiver before interface dispatch; CLI/native C# execution returns 42

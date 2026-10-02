@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
-    /// <param name="opCode">Newarr, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, or Callvirt for a Function signature.</param>
+    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, or Callvirt for a Function signature.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, unsupported element or foreign owner.</exception>
@@ -35,6 +35,7 @@ public sealed partial class MethodBuilder
         Append(new(opCode switch
         {
             OpCode.Newarr => "array.new",
+            OpCode.ReserveArray => "array.reserve",
             OpCode.Ldelem => "array.load",
             OpCode.Stelem => "array.store",
             _ => throw OperandError(opCode)
@@ -55,6 +56,13 @@ public sealed partial class MethodBuilder
     /// <summary>Consumes an Int32 length and creates a default-initialized reference vector.</summary>
     /// <param name="elementType">Supported scalar element; see Emit(OpCode, SignatureType).</param>
     public void NewArray(SignatureType elementType) => Emit(OpCode.Newarr, elementType);
+    /// <summary>Consumes an Int32 length and reserves checked uninitialized vector elements.</summary>
+    /// <param name="elementType">Supported scalar element, including caller-scoped generic parameters.</param>
+    /// <exception cref="ArgumentNullException">Element is null.</exception>
+    /// <exception cref="ArgumentException">Unsupported element or invalid owner scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on native write.</exception>
+    /// <remarks>Native-only operation. Reads before writes fault at runtime. Executable CLI writing rejects this operation; PE/#Neo reference projections remain supported.</remarks>
+    public void ReserveArray(SignatureType elementType) => Emit(OpCode.ReserveArray, elementType);
     /// <summary>Consumes an array and Int32 index, then pushes the element.</summary>
     /// <param name="elementType">Exact element identity.</param>
     public void LoadArrayElement(SignatureType elementType) => Emit(OpCode.Ldelem, elementType);
