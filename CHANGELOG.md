@@ -18,8 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   CLR and neoCLR (both containers), with 105 C# groups passing. Raven imports these owners
   through shared constructed-type substitution. Loaded local closed generic signatures
   now expose immutable ReferencedGenericType definitions/arguments and import recursively;
-  factory/identity calls carrying Box<int> execute on CLR and neoCLR. Open/external
-  constructions and constraints remain pending; no format change.
+  factory/identity calls carrying Box<int> execute on CLR and neoCLR. Scoped local
+  constructions such as Box<T> now retain method/owner parameters recursively; Raven
+  inferred calls and vectors of open constructions execute using scope-owned caches.
+  External constructions and constraints remain pending; no format change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now

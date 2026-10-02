@@ -2226,3 +2226,18 @@ C# tests verify structural equality, canonical definition references, argument i
 ownership rejection and executable factory/identity calls on CLR/neoCLR. Raven imports
 CreateBox(int)->Box<int> and EchoBox(Box<int>)->Box<int> directly, reusing the module's
 signature cache and shared constructed-type substitution. All seven consumers return 42.
+
+### Scoped local constructions (2026-10-02)
+
+Local constructed signatures now retain method and owner parameters recursively,
+including vectors of Box<T>. The reader already validates ordinals against declaration
+scope; materialization no longer rejects these validated constructions. Import reuses
+the existing recursive generic signature substitution. This implements the existing
+VAR/MVAR distinction from the generic contract comparison, with no schema change.
+
+Raven selects the cache belonging to the scope that supplies the parameters: method,
+owner, or module for closed signatures. Recursive mapping preserves parameter identity
+without storing scoped symbols in a module-wide cache. The native consumer covers
+inferred OpenBox/OpenBoxes and Box<TItem>.Same. C# symbol checks retain exact parameter
+owners and reject incompatible Box<bool>/Box<int> returns. External constructions and
+constraint materialization remain pending.

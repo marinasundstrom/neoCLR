@@ -27,6 +27,12 @@ internal static class NativeGenericOwnerChecks
         factory.LoadArgument(0); factory.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); factory.Return();
         var echo = factoryType.AddMethod("Echo", new MethodSignature(closed, [closed]));
         echo.LoadArgument(0); echo.Return();
+        var openType = type.MakeGenericInstance(SignatureType.MethodParameter(0));
+        var openEcho = factoryType.AddMethod("Open", new MethodSignature(openType, [openType], ["T"]));
+        openEcho.LoadArgument(0); openEcho.Return();
+        var selfType = type.MakeGenericInstance(parameter);
+        var same = type.AddInstanceMethod("Same", new MethodSignature(selfType, [selfType]));
+        same.LoadArgument(1); same.Return();
         var native = library.WriteNativeAssembly();
         var image = binary ? RuntimeAssemblyContainer.WriteBinary(native, core) : RuntimeAssemblyContainer.Write(native, core);
         var read = AssemblyDefinition.ReadNativeAssembly(image);
@@ -50,13 +56,18 @@ internal static class NativeGenericOwnerChecks
         var app = new AssemblyBuilder(new("NativeOwnerApp", new Version(1, 0, 0, 0)), core);
         Reject<ArgumentException>(() => app.AddFunction("Unimported", createSignature!));
         Check(!createDefinition.TryGetStaticValueSignature(out _) && !createDefinition.TryGetStaticPrimitiveSignature(out _), "closed construction is not a primitive signature");
+        var openDefinition = readFactory.Methods.Single(m => m.Name == "Open");
+        Check(openDefinition.TryGetSignature(out var openSignature) && openSignature!.ReturnType.ReferencedGenericInstance!.TypeArguments[0].MethodParameterIndex == 0,
+            "method-scoped constructed argument");
+        Check(definition.Methods.Single(m => m.Name == "Same").TryGetSignature(out var sameSignature) &&
+            sameSignature!.ReturnType.ReferencedGenericInstance!.TypeArguments[0].TypeParameterIndex == 0, "owner-scoped constructed argument");
         var importedType = app.ImportReference(definition, core).MakeGenericInstance(PrimitiveType.Int32);
         ImportedConstructedMethodReference Import(string name) => app.ImportReference(definition.Methods.Single(m => m.Name == name), core).MakeConstructedReference([PrimitiveType.Int32]);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var local = main.DeclareLocal(importedType);
-        main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Call(app.ImportReference(echoDefinition, core)); main.StoreLocal(local);
+        main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));
-        main.LoadLocal(local); main.Call(Import("Get")); main.Return();
+        main.LoadLocal(local); main.LoadLocal(local); main.Call(Import("Same")); main.Call(Import("Get")); main.Return();
         _ = app.WriteNativeAssembly();
         return (library, app, image);
     }
@@ -74,12 +85,7 @@ internal static class NativeGenericOwnerChecks
             finally { context.Unload(); }
             library.Types.Single(t => t.Name == "Box`1").SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType);
             Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), library.CoreLibrary)));
-            var (openLibrary, _, _) = Create(binary);
-            var owner = openLibrary.Types.Single(t => t.Name == "Box`1");
-            var open = owner.MakeGenericInstance(SignatureType.MethodParameter(0));
-            var openEcho = openLibrary.AddFunction("Open", new MethodSignature(open, [open], ["T"]));
-            openEcho.LoadArgument(0); openEcho.Return();
-            Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(openLibrary.WriteNativeAssembly(), openLibrary.CoreLibrary)));
+
         }
     }
     internal static async Task RunRuntime(string runtime, string directory)

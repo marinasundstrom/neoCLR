@@ -3616,3 +3616,13 @@ carry constructed parameters/results across the library boundary; all seven cons
 execute (42). C# metadata checks and CLR/native factory consumers pass (105 groups).
 No Runtime Contract, format or runtime change. Open/external generic constructions and
 constraints remain unsupported, and the CLI core/translated System bootstrap remains.
+
+### Open local constructed signatures (2026-10-02 development)
+
+Raven now consumes Box<T>-style native signatures whose arguments refer to method or
+owner parameters. Recursive signature mapping uses the appropriate method/owner cache,
+retaining module caching for closed signatures. OpenBox/OpenBoxes generic namespace
+functions and Box<TItem>.Same compile and execute; the seven native consumers return 42.
+C# metadata tests pass (105 groups), including CLR/native instantiated open-signature
+calls. No Runtime Contract, CLI bridge or runtime encoding change. External generic
+constructions, constraints and full native System/bootstrap remain pending.

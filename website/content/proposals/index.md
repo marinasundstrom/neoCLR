@@ -598,3 +598,8 @@ Development checkpoint (2026-10-02): local closed generic signatures such as Box
 now read directly into immutable metadata definitions and Raven symbols. Native
 factory/identity calls execute successfully; open/external constructions and constraints
 remain future import work.
+
+Development checkpoint (2026-10-02): scoped local constructions such as Box<T> and their
+vectors now retain method/owner parameter identity through direct native import. Raven
+inferred calls execute successfully. External generic constructions and constraints
+remain pending.

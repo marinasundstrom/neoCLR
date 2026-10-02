@@ -1,0 +1,137 @@
+{
+  "date": "2026-10-02",
+  "metadataBaseCommit": "93daf820",
+  "ravenCommit": "2238c0249",
+  "metadataGroups": 105,
+  "standalone": {
+    "result": "CLR execution=42; native verify=0/run=42 for both schemas",
+    "artifacts": {
+      "App-False.dll": "5e24d5c3e4c6490db000d15d5152921fca61a2d11a481da8f6d77a002a9295f2",
+      "App-True.dll": "a4fc974ec00cd1ca6f6b18ca91b94f9ba3dbe2cbcc37a1841c45aa78c000b70d",
+      "Library-False.dll": "f8b86479cb5151b6b84ad6c67531cf3fa296a7031cd011d827ee2007b290712a",
+      "Library-True.dll": "9a25402cc828a5467235b6b7922344a8128d76b1981798193051e0dd9d0c2a60"
+    }
+  },
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "A6FE2773F6F2EF1BB9E9102C28B6ECA2AE3B6131B9BAF31E6D1E178CBFC39A2A",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "AE58A26402D7AAEB532C340C52CD89BA441E37F4AD427C9A0BB9CF89111948A2",
+        "dependencySha256": "A6FE2773F6F2EF1BB9E9102C28B6ECA2AE3B6131B9BAF31E6D1E178CBFC39A2A",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "D9F1152480B03E59C1D036CE982798FF8436D652875071231976F33CDE26353E",
+        "dependencySha256": "97C6967FAFF9E2BD8CBE76DA4953D1EAFC4C202FC940F268E745281059910EB1",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "ADC3D32500DD62F17181C8B454280233321323EC5C9ACC029B7C2969AEE7C0DA",
+        "dependencySha256": "9D48A3214202ABF5131FF3AD212A696C193D72DF88FCF82FEB38AED405372F9F",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "97EDAC5FD72B5F90F807291F4661FAA94790A43A877EF87F52E799908BA96A53",
+        "dependencySha256": "9D48A3214202ABF5131FF3AD212A696C193D72DF88FCF82FEB38AED405372F9F",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "08CC448F6E8C5985BF4CCC44B3B230F8B0DAE2C559A107CFD28A020AF087687D",
+        "dependencySha256": "0D0486675CAF6C32A8343775D98BBD0748EDFA839D7777A58C4D018BA2866F5A",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "41EEE30785CC1EB6B80DE23270CC837CE329B6A0B61E5BCC4DC0F9CF314756E1"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0C5B0EE3B388B10F72ADE878DB8549EFB46AE47CE227BF0BFB92AE79C9548B60",
+        "dependencySha256": "CB28905EC3F41234C34ACEEF93930820EC173CCA1FDD5F0541EB2E71FE792011",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "40C63E4465867FB90131EAB387621CB71B5699F2568DD4B8D0B0C1AA60D5CB42"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0FB1AE921CA900AE90F72644D65D99E6077C18CF9CA2EE2630163043914A79E0",
+        "dependencySha256": "B70C88294112FCB5432233AA7D6112BDC7C87A7228B1D8690F667F04D391D5F4",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "additionalCoverage": [
+    "OpenBox<T> inferred namespace call",
+    "OpenBoxes<T> vector construction and aliases",
+    "Box<TItem>.Same owner-scoped construction",
+    "method/owner parameter identity",
+    "incompatible constructed return diagnostic"
+  ],
+  "limitations": "External constructions, generic constraints/inheritance and full native core/bootstrap remain pending."
+}
