@@ -658,3 +658,9 @@ Writer validation and encodings remain unchanged.
 Native static-container calls, including generic methods, now reconstruct from Raven
 symbols too. Static classes remain declaration owners rather than valid value types.
 Translated CLI bindings and remaining virtual/profile cases are unchanged.
+
+
+Native callable, type and field emission now has no reader-definition fallback: supported
+references use symbols and explicit identity/layout facts, while unsupported contracts
+diagnose. Seven consumers still execute. Host input setup and lazy symbol loading remain
+reader-backed, and translated CLI compatibility is a separate path.

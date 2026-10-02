@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Remove Raven native type/field reader fallbacks and its emitter-native resolver;
+  all supported native references now require symbol contracts. Seven consumers execute
+  (42). Library/runtime are unchanged; host input binding and lazy semantic loading
+  still retain readers, and translated CLI compatibility lookup remains explicit.
+
 - Enforce symbol-only native callable emission in Raven by removing its reader-definition
   fallback; incomplete contracts diagnose. Seven consumers execute (42), including direct
   concrete implementation calls. Clarify that native implementation flags differ from

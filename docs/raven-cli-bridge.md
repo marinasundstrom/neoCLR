@@ -3784,3 +3784,14 @@ concrete interface-implementation calls. Native concrete implementations do not 
 the CLI projection's final/virtual flags; no metadata change is made. CLI compatibility,
 type/field/host paths and lazy symbol materialization remain separate pending work.
 Runtime Contract/bootstrap requirements are unchanged. See [evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json).
+
+
+### Native reference fallbacks removed (2026-10-02)
+
+Raven `6baabdceb` removes native type/field fallback and the emitter-native resolver.
+Alongside the earlier callable change, supported native references now require complete
+symbol contracts; unsupported contracts diagnose instead of consulting definitions.
+All seven consumers execute (42), with diagnostic checks retained. The metadata/runtime
+are unchanged and prior 108-group library evidence is reused. Host-native input binding,
+translated CLI lookup and lazy semantic loading remain separate pending concerns.
+Runtime Contract/bootstrap requirements are unchanged. See [evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json).

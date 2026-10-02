@@ -17,7 +17,10 @@ and lazy symbol materialization as remaining reader dependencies. The generator 
 writer-side validation remains unchanged. Static native containers now also reconstruct as declaration owners from symbols,
 with value signatures still excluding static classes. The audit found native concrete implementations do not carry CLI-projection final/virtual
 flags. Native callable reader fallback is now removed; incomplete contracts diagnose.
-Next audit native type/field fallbacks and host input separation. See [callable boundary evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json). See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).
+Native type/field fallbacks and the emitter resolver are now removed too; all seven
+consumers execute. Next separate native host input bindings from translated CLI
+compatibility bindings. Reader-backed semantic materialization remains supported.
+See [native reference boundary evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json). See [callable boundary evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json). See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).
 See [body-engine evidence](experiments/extended-cli-metadata/body-engine-2026-10-02.json). See [generator evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json). See [interface evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json). See [field evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json). See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
 See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json). See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 

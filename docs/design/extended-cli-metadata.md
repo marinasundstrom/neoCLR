@@ -2425,3 +2425,13 @@ abstract interface contracts virtual, while concrete implementations are ordinar
 methods. Do not copy projection flags into native semantics. No new final-virtual
 contract or format extension was needed. Added direct concrete-implementation calls
 and getters execute alongside the existing interface-dispatch tests.
+
+
+### Native reference fallback elimination (2026-10-02)
+
+Raven native type and field references now also require supported symbol contracts.
+The emitter's native resolver and unused native field definition property are removed.
+Native callable/type/field encoding uses symbols and explicit identity/layout/relationship
+values. Translated CLI compatibility still looks up definitions under its existing
+binding contract. Host input setup and lazy semantic materialization retain readers;
+this does not claim whole-compilation reader lifetime independence.
