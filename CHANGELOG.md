@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Enable already-lowered static extension calls in Raven's native adapter under an
+  explicit capability. The unchanged collections sample passes Single admission and
+  now reports unsupported union-pattern emission; no native sample output is claimed.
+
 - Connect Raven's native adapter to structural Function signatures, static binding
   and invocation. A directly emitted Raven PE passes a callback through a function
   and executes to 42. Noncapturing lambdas also compile and execute directly;

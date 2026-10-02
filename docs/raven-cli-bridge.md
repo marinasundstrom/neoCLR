@@ -2914,3 +2914,10 @@ The subsequent compiler slice supports noncapturing synchronous lambdas through
 internal assembly-function definitions and the shared lowered body planner. The
 direct lambda consumer returns 42. Capturing, async, iterator and generic lambda
 targets remain producer gaps; .NET closure generation and Runtime Contracts are unchanged.
+
+Static extension calls are admitted through Raven's explicit
+`AllowsLoweredExtensionCalls` capability after shared lowering supplies the receiver
+as an argument. This changes no binding or Runtime Contract configuration and keeps
+ordinary .NET defaults. The unchanged collections sample passes `Single` admission
+and next reports unsupported union-pattern emission; it is not yet executable through
+the direct backend.
