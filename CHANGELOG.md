@@ -16,8 +16,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   native consumers execute (42). Unconstrained generic root classes now preserve owner
   parameter names and scoped signatures; imported construction and mutation execute on
   CLR and neoCLR (both containers), with 105 C# groups passing. Raven imports these owners
-  through shared constructed-type substitution. Constraints and constructed signature
-  imports remain pending; no format change.
+  through shared constructed-type substitution. Loaded local closed generic signatures
+  now expose immutable ReferencedGenericType definitions/arguments and import recursively;
+  factory/identity calls carrying Box<int> execute on CLR and neoCLR. Open/external
+  constructions and constraints remain pending; no format change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now

@@ -593,3 +593,8 @@ Development checkpoint (2026-10-02): direct native generic root classes now pres
 owner parameters. Raven constructs and uses Box<int>/Box<Item> through shared generic
 substitution; all seven native consumers return 42. Constructed signature types,
 constraints and full native class-library bootstrap remain under development.
+
+Development checkpoint (2026-10-02): local closed generic signatures such as Box<int>
+now read directly into immutable metadata definitions and Raven symbols. Native
+factory/identity calls execute successfully; open/external constructions and constraints
+remain future import work.

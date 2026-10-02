@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [ReferencedGenericType](#referencedgenerictype-development-2026-10-02): immutable constructed signatures in loaded snapshots.
+
 - [Imported type signatures](#imported-type-signatures-development-2026-10-01): external nominal and constructed reference types.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [Integer shifts](#integer-shifts-development-2026-10-01): Shl/Shr with Int32 counts.
@@ -4706,3 +4708,28 @@ Native generic constraints, nested/value owners and instance generic methods sti
 reject. Direct imported fields on constructed owners remain unsupported; use supported
 methods/properties. Both container schemas execute Box<int> construction, Set and Get
 on neoCLR; the equivalent CLI consumer executes on CLR (42).
+
+### ReferencedGenericType (development 2026-10-02)
+
+Namespace: `NeoCLR.Metadata.Experimental.Model`. The new read-only
+`SignatureType.ReferencedGenericInstance` property returns a `ReferencedGenericType`
+for loaded constructed signatures such as `Box<int>`; otherwise null. Its public members:
+
+- `TypeReference Definition`: canonical snapshot-scoped generic definition reference.
+- `IReadOnlyList<SignatureType> TypeArguments`: copied, immutable arguments in ordinal order.
+- `Equals(ReferencedGenericType?)` / `Equals(object?)`: definition reference identity plus
+  structural ordered argument equality; null and other categories are unequal.
+- `GetHashCode()`: agrees with that equality; it is not a stable serialized identity.
+- `ToString()`: diagnostic display, not a serialized type name.
+
+`ReadNativeAssembly` now retains local closed generic root-class constructions in the
+supported field/property/method signature categories, including vectors. Arguments can
+include bounded primitive, nominal, vector and nested closed construction signatures.
+Scoped parameters inside a construction (`Box<T>`), constructions of external generic
+owners, constraints and generic inheritance remain rejected with InvalidDataException.
+
+Loaded construction signatures are not builder operands: using one directly in an
+authored method fails ownership validation with ArgumentException. Import the containing
+declaration using AssemblyBuilder.ImportReference; that recursively imports the owner
+and arguments into output-owned references. Existing CLI/native constructed-call
+encoding is reused. No synthetic CLI blobs or reflection types are introduced.

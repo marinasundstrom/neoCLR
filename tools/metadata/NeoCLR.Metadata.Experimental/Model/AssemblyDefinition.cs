@@ -249,9 +249,10 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
-    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null)
+    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null)
     {
-        internal SignatureType Materialize(ModuleDefinition module) => Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
+        internal SignatureType Materialize(ModuleDefinition module) => Arguments is { } arguments ? SignatureType.FromConstruction(module.GetNativeSignatureType(TypeToken).ReferencedType!, arguments.Select(a => a.Materialize(module)))
+            : Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
             : TypeParameter is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : MethodParameter is { } parameter ? SignatureType.MethodParameter(parameter)
             : Primitive is { } primitive ? primitive

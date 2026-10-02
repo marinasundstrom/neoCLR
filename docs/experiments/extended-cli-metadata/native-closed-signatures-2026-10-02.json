@@ -1,0 +1,139 @@
+{
+  "date": "2026-10-02",
+  "metadataBaseCommit": "d2a5c51b",
+  "ravenCommit": "3051b959b",
+  "metadataGroups": 105,
+  "standalone": {
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --native-owner-runtime <runtime> <output>",
+    "result": "CLR factory/identity consumer=42; native verify=0/run=42 for both schemas",
+    "artifacts": {
+      "App-False.dll": "60bbc7fa31649180ad3eab423e02db50a8324972d5546a28012742a6279f6bc0",
+      "App-True.dll": "33af713f75fc2a7fc4737b6383f644f71ae660f9430be9ab5de68845b46ce9e1",
+      "Library-False.dll": "44c8afbfcdca28d4f4c5309137f53878304806cb537697777ea2cb567729494c",
+      "Library-True.dll": "00cc26bb75220568328b66c14accf8941cf65b84d0102918e693b28ed99c3f48"
+    }
+  },
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "7D3140BAAFE796999AB820F56C3AF1912BC3CD3E30C1E29B681818000650EEB3",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "43A89491BD8E76F983413F5AD524392308877F837DEDDA01E98FBE9D8FEAAFB0",
+        "dependencySha256": "7D3140BAAFE796999AB820F56C3AF1912BC3CD3E30C1E29B681818000650EEB3",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "AFDD119AB6F0045B6FAACFCF8DD36105C52E2BE0B7CD81D1A2732004CD27AAC3",
+        "dependencySha256": "4203EE72D8390E61CA33FE214FFEE01D84F0E219E0F5677D6CAE0AFADDC6D439",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "9CCA488C5A89E9A9B38448DCC199CB0156CCA05233D287D98D3B0F2032C7B394",
+        "dependencySha256": "08245B2AEA6570BDDEB03D72AAF84FDAD49715CF0F214933117FAE3F6FE40A65",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "1BDF100A4C5F243357196115451B7D2BBE87F75F2B067614FC0780E854431CFA",
+        "dependencySha256": "08245B2AEA6570BDDEB03D72AAF84FDAD49715CF0F214933117FAE3F6FE40A65",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "D8E5340D51B6C2D303347554DAFD3FFDF5B965D3FBB602040173186E142B99CF",
+        "dependencySha256": "35E7D0E3D56B6417387910A6B9F150DB86685A5B480F55FB7FB113DFC10E1DE4",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "51EACEAF4F4D2F265CDDDA938D54171E62AB31D8F7958333FB7418A27BB86804"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "29245D4F97022F4AF2A77D03210784074D5998DC2EFD773BFEEAEEAD2F56F08A",
+        "dependencySha256": "7CCA431590B8AD7F5DAA75D63BCC48F5F02CCAAC83CBA191F8A0A22FA7CD5C21",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "14E745D944F48C00370F140B7AF8672CD0906D78D64AFBFBC670064891B4F574"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "7B8AF98C949D3E3CCC090CBF302BA486D098029ED5510D897D6C853A34A58DF0",
+        "dependencySha256": "E7326A009BC5E2F7EB12C6EB25EC5E0565B80769B96C733257542181184AEE3A",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "additionalCoverage": [
+    "CreateBox(int)->Box<int>",
+    "EchoBox(Box<int>)->Box<int>",
+    "immutable loaded construction arguments",
+    "structural signature equality and canonical definition",
+    "unimported construction ownership rejection",
+    "open construction rejection"
+  ],
+  "limitations": "Local closed generic root-class constructions only; open/external constructions and constraints remain pending. CLI core and translated System bootstrap remain required."
+}

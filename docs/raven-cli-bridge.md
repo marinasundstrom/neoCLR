@@ -3606,3 +3606,13 @@ consumers execute imported Box<int> on CLR and neoCLR in both native schemas.
 No Runtime Contract, metadata encoding or runtime changes were required. Constructed
 nominal signatures, constraints, generic interface inheritance and direct imported
 constructed-field emission remain pending. CLI core/translated System bootstrap remains.
+
+### Local closed constructed signatures (2026-10-02 development)
+
+Direct native signatures now retain local Box<int>-style constructions in an immutable
+ReferencedGenericType model. Raven resolves these through its existing module signature
+cache and shared type construction. CreateBox/EchoBox native namespace functions now
+carry constructed parameters/results across the library boundary; all seven consumers
+execute (42). C# metadata checks and CLR/native factory consumers pass (105 groups).
+No Runtime Contract, format or runtime change. Open/external generic constructions and
+constraints remain unsupported, and the CLI core/translated System bootstrap remains.

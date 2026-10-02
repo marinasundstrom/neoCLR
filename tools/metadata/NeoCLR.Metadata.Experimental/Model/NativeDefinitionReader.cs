@@ -5,8 +5,8 @@ public sealed partial class AssemblyDefinition
     /// <summary>Reads authoritative native namespace-function and bounded class/interface declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value, constrained, nested and generic interface/static owners and generic instance methods, unsupported field types and signatures beyond primitives/nominal references and their vectors.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference or vector signatures, and unconstrained top-level classes and nongeneric interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value, constrained, nested and generic interface/static owners and generic instance methods, open or external generic constructions, unsupported field types and signatures beyond the bounded native profile.</exception>
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference, local closed generic construction or vector signatures, and unconstrained top-level classes and nongeneric interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -26,7 +26,9 @@ public sealed partial class NativeAssemblyDefinition
 {
     internal AssemblyDefinition MaterializeDeclarations(byte[] image)
     {
-        static bool SupportedScalar(SignatureType type) => type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool ClosedArgument(SignatureType type) => type.MethodParameterIndex is null && type.TypeParameterIndex is null &&
+            (type.ArrayElement is { } element ? ClosedArgument(element) : SupportedScalar(type));
+        static bool SupportedScalar(SignatureType type) => type.GenericInstance is { } instance && !instance.Definition.IsValueType && !instance.Definition.IsInterface && instance.TypeArguments.All(ClosedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false, IsValueType: false } ||
             type.ImportedType is { IsValueType: false, GenericArity: 0, DeclaringType: null };
         static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
@@ -46,6 +48,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.GenericInstance is { } instance) return new(null, nominalTokens[(instance.Definition.Namespace, instance.Definition.Name)], Arguments: instance.TypeArguments.Select(Copy).ToArray());
             if (type.TypeParameterIndex is { } typeParameter) return new(null, 0, TypeParameter: typeParameter);
             if (type.MethodParameterIndex is { } parameter) return new(null, 0, MethodParameter: parameter);
             if (type.ArrayElement is { } element) return new(null, 0, Copy(element));

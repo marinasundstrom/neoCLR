@@ -2209,3 +2209,20 @@ profile: constructed nominal signature nodes, constraints and generic inheritanc
 need their own definition model support. C# tests preserve field/method/vector signatures,
 immutable names, exact arity and rejection of constrained declarations. CLR and neoCLR
 consumers construct and mutate Box<int> and return 42 in both native schemas.
+
+## Loaded constructed signatures (2026-10-02)
+
+The definition model now represents local closed constructions with
+SignatureType.ReferencedGenericInstance / ReferencedGenericType, separate from mutable
+builder constructions and output-owned imports. Definition reference identity and
+ordered argument equality follow the existing GenericTypeInstance contract and the
+ECMA-335 generic-instantiation comparison above. Arguments are immutable; emission
+requires explicit import. This preserves the builders → definitions → metadata → PE
+boundary without introducing a second codegen path. The cost is a new signature category
+for readers to handle. Open/external constructions remain rejected until their scope
+and dependency contracts are covered.
+
+C# tests verify structural equality, canonical definition references, argument immutability,
+ownership rejection and executable factory/identity calls on CLR/neoCLR. Raven imports
+CreateBox(int)->Box<int> and EchoBox(Box<int>)->Box<int> directly, reusing the module's
+signature cache and shared constructed-type substitution. All seven consumers return 42.

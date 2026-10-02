@@ -21,10 +21,16 @@ internal static class NativeGenericOwnerChecks
         set.LoadArgument(0); set.LoadArgument(1); set.StoreField(field); set.Return();
         var array = type.AddMethod("ArrayIdentity", new MethodSignature(SignatureType.ArrayOf(parameter), [SignatureType.ArrayOf(parameter)]));
         array.LoadArgument(0); array.Return();
+        SignatureType closed = type.MakeGenericInstance(PrimitiveType.Int32);
+        var factoryType = library.AddType("Example", "Factory");
+        var factory = factoryType.AddMethod("Create", new MethodSignature(closed, [PrimitiveType.Int32]));
+        factory.LoadArgument(0); factory.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); factory.Return();
+        var echo = factoryType.AddMethod("Echo", new MethodSignature(closed, [closed]));
+        echo.LoadArgument(0); echo.Return();
         var native = library.WriteNativeAssembly();
         var image = binary ? RuntimeAssemblyContainer.WriteBinary(native, core) : RuntimeAssemblyContainer.Write(native, core);
         var read = AssemblyDefinition.ReadNativeAssembly(image);
-        var definition = read.MainModule.Types.Single();
+        var definition = read.MainModule.Types.Single(t => t.Name == "Box`1");
         Check(definition.Name == "Box`1" && definition.GenericArity == 1 && definition.GenericParameterNames!.SequenceEqual(new[] { "TItem" }), "owner identity and parameter names");
         Reject<NotSupportedException>(() => ((IList<string>)definition.GenericParameterNames!)[0] = "Changed");
         Check(definition.SpecialConstraints.Count == 0 && definition.GenericConstraints.Count == 0, "unconstrained owner");
@@ -32,12 +38,23 @@ internal static class NativeGenericOwnerChecks
         Check(definition.Methods.Single(m => m.Name == "Get").TryGetSignature(out var signature) && signature!.ReturnType.TypeParameterIndex == 0, "type parameter return");
         Check(definition.Methods.Single(m => m.Name == "ArrayIdentity").TryGetSignature(out var vector) && vector!.ReturnType.ArrayElement!.TypeParameterIndex == 0, "type parameter vector");
         Check(read.Write().SequenceEqual(image), "opaque generic owner roundtrip");
+        var readFactory = read.MainModule.Types.Single(t => t.Name == "Factory");
+        var createDefinition = readFactory.Methods.Single(m => m.Name == "Create");
+        var echoDefinition = readFactory.Methods.Single(m => m.Name == "Echo");
+        Check(createDefinition.TryGetSignature(out var createSignature) && echoDefinition.TryGetSignature(out var echoSignature) &&
+            createSignature!.ReturnType == echoSignature!.ParameterTypes[0] &&
+            ReferenceEquals(createSignature.ReturnType.ReferencedGenericInstance!.Definition.Resolve(), definition) &&
+            createSignature.ReturnType.ReferencedGenericInstance.TypeArguments[0].Primitive == PrimitiveType.Int32,
+            "structural closed signature identity and canonical definition");
+        Reject<NotSupportedException>(() => ((IList<SignatureType>)createSignature!.ReturnType.ReferencedGenericInstance!.TypeArguments)[0] = PrimitiveType.Boolean);
         var app = new AssemblyBuilder(new("NativeOwnerApp", new Version(1, 0, 0, 0)), core);
+        Reject<ArgumentException>(() => app.AddFunction("Unimported", createSignature!));
+        Check(!createDefinition.TryGetStaticValueSignature(out _) && !createDefinition.TryGetStaticPrimitiveSignature(out _), "closed construction is not a primitive signature");
         var importedType = app.ImportReference(definition, core).MakeGenericInstance(PrimitiveType.Int32);
         ImportedConstructedMethodReference Import(string name) => app.ImportReference(definition.Methods.Single(m => m.Name == name), core).MakeConstructedReference([PrimitiveType.Int32]);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var local = main.DeclareLocal(importedType);
-        main.LoadConstant(19); main.NewObject(Import(".ctor")); main.StoreLocal(local);
+        main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Call(app.ImportReference(echoDefinition, core)); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));
         main.LoadLocal(local); main.Call(Import("Get")); main.Return();
         _ = app.WriteNativeAssembly();
@@ -55,8 +72,14 @@ internal static class NativeGenericOwnerChecks
                 Check(Equals(42, context.LoadFromStream(new MemoryStream(app.Write())).EntryPoint!.Invoke(null, null)), "CLR constructed native imports");
             }
             finally { context.Unload(); }
-            library.Types.Single().SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType);
+            library.Types.Single(t => t.Name == "Box`1").SetSpecialConstraints(0, TypeParameterConstraints.ReferenceType);
             Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), library.CoreLibrary)));
+            var (openLibrary, _, _) = Create(binary);
+            var owner = openLibrary.Types.Single(t => t.Name == "Box`1");
+            var open = owner.MakeGenericInstance(SignatureType.MethodParameter(0));
+            var openEcho = openLibrary.AddFunction("Open", new MethodSignature(open, [open], ["T"]));
+            openEcho.LoadArgument(0); openEcho.Return();
+            Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(openLibrary.WriteNativeAssembly(), openLibrary.CoreLibrary)));
         }
     }
     internal static async Task RunRuntime(string runtime, string directory)

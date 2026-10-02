@@ -36,8 +36,9 @@ substitution; all seven native consumers execute (42), including generic forward
 array aliases. Unconstrained native generic root classes now also import with owner-scoped
 parameters and shared constructed-type/member substitution. Box<int>/Box<Item> construction,
 methods, properties and vector aliases execute (42); all seven consumers and 105 metadata
-groups pass. Next broaden constructed nominal signatures and constraints before full
-System loading. See [generic owner evidence](experiments/extended-cli-metadata/native-generic-owners-2026-10-02.json).
+groups pass. Local closed generic signatures now also retain immutable definition/argument
+identity; Raven consumes Box<int> factory/identity calls (42). Next broaden open/external
+constructions and constraints before full System loading. See [closed signature evidence](experiments/extended-cli-metadata/native-closed-signatures-2026-10-02.json). See [generic owner evidence](experiments/extended-cli-metadata/native-generic-owners-2026-10-02.json).
 See [generic import evidence](experiments/extended-cli-metadata/native-generic-symbols-2026-10-02.json). See [return diagnostic evidence](experiments/extended-cli-metadata/native-return-diagnostics-2026-10-02.json). See [storage evidence](experiments/extended-cli-metadata/native-interface-storage-2026-10-02.json).
 See [interface evidence](experiments/extended-cli-metadata/native-interfaces-2026-10-02.json). Setter-only indexed assignments now also compile and execute (42);
 source reads still require a getter. See [setter-only evidence](experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json). See [indexer evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json). See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
