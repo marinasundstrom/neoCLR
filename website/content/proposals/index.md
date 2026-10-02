@@ -469,3 +469,7 @@ support for its Option.None carrier; complete class-library execution remains op
 Development metadata APIs now preserve nested nongeneric class/value declarations
 through CLI and native PE, with constructor execution checked on both runtimes.
 Nested imports and the broad Raven collections application remain in progress.
+
+Nested imports and generic value children now execute through Raven and native metadata
+(42). The unchanged collections application has advanced to extension/delegate signature
+support; it is not yet an executable integration milestone.

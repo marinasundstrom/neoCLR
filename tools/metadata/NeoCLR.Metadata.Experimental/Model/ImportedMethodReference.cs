@@ -64,7 +64,7 @@ public sealed partial class AssemblyBuilder
         bool isVirtual = (definition.Attributes & 0x40) != 0;
         bool isAbstract = (definition.Attributes & 0x400) != 0;
         bool isFinal = (definition.Attributes & 0x20) != 0;
-        if (type?.DeclaringType is not null || type is { GenericArity: > 0, CanImportReference: false })
+        if (type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
             definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
@@ -95,8 +95,16 @@ public sealed partial class AssemblyBuilder
         if (importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
         // Private reference-only nodes reuse both backends' existing exact-identity call encoding.
         // No producer bodies or mutable definition graph are retained or exposed.
-        var owner = type is null ? null : new TypeBuilder(imported.Graph, type.Namespace, type.Name,
-            isStatic: false, genericNames: Enumerable.Range(0, type.GenericArity).Select(i => "T" + i).ToArray(), isInterface: isInterface, isValueType: type.IsValueType);
+        TypeBuilder? MakeOwner(TypeDefinition? declaration)
+        {
+            if (declaration is null) return null;
+            var result = new TypeBuilder(imported.Graph, declaration.Namespace, declaration.Name, isStatic: false,
+                genericNames: Enumerable.Range(0, declaration.GenericArity).Select(i => "T" + i).ToArray(),
+                isInterface: (declaration.Attributes & 0x20) != 0, isValueType: declaration.IsValueType);
+            result.Definition.AuthoredDeclaringType = MakeOwner(declaration.DeclaringType)?.Definition;
+            return result;
+        }
+        var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         importedReferences.Add(key, reference);
         return reference;

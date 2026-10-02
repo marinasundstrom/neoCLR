@@ -1671,3 +1671,24 @@ No runtime opcode or format version changes were needed. Raven remains at 5bc0d5
 the unchanged collections case remains blocked until nested imports and target mapping
 are connected. The author explicitly directed continuing beyond intermediate slices until
 the attempted samples compile and run successfully.
+
+
+### Nested import/compiler checkpoint (2026-10-02)
+
+ImportedTypeReference now preserves enclosing scopes in identity, signature substitution
+and CLI TypeRef resolution. Native identities use explicit enclosing paths, while definitions
+retain module-local ownership. Generic children under nongeneric owners are admitted;
+captured outer parameters remain a deliberate bound. This follows CLI nested scope semantics
+and reuses the existing native owner representation, without a format version change.
+
+Raven selects the capability explicitly and matches physical union-case containers separately
+from semantic carrier ownership. Runtime Contracts, binding and default .NET behavior are
+unchanged. The temporary CLI symbol bridge retains these scopes until native symbol loading
+replaces it. C# metadata tests (86 groups), focused compiler tests (30), CLR/native metadata
+consumers (42), and a Raven dependency consumer (42) validate the slice. The unchanged
+collections application now reaches Single callable signature admission; it has not run.
+Extension/delegate signatures and the native System dependency mapping remain open.
+
+Evidence: [Raven nested consumer](../experiments/extended-cli-metadata/nested-imports-2026-10-02.json)
+and [unchanged collections assessment](../experiments/extended-cli-metadata/collections-after-nested-imports-2026-10-02.json),
+Raven revision 942a0dce5 on codex/metadata-consumer.

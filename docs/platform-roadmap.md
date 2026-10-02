@@ -1,8 +1,8 @@
 # neoCLR platform roadmap
 
 Development checkpoint (2026-10-02): the metadata producer now preserves nested
-nongeneric definitions through CLI/native PE and runtime execution (42). Nested imports
-and Raven mapping remain active work for the unchanged collections sample; this is not
+nongeneric definitions through CLI/native PE and runtime execution (42). Nested imports and Raven mapping now execute in a separate-library consumer (42);
+extension/delegate signatures and native System binding remain active work for the unchanged collections sample; this is not
 completion of the integration milestone.
 
 **Updated 2026-10-02.** This is the authoritative default for work priorities,

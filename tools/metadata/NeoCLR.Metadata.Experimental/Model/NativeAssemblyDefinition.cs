@@ -128,7 +128,7 @@ public sealed class NativeAssemblyDefinition
                     typeFields.Add("declaring_type"); Shape(declaring, "module", "revision", "index");
                     declaringType = declaring.GetProperty("index").GetInt32();
                     Require(Text(declaring, "module") == moduleName && Text(declaring, "revision") == identity.Version.ToString() &&
-                        declaringType >= 0 && declaringType < types.Count && types[declaringType].GenericNames.Length == 0 && typeNames.Length == 0,
+                        declaringType >= 0 && declaringType < types.Count && types[declaringType].GenericNames.Length == 0,
                         "invalid or unsupported nested owner");
                 }
                 Shape(type, typeFields.ToArray());
@@ -484,11 +484,18 @@ public sealed class NativeAssemblyDefinition
             }
         for (int t = 0; t < types.Length; t++)
             foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
-        SignatureType Remap(SignatureType type) => type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? owners[System.Array.FindIndex(types, t => t.Namespace == instance.Definition.Namespace && t.Name == instance.Definition.Name)].MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
-            : type.ClassType is { } c ? owners[System.Array.FindIndex(types, t => t.Namespace == c.Namespace && t.Name == c.Name)] : type;
+        var mappedOwners = new Dictionary<TypeBuilder, TypeBuilder>();
+        TypeBuilder RemapOwner(TypeBuilder original)
+        {
+            if (mappedOwners.Count == 0)
+                foreach (var (owner, index) in original.Assembly.Types.Select((owner, index) => (owner, index))) mappedOwners.Add(owner, owners[index]);
+            return mappedOwners[original];
+        }
+        SignatureType Remap(SignatureType type) => type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+            : type.ClassType is { } c ? RemapOwner(c) : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {
-            var definition = graph.ImportTypeIdentity(type.AssemblyIdentity, type.Namespace, type.Name, type.GenericArity, type.IsValueType);
+            var definition = graph.ImportTypeIdentity(type.AssemblyIdentity, type.Namespace, type.Name, type.GenericArity, type.IsValueType, type.DeclaringType is null ? null : RemapImported(type.DeclaringType).ImportedType);
             return type.TypeArguments.Count == 0 ? definition : definition.MakeGenericInstance(type.TypeArguments.Select(Remap).ToArray());
         }
         var projectedMethods = new List<MethodBuilder>();
@@ -514,7 +521,7 @@ public sealed class NativeAssemblyDefinition
         {
             var type = rows[i];
             result[i] = type.DeclaringType < 0 ? DefineType(graph, type) : type.IsValueType
-                ? result[type.DeclaringType].AddNestedValueType(type.Name, type.Visibility)
+                ? type.GenericNames.Length == 0 ? result[type.DeclaringType].AddNestedValueType(type.Name, type.Visibility) : result[type.DeclaringType].AddNestedGenericValueType(type.Name[..type.Name.LastIndexOf('`')], type.GenericNames, type.Visibility)
                 : result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility);
         }
         return result;
@@ -540,9 +547,17 @@ public sealed class NativeAssemblyDefinition
             var text = JsonSerializer.Serialize(new[] { identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(CultureInfo.InvariantCulture) });
             var prefix = ModuleName(text) + ".T_";
             if (!name.StartsWith(prefix, StringComparison.Ordinal)) continue;
-            var parts = name[prefix.Length..].Split('_');
-            Require(parts.Length == 2, "invalid imported native type name");
-            return graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), arity, valueTypeReferences.Contains(name));
+            var path = name[prefix.Length..].Split(".N_", StringSplitOptions.None);
+            Require(path.Length <= 16, "nested imported depth exceeded");
+            var parts = path[0].Split('_'); Require(parts.Length == 2, "invalid imported native type name");
+            var top = prefix + path[0];
+            var reference = graph.ImportTypeIdentity(identity, Decode(parts[0]), Decode(parts[1]), path.Length == 1 ? arity : 0, valueTypeReferences.Contains(top));
+            for (int i = 1; i < path.Length; i++)
+            {
+                top += ".N_" + path[i];
+                reference = graph.ImportTypeIdentity(identity, "", Decode(path[i]), i == path.Length - 1 ? arity : 0, valueTypeReferences.Contains(top), reference);
+            }
+            return reference;
         }
         throw new InvalidDataException("signature type must be owned or scoped to a declared dependency");
     }

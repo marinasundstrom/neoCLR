@@ -236,14 +236,24 @@ public sealed partial class AssemblyBuilder
         var importedTypes = new Dictionary<TypeBuilder, TypeReferenceHandle>();
         var importedMethods = new Dictionary<MethodBuilder, MemberReferenceHandle>();
         var typeHandles = types.Select((type, index) => (type, handle: MetadataTokens.TypeDefinitionHandle(index + 2))).ToDictionary(p => p.type, p => p.handle);
-        var externalTypeHandles = new Dictionary<(AssemblyIdentity, string, string), TypeReferenceHandle>();
+        var externalTypeHandles = new Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), TypeReferenceHandle>();
         EntityHandle ImportedTypeHandle(ImportedTypeReference type)
         {
-            var key = (type.AssemblyIdentity, type.Namespace, type.Name);
+            var key = (type.AssemblyIdentity, type.Namespace, type.Name, type.DeclaringType);
             if (!externalTypeHandles.TryGetValue(key, out var handle))
             {
-                handle = metadata.AddTypeReference(ImportAssembly(type.AssemblyIdentity), metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name));
+                handle = metadata.AddTypeReference(type.DeclaringType is { } parent ? ImportedTypeHandle(parent) : ImportAssembly(type.AssemblyIdentity), metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name));
                 externalTypeHandles.Add(key, handle);
+            }
+            return handle;
+        }
+        TypeReferenceHandle ImportOwner(TypeBuilder owner)
+        {
+            if (!importedTypes.TryGetValue(owner, out var handle))
+            {
+                handle = metadata.AddTypeReference(owner.Definition.DeclaringType is { } parent ? ImportOwner(parent.Producer!) : ImportAssembly(owner.Assembly.Identity),
+                    metadata.GetOrAddString(owner.Namespace), metadata.GetOrAddString(owner.Name));
+                importedTypes.Add(owner, handle);
             }
             return handle;
         }
@@ -325,11 +335,7 @@ public sealed partial class AssemblyBuilder
             if (!importedMethods.TryGetValue(method, out var handle))
             {
                 var owner = method.DeclaringType ?? throw new InvalidDataException("cross-assembly global function calls require native emission");
-                if (!importedTypes.TryGetValue(owner, out var type))
-                {
-                    type = metadata.AddTypeReference(ImportAssembly(owner.Assembly.Identity), metadata.GetOrAddString(owner.Namespace), metadata.GetOrAddString(owner.Name));
-                    importedTypes.Add(owner, type);
-                }
+                var type = ImportOwner(owner);
                 handle = metadata.AddMemberReference(type, metadata.GetOrAddString(method.CliName), Signature(method));
                 importedMethods.Add(method, handle);
             }
@@ -360,11 +366,7 @@ public sealed partial class AssemblyBuilder
             if (typeHandles.TryGetValue(declaring, out var ownedHandle)) declaringHandle = ownedHandle;
             else {
                 if (!CoreLibrary.Equals(declaring.Assembly.CoreLibrary)) throw new InvalidDataException("incompatible core identity");
-                if (!importedTypes.TryGetValue(declaring, out var external)) {
-                    external = metadata.AddTypeReference(ImportAssembly(declaring.Assembly.Identity), metadata.GetOrAddString(declaring.Namespace), metadata.GetOrAddString(declaring.Name));
-                    importedTypes.Add(declaring, external);
-                }
-                declaringHandle = external;
+                declaringHandle = ImportOwner(declaring);
             }
             var arguments = new BlobEncoder(ownerBlob).TypeSpecificationSignature().GenericInstantiation(declaringHandle, reference.DeclaringTypeArguments.Count, declaring.IsValueType);
             foreach (var type in reference.DeclaringTypeArguments) EncodeType(arguments.AddArgument(), type);

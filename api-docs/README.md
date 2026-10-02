@@ -662,3 +662,6 @@ public guest signature changes are part of this constructor slice.
 Host metadata nested declaration APIs (NestedTypes, AddNestedClass, AddNestedValueType)
 are covered in [the experimental manual](experimental-metadata.md#nested-declarations-development-2026-10-02).
 They remain host C# APIs outside the guest RavenDoc selection.
+
+The same host manual covers ImportedTypeReference.DeclaringType and
+AddNestedGenericValueType; neither is a guest RavenDoc API.

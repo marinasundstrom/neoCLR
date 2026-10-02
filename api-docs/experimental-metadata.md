@@ -3994,3 +3994,26 @@ projection. Runtime loading/execution is tested with a nested value constructor 
 alongside CLR execution, duplicate short names under different owners, deep navigation
 and malformed ownership rejection. Imported nested types and captured generic owner
 parameters are not yet supported. Existing top-level identities remain unchanged.
+
+
+### Nested imports and generic children (development, 2026-10-02)
+
+`TypeBuilder.AddNestedGenericValueType(string name, IEnumerable<string> parameters,
+TypeVisibility visibility = Public)` adds a generic value child under a nongeneric
+owner. The name excludes the arity suffix; one to 32 unique parameter names are copied.
+Null parameters throw ArgumentNullException; invalid identity, arity, visibility or
+ownership throws ArgumentException. NestedTypes now also accepts corresponding manually
+created generic value definitions. Captured generic outer parameters remain unsupported.
+
+`ImportedTypeReference.DeclaringType` exposes the immutable enclosing definition reference,
+or null. ImportReference accepts public nested class/value declarations under public
+nongeneric containers, retaining scope through equality, hashing and generic substitution.
+Parents may be static containers. CLI TypeRefs use enclosing TypeRef resolution scopes;
+native identity paths are deterministic and preserve all owners. Private/internal enclosing
+scopes, generic captured owners and unsupported base/core contracts reject with
+InvalidDataException. NewObject, Call and constructed imported methods retain the nested
+owner; their earlier stack and ownership checks still apply.
+
+C# fixtures execute nested imported nongeneric/generic value and class constructors on
+both CLR and neoCLR (42). Native reference projection remaps owned types by declaration
+identity instead of namespace/name, preventing collisions between equal child short names.

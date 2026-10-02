@@ -7,23 +7,24 @@ using AssemblyBuilder = NeoCLR.Metadata.Experimental.Model.AssemblyBuilder;
 
 internal static class ValueConstructorChecks
 {
-    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create()
+    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create(bool nested = false)
     {
         var core = new AssemblyIdentity("System.Private.CoreLib", typeof(object).Assembly.GetName().Version!, "", "7cec85d7bea7798e");
         var library = new AssemblyBuilder(new("ValueConstructorLibrary", new Version(1, 0, 0, 0)), core);
-        var number = library.AddValueType("Example", "Number");
+        var container = nested ? library.AddType("Example", "Container") : null;
+        var number = nested ? container!.AddNestedValueType("Number") : library.AddValueType("Example", "Number");
         var value = number.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public);
         var constructor = number.AddConstructor([PrimitiveType.Int32]);
         constructor.LoadArgument(0); constructor.LoadArgument(1); constructor.StoreField(value); constructor.Return();
         var read = number.AddInstanceMethod("Read", new MethodSignature(PrimitiveType.Int32, []));
         read.LoadArgument(0); read.LoadField(value); read.Return();
-        var box = library.AddGenericValueType("Example", "Box", ["T"]);
+        var box = nested ? container!.AddNestedGenericValueType("Box", ["T"]) : library.AddGenericValueType("Example", "Box", ["T"]);
         var t = SignatureType.TypeParameter(0); var field = box.AddField("Value", t, FieldVisibility.Public);
         var init = box.AddConstructor(new MethodSignature(PrimitiveType.Void, [t]));
         init.LoadArgument(0); init.LoadArgument(1); init.StoreField(field); init.Return();
         var get = box.AddInstanceMethod("Get", new MethodSignature(t, []));
         get.LoadArgument(0); get.LoadField(field); get.Return();
-        var referenceType = library.AddClass("Example", "ReferenceBox");
+        var referenceType = nested ? container!.AddNestedClass("ReferenceBox") : library.AddClass("Example", "ReferenceBox");
         var referenceField = referenceType.AddField("Value", PrimitiveType.Int32, FieldVisibility.Public);
         var referenceConstructor = referenceType.AddConstructor([PrimitiveType.Int32]);
         referenceConstructor.LoadArgument(0); referenceConstructor.LoadArgument(1); referenceConstructor.StoreField(referenceField); referenceConstructor.Return();
@@ -49,9 +50,9 @@ internal static class ValueConstructorChecks
         try { main.Call(numberCtor); throw new Exception("ordinary constructor call admitted"); } catch (ArgumentException) { }
         return (library, app, constructor, value);
     }
-    internal static void Run()
+    internal static void Run(bool nested = false)
     {
-        var (library, app, constructor, field) = Create();
+        var (library, app, constructor, field) = Create(nested);
         var context = new AssemblyLoadContext("value-constructors", true);
         try
         {
@@ -72,9 +73,9 @@ internal static class ValueConstructorChecks
         try { assembly.Write(); throw new Exception("invalid constructor accepted"); } catch (InvalidDataException) { }
         try { assembly.WriteNativeAssembly(); throw new Exception("invalid native constructor accepted"); } catch (InvalidDataException) { }
     }
-    internal static async Task RunRuntime(string runtime, string directory)
+    internal static async Task RunRuntime(string runtime, string directory, bool nested = false)
     {
-        Run(); Directory.CreateDirectory(directory); var (library, app, _, _) = Create();
+        Run(nested); Directory.CreateDirectory(directory); var (library, app, _, _) = Create(nested);
         var libraryPath = Path.Combine(directory, "Library.dll"); var appPath = Path.Combine(directory, "App.dll");
         File.WriteAllBytes(libraryPath, RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), library.CoreLibrary));
         File.WriteAllBytes(appPath, RuntimeAssemblyContainer.WriteBinary(app.WriteNativeAssembly(), app.CoreLibrary));

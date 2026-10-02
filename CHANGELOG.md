@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Import nested public metadata identities with enclosing TypeRef scopes, and author
+  generic nested value types under nongeneric owners. Preserve scope in equality,
+  substitution, native references and CLI projections. Separate-library metadata and
+  Raven consumers execute to 42; 86 metadata groups and 30 compiler tests pass.
+  Collections advances to the Single signature; application execution remains pending.
+
 - Author nested nongeneric class/value definitions through definition collections and
   builder helpers, preserving CLI NestedClass rows and explicit native declaring owners.
   Validate ownership, visibility and native/CLI origin agreement; nested constructor
