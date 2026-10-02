@@ -2895,3 +2895,17 @@ Its existing structural Function implementation and API are retained, independen
 of main's nominal delegates. Function identity/metadata work is still experimental;
 Self support is inherited from main. Use this branch's matching generated core,
 bridge and native library, not a nominal main bundle.
+
+### Native static Function producer (2026-10-02)
+
+Raven's metadata adapter now explicitly enables shared Function signature/local and
+bind/invoke capabilities. A static method-group callback compiles directly to binary
+PE and executes to 42; Hello World, arrays, interfaces and ref/out controls also pass.
+Compiler binding still uses the matching CLI reference snapshot and unchanged Runtime
+Contracts. Func/Action carry signatures in CLI metadata; native code uses structural
+Function identity and binding. The compiler owns logical lowering, the independent
+metadata API owns encoding, and neoCLR owns invocation. Ordinary .NET emission retains
+its existing path. Lambda synthesis, captured receivers, generic/imported binding
+and inhabited-Void callbacks remain pending in this producer profile; these are not
+permanent native Function restrictions. Runtime integration remains on the feature
+branch `codex/extended-cli-metadata`.

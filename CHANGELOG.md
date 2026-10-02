@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Connect Raven's native adapter to structural Function signatures, static binding
+  and invocation. A directly emitted Raven PE passes a callback through a function
+  and executes to 42; five existing native profile controls continue to pass.
+
 - Add structural Function signatures and checked static binding/invocation to the
   metadata API, including raw typed operands, exact shape identity, generic substitution,
   native Function encoding and CLI Func/Action transport. Imported callable signatures
