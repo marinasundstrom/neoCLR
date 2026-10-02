@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Record Raven native host dependency binding without a separately supplied reader
+  definition or image roundtrip. Legacy CLI/snapshot bindings remain available; the
+  legacy Definition accessor throws for new native bindings. Seven consumers compile
+  and execute (42), with invalid configuration rejected before output. No native format
+  change; lazy semantic reader state and explicit core/bootstrap remain.
+
 - Remove Raven native type/field reader fallbacks and its emitter-native resolver;
   all supported native references now require symbol contracts. Seven consumers execute
   (42). Library/runtime are unchanged; host input binding and lazy semantic loading

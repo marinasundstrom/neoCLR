@@ -664,3 +664,10 @@ Native callable, type and field emission now has no reader-definition fallback: 
 references use symbols and explicit identity/layout facts, while unsupported contracts
 diagnose. Seven consumers still execute. Host input setup and lazy symbol loading remain
 reader-backed, and translated CLI compatibility is a separate path.
+
+
+Development checkpoint (2026-10-02): Raven's native emission host can now bind a
+registered native compiler reference without separately supplying its metadata reader
+definition. Seven native consumers compile and execute. Lazy symbol loading and the
+explicit primitive-core/translated-System bootstrap remain; this does not change the
+published metadata format or promise complete class-library support.

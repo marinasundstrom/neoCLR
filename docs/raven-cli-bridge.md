@@ -3795,3 +3795,22 @@ All seven consumers execute (42), with diagnostic checks retained. The metadata/
 are unchanged and prior 108-group library evidence is reused. Host-native input binding,
 translated CLI lookup and lazy semantic loading remain separate pending concerns.
 Runtime Contract/bootstrap requirements are unchanged. See [evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json).
+
+
+### Native host dependency binding checkpoint (2026-10-02)
+
+Raven `1d4cb92fc` adds `NeoClrMetadataDependency(NeoClrMetadataReference,
+AssemblyIdentity)` for native emission configuration. The exact registered compiler
+reference provides captured artifact identity/digest; the explicit second argument
+specifies the primitive core contract. No separately supplied AssemblyDefinition or
+image roundtrip is required. Output references continue to be authored from symbols.
+
+The legacy snapshot constructor remains for CLI/translated compatibility and old native
+callers. Its snapshot accessor `Definition` throws InvalidOperationException for the
+new native binding. Duplicate identities/symbols, wrong core, unregistered references
+and mismatched legacy native snapshots diagnose NEOMETA002 without output. All seven
+native probe consumers now use the new overload, compile and execute with result 42.
+The compiler reference still owns lazy semantic reader state. Runtime Contract,
+explicit CLI primitive core, translated System bootstrap and native format are unchanged.
+This is a Raven backend host API change, not a metadata-library or shared .NET API change.
+Existing 108-group C# metadata validation remains applicable to the unchanged library.

@@ -2435,3 +2435,22 @@ Native callable/type/field encoding uses symbols and explicit identity/layout/re
 values. Translated CLI compatibility still looks up definitions under its existing
 binding contract. Host input setup and lazy semantic materialization retain readers;
 this does not claim whole-compilation reader lifetime independence.
+
+
+### Native host dependency binding checkpoint (2026-10-02)
+
+Raven `1d4cb92fc` adds `NeoClrMetadataDependency(NeoClrMetadataReference,
+AssemblyIdentity)` for native emission configuration. The exact registered compiler
+reference provides captured artifact identity/digest; the explicit second argument
+specifies the primitive core contract. No separately supplied AssemblyDefinition or
+image roundtrip is required. Output references continue to be authored from symbols.
+
+The legacy snapshot constructor remains for CLI/translated compatibility and old native
+callers. Its snapshot accessor `Definition` throws InvalidOperationException for the
+new native binding. Duplicate identities/symbols, wrong core, unregistered references
+and mismatched legacy native snapshots diagnose NEOMETA002 without output. All seven
+native probe consumers now use the new overload, compile and execute with result 42.
+The compiler reference still owns lazy semantic reader state. Runtime Contract,
+explicit CLI primitive core, translated System bootstrap and native format are unchanged.
+This is a Raven backend host API change, not a metadata-library or shared .NET API change.
+Existing 108-group C# metadata validation remains applicable to the unchanged library.
