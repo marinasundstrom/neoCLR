@@ -5,8 +5,8 @@ public sealed partial class AssemblyDefinition
     /// <summary>Reads authoritative native namespace-function and bounded class declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/interface/generic types, unsupported field types, properties and signatures beyond primitives/nominal classes and their vectors.</exception>
-    /// <remarks>This first materialization profile admits nongeneric functions/methods with primitive, nominal class or vector signatures, top-level classes with primitive, nominal class or vector fields and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/interface/generic types, unsupported field types, indexed properties and signatures beyond primitives/nominal classes and their vectors.</exception>
+    /// <remarks>This first materialization profile admits nongeneric functions/methods with primitive, nominal class or vector signatures, top-level classes with primitive, nominal class or vector fields/non-indexed properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -17,9 +17,9 @@ public sealed partial class AssemblyDefinition
         return native.MaterializeDeclarations(owned);
     }
 
-    internal static AssemblyDefinition NativeDeclarations(AssemblyIdentity identity, TypeRow[] types, FieldRow[] fields, MethodRow[] methods,
+    internal static AssemblyDefinition NativeDeclarations(AssemblyIdentity identity, TypeRow[] types, FieldRow[] fields, MethodRow[] methods, PropertyRow[] properties,
         ReferenceRow[] references, TypeReferenceRow[] typeReferences, byte[] image, uint entryPoint)
-        => new(identity, identity.Name + ".dll", Guid.Empty, types, fields, [], methods, [], references, typeReferences, null, image, entryPoint) { IsNative = true };
+        => new(identity, identity.Name + ".dll", Guid.Empty, types, fields, properties, methods, [], references, typeReferences, null, image, entryPoint) { IsNative = true };
 }
 
 public sealed partial class NativeAssemblyDefinition
@@ -31,7 +31,7 @@ public sealed partial class NativeAssemblyDefinition
             type.ImportedType is { IsValueType: false, GenericArity: 0, DeclaringType: null };
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && SupportedScalar(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Length != 0 || types.Any(t => t.IsInterface || t.IsValueType || t.DeclaringType >= 0 ||
+        if (properties.Any(p => p.Parameters.Length != 0 || !Supported(p.Type)) || types.Any(t => t.IsInterface || t.IsValueType || t.DeclaringType >= 0 ||
             t.GenericNames.Length != 0 || t.Fields.Any(f => !Supported(f.Signature!)) || t.BaseInterfaces.Length != 0 || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             m.Signature.GenericParameterNames.Count != 0 || !Supported(m.Signature.ReturnType) ||
@@ -67,12 +67,17 @@ public sealed partial class NativeAssemblyDefinition
                 fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
                     (ushort)((field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)),
                     [], Copy(field.Signature!)));
+        var accessors = properties.SelectMany(p => new[] { p.Getter, p.Setter }).Where(index => index >= 0).ToHashSet();
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
-            (ushort)((method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, 0, [], false, [],
+            (ushort)((accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, 0, [], false, [],
             new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray()), method.Namespace)).ToArray();
+        var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
+            0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
+            property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
+            property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type))).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
-        return AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, references, externalRows.ToArray(), image, entryPointToken);
+        return AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
     }
 }
 

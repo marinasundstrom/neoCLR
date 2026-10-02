@@ -4562,3 +4562,38 @@ identity, field/method signature equality, wrong-element arguments/stores and .N
 of native array imports (42). Raven's three-assembly consumer stores an external-class
 array in a field, replaces an element through an alias and passes a primitive array
 across the same boundary; neoCLR returns 42.
+
+### Native non-indexed properties (development, 2026-10-02)
+
+ReadNativeAssembly now materializes non-indexed properties on the supported root
+class profile. ModuleDefinition.Properties, TypeDefinition.Properties and
+GetPropertyDefinition return the same snapshot-owned PropertyDefinition objects.
+DeclaringType, GetMethod and SetMethod refer to canonical definitions; accessor
+visibility and staticness are preserved, with SpecialName on accessor methods.
+MetadataToken is the validated native property origin token. Missing accessors remain
+null, including read-only and write-only properties; OtherMethods is empty.
+
+```csharp
+public bool TryGetSignature(out SignatureType? type, out bool isStatic);
+```
+
+PropertyDefinition.TryGetSignature returns the logical property value type and
+staticness for supported native properties, authored non-indexed properties and
+primitive non-indexed CLI properties. It returns false, null and false for other
+loaded CLI signatures and indexers. Native types include supported primitives,
+local/external nominal classes and their vectors. References belong to the immutable
+snapshot; dependencies resolve explicitly through the existing resolver contract.
+GetSignature throws NotSupportedException for native properties because they have no
+CLI blob. PropertyType and ParameterTypes remain authored-only APIs; use the logical
+reader for loaded native properties. TryGetPrimitiveSignature recognizes native
+primitive properties and rejects nominal/vector properties with Void/false outputs.
+
+Import the canonical accessor methods through AssemblyBuilder.ImportReference to emit
+property calls; properties themselves are associations rather than CIL call operands.
+Existing exact identity, resolver and snapshot checks apply. An unchanged native
+assembly still writes its original bytes. Indexed properties, generic/value/interface
+owners and unsupported signatures fail the whole direct read with InvalidDataException.
+No property schema or runtime opcode changes are made. C# checks cover both containers,
+ownership, signatures, static/read-only/write-only accessors, CLR accessor execution,
+opaque roundtrip and indexer rejection. Raven consumes separately compiled native
+properties through the same accessor definitions.

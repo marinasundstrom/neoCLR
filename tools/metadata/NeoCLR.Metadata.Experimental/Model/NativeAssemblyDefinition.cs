@@ -12,7 +12,7 @@ public sealed partial class NativeAssemblyDefinition
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
-    private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
+    private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
     private readonly HashSet<string> valueTypeReferences;
@@ -482,7 +482,7 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     var getter = Accessor("getter", false); var setter = Accessor("setter", true);
                     Require(getter >= 0 || setter >= 0, "property needs an accessor");
-                    properties.Add(new(owner, name, valueType, getter, setter));
+                    properties.Add(new(owner, name, valueType, getter, setter, indices));
                 }
             }
             var entry = Text(root, "entry");

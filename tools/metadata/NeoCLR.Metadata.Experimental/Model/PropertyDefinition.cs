@@ -4,16 +4,18 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class PropertyDefinition
 {
     private readonly byte[] signature;
+    private readonly SignatureType? nativeType;
     private readonly uint owner, getter, setter;
     internal PropertyDefinition(ModuleDefinition module, AssemblyDefinition.PropertyRow row)
     {
         Module = module; MetadataToken = row.Token; Name = row.Name; Attributes = row.Attributes;
+        nativeType = row.NativeType?.Materialize(module);
         signature = (byte[])row.Signature.Clone(); owner = row.DeclaringToken; getter = row.Getter; setter = row.Setter;
         OtherMethods = Array.AsReadOnly(row.Others.Select(token => module.GetMethodDefinition(token)!).ToArray());
     }
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; internal set; } = null!;
-    /// <summary>Gets the physical Property token.</summary>
+    /// <summary>Gets the CLI Property token or validated native property origin token.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the exact declaring type in this snapshot.</summary>
     public TypeDefinition DeclaringType => PropertyType is null ? Module.GetTypeDefinition(owner)! : AuthoredOwner ?? throw new InvalidOperationException("property is detached");
@@ -29,13 +31,33 @@ public sealed partial class PropertyDefinition
     public IReadOnlyList<MethodDefinition> OtherMethods { get; }
     /// <summary>Copies the signature, preserving unsupported encodings opaquely.</summary>
     /// <returns>New owned signature bytes.</returns>
-    public byte[] GetSignature() => PropertyType is null ? (byte[])signature.Clone() : throw new InvalidOperationException("use authored PropertyType and ParameterTypes before encoding");
+    /// <exception cref="NotSupportedException">Native properties have no CLI signature blob; use TryGetSignature.</exception>
+    public byte[] GetSignature() => nativeType is not null ? throw new NotSupportedException("native properties have no CLI signature blob; use TryGetSignature") : PropertyType is null ? (byte[])signature.Clone() : throw new InvalidOperationException("use authored PropertyType and ParameterTypes before encoding");
+    /// <summary>Reads a supported non-indexed logical property type and staticness without resolving dependencies.</summary>
+    /// <param name="type">Authored or snapshot-owned type on success; null otherwise.</param>
+    /// <param name="isStatic">True for a static property on success; false otherwise.</param>
+    /// <returns>True for authored non-indexed properties, supported native properties and primitive non-indexed CLI properties.</returns>
+    public bool TryGetSignature(out SignatureType? type, out bool isStatic)
+    {
+        type = nativeType ?? (ParameterTypes is { Count: 0 } ? PropertyType : null);
+        isStatic = false;
+        if (type is not null) { isStatic = (GetMethod ?? SetMethod)!.IsStatic; return true; }
+        if (!TryGetPrimitiveSignature(out var primitive, out isStatic)) return false;
+        type = primitive;
+        return true;
+    }
     /// <summary>Recognizes an exact non-indexed primitive property signature, without resolving types or validating accessor signatures.</summary>
     /// <param name="type">Int32/Int64/Boolean/String on success; Void otherwise.</param>
     /// <param name="isStatic">True for a recognized static signature; false for instance or unrecognized signatures.</param>
     /// <returns>False for malformed, indexed or other unsupported encodings.</returns>
     public bool TryGetPrimitiveSignature(out PrimitiveType type, out bool isStatic)
     {
+        if (nativeType is { } native)
+        {
+            type = native.Primitive ?? PrimitiveType.Void;
+            isStatic = type != PrimitiveType.Void && (GetMethod ?? SetMethod)!.IsStatic;
+            return type != PrimitiveType.Void;
+        }
         type = signature.Length == 3 && signature[0] is 0x08 or 0x28 && signature[1] == 0 ? signature[2] switch {
             0x08 => PrimitiveType.Int32, 0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
             _ => PrimitiveType.Void } : PrimitiveType.Void;

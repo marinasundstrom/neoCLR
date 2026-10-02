@@ -247,7 +247,7 @@ public sealed partial class AssemblyDefinition
         }
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
-    internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others);
+    internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
     internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null)
     {

@@ -750,3 +750,8 @@ The expanded native array signature profile uses existing host APIs and is cover
 [the metadata manual](experimental-metadata.md#native-vector-signatures-development-2026-10-02).
 These C# host APIs remain excluded from guest RavenDoc selection; no guest reference
 assembly signature changes.
+
+PropertyDefinition.TryGetSignature and the native property read profile are documented
+in [the host metadata manual](experimental-metadata.md#native-non-indexed-properties-development-2026-10-02).
+They are C# host tooling APIs, explicitly excluded from guest RavenDoc selection;
+the guest reference assembly and documentation snapshot signatures are unchanged.

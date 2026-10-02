@@ -550,3 +550,10 @@ Development checkpoint (2026-10-02): direct native importing now includes one-di
 primitive and class array signatures. Raven's three-assembly consumer preserves array
 aliases and replaces elements across library boundaries (42). Broader metadata categories
 and full native System loading remain pending; the wire format is unchanged.
+
+Development checkpoint (2026-10-02, metadata feature branch): native non-indexed
+properties now read into Raven symbols and execute across separately compiled native
+assemblies, including class/array setters and static getters (42). This extends the
+existing CLI-shaped property/accessor model without a new encoding. Indexers and full
+native core loading remain pending; CLI core/translated System bootstrap inputs remain.
+[Evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/native-properties-2026-10-02.json)

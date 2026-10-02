@@ -2082,3 +2082,25 @@ replaces an element through an alias and passes an Int32 array across the same b
 native-array imports on .NET. See [hashed evidence](../experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json).
 The CLI primitive core and translated System remain bootstrap dependencies; full native
 System importing remains pending.
+
+## Direct native non-indexed properties (2026-10-02)
+
+The reader materializes properties as associations over canonical getter/setter method
+definitions, with immutable logical value signatures and exact nominal dependency
+identity. This follows the CLI/Cecil property-versus-accessor separation documented
+in the existing research: calls import methods, while inspection exposes properties.
+There is no new property encoding or runtime instruction. The benefit is native
+semantic property import without reflection or a CLI projection; the remaining cost
+is a bounded non-indexed primitive/nominal/vector profile. Indexers and broader
+owner categories remain explicit reader failures.
+
+Raven associates each property with the already-created accessor symbols, preserving
+MethodKind, visibility and canonical type identity. Property emission uses NeoCLR
+signature capabilities, and shared static property lowering admits external class
+owners only through the explicit external-reference capability. A separate general
+binder fix checks private setter accessibility, independently reproduced against
+.NET metadata. Default target capabilities and Runtime Contract configuration remain
+unchanged. The CLI primitive core and translated System are still bootstrap inputs.
+
+All five runtime consumers return 42, and 102 C# metadata contract groups pass. See
+[hashed property evidence](../experiments/extended-cli-metadata/native-properties-2026-10-02.json).

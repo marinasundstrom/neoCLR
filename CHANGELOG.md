@@ -28,7 +28,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   signatures now also support one-dimensional primitive and nominal class arrays,
   including externally resolved element types. Raven preserves array aliases and
   executes element replacement across native libraries (42). Generic/value/interface
-  profiles remain outside direct reading.
+  profiles remain outside direct reading. Non-indexed properties now load with canonical
+  accessor definitions and logical primitive/nominal/vector signatures. Raven consumes
+  instance/static properties across native libraries (42), rejecting read-only/private
+  setter writes; a general setter-accessibility binder fix is independently tested on .NET.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata
