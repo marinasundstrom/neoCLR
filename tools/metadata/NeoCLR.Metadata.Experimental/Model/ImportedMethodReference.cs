@@ -41,12 +41,12 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<AssemblyIdentity, (Guid Mvid, AssemblyBuilder Graph)> importedGraphs = [];
 
     /// <summary>Imports an immutable callable contract from a read-only definition.</summary>
-    /// <param name="definition">External static method/global function, public nonvirtual or final class/value member, or public abstract interface member with bounded nominal signatures.</param>
+    /// <param name="definition">External static method/global function, public nonvirtual/final class member or concrete value member, or public abstract interface member with bounded nominal signatures.</param>
     /// <param name="dependencyCoreLibrary">Host-asserted dependency core contract; must equal this output's explicit core identity.</param>
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
-    /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested owners and signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
+    /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
     /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; cross-dependency TypeRef signatures require further contracts.
     /// Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
@@ -68,7 +68,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
             definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
-            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal)))
+            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType)))
             throw new InvalidDataException("unsupported imported instance method contract");
         if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
             throw new InvalidDataException("invalid imported constructor contract");

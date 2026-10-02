@@ -4056,3 +4056,15 @@ C# validation executes static bindings across an assembly boundary on CLR and na
 binary PE, including generic higher-order calls and a no-result callback (42). Exact
 shape equality, wrong results, wrong receivers and reference projection are checked.
 The separate Raven backend still needs shared Function body lowering to consume this API.
+
+### Concrete imported value overrides (development, 2026-10-02)
+
+`AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)` accepts public,
+nongeneric concrete instance overrides declared on imported value types. They consume
+an exact managed receiver and use direct `Call`; `RequiresManagedReceiver` is true and
+`RequiresVirtualDispatch` is false. This follows CLR's concrete value-call behavior,
+without boxing or reference dispatch. Abstract methods remain unsupported, as do
+nonfinal virtual/override methods on reference classes. The same explicit owner/core
+and signature validation applies. C# fixtures execute an actual CLR override and a
+matching native implementation emitted by the API, returning the expected string and
+42. This does not add general class virtual dispatch or boxed value receivers.

@@ -703,3 +703,6 @@ FunctionSignature, FunctionBinding, SignatureType.Function/FunctionSignature and
 MethodBuilder BindFunction/InvokeFunction/raw operands are host C# development APIs,
 covered in [the structural Function manual](experimental-metadata.md#structural-function-bodies-development-2026-10-02).
 They are not omitted guest RavenDoc types.
+
+The host metadata manual covers concrete imported value overrides and their managed
+receiver/direct-call restrictions (2026-10-02); no Raven public API was added.

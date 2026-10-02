@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Admit concrete imported value-type overrides as direct managed-receiver calls,
+  matching CLR value dispatch. Nonfinal reference overrides remain rejected.
+  C# coverage executes a real CLR override and a matching metadata-produced native
+  library (expected output and 42); all 88 metadata contract groups pass.
+
 - Enable already-lowered static extension calls in Raven's native adapter under an
   explicit capability. The unchanged collections sample passes Single admission and
   now reports unsupported union-pattern emission; no native sample output is claimed.
