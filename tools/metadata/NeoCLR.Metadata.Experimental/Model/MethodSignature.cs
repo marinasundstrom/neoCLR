@@ -110,9 +110,10 @@ public class MethodSignature
     /// <param name="returnType">Supported primitive, Void, owned nominal or imported reference type.</param>
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
     /// <exception cref="ArgumentNullException">Result or parameters are null.</exception>
-    /// <exception cref="ArgumentException">Null/Void parameter, byref result or more than 256 parameters.</exception>
+    /// <exception cref="ArgumentException">Null/Void parameter, byref result, invalid out index, or more than 256 parameters.</exception>
     /// <param name="genericParameterNames">Copied unique method parameter names, at most 32; omitted for nongeneric signatures.</param>
-    public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null)
+    /// <param name="outParameters">Copied distinct zero-based byref parameter indices assigned before normal return; omitted for ordinary ref parameters.</param>
+    public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null, IEnumerable<int>? outParameters = null)
     {
         ArgumentNullException.ThrowIfNull(returnType);
         ArgumentNullException.ThrowIfNull(parameterTypes);
@@ -127,6 +128,10 @@ public class MethodSignature
         if (parameters.Length > 256 || parameters.Any(p => p is null || p.Primitive == PrimitiveType.Void))
             throw new ArgumentException("invalid parameter signature", nameof(parameterTypes));
         if (returnType.ByReferenceElement is not null) throw new ArgumentException("byref returns are unsupported", nameof(returnType));
+        var outputs = (outParameters ?? []).Take(257).ToArray();
+        if (outputs.Length > 256 || outputs.Distinct().Count() != outputs.Length || outputs.Any(i => i < 0 || i >= parameters.Length || parameters[i].ByReferenceElement is null))
+            throw new ArgumentException("out parameters must be distinct byref parameter indices", nameof(outParameters));
+        OutParameters = Array.AsReadOnly(outputs.Order().ToArray());
         ReturnType = returnType; ParameterTypes = Array.AsReadOnly(parameters);
     }
     /// <summary>Creates a primitive-only signature.</summary>
@@ -136,6 +141,8 @@ public class MethodSignature
     public IReadOnlyList<string> GenericParameterNames { get; }
     /// <summary>Gets the result type; Void denotes no result.</summary>
     public SignatureType ReturnType { get; }
+    /// <summary>Gets zero-based declared parameter indices that must be assigned before every normal return.</summary>
+    public IReadOnlyList<int> OutParameters { get; }
     /// <summary>Gets declared parameters, excluding the receiver.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
     internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false)
@@ -143,5 +150,5 @@ public class MethodSignature
         ReturnType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
         foreach (var type in ParameterTypes) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowByReference: true);
     }
-    internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
+    internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes) && OutParameters.SequenceEqual(other.OutParameters);
 }

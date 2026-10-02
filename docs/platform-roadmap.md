@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Out-call checkpoint (2026-10-02):** explicit output contracts now map CLI Param Out
+flags to existing native out_parameters metadata. Generic forwarding, imported calls
+and native CLI projection preserve them; producer validation requires assignment on
+every normal return. Metadata library/consumer binaries execute on CLR and neoCLR (42).
+Raven admission and imported value receivers remain the next integration work; the
+unchanged collections application has not advanced yet.
+[Contract and validation](design/extended-cli-metadata.md#output-parameter-contracts-2026-10-02).
+
 **Byref-call checkpoint (2026-10-02):** writable managed-reference parameters now
 survive CLI/native emission, generic substitution, imports and CLI projection. An
 initialized local can be passed and mutated through a separate assembly; metadata C#

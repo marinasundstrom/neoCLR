@@ -1472,3 +1472,32 @@ Validation recorded on 2026-10-02: 80/80 C# metadata checks passed; standalone a
 separate-consumer native verify/run passed (42). Runtime binary SHA-256:
 `3a254fac354a0878db897c17e46c66fdc19bddf1136d6659274033b25d063f0d`
 on the `codex/extended-cli-metadata` integration worktree. API snapshot validation passed.
+
+
+### Output parameter contracts (2026-10-02)
+
+Reuse native Function.out_parameters and its existing loader and frame-return enforcement.
+The metadata API now records explicit output indices in immutable method signatures,
+retains them through generic substitution/import/projection, emits standard CLI Param
+Out flags, and produces the equivalent native contract. This continues the ECMA-335
+baseline above: BYREF is in the signature; Out is a parameter attribute, not a distinct
+overload or a CLR verifier guarantee. C# definite assignment and the producer's proof
+are separate from the CLI representation. An imported flag declares a contract; reading
+metadata does not verify the external method body.
+
+Track assignment for local slots and declared output parameters across branches. Store
+through the exact parameter reference assigns it; read requires prior assignment;
+normal return requires all outputs. Calls validate all ref inputs first, then publish
+out assignment, preventing aliasing from masking an uninitialized input. Output
+forwarding works without synthetic default initialization. Interface implementations
+must match output contracts. This costs more flow state, but preserves the existing
+runtime model and avoids either assuming every byref is out or initializing values only
+to bypass the verifier. No performance benefit is claimed.
+
+`OutParameterChecks.cs` covers generic assignment, forwarded outputs, Param Out
+reflection and preservation via native projection/import, plus separate CLI/native
+library/consumer execution (42). Rejections cover unassigned returns, early reads,
+partial-path writes, non-address inputs, invalid indices, mismatched interface contracts
+and aliased ref/out inputs. Conditional out_when_true and readonly contracts remain
+future work. This slice does not yet change Raven's admission or the collections
+application's observed blocker. Runtime binary is unchanged from the preceding checkpoint.

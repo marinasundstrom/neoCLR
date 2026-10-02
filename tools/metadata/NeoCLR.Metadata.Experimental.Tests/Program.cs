@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--out-integration")
+{
+    await OutParameterChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--byref-integration")
 {
     await ByReferenceChecks.RunRuntime(args[1], args[2]); return 0;
@@ -223,6 +227,7 @@ var tests = new (string Name, Action Body)[]
     ("Typed and generic default initialization", DefaultValueChecks.Run),
     ("Typed local object reads stores and definite assignment", LocalObjectChecks.Run),
     ("Managed-reference signatures calls and projection", ByReferenceChecks.Run),
+    ("Output parameters assignment imports and projection", OutParameterChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),
     ("Constructed generic instance classes", GenericClassChecks.Run),
     ("Nominal type constraints", TypeConstraintChecks.Run),

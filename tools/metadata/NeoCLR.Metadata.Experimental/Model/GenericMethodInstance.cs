@@ -10,7 +10,7 @@ public sealed class GenericMethodInstance
         SignatureType Substitute(SignatureType type) => type.ByReferenceElement is { } target ? SignatureType.ByReference(Substitute(target)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.MethodParameterIndex is { } index ? arguments[index]
             : type.GenericInstance is { } instance ? instance.Definition.MakeGenericInstance(instance.TypeArguments.Select(Substitute).ToArray())
             : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
-        Signature = new(Substitute(definition.Signature.ReturnType), definition.Signature.ParameterTypes.Select(Substitute));
+        Signature = new(Substitute(definition.Signature.ReturnType), definition.Signature.ParameterTypes.Select(Substitute), outParameters: definition.Signature.OutParameters);
     }
     /// <summary>Gets the generic definition, retaining its declaring assembly and owner.</summary>
     public MethodBuilder Definition { get; }

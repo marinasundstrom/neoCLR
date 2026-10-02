@@ -634,3 +634,7 @@ Host-only `SignatureType.ByReference`/`ByReferenceElement` and updated method-si
 readers are covered by the [managed-reference manual](experimental-metadata.md#writable-managed-reference-parameters-development-2026-10-02).
 The existing guest RavenDoc exclusion applies: these APIs belong to the C# metadata
 producer, so no guest reference-assembly snapshot changes are required.
+
+The host-only `MethodSignature` outParameters constructor argument and OutParameters
+property are covered in the [output parameter manual](experimental-metadata.md#output-parameter-contracts-development-2026-10-02).
+Existing C# producer exclusion from guest RavenDoc applies; the guest snapshot is unchanged.

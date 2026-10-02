@@ -3830,7 +3830,7 @@ MethodSignature, owned and imported method calls, generic substitution and nativ
 projection preserve BYREF. CLI uses ELEMENT_TYPE_BYREF in parameter signatures; native
 uses its existing ByRef type. The bounded static value/generic signature readers recognize
 byref primitive/vector/MVAR parameters; primitive-only readers continue to return false
-for those signatures. No Param Out/In flag or readonly modifier is emitted or inferred.
+for those signatures. Out flags are emitted only for explicit OutParameters contracts described below; no In flag or readonly modifier is inferred.
 
 Call consumes an initialized exact local address or a matching forwarded ref parameter.
 It cannot establish assignment for an uninitialized caller local. `LoadArgument` loads
@@ -3838,9 +3838,45 @@ the reference; `LoadObject`/`StoreObject` (or raw Ldobj/Stobj) read/write the re
 value. Argument rebinding with Starg rejects; Initobj remains local-address-only.
 The body validator rejects mismatched targets, non-address operands and uninitialized
 ref calls when either writer runs. References cannot escape via results or value locals.
-This slice does not admit ref receiver methods or Raven `out` propagation calls.
+This slice does not admit ref receiver methods or Raven `out` propagation calls. Explicit metadata out calls are described below.
 
 `ByReferenceChecks.cs` demonstrates generic replacement and reference forwarding, with
 independent library/consumer execution from both CLI snapshots and native projections.
 Run `--byref-integration <runtime> <fresh-output>` for native binary verification and
 execution (42); the regular C# tests include positive and rejection checks.
+
+
+### Output parameter contracts (development, 2026-10-02)
+
+`MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes,
+IEnumerable<string>? genericParameterNames = null, IEnumerable<int>? outParameters = null)`
+accepts optional zero-based declared parameter indices (excluding the instance receiver).
+`IReadOnlyList<int> OutParameters` exposes a copied, sorted list. Every index must be
+unique, in bounds and designate a ByReference parameter; invalid or oversized lists
+throw ArgumentException. Omission means ordinary ref semantics. The distinction is a
+parameter contract, not an overload identity; methods cannot overload ref versus out.
+Interface implementations must match the declared out contract.
+
+Callers may pass uninitialized local addresses to declared outputs. On normal return,
+those locals become definitely assigned. Ref inputs, including aliases of outputs,
+are checked before any output assignment is published. Callees cannot read an output
+before writing it and must assign every output on every normal return path; forwarding
+an output to another out parameter also establishes assignment. Ldobj/Stobj use the
+same parameter addresses as ref calls. Invalid flow raises InvalidDataException when
+writing either representation. Initobj still accepts only local addresses.
+
+CLI output uses ordinary BYREF signatures plus Param Out flags. Snapshot signature
+readers and imports retain those flags in OutParameters. Native output uses the existing
+out_parameters function member, which runtime loading checks and execution enforces;
+no wire-format extension or runtime opcode is added. Native-to-CLI projection writes
+matching Param rows. Generic method/owner substitution retains output indices.
+C# definite-assignment is a language rule; the CLI flag alone does not prove an external
+body assigns its outputs. Imported contracts require a trusted/validated implementation;
+the metadata reader does not inspect method bodies.
+
+`OutParameterChecks.cs` covers generic assignment, output forwarding, ordinary CLR Out
+reflection, native projection/import and library/consumer execution. Negative checks
+cover invalid indices, missing/partial assignment, reads before writes, interface
+contract mismatch and aliased ref/out preconditions. Run `--out-integration <runtime>
+<fresh-output>` for native binary verify/run (42). Conditional out_when_true,
+readonly/in contracts and Raven admission remain unsupported by this producer API.

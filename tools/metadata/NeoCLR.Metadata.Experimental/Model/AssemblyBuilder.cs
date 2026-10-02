@@ -96,8 +96,7 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types.Where(t => !t.IsInterface))
                 foreach (var contract in type.RequiredInterfaceMethods)
                     if (!type.Methods.Any(m => !m.IsStatic && m.Visibility == MethodVisibility.Public && m.Name == contract.Name &&
-                        m.Signature.GenericParameterNames.Count == 0 && m.Signature.ReturnType == contract.Signature.ReturnType &&
-                        m.Signature.ParameterTypes.SequenceEqual(contract.Signature.ParameterTypes)))
+                        m.Signature.GenericParameterNames.Count == 0 && m.Signature.Matches(contract.Signature)))
                         throw new InvalidDataException("missing public interface implementation: " + contract.Name);
             foreach (var type in types)
                 foreach (var contract in type.InterfaceSignatures)
@@ -406,13 +405,21 @@ public sealed partial class AssemblyBuilder
             MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
         int nextField = 1;
         int nextMethod = 1;
+        int nextParameter = 1;
         var genericRows = new List<(EntityHandle Owner, int Sort, IReadOnlyList<string> Names)>();
         void EmitMethod(MethodBuilder method)
         {
+            var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
+            if (method.Signature.OutParameters.Count > 0)
+                for (int i = 0; i < method.ParameterCount; i++)
+                {
+                    metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, default, i + 1);
+                    nextParameter++;
+                }
             if (method.IsAbstract)
             {
                 metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
-                    MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), -1, MetadataTokens.ParameterHandle(1));
+                    MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), -1, firstParameter);
                 nextMethod++;
                 return;
             }
@@ -507,7 +514,7 @@ public sealed partial class AssemblyBuilder
             int body = bodyEncoder.AddMethodBody(new InstructionEncoder(code), maxStack: referenceOnly ? 1 : Math.Max(method.IsConstructor ? 1 : 0, method.MaxStack),
                 localVariablesSignature: locals, attributes: MethodBodyAttributes.InitLocals);
             metadata.AddMethodDefinition((MethodAttributes)method.GetAttributes(accessors.Contains(method)),
-                MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, MetadataTokens.ParameterHandle(1));
+                MethodImplAttributes.IL | MethodImplAttributes.Managed, metadata.GetOrAddString(method.CliName), Signature(method), body, firstParameter);
             genericRows.Add((handles[method], MetadataTokens.GetRowNumber(handles[method]) * 2 + 1, method.Signature.GenericParameterNames));
             nextMethod++;
         }

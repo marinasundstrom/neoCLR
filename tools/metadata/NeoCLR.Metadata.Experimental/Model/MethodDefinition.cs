@@ -6,6 +6,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class MethodDefinition
 {
     private readonly byte[] signature;
+    private readonly int[] outParameters = [];
     private readonly uint declaringToken;
     private readonly bool unsupportedGenericParameters;
     internal MethodDefinition(ModuleDefinition module, AssemblyDefinition.MethodRow row)
@@ -19,6 +20,7 @@ public sealed partial class MethodDefinition
         unsupportedGenericParameters = row.UnsupportedGenericParameters;
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
+        outParameters = row.OutParameters;
     }
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; internal set; } = null!;
@@ -83,7 +85,7 @@ public sealed partial class MethodDefinition
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
         decoded = null;
-        return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded);
+        return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
 
     /// <summary>Recognizes unconstrained static generic primitive/vector signatures with scoped method parameters.</summary>
@@ -94,14 +96,24 @@ public sealed partial class MethodDefinition
     {
         decoded = null;
         return IsStatic && !unsupportedGenericParameters && GenericArity is > 0 and <= 32 &&
-            TryDecodeStaticValueSignature(signature, out decoded, GenericArity);
+            TryDecodeStaticValueSignature(signature, out decoded, GenericArity) && ApplyOutputs(ref decoded);
+    }
+
+    private bool ApplyOutputs(ref MethodSignature? decoded)
+    {
+        try { decoded = new(decoded!.ReturnType, decoded.ParameterTypes, decoded.GenericParameterNames, outParameters); return true; }
+        catch (ArgumentException) { decoded = null; return false; }
     }
 
     internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
     {
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");
-        try { return new ImportedSignatureDecoder(signature, Module, consumer, core, GenericArity, DeclaringType?.GenericArity ?? 0, !IsStatic).Read(); }
+        try
+        {
+            var decoded = new ImportedSignatureDecoder(signature, Module, consumer, core, GenericArity, DeclaringType?.GenericArity ?? 0, !IsStatic).Read();
+            return new(decoded.ReturnType, decoded.ParameterTypes, decoded.GenericParameterNames, outParameters);
+        }
         catch (ArgumentException error) { throw new InvalidDataException("invalid imported signature", error); }
     }
 

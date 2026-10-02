@@ -429,3 +429,9 @@ Writable managed-reference parameters now survive metadata emission, generic sub
 imports and CLI projection. Separate test assemblies mutate a caller local on CLR and
 neoCLR (42). Out assignment guarantees and Raven propagation admission remain subsequent
 work; this metadata-only slice does not complete the collections application.
+
+
+Explicit output contracts now preserve CLI Param Out flags and native out_parameters
+through metadata imports and projection. Test producers prove assignment on normal
+return, including forwarded outputs, and separate library/consumer execution returns
+42 on both runtimes. Raven admission and imported value receivers remain integration work.

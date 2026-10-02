@@ -275,6 +275,7 @@ public sealed class NativeAssemblyDefinition
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
+                if (method.TryGetProperty("out_parameters", out _)) fields.Add("out_parameters");
                 var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
                 genericArity = genericNames.Length;
                 if (method.TryGetProperty("generic_parameters", out _)) fields.Add("generic_parameters");
@@ -351,7 +352,7 @@ public sealed class NativeAssemblyDefinition
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames), visibility, instance)); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance)); methodNames.Add(expectedName);
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -466,7 +467,7 @@ public sealed class NativeAssemblyDefinition
         var projectedMethods = new List<MethodBuilder>();
         foreach (var method in methods)
         {
-            var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames);
+            var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames, method.Signature.OutParameters);
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
                 : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)

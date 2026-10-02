@@ -51,14 +51,19 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
         public static implicit operator BodyValueType(SignatureType type) => type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
-    private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
-        ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];
+    private BodyValueType ArgumentType(int index)
+    {
+        if (!IsStatic && index == 0) return BodyValueType.Receiver(DeclaringType!);
+        int parameter = index - (IsStatic ? 0 : 1);
+        BodyValueType type = Signature.ParameterTypes[parameter];
+        return type.ByReferenceElement is null ? type : type with { AddressedParameter = parameter };
+    }
     private static BodyValueType LocalType(LocalDefinition local) => local.SignatureType;
     private sealed record FlowState(BodyValueType[] Stack, bool[] Assigned);
 
@@ -81,19 +86,24 @@ public sealed partial class MethodBuilder
         MaxStack = 0;
         var states = new FlowState?[Instructions.Count];
         var work = new Queue<int>();
-        states[0] = new([], new bool[locals.Count]); work.Enqueue(0);
+        var initiallyAssigned = new bool[locals.Count + ParameterCount];
+        for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.OutParameters.Contains(i);
+        states[0] = new([], initiallyAssigned); work.Enqueue(0);
         while (work.TryDequeue(out var index))
         {
             var state = states[index]!;
             var stack = state.Stack.ToList(); var assigned = (bool[])state.Assigned.Clone();
             var instruction = Instructions[index];
             // Preserve native primitive identity across stack operations and joins.
-            void Pop(BodyValueType type)
+            void Pop(BodyValueType type, bool output = false)
             {
-                if (type.ByReferenceElement is { } target && stack.Count > 0 && stack[^1].AddressedLocal is { } local)
+                if (type.ByReferenceElement is { } target && stack.Count > 0)
                 {
-                    if (!assigned[local] || locals[local].SignatureType != target)
-                        throw new InvalidDataException("ref call requires an initialized local of the exact type");
+                    var referenceValue = stack[^1];
+                    int? slot = referenceValue.AddressedLocal ?? (referenceValue.AddressedParameter is { } parameter ? locals.Count + parameter : null);
+                    var actualTarget = referenceValue.AddressedLocal is { } local ? locals[local].SignatureType : referenceValue.ByReferenceElement;
+                    if (actualTarget != target || slot is { } index && !output && !assigned[index])
+                        throw new InvalidDataException("ref call requires initialized storage of the exact type");
                     stack.RemoveAt(stack.Count - 1);
                     return;
                 }
@@ -185,8 +195,14 @@ public sealed partial class MethodBuilder
                             throw new InvalidDataException("indirect local loaded before store on some path");
                         if (instruction.Op == "object.store") assigned[addressed] = true;
                     }
-                    else if (address.ByReferenceElement is null || address.ByReferenceElement != instruction.Type)
-                        throw new InvalidDataException("object operation requires an exact managed-reference target");
+                    else
+                    {
+                        if (address.ByReferenceElement is null || address.ByReferenceElement != instruction.Type || address.AddressedParameter is not { } parameter)
+                            throw new InvalidDataException("object operation requires an exact managed-reference target");
+                        if (instruction.Op == "object.load" && !assigned[locals.Count + parameter])
+                            throw new InvalidDataException("out parameter read before assignment");
+                        if (instruction.Op == "object.store") assigned[locals.Count + parameter] = true;
+                    }
                     stack.RemoveAt(stack.Count - 1);
                     if (instruction.Op == "object.load") stack.Add(instruction.Type!);
                     break;
@@ -231,7 +247,19 @@ public sealed partial class MethodBuilder
                 case "call.constructed":
                 case "call.generic":
                     var callSignature = instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
-                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(callSignature.ParameterTypes[i]);
+                    var outputs = new List<int>();
+                    for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--)
+                    {
+                        bool output = callSignature.OutParameters.Contains(i);
+                        if (output && stack.Count > 0)
+                        {
+                            if (stack[^1].AddressedLocal is { } slot) outputs.Add(slot);
+                            if (stack[^1].AddressedParameter is { } parameter) outputs.Add(locals.Count + parameter);
+                        }
+                        Pop(callSignature.ParameterTypes[i], output);
+                    }
+                    // All ref input preconditions must hold before publishing any out assignment.
+                    foreach (var slot in outputs) assigned[slot] = true;
                     if (!instruction.Target.IsStatic) Pop(instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature));
                     if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
                     break;
@@ -242,6 +270,8 @@ public sealed partial class MethodBuilder
                 case "branch.true": case "branch.false": Pop(PrimitiveType.Boolean); break;
                 case "branch": break;
                 case "return":
+                    if (Signature.OutParameters.Any(i => !assigned[locals.Count + i]))
+                        throw new InvalidDataException("out parameter must be assigned on every normal return");
                     if (ReturnsValue) Pop(Signature.ReturnType);
                     if (stack.Count != 0) throw new InvalidDataException("invalid return stack");
                     continue;

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add explicit out-parameter contracts to experimental method signatures, CLI Param
+  Out flags and native out_parameters metadata. Readers, imports, generic substitution
+  and reference projections retain the contract. Producer flow validation requires
+  assignment on every normal return and checks all ref inputs before publishing out
+  assignments. Separate library/consumer binaries execute on CLR and neoCLR (42);
+  conditional outputs, readonly references and Raven propagation admission remain open.
+
 - Add writable managed-reference method parameters to the experimental metadata API:
   standard CLI BYREF signatures and native ByRef types survive generic substitution,
   imported calls and CLI projection. Initialized local addresses and forwarded ref
