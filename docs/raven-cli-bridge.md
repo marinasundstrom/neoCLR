@@ -3703,3 +3703,15 @@ Type-owned methods/constructors/fields and richer type profiles remain reader-ba
 as do host setup and lazy symbol materialization. Explicit Runtime Contract selection,
 CLI primitive core and translated System bootstrap are unchanged. See
 [evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json).
+
+
+### Symbol-owned root-class members (2026-10-02)
+
+Raven `a9066f559` authors public nonvirtual root-class methods and constructors from
+symbols, retaining owner generic parameter ordinals and existing construction semantics.
+All seven native consumers execute (42). The metadata generic-owner consumer authors
+constructor/Get/Set/Same references and executes on CLR and both native containers.
+All 107 C# groups and API snapshot validation pass. Fields, virtual/interface/value/
+nested profiles, host setup and semantic materialization remain reader-backed. Explicit
+Runtime Contract, CLI primitive core and translated System bootstrap requirements are
+unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).

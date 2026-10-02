@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Authored method references](#authored-method-references-development-2026-10-02): member contracts without input definitions.
+
 - [Authored type references](#authored-type-references-development-2026-10-02): nominal reference-class identities without input definitions.
 
 - [Authored function references](#authored-function-references-development-2026-10-02): native call contracts without input definitions.
@@ -4823,3 +4825,42 @@ AuthoredFunctionReferenceChecks covers reader-free nominal identity, interning, 
 copying and negative contracts. NativeGenericOwnerChecks uses an authored Box reference
 alongside imported members, checking canonical identity and execution on CLR and both
 native containers. This does not imply that member references are reader-independent.
+
+
+## Authored method references (development, 2026-10-02)
+
+`AssemblyBuilder.CreateMethodReference(ImportedTypeReference declaringType, string name,
+MethodSignature signature, bool isStatic = false) -> ImportedMethodReference` authors a
+public concrete nonvirtual root-class member contract without a reader definition.
+The declaring type must be an output-owned, top-level reference-class definition whose
+dependency/core/artifact contract has already been registered. Pass the generic definition,
+not its construction; use `MakeConstructedReference` on the returned member to bind owner
+arguments. Static generic methods are supported; instance generic methods are not.
+
+Signatures admit primitive values, a Void result, scoped owner/method parameters,
+output-owned external reference-class constructions and vectors. `.ctor` requires an
+instance nongeneric Void signature. Byrefs/out parameters, nested/value owners, interface
+dispatch and virtual contracts are unsupported. No members or access rules are resolved
+from the dependency: the caller asserts the semantic contract. This API does not imply
+that an arbitrary interface reference can be treated as a reference-class owner.
+
+Matching authored contracts are interned. Conflicting static/result contracts with the
+same owner/name/arity/parameter signature reject. Null arguments throw
+ArgumentNullException; invalid owner/name/constructor or parameter scope throws
+ArgumentException; unsupported signature, conflicting contract or the shared 4,096
+callable-reference limit throws InvalidDataException. Foreign output signatures reject.
+Existing artifact checks and writer signature/stack validation still apply.
+
+```csharp
+var box = output.CreateTypeReference(dependencyIdentity, coreIdentity,
+    dependencyImageSha256, "Example", "Box`1", 1);
+var constructor = output.CreateMethodReference(box, ".ctor",
+    new MethodSignature(PrimitiveType.Void, [SignatureType.TypeParameter(0)]));
+main.LoadConstant(42);
+main.NewObject(constructor.MakeConstructedReference([PrimitiveType.Int32]));
+```
+
+NativeGenericOwnerChecks reconstructs constructor/Get/Set/Same contracts from values,
+then executes construction, mutation and self-typed calls on CLR and both native
+containers. AuthoredFunctionReferenceChecks covers interning and invalid owner/scope/
+constructor/conflicting contracts. The separate library IILGenerator remains planned.

@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Author public nonvirtual root-class methods and constructors from output-owned type
+  references and signatures without reader methods. Support generic-owner substitution;
+  reject invalid constructor/scope/owner contracts and instance generic methods. Raven
+  uses this path for the supported root-class members. Virtual/interface/value/nested
+  profiles, fields and host setup remain reader-backed; the format is unchanged.
+  All 107 C# groups and seven native consumers pass; authored generic-owner construction
+  and member calls execute on CLR and both native containers (42). API snapshot passes.
+
 - Extend authored native namespace-function references to output-owned external root-class
   signatures, including recursive generic constructions and vectors. Raven reconstructs
   these call signatures from symbols; member calls and richer type profiles retain the

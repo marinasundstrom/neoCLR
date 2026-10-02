@@ -2337,3 +2337,16 @@ namespace function forwarding Box<T> from another dependency needs neither a met
 definition nor a type-row lookup on this path. Type-owned members, interfaces, inheritance,
 value/nested profiles and host setup remain outside this migration. The independent
 library body-generator API is still pending; no metadata format change is required.
+
+
+### Root-class member reconstruction (2026-10-02)
+
+CreateMethodReference now authors public concrete nonvirtual member/constructor
+contracts from an output-owned nominal definition and scoped signature. Generic-owner
+construction uses the existing immutable reference API. Raven reconstructs these
+contracts from IMethodSymbol, including owner parameter ordinals, rather than accessing
+NativeMethodSymbol.Definition. The shared callable reference registry includes authored
+functions and methods for writer validation and resource limits. Virtual/interface
+contracts, instance generic methods, value/nested profiles and fields remain outside
+this slice. Host setup and semantic materialization still use reader data. This is not
+a migration of the independent metadata-library body-generator API.

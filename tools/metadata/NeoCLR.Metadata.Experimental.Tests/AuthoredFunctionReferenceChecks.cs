@@ -23,6 +23,14 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, core, hash, "Example", "Box", 1));
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, new("OtherCore", new Version(1, 0, 0, 0)), hash, "Example", "Item"));
         Reject<InvalidDataException>(() => app.CreateTypeReference(app.Identity, core, hash, "Example", "Item"));
+        var getterSignature = new MethodSignature(SignatureType.TypeParameter(0), []);
+        var getter = app.CreateMethodReference(box, "Get", getterSignature);
+        if (!ReferenceEquals(getter, app.CreateMethodReference(box, "Get", getterSignature))) throw new Exception("method interning");
+        Reject<InvalidDataException>(() => app.CreateMethodReference(box, "Get", new MethodSignature(PrimitiveType.Boolean, [])));
+        Reject<ArgumentException>(() => app.CreateMethodReference(box, ".ctor", new MethodSignature(PrimitiveType.Int32, [])));
+        Reject<ArgumentException>(() => app.CreateMethodReference(constructed, "Get", getterSignature));
+        Reject<ArgumentException>(() => app.CreateMethodReference(box, "Bad", new MethodSignature(SignatureType.TypeParameter(1), [])));
+        Reject<ArgumentException>(() => app.CreateMethodReference(box, "GenericInstance", new MethodSignature(PrimitiveType.Void, [], ["T"])));
         SignatureType nominal = constructed;
         var nominalCall = app.CreateFunctionReference(dependency, core, hash, "Example", "EchoBox", new MethodSignature(nominal, [nominal]));
         var forwarding = app.AddFunction("ForwardBox", new MethodSignature(nominal, [nominal]));

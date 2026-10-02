@@ -2,7 +2,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyBuilder
 {
-    private readonly List<ImportedMethodReference> authoredFunctionReferences = [];
+    private readonly List<ImportedMethodReference> authoredCallableReferences = [];
 
     /// <summary>Authors a native namespace-function reference from a resolved contract, without a reader definition.</summary>
     /// <param name="dependency">Exact unsigned dependency identity, distinct from this output.</param>
@@ -40,15 +40,15 @@ public sealed partial class AssemblyBuilder
         var snapshot = "native:" + artifactSha256.ToUpperInvariant();
         if (importedGraphs.TryGetValue(dependency, out var graph) && graph.Snapshot != snapshot)
             throw new InvalidDataException("conflicting dependency module snapshots");
-        foreach (var existing in authoredFunctionReferences.Concat(importedReferences.Values.Where(r => r.DeclaringTypeName is null)))
+        foreach (var existing in authoredCallableReferences.Concat(importedReferences.Values.Where(r => r.DeclaringTypeName is null)))
         {
             if (!existing.AssemblyIdentity.Equals(dependency) || existing.Namespace != (@namespace.Length == 0 ? null : @namespace) ||
-                existing.Name != name || existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
+                existing.DeclaringTypeName is not null || existing.Name != name || existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
             if (!existing.Signature.Matches(signature)) throw new InvalidDataException("conflicting function contract");
             return existing;
         }
-        if (authoredFunctionReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
+        if (authoredCallableReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
         if (graph.Graph is null)
         {
             if (importedGraphs.Count >= 256) throw new InvalidDataException("too many imported assemblies");
@@ -56,7 +56,7 @@ public sealed partial class AssemblyBuilder
             importedGraphs.Add(dependency, graph);
         }
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, null, name, signature, @namespace: @namespace));
-        authoredFunctionReferences.Add(reference);
+        authoredCallableReferences.Add(reference);
         return reference;
 
         static bool Supported(SignatureType type, bool result) =>

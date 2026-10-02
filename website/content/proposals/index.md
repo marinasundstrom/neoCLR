@@ -626,3 +626,9 @@ not a new metadata format or complete reader/emitter independence.
 Native namespace-function signatures now also reconstruct root-class constructions
 and vectors from Raven symbols, including cross-dependency Box<T> forwarding. Member
 references and richer type profiles remain on the earlier reader-backed route.
+
+
+Public nonvirtual root-class methods and constructors now also reconstruct from Raven
+symbols, including generic-owner parameters. Generic construction and mutation execute
+on CLR and neoCLR; interface/virtual profiles and fields still require further boundary
+work. The assembly format is unchanged.

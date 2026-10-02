@@ -65,10 +65,21 @@ internal static class NativeGenericOwnerChecks
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), definition.Namespace, definition.Name, 1);
         Check(ReferenceEquals(authoredType, app.ImportReference(definition, core)), "authored/read type identity agreement");
         var importedType = authoredType.MakeGenericInstance(PrimitiveType.Int32);
-        ImportedConstructedMethodReference Import(string name) => app.ImportReference(definition.Methods.Single(m => m.Name == name), core).MakeConstructedReference([PrimitiveType.Int32]);
+        ImportedConstructedMethodReference Import(string name)
+        {
+            var signature = name switch
+            {
+                ".ctor" => new MethodSignature(PrimitiveType.Void, [parameter]),
+                "Get" => new MethodSignature(parameter, []),
+                "Set" => new MethodSignature(PrimitiveType.Void, [parameter]),
+                "Same" => new MethodSignature(authoredType.MakeGenericInstance(parameter), [authoredType.MakeGenericInstance(parameter)]),
+                _ => throw new Exception("unexpected authored member " + name)
+            };
+            return app.CreateMethodReference(authoredType, name, signature).MakeConstructedReference([PrimitiveType.Int32]);
+        }
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var local = main.DeclareLocal(importedType);
-        main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
+        main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Emit(OpCode.Pop); main.LoadConstant(19); main.NewObject(Import(".ctor")); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));
         main.LoadLocal(local); main.LoadLocal(local); main.Call(Import("Same")); main.Call(Import("Get")); main.Return();
         _ = app.WriteNativeAssembly();
