@@ -24,9 +24,14 @@ bindings remain explicit. Reader-backed semantic materialization remains support
 The generic consumer assessment exposed closed generic field storage rejection. That
 bounded gap is now fixed: a separate BoxStorage library holds Box<int> and Box<int>[];
 all seven consumers execute (42), and 108 metadata groups plus CLR/both-container
-field execution pass. Next extend fields on generic declaring owners or generic
-interface imports toward separate class-library consumption; reader lifetime
-independence is not a prerequisite.
+field execution pass. Fields on generic declaring owners and generic interface imports now also pass:
+reader relationships retain owner arguments, emitted references are symbol-authored,
+and generic inherited dispatch executes for primitive and nominal payloads. All seven
+Raven consumers and 108 metadata groups pass, with .NET and both-container execution.
+See [generic field/interface evidence](experiments/extended-cli-metadata/generic-fields-interfaces-2026-10-02.json).
+Next address external interface implementation/inheritance declarations for separately
+compiled class-library consumers; the current reader admits relationships within one
+native assembly. Reader lifetime independence is not a prerequisite.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).
 See [native host binding evidence](experiments/extended-cli-metadata/native-host-bindings-2026-10-02.json).
 See [native reference boundary evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json). See [callable boundary evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json). See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).

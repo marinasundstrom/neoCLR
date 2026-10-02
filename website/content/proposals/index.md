@@ -677,3 +677,9 @@ Development checkpoint (2026-10-02): native cross-assembly fields can now hold c
 generic class values and arrays of them. Raven's generic consumer tests replacement
 and aliasing, and metadata tests execute the same storage on .NET and neoCLR. Fields
 on generic declaring types remain a separate development gap.
+
+
+Development checkpoint (2026-10-02): Raven now consumes fields on generic native classes
+and dispatches through imported generic interfaces, including inherited contracts and
+class-valued arguments. C# tests execute equivalent metadata on .NET and neoCLR. Creating
+new implementations of external interfaces remains a separate development capability.

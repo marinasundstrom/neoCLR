@@ -23,13 +23,13 @@ public sealed partial class ImportedFieldReference
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, uint), ImportedFieldReference> importedFields = [];
-    /// <summary>Imports a public primitive or native nominal-class/vector instance field on a public nongeneric top-level reference class.</summary>
+    /// <summary>Imports a public primitive or native nominal-class/vector instance field on a public top-level reference class; native generic owners require construction before use.</summary>
     /// <param name="definition">Immutable CLI or native field definition.</param>
     /// <param name="dependencyCoreLibrary">Explicit core identity, matching this output.</param>
     /// <returns>An interned reference owned by this builder.</returns>
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported owner/signature/access/layout, incompatible core/snapshot, translated binding or limit.</exception>
-    /// <remarks>CLI output uses a MemberRef. Native output requires a native definition snapshot and uses its validated field ordinal. CLI input fields support CLI output only. Static fields, constructed owners and translated layouts are not admitted. Readonly loads are supported; stores fail body validation.</remarks>
+    /// <remarks>CLI output uses a MemberRef. Native output requires a native definition snapshot and uses its validated field ordinal. CLI input fields support CLI output only. Static fields and translated layouts are not admitted. Generic native owners bind through MakeConstructedReference. Readonly loads are supported; stores fail body validation.</remarks>
     public ImportedFieldReference ImportReference(FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary)
         => ImportReference(definition, dependencyCoreLibrary, null);
 
@@ -46,7 +46,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("field import requires a loaded immutable snapshot");
         var type = definition.DeclaringType;
         if ((definition.Attributes & 7) != 6 || (definition.Attributes & ~0x27) != 0 ||
-            !definition.TryGetSignature(out var signature) || type.IsValueType || type.GenericArity != 0 || type.DeclaringType is not null ||
+            !definition.TryGetSignature(out var signature) || type.IsValueType || type.GenericArity != 0 && !definition.Module.Assembly.IsNative || type.DeclaringType is not null ||
             (type.Attributes & 0x20) != 0 || type.Fields.Any(field => (field.Attributes & 0x10) != 0) || NativeBindingFor(type.Module.Assembly.Identity) is not null)
             throw new InvalidDataException("unsupported imported field contract");
         var owner = ImportReference(type, dependencyCoreLibrary);

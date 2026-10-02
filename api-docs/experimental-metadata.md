@@ -4885,8 +4885,9 @@ against bytes it has not read. CLI output uses name/type MemberRef; native outpu
 the ordinal. This does not change the instruction set or encode the artifact digest.
 
 Storage supports primitive non-Void values, external reference classes (including
-closed generic constructions) and single vectors thereof. Construction arguments are
-checked recursively; open type/method parameters, bare generic definitions and foreign
+generic constructions) and single vectors thereof. Owner type parameters are permitted
+within the declaring definition's arity. Construction arguments are checked recursively;
+method parameters, out-of-scope owner parameters, bare generic definitions and foreign
 output signatures reject. Static/inherited fields, byrefs and value
 profiles are unsupported. Readonly loads work; stores reject during body validation.
 Matching contracts intern; conflicting names, ordinals, storage or readonly flags on
@@ -4912,6 +4913,8 @@ field load/store and alias mutation with private fields preceding public fields.
 `AssemblyBuilder.CreateInterfaceReference(AssemblyIdentity dependency,
 AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
 string name) -> ImportedTypeReference` authors a public nongeneric top-level interface.
+The overload with a final `int genericArity` authors an unconstrained invariant generic
+interface; the metadata name includes its arity suffix. The original overload remains.
 Identity/core/digest/name validation, errors and limits follow CreateTypeReference.
 Class/interface classification conflicts throw InvalidDataException, including when
 mixing authored references and reader imports. The caller asserts truthful declaration
@@ -4919,8 +4922,11 @@ facts; the dependency is not loaded or inspected.
 
 `AssemblyBuilder.AddInterfaceConversion(ImportedTypeReference source,
 ImportedTypeReference target) -> void` registers direct interface inheritance or class
-implementation. Both references belong to this output; the source is nongeneric,
-top-level and reference-shaped, and the target must come from CreateInterfaceReference.
+implementation. Both references belong to this output; the source is a top-level
+reference definition (possibly generic), and the target is an interface identity or
+construction from CreateInterfaceReference. Target arguments may refer to the source's
+type parameters; out-of-scope arguments reject. Traversal substitutes arguments
+simultaneously, preserving distinct constructions and rejecting declaration cycles.
 Edges are idempotent and transitive conversions are derived using graph traversal.
 Null endpoints throw ArgumentNullException; foreign/unsupported endpoints, noninterface
 targets and cycles throw ArgumentException. More than 4096 distinct direct edges throws
@@ -5102,3 +5108,28 @@ out-of-scope operands throw ArgumentException. Writing validates receiver, stora
 readonly rules and throws InvalidDataException for invalid bodies. CLI writes a MemberRef
 with open storage signature and a constructed parent; native writes the existing slot.
 These host APIs are covered by this manual reference, not the guest RavenDoc snapshot.
+
+
+### Generic native relationship materialization (development, 2026-10-02)
+
+ReadNativeAssembly now admits unconstrained invariant top-level generic interfaces and
+classes implementing them. TypeDefinition.Interfaces exposes immutable relationships;
+InterfaceImplementation.TypeArguments preserves open owner parameter ordinals or closed
+arguments, and InterfaceType resolves the canonical open definition. Relationships
+currently target interfaces declared in the same native assembly. Cyclic/invalid
+relationships reject during reader validation. Loaded CLI relationship materialization
+remains pending; no reflection facade or projection is introduced.
+
+ImportReference(MethodDefinition, core) supports abstract generic-owner interface
+methods; bind owner arguments with MakeConstructedReference and emit CallVirtual.
+ImportReference(FieldDefinition, core) now supports native generic-owner fields; bind
+arguments with MakeConstructedReference and emit LoadField/StoreField. Native storage
+and dispatch encodings are unchanged. Reader-derived and explicitly authored interface
+conversion paths both substitute and validate invariant arguments.
+
+Validation: NativeGenericOwnerChecks runs reader and authored imports on .NET and
+executes the authored field/interface consumer with both native containers. Raven tests
+scope identity, both dependency orders, incompatible constructions and primitive/nominal
+runtime dispatch. Constraints, variance and cross-assembly relationship declarations
+are not added by this slice. Host APIs remain documented manually here; the guest
+RavenDoc assembly is unchanged.

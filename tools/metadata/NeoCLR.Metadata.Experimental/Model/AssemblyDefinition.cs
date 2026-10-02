@@ -265,7 +265,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, uint[]? NativeInterfaces = null, string[]? NativeGenericNames = null);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -384,7 +384,15 @@ public sealed partial class TypeDefinition
     {
         Module = module;
         GenericParameterNames = row.NativeGenericNames is { } names ? Array.AsReadOnly((string[])names.Clone()) : null;
-        nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(token => new InterfaceImplementation(Module.GetTypeDefinition(token)!.ToReference()) { DeclaringType = this }).ToArray()));
+        nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(signature =>
+        {
+            var type = signature.Materialize(Module);
+            var relationship = type.ReferencedGenericInstance is { } constructed
+                ? new InterfaceImplementation(constructed.Definition, constructed.TypeArguments)
+                : new InterfaceImplementation(type.ReferencedType!);
+            relationship.DeclaringType = this;
+            return relationship;
+        }).ToArray()));
         MetadataToken = row.Token; Namespace = row.Namespace;
         Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }

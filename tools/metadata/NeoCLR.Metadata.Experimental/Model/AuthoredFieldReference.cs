@@ -6,7 +6,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Authors a native instance-field contract from explicit semantic and layout values.</summary>
     /// <param name="declaringType">Owned top-level root reference-class definition, not a construction.</param>
     /// <param name="name">Nonempty metadata field name.</param>
-    /// <param name="fieldType">Primitive, external nominal (including closed generic constructions) or single-vector storage type.</param>
+    /// <param name="fieldType">Primitive, scoped owner parameter, external nominal construction or single-vector storage type.</param>
     /// <param name="instanceStorageOrdinal">Zero-based native field slot in the selected declaring artifact, including private fields.</param>
     /// <param name="isReadOnly">Whether external stores are forbidden.</param>
     /// <returns>An interned output-owned field reference.</returns>

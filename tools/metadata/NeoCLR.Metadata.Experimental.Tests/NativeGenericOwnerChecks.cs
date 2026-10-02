@@ -10,7 +10,12 @@ internal static class NativeGenericOwnerChecks
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
         var library = new AssemblyBuilder(new("NativeOwnerLibrary", new Version(1, 0, 0, 0)), core);
+        var contract = library.AddGenericInterface("Example", "Value", ["T"]);
+        contract.AddInterfaceMethod("Get", new MethodSignature(SignatureType.TypeParameter(0), []));
+        var derived = library.AddGenericInterface("Example", "Derived", ["T"]);
+        derived.AddBaseInterface(contract.MakeGenericInstance(SignatureType.TypeParameter(0)));
         var type = library.AddGenericClass("Example", "Box", ["TItem"]);
+        type.AddInterfaceImplementation(derived.MakeGenericInstance(SignatureType.TypeParameter(0)));
         var parameter = SignatureType.TypeParameter(0);
         var field = type.AddField("Value", parameter, FieldVisibility.Public);
         var ctor = type.AddConstructor(new MethodSignature(PrimitiveType.Void, [parameter]));
@@ -50,6 +55,11 @@ internal static class NativeGenericOwnerChecks
         Check(definition.Methods.Single(m => m.Name == "Get").TryGetSignature(out var signature) && signature!.ReturnType.TypeParameterIndex == 0, "type parameter return");
         Check(definition.Methods.Single(m => m.Name == "ArrayIdentity").TryGetSignature(out var vector) && vector!.ReturnType.ArrayElement!.TypeParameterIndex == 0, "type parameter vector");
         Check(read.Write().SequenceEqual(image), "opaque generic owner roundtrip");
+        var relation = definition.Interfaces.Single();
+        Check(relation.TypeArguments.Single().TypeParameterIndex == 0 && relation.InterfaceType.Resolve().Name == "Derived`1", "generic implementation arguments");
+        var parentRelation = relation.InterfaceType.Resolve().Interfaces.Single();
+        Check(parentRelation.TypeArguments.Single().TypeParameterIndex == 0 && parentRelation.InterfaceType.Resolve().Name == "Value`1", "generic inherited arguments");
+        Reject<NotSupportedException>(() => ((IList<SignatureType>)relation.TypeArguments)[0] = PrimitiveType.Boolean);
         var readFactory = read.MainModule.Types.Single(t => t.Name == "Factory");
         var createDefinition = readFactory.Methods.Single(m => m.Name == "Create");
         var echoDefinition = readFactory.Methods.Single(m => m.Name == "Echo");
@@ -71,6 +81,29 @@ internal static class NativeGenericOwnerChecks
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), definition.Namespace, definition.Name, 1);
         Check(ReferenceEquals(authoredType, app.ImportReference(definition, core)), "authored/read type identity agreement");
         var importedType = authoredType.MakeGenericInstance(PrimitiveType.Int32);
+        var readerApp = new AssemblyBuilder(new("ReaderInterfaceApp", new Version(1, 0, 0, 0)), core);
+        var readerMain = readerApp.AddFunction("Main"); readerApp.EntryPoint = readerMain;
+        readerMain.LoadConstant(42);
+        readerMain.NewObject(readerApp.ImportReference(definition.Methods.Single(m => m.Name == ".ctor"), core).MakeConstructedReference([PrimitiveType.Int32]));
+        var readContract = parentRelation.InterfaceType.Resolve();
+        readerMain.CallVirtual(readerApp.ImportReference(readContract.Methods.Single(), core).MakeConstructedReference([PrimitiveType.Int32]));
+        readerMain.Return();
+        _ = readerApp.WriteNativeAssembly();
+        var readerContext = new AssemblyLoadContext("reader-generic-interface-" + binary, true);
+        try
+        {
+            readerContext.LoadFromStream(new MemoryStream(library.Write()));
+            Check(Equals(42, readerContext.LoadFromStream(new MemoryStream(readerApp.Write())).EntryPoint!.Invoke(null, null)), "reader generic interface dispatch");
+        }
+        finally { readerContext.Unload(); }
+        var digest = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image));
+        var importedContract = app.CreateInterfaceReference(library.Identity, core, digest, "Example", "Value`1", 1);
+        var importedDerived = app.CreateInterfaceReference(library.Identity, core, digest, "Example", "Derived`1", 1);
+        app.AddInterfaceConversion(authoredType, importedDerived.MakeGenericInstance(parameter));
+        app.AddInterfaceConversion(importedDerived, importedContract.MakeGenericInstance(parameter));
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(importedContract, importedDerived.MakeGenericInstance(parameter)));
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(authoredType, importedContract.MakeGenericInstance(SignatureType.TypeParameter(1))));
+        var dispatch = app.CreateMethodReference(importedContract, "Get", new MethodSignature(parameter, []));
         ImportedConstructedMethodReference Import(string name)
         {
             var signature = name switch
@@ -89,7 +122,9 @@ internal static class NativeGenericOwnerChecks
         main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Emit(OpCode.Pop); main.LoadConstant(19); main.NewObject(Import(".ctor")); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
         var importedField = app.CreateFieldReference(authoredType, "Value", parameter, 0).MakeConstructedReference(PrimitiveType.Int32);
         main.LoadLocal(local); main.LoadConstant(42); main.StoreField(importedField);
-        main.LoadLocal(local); main.LoadField(importedField); main.Emit(OpCode.Pop);
+        var readField = app.ImportReference(definition.Fields.Single(), core).MakeConstructedReference(PrimitiveType.Int32);
+        Check(readField.FieldType == importedField.FieldType, "read and authored field substitution agree");
+        main.LoadLocal(local); main.LoadField(readField); main.Emit(OpCode.Pop);
         var storageReference = app.CreateTypeReference(library.Identity, core,
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "Storage");
         var boxField = app.CreateFieldReference(storageReference, "Box", importedType, 0);
@@ -101,7 +136,7 @@ internal static class NativeGenericOwnerChecks
         main.NewObject(storageConstructor); main.StoreLocal(storageLocal);
         main.LoadLocal(storageLocal); main.LoadField(boxesField); main.LoadConstant(0); main.LoadLocal(local); main.StoreArrayElement(importedType);
         main.LoadLocal(storageLocal); main.LoadLocal(storageLocal); main.LoadField(boxesField); main.LoadConstant(0); main.LoadArrayElement(importedType); main.StoreField(boxField);
-        main.LoadLocal(storageLocal); main.LoadField(boxField); main.LoadLocal(local); main.Call(Import("Same")); main.Call(Import("Get")); main.Return();
+        main.LoadLocal(storageLocal); main.LoadField(boxField); main.LoadLocal(local); main.Call(Import("Same")); main.CallVirtual(dispatch.MakeConstructedReference([PrimitiveType.Int32])); main.Return();
         _ = app.WriteNativeAssembly();
         return (library, app, image);
     }

@@ -55,18 +55,30 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
     internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
     {
-        if (authoredInterfaces.Contains(target) && HasAuthoredInterfaceConversion(actual, target)) return true;
-        if (!nativeImportedDefinitions.TryGetValue(actual, out var source) || !nativeImportedDefinitions.TryGetValue(target, out var destination) ||
-            (destination.Attributes & 0x20) == 0 || actual.GenericArity != 0 || target.GenericArity != 0) return false;
+        if (IsAuthoredInterface(target) && HasAuthoredInterfaceConversion(actual, target)) return true;
+        if (!nativeImportedDefinitions.ContainsKey(InterfaceDefinition(actual)) || !nativeImportedDefinitions.TryGetValue(InterfaceDefinition(target), out var destination) ||
+            (destination.Attributes & 0x20) == 0) return false;
         if (nativeInterfaceConversions.TryGetValue((actual, target), out var known)) return known;
-        var seen = new HashSet<TypeDefinition>();
-        bool Visit(TypeDefinition type)
+        var seen = new HashSet<ImportedTypeReference>();
+        bool Visit(ImportedTypeReference current)
         {
-            if (!seen.Add(type)) return false;
-            if (ReferenceEquals(type, destination)) return true;
-            return type.Interfaces.Any(i => Visit(i.InterfaceType.Resolve()));
+            if (!seen.Add(current)) return false;
+            if (current.Equals(target)) return true;
+            if (seen.Count > 4096) throw new InvalidDataException("interface conversion graph exceeds limit");
+            if (!nativeImportedDefinitions.TryGetValue(InterfaceDefinition(current), out var definition)) return false;
+            SignatureType Substitute(SignatureType type) => type.TypeParameterIndex is { } index && current.TypeArguments.Count != 0
+                ? current.TypeArguments[index] : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element))
+                : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type;
+            foreach (var relationship in definition.Interfaces)
+            {
+                var parent = ImportReference(relationship.InterfaceType.Resolve(), CoreLibrary);
+                if (relationship.TypeArguments.Count != 0)
+                    parent = parent.MakeGenericInstance(relationship.TypeArguments.Select(t => Substitute(ImportNativeSignatureType(t, CoreLibrary, null))).ToArray());
+                if (Visit(parent)) return true;
+            }
+            return false;
         }
-        return nativeInterfaceConversions[(actual, target)] = Visit(source);
+        return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
         => type.ReferencedGenericInstance is { } constructed

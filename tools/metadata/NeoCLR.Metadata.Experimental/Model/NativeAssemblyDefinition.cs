@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
@@ -264,12 +264,17 @@ public sealed partial class NativeAssemblyDefinition
                     {
                         typeArity = types[i].GenericNames.Length;
                         var inheritedType = signatureOwners[parent].MakeGenericInstance(Array(instance, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
+                        types[i].InterfaceSignatures.Add(inheritedType);
                         if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(inheritedType);
                         else signatureOwners[i].AddInterfaceImplementation(inheritedType);
                         typeArity = 0;
                     }
-                    else if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
-                    else signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent]);
+                    else
+                    {
+                        types[i].InterfaceSignatures.Add(signatureOwners[parent]);
+                        if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
+                        else signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent]);
+                    }
                 }
             for (int i = 0; i < types.Count; i++)
                 foreach (var constraint in types[i].Constraints)

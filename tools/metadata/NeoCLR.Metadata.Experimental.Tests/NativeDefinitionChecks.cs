@@ -113,8 +113,9 @@ internal static class NativeDefinitionChecks
         library.AddValueType("Example", "Unsupported");
         Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)));
         var generic = new AssemblyBuilder(new("Generic", new Version(1, 0, 0, 0)), core);
-        var identity = generic.AddGenericInterface("Example", "Unsupported", ["T"]);
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(generic.WriteNativeAssembly(), core)));
+        generic.AddGenericInterface("Example", "Supported", ["T"]);
+        var genericSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(generic.WriteNativeAssembly(), core));
+        Check(genericSnapshot.MainModule.Types.Single().GenericArity == 1, "generic interface materialization");
     }
     private sealed class Resolver(AssemblyDefinition? assembly) : IAssemblyResolver
     {
