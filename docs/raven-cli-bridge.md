@@ -3593,3 +3593,16 @@ parameter/vector identity, compilation isolation, both reference orders and inva
 arguments. All seven runtime consumers pass.
 No Runtime Contract or temporary CLI encoding changes. Generic owners, constraints,
 instance methods and complete native System import remain subsequent work.
+
+### Native generic root class import (2026-10-02 development)
+
+Raven now reads unconstrained generic root classes directly from native definitions.
+Owner-scoped parameter names, fields, method signatures and properties map into shared
+constructed-type/member substitution. The generic library consumer constructs Box<int>
+and Box<Item>, invokes constructors/methods/getters and preserves object/vector aliases
+(42). All seven runtime consumers and 105 C# metadata groups pass; standalone metadata
+consumers execute imported Box<int> on CLR and neoCLR in both native schemas.
+
+No Runtime Contract, metadata encoding or runtime changes were required. Constructed
+nominal signatures, constraints, generic interface inheritance and direct imported
+constructed-field emission remain pending. CLI core/translated System bootstrap remains.

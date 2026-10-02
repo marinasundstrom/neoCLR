@@ -6,13 +6,13 @@ public sealed partial class TypeDefinition
     internal List<GenericTypeConstraint> GenericConstraintStorage { get; } = [];
     private IReadOnlyDictionary<int, TypeParameterConstraints>? specialConstraintView;
     private IReadOnlyList<GenericTypeConstraint>? genericConstraintView;
-    /// <summary>Gets a live read-only view of authored special constraints by parameter ordinal.</summary>
-    /// <exception cref="NotSupportedException">Loaded constraint materialization is pending.</exception>
+    /// <summary>Gets a read-only view of authored special constraints, or the validated empty constraints of a supported native snapshot.</summary>
+    /// <exception cref="NotSupportedException">CLI and unsupported native constraint materialization is pending.</exception>
     public IReadOnlyDictionary<int, TypeParameterConstraints> SpecialConstraints => GenericParameterNames is null
         ? throw new NotSupportedException("loaded generic constraints are not materialized yet")
         : specialConstraintView ??= new System.Collections.ObjectModel.ReadOnlyDictionary<int, TypeParameterConstraints>(SpecialConstraintStorage);
-    /// <summary>Gets a live read-only view of authored nominal constraints, retaining existing builder bound handles.</summary>
-    /// <exception cref="NotSupportedException">Loaded constraint materialization is pending.</exception>
+    /// <summary>Gets a read-only view of authored nominal constraints, or the validated empty constraints of a supported native snapshot.</summary>
+    /// <exception cref="NotSupportedException">CLI and unsupported native constraint materialization is pending.</exception>
     public IReadOnlyList<GenericTypeConstraint> GenericConstraints => GenericParameterNames is null
         ? throw new NotSupportedException("loaded generic constraints are not materialized yet")
         : genericConstraintView ??= GenericConstraintStorage.AsReadOnly();
@@ -40,6 +40,6 @@ public sealed partial class TypeDefinition
             throw new ArgumentException("generic type requires a simple name and parameters");
         return (name + "`" + names.Count, names);
     }
-    /// <summary>Gets authored parameter names in ordinal order; null for loaded snapshots whose names are not materialized.</summary>
+    /// <summary>Gets authored or supported native parameter names in ordinal order; null for CLI snapshots whose names are not materialized.</summary>
     public IReadOnlyList<string>? GenericParameterNames { get; internal set; }
 }

@@ -2194,3 +2194,18 @@ Raven method-parameter symbols now consume this profile, with shared inference a
 constructed-method substitution; its seventh native consumer executes (42). The writer/runtime
 reserved generic-name mismatch (`Value`) was observed and remains explicitly tracked;
 these tests use valid `TItem`/`TElement` names.
+
+## Direct native generic owner checkpoint (2026-10-02)
+
+Unconstrained root class declarations now retain generic names/arity and positional type
+parameters in the immutable model. This follows the existing ECMA-335 generic contract
+comparison (GenericParam/VAR and constructed-owner MemberRefs), reusing current native
+encoding and constructed references. Names remain descriptive; parameter scope belongs
+to the declaring type. No new schema or reflection facade is introduced.
+
+The benefit is that the existing CLI/native import machinery handles Box<T> constructors,
+methods and properties from direct native declarations. The cost is an explicit bounded
+profile: constructed nominal signature nodes, constraints and generic inheritance still
+need their own definition model support. C# tests preserve field/method/vector signatures,
+immutable names, exact arity and rejection of constrained declarations. CLR and neoCLR
+consumers construct and mutate Box<int> and return 42 in both native schemas.

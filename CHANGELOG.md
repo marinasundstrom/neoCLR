@@ -13,8 +13,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   imports emit executable CLR and native calls (42 in both native containers; 104 C#
   groups pass). Nongeneric helpers reject unused generic parameters. Raven now imports
   this profile with method-owned parameters and shared inference/substitution; all seven
-  native consumers execute (42). Generic owners and constraints remain pending; no
-  format change.
+  native consumers execute (42). Unconstrained generic root classes now preserve owner
+  parameter names and scoped signatures; imported construction and mutation execute on
+  CLR and neoCLR (both containers), with 105 C# groups passing. Raven imports these owners
+  through shared constructed-type substitution. Constraints and constructed signature
+  imports remain pending; no format change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now

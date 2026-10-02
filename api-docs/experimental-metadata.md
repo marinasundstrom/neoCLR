@@ -4683,3 +4683,26 @@ method-owned parameters and shared constructed-method substitution.
 Native parameter names must also satisfy runtime slot-name rules; the existing writer
 can accept reserved names such as `Value` that runtime verification rejects. This writer
 validation mismatch remains a follow-up, not an accepted runtime contract.
+
+### Direct native generic root classes (2026-10-02 development)
+
+`AssemblyDefinition.ReadNativeAssembly` now also admits unconstrained generic root
+classes with bounded members. `TypeDefinition.GenericArity` and the read-only
+`GenericParameterNames` retain the metadata arity/name suffix and declared parameter
+names. CLI snapshots still return null for GenericParameterNames. `SpecialConstraints`
+and `GenericConstraints` return empty read-only views for the supported native profile;
+constrained native declarations remain rejected, not silently stripped.
+
+`MethodDefinition.TryGetSignature`, `FieldDefinition.TryGetSignature` and property
+signature queries preserve `SignatureType.TypeParameter(ordinal)` and its vectors.
+`AssemblyBuilder.ImportReference(TypeDefinition, core)` creates the open reference;
+`MakeGenericInstance` constructs it. Imported constructors and methods use the existing
+`ImportedMethodReference.MakeConstructedReference` API and shared substitution. They
+emit CLI or native calls without projecting native definitions to CLI metadata.
+
+The bounded profile does not yet materialize constructed nominal signatures such as
+`Box<int>` in a declaration, generic interface/static owners or generic inheritance.
+Native generic constraints, nested/value owners and instance generic methods still
+reject. Direct imported fields on constructed owners remain unsupported; use supported
+methods/properties. Both container schemas execute Box<int> construction, Set and Get
+on neoCLR; the equivalent CLI consumer executes on CLR (42).

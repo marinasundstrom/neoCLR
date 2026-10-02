@@ -249,9 +249,10 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
-    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null)
+    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null)
     {
         internal SignatureType Materialize(ModuleDefinition module) => Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
+            : TypeParameter is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : MethodParameter is { } parameter ? SignatureType.MethodParameter(parameter)
             : Primitive is { } primitive ? primitive
             : module.GetNativeSignatureType(TypeToken);
@@ -263,7 +264,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, uint[]? NativeInterfaces = null);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, uint[]? NativeInterfaces = null, string[]? NativeGenericNames = null);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -381,6 +382,7 @@ public sealed partial class TypeDefinition
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
     {
         Module = module;
+        GenericParameterNames = row.NativeGenericNames is { } names ? Array.AsReadOnly((string[])names.Clone()) : null;
         nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(token => new InterfaceImplementation(Module.GetTypeDefinition(token)!.ToReference()) { DeclaringType = this }).ToArray()));
         MetadataToken = row.Token; Namespace = row.Namespace;
         Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;

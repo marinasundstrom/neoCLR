@@ -5,8 +5,8 @@ public sealed partial class AssemblyDefinition
     /// <summary>Reads authoritative native namespace-function and bounded class/interface declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/generic owners and generic instance methods, unsupported field types and signatures beyond primitives/nominal references and their vectors.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method parameters, primitive, nominal reference or vector signatures, and nongeneric top-level classes/interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value, constrained, nested and generic interface/static owners and generic instance methods, unsupported field types and signatures beyond primitives/nominal references and their vectors.</exception>
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference or vector signatures, and unconstrained top-level classes and nongeneric interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -26,7 +26,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     internal AssemblyDefinition MaterializeDeclarations(byte[] image)
     {
-        static bool SupportedScalar(SignatureType type) => type.Primitive is not null ||
+        static bool SupportedScalar(SignatureType type) => type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false, IsValueType: false } ||
             type.ImportedType is { IsValueType: false, GenericArity: 0, DeclaringType: null };
         static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
@@ -34,11 +34,11 @@ public sealed partial class NativeAssemblyDefinition
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && SupportedScalar(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
         if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.IsValueType || t.DeclaringType >= 0 ||
-            t.GenericNames.Length != 0 || t.Fields.Any(f => !Supported(f.Signature!)) || t.BaseInterfaces.Any(i => !i.TryGetProperty("Named", out _)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
+            (t.GenericNames.Length != 0 && (t.IsStatic || t.IsInterface || t.BaseInterfaces.Length != 0)) || t.Fields.Any(f => !Supported(f.Signature!)) || t.BaseInterfaces.Any(i => !i.TryGetProperty("Named", out _)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||
             m.Signature.ParameterTypes.Any(p => !SupportedMethod(p))))
-            throw new InvalidDataException("native definition materialization requires bounded static generic or nongeneric signatures and nongeneric top-level classes/interfaces");
+            throw new InvalidDataException("native definition materialization requires bounded static generic or nongeneric signatures and unconstrained top-level classes and nongeneric interfaces");
         var nominalTokens = types.Select((type, index) => (type, token: 0x02000002u + (uint)index))
             .ToDictionary(item => (item.type.Namespace, item.type.Name), item => item.token);
         var referenceTokens = References.Select((identity, index) => (identity, token: 0x23000001u + (uint)index)).ToDictionary(item => item.identity, item => item.token);
@@ -46,6 +46,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.TypeParameterIndex is { } typeParameter) return new(null, 0, TypeParameter: typeParameter);
             if (type.MethodParameterIndex is { } parameter) return new(null, 0, MethodParameter: parameter);
             if (type.ArrayElement is { } element) return new(null, 0, Copy(element));
             if (type.Primitive is { } primitive) return new(primitive, 0);
@@ -63,8 +64,8 @@ public sealed partial class NativeAssemblyDefinition
         }
         var interfaceTokens = types.Select((type, index) => (type.NativeName, Token: 0x02000002u + (uint)index)).ToDictionary(t => t.NativeName, t => t.Token);
         var typeRows = types.Select((type, index) => new AssemblyDefinition.TypeRow(
-            0x02000002u + (uint)index, type.Namespace, type.Name, 0, 0,
-            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : 0) | (type.Visibility == TypeVisibility.Public ? 1 : 0)), !type.IsStatic, false, null, type.BaseInterfaces.Select(i => interfaceTokens[i.GetProperty("Named").GetString()!]).ToArray())).ToArray();
+            0x02000002u + (uint)index, type.Namespace, type.Name, type.GenericNames.Length, 0,
+            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : 0) | (type.Visibility == TypeVisibility.Public ? 1 : 0)), !type.IsStatic, false, null, type.BaseInterfaces.Select(i => interfaceTokens[i.GetProperty("Named").GetString()!]).ToArray(), type.GenericNames)).ToArray();
         var fieldRows = new List<AssemblyDefinition.FieldRow>();
         for (int owner = 0; owner < types.Length; owner++)
             foreach (var field in types[owner].Fields)

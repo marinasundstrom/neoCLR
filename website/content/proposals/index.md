@@ -588,3 +588,8 @@ and namespace functions. C# consumers execute imported generic calls on CLR and 
 Raven now imports this profile and executes generic forwarding, overloads and array
 aliases; all seven native consumers pass (42). Generic owners and constraints remain
 pending. This is not full generic import.
+
+Development checkpoint (2026-10-02): direct native generic root classes now preserve
+owner parameters. Raven constructs and uses Box<int>/Box<Item> through shared generic
+substitution; all seven native consumers return 42. Constructed signature types,
+constraints and full native class-library bootstrap remain under development.

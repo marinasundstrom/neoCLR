@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--native-owner-runtime")
+{
+    await NativeGenericOwnerChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-generic-runtime")
 {
     await NativeGenericMethodChecks.RunRuntime(args[1], args[2]); return 0;
@@ -294,6 +298,7 @@ var tests = new (string Name, Action Body)[]
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),
+    ("Native generic class definitions", NativeGenericOwnerChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),
     ("External native signature resolution", ExternalNativeSignatureChecks.Run),
