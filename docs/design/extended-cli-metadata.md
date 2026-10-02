@@ -1528,3 +1528,28 @@ Release assert shared admission and CLR behavior, not opcode sequences. The
 now reaches imported value-receiver TryGetOutput invocation admission. CLI control
 still emits 7168 bytes; the whole native application remains incomplete. No runtime
 instruction or metadata encoding change accompanies this Raven integration slice.
+
+
+### Managed value receiver contracts (2026-10-02)
+
+The next imported-member gap uses CLI's existing value instance `this` convention:
+an initialized managed reference, direct call to a concrete method (ECMA-335 baseline
+above). Preserve the owner value category through TypeSpec, native receiver_byref and
+CLI projection. Reuse native slot references instead of boxing or copying the receiver;
+mutation consequently affects the caller's storage. This extends existing producer and
+reader APIs without introducing a new instruction. Value constructors and constrained
+interface dispatch need different contracts and remain rejected.
+
+The flow validator checks receiver initialization before committing out assignment,
+including aliases between receiver and output. This costs receiver-aware validation but
+avoids unsoundly treating an out alias as initialization of a call precondition. Fields
+and indirect object operations share the typed reference contract. No performance
+improvement is claimed. Imported final virtual value methods use direct concrete calls;
+this is not permission to treat class virtual slots or interface dispatch as direct.
+
+`ValueReceiverChecks.cs` verifies separate CLR/native library/consumer mutation and
+generic value-owner TryGet(out T), with receiver and out contracts retained through
+native projection. Negative checks cover value/uninitialized receivers, Callvirt,
+value constructors and receiver/output aliasing. The native runtime is unchanged from
+the prior checkpoints. Raven integration is the next step; this metadata slice alone
+does not advance the unchanged collections application.

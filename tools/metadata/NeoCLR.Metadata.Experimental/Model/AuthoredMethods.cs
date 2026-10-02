@@ -120,7 +120,7 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
         if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))
             throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");
-        if (!definition.IsStatic && (IsStatic || IsValueType)) throw new InvalidOperationException("instance methods require a reference class");
+        if (!definition.IsStatic && (IsStatic || IsValueType && definition.Name == ".ctor")) throw new InvalidOperationException("instance method owner or value constructor unsupported");
         signature.ValidateOwner(Assembly, GenericParameterNames.Count);
         if (methods.Count >= 256 || methods.Any(m => m.Name == definition.Name &&
             m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))

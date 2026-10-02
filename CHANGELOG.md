@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Support initialized managed receivers on metadata-authored value instance methods and
+  imported nongeneric methods on ordinary/generic value owners. Preserve receiver_byref
+  through native projection and direct CLI calls; value constructors and constrained
+  interface dispatch remain unsupported. C# library/consumer tests prove mutation and
+  generic out calls on CLR/neoCLR (42), including receiver/output alias rejection.
+
 - Connect Raven ref/out emission through the shared portable codegen plan and explicit
   adapter capabilities. Five native controls now pass, including source output forwarding
   and ref mutation; 64 focused C# tests pass. The unchanged collections sample advances

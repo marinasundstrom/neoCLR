@@ -441,3 +441,9 @@ Raven's shared emission path now consumes those ref/out contracts. Five native c
 pass, including source forwarding/mutation, with 64 focused C# tests passing. The
 unchanged collections sample advances to imported value-receiver TryGetOutput admission;
 full application and runtime-library compilation remain incomplete.
+
+
+Metadata value-instance calls now preserve managed receiver addresses and caller mutation.
+Separate generic value/out library consumers execute on CLR and neoCLR (42); constructors
+and constrained interface dispatch remain outside this development slice. Raven adoption
+is the next integration step.

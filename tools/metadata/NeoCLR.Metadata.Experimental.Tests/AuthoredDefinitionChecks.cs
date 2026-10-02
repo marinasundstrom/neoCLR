@@ -123,7 +123,9 @@ internal static class AuthoredDefinitionChecks
         Reject<ArgumentException>(() => foreignType.Definition.Methods.Add(direct));
         Reject<NotSupportedException>(() => type.Methods.Clear());
         MethodBuilder.ForDefinition(direct).LoadConstant(42); MethodBuilder.ForDefinition(direct).Return();
-        Reject<InvalidOperationException>(() => type.Methods.Add(new MethodDefinition("Instance", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true))));
+        var instance = new MethodDefinition("Instance", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true));
+        type.Methods.Add(instance);
+        MethodBuilder.ForDefinition(instance).LoadConstant(42); MethodBuilder.ForDefinition(instance).Return();
         Reject<ArgumentException>(() => new MethodDefinition(".cctor", (ushort)(MethodAttributes.Public | MethodAttributes.Static), PrimitiveMethodSignature.Int32(0, true)));
         var image = assembly.Write();
         if (!image.SequenceEqual(builder.Write())) throw new Exception("facade writer differs");

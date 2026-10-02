@@ -75,7 +75,7 @@ internal static class ValueTypeChecks
         Reject<ArgumentException>(() => number.AddField("Recursive", number));
 
         Reject<InvalidOperationException>(() => number.AddConstructor([]));
-        Reject<InvalidOperationException>(() => number.AddInstanceMethod("Bad", new MethodSignature(PrimitiveType.Void, [])));
+        number.AddInstanceMethod("NoOp", new MethodSignature(PrimitiveType.Void, [])).Return();
 
 
         return app;

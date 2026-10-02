@@ -3880,3 +3880,33 @@ cover invalid indices, missing/partial assignment, reads before writes, interfac
 contract mismatch and aliased ref/out preconditions. Run `--out-integration <runtime>
 <fresh-output>` for native binary verify/run (42). Conditional out_when_true,
 readonly/in contracts and Raven admission remain unsupported by this producer API.
+
+
+### Managed value receivers (development, 2026-10-02)
+
+`TypeBuilder.AddInstanceMethod` and attached instance `MethodDefinition` declarations
+now admit value types as well as reference classes. On a value type, argument zero is
+an initialized managed reference to the exact open declaring type. Field reads/writes
+and typed LoadObject/StoreObject may use that receiver; field mutation affects caller
+storage. Static-type instance declarations and value constructors remain rejected.
+CLI uses ordinary instance method signatures with implicit byref `this`; native writes
+`receiver_byref: true`. Native readers require that flag for value instance methods and
+preserve it when creating a CLI reference assembly. No new opcode or format extension.
+
+`ImportedMethodReference.RequiresManagedReceiver` is true for value instance members.
+ImportReference accepts public nongeneric nonvirtual or final concrete value methods,
+including invariant unconstrained generic owners; ordinary imported signature limits
+still apply. RequiresVirtualDispatch is false for these concrete value calls, including
+final virtual implementations. Use Call (or Emit(Call, reference)) with an initialized
+exact managed receiver; value Callvirt is rejected because constrained/boxed dispatch
+is not represented by this contract. Constructed imported references retain their value
+category and receiver requirement. No receiver flag is added to ordinary parameter lists.
+
+Receiver preconditions are checked before publishing any out assignments. Passing an
+uninitialized receiver also as an output does not make the call valid. Mismatched or
+value-copy receivers and invalid field/indirect access fail on writing with
+InvalidDataException. Import/dispatch argument failures retain existing exceptions.
+`ValueReceiverChecks.cs` demonstrates separate library/consumer mutation and generic
+TryGet(out T), CLI/native projection and rejection cases. Run
+`--value-receiver-integration <runtime> <fresh-output>` for CLR and native verify/run 42.
+Raven source value declarations and constrained interface calls are not implied.

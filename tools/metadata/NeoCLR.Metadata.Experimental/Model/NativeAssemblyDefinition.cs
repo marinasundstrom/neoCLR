@@ -288,6 +288,8 @@ public sealed class NativeAssemblyDefinition
                 }
                 var instance = false;
                 if (method.TryGetProperty("instance", out var instanceValue)) { fields.Add("instance"); instance = instanceValue.GetBoolean(); }
+                bool receiverByRef = false;
+                if (method.TryGetProperty("receiver_byref", out var byRefReceiver)) { fields.Add("receiver_byref"); receiverByRef = byRefReceiver.GetBoolean(); }
                 var visibility = MethodVisibility.Public;
                 if (method.TryGetProperty("visibility", out var access))
                 {
@@ -335,7 +337,8 @@ public sealed class NativeAssemblyDefinition
                 var resultType = ReadType(method.GetProperty("returns"), true);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
-                Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic && !types[ownerIndex].IsValueType, "instance method requires a root class");
+                Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
+                Require(receiverByRef == (instance && types[ownerIndex].IsValueType), "value instance receiver must be byref");
                 var interfaceOwner = ownerIndex >= 0 && types[ownerIndex].IsInterface;
                 Require(isAbstract == interfaceOwner && isVirtual == interfaceOwner, "interface method flags mismatch");
                 Require(!interfaceOwner || instance && visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&

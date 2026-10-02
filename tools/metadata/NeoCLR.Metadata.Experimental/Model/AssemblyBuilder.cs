@@ -647,13 +647,13 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">Invalid visibility/name, duplicate signature or method limit exceeded.</exception>
     public MethodBuilder AddMethod(string name, MethodSignature signature, MethodVisibility visibility)
         => AddMethodCore(name, signature, visibility, isStatic: true, constructor: false);
-    /// <summary>Adds a nonvirtual instance method with primitive or owned-class parameters/results.</summary>
+    /// <summary>Adds a nonvirtual instance method on a reference class or value type.</summary>
     /// <param name="name">Nonempty simple name; .ctor/.cctor are reserved.</param>
     /// <param name="signature">Primitive/owned-class declared parameters, excluding the receiver.</param>
     /// <param name="visibility">Public, Internal or Private.</param>
-    /// <returns>An owned method whose argument zero is the declaring-class receiver.</returns>
+    /// <returns>An owned method whose argument zero is a class receiver or initialized managed value receiver.</returns>
     /// <exception cref="ArgumentException">Invalid or duplicate contract or exceeded limit.</exception>
-    /// <exception cref="InvalidOperationException">The declaring type is static or a value type.</exception>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
     public MethodBuilder AddInstanceMethod(string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(name, signature, visibility, isStatic: false, constructor: false);
     /// <summary>Adds a root-class constructor with primitive declared parameters and no result.</summary>
@@ -682,7 +682,8 @@ public sealed partial class TypeBuilder
     private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor, bool abstractContract = false)
     {
         if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
-        if (!isStatic && (IsStatic || IsValueType)) throw new InvalidOperationException("instance methods require a reference class");
+        if (constructor && IsValueType) throw new InvalidOperationException("value constructors are unsupported");
+        if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic nominal type");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);

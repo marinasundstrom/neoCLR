@@ -638,3 +638,8 @@ producer, so no guest reference-assembly snapshot changes are required.
 The host-only `MethodSignature` outParameters constructor argument and OutParameters
 property are covered in the [output parameter manual](experimental-metadata.md#output-parameter-contracts-development-2026-10-02).
 Existing C# producer exclusion from guest RavenDoc applies; the guest snapshot is unchanged.
+
+The C# metadata host's `ImportedMethodReference.RequiresManagedReceiver`, expanded
+`TypeBuilder.AddInstanceMethod`/definition attachment and receiver validation contract
+are covered by [managed value receivers](experimental-metadata.md#managed-value-receivers-development-2026-10-02).
+The existing host-only RavenDoc exclusion applies; guest reference signatures are unchanged.

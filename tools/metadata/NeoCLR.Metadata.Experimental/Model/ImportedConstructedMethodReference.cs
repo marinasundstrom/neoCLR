@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable imported call on a constructed reference class or interface.</summary>
+/// <summary>An immutable imported call on a constructed nominal type.</summary>
 public sealed class ImportedConstructedMethodReference
 {
     internal ImportedConstructedMethodReference(ImportedMethodReference definition, ConstructedMethodReference target, ImportedTypeReference declaringType)
@@ -18,7 +18,7 @@ public sealed class ImportedConstructedMethodReference
 
 public sealed partial class ImportedMethodReference
 {
-    /// <summary>Binds an imported generic reference owner and optional method parameters.</summary>
+    /// <summary>Binds an imported generic nominal owner and optional method parameters.</summary>
     /// <param name="declaringTypeArguments">Exactly one non-Void consumer-scoped type per owner parameter.</param>
     /// <param name="methodArguments">Exactly one per method parameter; null means none.</param>
     /// <returns>An immutable reference with copied arguments.</returns>
@@ -41,7 +41,7 @@ public sealed partial class ImportedMethodReference
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Appends a direct imported call on a constructed reference owner.</summary>
+    /// <summary>Appends a direct imported call on a constructed nominal owner.</summary>
     public void Call(ImportedConstructedMethodReference method) => Emit(OpCode.Call, method);
     /// <summary>Appends interface dispatch to an imported constructed contract.</summary>
     public void CallVirtual(ImportedConstructedMethodReference method) => Emit(OpCode.Callvirt, method);

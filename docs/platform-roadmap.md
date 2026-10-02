@@ -5,6 +5,13 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Value-receiver metadata checkpoint (2026-10-02):** owned/authored and imported value
+instance methods now preserve initialized managed receivers through CLI/native emission
+and reference projection. Separate generic value/out consumers execute on both runtimes
+(42); value constructors and constrained dispatch remain rejected. Next connect Raven's
+imported value-receiver admission and address emission to this validated contract, then
+rerun the unchanged collections sample.
+
 **Raven ref/out checkpoint (2026-10-02):** shared .NET/neoCLR emission now preserves
 ref/out signatures, local addresses, indirect access and uninitialized output locals.
 Five native controls pass, including source forwarding/mutation (42); 64 focused C#

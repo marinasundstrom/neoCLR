@@ -53,7 +53,7 @@ public sealed partial class MethodBuilder
 
     private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null)
     {
-        internal static BodyValueType Receiver(TypeBuilder owner) => owner.OpenSignature;
+        internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
         public static implicit operator BodyValueType(SignatureType type) => type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
@@ -132,6 +132,12 @@ public sealed partial class MethodBuilder
                             throw new InvalidDataException("value-type field receiver requires an initialized local of the exact owner type");
                         stack.RemoveAt(stack.Count - 1);
                     }
+                    else if (instruction.Field.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].ByReferenceElement == fieldOwner)
+                    {
+                        if (stack[^1].AddressedParameter is { } parameter && !assigned[locals.Count + parameter])
+                            throw new InvalidDataException("value field receiver parameter is uninitialized");
+                        stack.RemoveAt(stack.Count - 1);
+                    }
                     else
                     {
                         if (instruction.Field.DeclaringType.IsValueType && instruction.Op == "field.store")
@@ -197,11 +203,14 @@ public sealed partial class MethodBuilder
                     }
                     else
                     {
-                        if (address.ByReferenceElement is null || address.ByReferenceElement != instruction.Type || address.AddressedParameter is not { } parameter)
+                        if (address.ByReferenceElement is null || address.ByReferenceElement != instruction.Type)
                             throw new InvalidDataException("object operation requires an exact managed-reference target");
-                        if (instruction.Op == "object.load" && !assigned[locals.Count + parameter])
-                            throw new InvalidDataException("out parameter read before assignment");
-                        if (instruction.Op == "object.store") assigned[locals.Count + parameter] = true;
+                        if (address.AddressedParameter is { } parameter)
+                        {
+                            if (instruction.Op == "object.load" && !assigned[locals.Count + parameter])
+                                throw new InvalidDataException("out parameter read before assignment");
+                            if (instruction.Op == "object.store") assigned[locals.Count + parameter] = true;
+                        }
                     }
                     stack.RemoveAt(stack.Count - 1);
                     if (instruction.Op == "object.load") stack.Add(instruction.Type!);
@@ -258,9 +267,13 @@ public sealed partial class MethodBuilder
                         }
                         Pop(callSignature.ParameterTypes[i], output);
                     }
-                    // All ref input preconditions must hold before publishing any out assignment.
+                    if (!instruction.Target.IsStatic)
+                    {
+                        var receiver = instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
+                        Pop(instruction.Target.DeclaringType!.IsValueType ? SignatureType.ByReference(receiver) : receiver);
+                    }
+                    // Receiver and ref input preconditions precede all output assignments.
                     foreach (var slot in outputs) assigned[slot] = true;
-                    if (!instruction.Target.IsStatic) Pop(instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature));
                     if (instruction.Target.ReturnsValue) stack.Add(callSignature.ReturnType);
                     break;
                 case "native.call":
