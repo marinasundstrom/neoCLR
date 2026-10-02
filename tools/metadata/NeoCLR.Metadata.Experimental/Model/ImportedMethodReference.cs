@@ -47,9 +47,18 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
     /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
-    /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; cross-dependency TypeRef signatures require further contracts.
-    /// Native primitive/local-class namespace functions and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
+    /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; native cross-dependency signatures require the explicit-resolver overload; CLI cross-dependency decoding remains unsupported.
+    /// Native primitive/nominal-class namespace functions and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
+        => ImportReference(definition, dependencyCoreLibrary, null);
+
+    /// <summary>Imports a native contract with explicitly resolved cross-assembly nominal signature types.</summary>
+    /// <param name="definition">Immutable method or field definition.</param>
+    /// <param name="dependencyCoreLibrary">Matching explicit core contract for all resolved dependencies.</param>
+    /// <param name="resolver">Exact identity resolver; null permits local signature types only.</param>
+    /// <returns>An output-owned immutable reference.</returns>
+    /// <exception cref="InvalidDataException">A dependency/type is missing, mismatched, unsupported or conflicts with an imported snapshot.</exception>
+    public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver)
     {
         ArgumentNullException.ThrowIfNull(definition);
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
@@ -78,7 +87,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("invalid imported constructor contract");
         var declaringReference = type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
-        var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary);
+        var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver);
         if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
             throw new InvalidDataException("constructor requires a nongeneric void signature without byref parameters");
         if (!importedGraphs.TryGetValue(identity, out var imported))

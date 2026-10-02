@@ -51,6 +51,13 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
+    internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
+    {
+        var definition = reference.Resolve(resolver);
+        if (definition.GenericArity != 0 || definition.DeclaringType is not null || definition.IsValueType || (definition.Attributes & 0x20) != 0)
+            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class");
+        return ImportReference(definition, core);
+    }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
     /// <param name="definition">External public type; generic definitions must be unconstrained and invariant. Values must extend the explicit core System.ValueType; enums are not admitted.</param>
     /// <param name="dependencyCoreLibrary">Explicit matching core contract.</param>

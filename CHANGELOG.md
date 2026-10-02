@@ -20,8 +20,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven factory, identity-call and nominal-constructor consumers execute (42).
   Primitive-only helpers reject nominal signatures. Local class-valued fields now also
   expose immutable signatures and import for CLI/native load/store emission; Raven
-  replacement/mutation consumers preserve object identity (42). Cross-dependency
-  signature types and generic/value/interface profiles still reject direct reading.
+  replacement/mutation consumers preserve object identity (42). Native nominal method
+  and field signatures now retain exact assembly-scoped references across dependencies.
+  Resolver-taking method/field import overloads and Raven's explicit reference set resolve
+  them without reflection or CLI projection; a three-assembly consumer executes (42).
+  Missing/version/type/snapshot conflicts reject. Generic/value/interface profiles remain
+  outside direct reading.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

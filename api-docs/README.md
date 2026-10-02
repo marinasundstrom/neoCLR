@@ -740,3 +740,8 @@ FieldDefinition.TryGetSignature and native nominal field import are covered in t
 [host metadata manual](experimental-metadata.md#native-local-nominal-fields-development-2026-10-02).
 These C# tooling APIs remain outside guest RavenDoc selection; the guest public API
 and reference assembly snapshot are unchanged.
+
+The resolver-taking AssemblyBuilder.ImportReference method/field overloads and native
+assembly-scoped TypeReferences are documented in the [host metadata manual](experimental-metadata.md#external-native-nominal-signatures-development-2026-10-02).
+They remain C# tooling APIs excluded from guest RavenDoc selection; guest public
+signatures and the reference assembly snapshot are unchanged.

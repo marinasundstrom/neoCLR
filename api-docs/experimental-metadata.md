@@ -4489,3 +4489,47 @@ C# tests cover forward/cyclic references, field/method signature identity, both 
 containers, immutable fields, incorrect primitive/nominal stores and readonly stores.
 They execute the emitted equivalent on .NET (42); Raven consumers execute replacement,
 nested mutation and original-object independence in neoCLR (42).
+
+### External native nominal signatures (development, 2026-10-02)
+
+ReadNativeAssembly now admits nongeneric top-level reference classes from declared
+native dependencies in method/function/constructor and field signatures. The reader
+copies their exact assembly identity, namespace and name into TypeReference rows in
+ModuleDefinition.TypeReferences. ReferencedType points to that same immutable reference.
+Native TypeRef tokens are reader-assigned, module-local identifiers, not claimed CLI
+rows or native origin tokens. ResolutionScopeToken identifies the declared AssemblyRef.
+Read/inspection does not load dependencies or resolve types. Write preserves the original
+PE/#Neo image and introduces no format or instruction change.
+
+`TypeReference.Resolve(IAssemblyResolver? resolver = null)` retains its existing contract:
+external references require an explicit resolver returning an exact-identity snapshot;
+missing/wrong dependencies or missing/ambiguous types throw InvalidDataException.
+No filesystem probing, simple-name fallback or runtime reflection loading occurs.
+Local references still resolve without a resolver.
+
+New overloads:
+
+```csharp
+ImportedMethodReference AssemblyBuilder.ImportReference(
+    MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary,
+    IAssemblyResolver? resolver);
+ImportedFieldReference AssemblyBuilder.ImportReference(
+    FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary,
+    IAssemblyResolver? resolver);
+```
+
+These import native nominal signature types through the supplied resolver into the
+output's existing interned nominal references. All resolved types must be public,
+nongeneric top-level reference classes, and the supplied core contract applies to all
+of them. Exact snapshot/core checks remain in force. Existing two-argument overloads
+remain available and behave as before; external native signatures require a resolver.
+Null definition/core throws ArgumentNullException; a null resolver is permitted for
+local-only contracts. Missing/mismatched/unsupported dependencies or conflicting snapshots
+throw InvalidDataException. Resolver exceptions retain host meaning. Primitive helpers
+continue to reject nominal signatures. CLI cross-dependency signature decoding is not
+expanded by these overloads.
+
+C# tests inspect both native containers, check scoped reference/field/method identity,
+reject missing resolver/version/type/snapshot conflicts, and execute a three-assembly
+consumer on .NET (42). Raven compiles the same dependency shape and executes it in neoCLR.
+Generic, constructed, value/interface and array signature profiles remain unsupported.

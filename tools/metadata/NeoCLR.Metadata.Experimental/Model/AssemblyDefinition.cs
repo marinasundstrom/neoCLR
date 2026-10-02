@@ -278,6 +278,9 @@ public sealed partial class ModuleDefinition
         IReadOnlyList<AssemblyDefinition.FieldRow> fieldRows, IReadOnlyList<AssemblyDefinition.PropertyRow> propertyRows, IReadOnlyList<AssemblyDefinition.MethodRow> methodRows, IReadOnlyList<AssemblyDefinition.MemberReferenceRow> memberReferenceRows, IReadOnlyList<AssemblyDefinition.ReferenceRow> references, IReadOnlyList<AssemblyDefinition.TypeReferenceRow> typeReferences)
     {
         Assembly = assembly; Name = name; Mvid = mvid;
+        AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
+        TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
+        referencesByToken = TypeReferences.ToDictionary(reference => reference.MetadataToken);
         var types = rows.Select(row => new TypeDefinition(this, row)).ToArray();
         Types = new DefinitionCollection<TypeDefinition>(types, type => { _ = Assembly.Producer?.AttachType(type) ?? throw new InvalidOperationException("loaded type collections are read-only"); });
         definitions = types.ToDictionary(type => type.MetadataToken);
@@ -302,16 +305,17 @@ public sealed partial class ModuleDefinition
         properties = propertyDefinitions.ToDictionary(property => property.MetadataToken);
         declaredProperties = propertyDefinitions.GroupBy(property => property.DeclaringType.MetadataToken)
             .ToDictionary(group => group.Key, group => (IReadOnlyList<PropertyDefinition>)Array.AsReadOnly(group.ToArray()));
-        AssemblyReferences = Array.AsReadOnly(references.Select(row => new AssemblyReference(this, row.Token, row.Identity)).ToArray());
-        TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
         MemberReferences = Array.AsReadOnly(memberReferenceRows.Select(row => new MemberReference(this, row)).ToArray());
     }
     // Used only while constructing loaded fields and methods, before the snapshot is published.
+    private readonly Dictionary<uint, TypeReference> referencesByToken;
     private readonly Dictionary<uint, SignatureType> nativeSignatureTypes = [];
     internal SignatureType GetNativeSignatureType(uint token)
     {
         if (nativeSignatureTypes.TryGetValue(token, out var type)) return type;
-        type = SignatureType.FromReference((GetTypeDefinition(token) ?? throw new InvalidDataException("missing native signature type")).ToReference());
+        type = SignatureType.FromReference(token >> 24 == 1
+            ? referencesByToken.GetValueOrDefault(token) ?? throw new InvalidDataException("missing native signature reference")
+            : (GetTypeDefinition(token) ?? throw new InvalidDataException("missing native signature type")).ToReference());
         nativeSignatureTypes.Add(token, type);
         return type;
     }
@@ -360,7 +364,7 @@ public sealed partial class ModuleDefinition
     public MemberReference? GetMemberReference(uint metadataToken) => MemberReferences.FirstOrDefault(member => member.MetadataToken == metadataToken);
     /// <summary>Gets physical AssemblyRef rows in metadata order, without resolving dependencies.</summary>
     public IReadOnlyList<AssemblyReference> AssemblyReferences { get; }
-    /// <summary>Gets physical nominal TypeRef rows in metadata order.</summary>
+    /// <summary>Gets CLI TypeRef rows or native reader-assigned assembly-scoped nominal references.</summary>
     public IReadOnlyList<TypeReference> TypeReferences { get; }
     /// <summary>Looks up a module-local TypeDef without loading any dependencies.</summary>
     /// <param name="metadataToken">A physical TypeDef token; other kinds and absent rows return null.</param>
@@ -422,13 +426,13 @@ public sealed partial class TypeReference
     { Module = module; MetadataToken = row.Token; Namespace = row.Namespace; Name = row.Name; ResolutionScopeToken = row.Scope; }
     /// <summary>Gets the owning module snapshot; for a physical TypeRef this is the consuming module.</summary>
     public ModuleDefinition Module { get; }
-    /// <summary>Gets the TypeDef or physical TypeRef token within Module.</summary>
+    /// <summary>Gets the module-local TypeDef or TypeRef token. Native TypeRef tokens are assigned by the reader.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the stored namespace.</summary>
     public string Namespace { get; }
     /// <summary>Gets the stored metadata name.</summary>
     public string Name { get; }
-    /// <summary>Gets a physical resolution-scope token; zero for definition-backed references or a nil scope.</summary>
+    /// <summary>Gets the resolution-scope token; zero for definition-backed references or a nil scope.</summary>
     public uint ResolutionScopeToken { get; }
     /// <summary>Resolves a nominal reference through its local module or explicit assembly resolver.</summary>
     /// <param name="resolver">Required for assembly-scoped references; unused for local definitions.</param>

@@ -120,14 +120,14 @@ public sealed partial class MethodDefinition
         catch (ArgumentException) { decoded = null; return false; }
     }
 
-    internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
+    internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core, IAssemblyResolver? resolver = null)
     {
         if (nativeSignature is not null)
         {
             if ((!IsStatic && DeclaringType is null) || GenericArity != 0)
                 throw new InvalidDataException("unsupported native callable import");
             SignatureType Import(SignatureType type) => type.Primitive is { } primitive ? primitive
-                : type.ReferencedType is { } reference ? consumer.ImportReference(reference.Resolve(), core)
+                : type.ReferencedType is { } reference ? consumer.ImportNativeSignatureReference(reference, core, resolver)
                 : throw new InvalidDataException("unsupported native signature type");
             return new MethodSignature(Import(nativeSignature.ReturnType), nativeSignature.ParameterTypes.Select(Import));
         }

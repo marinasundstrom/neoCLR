@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive or local nominal instance-field reference owned by one output assembly.</summary>
+/// <summary>An immutable primitive or nominal instance-field reference owned by one output assembly.</summary>
 public sealed class ImportedFieldReference
 {
     internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
@@ -21,7 +21,7 @@ public sealed class ImportedFieldReference
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, uint), ImportedFieldReference> importedFields = [];
-    /// <summary>Imports a public primitive or native local-class instance field on a public nongeneric top-level reference class.</summary>
+    /// <summary>Imports a public primitive or native nominal-class instance field on a public nongeneric top-level reference class.</summary>
     /// <param name="definition">Immutable CLI or native field definition.</param>
     /// <param name="dependencyCoreLibrary">Explicit core identity, matching this output.</param>
     /// <returns>An interned reference owned by this builder.</returns>
@@ -29,6 +29,15 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported owner/signature/access/layout, incompatible core/snapshot, translated binding or limit.</exception>
     /// <remarks>CLI output uses a MemberRef. Native output requires a native definition snapshot and uses its validated field ordinal. CLI input fields support CLI output only. Static fields, constructed owners and translated layouts are not admitted. Readonly loads are supported; stores fail body validation.</remarks>
     public ImportedFieldReference ImportReference(FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary)
+        => ImportReference(definition, dependencyCoreLibrary, null);
+
+    /// <summary>Imports a native contract with explicitly resolved cross-assembly nominal signature types.</summary>
+    /// <param name="definition">Immutable method or field definition.</param>
+    /// <param name="dependencyCoreLibrary">Matching explicit core contract for all resolved dependencies.</param>
+    /// <param name="resolver">Exact identity resolver; null permits local signature types only.</param>
+    /// <returns>An output-owned immutable reference.</returns>
+    /// <exception cref="InvalidDataException">A dependency/type is missing, mismatched, unsupported or conflicts with an imported snapshot.</exception>
+    public ImportedFieldReference ImportReference(FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver)
     {
         ArgumentNullException.ThrowIfNull(definition); ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         if (definition.Module is null || definition.Module.Assembly.Producer is not null)
@@ -40,7 +49,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("unsupported imported field contract");
         var owner = ImportReference(type, dependencyCoreLibrary);
         SignatureType storage = signature!.Primitive is { } primitive ? primitive
-            : signature.ReferencedType is { } nominal ? ImportReference(nominal.Resolve(), dependencyCoreLibrary)
+            : signature.ReferencedType is { } nominal ? ImportNativeSignatureReference(nominal, dependencyCoreLibrary, resolver)
             : throw new InvalidDataException("unsupported imported field signature");
         var key = (type.Module.Assembly.Identity, definition.MetadataToken);
         if (importedFields.TryGetValue(key, out var existing))

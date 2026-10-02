@@ -2031,3 +2031,30 @@ All four runtime consumers and 99 C# metadata contract groups pass; C# also exec
 the equivalent native-snapshot import on .NET. See [hashed evidence](../experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json).
 The CLI primitive core and translated System remain explicit bootstrap dependencies;
 full native System import is not claimed.
+
+## Explicit native signature dependencies (2026-10-02)
+
+Native nominal field/method signatures now preserve exact external assembly identity
+in immutable TypeReferences. This follows the assembly-scoped nominal identity model
+from the existing ECMA-335/Cecil research rather than recreating System.Reflection.Type.
+The reader remains independent of dependency loading; the existing IAssemblyResolver
+is supplied at resolution/import boundaries. Native TypeRef identifiers are reader-local
+logical row identifiers and do not pretend to be native origin/physical CLI rows.
+Original-image Write behavior and the native wire format remain unchanged.
+
+The benefit is direct symbol loading across real native library boundaries. The cost
+is an explicit complete dependency set and the current nongeneric root-class profile;
+there is no implicit file probing, version unification, type forwarding, or expanded CLI
+signature decoding. Resolver imports check exact identities and snapshot fingerprints.
+Raven validates dependency identities/type existence before publishing symbols, then
+lazily resolves parameter/result/field types through compilation-owned modules. Emission
+uses the already validated explicit metadata bindings.
+
+The tested Raven pipeline builds PayloadLibrary, builds HolderLibrary against its direct
+native reference, then compiles a consumer of both. Constructor arguments, a static
+identity method and a class-valued field retain the PayloadLibrary type identity; the
+consumer replaces the payload and runs in neoCLR (42). All five runtime consumers and
+100 C# metadata groups pass, including .NET execution of equivalent scoped imports.
+See [hashed evidence](../experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json).
+The explicit CLI primitive core/translated System bootstrap remains; full native System
+import and generic/value/interface/array declarations are not claimed.

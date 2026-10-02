@@ -540,3 +540,8 @@ Development checkpoint (2026-10-02): class-valued fields now participate in dire
 metadata loading and Raven emission. A native library consumer replaces and mutates a
 stored object while preserving the original (42). Existing nominal CLR behavior and
 PE/#Neo encoding are retained; cross-dependency signature loading remains pending.
+
+Development checkpoint (2026-10-02): direct native signatures now resolve classes in
+explicit dependencies. Raven-produced payload/holder libraries and their consumer run
+as three native assemblies (42). Exact identities are preserved without a CLI projection;
+full native System importing and broader signature categories remain pending.

@@ -291,6 +291,7 @@ var tests = new (string Name, Action Body)[]
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),
+    ("External native signature resolution", ExternalNativeSignatureChecks.Run),
     ("Imported primitive field operands", ImportedFieldChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),

@@ -10,7 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType);
-    private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
+    private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
@@ -335,9 +335,11 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var type in types)
             {
                 typeArity = type.GenericNames.Length;
-                foreach (var field in type.Fields)
+                for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
+                    var field = type.Fields[fieldIndex];
                     var storage = ReadType(field.Type, false);
+                    type.Fields[fieldIndex] = field with { Signature = storage };
                     Require(!type.IsValueType || storage.Primitive is not null || storage.TypeParameterIndex is not null, "value-type fields currently require primitive or declaring-parameter storage");
                 }
             }
