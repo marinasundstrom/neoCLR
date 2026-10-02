@@ -1,0 +1,65 @@
+{
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    }
+  ],
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "consumer": "public interface Counted : System.Collections.Sequence\u003Cint\u003E { }\npublic interface Cursor : System.Collections.Iterator\u003Cint\u003E { }\npublic class EmptyCursor : Cursor {\n    func MoveNext() -\u003E bool =\u003E false\n    val Current: int =\u003E 0\n    func Dispose() { }\n}\npublic class Provider : Counted {\n    val Count: int =\u003E 40\n    val self[index: int]: int =\u003E index \u002B 2\n    func GetIterator() -\u003E System.Collections.Iterator\u003Cint\u003E =\u003E EmptyCursor()\n}\nfunc Main() -\u003E int {\n    let collection: Counted = Provider()\n    return collection.Count \u002B collection[0]\n}",
+  "cases": [
+    {
+      "name": "CollectionContractsHostForward",
+      "target": false,
+      "reverse": false,
+      "nativeResult": 42,
+      "cliExecution": true,
+      "bytes": 32768,
+      "coreSha256": "A99B94BCEAF3108BE8DCF97BA85D778910E6F8FF71266B891897B09139927865"
+    },
+    {
+      "name": "CollectionContractsHostReverse",
+      "target": false,
+      "reverse": true,
+      "nativeResult": 42,
+      "cliExecution": true,
+      "bytes": 32768,
+      "coreSha256": "A99B94BCEAF3108BE8DCF97BA85D778910E6F8FF71266B891897B09139927865"
+    },
+    {
+      "name": "CollectionContractsTargetForward",
+      "target": true,
+      "reverse": false,
+      "nativeResult": 42,
+      "cliExecution": false,
+      "bytes": 32768,
+      "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD"
+    },
+    {
+      "name": "CollectionContractsTargetReverse",
+      "target": true,
+      "reverse": true,
+      "nativeResult": 42,
+      "cliExecution": false,
+      "bytes": 32768,
+      "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD"
+    }
+  ],
+  "scope": "unchanged sequence interfaces with same-assembly consumer; inherited generic property and indexer dispatch, not collection storage implementation or full class library"
+}

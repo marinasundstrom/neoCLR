@@ -11,9 +11,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Support owned constructed interface inheritance and transitive positional argument
   substitution in the metadata producer/reader, plus constructed interface CallVirtual.
   Cycle, scope and implementation checks remain enforced. Unchanged Raven collection
-  contracts through Collection<T> now compile with a consumer whose inherited Count
-  dispatch returns 42 on CLR/native and the actual neoCLR target profile, in both source
-  orders. Sequence<T> indexers and the implementation bootstrap remain pending.
+  contracts through Sequence<T> now compile with a consumer whose inherited Count
+  and indexer dispatch returns 42 on CLR/native and the actual neoCLR target profile,
+  in both source orders. Raven admits interface indexers through a shared capability;
+  separately isolated general fixes prevent incomplete source interface/member caches
+  and infer abstract bodyless indexer accessors. The broad collections application
+  retains exact output. Full library implementation bootstrap remains pending.
 
 - Add explicit CLI declaration/native implementation bindings to the metadata API,
   preserving PE reference scopes while validating selected native signatures. Support

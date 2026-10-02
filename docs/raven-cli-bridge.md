@@ -3031,3 +3031,39 @@ collections application still matching its established output. Next: Sequence<T>
 interface indexer; ArrayList source also needs the implementation seed's RuntimeServices/
 CheckedStorage declarations. A fresh inventory's whole-library diagnostics still reflect
 that unsupported bootstrap, not a count of independent compiler defects.
+
+
+### Sequence interface indexers (2026-10-02, development)
+
+Raven's `InterfaceIndexer` capability admits supported public bodyless instance indexers
+in the shared plan. CLR and native profiles opt in. Native codegen reuses the existing
+metadata property/accessor definitions and constructed interface calls; the property
+signature retains index parameters. This follows CLI behavior without a format or
+runtime instruction change. Native declaration mapping belongs to Raven, encoding to
+the metadata library, and execution to neoCLR.
+
+The unchanged Sequence<T> source joins Disposable, Iterator<T>, Iterable<T> and
+Collection<T>. A concrete same-assembly consumer calls inherited Count (40) and indexer
+(2), returning 42. Both source orders run on native with host bootstrap and
+CompilationOptions.NeoCLR plus the matching CoreProbe Self contract; host-profile CLR
+controls also return 42. Projection checks preserve the getter-only property association.
+[Source and bundle hashes](experiments/extended-cli-metadata/sequence-contracts-2026-10-02.json).
+
+Two general Raven defects were isolated in commit d360b964f: source member/interface
+views could cache incomplete cross-file declarations, and bodyless interface indexers
+did not infer abstract accessors. Independent .NET source-order tests exercise these
+fixes; completed declaration caches remain in use. No performance claim is made.
+Target admission and the expanded C# probe are in Raven commit 67787fa13 on
+`codex/metadata-consumer`; runtime/metadata remain on `codex/extended-cli-metadata`.
+29 focused interface declaration/completion/symbol tests pass, including shared
+getter/setter mutation and capability rejection. The unchanged broad collections sample
+still verifies and executes with exact expected stdout, exit 0 and empty stderr
+([regression evidence](experiments/extended-cli-metadata/collections-after-sequence-2026-10-02.json)).
+
+This advances source emission, not full System bootstrap: implementing classes remain
+nongeneric in the native producer, and native semantic importing remains future work.
+Core symbols still come from the matching CLI snapshot; the broad sample still binds
+translated System. The eventual replacement loads native declarations directly and
+compiles System implementation sources. Next is the implementation seed needed for
+ArrayList's RuntimeServices/CheckedStorage dependencies. No public metadata API changed
+in this slice; its existing property/accessor and generic interface contracts suffice.

@@ -3,13 +3,14 @@
 Development checkpoint (2026-10-02): the metadata feature branch integrates the
 structural Function runtime and direct Raven Function emission. The unchanged collections
 application now compiles to native PE/#Neo, verifies and executes with exact expected
-output against the explicitly bound translated System library. 91 metadata contract
+output against the explicitly bound translated System library. 92 metadata contract
 groups and native binary fixture checks pass. This establishes the requested broad
 application end-to-end case; it does not complete native class-library source emission
-or native semantic symbol loading. Unchanged library interfaces through Collection<T> now emit with constructed inheritance
-and an executable inherited-property consumer (42); both source orders and target profiles
-pass. Next support Sequence<T> interface indexers, then the implementation bootstrap
-needed by ArrayList<T>. Author-directed integration stays on the feature branches;
+or native semantic symbol loading. Unchanged library interfaces through Sequence<T> now
+emit with constructed inheritance and an executable inherited-property/indexer consumer
+(42); both source orders and target profiles pass. 29 focused Raven interface tests pass,
+and the broad application retains exact output after general binding fixes. Next support
+the RuntimeServices/CheckedStorage implementation bootstrap needed by ArrayList<T>. Author-directed integration stays on the feature branches;
 no main-branch feature merge or roadmap milestone completion is implied.
 See [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)
 and [integration contracts](raven-cli-bridge.md#unchanged-collections-end-to-end-acceptance-2026-10-02-development).
