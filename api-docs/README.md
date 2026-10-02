@@ -764,3 +764,10 @@ reference assembly and snapshot are unchanged.
 Native TypeDefinition.Interfaces materialization and interface import/conformance are
 covered in [the host manual](experimental-metadata.md#direct-native-interface-definitions-development-2026-10-02).
 These C# host APIs remain excluded from guest RavenDoc; guest snapshot signatures are unchanged.
+
+
+The development C# `NeoCLR.Metadata.Experimental.Introspection` namespace now exposes
+MetadataLoadContext, AssemblyInfo, ModuleInfo, TypeInfo and NominalTypeInfo. All public
+members are covered in the [host manual](experimental-metadata.md#metadata-only-introspection-facade-development-2026-10-02).
+These host-only types are not guest Raven APIs and do not belong in the RavenDoc input
+assembly. Constructed/member facade coverage remains pending rather than silently omitted.

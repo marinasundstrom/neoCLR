@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add a C# metadata-only Introspection facade with a fixed MetadataLoadContext and
+  canonical assembly/module/nominal views. Raven replaces its private nominal resolver
+  with the shared context; constructed/member views remain pending. Validate exact
+  identity, cycles, diamonds, conflicts and isolation; 109 C# groups pass.
+
 - Record the proposed pure metadata resolution context and constructed-view layer over
   existing definitions/resolvers, including identity/lifetime rules, staged C# tests and future NeoCLR metadata-only
   Introspection/Emit use cases. This is a .NET-hosted Raven prototype direction,

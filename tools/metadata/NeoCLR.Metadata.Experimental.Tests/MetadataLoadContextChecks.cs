@@ -1,0 +1,59 @@
+using NeoCLR.Metadata.Experimental;
+using NeoCLR.Metadata.Experimental.Model;
+using NeoCLR.Metadata.Experimental.Introspection;
+
+internal static class MetadataLoadContextChecks
+{
+    internal static void Run()
+    {
+        var core = new AssemblyIdentity("Core", new Version(1, 0, 0, 0));
+        AssemblyIdentity Id(string name, int revision = 1) => new(name, new Version(revision, 0, 0, 0));
+        AssemblyDefinition Snapshot(string name, params string[] dependencies)
+        {
+            var builder = new AssemblyBuilder(Id(name), core);
+            var type = builder.AddClass("Example", "Item");
+            foreach (var dependency in dependencies)
+                type.AddField(dependency, builder.CreateTypeReference(Id(dependency), core, new string('a', 64), "Example", "Item"));
+            return AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(builder.WriteNativeAssembly(), core));
+        }
+        var a = Snapshot("A", "B", "C");
+        var b = Snapshot("B", "D");
+        var c = Snapshot("C", "D");
+        var d = Snapshot("D", "A"); // Legal assembly cycle, not a declaration cycle.
+        var context = new MetadataLoadContext([a, b, c, d, a]);
+        Check(context.Assemblies.Count == 4, "same snapshot registration is idempotent");
+        var view = context.Resolve(a.Identity);
+        var left = view.ReferencedAssemblies[0].ReferencedAssemblies.Single();
+        var right = view.ReferencedAssemblies[1].ReferencedAssemblies.Single();
+        Check(ReferenceEquals(left, right) && ReferenceEquals(left.ReferencedAssemblies.Single(), view), "diamond and cycle identity");
+        var nominal = context.Resolve(b.MainModule.TypeReferences.Single());
+        Check(ReferenceEquals(nominal, context.Resolve(d.Identity).GetTypes().Single()), "external type shares local facade");
+        Check(ReferenceEquals(nominal.Module.Assembly, left) && nominal.FullName == "Example.Item" && nominal.IsNominalType, "provenance and nominal shape");
+        Parallel.For(0, 32, _ => Check(ReferenceEquals(context.Resolve(b.MainModule.TypeReferences.Single()), nominal), "concurrent canonical identity"));
+        Check(!ReferenceEquals(new MetadataLoadContext([a, b, c, d]).Resolve(d.Identity).GetTypes().Single(), nominal), "context isolation");
+        Reject<InvalidDataException>(() => new MetadataLoadContext([a, Snapshot("A")]));
+        Reject<InvalidDataException>(() => new MetadataLoadContext([b]).Resolve(b.MainModule.TypeReferences.Single()));
+        Reject<InvalidDataException>(() => context.Resolve(Id("A", 2)));
+        Reject<InvalidDataException>(() => context.Resolve(Snapshot("B", "D").MainModule.TypeReferences.Single()));
+        Reject<NotSupportedException>(() => ((IList<NominalTypeInfo>)view.GetTypes()).Clear());
+        var missing = new MetadataLoadContext([a]);
+        Reject<InvalidDataException>(() => _ = missing.Resolve(a.Identity).ReferencedAssemblies);
+        Check(new MetadataLoadContext([a, b, c, d]).Resolve(a.Identity).ReferencedAssemblies.Count == 2, "failed context does not poison next context");
+        var revisionBuilder = new AssemblyBuilder(Id("A", 2), core);
+        revisionBuilder.AddClass("Example", "Item");
+        var revision = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(revisionBuilder.WriteNativeAssembly(), core));
+        var versions = new MetadataLoadContext([a, revision]);
+        Check(!ReferenceEquals(versions.Resolve(a.Identity).GetTypes().Single(), versions.Resolve(revision.Identity).GetTypes().Single()), "same name different version remains distinct");
+        var cli = new AssemblyBuilder(Id("Cli"), core);
+        cli.AddGenericClass("Example", "Box", ["T"]);
+        var cliSnapshot = AssemblyDefinition.ReadAssembly(cli.Write(), expectedExtended: false);
+        var cliContext = new MetadataLoadContext([cliSnapshot]);
+        var cliType = cliContext.Resolve(cliSnapshot.Identity).GetTypes().Single();
+        Check(cliType.Name == "Box`1" && cliType.GenericArity == 1 && cliType.DeclaringType is null, "CLI definition facade excludes module pseudo-type");
+        Check(ReferenceEquals(cliContext.Resolve(cliSnapshot.MainModule.Types.Single(t => t.Name == "Box`1").ToReference()), cliType), "CLI local resolution");
+        Reject<ArgumentException>(() => new MetadataLoadContext([cli.Definition]));
+    }
+    private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
+    private static void Reject<T>(Action action) where T : Exception
+    { try { action(); } catch (T) { return; } throw new Exception("expected " + typeof(T).Name); }
+}

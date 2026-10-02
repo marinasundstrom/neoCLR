@@ -1,6 +1,7 @@
 # Metadata resolution contexts and resolved views
 
-Design checkpoint: 2026-10-02. Proposed architecture, not an implemented public API.
+Design checkpoint: 2026-10-02. The fixed context and nominal facade below are now
+implemented in C#; constructed/member views and wider model alignment remain planned.
 This supports the native metadata milestone and the existing builders → definitions →
 metadata → PE architecture. It does not add another serialized representation.
 
@@ -14,8 +15,8 @@ Existing AssemblyReference.Resolve and TypeReference.Resolve use IAssemblyResolv
 and recheck exact assembly identities. Loaded definitions own their snapshots.
 ReferencedGenericType retains a definition reference plus arguments. Native interface
 relationships now retain constructed arguments. Physical MemberReference resolution
-remains bounded. Raven currently supplies its own dependency resolver and maps these
-shapes into compiler-owned symbols.
+remains bounded. Raven now uses the shared metadata context for nominal dependency resolution and
+maps its views into compiler-owned symbols. Signature/member adaptation remains in Raven.
 
 The missing convenience is a coherent session and resolved, constructed member view.
 A second type resolver, compiler symbol system or CLI projection would duplicate the
@@ -146,3 +147,20 @@ First success means a separately compiled native dependency is inspected through
 context, imported into Raven symbols, emitted through symbol contracts and executed in
 neoCLR. Keep .NET metadata tests as a compatibility control. The current seven-consumer
 runtime results are baseline evidence, not evidence that these proposed views exist.
+
+
+## First implemented checkpoint
+
+MetadataLoadContext and AssemblyInfo/ModuleInfo/TypeInfo/NominalTypeInfo now live in
+NeoCLR.Metadata.Experimental.Introspection next to the Model builder/definition APIs.
+Raven removes its private NativeAssemblyResolver and shares one context per immutable
+compilation through a weak-key lifetime adapter. Nominal resolution returns scoped
+metadata views; Raven maps assembly identity and module-local token to symbols. Its
+emitter does not receive this context. Repeated resolution caches views per context.
+
+109 C# groups pass, including context identity/conflict/cycle tests. Existing native
+consumer execution provides integration coverage; no runtime/format changes are needed.
+The runtime interfaces informed names and navigation, but remain unchanged: this slice
+has no execution handles, no invocation and no guest implementation. Next move scoped
+generic and member projection into the facade, using current symbol-loader behavior as
+regression evidence. Language binding and diagnostic policy remain Raven responsibilities.

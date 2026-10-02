@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Introspection facade and MetadataLoadContext](#metadata-only-introspection-facade-development-2026-10-02): context-owned assembly, module and nominal-type views.
+
 - [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
 
 - [Authored interface contracts](#authored-interface-contracts-development-2026-10-02): interface identity, conversions and dispatch.
@@ -5133,3 +5135,61 @@ scope identity, both dependency orders, incompatible constructions and primitive
 runtime dispatch. Constraints, variance and cross-assembly relationship declarations
 are not added by this slice. Host APIs remain documented manually here; the guest
 RavenDoc assembly is unchanged.
+
+
+## Metadata-only Introspection facade (development, 2026-10-02)
+
+Namespace `NeoCLR.Metadata.Experimental.Introspection`, in the existing .NET metadata
+library. These are C# prototype types shaped after the runtime System.Introspection
+model, not runtime Reflection types or a complete replacement for that model.
+
+| Type | Implemented public surface |
+| --- | --- |
+| MetadataLoadContext | Constructor `(IEnumerable<AssemblyDefinition> snapshots)`; `IReadOnlyList<AssemblyInfo> Assemblies`; `Resolve(AssemblyIdentity)` and `Resolve(AssemblyReference)` returning AssemblyInfo; `Resolve(TypeReference)` returning NominalTypeInfo |
+| AssemblyInfo | `string Name`, `AssemblyIdentity Identity`, `IReadOnlyList<AssemblyInfo> ReferencedAssemblies`, `GetModules(): IReadOnlyList<ModuleInfo>`, `GetTypes(): IReadOnlyList<NominalTypeInfo>` |
+| ModuleInfo | `string Name`, `AssemblyInfo Assembly`, `GetTypes(): IReadOnlyList<NominalTypeInfo>` |
+| TypeInfo | Abstract read-only `string DisplayName`, `bool IsNominalType`; library-controlled construction |
+| NominalTypeInfo | TypeInfo plus `string Name`, `string Namespace`, `string FullName`, `uint MetadataToken`, `ModuleInfo Module`, nullable `NominalTypeInfo DeclaringType`, `int GenericArity`, `bool IsInterface`, `bool IsValueType` |
+
+The constructor registers at most 4096 already-read CLI/native snapshots in input order.
+It does not read files or expand dependencies. Null catalog/elements throw
+ArgumentNullException; mutable builder definitions or excessive input throw
+ArgumentException. Repeating the same snapshot object is idempotent; different objects
+with one exact identity throw InvalidDataException even when their bytes might match.
+No implicit image hashing, version fallback, assembly loading or code execution occurs.
+
+Resolve(identity) requires the full identity, including version/culture/token/flags.
+Resolve(reference) also requires its consuming snapshot to be the registered object.
+Missing/conflicting scopes, missing or ambiguous types and unsupported reader scopes
+throw InvalidDataException. Null inputs throw ArgumentNullException. Exported forwarders,
+multimodule scopes and constructed TypeSpec resolution retain reader limitations.
+ReferencedAssemblies lazily resolves direct edges and throws when a dependency is
+unregistered; legal assembly cycles reuse views rather than recursively loading graphs.
+
+Collections are read-only and views canonical within a context, including concurrent
+nominal lookups. Reference equality is context identity, not equality across contexts.
+GetTypes includes nested definitions and excludes the CLI `<Module>` pseudo-type.
+Names are display/declaration strings; Module.Assembly.Identity supplies binding scope.
+GenericArity describes a definition, not constructed arguments. MetadataToken is the
+reader's module-local token (native origin tokens included), not an execution handle.
+
+No assembly/module token or FullName is fabricated for native inputs without that
+contract. The exact AssemblyIdentity is exposed instead. Additional runtime TypeInfo
+properties, member enumeration, constructed/array/function/parameter views and binding
+flags remain unimplemented. This is an explicit subset; unsupported capabilities are
+not represented as empty member collections. The context retains snapshots through its
+views and owns no disposable runtime loader; ordinary managed lifetime applies.
+
+```csharp
+var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext(
+    new[] { consumerSnapshot, dependencySnapshot });
+var consumer = context.Resolve(consumerSnapshot.Identity);
+var externalType = context.Resolve(consumerSnapshot.MainModule.TypeReferences[0]);
+var declaringAssembly = externalType.Module.Assembly;
+```
+
+MetadataLoadContextChecks covers CLI/native navigation, exact versions, conflicts,
+missing dependencies, diamonds, legal cycles, foreign snapshot rejection, concurrency,
+context isolation and collection immutability. Raven now uses this context for nominal
+resolution; its emission remains based on symbols. This host-only namespace is manually
+documented here and is not included in the guest RavenDoc reference assembly.

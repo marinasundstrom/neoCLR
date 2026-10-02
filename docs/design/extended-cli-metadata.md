@@ -2531,3 +2531,11 @@ not a shipped public API. Raven importer integration must not leak the context i
 Author clarification: implement this as a prototype for .NET-hosted Raven. Future
 NeoCLR-hosted compiler/introspection use may inform the design but does not require
 the same implementation or API, nor commit to a port.
+
+
+Metadata facade checkpoint (2026-10-02): the C# Introspection namespace now owns a fixed
+MetadataLoadContext and canonical assembly/module/nominal views. Raven removes its
+private dependency resolver, reuses one context per immutable compilation, and maps
+resolved metadata identity/token to symbols. Signature/member projection remains pending.
+Runtime Contract, primitive core, System bootstrap, emission ownership and encoding are
+unchanged. See [the facade design](metadata-resolution-views.md) and host API manual for current scope.

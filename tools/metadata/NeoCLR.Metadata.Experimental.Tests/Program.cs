@@ -302,6 +302,7 @@ var tests = new (string Name, Action Body)[]
     ("External native generic signatures", ExternalGenericSignatureChecks.Run),
     ("Authored native function references", AuthoredFunctionReferenceChecks.Run),
     ("Definition body generator", GeneratorChecks.Run),
+    ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),
     ("External native signature resolution", ExternalNativeSignatureChecks.Run),

@@ -1,0 +1,135 @@
+{
+  "date": "2026-10-02",
+  "ravenCommit": "88d350130",
+  "metadataContractGroups": {
+    "passed": 109,
+    "total": 109
+  },
+  "contextChecks": [
+    "CLI and native nominal navigation",
+    "Exact version identities",
+    "Conflicting snapshot rejection",
+    "Idempotent same-object registration",
+    "Missing dependency and foreign snapshot rejection",
+    "Diamond and legal assembly-cycle identity",
+    "Concurrent canonical nominal lookup",
+    "Context isolation and failure isolation",
+    "Read-only collections",
+    "Reject mutable builder inputs"
+  ],
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "03A2BFBC7E5AF737E5D4C1F027BA093DB017FB8348D91871414D1048E039D036",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "03E0C71B24B64257D388D15C7DDDA07A31EA306B9548A574A28BC88D4350C14C",
+        "dependencySha256": "03A2BFBC7E5AF737E5D4C1F027BA093DB017FB8348D91871414D1048E039D036",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "6FE40CB22B6E6FCC3CD05F2F316AFCBCD994466B772118140ADA60D8D03ACF36",
+        "dependencySha256": "D263A56002950C0FC16016BEF3E91787EC85586322F19B7C925A7518D28A1171",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "B2CF338D3CCE8F18D875B690CAB5263CEBC1A57C434F63F53714BE818206EA4B",
+        "dependencySha256": "7CA274483E123F6217AB881CF50016F6ECC90D3E422D1DFE5569B60C6DD315DC",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "7D41C66DD83B32196D45FE8E1C36CD94922D11098CD2CBAD554F9639CFD3AF40",
+        "dependencySha256": "7CA274483E123F6217AB881CF50016F6ECC90D3E422D1DFE5569B60C6DD315DC",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "DFE90D13472DE63F68CDE03033F25E7AA627277F457F8D49EA78D57D904E5F18",
+        "dependencySha256": "8513104E21B3E2046BCAC0AAB3E7E9F72FE0BA7EA48FE8C4D6ABF0F3F199F438",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "F026A71639AA4997C3F7935E1E4920D791D264E5F8FD218DEE8C6C3AE95AFC4A"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "8A9D1F18533D1270FF000B2FF20473E751EF076E9C48D593F9DD0EF1202882C7",
+        "dependencySha256": "F6AA58F021AA7333040B5ED63DE118CA3FB99ED1E85B010386F392F2F1F617B7",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "7B886B8487DD0F01985B6661456893707552140983EAC2F41EB2EDEA73BB848C"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0B2BD157EB2276FB6EE2595E127A3B3D20EC37B50C8C56A6D99539B2BFBC4604",
+        "dependencySha256": "7DC3E00B26392EEDEEB734E991A95E469A5906D333515067E1F2165989344C88",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "82624B08C223E915D653C13055E94418D01007E383909A3C7EAC70729947AA64"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "scope": "Initial metadata-only AssemblyInfo/ModuleInfo/TypeInfo/NominalTypeInfo facade and immutable-catalog MetadataLoadContext. Raven uses it for nominal resolution; no emitter context dependency. Constructed/member views and guest implementation remain pending."
+}

@@ -683,3 +683,9 @@ Development checkpoint (2026-10-02): Raven now consumes fields on generic native
 and dispatches through imported generic interfaces, including inherited contracts and
 class-valued arguments. C# tests execute equivalent metadata on .NET and neoCLR. Creating
 new implementations of external interfaces remains a separate development capability.
+
+
+Development checkpoint (2026-10-02): the C# metadata prototype now has an Introspection-
+shaped facade and explicit metadata load context. Raven uses it for local/external type
+resolution without runtime loading. Constructed and member views remain development work;
+this is not a new guest Introspection release.

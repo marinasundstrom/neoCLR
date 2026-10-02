@@ -10139,3 +10139,23 @@ inform later work after bootstrapping Raven to compile for NeoCLR on NeoCLR.
 **Assistant response and action:** clarified the design's immediate .NET-hosted scope
 and removed any implied requirement for identical future APIs or a direct port. Reuse
 and eventual library shape remain exploratory; metadata/execution separation is retained.
+
+
+## 2026-10-02 — Implementing the C# Introspection facade
+
+**Author:** clarified that the C# facade should follow the shape of System.Introspection
+above readers, alongside builders, then directed implementation and co-evolution with
+the runtime model and an owned metadata load context. The author noted that reusable
+complexity could move out of the symbol/semantic loader into this introspection layer.
+
+**Assistant response:** separate metadata identity/dependency resolution/substitution from
+Raven language binding. Inspect runtime AssemblyInfo/ModuleInfo/TypeInfo/NominalTypeInfo
+before implementing the initial facade; do not invent runtime-backed capabilities.
+
+**Performed outcome:** added the immutable-catalog C# load context and nominal facade,
+with CLI/native, cycle, diamond, conflict, version, concurrency and isolation tests.
+Raven now consumes it for nominal resolution and removes its private assembly resolver.
+A compilation-owned weak-key adapter supplies lifetime without exposing caches publicly.
+Constructed/member views and further loader simplification remain next; the runtime
+model and guest implementation are unchanged. 109 C# groups pass; native integration
+execution evidence is recorded with this slice. No future identical port/API is promised.

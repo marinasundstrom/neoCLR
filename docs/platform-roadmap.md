@@ -30,8 +30,11 @@ and generic inherited dispatch executes for primitive and nominal payloads. All 
 Raven consumers and 108 metadata groups pass, with .NET and both-container execution.
 See [generic field/interface evidence](experiments/extended-cli-metadata/generic-fields-interfaces-2026-10-02.json).
 Author follow-up proposes a pure metadata resolution/view layer to unify local and
-external inspection. Begin with the bounded catalog/context design and tests in
-[metadata resolution views](design/metadata-resolution-views.md); this is not yet an API.
+external inspection. The initial C# MetadataLoadContext and assembly/module/nominal facade are implemented;
+Raven uses them instead of its private dependency resolver. 109 metadata test groups pass;
+[all seven consumers execute](experiments/extended-cli-metadata/introspection-context-2026-10-02.json).
+Next add constructed/member views to move reusable metadata projection out of Raven's
+loader; see [metadata resolution views](design/metadata-resolution-views.md).
 External interface implementation/inheritance declarations remain subsequent work.
 Previously identified next capability: external interface implementation/inheritance declarations for separately
 compiled class-library consumers; the current reader admits relationships within one
