@@ -239,7 +239,10 @@ fn check_type(module: &Module, source: Scope<'_>, ty: &Type) -> Result<(), Fault
 
 fn check_owner(module: &Module, source: Scope<'_>, owner: &Type) -> Result<(), Fault> {
     if matches!(owner, Type::Function(_)) {
-        return check_type(module, source, owner);
+        // Structural Invoke has no nominal declaring owner. Its open shape was
+        // checked by validate_types; substitution must not revoke access to a
+        // caller-supplied internal type (the same rule as nominal generic owners).
+        return Ok(());
     }
     // Runtime specialization does not revoke access to caller-supplied generic arguments.
     // Explicit signature/operand types were checked in their open declaring context.

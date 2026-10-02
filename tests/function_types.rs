@@ -311,3 +311,46 @@ fn function_object_roundtrip_preserves_value_and_reference_contracts() {
         neoclr::FaultCode::InvalidCast
     );
 }
+
+#[test]
+fn generic_library_invokes_function_with_callers_internal_type() {
+    let app = ".module App\n.references (Callbacks)\n.entry Main\n.type internal Payload\n.field Number Int32\n.end\n.function Read(Payload value) -> Int32\nldarg value\nldfld Payload::Number\nret\n.end\n.function Main() -> Int32\nfunction.bind fn<Payload,Int32> = Read(Payload)\nldc.i4 42\nnewobj Payload\ncall Apply<Payload>(fn<Payload,Int32>,Payload)\nret\n.end";
+    let library = ".module Callbacks\n.function Apply<T>(fn<T,Int32> callback, T value) -> Int32\nldarg callback\nldarg value\ncallvirt instance fn<T,Int32>::Invoke(T)\nret\n.end";
+    let modules = neoclr::assembler::assemble_modules(&[app, library]).unwrap();
+    let program = LoadedProgram::with_modules(
+        &modules[0],
+        neoclr::library::system().unwrap(),
+        &modules[1..],
+    )
+    .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program
+            .run(neoclr::ExecutionOptions::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+
+    // Explicitly naming the other module's internal type is still rejected.
+    let illegal = library
+        .replace(
+            "Apply<T>(fn<T,Int32> callback, T value)",
+            "Apply<T>(fn<Payload,Int32> callback, Payload value)",
+        )
+        .replace(
+            "fn<T,Int32>::Invoke(T)",
+            "fn<Payload,Int32>::Invoke(Payload)",
+        );
+    let error = neoclr::assembler::assemble_modules(&[app, &illegal])
+        .and_then(|modules| {
+            LoadedProgram::with_modules(
+                &modules[0],
+                neoclr::library::system().unwrap(),
+                &modules[1..],
+            )
+            .map(|_| ())
+        })
+        .unwrap_err();
+    assert!(error.message.contains("type access denied"), "{error}");
+}

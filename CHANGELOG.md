@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Preserve access to caller-supplied internal types when generic library code invokes
+  a structural Function. Open signatures still reject explicit foreign internal
+  types; a cross-module regression reproduces the former execution fault and now
+  returns 42. This aligns Function specialization with nominal generic owner checks.
+
 - Add Raven's opt-in shared reference-iterator lowering. The unchanged collections
   sample now completes body planning and reaches explicit native System dependency
   linkage; no full native application execution is claimed yet.

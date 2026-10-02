@@ -2942,3 +2942,15 @@ MoveNext and Current members through ordinary bound calls, locals and branches. 
 native adapter opts in; .NET retains its existing generator and Runtime Contracts.
 The unchanged collections application completes body planning and now needs explicit
 linkage between the matching CLI reference snapshot and translated native System.
+
+
+### Generic Function invocation access (2026-10-02 development)
+
+On `codex/extended-cli-metadata`, native Function invocation now follows the existing
+nominal generic-owner access rule: substituting a caller-owned internal type does not
+revoke a generic library's permission to invoke a supplied callback. As with CLR generic
+delegate use, this does not grant access to members of that internal type. Open signature
+and operand checks still reject a library explicitly naming a foreign internal type;
+target access is checked at binding. The two-module native regression returns 42 and
+checks the negative case. The unchanged Raven collections application exposed this at
+`System.Linq.Operators.Single<Order>`; no source visibility change was needed.
