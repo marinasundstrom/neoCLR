@@ -517,3 +517,7 @@ Both tested consumers return 42; nominal/generic native importing remains open.
 The direct-reader development profile now also includes fieldless nongeneric static
 classes and primitive static methods. Instance types and richer native signatures are
 still pending; the general writer/runtime support is broader than this reader profile.
+
+Fieldless instance classes, constructors and primitive instance methods now also pass
+the direct native import/emission/runtime path. Fields, richer signatures and reference
+comparison lowering remain gaps; the CLI primitive core bootstrap is still required.

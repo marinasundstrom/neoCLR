@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-02",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "DC920299D46319DE158C41686F0F367E63A84AFD13AF6291324A26C6654347E7",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class symbols, overloads, constructors and instance calls"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "A5C0A99E9124929E8364C83C4FE40BF7903BA43404E2E4AE0788DBB2607EB992",
+        "dependencySha256": "DC920299D46319DE158C41686F0F367E63A84AFD13AF6291324A26C6654347E7"
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "FEB399C6E8E6CF92D72A7435B6400F547CAA96ADD8F3F238C4C8F71B952C8FFD",
+        "dependencySha256": "A5AD2CC36372FE7D340A05225A356D0F8FC8FA83E260E46E409EA894D5412CC2"
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "A642F4B654ABF8544D881C5D78A2BDCB7CCE9903E0D80954668044BC3BC605FB",
+        "dependencySha256": "40C812BEEA212A06FF0F52455B48EFEEF071B552EA68A744057EADFEB18CB8D8"
+      }
+    ],
+    "scope": "native primitive function/class import and cross-assembly execution; explicit CLI primitive core retained"
+  },
+  "checks": {
+    "metadataContractGroups": 96,
+    "apiSnapshot": "passed",
+    "privateConstructorAndMethod": "RAV0500"
+  },
+  "reproduce": "NeoClrMetadataProbe --native-symbols-runtime <core.dll> <neoclr> <System.neox> <fresh-output>",
+  "limits": "Fieldless nongeneric top-level classes with primitive methods/constructors; explicit CLI primitive core. Storage declarations and nominal signatures remain pending.",
+  "separateGap": "Reference equality/inequality on Calculator instances reaches NEOMETA001: lowered expression BoundBinaryExpression. Not included in the passing runtime consumer."
+}

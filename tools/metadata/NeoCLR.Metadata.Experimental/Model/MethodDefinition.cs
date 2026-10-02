@@ -59,7 +59,7 @@ public sealed partial class MethodDefinition
         returnsValue = false;
         if (nativeSignature is { } native)
         {
-            if (GenericArity != 0 || native.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void) || native.ParameterTypes.Any(p => p.Primitive != PrimitiveType.Int32)) return false;
+            if (!IsStatic || GenericArity != 0 || native.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void) || native.ParameterTypes.Any(p => p.Primitive != PrimitiveType.Int32)) return false;
             parameterCount = native.ParameterTypes.Count; returnsValue = native.ReturnType.Primitive == PrimitiveType.Int32; return true;
         }
         if (!IsStatic || GenericArity != 0) return false;
@@ -85,6 +85,7 @@ public sealed partial class MethodDefinition
         decoded = null;
         if (nativeSignature is { } native)
         {
+            if (!IsStatic) return false;
             decoded = new PrimitiveMethodSignature(native.ReturnType.Primitive!.Value, native.ParameterTypes.Select(p => p.Primitive!.Value));
             return true;
         }
@@ -97,7 +98,7 @@ public sealed partial class MethodDefinition
     /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
-        decoded = nativeSignature;
+        decoded = IsStatic ? nativeSignature : null;
         if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
@@ -123,7 +124,7 @@ public sealed partial class MethodDefinition
     {
         if (nativeSignature is not null)
         {
-            if (!IsStatic || (DeclaringType is { } owner && (owner.Attributes & 0x180) != 0x180) || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
+            if ((!IsStatic && DeclaringType is null) || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
                 nativeSignature.ParameterTypes.Any(p => p.Primitive is null))
                 throw new InvalidDataException("unsupported native callable import");
             return nativeSignature;

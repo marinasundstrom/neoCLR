@@ -4243,7 +4243,7 @@ not a general public custom-attribute API or native semantic importer.
 
 `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image)` reads API-produced
 PE/#Neo schema-1/2 containers into the existing definition model. This first profile
-admits nongeneric namespace functions and fieldless top-level static classes with
+admits nongeneric namespace functions and fieldless top-level classes with
 Int32, Int64, Boolean, String or no-result method signatures. It rejects other types and unsupported
 signatures with InvalidDataException rather than silently returning a partial assembly.
 Input/container limits and required-schema/binding checks still apply. No dependency
@@ -4316,7 +4316,7 @@ output.EntryPoint = main;
 Global/native namespace calls support native emission, not ordinary CLI output.
 Import does not perform source accessibility checking or discover/load dependencies;
 Raven performs semantic access checks and neoCLR resolves explicit runtime modules.
-Instance/generic native callable imports remain outside this read profile. These host
+Generic/richer-signature native callable imports remain outside this read profile. These host
 C# APIs continue to use this manual reference instead of the guest RavenDoc inventory.
 
 
@@ -4332,8 +4332,30 @@ TypeReference.Resolve returns the same owned definition. Loaded collections rema
 read-only and Write preserves the original complete image.
 
 AssemblyBuilder.ImportReference accepts these primitive static methods through the
-existing callable overload. Instance/value/interface/nested/generic types, fields,
+existing callable overload. Value/interface/nested/generic types, fields,
 properties and nonprimitive signatures still reject the entire read with
 InvalidDataException; no partial type inventory is silently exposed. This adds no new
 encoding or public API surface. Compared with .NET metadata, ownership and access flags
 use the same shape; the supported native declaration profile remains narrower.
+
+
+### Direct native instance classes (development, 2026-10-02)
+
+ReadNativeAssembly also admits fieldless nongeneric top-level instance classes. Existing
+TypeDefinition.Attributes retains the native class's nonabstract/nonsealed category;
+MethodDefinition.IsStatic reflects receiver presence. Constructor definitions use .ctor,
+SpecialName/RTSpecialName flags and a no-result logical signature. The explicit signature
+parameters exclude the receiver. TryGetSignature accepts these declarations, while all
+TryGetStatic* signature helpers reject instance methods and constructors.
+
+ImportReference(TypeDefinition, core) admits the public instance-class identity for
+locals/receivers. ImportReference(MethodDefinition, core) accepts public primitive
+instance methods and constructors through its existing contract. ImportedMethodReference
+IsConstructor/IsStatic and its declaring identity govern NewObject/Call emission; no
+reflection object or CLI signature blob is synthesized. Existing core, exact identity,
+snapshot and accessibility restrictions remain. Raven performs source access checks.
+
+The loaded definition graph remains immutable. Fields/properties, value/interface/
+nested/generic classes and nominal parameter/result signatures are rejected by the
+current direct reader. Existing writer/runtime support is broader than this read profile.
+No additional guest API or RavenDoc type is introduced; this manual covers the host APIs.

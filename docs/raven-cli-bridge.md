@@ -3333,3 +3333,24 @@ Validation: three native consumers return 42; all 96 metadata contract groups an
 A .NET-only regression reproduced an identifier-expression access-check omission;
 Raven's general binder fix is isolated in e3afed13c for independent integration.
 No merge to main is claimed.
+
+### Direct native instance-class checkpoint (2026-10-02)
+
+The direct reader now admits fieldless nongeneric top-level instance classes alongside
+static types/functions. It preserves class flags, instance receivers and constructor
+attributes in the existing definitions; Raven uses these for named-type/constructor
+symbols and the existing imported allocation/call emit path. The Raven class consumer
+constructs Calculator, stores an alias and invokes its primitive Add method, returning
+42 in neoCLR. Private constructor and instance method calls require RAV0500 diagnostics.
+Static signature helpers now reject loaded native instance methods; TryGetSignature
+continues to report their primitive explicit parameter/result contract.
+
+This matches the CLI ownership/constructor/receiver model for the admitted subset.
+The explicit CLI primitive core remains. No new metadata encoding or runtime bridge is
+introduced. Fields/properties, interfaces, value/nested/generic types and nominal
+parameter/result signatures are pending in the direct reader. Added exploratory
+reference-equality/inequality expressions hit the portable lowerer's BoundBinaryExpression
+limit (NEOMETA001); that separate codegen gap remains open and is not a passing sample.
+
+Validation: all 96 metadata contract groups and three runtime consumers pass; the API
+snapshot check passes. [Instance-class evidence](experiments/extended-cli-metadata/native-instance-types-2026-10-02.json).
