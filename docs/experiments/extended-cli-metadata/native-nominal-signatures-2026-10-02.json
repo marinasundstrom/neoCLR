@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-02",
+  "metadataBranch": "codex/extended-cli-metadata",
+  "ravenBranch": "codex/metadata-consumer",
+  "metadataBaseCommit": "9ee901bf",
+  "ravenBaseCommit": "bbb62ca8f",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "4CA2CBDA464EE6C2DF661DEB522F726C42D2671A7098DE700C71B45A80A63F08",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and direct field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "A5D1A2CA21046427A90C97A3C0275DC70F9F5E8DB0F168B62AD2101C151F9731",
+        "dependencySha256": "4CA2CBDA464EE6C2DF661DEB522F726C42D2671A7098DE700C71B45A80A63F08"
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "115F283FE46A6BB71EAED97E8B869587291635F913BEF4521490ABF189FCA763",
+        "dependencySha256": "E0CD90514C47BEA718E3C1B8511F8133D2D8598977EFC76426863B54E9DB7E25"
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "024182232BF0A624BB065B4D7CBCEB769D93E179556D913E0122A27948523F7A",
+        "dependencySha256": "1893F49EE89E91207FE773E219AE53D00C8F863EB42BA2ECB4E20FD8C83ABC74"
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "69B44733614BE2FB89A3AB39C31F1C73EEA0045D0F6799EA91364B34DE3861D5",
+        "dependencySha256": "1893F49EE89E91207FE773E219AE53D00C8F863EB42BA2ECB4E20FD8C83ABC74"
+      }
+    ],
+    "scope": "native primitive/local-class signature import and cross-assembly execution; explicit CLI primitive core retained"
+  },
+  "checks": {
+    "metadataContractGroups": 98,
+    "apiSnapshot": "passed",
+    "cli": "Imported nominal factory and instance calls execute on CLR from both native container variants, returning 42",
+    "identity": "Canonical snapshot type resolution, equal nominal signatures, output import interning and compilation-owned nominal symbols",
+    "rejections": [
+      "unimported loaded nominal builder signature",
+      "nominal signatures in primitive helpers",
+      "unsupported nominal array reader profile",
+      "invalid Raven nominal argument"
+    ]
+  },
+  "reproduce": "NeoClrMetadataProbe --native-symbols-runtime <core.dll> <neoclr> <System.neox> <fresh-output>",
+  "limits": "Local nongeneric root class parameters/results only. Primitive fields only. External signature dependencies, generic/value/interface profiles and full native System loading remain pending; CLI primitive bootstrap core retained."
+}

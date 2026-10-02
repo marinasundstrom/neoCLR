@@ -21,7 +21,7 @@ public sealed partial class MethodDefinition
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
         outParameters = row.OutParameters;
-        nativeSignature = row.NativeSignature;
+        nativeSignature = row.NativeSignature?.Materialize(module);
         nativeNamespace = row.NativeNamespace;
     }
     /// <summary>Gets the owning module snapshot.</summary>
@@ -85,7 +85,7 @@ public sealed partial class MethodDefinition
         decoded = null;
         if (nativeSignature is { } native)
         {
-            if (!IsStatic) return false;
+            if (!IsStatic || native.ReturnType.Primitive is null || native.ParameterTypes.Any(p => p.Primitive is null)) return false;
             decoded = new PrimitiveMethodSignature(native.ReturnType.Primitive!.Value, native.ParameterTypes.Select(p => p.Primitive!.Value));
             return true;
         }
@@ -98,7 +98,7 @@ public sealed partial class MethodDefinition
     /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
-        decoded = IsStatic ? nativeSignature : null;
+        decoded = IsStatic && nativeSignature is { } native && native.ReturnType.Primitive is not null && native.ParameterTypes.All(p => p.Primitive is not null) ? native : null;
         if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
@@ -124,10 +124,12 @@ public sealed partial class MethodDefinition
     {
         if (nativeSignature is not null)
         {
-            if ((!IsStatic && DeclaringType is null) || GenericArity != 0 || nativeSignature.ReturnType.Primitive is null ||
-                nativeSignature.ParameterTypes.Any(p => p.Primitive is null))
+            if ((!IsStatic && DeclaringType is null) || GenericArity != 0)
                 throw new InvalidDataException("unsupported native callable import");
-            return nativeSignature;
+            SignatureType Import(SignatureType type) => type.Primitive is { } primitive ? primitive
+                : type.ReferencedType is { } reference ? consumer.ImportReference(reference.Resolve(), core)
+                : throw new InvalidDataException("unsupported native signature type");
+            return new MethodSignature(Import(nativeSignature.ReturnType), nativeSignature.ParameterTypes.Select(Import));
         }
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");

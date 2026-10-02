@@ -1985,3 +1985,29 @@ translated field layouts and reference-comparison lowering remain pending.
 
 Validation: 97 metadata contract groups (including actual CLR execution), four neoCLR
 consumers and the API snapshot check pass. [Field-operand evidence](../experiments/extended-cli-metadata/native-field-operands-2026-10-02.json).
+
+## Native local nominal signatures (2026-10-02)
+
+The direct native reader now admits local nongeneric root class parameters/results in
+functions, methods and constructors. Following the existing ECMA-335/Cecil comparison,
+nominal identity is a reference into a definition graph, not a copied name or runtime
+reflection Type. Internal parsing copies validated identities to module tokens before
+materialization; public SignatureType.ReferencedType resolves to the immutable snapshot's
+canonical TypeDefinition. No parser TypeBuilder escapes into a loaded signature.
+ImportReference translates these references into interned output-owned ImportedTypeReference
+operands. Primitive-only helpers return false for nominal signatures. Unsupported
+categories still reject the entire read; the original native image remains opaque/copyable.
+This changes the reader profile, not the PE/#Neo schema or instruction set.
+
+Raven resolves signature types lazily after publishing the module, using a definition-keyed
+symbol map and cached return/parameter types. The source-library consumer exercises a
+factory, namespace/static/instance class identity functions, a constructor accepting a
+class, alias writes and field reads; neoCLR returns 42. The 98 C# metadata groups include
+both native container variants, same short names in different namespaces, canonical
+resolution, output import interning, primitive-helper rejection and actual CLR execution
+of equivalent imported signatures. See [hashed evidence](../experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
+
+The tradeoff versus full CLI loading remains deliberately bounded coverage: nominal
+fields, external signature types, inheritance, generics, interfaces and value types are
+not admitted by this native reader profile. The explicit CLI primitive core/bootstrap
+contract is unchanged. No performance improvement or full System import is claimed.

@@ -4429,3 +4429,32 @@ C# contract tests execute CLI field accesses on the CLR from both CLI and native
 read-model inputs, and cover readonly/receiver/opcode/ownership/core/snapshot rejection.
 Raven consumers execute direct native field stores and loads across assemblies (42).
 These host C# APIs use this manual reference and remain outside guest RavenDoc selection.
+
+### Native local nominal signatures (development, 2026-10-02)
+
+`SignatureType.ReferencedType { get; }` returns `TypeReference?`: a nominal reference
+owned by a loaded definition snapshot, or null for other signature categories.
+For the direct native reader's current profile, `ReferencedType.Resolve()` requires no
+resolver and returns the canonical local TypeDefinition. `ClassType` and `ImportedType`
+remain null for this category; no mutable builder is retained. `ToString()` provides a
+diagnostic namespace/name, not serialized identity. The getter performs no code loading.
+
+`AssemblyDefinition.ReadNativeAssembly` and `MethodDefinition.TryGetSignature` now support
+nongeneric local root class parameter/result types as well as primitives, on namespace
+functions, class methods and constructors. The native format and opaque Write roundtrip
+are unchanged. Cross-dependency, generic, interface/value, array/byref signature categories,
+nominal fields and properties remain outside this read profile and throw InvalidDataException.
+
+`AssemblyBuilder.ImportReference(MethodDefinition, core)` imports each referenced local
+class through the existing exact identity/snapshot/core checks and produces output-owned
+ImportedTypeReference signature operands. Existing public-type/access restrictions apply;
+unsupported imports throw InvalidDataException. Passing a loaded nominal SignatureType
+directly to a builder definition throws ArgumentException: import its declaring method
+or resolve and explicitly import its type first. This separation prevents a loaded
+snapshot from acquiring an output builder owner.
+
+The static Int32, primitive and primitive-vector signature helpers continue to return
+false for nominal signatures. Use TryGetSignature to inspect the richer native profile.
+C# tests read both native container variants and execute imported factory/instance calls
+on the CLR; Raven tests compile and execute factories, nominal function/method signatures
+and constructor arguments in neoCLR. These are host development APIs, not guest APIs.

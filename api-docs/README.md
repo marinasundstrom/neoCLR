@@ -730,3 +730,8 @@ ImportedFieldReference, AssemblyBuilder.ImportReference(FieldDefinition, core) a
 MethodBuilder LoadField/StoreField/raw Emit overloads are host C# development APIs covered
 in [the imported-field manual](experimental-metadata.md#imported-primitive-field-operands-development-2026-10-02).
 They are outside the guest RavenDoc selection; no guest public type/signature is added.
+
+SignatureType.ReferencedType and the extended native nominal method import profile are
+covered in [the host metadata manual](experimental-metadata.md#native-local-nominal-signatures-development-2026-10-02).
+They remain excluded from guest RavenDoc selection because they belong to the C# host
+metadata library; no guest reference assembly signature changes.

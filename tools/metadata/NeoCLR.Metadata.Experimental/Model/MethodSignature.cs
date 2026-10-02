@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector or managed-reference parameter signature type.</summary>
 public sealed partial record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null) { FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null) { ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
     /// <summary>Gets the target of a writable managed-reference parameter, or null.</summary>
     public SignatureType? ByReferenceElement { get; }
     /// <summary>Creates a writable managed-reference parameter type. Ref arguments must be initialized before calls.</summary>
@@ -64,9 +64,14 @@ public sealed partial record SignatureType
         if (type.GenericArity != type.TypeArguments.Count) throw new ArgumentException("imported generic definition requires construction", nameof(type));
         return new(null, null, importedType: type);
     }
+    /// <summary>Gets a nominal reference in a loaded definition snapshot, or null for another signature category.</summary>
+    /// <remarks>Resolve returns the snapshot-owned definition. Import the containing method into an output builder before emission; loaded references are not builder operands.</remarks>
+    public TypeReference? ReferencedType { get; }
+    internal static SignatureType FromReference(TypeReference reference) => new(null, null, referencedType: reference);
     internal int NestingDepth => FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
     internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false)
     {
+        if (ReferencedType is not null) throw new ArgumentException("loaded nominal signatures must be imported before emission");
         if (FunctionSignature is { } function) foreach (var type in function.ParameterTypes.Append(function.ReturnType)) type.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (ByReferenceElement is { } target)
         {
@@ -101,7 +106,7 @@ public sealed partial record SignatureType
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>

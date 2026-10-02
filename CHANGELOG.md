@@ -15,8 +15,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   field loads/stores across native assemblies (42). Immutable imported field references
   emit CLI MemberRefs or validated native field ordinals; native field emission requires
   a native snapshot. Readonly stores and invalid receiver/operand contracts reject.
-  Static signature helpers reject instance methods. Richer declaration/signature
-  profiles remain unsupported and reject the read.
+  Native method/function/constructor signatures now also retain local nominal class
+  references in the immutable definition graph and import them into output-owned types.
+  Raven factory, identity-call and nominal-constructor consumers execute (42).
+  Primitive-only helpers reject nominal signatures. Cross-dependency signature types,
+  generic/value/interface profiles and nominal fields still reject direct reading.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

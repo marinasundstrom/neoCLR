@@ -529,3 +529,9 @@ Direct imported field emission and richer field signatures remain development ga
 Direct public primitive field loads and stores now execute across native assembly
 boundaries, including writes through a local alias. The metadata library also emits
 ordinary CLI field MemberRefs. Richer signatures and field-owner categories remain open.
+
+Development checkpoint (2026-10-02): direct native metadata reading now includes local
+class parameter/result signatures. A Raven-produced native library and consumer execute
+factory, identity-call and constructor-argument paths in neoCLR (42). This remains a
+bounded feature-branch profile with an explicit CLI primitive core; full native System
+loading is pending.
