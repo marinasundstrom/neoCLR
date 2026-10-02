@@ -51,6 +51,11 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
+    internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
+        => type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
+            : type.Primitive is { } primitive ? primitive
+            : type.ReferencedType is { } reference ? ImportNativeSignatureReference(reference, core, resolver)
+            : throw new InvalidDataException("unsupported native signature type");
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);

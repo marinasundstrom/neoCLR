@@ -2058,3 +2058,27 @@ consumer replaces the payload and runs in neoCLR (42). All five runtime consumer
 See [hashed evidence](../experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json).
 The explicit CLI primitive core/translated System bootstrap remains; full native System
 import and generic/value/interface/array declarations are not claimed.
+
+## Direct native vector signatures (2026-10-02)
+
+The bounded native definition profile now retains one-dimensional vectors in field and
+method/constructor signatures. The internal immutable signature row carries its element
+shape; materialization reuses nominal definition/reference identities. A shared importer
+maps primitives, nominal classes and vectors into output-owned signature operands.
+External elements use the existing exact resolver contract, without reflection loading.
+
+Compared with the CLI vector signatures in the existing research, this reuses ordinary
+zero-based vector shape and alias behavior. It is a reader/import coverage extension,
+not a new array format or storage model. Benefits are direct native array inspection and
+cross-library compilation; costs remain the current exact-element, one-dimensional
+profile. No new covariance, jagged/multidimensional or generic/value/interface element
+support is claimed. Existing array opcodes and their validation are unchanged.
+
+Raven now shares module-scoped signature mapping between fields and methods, caching
+array symbols with their resolved element symbols after module publication. The native
+payload/holder/consumer pipeline passes external-class arrays, stores one in a field,
+replaces an element through an alias and passes an Int32 array across the same boundary
+(42). All five runtime consumers and 101 metadata C# groups pass. C# additionally runs
+native-array imports on .NET. See [hashed evidence](../experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json).
+The CLI primitive core and translated System remain bootstrap dependencies; full native
+System importing remains pending.

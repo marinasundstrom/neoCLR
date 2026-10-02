@@ -3,7 +3,7 @@
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
 → metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
-(100 metadata groups pass). Raven now binds these native functions directly with
+(101 metadata groups pass). Raven now binds these native functions directly with
 exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
 Native calls now import and execute across that boundary, including a Raven-produced
 library read directly and consumed by Raven (42). Fieldless nongeneric static classes
@@ -19,8 +19,10 @@ the Raven consumer executes (42). Local nominal fields now also load and emit di
 object field and mutates the replacement without changing the original (42).
 Cross-dependency class signatures now resolve through explicit exact-identity metadata
 resolvers; Raven-produced payload/holder libraries and their consumer execute (42).
-All five native consumers pass. Next broaden array signatures and remaining declaration
-categories before full System loading. See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
+All five native consumers pass. Primitive and nominal class arrays now also load directly
+in method/constructor/field signatures, including external element types; cross-library
+array aliases and element replacement execute (42). Next broaden property metadata and
+remaining declaration categories before full System loading. See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 

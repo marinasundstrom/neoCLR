@@ -36,7 +36,7 @@ public sealed partial class FieldDefinition
     public byte[] GetSignature() => nativeType is not null ? throw new NotSupportedException("native fields have no CLI signature blob; use TryGetSignature") : FieldType is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use FieldType");
     /// <summary>Reads the supported logical field type without loading code or resolving dependencies.</summary>
     /// <param name="type">Snapshot-owned or authored signature on success; otherwise null.</param>
-    /// <returns>True for authored signatures, native primitive/nominal-class fields and primitive CLI fields. False for other loaded CLI signatures.</returns>
+    /// <returns>True for authored signatures, native primitive/nominal-class/vector fields and primitive CLI fields. False for other loaded CLI signatures.</returns>
     /// <remarks>Loaded nominal references resolve to the canonical definition through its local module or an explicit resolver. Import them before use as builder operands.</remarks>
     public bool TryGetSignature(out SignatureType? type)
     {

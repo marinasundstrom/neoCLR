@@ -24,8 +24,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and field signatures now retain exact assembly-scoped references across dependencies.
   Resolver-taking method/field import overloads and Raven's explicit reference set resolve
   them without reflection or CLI projection; a three-assembly consumer executes (42).
-  Missing/version/type/snapshot conflicts reject. Generic/value/interface profiles remain
-  outside direct reading.
+  Missing/version/type/snapshot conflicts reject. Direct native method/constructor/field
+  signatures now also support one-dimensional primitive and nominal class arrays,
+  including externally resolved element types. Raven preserves array aliases and
+  executes element replacement across native libraries (42). Generic/value/interface
+  profiles remain outside direct reading.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

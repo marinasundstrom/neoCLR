@@ -98,7 +98,8 @@ public sealed partial class MethodDefinition
     /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
-        decoded = IsStatic && nativeSignature is { } native && native.ReturnType.Primitive is not null && native.ParameterTypes.All(p => p.Primitive is not null) ? native : null;
+        static bool Value(SignatureType type) => type.Primitive is not null || type.ArrayElement?.Primitive is not null;
+        decoded = IsStatic && nativeSignature is { } native && Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
         if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
@@ -126,10 +127,8 @@ public sealed partial class MethodDefinition
         {
             if ((!IsStatic && DeclaringType is null) || GenericArity != 0)
                 throw new InvalidDataException("unsupported native callable import");
-            SignatureType Import(SignatureType type) => type.Primitive is { } primitive ? primitive
-                : type.ReferencedType is { } reference ? consumer.ImportNativeSignatureReference(reference, core, resolver)
-                : throw new InvalidDataException("unsupported native signature type");
-            return new MethodSignature(Import(nativeSignature.ReturnType), nativeSignature.ParameterTypes.Select(Import));
+            return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver),
+                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)));
         }
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");

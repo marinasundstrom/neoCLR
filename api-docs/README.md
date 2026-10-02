@@ -745,3 +745,8 @@ The resolver-taking AssemblyBuilder.ImportReference method/field overloads and n
 assembly-scoped TypeReferences are documented in the [host metadata manual](experimental-metadata.md#external-native-nominal-signatures-development-2026-10-02).
 They remain C# tooling APIs excluded from guest RavenDoc selection; guest public
 signatures and the reference assembly snapshot are unchanged.
+
+The expanded native array signature profile uses existing host APIs and is covered in
+[the metadata manual](experimental-metadata.md#native-vector-signatures-development-2026-10-02).
+These C# host APIs remain excluded from guest RavenDoc selection; no guest reference
+assembly signature changes.

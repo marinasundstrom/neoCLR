@@ -4533,3 +4533,32 @@ C# tests inspect both native containers, check scoped reference/field/method ide
 reject missing resolver/version/type/snapshot conflicts, and execute a three-assembly
 consumer on .NET (42). Raven compiles the same dependency shape and executes it in neoCLR.
 Generic, constructed, value/interface and array signature profiles remain unsupported.
+
+### Native vector signatures (development, 2026-10-02)
+
+ReadNativeAssembly, MethodDefinition.TryGetSignature and FieldDefinition.TryGetSignature
+now admit one-dimensional zero-based vectors of supported primitives or nongeneric root
+reference classes. SignatureType.ArrayElement retains the primitive kind or immutable
+nominal reference; external class elements use the existing explicit resolver contract.
+Field and method signatures share the same nominal element identity. Opaque Write still
+copies the original image. No format or public API signature change is introduced.
+
+Method/field ImportReference overloads recursively map array elements into output-owned
+signatures and retain exact dependency/snapshot checks. Loaded nominal array signatures
+must be imported before builder use; using one directly throws ArgumentException.
+Array operands continue to use existing exact element-type validation. Wrong array
+arguments or field stores throw InvalidDataException on write. No covariance, jagged,
+multidimensional, generic, value/interface element or byref-array support is added.
+Unsupported native declaration shapes still reject the entire read.
+
+TryGetStaticValueSignature recognizes native primitive vectors, matching its existing
+bounded CLI profile; nominal vectors return false. TryGetStaticPrimitiveSignature and
+TryGetPrimitiveType continue to reject all vectors. Use the logical signature APIs to
+inspect nominal arrays. CLI field decoding remains limited to its existing primitive
+profile; native array field imports can emit either CLI MemberRefs or native ordinals.
+
+C# checks cover both native containers, primitive vector helper behavior, nominal element
+identity, field/method signature equality, wrong-element arguments/stores and .NET execution
+of native array imports (42). Raven's three-assembly consumer stores an external-class
+array in a field, replaces an element through an alias and passes a primitive array
+across the same boundary; neoCLR returns 42.

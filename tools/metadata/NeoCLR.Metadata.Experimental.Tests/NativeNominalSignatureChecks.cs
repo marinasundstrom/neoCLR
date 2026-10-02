@@ -65,7 +65,8 @@ internal static class NativeNominalSignatureChecks
         var arrayMethod = library.AddFunction("ArrayIdentity", new MethodSignature(vector, [vector]));
         arrayMethod.LoadArgument(0); arrayMethod.Return();
         var vectorImage = RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core);
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(vectorImage));
+        Check(AssemblyDefinition.ReadNativeAssembly(vectorImage).MainModule.Functions.Single().TryGetSignature(out var arraySignature) &&
+            arraySignature!.ReturnType.ArrayElement!.ReferencedType!.Resolve().Name == "Box", "nominal vector signature");
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static void Reject<T>(Action action) where T : Exception

@@ -545,3 +545,8 @@ Development checkpoint (2026-10-02): direct native signatures now resolve classe
 explicit dependencies. Raven-produced payload/holder libraries and their consumer run
 as three native assemblies (42). Exact identities are preserved without a CLI projection;
 full native System importing and broader signature categories remain pending.
+
+Development checkpoint (2026-10-02): direct native importing now includes one-dimensional
+primitive and class array signatures. Raven's three-assembly consumer preserves array
+aliases and replaces elements across library boundaries (42). Broader metadata categories
+and full native System loading remain pending; the wire format is unchanged.

@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive or nominal instance-field reference owned by one output assembly.</summary>
+/// <summary>An immutable primitive, nominal or vector instance-field reference owned by one output assembly.</summary>
 public sealed class ImportedFieldReference
 {
     internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
@@ -11,7 +11,7 @@ public sealed class ImportedFieldReference
     public ImportedTypeReference DeclaringType { get; }
     /// <summary>Gets the metadata field name.</summary>
     public string Name { get; }
-    /// <summary>Gets the output-owned primitive or imported nominal storage signature.</summary>
+    /// <summary>Gets the output-owned primitive, imported nominal or vector storage signature.</summary>
     public SignatureType FieldType { get; }
     /// <summary>Gets whether stores from this external consumer are forbidden.</summary>
     public bool IsReadOnly { get; }
@@ -21,7 +21,7 @@ public sealed class ImportedFieldReference
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, uint), ImportedFieldReference> importedFields = [];
-    /// <summary>Imports a public primitive or native nominal-class instance field on a public nongeneric top-level reference class.</summary>
+    /// <summary>Imports a public primitive or native nominal-class/vector instance field on a public nongeneric top-level reference class.</summary>
     /// <param name="definition">Immutable CLI or native field definition.</param>
     /// <param name="dependencyCoreLibrary">Explicit core identity, matching this output.</param>
     /// <returns>An interned reference owned by this builder.</returns>
@@ -48,9 +48,7 @@ public sealed partial class AssemblyBuilder
             (type.Attributes & 0x20) != 0 || type.Fields.Any(field => (field.Attributes & 0x10) != 0) || NativeBindingFor(type.Module.Assembly.Identity) is not null)
             throw new InvalidDataException("unsupported imported field contract");
         var owner = ImportReference(type, dependencyCoreLibrary);
-        SignatureType storage = signature!.Primitive is { } primitive ? primitive
-            : signature.ReferencedType is { } nominal ? ImportNativeSignatureReference(nominal, dependencyCoreLibrary, resolver)
-            : throw new InvalidDataException("unsupported imported field signature");
+        var storage = ImportNativeSignatureType(signature!, dependencyCoreLibrary, resolver);
         var key = (type.Module.Assembly.Identity, definition.MetadataToken);
         if (importedFields.TryGetValue(key, out var existing))
         {
@@ -69,9 +67,9 @@ public sealed partial class AssemblyBuilder
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Loads a primitive or nominal field from its exact external receiver type.</summary>
+    /// <summary>Loads a primitive, nominal or vector field from its exact external receiver type.</summary>
     public void LoadField(ImportedFieldReference field) => Emit(OpCode.Ldfld, field);
-    /// <summary>Stores a primitive or nominal field on its exact external receiver type; readonly stores fail validation.</summary>
+    /// <summary>Stores a primitive, nominal or vector field on its exact external receiver type; readonly stores fail validation.</summary>
     public void StoreField(ImportedFieldReference field) => Emit(OpCode.Stfld, field);
     /// <summary>Appends Ldfld or Stfld with an imported field operand.</summary>
     /// <param name="opCode">Ldfld or Stfld.</param>

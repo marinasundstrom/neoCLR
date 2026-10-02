@@ -107,8 +107,9 @@ internal static class NativeDefinitionChecks
         Check(ctorImport.IsConstructor && !valueImport.IsStatic && valueImport.DeclaringTypeName == "Calculator", "instance import contract");
         var instanceCall = consumer.AddFunction("InstanceCall"); instanceCall.NewObject(ctorImport); instanceCall.Call(valueImport); instanceCall.Return();
         _ = consumer.WriteNativeAssembly();
-        instances.AddClass("Example", "UnsupportedStorage").AddField("Other", SignatureType.ArrayOf(instanceType));
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core)));
+        instances.AddClass("Example", "UnsupportedStorage").AddField("Other", SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [])));
+        var unsupportedStorageImage = RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core);
+        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(unsupportedStorageImage));
         library.AddValueType("Example", "Unsupported");
         Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)));
         var generic = new AssemblyBuilder(new("Generic", new Version(1, 0, 0, 0)), core);

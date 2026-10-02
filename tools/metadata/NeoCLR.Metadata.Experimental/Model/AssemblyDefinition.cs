@@ -249,9 +249,10 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
-    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken)
+    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null)
     {
-        internal SignatureType Materialize(ModuleDefinition module) => Primitive is { } primitive ? primitive
+        internal SignatureType Materialize(ModuleDefinition module) => Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
+            : Primitive is { } primitive ? primitive
             : module.GetNativeSignatureType(TypeToken);
     }
     internal sealed record NativeMethodSignatureRow(NativeSignatureTypeRow Result, NativeSignatureTypeRow[] Parameters)
