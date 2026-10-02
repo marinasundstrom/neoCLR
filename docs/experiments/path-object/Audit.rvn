@@ -6,7 +6,7 @@ func Main() {
     let firstObject: Object = first
     let secondObject: Object = second
     if !first.Equals(second) {
-        System.Fault("Same type handles should compare equal")
+        System.Fail("Same type handles should compare equal")
     }
     Console.WriteLine("TypeInfo typed equality: equal")
     if firstObject.Equals(secondObject) {

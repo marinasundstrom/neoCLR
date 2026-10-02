@@ -20,7 +20,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         }
         iterator.Dispose()
         if index != count {
-            System.Fault("Character sequence count changed during construction")
+            System.Fail("Character sequence count changed during construction")
         }
         return RuntimeServices.StringFromChars(snapshot)
     }
@@ -58,7 +58,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         if comparison == StringComparison.OrdinalIgnoreCase {
             return CompareOrdinalIgnoreCase(left, right)
         }
-        System.Fault("Unsupported StringComparison")
+        System.Fail("Unsupported StringComparison")
         return 0
     }
 
@@ -123,7 +123,7 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         if status == 2 {
             return Error(Utf8SliceError.InvalidBoundary())
         }
-        System.Fault("invalid native UTF-8 slice status")
+        System.Fail("invalid native UTF-8 slice status")
         return Error(Utf8SliceError.OutOfRange())
     }
 }

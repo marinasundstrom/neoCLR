@@ -8,13 +8,13 @@ func Parsed(text: string) -> Path {
     if let Ok(path) = Path.Parse(text) {
         return path
     }
-    System.Fault("Invalid fixture path")
+    System.Fail("Invalid fixture path")
     return Parsed(text)
 }
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -47,7 +47,7 @@ func Main() {
     if let Some(value) = index.Find(Parsed("notes/naïve.txt")) {
         Check(value == 3 && index.Count == 1, "Equal-key replacement")
     } else {
-        System.Fault("Equal-key lookup missed")
+        System.Fail("Equal-key lookup missed")
     }
     // Keep Object dispatch in a second map; force collisions to check equality too.
     let objects = HashMap<Path, int>((left, right) => Same(left, right), key => 0)

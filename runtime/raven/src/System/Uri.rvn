@@ -28,7 +28,7 @@ public class Uri : EquatableTo<Uri> {
         if let Ok(part) = text.SliceUtf8(start, end - start) {
             return part
         }
-        System.Fault("Invalid internal URI boundary")
+        System.Fail("Invalid internal URI boundary")
         return ""
     }
 

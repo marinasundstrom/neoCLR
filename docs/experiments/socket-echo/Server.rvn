@@ -5,7 +5,7 @@ import System.Networking.Sockets.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Echo server contract failed")
+        System.Fail("Echo server contract failed")
     }
 }
 
@@ -44,7 +44,7 @@ func StartServer(listener: Socket) {
             Check(count == 2)
             Console.WriteLine("Server closed")
         } else {
-            System.Fault("Echo failed")
+            System.Fail("Echo failed")
         }
     })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while accept is pending"))
@@ -57,9 +57,9 @@ func Main() {
             StartServer(listener)
         } else {
             listener.Close()
-            System.Fault("Local port unavailable")
+            System.Fail("Local port unavailable")
         }
     } else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
     }
 }

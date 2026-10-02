@@ -50,7 +50,7 @@ public class RoutePattern {
         if let Ok(value) = text.SliceUtf8(start, length) {
             return value
         }
-        System.Fault("Invalid route boundary")
+        System.Fail("Invalid route boundary")
         return ""
     }
 

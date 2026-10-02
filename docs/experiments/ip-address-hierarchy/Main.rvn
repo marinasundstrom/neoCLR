@@ -2,7 +2,7 @@ import System.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Address hierarchy assertion failed")
+        System.Fail("Address hierarchy assertion failed")
     }
 }
 

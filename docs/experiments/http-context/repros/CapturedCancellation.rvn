@@ -7,11 +7,11 @@ import System.Web.Http.*
 
 func Main() {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fault("Port failed")
+        System.Fail("Port failed")
         return
     }
     Console.WriteLine(port)
@@ -24,7 +24,7 @@ func Main() {
 func Observe(pending: Task<Result<HttpContext, HttpError>>, server: HttpServer, stop: CancellationTokenSource) {
     pending.OnCompleted(() => {
         if !pending.IsCancelled {
-            System.Fault("Accept did not acknowledge cancellation")
+            System.Fail("Accept did not acknowledge cancellation")
         }
         server.Close()
         stop.Dispose()
@@ -37,7 +37,7 @@ func StartControl(server: HttpServer, stop: CancellationTokenSource) {
     let control = Socket.Connect("127.0.0.1", 19092)
     control.OnCompleted(() => {
         let Ok(connection) = control.GetResult() else {
-            System.Fault("Control connect failed")
+            System.Fail("Control connect failed")
             return
         }
         ReadControl(connection, server, stop)
@@ -49,11 +49,11 @@ func ReadControl(connection: Socket, server: HttpServer, stop: CancellationToken
     let reading = connection.Receive(buffer, 0, 1)
     reading.OnCompleted(() => {
         let Ok(count) = reading.GetResult() else {
-            System.Fault("Control read failed")
+            System.Fail("Control read failed")
             return
         }
         if count != 1 {
-            System.Fault("Control signal missing")
+            System.Fail("Control signal missing")
         }
         if buffer[0] == 1 {
             stop.Cancel()

@@ -5,7 +5,7 @@ import System.Option.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -13,7 +13,7 @@ public func Step(result: Result<DecodeStep, DecodeFailure>) -> DecodeStep {
     return match result {
         Ok(let value) => value
         Error(_) => {
-            System.Fault("Unexpected decode failure")
+            System.Fail("Unexpected decode failure")
             DecodeStep("", 0, 0, DecodeStatus.Finished)
         }
     }
@@ -23,7 +23,7 @@ public func Failure(result: Result<DecodeStep, DecodeFailure>) -> DecodeFailure 
     return match result {
         Error(let value) => value
         Ok(_) => {
-            System.Fault("Expected decode failure")
+            System.Fail("Expected decode failure")
             DecodeFailure("", 0, 0, DecodeError.Stopped)
         }
     }
@@ -46,13 +46,13 @@ public func CheckBoundaries() {
                 Check(scalar.Value == value, "Scalar value")
                 Check(scalar.ToText().GetUtf8ByteCount() > 0, "Scalar encoding")
             }
-            Error(_) => System.Fault("Valid scalar rejected")
+            Error(_) => System.Fail("Valid scalar rejected")
         }
     }
     for value in [(uint)55296, (uint)57343, (uint)1114112] {
         match ScalarValue.FromValue(value) {
             Error(BoundaryError.InvalidScalar) => { }
-            _ => System.Fault("Invalid scalar accepted")
+            _ => System.Fail("Invalid scalar accepted")
         }
     }
     Check(default(ScalarValue).ToText().Equals("\u0000"), "Default scalar is NUL")
@@ -62,14 +62,14 @@ public func CheckBoundaries() {
             Check(range.Utf8Start == 6 && range.Utf8Length == 2, "Scalar range inside grapheme")
             match source.Slice(range) {
                 Ok(let text) => Check(text.Equals("́"), "Slice match")
-                _ => System.Fault("Slice rejected")
+                _ => System.Fail("Slice rejected")
             }
             match TextSource("name=é").Slice(range) {
                 Error(BoundaryError.WrongSource) => { }
-                _ => System.Fault("Wrong source accepted")
+                _ => System.Fail("Wrong source accepted")
             }
         }
-        _ => System.Fault("Missing combining mark")
+        _ => System.Fail("Missing combining mark")
     }
     match source.FindOrdinal("=") {
         Some(let delimiter) => {
@@ -78,33 +78,33 @@ public func CheckBoundaries() {
                 Ok(let range) => {
                     match source.Slice(range) {
                         Ok(let value) => Check(value.Equals("é") && value.Length == 1, "Delimiter extraction")
-                        _ => System.Fault("Delimiter slice")
+                        _ => System.Fail("Delimiter slice")
                     }
                 }
-                _ => System.Fault("Delimiter range")
+                _ => System.Fail("Delimiter range")
             }
         }
-        _ => System.Fault("Missing delimiter")
+        _ => System.Fail("Missing delimiter")
     }
     match source.Slice(SourceRange(source, 7, 1)) {
         Error(BoundaryError.InvalidBoundary) => { }
-        _ => System.Fault("Forged boundary")
+        _ => System.Fail("Forged boundary")
     }
     match source.Slice(SourceRange(source, 0, 99)) {
         Error(BoundaryError.OutOfRange) => { }
-        _ => System.Fault("Forged range")
+        _ => System.Fail("Forged range")
     }
     match source.Slice(default(SourceRange)) {
         Error(BoundaryError.UninitializedRange) => { }
-        _ => System.Fault("Null range")
+        _ => System.Fail("Null range")
     }
     match source.FindOrdinal("") {
         Some(let range) => Check(range.Utf8Start == 0 && range.Utf8Length == 0, "Empty match")
-        _ => System.Fault("Empty search")
+        _ => System.Fail("Empty search")
     }
     match source.FindOrdinal("absent") {
         None => { }
-        _ => System.Fault("Absent match")
+        _ => System.Fail("Absent match")
     }
     WriteLine("Scalar and source-range contracts: passed")
 
@@ -170,18 +170,18 @@ public func CheckDecodeEdges() {
     Check(failure.Text.Equals("A") && failure.InputBytesConsumed == 1 && failure.ScalarsProduced == 1, "Failure preserves prefix")
     match failure.Reason {
         DecodeError.InvalidUtf8(let position) => Check(position.Value == 1, "Error offset")
-        _ => System.Fault("Wrong error")
+        _ => System.Fail("Wrong error")
     }
     let truncated = BoundedUtf8Decoder()
     _ = Step(truncated.Decode(bytes, 0, 2, false, 4))
     match Failure(truncated.Decode(empty, 0, 0, true, 4)).Reason {
         DecodeError.IncompleteUtf8(let position) => Check(position.Value == 1, "Truncated offset")
-        _ => System.Fault("Wrong truncation error")
+        _ => System.Fail("Wrong truncation error")
     }
     for invalid in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128]] {
         match Failure(BoundedUtf8Decoder().Decode(invalid, 0, invalid.Length, true, 4)).Reason {
             DecodeError.InvalidUtf8(let position) => Check(position.Value == 0, "Strict error position")
-            _ => System.Fault("Strict validation")
+            _ => System.Fail("Strict validation")
         }
     }
     WriteLine("Decoding ownership, progress and errors: passed")

@@ -5,21 +5,21 @@ import System.Console.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
 public func Added(result: Result<unit, BuildError>) {
     match result {
         Ok(_) => { }
-        Error(_) => System.Fault("Unexpected build limit")
+        Error(_) => System.Fail("Unexpected build limit")
     }
 }
 
 public func Rejected(result: Result<unit, BuildError>) {
     match result {
         Error(BuildError.LimitExceeded) => { }
-        _ => System.Fault("Missing build limit")
+        _ => System.Fail("Missing build limit")
     }
 }
 
@@ -65,11 +65,11 @@ public func Contracts() {
     let finalBytes: byte[] = [(byte)129]
     match split.Decode(firstBytes, 0, 2, false) {
         Ok(let part) => Added(chunks.Append(part))
-        Error(_) => System.Fault("First decoded part")
+        Error(_) => System.Fail("First decoded part")
     }
     match split.Decode(finalBytes, 0, 1, true) {
         Ok(let part) => Added(chunks.Append(part))
-        Error(_) => System.Fault("Final decoded part")
+        Error(_) => System.Fail("Final decoded part")
     }
     Check(chunks.Build().Equals("é") && chunks.Build().Length == 1, "Decoded parts resegment")
     let odd = ReportTextBuilder(8)
@@ -92,7 +92,7 @@ public func Diagnostic(mode: string, count: int) {
     } else {
         for index in 0..<count {
             if part.GetUtf8ByteCount() > 65536 - text.GetUtf8ByteCount() {
-                System.Fault("Concat limit")
+                System.Fail("Concat limit")
             }
             text = String.Concat(text, part)
         }

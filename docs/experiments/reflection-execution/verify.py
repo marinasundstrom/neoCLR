@@ -41,7 +41,7 @@ def main():
                                   capture_output=True, text=True, timeout=120)
         assert terminal.returncode != 0, terminal.stdout + terminal.stderr
         assert 'Missing reflection property' in terminal.stderr, terminal.stderr
-        assert 'System.Fault returned unexpectedly' not in terminal.stderr, terminal.stderr
+        assert 'System.Fail returned unexpectedly' not in terminal.stderr, terminal.stderr
         print('Terminal Fault import and message check passed')
 
 

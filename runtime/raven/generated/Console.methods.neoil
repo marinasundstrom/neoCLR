@@ -83,8 +83,8 @@ M00000001_IL_006b:
 M00000001_IL_006c:
 ldstr "invalid native I/O status"
 M00000001_IL_0071:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000001_IL_008b:
 M00000001_IL_008c:
 M00000001_IL_008d:
@@ -586,8 +586,8 @@ M00000018_IL_0071:
 M00000018_IL_0072:
 ldstr "console output failed"
 M00000018_IL_0077:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000018_IL_007c:
 M00000018_IL_007d:
 M00000018_IL_007e:
@@ -660,8 +660,8 @@ M00000018_IL_00eb:
 M00000018_IL_00ec:
 ldstr "console output failed"
 M00000018_IL_00f1:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000018_IL_00f6:
 M00000018_IL_00f7:
 M00000018_IL_00f8:

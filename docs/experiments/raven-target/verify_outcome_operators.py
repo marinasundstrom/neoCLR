@@ -44,7 +44,7 @@ func Main() {
     let mapped = word.Map(value => String.Concat(value, "!"))
     match mapped {
         Some(let value) => WriteLine(value)
-        None => System.Fault("Lost reference payload")
+        None => System.Fail("Lost reference payload")
     }
     let completed: Result<unit, string> = Ok(())
     let answer = completed.Map((value: unit) -> int => 42)
@@ -68,7 +68,7 @@ func Main() {
 func Main() {
     let value: Option<int> = Some(1)
     value.Map((item: int) -> int => {
-        System.Fault("Outcome callback failed")
+        System.Fail("Outcome callback failed")
         return item
     })
     WriteLine("Must not continue")

@@ -18,7 +18,7 @@ public struct Boolean : ComparableTo<bool> {
         if status == 1 {
             return Error(BooleanParseError.InvalidFormat())
         }
-        System.Fault("invalid native parse status")
+        System.Fail("invalid native parse status")
         return Error(BooleanParseError.InvalidFormat())
     }
 

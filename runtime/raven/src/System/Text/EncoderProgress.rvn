@@ -10,17 +10,17 @@ public class EncoderProgress {
         EncoderState.Ready => EncoderState.Ready
         EncoderState.Finished => EncoderState.Finished
         _ => {
-            System.Fault("Inactive encoder progress state")
+            System.Fail("Inactive encoder progress state")
             EncoderState.Ready
         }
     }
 
     init(bytesWritten: int, state: EncoderState) {
         if bytesWritten < 0 {
-            System.Fault("Encoded byte count must be non-negative")
+            System.Fail("Encoded byte count must be non-negative")
         }
         if !(state.HasValue) {
-            System.Fault("Inactive encoder progress state")
+            System.Fail("Inactive encoder progress state")
         }
         self.bytesWritten = bytesWritten
         self.state = state

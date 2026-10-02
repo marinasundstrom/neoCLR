@@ -985,7 +985,7 @@ static class UnionImport
                         {
                             // Raven may end a non-void method at this terminal call.
                             // Keep its message-bearing invocation and close the IL path.
-                            code.AppendLine("fault \"System.Fault returned unexpectedly\"");
+                            code.AppendLine("fault \"System.Fail returned unexpectedly\"");
                             terminates = true;
                         }
                         break;

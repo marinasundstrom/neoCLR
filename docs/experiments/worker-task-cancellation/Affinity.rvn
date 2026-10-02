@@ -20,11 +20,11 @@ class AffinityProbe {
 
     func DrainCaller(caller: TaskQueue) {
         if observed {
-            System.Fault("Caller observation ran before its queue was drained")
+            System.Fail("Caller observation ran before its queue was drained")
         }
         caller.Drain()
         if !observed {
-            System.Fault("Caller observation was not queued")
+            System.Fail("Caller observation was not queued")
         }
         WriteLine("Caller queue drained explicitly")
     }
@@ -39,7 +39,7 @@ async func Observe(work: Task<string>, caller: TaskQueue, probe: AffinityProbe) 
 func Register(result: Task<string>, probe: AffinityProbe) {
     result.OnCompleted(() => {
         if !probe.Resumed || result.GetResult() != "Hi" {
-            System.Fault("Unexpected continuation outcome")
+            System.Fail("Unexpected continuation outcome")
         }
         probe.MarkObserved()
         WriteLine("Result observation ran on caller queue")
@@ -55,7 +55,7 @@ func Main() {
         Register(result, probe)
     })
     if probe.Resumed || probe.Observed {
-        System.Fault("Worker completion ran synchronously")
+        System.Fail("Worker completion ran synchronously")
     }
     WriteLine("Entry returned before worker completion")
 }

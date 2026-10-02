@@ -8,7 +8,7 @@ class Second { }
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -68,18 +68,18 @@ func Main() {
     if let Some(value) = index.Find(typeof(ArrayList<int>)) {
         Check(value == 3 && index.Count == 1, "Type identity survives collection")
     } else {
-        System.Fault("Repeated descriptor missed map entry")
+        System.Fail("Repeated descriptor missed map entry")
     }
     Check(Same(first, typeof(First)) && Display(first) == first.FullName, "Retained descriptor survives collection")
     if let Some(value) = assemblies.Find(first.Module.Assembly) {
         Check(value == 1, "Assembly identity survives collection")
     } else {
-        System.Fault("Assembly lookup failed after collection")
+        System.Fail("Assembly lookup failed after collection")
     }
     if let Some(value) = modules.Find(first.Module) {
         Check(value == 1, "Module identity survives collection")
     } else {
-        System.Fault("Module lookup failed after collection")
+        System.Fail("Module lookup failed after collection")
     }
     Console.WriteLine("TypeInfo, AssemblyInfo and ModuleInfo equality, hash, display and map lookup: passed")
 }

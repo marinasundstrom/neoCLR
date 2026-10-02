@@ -6,7 +6,7 @@ import System.Option.*
 
 func Check(value: bool) {
     if !value {
-        System.Fault("Console stream contract failed")
+        System.Fail("Console stream contract failed")
     }
 }
 
@@ -46,7 +46,7 @@ class ZeroOutput : OutputStream {
 
 func ReadExpected(reader: TextReader, bound: int, expected: string) -> Result<unit, TextReadError> {
     let Some(text) = reader.ReadLine(bound)? else {
-        System.Fault("Unexpected EOF")
+        System.Fail("Unexpected EOF")
         return Ok(())
     }
     Check(text == expected)
@@ -57,13 +57,13 @@ func Main() {
     let stopped = StreamWriter(ZeroOutput())
     match stopped.Write("x") {
         Error(let error) => Check((error is System.IO.StreamError.IoFailure))
-        Ok(_) => System.Fault("Zero-progress output was accepted")
+        Ok(_) => System.Fail("Zero-progress output was accepted")
     }
     let destination = ShortOutput()
     let writer: TextWriter = StreamWriter(destination, true)
     match writer.WriteLine("å") {
         Ok(let count) => Check(count == 3)
-        Error(_) => System.Fault("Short writes were not handled")
+        Error(_) => System.Fail("Short writes were not handled")
     }
     Check(destination.Count == 3)
     Check(destination.ByteAt(0) == 195 && destination.ByteAt(1) == 165 && destination.ByteAt(2) == 10)
@@ -71,7 +71,7 @@ func Main() {
     Check(!destination.Closed)
     match writer.Write("") {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fault("Closed writer accepted text")
+        Ok(_) => System.Fail("Closed writer accepted text")
     }
     let owned = StreamWriter(destination)
     owned.Close()
@@ -86,7 +86,7 @@ func Main() {
     let next = StreamReader(input)
     Check(ReadExpected(next, 4, "tail").IsOk)
     let Ok(end) = next.ReadLine(0) else {
-        System.Fault("Could not read EOF")
+        System.Fail("Could not read EOF")
         return
     }
     Check(end.IsNone)
@@ -94,27 +94,27 @@ func Main() {
     let buffer: byte[] = [(byte)0]
     match input.Read(buffer, 0, 0) {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fault("Owned input was not closed")
+        Ok(_) => System.Fail("Owned input was not closed")
     }
     // Closing a wrapper must not close the process channel.
     let closed = Console.OpenStandardOutput()
     closed.Close()
     match closed.Write(buffer, 0, 1) {
         Error(let error) => Check((error is System.IO.StreamError.Closed))
-        Ok(_) => System.Fault("Closed output accepted bytes")
+        Ok(_) => System.Fail("Closed output accepted bytes")
     }
     let output = Console.OpenStandardOutput()
     match output.Write(buffer, 2, 0) {
         Error(let error) => Check((error is System.IO.StreamError.InvalidRange))
-        Ok(_) => System.Fault("Invalid range accepted")
+        Ok(_) => System.Fail("Invalid range accepted")
     }
     let raw: byte[] = [(byte)65, (byte)10]
     match output.Write(raw, 0, 2) {
         Ok(let count) => Check(count == 2)
-        Error(_) => System.Fault("Byte output failed")
+        Error(_) => System.Fail("Byte output failed")
     }
     let Ok(_) = output.Flush() else {
-        System.Fault("Could not flush raw output")
+        System.Fail("Could not flush raw output")
         return
     }
     Console.Write(42)

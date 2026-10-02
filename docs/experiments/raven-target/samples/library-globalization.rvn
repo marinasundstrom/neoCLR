@@ -5,13 +5,13 @@ import System.Console.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Calendar/globalization check failed")
+        System.Fail("Calendar/globalization check failed")
     }
 }
 
 func RequireDate(result: Result<Date, InvalidDateError>) -> Date {
     let Ok(date) = result else {
-        System.Fault("Expected valid date")
+        System.Fail("Expected valid date")
     }
     return date
 }
@@ -19,20 +19,20 @@ func RequireDate(result: Result<Date, InvalidDateError>) -> Date {
 func RejectDate(result: Result<Date, InvalidDateError>) {
     match result {
         .Error(_) => { }
-        .Ok(_) => System.Fault("Expected invalid date")
+        .Ok(_) => System.Fail("Expected invalid date")
     }
 }
 
 func Text(result: Result<string, InvalidDateError>) -> string {
     let Ok(text) = result else {
-        System.Fault("Expected formatted date")
+        System.Fail("Expected formatted date")
     }
     return text
 }
 
 func Number(result: Result<int, InvalidDateError>) -> int {
     let Ok(number) = result else {
-        System.Fault("Expected calendar component")
+        System.Fail("Expected calendar component")
     }
     return number
 }
@@ -94,14 +94,14 @@ func Main() {
     RejectDate(calendar.CreateDate(1900, 2, 29))
     for year in [1, 4, 100, 400, 1900, 2000, 2024, 9999] {
         let Ok(isLeap) = calendar.IsLeapYear(year) else {
-            System.Fault("Leap query failed")
+            System.Fail("Leap query failed")
         }
         let end = RequireDate(calendar.CreateDate(year, 12, 31))
         Check(isLeap == (end.DayOfYear == 366))
         var total = 0
         for month in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] {
             let Ok(days) = calendar.GetDaysInMonth(year, month) else {
-                System.Fault("Month query failed")
+                System.Fail("Month query failed")
             }
             Check(days >= 28 && days <= 31)
             let endOfMonth = RequireDate(calendar.CreateDate(year, month, days))
@@ -113,31 +113,31 @@ func Main() {
     }
     match calendar.IsLeapYear(0) {
         .Error(_) => { }
-        .Ok(_) => System.Fault("Invalid year accepted")
+        .Ok(_) => System.Fail("Invalid year accepted")
     }
     match calendar.GetDaysInMonth(10000, 12) {
         .Error(_) => { }
-        .Ok(_) => System.Fault("Invalid year accepted")
+        .Ok(_) => System.Fail("Invalid year accepted")
     }
     match calendar.GetDaysInMonth(2024, 13) {
         .Error(_) => { }
-        .Ok(_) => System.Fault("Invalid month accepted")
+        .Ok(_) => System.Fail("Invalid month accepted")
     }
     let Ok(time) = Time.Create(12, 34, 56, 1234567) else {
-        System.Fault("Expected valid time")
+        System.Fail("Expected valid time")
     }
     let local = LocalDateTime.Create(leap, time)
     Check(local.Date.Equals(leap))
     Check(local.Time.Equals(time))
     Check(Text(format.FormatLocalDateTime(local)).Equals("2024-02-29T12:34:56.1234567"))
     let Ok(midnight) = Time.FromTicks(0L) else {
-        System.Fault("Expected midnight")
+        System.Fail("Expected midnight")
     }
     let Ok(tick) = Time.FromTicks(1L) else {
-        System.Fault("Expected one tick")
+        System.Fail("Expected one tick")
     }
     let Ok(endOfDay) = Time.FromTicks(863999999999L) else {
-        System.Fault("Expected last tick")
+        System.Fail("Expected last tick")
     }
     Check(format.FormatTime(midnight).Equals("00:00:00.0000000"))
     Check(format.FormatTime(tick).Equals("00:00:00.0000001"))
@@ -180,7 +180,7 @@ func Main() {
     Check(Text(israeli.DateTimeFormat.FormatLocalDateTime(local)).Equals("29.02.2024 12:34:56.1234567"))
     match hebrewFormat.FormatDate(first) {
         .Error(_) => { }
-        .Ok(_) => System.Fault("Out-of-range Hebrew formatting accepted")
+        .Ok(_) => System.Fail("Out-of-range Hebrew formatting accepted")
     }
     let hebrewLocal = LocalDateTime.Create(newYear, time)
     Check(Text(hebrewFormat.FormatLocalDateTime(hebrewLocal)).Equals("א׳ תשרי ה׳תשפ״ד 12:34:56.1234567"))

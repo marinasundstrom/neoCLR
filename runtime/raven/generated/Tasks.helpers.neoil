@@ -340,8 +340,8 @@ M00000005_IL_0012:
 M00000005_IL_0013:
 ldstr "Task queue cannot be pumped recursively"
 M00000005_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000005_IL_001d:
 M00000005_IL_001e:
 M00000005_IL_001f:
@@ -398,8 +398,8 @@ M00000006_IL_0012:
 M00000006_IL_0013:
 ldstr "Task queue cannot be pumped recursively"
 M00000006_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000006_IL_001d:
 M00000006_IL_001e:
 M00000006_IL_001f:
@@ -847,8 +847,8 @@ M00000018_IL_0012:
 M00000018_IL_0013:
 ldstr "Task is cancelled; consume its Outcome"
 M00000018_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000018_IL_001d:
 M00000018_IL_001e:
 M00000018_IL_001f:
@@ -869,8 +869,8 @@ M00000018_IL_0032:
 M00000018_IL_0033:
 ldstr "Task is still pending"
 M00000018_IL_0038:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000018_IL_003d:
 M00000018_IL_003e:
 M00000018_IL_003f:
@@ -1099,8 +1099,8 @@ M00000020_IL_003c:
 M00000020_IL_003d:
 ldstr "Async state has not been retained"
 M00000020_IL_0042:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance SetResult(T0 value) -> noresult
 M00000021_IL_0000:
@@ -1509,8 +1509,8 @@ M0000002f_IL_00f1:
 M0000002f_IL_00f2:
 ldstr "Task continuation ran while pending"
 M0000002f_IL_00f7:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000002f_IL_00fc:
 M0000002f_IL_00fd:
 M0000002f_IL_00fe:
@@ -1739,8 +1739,8 @@ M00000031_IL_0108:
 M00000031_IL_0109:
 ldstr "Task continuation ran while pending"
 M00000031_IL_010e:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000031_IL_0113:
 M00000031_IL_0114:
 M00000031_IL_0115:
@@ -2045,8 +2045,8 @@ M00000033_IL_0182:
 M00000033_IL_0183:
 ldstr "Task continuation ran while pending"
 M00000033_IL_0188:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000033_IL_018d:
 M00000033_IL_018e:
 M00000033_IL_018f:
@@ -2241,8 +2241,8 @@ M00000035_IL_00e6:
 M00000035_IL_00e7:
 ldstr "Task continuation ran while pending"
 M00000035_IL_00ec:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000035_IL_00f1:
 M00000035_IL_00f2:
 M00000035_IL_00f3:

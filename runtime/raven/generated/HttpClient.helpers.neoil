@@ -1129,8 +1129,8 @@ M00000002_IL_003e:
 M00000002_IL_003f:
 ldstr "Invalid route boundary"
 M00000002_IL_0044:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private static Hex(Byte value) -> Int32
 M00000003_IL_0000:
@@ -7664,8 +7664,8 @@ M00000055_IL_0095:
 M00000055_IL_0096:
 ldstr "URI parser returned no outcome"
 M00000055_IL_009b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method static Get(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local String local0
@@ -9827,8 +9827,8 @@ M0000006a_IL_0015:
 M0000006a_IL_0016:
 ldstr "Stream content has no buffered Bytes; use TryGetBytes"
 M0000006a_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000006a_IL_0020:
 M0000006a_IL_0021:
 M0000006a_IL_0022:

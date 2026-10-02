@@ -541,7 +541,7 @@ M0000001f_IL_00fb:
 M0000001f_IL_00fc:
 ldstr "invalid stream error case"
 M0000001f_IL_0101:
-call System.Fault(String)
+call System.Fail(String)
 M0000001f_IL_0106:
 M0000001f_IL_0107:
 ldstr ""

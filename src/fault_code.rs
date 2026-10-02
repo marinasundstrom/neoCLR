@@ -11,7 +11,7 @@ use serde::{Serialize, Serializer};
 pub enum FaultCode {
     /// A runtime/host failure without a more specific classification yet.
     RuntimeError,
-    /// An explicit guest `fault` instruction or `System.Fault(message)` call.
+    /// An explicit guest `fault` instruction or `System.Fail(message)` call.
     UserFault,
     /// Invalid program metadata or verified instruction behavior.
     InvalidProgram,

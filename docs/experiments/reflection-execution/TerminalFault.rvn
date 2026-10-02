@@ -2,7 +2,7 @@ import System.*
 import System.Introspection.*
 
 func MissingProperty() -> PropertyInfo {
-    System.Fault("Missing reflection property")
+    System.Fail("Missing reflection property")
 }
 
 func Main() {

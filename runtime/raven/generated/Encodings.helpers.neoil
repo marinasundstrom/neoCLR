@@ -1215,8 +1215,8 @@ br M0000000d_IL_01cb
 M0000000d_IL_01cb:
 ldstr "Validated text encoding failed"
 M0000000d_IL_01d0:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000000d_IL_01e4:
 M0000000d_IL_01e5:
 M0000000d_IL_01e6:
@@ -1577,8 +1577,8 @@ M0000000e_IL_00b4:
 M0000000e_IL_00b5:
 ldstr "Invalid internal scalar boundary"
 M0000000e_IL_00ba:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end
 .type internal class neoCLR.Library.System.Text.Encodings.Type_53797374656D2E546578742E557466384465636F646572

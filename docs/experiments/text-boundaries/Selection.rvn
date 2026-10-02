@@ -202,7 +202,7 @@ public class SelectedReader {
                 Error(let reason) => return Error(SelectionFailure.Stream(reason))
             }
             if !(count >= 0) || count > request {
-                System.Fault("Invalid selected reader input count")
+                System.Fail("Invalid selected reader input count")
             }
             if count > maxUtf8Bytes - sourceBytes {
                 return Error(SelectionFailure.LimitExceeded)
@@ -277,7 +277,7 @@ public class SelectedWriter {
                 match output.Write(buffer, offset, size - offset) {
                     Ok(let accepted) => {
                         if !(accepted >= 0) || accepted > size - offset {
-                            System.Fault("Invalid selected writer output count")
+                            System.Fail("Invalid selected writer output count")
                         }
                         if accepted == 0 {
                             return Error(SelectionFailure.Stream(StreamError.IoFailure))

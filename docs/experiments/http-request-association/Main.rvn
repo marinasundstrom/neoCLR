@@ -9,7 +9,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("HTTP request/header assertion failed")
+        System.Fail("HTTP request/header assertion failed")
     }
 }
 
@@ -39,15 +39,15 @@ func RequestAssociation() {
     let ready = ReplyHandler(200, "{}", false)
     Check(ready.Response.Request is None)
     let Ok(request) = HttpRequest.Get("http://example.test/direct") else {
-        System.Fault("Request creation failed")
+        System.Fail("Request creation failed")
     }
     let sent = HttpClient(ready).Send(request)
     Check(sent.IsCompleted)
     let Ok(response) = sent.GetResult() else {
-        System.Fault("Send failed")
+        System.Fail("Send failed")
     }
     let Some(original) = response.Request else {
-        System.Fault("Originating request missing")
+        System.Fail("Originating request missing")
     }
     Check(Object.ReferenceEquals(original, request))
     Check(Object.ReferenceEquals(response, ready.Response))
@@ -67,7 +67,7 @@ func RequestAssociation() {
     TaskQueue.Default.Drain()
     Check(waiting.IsCompleted)
     let Some(retained) = delayed.Response.Request else {
-        System.Fault("Delayed request missing")
+        System.Fail("Delayed request missing")
     }
     Check(Object.ReferenceEquals(retained, request))
 
@@ -76,7 +76,7 @@ func RequestAssociation() {
     _ = failed.Completion.Complete(Error(HttpError.Handler("expected")))
     TaskQueue.Default.Drain()
     let Error(HttpError.Handler(message)) = failure.GetResult() else {
-        System.Fault("Handler error missing")
+        System.Fail("Handler error missing")
     }
     Check(message == "expected")
     Check(failed.Response.Request is None)
@@ -106,15 +106,15 @@ func DefaultHeaders() {
     defaults.Add(HttpHeader("X-Later", "ignored"))
     Check(client.DefaultRequestHeaders.Count == 3)
     let Ok(baseRequest) = HttpRequest.Get("http://example.test/") else {
-        System.Fault("Default-header request failed")
+        System.Fail("Default-header request failed")
     }
     let Ok(explicitRequest) = baseRequest.WithHeader("x-mode", "explicit") else {
-        System.Fault("Explicit header failed")
+        System.Fail("Explicit header failed")
     }
     let result = client.Send(explicitRequest)
     Check(result.IsCompleted)
     let Some(sent) = handler.Response.Request else {
-        System.Fault("Prepared request missing")
+        System.Fail("Prepared request missing")
     }
     Check(!Object.ReferenceEquals(sent, explicitRequest))
     Check(sent.GetHeaderValues("X-MODE")[0] == "explicit")

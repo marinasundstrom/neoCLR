@@ -25,7 +25,7 @@ public class Thread {
 
     func Start() {
         if started {
-            System.Fault("Thread has already been started")
+            System.Fail("Thread has already been started")
         }
         let handle = RuntimeServices.StartWorker(callback, input)
         started = true
@@ -73,7 +73,7 @@ internal class WorkerCompletion {
         } else if RuntimeServices.IsValue<System.Void>(outcome) {
             _ = source.Cancel()
         } else {
-            System.Fault("Invalid worker terminal outcome")
+            System.Fail("Invalid worker terminal outcome")
         }
     }
 }

@@ -4,7 +4,7 @@ import System.Option.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -45,7 +45,7 @@ func Main() {
     if let Some(value) = values.Find("hello 👩‍💻") {
         Check(value == 1, "Text key after GC")
     } else {
-        System.Fault("Text key lost")
+        System.Fail("Text key lost")
     }
     Console.WriteLine("String Object equality, hashing, display and GC: passed")
 }

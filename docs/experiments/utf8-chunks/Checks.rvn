@@ -4,7 +4,7 @@ import System.Console.*
 
 func Check(value: bool) {
     if !value {
-        System.Fault("UTF-8 chunk check failed")
+        System.Fail("UTF-8 chunk check failed")
     }
 }
 
@@ -12,14 +12,14 @@ func Text(result: Result<string, string>) -> string {
     var text = ""
     match result {
         Ok(let value) => text = value
-        Error(_) => System.Fault("Unexpected decoding failure")
+        Error(_) => System.Fail("Unexpected decoding failure")
     }
     return text
 }
 
 func Rejected(result: Result<string, string>) {
     match result {
-        Ok(_) => System.Fault("Expected decoding failure")
+        Ok(_) => System.Fail("Expected decoding failure")
         Error(_) => { }
     }
 }

@@ -20,10 +20,10 @@ public struct LocalDateTime {
     internal static func FromUnixTimeTicks(ticks: long) -> LocalDateTime {
         let parts = RuntimeServices.UnixTimeToLocal(ticks)
         let Ok(date) = System.Date.Create(parts[0], parts[1], parts[2]) else {
-            System.Fault("Invalid local date from runtime")
+            System.Fail("Invalid local date from runtime")
         }
         let Ok(time) = System.Time.Create(parts[3], parts[4], parts[5], parts[6]) else {
-            System.Fault("Invalid local time from runtime")
+            System.Fail("Invalid local time from runtime")
         }
         return LocalDateTime(date, time)
     }

@@ -18,7 +18,7 @@ public static class Console {
             if status == 2 {
                 return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
             }
-            System.Fault("invalid native I/O status")
+            System.Fail("invalid native I/O status")
             return System.Result<System.Option<byte>, ConsoleReadError>.Error(ConsoleReadError.ReadFailed())
         }
         if RuntimeServices.IsValue<System.Void>(payload) {
@@ -122,11 +122,11 @@ public static class Console {
         let writer = Out
         match writer.Write(value0) {
             Ok(_) => { }
-            Error(_) => System.Fault("console output failed")
+            Error(_) => System.Fail("console output failed")
         }
         match writer.Flush() {
             Ok(_) => { }
-            Error(_) => System.Fault("console output failed")
+            Error(_) => System.Fail("console output failed")
         }
     }
 

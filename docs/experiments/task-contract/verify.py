@@ -60,7 +60,7 @@ cases = {
     executor.Drain()
     Check(destination.IsCompleted)
     match destination.GetResult() {
-        Ok(_) => System.Fault("Lost expected error")
+        Ok(_) => System.Fail("Lost expected error")
         Error(let message) => Check(message == "Expected failure")
     }
 ''',
@@ -114,7 +114,7 @@ faults = {
 '''),
     'Callback faults stay terminal': ('Terminal callback', '''
     let executor = Executor()
-    executor.Post(() => { System.Fault("Terminal callback") })
+    executor.Post(() => { System.Fail("Terminal callback") })
     executor.Drain()
 '''),
 }
@@ -154,7 +154,7 @@ func Main() {
     source.OnCompleted(() => {
         match source.GetResult() {
             Ok(_) => WriteLine("Completed unit")
-            Error(_) => System.Fault("Expected completion")
+            Error(_) => System.Fail("Expected completion")
         }
     })
     source.TryComplete(Ok(()))

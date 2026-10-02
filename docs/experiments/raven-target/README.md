@@ -1,5 +1,11 @@
 # Raven targeting neoCLR
 
+**Development migration — 2026-10-02:** the terminal namespace function is now
+`System.Fail(message)`. Earlier dated checkpoints below use its former `System.Fault`
+name. Rebuild with the matching compiler, reference and runtime library; host Fault
+results and classification are unchanged. See [the current terminal-failure contract](../../system-fault.md).
+
+
 ## Callback syntax and OfType backport (2026-09-30)
 
 Raven-authored library callback annotations now use function type syntax while the

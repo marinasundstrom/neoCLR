@@ -36,6 +36,11 @@ Development adds the lazy `System.Linq.Operators.OfType<T, U>` extension, writte
 ordering, disposal and the existing Object conversion limits. Function syntax in
 Raven library callbacks remains backed by main's nominal Func metadata contracts.
 
+Development (2026-10-02) renames the terminal namespace function to `System.Fail`.
+The selected namespace container and XML member entry include the new name; host Fault
+and FaultCode retain their manual reference. Source callers must migrate from
+`System.Fault` and use the matching reference/compiler/runtime bundle.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not

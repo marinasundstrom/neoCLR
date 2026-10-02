@@ -1266,7 +1266,7 @@ M0000001c_IL_0172:
 M0000001c_IL_0173:
 ldstr "invalid native socket error"
 M0000001c_IL_0178:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end

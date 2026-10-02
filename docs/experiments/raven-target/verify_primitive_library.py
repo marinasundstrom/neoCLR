@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-primitive-library-') as temporar
         ('WrongStorage', source.replace('m_value: long', 'm_value: int'), 'Unsupported primitive library storage'),
         ('ExtraStorage', source.replace('private field m_value: long', 'private field m_value: long\n    private field extra: int'), 'Unsupported primitive library storage'),
         ('Mutation', source.replace('if m_value < other', 'm_value = 0L\n        if m_value < other'), 'Primitive library backing storage is readonly'),
-        ('Constructor', source.replace('    func CompareTo', '    public init() { System.Fault("unexpected") }\n\n    func CompareTo'), 'Unsupported primitive library storage'),
+        ('Constructor', source.replace('    func CompareTo', '    public init() { System.Fail("unexpected") }\n\n    func CompareTo'), 'Unsupported primitive library storage'),
     ]:
         folder = root / name
         folder.mkdir()

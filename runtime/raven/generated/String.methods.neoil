@@ -117,8 +117,8 @@ M00000001_IL_0060:
 M00000001_IL_0061:
 ldstr "Character sequence count changed during construction"
 M00000001_IL_0066:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000001_IL_006b:
 M00000001_IL_006c:
 M00000001_IL_006d:
@@ -331,8 +331,8 @@ M00000008_IL_0033:
 M00000008_IL_0034:
 ldstr "Unsupported StringComparison"
 M00000008_IL_0039:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method static CompareOrdinalIgnoreCase(String left,String right) -> Int32
 M00000009_IL_0000:
@@ -599,7 +599,7 @@ M00000015_IL_0088:
 M00000015_IL_0089:
 ldstr "invalid native UTF-8 slice status"
 M00000015_IL_008e:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end

@@ -29,7 +29,7 @@ public func AfterOrdinal(source: string, delimiter: string) -> Option<string> {
             let start = range.Utf8Start + range.Utf8Length
             match owner.Slice(SourceRange(owner, start, source.GetUtf8ByteCount() - start)) {
                 Ok(let suffix) => return Some(suffix)
-                Error(_) => System.Fault("Invalid internally constructed suffix")
+                Error(_) => System.Fail("Invalid internally constructed suffix")
             }
         }
     }
@@ -51,19 +51,19 @@ public func CheckConsumer() {
     Check(builder.Build().Equals("replacement"), "Builder reuse")
     match AfterOrdinal(report, "=") {
         Some(let text) => Check(text.Equals("é") && text.Length == 1, "Extract without offset arithmetic")
-        None => System.Fault("Missing delimiter")
+        None => System.Fail("Missing delimiter")
     }
     match AfterOrdinal(report, "missing") {
         None => { }
-        Some(_) => System.Fault("Missing delimiter must remain distinct from empty text")
+        Some(_) => System.Fail("Missing delimiter must remain distinct from empty text")
     }
     match AfterOrdinal("name=", "=") {
         Some(let text) => Check(text.Length == 0, "Present delimiter with empty suffix")
-        None => System.Fault("Empty suffix is present")
+        None => System.Fail("Empty suffix is present")
     }
     match AfterOrdinal("é", "e") {
         Some(let text) => Check(text.Equals("́"), "Ordinal matching may split a grapheme")
-        None => System.Fault("Ordinal scalar match")
+        None => System.Fail("Ordinal scalar match")
     }
     let decoder = BoundedUtf8Decoder()
     let first: byte[] = [(byte)101, (byte)204]

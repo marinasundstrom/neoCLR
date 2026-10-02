@@ -14,7 +14,7 @@ static class NamespaceFunctions
 
     public static void ProjectFault(ModuleDefinition module)
     {
-        var type = module.GetType("System.FaultFunctions");
+        var type = module.GetType("System.FailFunctions");
         type.Name = "NamespaceMembers";
         var marker = module.GetType(Marker).Methods.Single(m => m.IsConstructor && !m.HasParameters);
         type.CustomAttributes.Add(new CustomAttribute(marker));

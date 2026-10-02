@@ -10,7 +10,7 @@ class Converter {
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -42,7 +42,7 @@ func Main() {
     if let Some(value) = parameters.Find(typeof(Converter).GetMethods()[0].GetParameters()[0]) {
         Check(value == 1 && parameters.Count == 3, "Parameter owner survives collection")
     } else {
-        System.Fault("Parameter lookup failed after collection")
+        System.Fail("Parameter lookup failed after collection")
     }
     Check(Same(first, repeated) && Hash(first) == Hash(repeated), "Retained descriptors remain valid")
     Console.WriteLine("Parameter ownership, equality, hash, display and map lookup: passed")

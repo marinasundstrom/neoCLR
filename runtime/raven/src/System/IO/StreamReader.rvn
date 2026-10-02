@@ -64,7 +64,7 @@ public class StreamReader : TextReader {
                 if value == 10 {
                     match part.SliceUtf8(index + 1, bytes.Count - index - 1) {
                         Ok(let suffix) => pendingText = suffix
-                        Error(_) => System.Fault("Invalid decoded line suffix")
+                        Error(_) => System.Fail("Invalid decoded line suffix")
                     }
                     var lineLength = line.Count
                     if lineLength > 0 && line[lineLength - 1] == 13 {
@@ -159,7 +159,7 @@ public class StreamReader : TextReader {
             Error(let error) => return Error(FromStream(error))
         }
         if !(count >= 0) || count > request {
-            System.Fault("Invalid input read count")
+            System.Fail("Invalid input read count")
         }
         lastRead = count
         if count > remaining {

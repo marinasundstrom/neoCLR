@@ -15,35 +15,35 @@ func RoundTrip(directory: Directory, provider: StorageProvider) {
             WriteLine(file.Name)
             match provider.WriteText(file.Path, "Hello, värld!", 14) {
                 Ok(_) => WriteLine("Written")
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
             match provider.ReadText(file.Path, 14) {
                 Ok(let text) => WriteLine(text)
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
             match provider.WriteText(file.Path, "too large", 2) {
                 Error(let error) => {
                     if !(error is System.Storage.FileWriteError.TooLarge) {
-                        System.Fault("Wrong bounded-write error")
+                        System.Fail("Wrong bounded-write error")
                     }
                 }
-                Ok(_) => System.Fault("Oversized write succeeded")
+                Ok(_) => System.Fail("Oversized write succeeded")
             }
             match provider.ReadText(file.Path, 14) {
                 Ok(let text) => {
                     if text != "Hello, värld!" {
-                        System.Fault("Rejected write changed contents")
+                        System.Fail("Rejected write changed contents")
                     }
                 }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
             match provider.ReadText(file.Path, 13) {
                 Error(let error) => {
                     if !(error is System.Storage.FileReadError.TooLarge) {
-                        System.Fault("Wrong UTF-8 byte-limit error")
+                        System.Fail("Wrong UTF-8 byte-limit error")
                     }
                 }
-                Ok(_) => System.Fault("Byte limit counted characters")
+                Ok(_) => System.Fail("Byte limit counted characters")
             }
             match file.OpenRead() {
                 Ok(let input) => {
@@ -54,21 +54,21 @@ func RoundTrip(directory: Directory, provider: StorageProvider) {
                             match Utf8.Decode(bytes) {
                                 Ok(let text) => {
                                     if text != "Hello, värld!" {
-                                        System.Fault("Text and byte reads disagree")
+                                        System.Fail("Text and byte reads disagree")
                                     }
                                 }
-                                Error(_) => System.Fault("Written text was not valid UTF-8")
+                                Error(_) => System.Fail("Written text was not valid UTF-8")
                             }
                         }
-                        Error(let error) => System.Fault(error.ToString())
+                        Error(let error) => System.Fail(error.ToString())
                     }
                 }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
             WriteLine("Text write visible through byte stream")
             WriteLine("Rejected write preserved contents")
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -76,10 +76,10 @@ func RejectChild(directory: Directory, name: string) {
     match directory.FileAt(name) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
-                System.Fault("Wrong child-name error")
+                System.Fail("Wrong child-name error")
             }
         }
-        Ok(_) => System.Fault("Invalid child name accepted")
+        Ok(_) => System.Fail("Invalid child name accepted")
     }
 }
 
@@ -100,36 +100,36 @@ func Main() {
         match directory.GetFile("notes.txt") {
             Ok(let file) => {
                 if file.Name != "notes.txt" {
-                    System.Fault("Lookup lost the child name")
+                    System.Fail("Lookup lost the child name")
                 }
                 match ReadFileText(file) {
                     Ok(let text) => {
                         if text != "Hello, värld!" {
-                            System.Fault("Lookup changed provider ownership")
+                            System.Fail("Lookup changed provider ownership")
                         }
                     }
-                    Error(let error) => System.Fault(error.ToString())
+                    Error(let error) => System.Fail(error.ToString())
                 }
             }
-            Error(let error) => System.Fault(error.ToString())
+            Error(let error) => System.Fail(error.ToString())
         }
     }
     WriteLine("File lookup reads the same contents on disk and memory")
     match temporary.FileAt("notes.txt") {
         Ok(let file) => {
             if !file.Path.Equals(RequirePath("/notes.txt")) {
-                System.Fault("Directory replaced the provider address")
+                System.Fail("Directory replaced the provider address")
             }
             match ReadFileText(file) {
                 Ok(let text) => {
                     if text != "Hello, värld!" {
-                        System.Fault("A new descriptor lost provider state")
+                        System.Fail("A new descriptor lost provider state")
                     }
                 }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     RejectChild(disk, "../outside.txt")
     RejectChild(disk, "")
@@ -144,10 +144,10 @@ func Main() {
     match otherMemory.ReadText(other.Path, 64) {
         Error(let error) => {
             if !(error is System.Storage.FileReadError.NotFound) {
-                System.Fault("Wrong missing-file error")
+                System.Fail("Wrong missing-file error")
             }
             WriteLine("Providers remain independent")
         }
-        Ok(_) => System.Fault("Provider state leaked")
+        Ok(_) => System.Fail("Provider state leaked")
     }
 }

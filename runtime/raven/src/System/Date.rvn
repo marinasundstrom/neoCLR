@@ -171,7 +171,7 @@ public struct Date : ComparableTo<Date>, EquatableTo<Date> {
     /// Formats with a culture's Gregorian default; no ambient culture is read.
     func ToString(culture: Globalization.Culture) -> string {
         let Ok(text) = culture.DateTimeFormat.FormatDate(self) else {
-            System.Fault("A supported culture must format every valid Date")
+            System.Fail("A supported culture must format every valid Date")
         }
         return text
     }

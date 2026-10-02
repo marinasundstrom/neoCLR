@@ -8,7 +8,7 @@ import System.Web.Http.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("POST contract failed")
+        System.Fail("POST contract failed")
     }
 }
 
@@ -46,7 +46,7 @@ func CheckContracts() {
     let content = ContentFor(0)
     let source = CancellationTokenSource()
     let Ok(uri) = Uri.Parse("echo") else {
-        System.Fault("URI failed")
+        System.Fail("URI failed")
         return
     }
     Check(client.Post("echo", content, source.Token).GetResult() is Ok(_))
@@ -60,7 +60,7 @@ func CheckContracts() {
 
     let bytes = ArrayList<byte>()
     let Ok(request) = HttpRequest.Post("http://not-resolved.invalid/", HttpContent(bytes)) else {
-        System.Fault("Request construction failed")
+        System.Fail("Request construction failed")
         return
     }
     while bytes.Count <= 1024 {
@@ -69,13 +69,13 @@ func CheckContracts() {
     if let Error(HttpError.LimitExceeded(_)) = HttpClient().Send(request).GetResult() {
         Check(true)
     } else {
-        System.Fault("Mutated oversized body reached transport")
+        System.Fail("Mutated oversized body reached transport")
     }
     let bad = HttpContent(ArrayList<byte>(), "text/plain\r\nInjected: yes")
     if let Error(HttpError.InvalidRequest(_)) = HttpClient().Post("http://not-resolved.invalid/", bad).GetResult() {
         Check(true)
     } else {
-        System.Fault("Header injection reached transport")
+        System.Fail("Header injection reached transport")
     }
     Console.WriteLine("POST contracts passed")
 }
@@ -97,7 +97,7 @@ class ClientProbe {
         let pending = PostText(client, "Café 🌍")
         pending.OnCompleted(() => {
             let Ok(text) = pending.GetResult() else {
-                System.Fault("Propagating POST sample failed")
+                System.Fail("Propagating POST sample failed")
                 return
             }
             Check(text == "Café 🌍")
@@ -118,7 +118,7 @@ class ClientProbe {
         let pending = if index == 3 { client.Get("empty") } else { client.Post("echo", content) }
         pending.OnCompleted(() => {
             let Ok(response) = pending.GetResult() else {
-                System.Fault("Echo request failed")
+                System.Fail("Echo request failed")
                 return
             }
             Check(response.StatusCode == (if index == 3 { HttpStatusCode.OK } else { HttpStatusCode.Created }))

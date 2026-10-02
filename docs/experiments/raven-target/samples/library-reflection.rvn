@@ -38,7 +38,7 @@ func Main() {
     ShowMemberName(first)
     match first.DeclaringType {
         .Some(let owner) => WriteLine(owner.Name)
-        .None => Fault("Expected a declaring type")
+        .None => Fail("Expected a declaring type")
     }
     WriteLine(method.ReturnType.Name)
     Show(method.IsStatic)

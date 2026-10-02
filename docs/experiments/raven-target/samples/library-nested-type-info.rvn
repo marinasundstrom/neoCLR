@@ -17,16 +17,16 @@ func Main() {
                 Console.WriteLine("Actual declaring type")
             }
         }
-        .None => Fault("Expected a declaring type")
+        .None => Fail("Expected a declaring type")
     }
     match typeof(Outer).DeclaringType {
-        .Some(_) => Fault("Top-level type has an owner")
+        .Some(_) => Fail("Top-level type has an owner")
         .None => Console.WriteLine("Top-level type")
     }
     match nested {
         TypeInfo => Console.WriteLine("Type member")
-        FieldInfo => Fault("Unexpected field")
-        MethodInfo => Fault("Unexpected method")
-        PropertyInfo => Fault("Unexpected property")
+        FieldInfo => Fail("Unexpected field")
+        MethodInfo => Fail("Unexpected method")
+        PropertyInfo => Fail("Unexpected property")
     }
 }

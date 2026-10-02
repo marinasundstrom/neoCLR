@@ -77,7 +77,7 @@ class PendingRead {
 
     func ByteAt(index: int) -> byte {
         if !terminal {
-            System.Fault("Pending destination is private")
+            System.Fail("Pending destination is private")
         }
         return buffer[index]
     }

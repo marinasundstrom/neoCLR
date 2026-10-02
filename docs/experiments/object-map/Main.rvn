@@ -10,13 +10,13 @@ func Parsed(text: string) -> Path {
     if let Ok(path) = Path.Parse(text) {
         return path
     }
-    System.Fault("Invalid fixture path")
+    System.Fail("Invalid fixture path")
     return Parsed(text)
 }
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -24,7 +24,7 @@ func Found(map: HashMap<Object, Object>, key: Object) -> Object {
     if let Some(value) = map.Find(key) {
         return value
     }
-    System.Fault("Missing object key")
+    System.Fail("Missing object key")
     return key
 }
 

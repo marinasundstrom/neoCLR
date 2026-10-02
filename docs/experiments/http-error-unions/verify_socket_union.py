@@ -62,7 +62,7 @@ import System.Networking.Sockets.*
 import System.Networking.*
 import HttpErrorProbe.*
 func Check(value: bool) {
-    if !value { System.Fault("Socket union assertion failed") }
+    if !value { System.Fail("Socket union assertion failed") }
 }
 func CheckName(value: SocketError, name: string) {
     Check(value.HasValue)
@@ -107,13 +107,13 @@ func Main() {
         Check(cause is DnsError.LookupFailed)
         Check(!(cause is DnsError.InvalidName))
     } else {
-        System.Fault("Lost DNS case")
+        System.Fail("Lost DNS case")
     }
     if let LookupFailure.Address(cause) = failure {
         Check(cause is UriError.InvalidFormat)
         Check(!(cause is UriError.TooLong))
     } else {
-        System.Fault("Lost URI case")
+        System.Fail("Lost URI case")
     }
     CASE_CHECKS
     let inactive = default(SocketError)
@@ -121,15 +121,15 @@ func Main() {
     Check(inactive.ToString() == "Empty")
     Check(inactive.Value == null)
     let error: SocketError = SocketError.Closed
-    if let SocketError.Closed = error { } else { System.Fault("Wrong case") }
-    if let SocketError.Busy = error { System.Fault("Wrong match") }
+    if let SocketError.Closed = error { } else { System.Fail("Wrong case") }
+    if let SocketError.Busy = error { System.Fail("Wrong match") }
     let preserved: Object = error
     var outer: HttpError = HttpError.Transport(error)
     let copy = outer
     outer = HttpError.TimedOut
     if let HttpError.Transport(cause) = copy {
         Check(cause.ToString() == "Closed")
-    } else { System.Fault("Lost nested case") }
+    } else { System.Fail("Lost nested case") }
     Check(!default(HttpError).HasValue)
     var index = 0
     while index < 100 {

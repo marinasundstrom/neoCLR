@@ -19,11 +19,11 @@ func Main() {
         Error(_) => {
             let diagnostics = Console.Error
             let Ok(_) = diagnostics.WriteLine("Could not read input") else {
-                System.Fault("Could not write diagnostic")
+                System.Fail("Could not write diagnostic")
                 return
             }
             let Ok(_) = diagnostics.Flush() else {
-                System.Fault("Could not write diagnostic")
+                System.Fail("Could not write diagnostic")
                 return
             }
         }

@@ -49,7 +49,7 @@ public class Dns {
         if code == 6 {
             return DnsError.LookupFailed()
         }
-        System.Fault("invalid native DNS error")
+        System.Fail("invalid native DNS error")
         return DnsError.LookupFailed()
     }
 }

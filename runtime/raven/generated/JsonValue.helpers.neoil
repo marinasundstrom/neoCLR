@@ -12262,8 +12262,8 @@ M0000004e_IL_00ea:
 M0000004e_IL_00eb:
 ldstr "JSON creation returned no outcome"
 M0000004e_IL_00f0:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method static Get(System.Web.Http.HttpClient client,System.Uri url,System.Introspection.TypeInfo type,System.Concurrency.CancellationToken token) -> System.Tasks.Task<System.Result<System.Object,System.Web.Http.Json.HttpJsonError>>
 M0000004f_IL_0000:
@@ -12464,8 +12464,8 @@ M00000050_IL_00ea:
 M00000050_IL_00eb:
 ldstr "JSON creation returned no outcome"
 M00000050_IL_00f0:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end
 .type internal class System.Web.Http.Json.JsonClientRead
@@ -12605,8 +12605,8 @@ M00000052_IL_0085:
 M00000052_IL_0086:
 ldstr "HTTP returned no outcome"
 M00000052_IL_008b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000052_IL_0090:
 M00000052_IL_0091:
 M00000052_IL_0092:

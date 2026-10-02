@@ -106,8 +106,8 @@ M00000001_IL_0081:
 M00000001_IL_0082:
 ldstr "invalid native parse status"
 M00000001_IL_0087:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method static Divide(Int32 dividend,Int32 divisor) -> System.Result<Int32,System.IntegerDivisionError>
 M00000002_IL_0000:

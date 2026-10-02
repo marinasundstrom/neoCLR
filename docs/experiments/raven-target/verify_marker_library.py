@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-flags-library-') as temporary:
         ('ObjectMethod', 'System.Object', object_source.replace('class Object {', 'class Object { func Added() -> int { return 42 }'), bad),
         ('SealedObject', 'System.Object', object_source.replace('open class', 'class'), bad),
         ('MarkerStorage', 'System.Runtime.CompilerServices.UnionAttribute', marker_source.replace('init()', 'private field value: int\n    init()'), bad),
-        ('MarkerBody', 'System.Runtime.CompilerServices.UnionAttribute', marker_source.replace('init() {', 'init() { System.Fault("side effect")'), bad),
+        ('MarkerBody', 'System.Runtime.CompilerServices.UnionAttribute', marker_source.replace('init() {', 'init() { System.Fail("side effect")'), bad),
         ('MarkerBase', 'System.Runtime.CompilerServices.UnionAttribute', marker_source.replace(' : System.Attribute', ''), bad),
         ('OpenMarker', 'System.Runtime.CompilerServices.UnionAttribute', marker_source.replace('public class', 'public open class'), bad),
     ]

@@ -5,7 +5,7 @@ import System.Result.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -22,7 +22,7 @@ func Main() {
     Check("é".StartsWithOrdinal("e"), "ordinal prefix can end within a grapheme")
     match "é".SliceUtf8(1, 2) {
         Ok(let mark) => Check(mark == "́", "byte slice allows scalar boundary inside grapheme")
-        Error(_) => System.Fault("unexpected slice failure")
+        Error(_) => System.Fail("unexpected slice failure")
     }
     let parts: char[] = ['e', Char.FromString("́")]
     Check(String(parts).Length == 1, "construction does not preserve input grapheme count")
@@ -31,7 +31,7 @@ func Main() {
     Check(String.CompareOrdinalIgnoreCase("ß", "ss") != 0, "no full folding")
     let invalid: byte[] = [(byte)255]
     match Utf8.Decode(invalid) {
-        Ok(_) => System.Fault("malformed UTF-8 accepted")
+        Ok(_) => System.Fail("malformed UTF-8 accepted")
         Error(_) => { }
     }
     Console.WriteLine("Text foundation observations passed")

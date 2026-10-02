@@ -177,7 +177,7 @@ class HostStorage : StorageProvider {
         if path.IsAbsolute {
             match text.SliceUtf8(1, text.GetUtf8ByteCount() - 1) {
                 Ok(let relative) => return System.Storage.Path.Combine(root, relative)
-                Error(_) => System.Fault("Invalid parsed path boundary")
+                Error(_) => System.Fail("Invalid parsed path boundary")
             }
         }
         return System.Storage.Path.Combine(root, text)
@@ -285,7 +285,7 @@ class MemoryStorage : StorageProvider {
                         items.Add(item)
                     }
                 }
-                Error(_) => System.Fault("Stored invalid memory key")
+                Error(_) => System.Fail("Stored invalid memory key")
             }
         }
         let result: Sequence<StorageItem> = items

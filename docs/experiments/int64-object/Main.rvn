@@ -4,7 +4,7 @@ import System.Option.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -44,7 +44,7 @@ func Main() {
     if let Some(value) = values.Find(4294967297L) {
         Check(value == 1 && values.Count == 4, "Int64 key survives collection")
     } else {
-        System.Fault("Int64 lookup failed after collection")
+        System.Fail("Int64 lookup failed after collection")
     }
     Check(first.Equals(repeated) && Hash(first) == 0, "Retained box remains unchanged")
     Check(first.ToString() == "4294967297", "Display after collection")

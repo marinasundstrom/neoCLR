@@ -20,7 +20,7 @@ public struct Int32 : Number, EquatableTo<int> {
         if status == 2 {
             return Error(NumberParseError.Overflow())
         }
-        System.Fault("invalid native parse status")
+        System.Fail("invalid native parse status")
         return Error(NumberParseError.InvalidFormat())
     }
 

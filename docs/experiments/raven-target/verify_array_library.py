@@ -32,7 +32,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-flags-library-') as temporary:
         ('WrongStorage', source.replace('m_value', 'other'), 'Unsupported intrinsic array storage'),
         ('ExtraStorage', source.replace('private field m_value:', 'private field extra: int\n    private field m_value:'), 'Unsupported intrinsic array storage'),
         ('PublicConstructor', source.replace('private init()', 'public init()'), 'Unsupported intrinsic array storage'),
-        ('ConstructorEffect', source.replace('private init() {', 'private init() { Fault("effect")'), 'Unsupported intrinsic array storage'),
+        ('ConstructorEffect', source.replace('private init() {', 'private init() { Fail("effect")'), 'Unsupported intrinsic array storage'),
         ('MutateStorage', source.replace('let buffer = m_value', 'm_value = Runtime.CompilerServices.CheckedStorage.Reserve<T>(0)\n        let buffer = m_value'), 'backing storage is readonly'),
         ('AllocateIntrinsic', source.replace('let buffer = m_value', 'let allocated = Array<T>()\n        let buffer = m_value'), 'Managed arrays require intrinsic allocation'),
         ('WrongParameterName', source.replace('action', 'callback'), 'export does not match reference contract'),

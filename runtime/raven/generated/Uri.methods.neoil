@@ -169,8 +169,8 @@ M00000005_IL_0040:
 M00000005_IL_0041:
 ldstr "Invalid internal URI boundary"
 M00000005_IL_0046:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private static At(String text,Int32 index) -> String
 .local String local0

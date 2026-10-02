@@ -193,8 +193,8 @@ M00000007_IL_007f:
 M00000007_IL_0080:
 ldstr "invalid native parse status"
 M00000007_IL_0085:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance readonly byref CompareTo(Byte other) -> Int32
 M00000008_IL_0000:

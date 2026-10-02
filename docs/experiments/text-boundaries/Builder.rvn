@@ -16,7 +16,7 @@ public class ReportTextBuilder {
 
     init(maxUtf8Bytes: int) {
         if !(maxUtf8Bytes >= 0) || maxUtf8Bytes > 65536 {
-            System.Fault("Builder limit must be between 0 and 65536 UTF-8 bytes")
+            System.Fail("Builder limit must be between 0 and 65536 UTF-8 bytes")
         }
         limit = maxUtf8Bytes
     }

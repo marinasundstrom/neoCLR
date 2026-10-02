@@ -580,8 +580,8 @@ M00000005_IL_0175:
 M00000005_IL_0176:
 ldstr "Invalid decoded line suffix"
 M00000005_IL_017b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000005_IL_0180:
 M00000005_IL_0181:
 M00000005_IL_0182:
@@ -1524,8 +1524,8 @@ M00000008_IL_00bf:
 M00000008_IL_00c0:
 ldstr "Invalid input read count"
 M00000008_IL_00c5:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000008_IL_00ca:
 M00000008_IL_00cb:
 M00000008_IL_00cc:

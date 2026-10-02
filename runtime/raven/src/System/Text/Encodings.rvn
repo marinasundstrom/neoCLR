@@ -214,7 +214,7 @@ internal class TextEncoder : Encoder {
                 bytes = match policy.Encode(part) {
                     Ok(let encoded) => encoded
                     Error(_) => {
-                        System.Fault("Validated text encoding failed")
+                        System.Fail("Validated text encoding failed")
                         ArrayList<byte>()
                     }
                 }
@@ -250,7 +250,7 @@ internal class TextEncoder : Encoder {
                 Error(_) => count -= 1
             }
         }
-        System.Fault("Invalid internal scalar boundary")
+        System.Fail("Invalid internal scalar boundary")
         return ""
     }
 }

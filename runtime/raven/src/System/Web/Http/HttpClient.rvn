@@ -565,7 +565,7 @@ public class HttpContent : Disposable {
     val Bytes: Sequence<byte> {
         get {
             if !IsBuffered {
-                System.Fault("Stream content has no buffered Bytes; use TryGetBytes")
+                System.Fail("Stream content has no buffered Bytes; use TryGetBytes")
             }
             return storedBytes
         }
@@ -914,7 +914,7 @@ public class HttpRequest {
         } else if let Error(reason) = parsed {
             return Error(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Error(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1024,7 +1024,7 @@ public class HttpClient {
             } else if let System.Option.None = value {
                 baseUri = None()
             } else {
-                System.Fault("BaseUri requires Some or None")
+                System.Fail("BaseUri requires Some or None")
             }
         }
     }
@@ -1051,7 +1051,7 @@ public class HttpClient {
             return Failure(error)
         }
         let Ok(outgoing) = prepared else {
-            System.Fault("Request preparation returned no outcome")
+            System.Fail("Request preparation returned no outcome")
         }
         let sent = handler.Send(outgoing, cancellationToken)
         if sent.IsCompleted {
@@ -1081,7 +1081,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1101,7 +1101,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1121,7 +1121,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1141,7 +1141,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1165,7 +1165,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1185,7 +1185,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1209,7 +1209,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1229,7 +1229,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1253,7 +1253,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1273,7 +1273,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1297,7 +1297,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(HttpError.InvalidUri(reason))
         }
-        System.Fault("URI parser returned no outcome")
+        System.Fail("URI parser returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid URI"))
     }
 
@@ -1317,7 +1317,7 @@ public class HttpClient {
         } else if let Error(reason) = parsed {
             return Failure(reason)
         }
-        System.Fault("Request construction returned no outcome")
+        System.Fail("Request construction returned no outcome")
         return Failure(HttpError.InvalidRequest("Invalid request"))
     }
 
@@ -1399,7 +1399,7 @@ public class HttpClient {
                     return Error(HttpError.InvalidUri(reason))
                 }
             }
-            System.Fault("URI resolution returned no outcome")
+            System.Fail("URI resolution returned no outcome")
             return Error(HttpError.InvalidRequest("Invalid URI"))
         }
         return Ok(uri)

@@ -6,7 +6,7 @@ func RequireInterface(description: TypeInfo) {
     if description.IsInterface {
         WriteLine("Interface")
     } else {
-        Fault("Expected an introspection interface")
+        Fail("Expected an introspection interface")
     }
 }
 
@@ -30,7 +30,7 @@ func Main() {
     let member: MemberInfo = typeof(Date).GetProperties()[0]
     match member.DeclaringType {
         .Some(let owner) => WriteLine(owner.Name)
-        .None => Fault("Expected a declaring type")
+        .None => Fail("Expected a declaring type")
     }
     WriteLine(Kind(typeof(Date).GetFields(BindingFlags.Instance | BindingFlags.NonPublic)[0]))
     WriteLine(Kind(typeof(Date).GetMethods()[0]))

@@ -449,3 +449,8 @@ and constrained interface dispatch remain outside this development slice. Raven 
 separate native-library consumer verifies and executes mutation and generic out calls
 (42). The unchanged collections sample advances to a lowered throw guard; terminal
 failure support, full application execution and runtime-library compilation remain open.
+
+Development naming correction: terminal guest failure is requested with
+`System.Fail(message)`; the host receives a `Fault`. The former `System.Fault` call
+spelling requires migration and a matching compiler/reference/runtime bundle. This does
+not add guest exception handling or process-abort behavior.

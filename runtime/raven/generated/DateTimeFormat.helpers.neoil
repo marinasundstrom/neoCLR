@@ -871,8 +871,8 @@ M0000000f_IL_0044:
 M0000000f_IL_0045:
 ldstr "Expected validated Hebrew year"
 M0000000f_IL_004a:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000000f_IL_004f:
 M0000000f_IL_0050:
 M0000000f_IL_0051:

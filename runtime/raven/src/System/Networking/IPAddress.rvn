@@ -281,7 +281,7 @@ public sealed class IPAddress : EquatableTo<IPAddress> {
 public class IPv4Address : IPAddress {
     internal init(bytes: byte[]) : base(bytes) {
         if bytes.Length != 4 {
-            System.Fault("Probe requires four IPv4 octets")
+            System.Fail("Probe requires four IPv4 octets")
         }
     }
 }
@@ -290,7 +290,7 @@ public class IPv4Address : IPAddress {
 public class IPv6Address : IPAddress {
     internal init(bytes: byte[]) : base(bytes) {
         if bytes.Length != 16 {
-            System.Fault("Probe requires sixteen IPv6 octets")
+            System.Fail("Probe requires sixteen IPv6 octets")
         }
     }
 }

@@ -1311,7 +1311,7 @@
     <member name="M:System.Math.NamespaceMembers.Sign(System.Int32)"><summary>Returns -1, 0 or 1 according to the integer sign.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="T:System.NamespaceMembers"><summary>Namespace functions including the terminal Fault operation.</summary></member>
-    <member name="M:System.NamespaceMembers.Fault(System.String)"><summary>Terminates the current invocation with the supplied fault message.</summary><param name="message">The terminal fault message.</param></member>
+    <member name="M:System.NamespaceMembers.Fail(System.String)"><summary>Terminates the current invocation with the supplied fault message.</summary><param name="message">The terminal fault message.</param></member>
 
     <member name="T:System.Propagatable`3"><summary>The compiler-facing contract for separating successful output from a residual outcome during propagation.</summary></member>
     <member name="M:System.Propagatable`3.TryGetOutput(`1@)"><summary>Returns true and assigns the successful output only when the value represents success.</summary><param name="output">Receives the successful output when the method returns true.</param></member>

@@ -43,7 +43,7 @@ func ObserveResult(result: Task<Result<int, string>>) {
         if let Error(text) = result.GetResult() {
             Console.WriteLine(text)
         } else {
-            System.Fault("Expected propagated error")
+            System.Fail("Expected propagated error")
         }
     })
 }
@@ -54,7 +54,7 @@ func Main() {
     let second = Promise<Result<int, string>>(queue)
     queue.Run(() => {
         if Immediate().GetResult() != 42 {
-            System.Fault("Awaitless result was lost")
+            System.Fail("Awaitless result was lost")
         }
         ObserveUnit(Unit(first.Task))
         ObserveResult(Propagate(second.Task))

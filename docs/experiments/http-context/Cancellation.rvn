@@ -29,7 +29,7 @@ class CancellationProbe {
 
     func OnAccepted() {
         if !pending.IsCancelled {
-            System.Fault("Accept did not acknowledge cancellation")
+            System.Fail("Accept did not acknowledge cancellation")
         }
         server.Close()
         stop.Dispose()
@@ -40,7 +40,7 @@ class CancellationProbe {
         if let Some(control) = connecting {
             connecting = None()
             let Ok(socket) = control.GetResult() else {
-                System.Fault("Control connect failed")
+                System.Fail("Control connect failed")
                 return
             }
             connection = Some(socket)
@@ -54,11 +54,11 @@ class CancellationProbe {
         if let Some(read) = reading {
             reading = None()
             let Ok(count) = read.GetResult() else {
-                System.Fault("Control read failed")
+                System.Fail("Control read failed")
                 return
             }
             if count != 1 {
-                System.Fault("Control signal missing")
+                System.Fail("Control signal missing")
             }
             if buffer[0] == 1 {
                 stop.Cancel()
@@ -75,11 +75,11 @@ class CancellationProbe {
 
 func Main() {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fault("Port failed")
+        System.Fail("Port failed")
         return
     }
     Console.WriteLine(port)

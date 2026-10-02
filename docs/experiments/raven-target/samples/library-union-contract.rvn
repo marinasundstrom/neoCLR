@@ -8,7 +8,7 @@ import System.Tasks.TaskOutcome.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -51,11 +51,11 @@ func Main() {
     if some.TryGetValue(out extracted) {
         Check(extracted.Value == 42, "Some extraction")
     } else {
-        System.Fault("Some extraction")
+        System.Fail("Some extraction")
     }
     Check(extracted.Value == 42, "Some payload")
     if none.TryGetValue(out extracted) {
-        System.Fault("Wrong case extraction")
+        System.Fail("Wrong case extraction")
     }
     Check(extracted.Value == 42, "Wrong case must preserve output")
 
@@ -67,7 +67,7 @@ func Main() {
     Check(!inactive.HasValue, "Default Option must be inactive")
     Check(Object.ReferenceEquals(inactive.Value, null), "Inactive Value must be null")
     if inactive.TryGetValue(out extracted) {
-        System.Fault("Inactive extraction")
+        System.Fail("Inactive extraction")
     }
     Check(extracted.Value == 42, "Inactive extraction preserves output")
 
@@ -114,10 +114,10 @@ func Main() {
     if taskCompleted.TryGetValue(out taskCase) {
         Check(taskCase.Value == 42, "Completed extraction")
     } else {
-        System.Fault("Completed extraction")
+        System.Fail("Completed extraction")
     }
     if taskCancelled.TryGetValue(out taskCase) {
-        System.Fault("Cancelled cannot extract Completed")
+        System.Fail("Cancelled cannot extract Completed")
     }
     Check(taskCase.Value == 42, "Task case mismatch preserves output")
     let inactiveTask = default(TaskOutcome<int>)

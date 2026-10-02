@@ -2,7 +2,7 @@ import System.*
 
 func Check(condition: bool, message: string) {
     if !condition {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 

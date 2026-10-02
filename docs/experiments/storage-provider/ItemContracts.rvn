@@ -25,29 +25,29 @@ func CheckItems(provider: System.Storage.StorageProvider) {
     match provider.GetItem(RequirePath("/lookup.txt")) {
         Ok(let item) => {
             if item.Name != "lookup.txt" || item.Path.Text != "/lookup.txt" {
-                System.Fault("Generic file lookup lost its address")
+                System.Fail("Generic file lookup lost its address")
             }
             if !(item is File) || item is Directory {
-                System.Fault("Generic lookup returned the wrong branch")
+                System.Fail("Generic lookup returned the wrong branch")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match provider.GetItem(RequirePath("/")) {
         Ok(let item) => {
             if item.Path.Text != "/" || !(item is Directory) || item is File {
-                System.Fault("Generic root lookup lost its directory branch")
+                System.Fail("Generic root lookup lost its directory branch")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match provider.GetItem(RequirePath("/missing-item")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fault("Missing generic item changed error")
+                System.Fail("Missing generic item changed error")
             }
         }
-        Ok(_) => System.Fault("Generic lookup created an item")
+        Ok(_) => System.Fail("Generic lookup created an item")
     }
 }
 
@@ -55,7 +55,7 @@ func Main() {
     let memory = MemoryStorage()
     match memory.WriteText(RequirePath("/lookup.txt"), "found", 5) {
         Ok(_) => { }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     CheckItems(memory)
     // The preceding file-lookup fixture writes this native file.
@@ -64,10 +64,10 @@ func Main() {
     match missing.GetItem(RequirePath("anything")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fault("Resolution-only provider changed error")
+                System.Fail("Resolution-only provider changed error")
             }
         }
-        Ok(_) => System.Fault("Resolution-only provider invented an item")
+        Ok(_) => System.Fail("Resolution-only provider invented an item")
     }
     System.Console.WriteLine("Provider item interfaces: passed")
 }

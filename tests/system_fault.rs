@@ -21,7 +21,7 @@ fn dynamic_fault_stops_guest_but_does_not_abort_host() {
 .entry Main
 .function Main() -> Int32
 ldstr "{message}"
-call System.Fault(String)
+call System.Fail(String)
 ldc.i4 42
 ret
 .end

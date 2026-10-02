@@ -18,7 +18,7 @@ public class Executor {
 
     func Drain() {
         if Running {
-            System.Fault("Executor cannot be pumped recursively")
+            System.Fail("Executor cannot be pumped recursively")
         }
         Running = true
         while Pending.Count != 0 {
@@ -53,7 +53,7 @@ public class Completion : Awaitable {
 
     func GetResult() -> Result<int, string> {
         if !IsCompleted {
-            System.Fault("Completion is still pending")
+            System.Fail("Completion is still pending")
         }
         return ResultSlot[0]
     }
@@ -121,14 +121,14 @@ public func Start(source: Awaitable, destination: Completion) {
 
 public func Check(condition: bool) {
     if !condition {
-        System.Fault("Completion contract assertion failed")
+        System.Fail("Completion contract assertion failed")
     }
 }
 
 public func Read(task: Awaitable, expected: int) {
     match task.GetResult() {
         Ok(let value) => Check(value == expected)
-        Error(_) => System.Fault("Expected successful completion")
+        Error(_) => System.Fail("Expected successful completion")
     }
 }
 

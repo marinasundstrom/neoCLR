@@ -273,8 +273,8 @@ M00000010_IL_0086:
 M00000010_IL_0087:
 ldstr "BaseUri requires Some or None"
 M00000010_IL_008c:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000010_IL_0091:
 M00000010_IL_0092:
 M00000010_IL_0093:
@@ -490,8 +490,8 @@ M00000014_IL_009d:
 M00000014_IL_009e:
 ldstr "Request preparation returned no outcome"
 M00000014_IL_00a3:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000014_IL_00a8:
 M00000014_IL_00a9:
 M00000014_IL_00aa:
@@ -734,8 +734,8 @@ M00000016_IL_00ab:
 M00000016_IL_00ac:
 ldstr "URI parser returned no outcome"
 M00000016_IL_00b1:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Get(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000017_IL_0000:
@@ -878,8 +878,8 @@ M00000018_IL_00a2:
 M00000018_IL_00a3:
 ldstr "Request construction returned no outcome"
 M00000018_IL_00a8:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Post(String url,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000019_IL_0000:
@@ -1028,8 +1028,8 @@ M0000001a_IL_00ac:
 M0000001a_IL_00ad:
 ldstr "URI parser returned no outcome"
 M0000001a_IL_00b2:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Post(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000001b_IL_0000:
@@ -1176,8 +1176,8 @@ M0000001c_IL_00a3:
 M0000001c_IL_00a4:
 ldstr "Request construction returned no outcome"
 M0000001c_IL_00a9:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private instance CreatePost(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -1412,8 +1412,8 @@ M0000001f_IL_00ac:
 M0000001f_IL_00ad:
 ldstr "URI parser returned no outcome"
 M0000001f_IL_00b2:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Put(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000020_IL_0000:
@@ -1560,8 +1560,8 @@ M00000021_IL_00a3:
 M00000021_IL_00a4:
 ldstr "Request construction returned no outcome"
 M00000021_IL_00a9:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private instance CreatePut(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -1796,8 +1796,8 @@ M00000024_IL_00ac:
 M00000024_IL_00ad:
 ldstr "URI parser returned no outcome"
 M00000024_IL_00b2:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Patch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M00000025_IL_0000:
@@ -1944,8 +1944,8 @@ M00000026_IL_00a3:
 M00000026_IL_00a4:
 ldstr "Request construction returned no outcome"
 M00000026_IL_00a9:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private instance CreatePatch(System.Uri uri,System.Web.Http.HttpContent content) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -2176,8 +2176,8 @@ M00000029_IL_00ab:
 M00000029_IL_00ac:
 ldstr "URI parser returned no outcome"
 M00000029_IL_00b1:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Delete(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000002a_IL_0000:
@@ -2320,8 +2320,8 @@ M0000002b_IL_00a2:
 M0000002b_IL_00a3:
 ldstr "Request construction returned no outcome"
 M0000002b_IL_00a8:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private instance CreateDelete(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -2543,8 +2543,8 @@ M0000002e_IL_00ab:
 M0000002e_IL_00ac:
 ldstr "URI parser returned no outcome"
 M0000002e_IL_00b1:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method instance Head(System.Uri uri) -> System.Tasks.Task<System.Result<System.Web.Http.HttpResponse,System.Web.Http.HttpError>>
 M0000002f_IL_0000:
@@ -2687,8 +2687,8 @@ M00000030_IL_00a2:
 M00000030_IL_00a3:
 ldstr "Request construction returned no outcome"
 M00000030_IL_00a8:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method private instance CreateHead(System.Uri uri) -> System.Result<System.Web.Http.HttpRequest,System.Web.Http.HttpError>
 .local System.Uri local0
@@ -3535,8 +3535,8 @@ M00000039_IL_01e8:
 M00000039_IL_01e9:
 ldstr "URI resolution returned no outcome"
 M00000039_IL_01ee:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000039_IL_020e:
 M00000039_IL_020f:
 M00000039_IL_0210:

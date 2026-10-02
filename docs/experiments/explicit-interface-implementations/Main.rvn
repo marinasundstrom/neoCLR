@@ -33,28 +33,28 @@ func Main() {
     let left: Left = pair
     let right: Right = pair
     if left.Read() != 21 || right.Read() != 42 || pair.Read() != 99 {
-        System.Fault("Explicit interface mapping failed")
+        System.Fail("Explicit interface mapping failed")
     }
     left.Clear()
     if left.Read() != 0 || right.Read() != 0 || pair.Read() != 99 {
-        System.Fault("Explicit receiver identity failed")
+        System.Fail("Explicit receiver identity failed")
     }
     let only: Right = OnlyExplicit()
     if only.Read() != 7 {
-        System.Fault("Private implementation dispatch failed")
+        System.Fail("Private implementation dispatch failed")
     }
     var hiddenCount = 0
     let flags = BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly
     for method in typeof(Pair).GetMethods(flags: flags) {
         if method.Name == "Left.Read" || method.Name == "Right.Read" || method.Name == "Left.Clear" {
             if !method.IsPrivate || method.IsStatic || method.IsVirtual || method.IsAbstract {
-                System.Fault("Explicit implementation metadata failed")
+                System.Fail("Explicit implementation metadata failed")
             }
             hiddenCount = hiddenCount + 1
         }
     }
     if hiddenCount != 3 {
-        System.Fault("Explicit implementation metadata missing")
+        System.Fail("Explicit implementation metadata missing")
     }
     Console.WriteLine("Explicit interface contracts passed")
 }

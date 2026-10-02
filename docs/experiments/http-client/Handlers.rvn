@@ -60,7 +60,7 @@ func CheckHandlers() {
     if let Ok(response) = client.Get("http://example.test/greeting").GetResult() {
         Check(response.Content.Bytes.Count == 10)
     } else {
-        System.Fault("Fake response lost")
+        System.Fail("Fake response lost")
     }
     Check(fake.Calls == 1)
     Check(events.Count == 4)
@@ -69,12 +69,12 @@ func CheckHandlers() {
     if let Error(HttpError.InvalidUri(UriError.InvalidFormat)) = client.Get("http://example.test/unsafe\r\nHeader: injected").GetResult() {
         Check(fake.Calls == 1)
     } else {
-        System.Fault("Unsafe target admitted")
+        System.Fail("Unsafe target admitted")
     }
     if let Error(HttpError.Unsupported(message)) = client.Get("https://example.test/greeting").GetResult() {
         Check(message == "Only plain http:// URLs are supported")
     } else {
-        System.Fault("Unsupported scheme admitted")
+        System.Fail("Unsupported scheme admitted")
     }
     Check(fake.Calls == 1)
     Check(events.Count == 4)
@@ -83,7 +83,7 @@ func CheckHandlers() {
     if let Error(HttpError.Handler(message)) = failed.Get("http://example.test/greeting").GetResult() {
         Check(message == "Fake failure")
     } else {
-        System.Fault("Handler failure lost")
+        System.Fail("Handler failure lost")
     }
     Check(failureEvents.Count == 2)
     Check(failureEvents[1] == "failure after")
@@ -91,7 +91,7 @@ func CheckHandlers() {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("HTTP contract failed")
+        System.Fail("HTTP contract failed")
     }
 }
 
@@ -99,19 +99,19 @@ func CheckTypedErrors() {
     let absent = default(HttpError)
     Check(absent.ToString() == "Empty")
     if let HttpError.Transport(_) = absent {
-        System.Fault("Inactive error matched a case")
+        System.Fail("Inactive error matched a case")
     }
     let transport: HttpError = HttpError.Transport(SocketError.ConnectionRefused)
     if let HttpError.Transport(SocketError.ConnectionRefused) = transport {
         Check(transport.ToString() == "ConnectionRefused")
     } else {
-        System.Fault("Socket cause lost")
+        System.Fail("Socket cause lost")
     }
     let lookup: HttpError = HttpError.NameResolution(DnsError.NoAddress)
     if let HttpError.NameResolution(DnsError.NoAddress) = lookup {
         Check(lookup.ToString() == "NoAddress")
     } else {
-        System.Fault("DNS cause lost")
+        System.Fail("DNS cause lost")
     }
     var original: HttpError = HttpError.Protocol(String.Concat("retained", " payload"))
     let copy = original

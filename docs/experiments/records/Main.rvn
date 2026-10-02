@@ -33,23 +33,23 @@ func CheckStructs() {
     copy.Set(7)
     original.Set(99)
     if copy.Number != 7 || original.Number != 99 || boxed.GetHashCode() != 42 {
-        System.Fault("Struct copies and boxes must own independent values")
+        System.Fail("Struct copies and boxes must own independent values")
     }
     let zero = default(Coordinate)
     if zero != Coordinate(0, 0) {
-        System.Fault("Default record struct must initialize value fields")
+        System.Fail("Default record struct must initialize value fields")
     }
     let absent = default(OwnedCoordinate)
     if absent != OwnedCoordinate(null, 0) || absent.GetHashCode() != OwnedCoordinate(null, 0).GetHashCode() {
-        System.Fault("Default record struct must preserve absent reference fields")
+        System.Fail("Default record struct must preserve absent reference fields")
     }
     let named = NamedCoordinate(BuildName("Ra"), 42)
     if named != NamedCoordinate("Raven", 42) || named.GetHashCode() != NamedCoordinate("Raven", 42).GetHashCode() {
-        System.Fault("Record struct string fields must compare and hash by contents")
+        System.Fail("Record struct string fields must compare and hash by contents")
     }
     let owner = OwnedCoordinate(Person("Raven", 42), 7)
     if owner != OwnedCoordinate(Person("Raven", 42), 7) || owner == OwnedCoordinate(null, 7) {
-        System.Fault("Record struct reference fields must use typed equality")
+        System.Fail("Record struct reference fields must use typed equality")
     }
     let first = Coordinate(42, 7)
     let same = Coordinate(42, 7)
@@ -57,22 +57,22 @@ func CheckStructs() {
     let absentObject: Object? = null
     let boxedObject: Object? = first
     if first.Equals(absentObject) || !first.Equals(boxedObject) {
-        System.Fault("Record struct Object equality must accept nullable comparison arguments")
+        System.Fail("Record struct Object equality must accept nullable comparison arguments")
     }
     let secondBox: Object = same
     let comparable: EquatableTo<Coordinate> = first
     if first != same || !first.Equals(same) || !value.Equals(secondBox) || !comparable.Equals(same) {
-        System.Fault("Record struct equality must agree through value, Object and interface views")
+        System.Fail("Record struct equality must agree through value, Object and interface views")
     }
     if Object.ReferenceEquals(value, secondBox) || value.Equals(Coordinate(7, 42)) || value.Equals(Key(42)) {
-        System.Fault("Boxed record structs require exact type and component equality")
+        System.Fail("Boxed record structs require exact type and component equality")
     }
     let (x, y) = first
     if x != 42 || y != 7 || value.GetHashCode() != first.GetHashCode() || first.GetHashCode() != same.GetHashCode() {
-        System.Fault("Record struct deconstruction and hashing differ")
+        System.Fail("Record struct deconstruction and hashing differ")
     }
     if value.ToString() != "Coordinate { X = 42, Y = 7 }" {
-        System.Fault("Unexpected boxed record struct display")
+        System.Fail("Unexpected boxed record struct display")
     }
     Console.WriteLine(value.ToString())
 }
@@ -86,43 +86,43 @@ func Main() {
     let absentObject: Object? = null
     let boxedObject: Object? = second
     if first.Equals(absentObject) || !first.Equals(boxedObject) {
-        System.Fault("Record class Object equality must accept nullable comparison arguments")
+        System.Fail("Record class Object equality must accept nullable comparison arguments")
     }
     let absentKey: Key? = null
     let maybeKey: Key? = second
     if first.Equals(absentKey) || first.Equals(null) || !first.Equals(maybeKey) {
-        System.Fault("Typed record equality must accept nullable record references")
+        System.Fail("Typed record equality must accept nullable record references")
     }
     let differentKey: Key? = Key(7)
     if first != maybeKey || maybeKey != first || maybeKey == differentKey {
-        System.Fault("Nullable record operators must preserve value equality")
+        System.Fail("Nullable record operators must preserve value equality")
     }
     if absentKey != null || null != absentKey || absentKey == maybeKey || maybeKey == absentKey {
-        System.Fault("Nullable record operators must handle absence symmetrically")
+        System.Fail("Nullable record operators must handle absence symmetrically")
     }
     let equatable: EquatableTo<Key> = first
     if !Object.ReferenceEquals(first, alias) {
-        System.Fault("Record assignment must preserve class identity")
+        System.Fail("Record assignment must preserve class identity")
     }
     if Object.ReferenceEquals(first, second) {
-        System.Fault("Separate records must retain distinct identities")
+        System.Fail("Separate records must retain distinct identities")
     }
     if !first.Equals(second) || !value.Equals(second) || !equatable.Equals(second) || first != second {
-        System.Fault("Record equality must agree through typed and Object views")
+        System.Fail("Record equality must agree through typed and Object views")
     }
     if first.GetHashCode() != second.GetHashCode() {
-        System.Fault("Equal records must have equal hashes")
+        System.Fail("Equal records must have equal hashes")
     }
     if first == Key(7) {
-        System.Fault("Different record components must compare unequal")
+        System.Fail("Different record components must compare unequal")
     }
     if first.ToString() != "Key { Number = 42 }" {
-        System.Fault("Unexpected record display")
+        System.Fail("Unexpected record display")
     }
     let pair = Pair(42, 7)
     let (left, right) = pair
     if left != 42 || right != 7 || pair.GetHashCode() != HashCode.Combine(42, 7) {
-        System.Fault("Deconstruction or ordered component hash differs")
+        System.Fail("Deconstruction or ordered component hash differs")
     }
     var hash = HashCode()
     hash.Add(42)
@@ -130,7 +130,7 @@ func Main() {
     var independent = hash
     independent.Add(99)
     if hash.ToHashCode() != pair.GetHashCode() || independent.ToHashCode() == hash.ToHashCode() {
-        System.Fault("Hash accumulator copies must retain independent state")
+        System.Fail("Hash accumulator copies must retain independent state")
     }
     let person = Person("Raven", 42)
     let samePerson = Person(BuildName("Ra"), 42)
@@ -138,40 +138,40 @@ func Main() {
     let sameEntry = Entry(samePerson, 7)
     let view: EquatableTo<Entry> = entry
     if !view.Equals(sameEntry) || entry != sameEntry || entry.GetHashCode() != sameEntry.GetHashCode() {
-        System.Fault("Nested records must use component equality and hashes")
+        System.Fail("Nested records must use component equality and hashes")
     }
     if entry == Entry(Person("Other", 42), 7) || entry == Entry(Person("Raven", 43), 7) {
-        System.Fault("Different nested components must compare unequal")
+        System.Fail("Different nested components must compare unequal")
     }
     let unicode = Person("Å", 42)
     let unicodeCopy = Person("Å", 42)
     if unicode != unicodeCopy || unicode.GetHashCode() != unicodeCopy.GetHashCode() || unicode == Person("Å", 42) {
-        System.Fault("String equality and hashing must preserve contents without normalization")
+        System.Fail("String equality and hashing must preserve contents without normalization")
     }
     let (name, age) = person
     let (owner, number) = entry
     if name != "Raven" || age != 42 || number != 7 || !Object.ReferenceEquals(owner, person) {
-        System.Fault("Deconstruction must preserve string contents and reference identity")
+        System.Fail("Deconstruction must preserve string contents and reference identity")
     }
     if entry.ToString() != "Entry { Owner = Person { Name = Raven, Age = 42 }, Number = 7 }" {
-        System.Fault("Unexpected nested record display")
+        System.Fail("Unexpected nested record display")
     }
     let missing = OptionalEntry(null, 7)
     let sameMissing = Wrap(null, 7)
     let present = OptionalEntry(person, 7)
     let nullableView: EquatableTo<OptionalEntry> = missing
     if !nullableView.Equals(sameMissing) || missing != sameMissing || missing.GetHashCode() != sameMissing.GetHashCode() {
-        System.Fault("Absent record components must compare and hash equally")
+        System.Fail("Absent record components must compare and hash equally")
     }
     if missing == present || present == missing || missing == OptionalEntry(null, 8) {
-        System.Fault("Presence and other components must affect equality")
+        System.Fail("Presence and other components must affect equality")
     }
     let (missingOwner, missingNumber) = missing
     if missingOwner is not null || missingNumber != 7 || missing.ToString() != "OptionalEntry { Owner = , Number = 7 }" {
-        System.Fault("Absent components must survive deconstruction and display")
+        System.Fail("Absent components must survive deconstruction and display")
     }
     if OptionalPair(null, null) != OptionalPair(null, null) || OptionalPair(person, null) == OptionalPair(null, person) {
-        System.Fault("Null arguments must preserve their positions")
+        System.Fail("Null arguments must preserve their positions")
     }
     Console.WriteLine("Nullable record components preserve absence")
     Console.WriteLine(entry.ToString())

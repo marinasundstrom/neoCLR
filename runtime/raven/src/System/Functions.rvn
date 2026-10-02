@@ -2,6 +2,6 @@ namespace System
 
 import System.Runtime.CompilerServices.RuntimeFailure
 
-public func Fault(message: string) {
+public func Fail(message: string) {
     RuntimeFailure.Terminate(message)
 }

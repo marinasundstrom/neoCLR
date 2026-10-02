@@ -12,7 +12,7 @@ import System.Web.Http.Json.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("HTTP JSON client assertion failed")
+        System.Fail("HTTP JSON client assertion failed")
     }
 }
 
@@ -54,18 +54,18 @@ func JsonVerbs() {
     let reading = client.GetFromJson<Report>("child", token.Token)
     TaskQueue.Default.Drain()
     let Ok(report) = reading.GetResult() else {
-        System.Fault("GET JSON failed")
+        System.Fail("GET JSON failed")
     }
     Check(report.station == "Café" && good.SawToken)
     let Some(request) = good.Response.Request else {
-        System.Fault("GET origin missing")
+        System.Fail("GET origin missing")
     }
     Check(request.Target == "/base/child")
     Check(request.GetHeaderValues("x-client")[0] == "json-sample")
     token.Dispose()
 
     let Ok(uri) = Uri.Parse("http://example.test/reports") else {
-        System.Fault("URI creation failed")
+        System.Fail("URI creation failed")
     }
     let posted = ReplyHandler(400, "not JSON", false)
     let postClient = HttpClient(posted)
@@ -74,17 +74,17 @@ func JsonVerbs() {
     TaskQueue.Default.Drain()
     // POST preserves non-success responses and does not decode their bodies.
     let Ok(postResponse) = posting.GetResult() else {
-        System.Fault("POST response lost")
+        System.Fail("POST response lost")
     }
     Check(postResponse.StatusCode == HttpStatusCode.BadRequest)
     let Some(postRequest) = postResponse.Request else {
-        System.Fault("POST origin missing")
+        System.Fail("POST origin missing")
     }
     Check(postRequest.Method == "POST")
     Check(postRequest.GetHeaderValues("x-client")[0] == "json-sample")
     Check(postRequest.GetHeaderValues("content-type")[0] == "application/json; charset=utf-8")
     let Ok(postedReport) = JsonContent.Read<Report>(postRequest.Content) else {
-        System.Fault("Posted body invalid")
+        System.Fail("Posted body invalid")
     }
     Check(postedReport.station == report.station)
 
@@ -96,7 +96,7 @@ func JsonVerbs() {
     _ = transport.Completion.Complete(Error(HttpError.TimedOut))
     TaskQueue.Default.Drain()
     let Error(HttpJsonError.Http(HttpError.UnsuccessfulStatus(code))) = rejection.GetResult() else {
-        System.Fault("Status error missing")
+        System.Fail("Status error missing")
     }
     Check(code == HttpStatusCode.NotFound)
     Check(malformed.GetResult() is Error(HttpJsonError.Json(JsonError.Syntax(_))))

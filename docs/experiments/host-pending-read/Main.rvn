@@ -5,7 +5,7 @@ import System.Console.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Host pending-read contract failed")
+        System.Fail("Host pending-read contract failed")
     }
 }
 

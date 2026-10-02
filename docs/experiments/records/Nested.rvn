@@ -6,7 +6,7 @@ record struct Point(var X: int, var Y: int)
 
 func Main() {
     if default(Rectangle) != Rectangle(Point(0, 0), Point(0, 0)) {
-        System.Fault("Nested struct default must initialize fields recursively")
+        System.Fail("Nested struct default must initialize fields recursively")
     }
     var origin = Point(1, 2)
     let bounds = Rectangle(origin, Point(3, 4))
@@ -18,16 +18,16 @@ func Main() {
     let boxedBounds: Object = bounds
     let comparableBounds: EquatableTo<Rectangle> = bounds
     if bounds != sameBounds || bounds.Start.X != 1 || start.X != 1 || end.Y != 4 {
-        System.Fault("Nested struct construction and deconstruction must copy values")
+        System.Fail("Nested struct construction and deconstruction must copy values")
     }
     if !boxedBounds.Equals(sameBounds) || !comparableBounds.Equals(sameBounds) || bounds.GetHashCode() != sameBounds.GetHashCode() {
-        System.Fault("Nested struct equality and hashing must agree through all views")
+        System.Fail("Nested struct equality and hashing must agree through all views")
     }
     if bounds == Rectangle(Point(99, 2), Point(3, 4)) || Drawing(bounds) != Drawing(sameBounds) {
-        System.Fault("Record classes and structs must compare nested struct components")
+        System.Fail("Record classes and structs must compare nested struct components")
     }
     if bounds.ToString() != "Rectangle { Start = Point { X = 1, Y = 2 }, End = Point { X = 3, Y = 4 } }" {
-        System.Fault("Nested struct display must use component display")
+        System.Fail("Nested struct display must use component display")
     }
     Console.WriteLine(bounds.ToString())
 }

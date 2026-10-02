@@ -53,7 +53,7 @@ internal class ArrayIterator<T> : Collections.Iterator<T> {
     val Current: T {
         get {
             if position < 0 || position >= data.Length {
-                Fault("Iterator has no current element")
+                Fail("Iterator has no current element")
             }
             return data[position]
         }

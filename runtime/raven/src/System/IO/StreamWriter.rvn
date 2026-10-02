@@ -88,7 +88,7 @@ public class StreamWriter : TextWriter {
                 }
             }
             if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
-                System.Fault("Invalid encoder byte count")
+                System.Fail("Invalid encoder byte count")
             }
             if step.BytesWritten > 65536 - total {
                 failed = true
@@ -99,7 +99,7 @@ public class StreamWriter : TextWriter {
                 match output.Write(buffer, sent, step.BytesWritten - sent) {
                     Ok(let count) => {
                         if !(count >= 0) || count > step.BytesWritten - sent {
-                            System.Fault("Invalid output count")
+                            System.Fail("Invalid output count")
                         }
                         if count == 0 {
                             failed = true
@@ -117,23 +117,23 @@ public class StreamWriter : TextWriter {
             match step.State {
                 EncoderState.NeedsOutput => {
                     if step.BytesWritten == 0 {
-                        System.Fault("Encoder made no progress with positive capacity")
+                        System.Fail("Encoder made no progress with positive capacity")
                     }
                 }
                 EncoderState.Ready => {
                     if finishing {
-                        System.Fault("Final input did not finalize encoder")
+                        System.Fail("Final input did not finalize encoder")
                     }
                     return Ok(total)
                 }
                 EncoderState.Finished => {
                     if !finishing {
-                        System.Fault("Encoder finalized nonfinal input")
+                        System.Fail("Encoder finalized nonfinal input")
                     }
                     finished = true
                     return Ok(total)
                 }
-                _ => System.Fault("Invalid encoder state")
+                _ => System.Fail("Invalid encoder state")
             }
         }
         return Error(StreamError.IoFailure)

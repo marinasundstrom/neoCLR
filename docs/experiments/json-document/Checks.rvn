@@ -4,7 +4,7 @@ import System.Console.*
 
 func Check(value: bool) {
     if !value {
-        System.Fault("JSON document check failed")
+        System.Fail("JSON document check failed")
     }
 }
 
@@ -33,15 +33,15 @@ func ContractChecks() -> Result<string, string> {
     Check(absentValue is JsonNull)
     match document.Field("missing") {
         Error(_) => { }
-        Ok(_) => System.Fault("Missing field accepted")
+        Ok(_) => System.Fail("Missing field accepted")
     }
     match absentValue.AsString() {
         Error(_) => { }
-        Ok(_) => System.Fault("Wrong type accepted")
+        Ok(_) => System.Fail("Wrong type accepted")
     }
     match document.Put("a", JsonValue.StringValue("replacement")) {
         Error(_) => Check(document.Count == 2)
-        Ok(_) => System.Fault("Duplicate field accepted")
+        Ok(_) => System.Fail("Duplicate field accepted")
     }
     let retained = document.Field("a")?
     Check(retained is JsonNull)
@@ -49,21 +49,21 @@ func ContractChecks() -> Result<string, string> {
     _ = array.Add(JsonValue.BooleanValue(false))?
     match array.Item(-1) {
         Error(_) => { }
-        Ok(_) => System.Fault("Negative index accepted")
+        Ok(_) => System.Fail("Negative index accepted")
     }
     match array.Item(1) {
         Error(_) => { }
-        Ok(_) => System.Fault("Past-end index accepted")
+        Ok(_) => System.Fail("Past-end index accepted")
     }
     match array.Put("x", JsonValue.NullValue()) {
         Error(_) => { }
-        Ok(_) => System.Fault("Array field accepted")
+        Ok(_) => System.Fail("Array field accepted")
     }
     let child = array.Item(0)?
     Check(!(child.AsBoolean()?))
     match JsonValue.NumberValue("01") {
         Error(_) => { }
-        Ok(_) => System.Fault("Malformed constructed number accepted")
+        Ok(_) => System.Fail("Malformed constructed number accepted")
     }
     return Ok("contracts passed")
 }
@@ -73,7 +73,7 @@ func WriterChecks() -> Result<string, string> {
     _ = cycle.Add(cycle)?
     match WriteDocument(cycle) {
         Error(_) => { }
-        Ok(_) => System.Fault("Cyclic tree accepted")
+        Ok(_) => System.Fail("Cyclic tree accepted")
     }
     let root = JsonValue.ArrayValue()
     let wide = JsonValue.ArrayValue()
@@ -84,7 +84,7 @@ func WriterChecks() -> Result<string, string> {
     _ = root.Add(wide)?
     match WriteDocument(root) {
         Error(_) => { }
-        Ok(_) => System.Fault("Oversized tree accepted")
+        Ok(_) => System.Fail("Oversized tree accepted")
     }
     // Each string fits the message codec, but the combined document does not.
     let large = JsonValue.ArrayValue()
@@ -92,7 +92,7 @@ func WriterChecks() -> Result<string, string> {
     _ = large.Add(JsonValue.StringValue("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"))?
     match WriteDocument(large) {
         Error(_) => { }
-        Ok(_) => System.Fault("Oversized output accepted")
+        Ok(_) => System.Fail("Oversized output accepted")
     }
     return Ok("writer limits passed")
 }

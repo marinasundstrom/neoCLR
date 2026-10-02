@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-fault-') as temporary:
     (root / 'demo').mkdir()
     core = root / 'demo/NeoCLR.CoreProbe.dll'
     run(['dotnet', bridge, '--reference-core', core])
-    for spelling in ('System.Fault', 'Fault'):
+    for spelling in ('System.Fail', 'Fail'):
         source = '\n'.join([
             'import System.*',
             'import System.Console.*',

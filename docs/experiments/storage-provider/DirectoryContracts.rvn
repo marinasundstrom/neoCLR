@@ -12,18 +12,18 @@ func CheckResolved(result: Result<File, StorageLookupError>, expected: string, c
     match result {
         Ok(let file) => {
             if file.Path.Text != expected || file.Name != "note.txt" {
-                System.Fault("Directory lookup changed the address")
+                System.Fail("Directory lookup changed the address")
             }
             match ReadFileText(file) {
                 Ok(let text) => {
                     if text != content {
-                        System.Fault("Directory lookup used the wrong context")
+                        System.Fail("Directory lookup used the wrong context")
                     }
                 }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -31,7 +31,7 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     let target = RequirePath("/context/nested/note.txt")
     match provider.WriteText(target, content, 32) {
         Ok(_) => { }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     let context = ProviderDirectory(provider, RequirePath("/context"))
     CheckResolved(context.GetFile(RequirePath("nested/note.txt")), target.Text, content)
@@ -46,35 +46,35 @@ func DirectoryCases(provider: StorageProvider, content: string) {
     match context.GetFile(target) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
-                System.Fault("Absolute path has wrong context error")
+                System.Fail("Absolute path has wrong context error")
             }
         }
-        Ok(_) => System.Fault("Absolute path replaced directory context")
+        Ok(_) => System.Fail("Absolute path replaced directory context")
     }
     // The string overload still accepts one child name, not a relative path.
     match context.GetFile("nested/note.txt") {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.InvalidPath) {
-                System.Fault("Nested string has wrong error")
+                System.Fail("Nested string has wrong error")
             }
         }
-        Ok(_) => System.Fault("Direct-child overload accepted a nested string")
+        Ok(_) => System.Fail("Direct-child overload accepted a nested string")
     }
     match context.GetFile(RequirePath("absent.txt")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fault("Missing relative lookup changed error")
+                System.Fail("Missing relative lookup changed error")
             }
         }
-        Ok(_) => System.Fault("Missing relative lookup succeeded")
+        Ok(_) => System.Fail("Missing relative lookup succeeded")
     }
     match root.GetFile(RequirePath(".")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.WrongKind) {
-                System.Fault("Current directory treated as file")
+                System.Fail("Current directory treated as file")
             }
         }
-        Ok(_) => System.Fault("Current directory returned as file")
+        Ok(_) => System.Fail("Current directory returned as file")
     }
 }
 
@@ -82,27 +82,27 @@ func DirectoryLookupCases(provider: StorageProvider) {
     let root = RequireDirectory(provider, RequirePath("/"))
     let current = RequireDirectory(provider, RequirePath("."))
     if root.Path.Text != "/" || current.Path.Text != "." {
-        System.Fault("Directory lookup changed logical spelling")
+        System.Fail("Directory lookup changed logical spelling")
     }
     let item: System.Storage.StorageItem = root
     if item.Path.Text != "/" {
-        System.Fault("Directory lost StorageItem contract")
+        System.Fail("Directory lost StorageItem contract")
     }
     match provider.GetDirectory(RequirePath("context/nested/note.txt")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.WrongKind) {
-                System.Fault("File lookup as directory changed error")
+                System.Fail("File lookup as directory changed error")
             }
         }
-        Ok(_) => System.Fault("File returned as directory")
+        Ok(_) => System.Fail("File returned as directory")
     }
     match provider.GetDirectory(RequirePath("absent-directory")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fault("Missing directory changed error")
+                System.Fail("Missing directory changed error")
             }
         }
-        Ok(_) => System.Fault("Missing directory returned")
+        Ok(_) => System.Fail("Missing directory returned")
     }
 }
 
@@ -119,10 +119,10 @@ func Main() {
     match memory.GetDirectory(RequirePath("context/nested")) {
         Error(let error) => {
             if !(error is System.Storage.StorageLookupError.NotFound) {
-                System.Fault("Flat memory provider changed directory policy")
+                System.Fail("Flat memory provider changed directory policy")
             }
         }
-        Ok(_) => System.Fault("Memory lookup invented a directory")
+        Ok(_) => System.Fail("Memory lookup invented a directory")
     }
     WriteLine("Relative directory lookup contracts: passed")
 }

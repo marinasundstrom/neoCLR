@@ -999,8 +999,8 @@ M00000007_IL_00f7:
 M00000007_IL_00f8:
 ldstr "Invalid encoder byte count"
 M00000007_IL_00fd:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_0102:
 M00000007_IL_0103:
 M00000007_IL_0104:
@@ -1151,8 +1151,8 @@ M00000007_IL_01cd:
 M00000007_IL_01ce:
 ldstr "Invalid output count"
 M00000007_IL_01d3:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_01d8:
 M00000007_IL_01d9:
 M00000007_IL_01da:
@@ -1302,8 +1302,8 @@ br M00000007_IL_02b5
 M00000007_IL_02ab:
 ldstr "Encoder made no progress with positive capacity"
 M00000007_IL_02b0:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_02b5:
 M00000007_IL_02b6:
 br M00000007_IL_036e
@@ -1341,8 +1341,8 @@ br M00000007_IL_02f9
 M00000007_IL_02ef:
 ldstr "Final input did not finalize encoder"
 M00000007_IL_02f4:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_02f9:
 M00000007_IL_02fa:
 M00000007_IL_02fb:
@@ -1392,8 +1392,8 @@ br M00000007_IL_0348
 M00000007_IL_033e:
 ldstr "Encoder finalized nonfinal input"
 M00000007_IL_0343:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_0348:
 M00000007_IL_0349:
 M00000007_IL_034a:
@@ -1417,8 +1417,8 @@ M00000007_IL_035f:
 M00000007_IL_0360:
 ldstr "Invalid encoder state"
 M00000007_IL_0365:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000007_IL_036e:
 M00000007_IL_036f:
 br M00000007_IL_0011

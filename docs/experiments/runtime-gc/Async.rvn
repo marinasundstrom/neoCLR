@@ -18,12 +18,12 @@ async func Main() -> Task<()> {
     })
     GC.Collect()
     if ready.Task.IsCompleted {
-        System.Fault("Collect must not drain callbacks")
+        System.Fail("Collect must not drain callbacks")
     }
     let value = await ready.Task
     GC.Collect()
     if value != 42 {
-        System.Fault("GC lost queued state")
+        System.Fail("GC lost queued state")
     }
     GC.KeepAlive(retained)
     Console.WriteLine("GC preserves queued callbacks and async entry state")

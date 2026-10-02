@@ -41,19 +41,19 @@ import System.Result.*
 import System.Console.*
 func Check(value: bool) {
     if !value {
-        System.Fault("JSON message check failed")
+        System.Fail("JSON message check failed")
     }
 }
 func Text(result: Result<string, string>) -> string {
     match result {
         Ok(let value) => return value
-        Error(_) => System.Fault("Unexpected codec error")
+        Error(_) => System.Fail("Unexpected codec error")
     }
     return ""
 }
 func Rejected(result: Result<string, string>) {
     match result {
-        Ok(_) => System.Fault("Expected codec rejection")
+        Ok(_) => System.Fail("Expected codec rejection")
         Error(_) => { }
     }
 }

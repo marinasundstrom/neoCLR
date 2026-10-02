@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Rename the public terminal namespace function from `System.Fault(message)` to
+  `System.Fail(message)`, distinguishing the action from the resulting host `Fault`.
+  Migrate source consumers, Raven terminal-call recognition, CLI reference metadata and
+  generated runtime implementations together. Callers must rebuild against the matching
+  compiler/reference/runtime bundle; no public old-name alias is retained. Fault result
+  types, codes, the low-level fault instruction and internal runtime binding are unchanged.
+  Fresh library regeneration also updates one FileSystem helper's local layout from the
+  current compiler; native enumeration/count/limit checks pass. Eight compiler tests,
+  four admission cases, seven runtime tests and qualified/imported consumers pass.
+
 - Integrate managed value receivers into Raven's shared emission plan and native adapter.
   A Raven consumer verifies and executes value mutation and generic output calls against
   a separate native library (42). The unchanged collections sample advances to a lowered

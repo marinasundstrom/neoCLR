@@ -481,7 +481,7 @@ M00000006_IL_011b:
 M00000006_IL_011c:
 ldstr "invalid native stream error"
 M00000006_IL_0121:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end

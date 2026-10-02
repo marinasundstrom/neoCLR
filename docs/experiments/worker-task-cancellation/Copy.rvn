@@ -20,7 +20,7 @@ class ReadState {
     func Apply(text: string) {
         let bytes = Utf8.Encode(text)
         if bytes.Count != 2 || delivered {
-            System.Fault("Invalid delivery")
+            System.Fail("Invalid delivery")
         }
         buffer[1] = bytes[0]
         buffer[2] = bytes[1]

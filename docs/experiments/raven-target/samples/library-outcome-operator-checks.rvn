@@ -6,36 +6,36 @@ import System.Console.*
 
 func Check(actual: int, expected: int, label: string) {
     if actual != expected {
-        System.Fault(label)
+        System.Fail(label)
     }
 }
 
 func SomeValue(value: Option<int>, expected: int) {
     match value {
         Some(let actual) => Check(actual, expected, "Some payload")
-        None => System.Fault("Expected Some")
+        None => System.Fail("Expected Some")
     }
 }
 
 func NoValue(value: Option<int>) {
     if value is Some(_) {
-        System.Fault("Expected None")
+        System.Fail("Expected None")
     }
 }
 
 func Success(value: Result<int, string>, expected: int) {
     match value {
         Ok(let actual) => Check(actual, expected, "Ok payload")
-        Error(_) => System.Fault("Expected Ok")
+        Error(_) => System.Fail("Expected Ok")
     }
 }
 
 func Failure(value: Result<int, string>, expected: string) {
     match value {
-        Ok(_) => System.Fault("Expected Error")
+        Ok(_) => System.Fail("Expected Error")
         Error(let actual) => {
             if actual != expected {
-                System.Fault("Error payload changed")
+                System.Fail("Error payload changed")
             }
         }
     }
@@ -153,7 +153,7 @@ func Main() {
         return Ok(value)
     }), "problem")
     match error.MapError(message => message.Length) {
-        Ok(_) => System.Fault("Expected mapped error")
+        Ok(_) => System.Fail("Expected mapped error")
         Error(let size) => Check(size, 7, "MapError changes error type")
     }
     match ok.MapError((message: string) -> int => {
@@ -161,7 +161,7 @@ func Main() {
         return message.Length
     }) {
         Ok(let value) => Check(value, 0, "MapError preserves success")
-        Error(_) => System.Fault("Expected unchanged success")
+        Error(_) => System.Fail("Expected unchanged success")
     }
     Check(ok.Match(value => value + 1, message => 9), 1, "Ok Match")
     Check(error.Match(value => value + 1, message => 9), 9, "Error Match")

@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-declaration-library-') as tempor
         ('Valid', source, None),
         ('Storage', source.replace('{ }', '{ private field payload: int }'), 'value library layout'),
         ('Member', source.replace('{ }', '{ func Surprise() -> int { return 1 } }'), 'does not match reference contract'),
-        ('Constructor', source.replace('{ }', '{ public init() { System.Fault("unexpected") } }'), 'does not match reference contract'),
+        ('Constructor', source.replace('{ }', '{ public init() { System.Fail("unexpected") } }'), 'does not match reference contract'),
         ('Category', source.replace('struct', 'class'), 'value/reference representation'),
     ]:
         folder = root / name

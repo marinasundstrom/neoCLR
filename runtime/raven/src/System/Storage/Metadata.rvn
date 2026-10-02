@@ -25,7 +25,7 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
         if status == 10 {
             return Error(StorageLookupError.IoFailure())
         }
-        System.Fault("Unexpected metadata error status")
+        System.Fail("Unexpected metadata error status")
     }
     let kind = RuntimeServices.UnpackValue<int>(payload)
     if kind == 1 {
@@ -34,6 +34,6 @@ public func GetKind(path: string) -> Result<EntryKind, StorageLookupError> {
     if kind == 2 {
         return Ok(EntryKind.Directory)
     }
-    System.Fault("Unexpected metadata kind")
+    System.Fail("Unexpected metadata kind")
     return Error(StorageLookupError.IoFailure())
 }

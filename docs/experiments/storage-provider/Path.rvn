@@ -9,7 +9,7 @@ func RequirePath(text: string) -> Path {
     return match Path.Parse(text) {
         Ok(let path) => path
         Error(_) => {
-            System.Fault("Invalid sample path")
+            System.Fail("Invalid sample path")
             // Fault does not yet have compiler-visible non-returning semantics.
             RequirePath("/")
         }
@@ -21,7 +21,7 @@ func RequireDirectory(provider: System.Storage.StorageProvider, path: System.Sto
     return match provider.GetDirectory(path) {
         Ok(let directory) => directory
         Error(let error) => {
-            System.Fault(error.ToString())
+            System.Fail(error.ToString())
             // Fault does not yet have compiler-visible non-returning semantics.
             RequireDirectory(provider, path)
         }

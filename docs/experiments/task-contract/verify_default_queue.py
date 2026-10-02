@@ -16,7 +16,7 @@ prelude = '''import System.*
 import System.Tasks.*
 import System.Concurrency.*
 import System.Console.*
-public func Check(value: bool) { if !value { System.Fault("Default queue assertion failed") } }
+public func Check(value: bool) { if !value { System.Fail("Default queue assertion failed") } }
 '''
 cases = [
     ('Promise defaults and observer order', '', '''
@@ -41,7 +41,7 @@ public async func Read(input: Task<int>) -> Task<int> {
     ('Async cancellation', '''
 public async func Read(input: Task<int>) -> Task<int> {
     let value = await input
-    System.Fault("Cancelled body continued")
+    System.Fail("Cancelled body continued")
     return value
 }
 ''', '''
@@ -117,7 +117,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-default-queue-') as directory:
             assert int(re.search(r'collections=(\d+)', run.stderr).group(1)) > 0, run.stderr
         print(label + ': Passed', flush=True)
     for index, (label, helpers, body, expected) in enumerate([
-        ('Callback faults remain terminal', '', 'TaskQueue.Default.Post(() => System.Fault("callback fault"))', 'callback fault'),
+        ('Callback faults remain terminal', '', 'TaskQueue.Default.Post(() => System.Fail("callback fault"))', 'callback fault'),
         ('Automatic dispatch obeys execution budget', 'public func Again() { TaskQueue.Default.Post(Again) }', 'Again()', 'instruction limit exceeded'),
     ]):
         (root / 'Main.rvn').write_text(prelude + helpers + '\nfunc Main() {\n' + body + '\n}\n')

@@ -214,7 +214,7 @@ func Main() {
     if view.Value is Limit.Headers {
         Console.WriteLine("Shared union case")
     } else {
-        System.Fault("Wrong shared union case")
+        System.Fail("Wrong shared union case")
     }
 }
 """)

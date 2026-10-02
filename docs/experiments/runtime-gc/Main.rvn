@@ -10,7 +10,7 @@ public class Item {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("GC contract failed")
+        System.Fail("GC contract failed")
     }
 }
 

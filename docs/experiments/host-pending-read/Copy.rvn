@@ -31,7 +31,7 @@ class PendingRead {
 
     func Finish(payload: string) {
         if terminal {
-            System.Fault("Duplicate host delivery")
+            System.Fail("Duplicate host delivery")
         }
         terminal = true
         deliveries += 1
@@ -57,7 +57,7 @@ class PendingRead {
 
     func ByteAt(index: int) -> byte {
         if !terminal {
-            System.Fault("Pending destination is private")
+            System.Fail("Pending destination is private")
         }
         return buffer[index]
     }

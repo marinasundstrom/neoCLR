@@ -4,7 +4,7 @@ import System.Option.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -48,7 +48,7 @@ func Main() {
     files.Set("readme", 42)
     match files.Find("rEaDmE") {
         Some(let value) => Check(value == 42, "folded lookup")
-        None => System.Fault("missing folded key")
+        None => System.Fail("missing folded key")
     }
     Check(files.Count == 1, "map replacement")
     Check(files.Keys[0] == "ReadMe", "original spelling retained")

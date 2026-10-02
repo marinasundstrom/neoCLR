@@ -5,7 +5,7 @@ import System.Web.Http.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -84,7 +84,7 @@ func Verify() -> Result<unit, string> {
 
 func Main() {
     if let Error(reason) = Verify() {
-        System.Fault(reason)
+        System.Fail(reason)
     }
     Console.WriteLine("Route parsing checks passed")
 }

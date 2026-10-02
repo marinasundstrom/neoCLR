@@ -5,6 +5,11 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Author-directed naming correction (2026-10-02):** the terminal namespace action is
+`System.Fail(message)`; `Fault` remains the result. Update the matching compiler,
+reference and library bundle together. This correction precedes, and does not replace,
+the next propagation terminal-failure emission slice. See [the contract](system-fault.md).
+
 **Raven value-receiver checkpoint (2026-10-02):** imported value methods now consume
 managed local/ref receiver addresses through explicit shared emission capabilities.
 A separate native-library Raven consumer verifies and executes mutation and generic out

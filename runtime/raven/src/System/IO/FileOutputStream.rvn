@@ -80,7 +80,7 @@ public class FileOutputStream : OutputStream {
         if status == 10 {
             return StreamError.IoFailure()
         }
-        System.Fault("invalid native stream error")
+        System.Fail("invalid native stream error")
         return StreamError.IoFailure()
     }
 }

@@ -125,7 +125,7 @@
 - [Initial semantic decisions](../semantics.md)
 - [Stack traces and Fault diagnostics](../stack-traces.md)
 - [Intrinsic String defaults in managed storage](../string-default-storage.md)
-- [Terminal failures with System.Fault](../system-fault.md)
+- [Terminal failures with System.Fail](../system-fault.md)
 - [Explicit target data layout](../target-layout.md)
 - [Text model and initial String API](../text-model.md)
 - [Type definitions distinguished by generic arity](../type-arities.md)

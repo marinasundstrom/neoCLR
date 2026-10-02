@@ -28,7 +28,7 @@ import System.Console.*
 
 public func Check(value: bool) {
     if !value {
-        System.Fault("Task assertion failed")
+        System.Fail("Task assertion failed")
     }
 }
 
@@ -91,7 +91,7 @@ cases = {
     if source.Task.Outcome is Some(Completed(Error(let message))) {
         Check(message == "Unavailable")
     } else {
-        System.Fault("Missing Result error payload")
+        System.Fail("Missing Result error payload")
     }
     Check(!source.Cancel())
 """,
@@ -193,7 +193,7 @@ cases = {
     var called = false
     source.Task.OnCompleted(() => {
         match source.Task.GetResult() {
-            Ok(_) => System.Fault("Expected Error payload")
+            Ok(_) => System.Fail("Expected Error payload")
             Error(let message) => Check(message == "Unavailable")
         }
         called = true
@@ -255,7 +255,7 @@ faults = {
 '''),
     'Callback faults remain terminal': ('Terminal callback', '''
     let queue = TaskQueue()
-    queue.Post(() => { System.Fault("Terminal callback") })
+    queue.Post(() => { System.Fail("Terminal callback") })
     queue.Drain()
 '''),
 }

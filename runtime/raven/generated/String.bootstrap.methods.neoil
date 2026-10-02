@@ -283,7 +283,7 @@ M00000015_IL_0088:
 M00000015_IL_0089:
 ldstr "invalid native UTF-8 slice status"
 M00000015_IL_008e:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end

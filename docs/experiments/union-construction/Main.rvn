@@ -6,7 +6,7 @@ import System.Runtime.Reflection.*
 
 public func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -79,21 +79,21 @@ func Main() {
     let factory = match ItemRouteFactory.Prepare() {
         Ok(let value) => value
         Error(let reason) => {
-            System.Fault(reason)
+            System.Fail(reason)
         }
     }
     let Ok(CatalogRoutes.GetItem(first)) = factory.Create(42) else {
-        System.Fault("Could not construct item route")
+        System.Fail("Could not construct item route")
         return
     }
     let Ok(CatalogRoutes.GetItem(second)) = factory.Create(-7) else {
-        System.Fault("Could not reuse retained constructors")
+        System.Fail("Could not reuse retained constructors")
         return
     }
     Check(first == 42 && second == -7, "Independent union values")
     let constructor = typeof(Product).GetConstructors()[0]
     let Ok(value) = constructor.Invoke(19) else {
-        System.Fault("Reference constructor failed")
+        System.Fail("Reference constructor failed")
         return
     }
     Check(((Product)value).Id == 19, "Reference construction")
@@ -104,7 +104,7 @@ func Main() {
     Check(denied.Invoke() is Error(ReflectionError.AccessDenied), "Private constructor rejected")
     let caseConstructor = typeof(TextRoutes.Item).GetConstructors()[0]
     let Ok(payload) = caseConstructor.Invoke("catalog", 23) else {
-        System.Fault("Mixed case constructor failed")
+        System.Fail("Mixed case constructor failed")
         return
     }
     var found = false
@@ -112,12 +112,12 @@ func Main() {
         let parameters = carrier.GetParameters()
         if parameters.Count == 1 && parameters[0].ParameterType.Equals(typeof(TextRoutes.Item)) {
             let Ok(boxed) = carrier.Invoke(payload) else {
-                System.Fault("Mixed carrier constructor failed")
+                System.Fail("Mixed carrier constructor failed")
                 return
             }
             if boxed is TextRoutes route {
                 let TextRoutes.Item(name, id) = route else {
-                    System.Fault("Wrong mixed case")
+                    System.Fail("Wrong mixed case")
                     return
                 }
                 Check(name == "catalog" && id == 23, "Mixed payload retained")
@@ -128,7 +128,7 @@ func Main() {
     Check(found, "Mixed carrier found")
     let emptyConstructor = typeof(TextRoutes.Empty).GetConstructors()[0]
     let Ok(empty) = emptyConstructor.Invoke() else {
-        System.Fault("Empty case construction failed")
+        System.Fail("Empty case construction failed")
         return
     }
     Check(empty is TextRoutes.Empty, "Empty case boxed")

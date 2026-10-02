@@ -45,11 +45,11 @@ class ServerProbe {
 
 func Main() {
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
-        System.Fault("Port failed")
+        System.Fail("Port failed")
         return
     }
     Console.WriteLine(port)

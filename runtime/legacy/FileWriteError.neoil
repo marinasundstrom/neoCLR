@@ -382,7 +382,7 @@ M00000016_IL_00b0:
 M00000016_IL_00b1:
 ldstr "invalid file write error"
 M00000016_IL_00b6:
-call System.Fault(String)
+call System.Fail(String)
 M00000016_IL_00bb:
 M00000016_IL_00bc:
 ldstr ""

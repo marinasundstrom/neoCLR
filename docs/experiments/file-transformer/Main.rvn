@@ -61,7 +61,7 @@ func WriteReply(output: System.IO.OutputStream, text: string) -> Result<unit, st
             match output.Write(buffer, offset, count - offset) {
                 Ok(let written) => {
                     if written <= 0 || written > count - offset {
-                        System.Fault("Invalid write progress")
+                        System.Fail("Invalid write progress")
                     }
                     offset += written
                 }

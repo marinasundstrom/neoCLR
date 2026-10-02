@@ -4,7 +4,7 @@ import System.Option.*
 
 public func Check(condition: bool, message: string) {
     if !condition {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -64,7 +64,7 @@ func Main() {
     files.Set(reconstructed, 43)
     match files.Find("café") {
         Some(let value) => Check(value == 43, "replace equivalent key")
-        None => System.Fault("missing equivalent key")
+        None => System.Fail("missing equivalent key")
     }
     Check(files.Count == 3, "map count")
 
@@ -80,7 +80,7 @@ func Main() {
     buckets.Set(22, 142)
     match buckets.Find(32) {
         Some(let value) => Check(value == 142, "custom lookup after growth")
-        None => System.Fault("missing collision key")
+        None => System.Fail("missing collision key")
     }
     Check(buckets.Count == 10, "custom count")
     Check(buckets.Keys[2] == 2, "preserve original key")

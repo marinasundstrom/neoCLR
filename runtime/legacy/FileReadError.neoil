@@ -435,7 +435,7 @@ M00000019_IL_00c9:
 M00000019_IL_00ca:
 ldstr "invalid I/O error case"
 M00000019_IL_00cf:
-call System.Fault(String)
+call System.Fail(String)
 M00000019_IL_00d4:
 M00000019_IL_00d5:
 ldstr ""

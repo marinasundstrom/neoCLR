@@ -18,10 +18,10 @@ func ExpectText(reader: TextReader, limit: int, expected: string) {
     match reader.ReadToEnd(limit) {
         Ok(let text) => {
             if text != expected {
-                System.Fault("Decoded text changed")
+                System.Fail("Decoded text changed")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -29,10 +29,10 @@ func ExpectPosition(stream: SeekableStream, expected: long) {
     match stream.GetPosition() {
         Ok(let position) => {
             if position != expected {
-                System.Fault("Stream position changed")
+                System.Fail("Stream position changed")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -41,28 +41,28 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     match seek.Seek(-1) {
         Error(let error) => {
             if !(error is System.IO.StreamError.InvalidRange) {
-                System.Fault("Invalid seek changed error")
+                System.Fail("Invalid seek changed error")
             }
         }
-        Ok(_) => System.Fault("Negative seek accepted")
+        Ok(_) => System.Fail("Negative seek accepted")
     }
     ExpectPosition(seek, 0)
     match seek.Seek(99) {
         Ok(_) => { }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     let probe: byte[] = [(byte)0]
     match input.Read(probe, 0, 1) {
         Ok(let count) => {
             if count != 0 {
-                System.Fault("Read beyond EOF returned data")
+                System.Fail("Read beyond EOF returned data")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match seek.Seek(0) {
         Ok(_) => { }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     let reader: TextReader = StreamReader(input, true)
     ExpectText(reader, 14, "Hello, värld!")
@@ -71,16 +71,16 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     reader.Close()
     match seek.Seek(0) {
         Ok(_) => { }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     let owner: TextReader = StreamReader(input)
     match owner.ReadToEnd(13) {
         Error(let error) => {
             if !(error is System.IO.TextReadError.LimitExceeded) {
-                System.Fault("Text bound changed error")
+                System.Fail("Text bound changed error")
             }
         }
-        Ok(_) => System.Fault("Oversized text accepted")
+        Ok(_) => System.Fail("Oversized text accepted")
     }
     ExpectPosition(seek, 14)
     owner.Close()
@@ -88,18 +88,18 @@ func ReaderAndSeek(input: InputStream, seek: SeekableStream) {
     match seek.GetPosition() {
         Error(let error) => {
             if !(error is System.IO.StreamError.Closed) {
-                System.Fault("Reader failed to close owned input")
+                System.Fail("Reader failed to close owned input")
             }
         }
-        Ok(_) => System.Fault("Owned stream remained open")
+        Ok(_) => System.Fail("Owned stream remained open")
     }
     match owner.ReadToEnd(-1) {
         Error(let error) => {
             if !(error is System.IO.TextReadError.Closed) {
-                System.Fault("Closed reader changed precedence")
+                System.Fail("Closed reader changed precedence")
             }
         }
-        Ok(_) => System.Fault("Closed reader read text")
+        Ok(_) => System.Fail("Closed reader read text")
     }
 }
 
@@ -118,7 +118,7 @@ func Main() {
     ReaderAndSeek(memory, memory)
     match FileInputStream.Open("reader.txt") {
         Ok(let disk) => ReaderAndSeek(disk, disk)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     let invalid: List<byte> = ArrayList<byte>()
     invalid.Add((byte)195)
@@ -126,10 +126,10 @@ func Main() {
     match bad.ReadToEnd(1) {
         Error(let error) => {
             if !(error is System.IO.TextReadError.InvalidUtf8) {
-                System.Fault("Malformed UTF-8 changed error")
+                System.Fail("Malformed UTF-8 changed error")
             }
         }
-        Ok(_) => System.Fault("Malformed UTF-8 accepted")
+        Ok(_) => System.Fail("Malformed UTF-8 accepted")
     }
     bad.Close()
     let bom = StreamReader(TextInput("\uFEFFx"))
@@ -143,18 +143,18 @@ func Main() {
     match errors.ReadToEnd(-1) {
         Error(let error) => {
             if !(error is System.IO.TextReadError.InvalidRange) || failing.Calls != 0 {
-                System.Fault("Invalid limit consumed input")
+                System.Fail("Invalid limit consumed input")
             }
         }
-        Ok(_) => System.Fault("Negative text limit accepted")
+        Ok(_) => System.Fail("Negative text limit accepted")
     }
     match errors.ReadToEnd(8) {
         Error(let error) => {
             if !(error is System.IO.TextReadError.AccessDenied) {
-                System.Fault("Stream failure distinction lost")
+                System.Fail("Stream failure distinction lost")
             }
         }
-        Ok(_) => System.Fault("Failed input succeeded")
+        Ok(_) => System.Fail("Failed input succeeded")
     }
     errors.Close()
     System.Console.WriteLine("Text readers and seekability: passed")

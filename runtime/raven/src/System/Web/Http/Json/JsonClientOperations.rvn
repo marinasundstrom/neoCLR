@@ -41,7 +41,7 @@ internal class JsonClientOperations {
             _ = failed.Complete(Error(HttpJsonError.Json(error)))
             return failed.Task
         }
-        System.Fault("JSON creation returned no outcome")
+        System.Fail("JSON creation returned no outcome")
     }
 
     static func Get(client: HttpClient, url: Uri, type: TypeInfo, token: CancellationToken) -> Task<Result<Object, HttpJsonError>> {
@@ -62,7 +62,7 @@ internal class JsonClientOperations {
             _ = failed.Complete(Error(HttpJsonError.Json(error)))
             return failed.Task
         }
-        System.Fault("JSON creation returned no outcome")
+        System.Fail("JSON creation returned no outcome")
     }
 }
 
@@ -77,7 +77,7 @@ internal class JsonClientRead {
             return Error(HttpJsonError.Http(error))
         }
         let Ok(response) = result else {
-            System.Fault("HTTP returned no outcome")
+            System.Fail("HTTP returned no outcome")
         }
         if !response.IsSuccessStatusCode {
             return Error(HttpJsonError.Http(HttpError.UnsuccessfulStatus(response.StatusCode)))

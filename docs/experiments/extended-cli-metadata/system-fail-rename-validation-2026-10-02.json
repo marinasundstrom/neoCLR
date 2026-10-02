@@ -1,0 +1,30 @@
+{
+  "ravenRevision": "c5ec77147",
+  "publicAction": "System.Fail(String)",
+  "hostOutcome": "Fault",
+  "hostCode": "UserFault",
+  "compilerFlowTests": 8,
+  "sourceAdmissionCases": 4,
+  "runtimeTests": {
+    "system_fault": 2,
+    "query_terminals": 5,
+    "profile": "release"
+  },
+  "consumerSpellings": [
+    "System.Fail",
+    "Fail"
+  ],
+  "consumerOutcome": "computed Unicode diagnostic; subsequent output not executed",
+  "regeneratedLibrarySlices": 150,
+  "apiReferenceSha256": "b7f2b143be11b25fbb91441adc988eb0f2b8dd0a4b9e49f9f8760bae22297eab",
+  "regeneratedFileSystemCheck": {
+    "verify": true,
+    "result": 42,
+    "scope": "native consumer of LocalDirectory.GetItems: two entries and bounded enumeration error"
+  },
+  "limitations": [
+    "Existing CLI importer rejected a direct FileSystem-local consumer; the regenerated method was validated through a native neoIL consumer instead.",
+    "Compiler-generated propagation throw guards are not admitted by native metadata emission yet.",
+    "No full sample matrix or website build run."
+  ]
+}

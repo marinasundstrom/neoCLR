@@ -51,7 +51,7 @@ public class FailedInput : InputStream {
 public func ExpectText(result: Result<string, TextReadError>, expected: string) {
     match result {
         Ok(let text) => Check(text.Equals(expected), "Reader text mismatch")
-        Error(_) => System.Fault("Unexpected reader error")
+        Error(_) => System.Fail("Unexpected reader error")
     }
 }
 
@@ -67,47 +67,47 @@ public func CheckReader() {
         Check(!(input.Closed), "Leave-open ownership")
         match reader.ReadToEnd(-1) {
             Error(TextReadError.Closed) => { }
-            _ => System.Fault("Closed precedes bounds")
+            _ => System.Fail("Closed precedes bounds")
         }
     }
     let invalid = ChunkInput([(byte)255, (byte)65], 1)
     match StreamReader(invalid).ReadToEnd(20) {
         Error(TextReadError.InvalidUtf8) => Check(invalid.Position == 1, "Reject malformed input before another read")
-        _ => System.Fault("Invalid input accepted")
+        _ => System.Fail("Invalid input accepted")
     }
     for bad in [[(byte)224, (byte)128, (byte)128], [(byte)237, (byte)160, (byte)128], [(byte)244, (byte)144, (byte)128, (byte)128], [(byte)226], [(byte)195, (byte)65]] {
         match StreamReader(ChunkInput(bad, 1)).ReadToEnd(8) {
             Error(TextReadError.InvalidUtf8) => { }
-            _ => System.Fault("Strict malformed/truncated input")
+            _ => System.Fail("Strict malformed/truncated input")
         }
     }
     let bounded = ChunkInput(Utf8.Encode("abc"), 3)
     let boundedReader = StreamReader(bounded)
     match boundedReader.ReadToEnd(-1) {
         Error(TextReadError.InvalidRange) => { }
-        _ => System.Fault("Negative bound")
+        _ => System.Fail("Negative bound")
     }
     match boundedReader.ReadToEnd(65537) {
         Error(TextReadError.LimitExceeded) => { }
-        _ => System.Fault("Unsupported bound")
+        _ => System.Fail("Unsupported bound")
     }
     Check(bounded.Calls == 0, "Invalid bounds must not read")
     match boundedReader.ReadToEnd(2) {
         Error(TextReadError.LimitExceeded) => Check(bounded.Position == 3, "Single excess byte")
-        _ => System.Fault("Exceeded bound accepted")
+        _ => System.Fail("Exceeded bound accepted")
     }
     boundedReader.Close()
     boundedReader.Close()
     Check(bounded.Closed, "Owned close")
     match StreamReader(FailedInput()).ReadToEnd(10) {
         Error(TextReadError.AccessDenied) => { }
-        _ => System.Fault("Stream error lost")
+        _ => System.Fail("Stream error lost")
     }
     ExpectText(StreamReader(ChunkInput(Utf8.Encode("\uFEFFx"), 1)).ReadToEnd(4), "\uFEFFx")
     let lines = StreamReader(ChunkInput(Utf8.Encode("a\r\né"), 1))
     match lines.ReadLine(1) {
         Ok(Some(let line)) => Check(line.Equals("a"), "Existing line contract")
-        _ => System.Fault("Line read regression")
+        _ => System.Fail("Line read regression")
     }
     ExpectText(lines.ReadToEnd(3), "é")
     WriteLine("Incremental StreamReader contracts passed")

@@ -155,8 +155,8 @@ brfalse M00000002_IL_00c9
 M00000002_IL_00ab:
 ldstr "Inactive encoder progress state"
 M00000002_IL_00b0:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000002_IL_00c9:
 M00000002_IL_00ca:
 M00000002_IL_00cb:
@@ -207,8 +207,8 @@ M00000003_IL_002f:
 M00000003_IL_0030:
 ldstr "Encoded byte count must be non-negative"
 M00000003_IL_0035:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000003_IL_003a:
 M00000003_IL_003b:
 M00000003_IL_003c:
@@ -229,8 +229,8 @@ M00000003_IL_0050:
 M00000003_IL_0051:
 ldstr "Inactive encoder progress state"
 M00000003_IL_0056:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000003_IL_005b:
 M00000003_IL_005c:
 M00000003_IL_005d:

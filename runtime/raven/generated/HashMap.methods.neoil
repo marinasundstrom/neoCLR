@@ -239,8 +239,8 @@ M00000005_IL_0012:
 M00000005_IL_0013:
 ldstr "HashMap callbacks must not reenter the map"
 M00000005_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000005_IL_001d:
 M00000005_IL_001e:
 M00000005_IL_001f:
@@ -581,8 +581,8 @@ M0000000b_IL_003d:
 M0000000b_IL_003e:
 ldstr "HashMap capacity overflow"
 M0000000b_IL_0043:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000000b_IL_0048:
 M0000000b_IL_0049:
 M0000000b_IL_004a:

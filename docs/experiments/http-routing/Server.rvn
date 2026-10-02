@@ -85,25 +85,25 @@ func Main(arguments: string[]) {
         }
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
-        System.Fault("Local port unavailable")
+        System.Fail("Local port unavailable")
         return
     }
     Console.WriteLine(port)
     let Ok(pattern) = RoutePattern.Parse("/stations/{stationId}/reports") else {
         server.Close()
-        System.Fault("Invalid station pattern")
+        System.Fail("Invalid station pattern")
         return
     }
     let serving = ReportServer(pattern).Serve(server, count)
     serving.OnCompleted(() => {
         server.Close()
         if let Error(error) = serving.GetResult() {
-            System.Fault(error.ToString())
+            System.Fail(error.ToString())
         }
         Console.WriteLine("Reports served")
     })

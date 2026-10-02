@@ -61,7 +61,7 @@ public class CancellationTokenSource : Disposable {
     val Token: CancellationToken {
         get {
             if disposed {
-                System.Fault("Cancellation source is disposed")
+                System.Fail("Cancellation source is disposed")
             }
             return CancellationToken(self)
         }
@@ -75,7 +75,7 @@ public class CancellationTokenSource : Disposable {
     /// Sets the request flag and invokes active callbacks synchronously in reverse registration order.
     func Cancel() {
         if disposed {
-            System.Fault("Cancellation source is disposed")
+            System.Fail("Cancellation source is disposed")
         }
         if requested {
             return
@@ -105,7 +105,7 @@ public class CancellationTokenSource : Disposable {
 
     internal func Register(callback: () -> Void) -> CancellationRegistration {
         if disposed {
-            System.Fault("Cancellation source is disposed")
+            System.Fail("Cancellation source is disposed")
         }
         if requested {
             callback()

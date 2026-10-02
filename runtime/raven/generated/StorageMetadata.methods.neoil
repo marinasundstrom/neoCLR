@@ -161,8 +161,8 @@ M00000001_IL_00e1:
 M00000001_IL_00e2:
 ldstr "Unexpected metadata error status"
 M00000001_IL_00e7:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000001_IL_00ec:
 M00000001_IL_00ed:
 M00000001_IL_00ee:
@@ -219,6 +219,6 @@ M00000001_IL_012f:
 M00000001_IL_0130:
 ldstr "Unexpected metadata kind"
 M00000001_IL_0135:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end

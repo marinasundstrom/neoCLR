@@ -12,23 +12,23 @@ func Valid(text: string, absolute: bool) {
     match Path.Parse(text) {
         Ok(let path) => {
             if path.Text != text || path.ToString() != text {
-                System.Fault("Path spelling changed")
+                System.Fail("Path spelling changed")
             }
             if path.IsAbsolute != absolute || path.IsRelative == absolute {
-                System.Fault("Wrong path kind")
+                System.Fail("Wrong path kind")
             }
             if !path.Equals(RequirePath(text)) {
-                System.Fault("Path equality used object identity")
+                System.Fail("Path equality used object identity")
             }
         }
-        Error(_) => System.Fault("Valid logical path rejected")
+        Error(_) => System.Fail("Valid logical path rejected")
     }
 }
 
 func Invalid(text: string) {
     match Path.Parse(text) {
         Error(_) => { }
-        Ok(_) => System.Fault("Invalid logical path accepted")
+        Ok(_) => System.Fail("Invalid logical path accepted")
     }
 }
 
@@ -37,7 +37,7 @@ func Main() {
     // with the parsed address. Unicode spelling is preserved.
     let descriptor = ProviderFile(HostStorage("missing-provider-root"), RequirePath("nested/naïve.txt"))
     if descriptor.Name != "naïve.txt" || descriptor.Path.Text != "nested/naïve.txt" {
-        System.Fault("Descriptor name disagrees with its path")
+        System.Fail("Descriptor name disagrees with its path")
     }
 
     Valid("/", true)
@@ -65,10 +65,10 @@ func Main() {
     Invalid("//server/share")
     Invalid("a/")
     if RequirePath("/A").Equals(RequirePath("/a")) {
-        System.Fault("Path equality depends on host case rules")
+        System.Fail("Path equality depends on host case rules")
     }
     if RequirePath("/notes.txt").Equals(RequirePath("notes.txt")) {
-        System.Fault("Path equality silently resolved relative addresses")
+        System.Fail("Path equality silently resolved relative addresses")
     }
     let memory: StorageProvider = MemoryStorage()
     let root = ProviderDirectory(memory, RequirePath("/"))
@@ -77,10 +77,10 @@ func Main() {
         Ok(let file) => {
             match memory.WriteText(file.Path, "rooted", 16) {
                 Ok(_) => { }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     // Providers may resolve distinct lexical values to the same address.
     match current.FileAt("note") {
@@ -88,45 +88,45 @@ func Main() {
             match memory.ReadText(file.Path, 16) {
                 Ok(let text) => {
                     if text != "rooted" {
-                        System.Fault("Relative resolution changed provider context")
+                        System.Fail("Relative resolution changed provider context")
                     }
                 }
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match root.FileAt("a\\b") {
         Error(_) => { }
-        Ok(_) => System.Fault("Directory bypassed path validation")
+        Ok(_) => System.Fail("Directory bypassed path validation")
     }
     let host: StorageProvider = HostStorage(".")
     match host.ReadText(RequirePath("/notes.txt"), 64) {
         Ok(let text) => {
             if text != "Hello, värld!" {
-                System.Fault("Provider-rooted path reached wrong disk file")
+                System.Fail("Provider-rooted path reached wrong disk file")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match host.ReadText(RequirePath("notes.txt"), 64) {
         Ok(let text) => {
             if text != "Hello, värld!" {
-                System.Fault("Relative path reached wrong disk file")
+                System.Fail("Relative path reached wrong disk file")
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     // Parse checks syntax without querying storage.
     match host.OpenRead(RequirePath("/missing")) {
         Error(let error) => {
             if !(error is System.IO.StreamError.NotFound) {
-                System.Fault("Parsing performed storage lookup")
+                System.Fail("Parsing performed storage lookup")
             }
         }
         Ok(let stream) => {
             stream.Close()
-            System.Fault("Missing item opened")
+            System.Fail("Missing item opened")
         }
     }
     WriteLine("Validated Path and provider resolution: passed")

@@ -25,6 +25,21 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-02: Fail names the action; Fault names the result
+
+- **Author:** “System.Fault method should be called System.Fail(message)” and “The Fault
+  is a result of Fail”, while terminal propagation-failure support was being investigated.
+- **Assistant:** Accepted the distinction and scoped a public API rename, retaining the
+  host Fault type, fault classifications and low-level fault instruction. Updated Raven
+  terminal-call recognition, reference generation, runtime source and consumers together.
+- **Outcome:** Eight compiler flow tests, four source-admission checks, seven runtime
+  tests and qualified/imported Fail execution passed; runtime and API snapshots were
+  regenerated. [Evidence](experiments/extended-cli-metadata/system-fail-rename-validation-2026-10-02.json)
+  distinguishes the native filesystem control from a still-rejected CLI importer case.
+- **Direction:** The naming correction does not request exceptions or process abort.
+  Generated propagation-guard/native metadata emission remains the subsequent integration
+  work; renaming the existing runtime API alone does not solve that blocker.
+
 ## 2026-10-01: Return to the end-to-end case
 
 - **Author:** “We should make this good enough for now. Record the direction. Work

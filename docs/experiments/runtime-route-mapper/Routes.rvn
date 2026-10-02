@@ -4,7 +4,7 @@ import System.Result.*
 [AttributeUsage(AttributeTargets.All, AllowMultiple: true)]
 public class RoutePatternAttribute : Attribute {
     init(pattern: string) {
-        System.Fault("Route attributes must be read without executing constructors")
+        System.Fail("Route attributes must be read without executing constructors")
     }
 }
 

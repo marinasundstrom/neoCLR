@@ -4,7 +4,7 @@ import System.Option.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -36,7 +36,7 @@ func Main() {
     if let Some(value) = values.Find(nan) {
         Check(value == 1 && values.Count == 4, "NaN lookup after collection")
     } else {
-        System.Fault("NaN key lost")
+        System.Fail("NaN key lost")
     }
     Check(copied.Equals(1.5), "Copy survives collection")
     Console.WriteLine("Floating Object keys, copied values and GC: passed")

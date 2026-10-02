@@ -23,7 +23,7 @@ public class FileSystem : StorageProvider {
         if path.IsAbsolute {
             match text.SliceUtf8(1, text.GetUtf8ByteCount() - 1) {
                 Ok(let relative) => return System.Storage.Path.Combine(root, relative)
-                Error(_) => System.Fault("Invalid parsed path boundary")
+                Error(_) => System.Fail("Invalid parsed path boundary")
             }
         }
         return System.Storage.Path.Combine(root, text)

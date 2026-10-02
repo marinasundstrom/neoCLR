@@ -38,9 +38,9 @@ func Main() {
             Start(server)
         } else {
             server.Close()
-            System.Fault("Local port unavailable")
+            System.Fail("Local port unavailable")
         }
     } else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
     }
 }

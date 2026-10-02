@@ -8,7 +8,7 @@ import System.Tasks.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Network cancellation assertion failed")
+        System.Fail("Network cancellation assertion failed")
     }
 }
 
@@ -20,7 +20,7 @@ func Main() {
     let addresses: Sequence<string> = ["invalid"]
     Check(Socket.Connect(addresses, 0, stopped.Token).IsCancelled)
     let Ok(address) = IPAddress.Parse("127.0.0.1") else {
-        System.Fault("Address parse failed")
+        System.Fail("Address parse failed")
         return
     }
     Check(Socket.Connect(address, 0, stopped.Token).IsCancelled)
@@ -44,7 +44,7 @@ func CheckLookupCompletion() {
     let lookup = Dns.GetHostAddresses("localhost", source.Token)
     lookup.OnCompleted(() => {
         let Ok(addresses) = lookup.GetResult() else {
-            System.Fault("Lookup failed")
+            System.Fail("Lookup failed")
             return
         }
         Check(addresses.Count > 0)
@@ -57,7 +57,7 @@ func CheckLookupCompletion() {
 
 func CheckAccept() {
     let Ok(listener) = Socket.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let stopped = CancellationTokenSource()
@@ -77,11 +77,11 @@ func CheckAccept() {
 
 func ConnectPair(listener: Socket) {
     let Ok(port) = listener.GetLocalPort() else {
-        System.Fault("Port lookup failed")
+        System.Fail("Port lookup failed")
         return
     }
     let Ok(address) = IPAddress.Parse("127.0.0.1") else {
-        System.Fault("Address parse failed")
+        System.Fail("Address parse failed")
         return
     }
     let addresses: Sequence<IPAddress> = [address]
@@ -93,7 +93,7 @@ func ConnectPair(listener: Socket) {
     let connecting = Socket.Connect(addresses, port, source.Token)
     connecting.OnCompleted(() => {
         let Ok(client) = connecting.GetResult() else {
-            System.Fault("Connect failed")
+            System.Fail("Connect failed")
             return
         }
         // Completion removed its registration; late cancellation cannot use a stale ID.
@@ -106,7 +106,7 @@ func ConnectPair(listener: Socket) {
 func FinishAccept(listener: Socket, client: Socket, accepted: Task<Result<Socket, SocketError>>) {
     accepted.OnCompleted(() => {
         let Ok(server) = accepted.GetResult() else {
-            System.Fault("Accept after cancellation failed")
+            System.Fail("Accept after cancellation failed")
             return
         }
         CheckTransfers(listener, client, server)
@@ -144,7 +144,7 @@ func CheckReuse(listener: Socket, client: Socket, server: Socket) {
     let sent = client.Send(bytes, 0, 1, CancellationToken.None)
     read.OnCompleted(() => {
         let Ok(count) = read.GetResult() else {
-            System.Fault("Receive after cancellation failed")
+            System.Fail("Receive after cancellation failed")
             return
         }
         Check(count == 1 && buffer[0] == 42)
@@ -153,7 +153,7 @@ func CheckReuse(listener: Socket, client: Socket, server: Socket) {
         source.Dispose()
         sent.OnCompleted(() => {
             let Ok(written) = sent.GetResult() else {
-                System.Fault("Send after cancellation failed")
+                System.Fail("Send after cancellation failed")
                 return
             }
             Check(written == 1)
@@ -180,7 +180,7 @@ func CheckEmptyCompletion(listener: Socket, client: Socket, server: Socket) {
     let empty = server.Receive(buffer, 0, 0, source.Token)
     empty.OnCompleted(() => {
         let Ok(count) = empty.GetResult() else {
-            System.Fault("Empty receive failed")
+            System.Fail("Empty receive failed")
             return
         }
         source.Cancel()

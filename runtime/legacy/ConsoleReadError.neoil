@@ -117,7 +117,7 @@ M00000007_IL_0033:
 M00000007_IL_0034:
 ldstr "invalid I/O error case"
 M00000007_IL_0039:
-call System.Fault(String)
+call System.Fail(String)
 M00000007_IL_003e:
 M00000007_IL_003f:
 ldstr ""

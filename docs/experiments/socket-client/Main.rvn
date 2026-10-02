@@ -7,7 +7,7 @@ import System.Collections.*
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Socket client contract failed")
+        System.Fail("Socket client contract failed")
     }
 }
 
@@ -75,13 +75,13 @@ async func ExchangeGreeting(addresses: Sequence<IPAddress>) -> Task<Result<int, 
     if let Error(error) = closed {
         Check(error is SocketError.Closed)
     } else {
-        System.Fault("Closed socket admitted a receive")
+        System.Fail("Closed socket admitted a receive")
     }
     let closedSend = socket.Send([(byte)0], 0, 1).GetResult()
     if let Error(error) = closedSend {
         Check(error is SocketError.Closed)
     } else {
-        System.Fault("Closed socket admitted a send")
+        System.Fail("Closed socket admitted a send")
     }
     return result
 }
@@ -89,11 +89,11 @@ async func ExchangeGreeting(addresses: Sequence<IPAddress>) -> Task<Result<int, 
 func StartExchange(addresses: Sequence<IPAddress>) {
     // The controlled loopback demo deliberately tries an address with no listener first.
     let Ok(fallback) = IPAddress.Parse("127.0.0.2") else {
-        System.Fault("Invalid fallback address in sample")
+        System.Fail("Invalid fallback address in sample")
         return
     }
     let Ok(replacement) = IPAddress.Parse("127.0.0.3") else {
-        System.Fault("Invalid replacement address in sample")
+        System.Fail("Invalid replacement address in sample")
         return
     }
     let candidates = ArrayList<IPAddress>()
@@ -112,7 +112,7 @@ func StartExchange(addresses: Sequence<IPAddress>) {
             Check(count == 2)
             Console.WriteLine("Socket closed")
         } else {
-            System.Fault("TCP exchange failed")
+            System.Fail("TCP exchange failed")
         }
     })
 }
@@ -122,18 +122,18 @@ func Main() {
     if let Error(error) = Socket.Connect(empty, 19090).GetResult() {
         Check(error is SocketError.InvalidRange)
     } else {
-        System.Fault("Empty address sequence admitted")
+        System.Fail("Empty address sequence admitted")
     }
     let invalid: Sequence<string> = ["127.0.0.1", "bad address"]
     if let Error(error) = Socket.Connect(invalid, 19090).GetResult() {
         Check(error is SocketError.InvalidAddress)
     } else {
-        System.Fault("Malformed address sequence admitted")
+        System.Fail("Malformed address sequence admitted")
     }
     if let Error(error) = Dns.GetHostAddresses("bad name").GetResult() {
         Check(error is DnsError.InvalidName)
     } else {
-        System.Fault("Invalid hostname admitted")
+        System.Fail("Invalid hostname admitted")
     }
     let lookup = ResolveHost()
     Churn()
@@ -143,7 +143,7 @@ func Main() {
             Console.WriteLine("Resolved localhost")
             StartExchange(addresses)
         } else {
-            System.Fault("Hostname lookup failed")
+            System.Fail("Hostname lookup failed")
         }
     })
     TaskQueue.Default.Post(() => Console.WriteLine("Other work runs while TCP is pending"))

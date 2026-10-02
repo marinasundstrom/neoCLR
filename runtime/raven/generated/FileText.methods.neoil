@@ -210,8 +210,8 @@ M00000001_IL_0138:
 M00000001_IL_0139:
 ldstr "invalid native file write status"
 M00000001_IL_013e:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .method static ReadAllText(String path,Int32 maxBytes) -> System.Result<String,System.Storage.FileReadError>
 .local Value local0
@@ -466,6 +466,6 @@ M00000002_IL_0169:
 M00000002_IL_016a:
 ldstr "invalid native I/O status"
 M00000002_IL_016f:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end

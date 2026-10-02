@@ -5,7 +5,7 @@ import System.Option.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -42,7 +42,7 @@ func Main() {
         }
         Check(found, "Accessor has the same identity as its method declaration")
     } else {
-        System.Fault("Fixture property must have a public getter")
+        System.Fail("Fixture property must have a public getter")
     }
 
     let members = HashMap<MemberInfo, int>((left, right) => Same(left, right), key => Hash(key))
@@ -58,7 +58,7 @@ func Main() {
     if let Some(value) = members.Find(typeof(Date).GetProperties()[0]) {
         Check(value == 3 && members.Count == 3, "Lookup survives collection")
     } else {
-        System.Fault("Member lookup failed after collection")
+        System.Fail("Member lookup failed after collection")
     }
     CheckMember(fieldInfo, typeof(Date).GetFields(flags)[0])
     CheckMember(method, typeof(Date).GetMethods()[0])

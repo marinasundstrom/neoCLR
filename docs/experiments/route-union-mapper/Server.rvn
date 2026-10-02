@@ -55,20 +55,20 @@ class ItemServer {
 
 func Main(arguments: string[]) {
     let Ok(routes) = AppRoutesParser.Create() else {
-        System.Fault("Invalid route configuration")
+        System.Fail("Invalid route configuration")
         return
     }
     let Ok(count) = Int32.Parse(arguments[0]) else {
-        System.Fault("Supply the number of requests")
+        System.Fail("Supply the number of requests")
         return
     }
     let Ok(server) = HttpServer.Listen("127.0.0.1", 0, 4) else {
-        System.Fault("Listen failed")
+        System.Fail("Listen failed")
         return
     }
     let Ok(port) = server.GetLocalPort() else {
         server.Close()
-        System.Fault("Local port unavailable")
+        System.Fail("Local port unavailable")
         return
     }
     Console.WriteLine(port)
@@ -76,7 +76,7 @@ func Main(arguments: string[]) {
     serving.OnCompleted(() => {
         server.Close()
         if let Error(error) = serving.GetResult() {
-            System.Fault(error.ToString())
+            System.Fail(error.ToString())
         }
         Console.WriteLine("Items served")
     })

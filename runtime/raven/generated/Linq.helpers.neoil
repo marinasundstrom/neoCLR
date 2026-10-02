@@ -582,8 +582,8 @@ M00000025_IL_0015:
 M00000025_IL_0016:
 ldstr "Query iterator has no current element"
 M00000025_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000025_IL_0020:
 M00000025_IL_0021:
 M00000025_IL_0022:
@@ -835,8 +835,8 @@ M00000029_IL_0015:
 M00000029_IL_0016:
 ldstr "Query iterator has no current element"
 M00000029_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000029_IL_0020:
 M00000029_IL_0021:
 M00000029_IL_0022:
@@ -1070,8 +1070,8 @@ M0000002d_IL_0015:
 M0000002d_IL_0016:
 ldstr "Query iterator has no current element"
 M0000002d_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000002d_IL_0020:
 M0000002d_IL_0021:
 M0000002d_IL_0022:
@@ -1399,8 +1399,8 @@ M00000031_IL_0015:
 M00000031_IL_0016:
 ldstr "Query iterator has no current element"
 M00000031_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000031_IL_0020:
 M00000031_IL_0021:
 M00000031_IL_0022:
@@ -1784,8 +1784,8 @@ M00000035_IL_0015:
 M00000035_IL_0016:
 ldstr "Query iterator has no current element"
 M00000035_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000035_IL_0020:
 M00000035_IL_0021:
 M00000035_IL_0022:
@@ -2181,8 +2181,8 @@ M00000039_IL_0015:
 M00000039_IL_0016:
 ldstr "Query iterator has no current element"
 M00000039_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000039_IL_0020:
 M00000039_IL_0021:
 M00000039_IL_0022:
@@ -2645,8 +2645,8 @@ M0000003d_IL_0015:
 M0000003d_IL_0016:
 ldstr "Query iterator has no current element"
 M0000003d_IL_001b:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000003d_IL_0020:
 M0000003d_IL_0021:
 M0000003d_IL_0022:

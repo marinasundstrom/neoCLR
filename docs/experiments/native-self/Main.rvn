@@ -46,19 +46,19 @@ func Main() {
     let copiedBox = Copy<Box>(box)
     box.Value = 99
     if copiedCell.Value + copiedBox.Value != 42 {
-        System.Fault("Self cloning did not preserve independent values")
+        System.Fail("Self cloning did not preserve independent values")
     }
     if InheritedClone().Clone().Read() != 20 {
-        System.Fault("Inherited clone changed its base result contract")
+        System.Fail("Inherited clone changed its base result contract")
     }
     if Copy<BaseClone>(InheritedClone()).Read() != 20 {
-        System.Fault("Base Self clone failed")
+        System.Fail("Base Self clone failed")
     }
     if Copy<BaseClone>(OverrideClone()).Read() != 42 {
-        System.Fault("Base Self clone lost virtual dispatch")
+        System.Fail("Base Self clone lost virtual dispatch")
     }
     if Copy<ReboundClone>(ReboundClone()).Read() != 60 {
-        System.Fault("Explicit derived Self clone failed")
+        System.Fail("Explicit derived Self clone failed")
     }
     Console.WriteLine("Generic Self cloning passed")
 }

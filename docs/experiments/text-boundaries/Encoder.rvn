@@ -44,7 +44,7 @@ public func ScalarChunk(text: string, start: int) -> string {
             Error(_) => count -= 1
         }
     }
-    System.Fault("Invalid internal scalar boundary")
+    System.Fail("Invalid internal scalar boundary")
     return ""
 }
 
@@ -122,7 +122,7 @@ public class BoundedTextEncoder : EncoderSession {
                 bytes = match policy.Encode(part) {
                     Ok(let encoded) => encoded
                     Error(_) => {
-                        System.Fault("Validated text encoding failed")
+                        System.Fail("Validated text encoding failed")
                         ArrayList<byte>()
                     }
                 }
@@ -222,14 +222,14 @@ public class EncodingWriterProbe {
                 }
             }
             if !(step.BytesWritten >= 0) || step.BytesWritten > buffer.Length {
-                System.Fault("Invalid encoder byte count")
+                System.Fail("Invalid encoder byte count")
             }
             var sent = 0
             while sent < step.BytesWritten {
                 match output.Write(buffer, sent, step.BytesWritten - sent) {
                     Ok(let count) => {
                         if !(count >= 0) || count > step.BytesWritten - sent {
-                            System.Fault("Invalid output count")
+                            System.Fail("Invalid output count")
                         }
                         if count == 0 {
                             failed = true
@@ -247,23 +247,23 @@ public class EncodingWriterProbe {
             match step.State {
                 EncodeState.NeedsOutput => {
                     if step.BytesWritten == 0 {
-                        System.Fault("Encoder made no progress with positive capacity")
+                        System.Fail("Encoder made no progress with positive capacity")
                     }
                 }
                 EncodeState.Ready => {
                     if finishing {
-                        System.Fault("Final input did not finalize encoder")
+                        System.Fail("Final input did not finalize encoder")
                     }
                     return Ok(total)
                 }
                 EncodeState.Finished => {
                     if !finishing {
-                        System.Fault("Encoder finalized nonfinal input")
+                        System.Fail("Encoder finalized nonfinal input")
                     }
                     finished = true
                     return Ok(total)
                 }
-                _ => System.Fault("Invalid encoder state")
+                _ => System.Fail("Invalid encoder state")
             }
         }
         return Error(StreamError.IoFailure)

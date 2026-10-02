@@ -13,10 +13,10 @@ artifacts. It is separate from the application-owned Storage provider experiment
 match System.Storage.Metadata.GetKind(".") {
     Ok(let kind) => {
         if kind != EntryKind.Directory {
-            System.Fault("Directory metadata lost its kind")
+            System.Fail("Directory metadata lost its kind")
         }
     }
-    Error(let error) => System.Fault(error.ToString())
+    Error(let error) => System.Fail(error.ToString())
 }
 ```
 

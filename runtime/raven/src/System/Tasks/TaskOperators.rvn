@@ -38,7 +38,7 @@ internal class MapContinuation<T, U> {
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()
         } else {
-            System.Fault("Task continuation ran while pending")
+            System.Fail("Task continuation ran while pending")
         }
     }
 }
@@ -62,7 +62,7 @@ internal class ThenContinuation<T, U> {
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()
         } else {
-            System.Fault("Task continuation ran while pending")
+            System.Fail("Task continuation ran while pending")
         }
     }
 }
@@ -82,7 +82,7 @@ internal class OutcomeTransfer<T> {
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()
         } else {
-            System.Fault("Task continuation ran while pending")
+            System.Fail("Task continuation ran while pending")
         }
     }
 }
@@ -118,7 +118,7 @@ internal class TaskResultMapContinuation<T, E, U> {
         } else if input.Outcome is Some(Cancelled) {
             _ = output.Cancel()
         } else {
-            System.Fault("Task continuation ran while pending")
+            System.Fail("Task continuation ran while pending")
         }
     }
 }

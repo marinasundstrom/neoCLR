@@ -143,8 +143,8 @@ M00000003_IL_004e:
 M00000003_IL_004f:
 ldstr "Invalid local date from runtime"
 M00000003_IL_0054:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000003_IL_0059:
 M00000003_IL_005a:
 M00000003_IL_005b:
@@ -204,8 +204,8 @@ M00000003_IL_00a3:
 M00000003_IL_00a4:
 ldstr "Invalid local time from runtime"
 M00000003_IL_00a9:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000003_IL_00ae:
 M00000003_IL_00af:
 M00000003_IL_00b0:

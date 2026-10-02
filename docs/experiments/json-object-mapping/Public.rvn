@@ -104,7 +104,7 @@ public class LockedParent {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Public JSON mapping check failed")
+        System.Fail("Public JSON mapping check failed")
     }
 }
 
@@ -117,7 +117,7 @@ func RoundTrip() -> Result<unit, JsonError> {
         Check(reading.Active)
         Check(reading.GetAssignments() == 1)
     } else {
-        System.Fault("Unexpected mapped type")
+        System.Fail("Unexpected mapped type")
     }
     let typed = JsonSerializer.Deserialize<Reading>(text)?
     Check(typed.Station == "Café" && typed.Count == 42 && typed.Active)
@@ -149,7 +149,7 @@ func RoundTrip() -> Result<unit, JsonError> {
         let summary = document.Field("Summary")?
         Check(summary is JsonString value && value.Value == "Café")
     } else {
-        System.Fault("Expected mapped object")
+        System.Fail("Expected mapped object")
     }
     let stream = MemoryStream()
     _ = JsonSerializer.Serialize(stream, instance)?
@@ -159,7 +159,7 @@ func RoundTrip() -> Result<unit, JsonError> {
         Check(copy.Count == 42 && copy.Active)
         Check(copy.GetAssignments() == 1)
     } else {
-        System.Fault("Unexpected stream result")
+        System.Fail("Unexpected stream result")
     }
     Check(stream.Seek(0) is Ok(_))
     let typedCopy = JsonSerializer.Deserialize<Reading>(stream)?
@@ -183,7 +183,7 @@ func RoundTrip() -> Result<unit, JsonError> {
     if let Ok(length) = untouched.GetLength() {
         Check(length == 0)
     } else {
-        System.Fault("Output stream was closed")
+        System.Fail("Output stream was closed")
     }
     untouched.Close()
     let preserved: Object = dom
@@ -225,7 +225,7 @@ func NestedRoundTrip() -> Result<unit, JsonError> {
     let rejected = MemoryStream()
     Check(JsonSerializer.Serialize(rejected, contact) is Error(JsonError.LimitExceeded(_)))
     let Ok(rejectedLength) = rejected.GetLength() else {
-        System.Fault("Could not inspect rejected output")
+        System.Fail("Could not inspect rejected output")
     }
     Check(rejectedLength == 0)
     rejected.Close()
@@ -267,7 +267,7 @@ func NestedRoundTrip() -> Result<unit, JsonError> {
     if let Ok(length) = untouched.GetLength() {
         Check(length == 0)
     } else {
-        System.Fault("Output stream was closed")
+        System.Fail("Output stream was closed")
     }
     untouched.Close()
     return Ok(())
@@ -331,13 +331,13 @@ func CollectionRoundTrip() -> Result<unit, JsonError> {
 func Main() {
     if let Ok(_) = RoundTrip() {
         if let Error(error) = NestedRoundTrip() {
-            System.Fault(error.ToString())
+            System.Fail(error.ToString())
         }
         if let Error(collectionError) = CollectionRoundTrip() {
-            System.Fault(collectionError.ToString())
+            System.Fail(collectionError.ToString())
         }
         Console.WriteLine("Public JSON mapping checks passed")
     } else {
-        System.Fault("Public JSON mapping failed")
+        System.Fail("Public JSON mapping failed")
     }
 }

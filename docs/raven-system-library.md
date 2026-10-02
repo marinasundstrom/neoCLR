@@ -1,5 +1,11 @@
 # Authoring the foundational library in Raven
 
+**Development migration — 2026-10-02:** the terminal namespace function is now
+`System.Fail(message)`. Earlier dated checkpoints below use its former `System.Fault`
+name. Rebuild with the matching compiler, reference and runtime library; host Fault
+results and classification are unchanged. See [the current terminal-failure contract](system-fault.md).
+
+
 ## API-preserving source port — 2026-09-19
 
 The author directs source migration first and proposal API alignment afterward.

@@ -28,17 +28,17 @@ import System.Console.*
 
 func Check(value: bool) {
     if !value {
-        System.Fault("Task composition assertion failed")
+        System.Fail("Task composition assertion failed")
     }
 }
 
 func FailMap(value: int) -> int {
-    System.Fault("Map callback fault")
+    System.Fail("Map callback fault")
     return value
 }
 
 func FailThen(value: int) -> Task<int> {
-    System.Fault("Then callback fault")
+    System.Fail("Then callback fault")
     return Promise<int>(TaskQueue()).Task
 }
 '''
@@ -158,7 +158,7 @@ cases = {
     if result.GetResult() is Error(let message) {
         Check(message == "Unavailable")
     } else {
-        System.Fault("Result was changed")
+        System.Fail("Result was changed")
     }
 ''',
     'Unit is an ordinary mapped payload': '''

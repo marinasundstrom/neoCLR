@@ -222,7 +222,7 @@ M00000006_IL_00a9:
 M00000006_IL_00aa:
 ldstr "invalid native DNS error"
 M00000006_IL_00af:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 .end
 .end

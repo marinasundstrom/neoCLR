@@ -37,7 +37,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
 
     private func Enter() {
         if busy {
-            System.Fault("HashMap callbacks must not reenter the map")
+            System.Fail("HashMap callbacks must not reenter the map")
         }
         busy = true
     }
@@ -85,7 +85,7 @@ public class HashMap<K, V> : MutableMap<K, V> {
             return
         }
         if size > 1073741823 {
-            System.Fault("HashMap capacity overflow")
+            System.Fail("HashMap capacity overflow")
         }
         size = size * 2
         let expanded = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(size)

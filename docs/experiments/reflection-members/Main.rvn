@@ -21,7 +21,7 @@ public class Model {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Reflection member contract failed")
+        System.Fail("Reflection member contract failed")
     }
 }
 
@@ -31,7 +31,7 @@ func Field(name: string) -> FieldInfo {
             return item
         }
     }
-    System.Fault("Missing field")
+    System.Fail("Missing field")
 }
 
 func Method(name: string) -> MethodInfo {
@@ -40,7 +40,7 @@ func Method(name: string) -> MethodInfo {
             return method
         }
     }
-    System.Fault("Missing method: " + name)
+    System.Fail("Missing method: " + name)
 }
 
 func Exercise() -> Result<(), ReflectionError> {
@@ -77,7 +77,7 @@ func Exercise() -> Result<(), ReflectionError> {
 
 func Main() {
     if Exercise() is Error(_) {
-        System.Fault("Reflection workflow failed")
+        System.Fail("Reflection workflow failed")
     }
     Console.WriteLine("Constructor, invocation and field checks passed")
 }

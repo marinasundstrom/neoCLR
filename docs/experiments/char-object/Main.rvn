@@ -4,7 +4,7 @@ import System.Option.*
 
 func Check(value: bool, message: string) {
     if !value {
-        System.Fault(message)
+        System.Fail(message)
     }
 }
 
@@ -32,7 +32,7 @@ func Main() {
     if let Some(value) = values.Find(Char.FromString("👩‍💻")) {
         Check(value == 1 && values.Count == 3, "Retained grapheme key")
     } else {
-        System.Fault("Grapheme key lost")
+        System.Fail("Grapheme key lost")
     }
     Check(first.ToString() == "👩‍💻", "Display after collection")
     Console.WriteLine("Char Object equality, display, map keys and GC: passed")

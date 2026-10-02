@@ -62,8 +62,8 @@ M00000008_IL_0012:
 M00000008_IL_0013:
 ldstr "Cancellation source is disposed"
 M00000008_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000008_IL_001d:
 M00000008_IL_001e:
 M00000008_IL_001f:
@@ -119,8 +119,8 @@ M0000000b_IL_0012:
 M0000000b_IL_0013:
 ldstr "Cancellation source is disposed"
 M0000000b_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000000b_IL_001d:
 M0000000b_IL_001e:
 M0000000b_IL_001f:
@@ -299,8 +299,8 @@ M0000000d_IL_0012:
 M0000000d_IL_0013:
 ldstr "Cancellation source is disposed"
 M0000000d_IL_0018:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M0000000d_IL_001d:
 M0000000d_IL_001e:
 M0000000d_IL_001f:

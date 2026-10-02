@@ -1216,8 +1216,8 @@ M00000010_IL_0049:
 M00000010_IL_004a:
 ldstr "A supported culture must format every valid Date"
 M00000010_IL_004f:
-call System.Fault(String)
-fault "System.Fault returned unexpectedly"
+call System.Fail(String)
+fault "System.Fail returned unexpectedly"
 M00000010_IL_0054:
 M00000010_IL_0055:
 M00000010_IL_0056:

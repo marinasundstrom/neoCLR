@@ -5,7 +5,7 @@ import System.Option.*
 
 public class NoteAttribute : Attribute {
     init(text: string, number: int, enabled: bool) {
-        System.Fault("Attribute constructors must not run during introspection")
+        System.Fail("Attribute constructors must not run during introspection")
     }
 }
 
@@ -31,7 +31,7 @@ public class Item {
 [AttributeUsage(AttributeTargets.All, AllowMultiple: true)]
 public class LabelAttribute : Attribute {
     init(text: string) {
-        System.Fault("Repeated attribute constructors must not run")
+        System.Fail("Repeated attribute constructors must not run")
     }
 }
 
@@ -60,76 +60,76 @@ func FindNote(member: MemberInfo) -> Option<string> {
 
 public func Check(attributes: Sequence<CustomAttributeData>, text: string) {
     if attributes.Count != 1 {
-        System.Fault("Wrong attribute count")
+        System.Fail("Wrong attribute count")
         return
     }
     let attribute = attributes[0]
     if attribute.AttributeType.Name != "NoteAttribute" || attribute.Constructor.Name != ".ctor" {
-        System.Fault("Wrong attribute identity")
+        System.Fail("Wrong attribute identity")
         return
     }
     let arguments = attribute.GetConstructorArguments()
     if arguments.Count != 3 {
-        System.Fault("Wrong argument count")
+        System.Fail("Wrong argument count")
         return
     }
     if arguments[0].Value is string value {
         if value != text {
-            System.Fault("Wrong text argument")
+            System.Fail("Wrong text argument")
         }
     } else {
-        System.Fault("Missing text argument")
+        System.Fail("Missing text argument")
     }
     if arguments[1].Value is int number {
         if number != 42 {
-            System.Fault("Wrong numeric argument")
+            System.Fail("Wrong numeric argument")
         }
     } else {
-        System.Fault("Missing numeric argument")
+        System.Fail("Missing numeric argument")
     }
     if arguments[2].Value is bool enabled {
         if !enabled {
-            System.Fault("Wrong Boolean argument")
+            System.Fail("Wrong Boolean argument")
         }
     } else {
-        System.Fault("Missing Boolean argument")
+        System.Fail("Missing Boolean argument")
     }
     let erased: Object = arguments
     let copied = (CustomAttributeTypedArgument[])erased
     copied[0] = copied[1]
     let fresh = attribute.GetConstructorArguments()
     if !fresh[0].ArgumentType.Equals(typeof(string)) {
-        System.Fault("A caller changed the stored metadata snapshot")
+        System.Fail("A caller changed the stored metadata snapshot")
     }
     if !fresh[0].ArgumentType.Equals(typeof(string)) || !arguments[1].ArgumentType.Equals(typeof(int)) || !arguments[2].ArgumentType.Equals(typeof(bool)) {
-        System.Fault("Wrong argument types")
+        System.Fail("Wrong argument types")
     }
 }
 
 func Main() {
     if typeof(PlainItem).GetCustomAttributesData().Count != 0 {
-        System.Fault("Unannotated type has attributes")
+        System.Fail("Unannotated type has attributes")
     }
     let repeated = typeof(RepeatedItem).GetCustomAttributesData()
     if repeated.Count != 3 {
-        System.Fault("Multiple attributes were lost")
+        System.Fail("Multiple attributes were lost")
     }
     if repeated[0].GetConstructorArguments()[0].Value is string first {
         if first != "first" {
-            System.Fault("Attribute order changed")
+            System.Fail("Attribute order changed")
         }
     } else {
-        System.Fault("First repeated attribute missing")
+        System.Fail("First repeated attribute missing")
     }
     if repeated[2].GetConstructorArguments()[0].Value is string last {
         if last != "last" {
-            System.Fault("Repeated attribute order changed")
+            System.Fail("Repeated attribute order changed")
         }
     } else {
-        System.Fault("Last repeated attribute missing")
+        System.Fail("Last repeated attribute missing")
     }
     if !repeated[1].AttributeType.Equals(typeof(NoteAttribute)) {
-        System.Fault("Mixed attribute declaration missing")
+        System.Fail("Mixed attribute declaration missing")
     }
     let routeType = typeof(AppRoutes)
     var routeCases = 0
@@ -142,15 +142,15 @@ func Main() {
         }
     }
     if routeCases != 1 {
-        System.Fault("Union case metadata missing")
+        System.Fail("Union case metadata missing")
     }
     let type = typeof(Item)
     let Some(note) = FindNote(type) else {
-        System.Fault("Attribute lookup failed")
+        System.Fail("Attribute lookup failed")
         return
     }
     if note != "type" {
-        System.Fault("Wrong startup metadata")
+        System.Fail("Wrong startup metadata")
     }
     Check(type.GetCustomAttributesData(), "type")
     var checks = 0
@@ -178,10 +178,10 @@ func Main() {
     }
     Check(type.GetCustomAttributesData(), "type")
     if checks != 4 {
-        System.Fault("Missing attributed members")
+        System.Fail("Missing attributed members")
     }
     if ReadRouteDeclarations() != 2 {
-        System.Fault("Catalog route metadata missing")
+        System.Fail("Catalog route metadata missing")
     }
     Console.WriteLine("Attribute introspection checks passed")
 }

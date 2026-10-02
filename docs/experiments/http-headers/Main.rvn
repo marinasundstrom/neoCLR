@@ -20,38 +20,38 @@ func Main() {
     let response = HttpResponse(HttpStatusCode.OK, headers, ArrayList<byte>())
     let cookies = response.GetHeaderValues("sEt-CoOkIe")
     if cookies.Count != 2 || cookies[0] != headers[0].Value || cookies[1] != "b=2" {
-        System.Fault("Repeated cookie values changed")
+        System.Fail("Repeated cookie values changed")
     }
     let lists = response.GetHeaderValues("X-LIST")
     if lists.Count != 2 || lists[0] != "one, two" || lists[1] != "three" {
-        System.Fault("Header values split, merged or reordered")
+        System.Fail("Header values split, merged or reordered")
     }
     let empty = response.GetHeaderValues("x-empty")
     if empty.Count != 1 || empty[0] != "" {
-        System.Fault("Empty value confused with absent field")
+        System.Fail("Empty value confused with absent field")
     }
     if response.GetHeaderValues("missing").Count != 0 || response.GetHeaderValues("").Count != 0 ||
         response.GetHeaderValues(" X-List").Count != 0 || response.GetHeaderValues("X-List:").Count != 0 ||
         response.GetHeaderValues("X-İ").Count != 0 || response.GetHeaderValues("X-List\r\n").Count != 0 {
-        System.Fault("Absent or invalid header name matched")
+        System.Fail("Absent or invalid header name matched")
     }
     headers.Add(HttpHeader("SET-COOKIE", "c=3"))
     if cookies.Count != 2 || response.GetHeaderValues("set-cookie").Count != 3 {
-        System.Fault("Lookup is not a separate snapshot")
+        System.Fail("Lookup is not a separate snapshot")
     }
     let Ok(types) = RequestMediaTypes() else {
-        System.Fault("Request construction failed")
+        System.Fail("Request construction failed")
         return
     }
     if types.Count != 1 || types[0] != "text/plain; charset=utf-8" {
-        System.Fault("Request lookup failed")
+        System.Fail("Request lookup failed")
     }
     let Ok(get) = HttpRequest.Get("http://example.test/") else {
-        System.Fault("GET construction failed")
+        System.Fail("GET construction failed")
         return
     }
     if get.GetHeaderValues("Host").Count != 0 {
-        System.Fault("Lookup invented provider-generated headers")
+        System.Fail("Lookup invented provider-generated headers")
     }
     Console.WriteLine("HTTP header lookup checks passed")
 }

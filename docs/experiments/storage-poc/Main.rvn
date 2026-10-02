@@ -10,7 +10,7 @@ func Parse(text: string) -> Path {
     return match Path.Parse(text) {
         Ok(let path) => path
         Error(_) => {
-            System.Fault("Invalid sample path")
+            System.Fail("Invalid sample path")
             Parse("/")
         }
     }
@@ -32,7 +32,7 @@ func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
             match output.Write(buffer, offset, count - offset) {
                 Ok(let written) => {
                     if written <= 0 || written > count - offset {
-                        System.Fault("Invalid write progress")
+                        System.Fail("Invalid write progress")
                     }
                     offset += written
                 }
@@ -46,7 +46,7 @@ func WriteMessage(output: OutputStream) -> Result<unit, StreamError> {
 func ShowText(prefix: string, result: Result<string, TextReadError>) {
     match result {
         Ok(let text) => Console.WriteLine(prefix + text)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }
 
@@ -57,10 +57,10 @@ func FileAccess(file: File) {
             output.Close()
             match written {
                 Ok(_) => Console.WriteLine("Created " + file.Name)
-                Error(let error) => System.Fault(error.ToString())
+                Error(let error) => System.Fail(error.ToString())
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match file.OpenRead() {
         Ok(let input) => {
@@ -79,18 +79,18 @@ func FileAccess(file: File) {
                         again.Close()
                         ShowText("Re-read after seek: ", reread)
                     }
-                    Error(let error) => System.Fault(error.ToString())
+                    Error(let error) => System.Fail(error.ToString())
                 }
             }
             input.Close()
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match file.CreateNew() {
         Error(let error) => Console.WriteLine("Existing file: " + error.ToString())
         Ok(let unexpected) => {
             unexpected.Close()
-            System.Fault("Exclusive creation replaced a file")
+            System.Fail("Exclusive creation replaced a file")
         }
     }
 }
@@ -99,7 +99,7 @@ func Explore(directory: Directory) {
     // FileAt describes a destination; CreateNew performs exclusive creation.
     match directory.FileAt("message.txt") {
         Ok(let file) => FileAccess(file)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match directory.GetItems(8) {
         Ok(let items) => {
@@ -112,19 +112,19 @@ func Explore(directory: Directory) {
                 }
             }
         }
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match directory.GetDirectory("examples") {
         Ok(let child) => Console.WriteLine("Directory: " + child.Path.Text)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match directory.GetItem(Parse("message.txt")) {
         Ok(let item) => Console.WriteLine("Item: " + item.Name)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
     match directory.GetFile("missing.txt") {
         Error(let error) => Console.WriteLine("Missing file: " + error.ToString())
-        Ok(_) => System.Fault("Unexpected fixture file")
+        Ok(_) => System.Fail("Unexpected fixture file")
     }
 }
 
@@ -132,6 +132,6 @@ func Main() {
     let provider: StorageProvider = FileSystem("storage-demo")
     match provider.GetDirectory(Parse("/")) {
         Ok(let directory) => Explore(directory)
-        Error(let error) => System.Fault(error.ToString())
+        Error(let error) => System.Fail(error.ToString())
     }
 }

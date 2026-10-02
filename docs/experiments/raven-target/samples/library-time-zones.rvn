@@ -6,7 +6,7 @@ import System.Console.*
 
 func Show(value: ZonedDateTime) {
     let Ok(text) = DateTimeFormat.Invariant.FormatLocalDateTime(value.LocalDateTime) else {
-        System.Fault("Cannot format date")
+        System.Fail("Cannot format date")
     }
     WriteLine(text)
     WriteLine(value.Offset.Seconds)
@@ -22,17 +22,17 @@ func Describe(value: DateTime) {
 
 func Main() {
     let Ok(zone) = TimeZone.Find("Europe/Stockholm") else {
-        System.Fault("Unknown zone")
+        System.Fail("Unknown zone")
     }
     let Ok(date) = Date.Create(2024, 10, 27) else {
-        System.Fault("Invalid date")
+        System.Fail("Invalid date")
     }
     let Ok(time) = Time.Create(2, 30, 0) else {
-        System.Fault("Invalid time")
+        System.Fail("Invalid time")
     }
     let local = LocalDateTime.Create(date, time)
     let Ok(mapping) = zone.MapLocal(local) else {
-        System.Fault("Date outside zone range")
+        System.Fail("Date outside zone range")
     }
     match mapping {
         Unique(let value) => Describe(value)

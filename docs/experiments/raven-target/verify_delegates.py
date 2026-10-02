@@ -22,7 +22,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-delegate-') as temporary:
     (root / 'Main.rvn').write_text('''import System.*
 import System.Collections.*
 func Fail(value: int) -> bool {
-    System.Fault("Callback test fault")
+    System.Fail("Callback test fault")
     return false
 }
 func Main() {

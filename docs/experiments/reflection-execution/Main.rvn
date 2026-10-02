@@ -27,7 +27,7 @@ public class Locked {
 
 func Check(condition: bool) {
     if !condition {
-        System.Fault("Reflection contract failed")
+        System.Fail("Reflection contract failed")
     }
 }
 
@@ -37,7 +37,7 @@ func Property(name: string) -> PropertyInfo {
             return property
         }
     }
-    System.Fault("Missing fixture property")
+    System.Fail("Missing fixture property")
 }
 
 // Construction and assignment errors propagate without obscuring the workflow.
@@ -57,7 +57,7 @@ func Main() {
         if let Ok(value) = count.GetValue(report) {
             Check(value is int number && number == 42)
         } else {
-            System.Fault("Property read failed")
+            System.Fail("Property read failed")
         }
         Check(count.SetValue(report, "wrong") is Error(ReflectionError.InvalidValue))
         Check(count.SetValue(report, null) is Error(ReflectionError.InvalidValue))
@@ -71,7 +71,7 @@ func Main() {
         if let Some(setter) = restricted.GetSetMethod(true) {
             Check(setter.IsPrivate && !setter.IsPublic)
         } else {
-            System.Fault("Missing private setter metadata")
+            System.Fail("Missing private setter metadata")
         }
         Check(restricted.SetValue(report, 1) is Error(ReflectionError.AccessDenied))
         let name = Property("Name")
@@ -79,10 +79,10 @@ func Main() {
         if let Ok(nullableValue) = name.GetValue(report) {
             Check(nullableValue is null)
         } else {
-            System.Fault("Nullable property read failed")
+            System.Fail("Nullable property read failed")
         }
         Console.WriteLine("Reflection checks passed")
     } else {
-        System.Fault("Report creation failed")
+        System.Fail("Report creation failed")
     }
 }

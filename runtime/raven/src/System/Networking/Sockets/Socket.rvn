@@ -232,7 +232,7 @@ public class Socket {
         if code == 13 {
             return SocketError.AddressInUse()
         }
-        System.Fault("invalid native socket error")
+        System.Fail("invalid native socket error")
         return SocketError.IoFailure()
     }
 }
