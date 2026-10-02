@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Support owned constructed interface inheritance and transitive positional argument
+  substitution in the metadata producer/reader, plus constructed interface CallVirtual.
+  Cycle, scope and implementation checks remain enforced. Unchanged Raven collection
+  contracts through Collection<T> now compile with a consumer whose inherited Count
+  dispatch returns 42 on CLR/native and the actual neoCLR target profile, in both source
+  orders. Sequence<T> indexers and the implementation bootstrap remain pending.
+
 - Add explicit CLI declaration/native implementation bindings to the metadata API,
   preserving PE reference scopes while validating selected native signatures. Support
   local core TypeRefs/Function carriers and inhabited Void storage/result adaptation.

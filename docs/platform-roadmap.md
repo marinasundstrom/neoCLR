@@ -6,8 +6,10 @@ application now compiles to native PE/#Neo, verifies and executes with exact exp
 output against the explicitly bound translated System library. 91 metadata contract
 groups and native binary fixture checks pass. This establishes the requested broad
 application end-to-end case; it does not complete native class-library source emission
-or native semantic symbol loading. Next assess library-source emission against this
-working application baseline. Author-directed integration stays on the feature branches;
+or native semantic symbol loading. Unchanged library interfaces through Collection<T> now emit with constructed inheritance
+and an executable inherited-property consumer (42); both source orders and target profiles
+pass. Next support Sequence<T> interface indexers, then the implementation bootstrap
+needed by ArrayList<T>. Author-directed integration stays on the feature branches;
 no main-branch feature merge or roadmap milestone completion is implied.
 See [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)
 and [integration contracts](raven-cli-bridge.md#unchanged-collections-end-to-end-acceptance-2026-10-02-development).

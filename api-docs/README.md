@@ -715,3 +715,8 @@ Rust host `metadata_origin` binding structs/AssemblyMetadata vectors are covered
 [the host metadata manual](experimental-metadata.md#explicit-translated-library-linkage-development-2026-10-02).
 They remain excluded from the guest RavenDoc reference because that assembly contains
 Raven class-library APIs, not these C#/Rust host APIs. No guest snapshot signature changes.
+
+The development constructed-interface `AddBaseInterface` and constructed `CallVirtual`
+overloads are documented in the [host metadata manual](experimental-metadata.md#constructed-interface-inheritance-development-2026-10-02).
+They share the existing C# host-library exclusion from the guest RavenDoc snapshot;
+no guest class-library public signature changed in this slice.

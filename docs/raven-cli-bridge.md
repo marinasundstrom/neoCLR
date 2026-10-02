@@ -2997,3 +2997,37 @@ Validation: 91 C# metadata contract groups; a C# CLI/native linkage consumer (42
 runtime metadata-container tests including the C# fixture and malformed scopes; 44
 Function/object tests (including the reproduced internal-type regression); matching API
 snapshot check; and the [seven native profile controls](experiments/extended-cli-metadata/native-controls-after-linkage-2026-10-02.json). No website build or performance claim.
+
+### Collection contract source compilation (2026-10-02 development)
+
+The next bounded source-emission slice compiles the unchanged Disposable, Iterator<T>,
+Iterable<T> and Collection<T> sources with an executable same-assembly consumer.
+Collection's `Iterable<T>` base preserves its owner argument through metadata and the
+PE projection. A nongeneric consumer interface closes the hierarchy with Int32; a class
+implements it and inherited Count dispatch returns 42. Both source orders verify and
+execute on neoCLR with both the host bootstrap and real neoCLR target configuration.
+The host-profile CLR controls also return 42. [Evidence](experiments/extended-cli-metadata/collection-contracts-2026-10-02.json).
+
+The shared plan now exposes constructed interface inheritance through an explicit
+capability enabled by the CLR and native adapters. The metadata API owns positional
+substitution and cycle/implementation validation. Native emission uses the existing
+constructed callvirt/InterfaceImpl-equivalent contract; no runtime changes are required.
+Configuration remains CompilationOptions.NeoCLR and the matching CoreProbe/Self marker
+for the target run. The source declarations and consumer are in one assembly; this is
+not yet a separately bootstrapped class library. The CLI snapshot still supplies core
+symbols. No library implementation is substituted by a stub or rewritten for this probe.
+
+Relative to CLR, the emitted relationships use the same invariant generic interface
+model and CLI InterfaceImpl TypeSpecs. Supported class implementations remain nongeneric,
+without variance, default interface bodies or explicit MethodImpl entries. The benefit
+is reusing source/semantic contracts and existing dispatch; the cost is a bounded producer
+subset and transitive validation work. Native symbol importing remains the eventual
+replacement for the CLI reference bridge, not a prerequisite for this emission slice.
+
+Run Raven's `NeoClrMetadataProbe --collection-contract-runtime <neo-root> <fresh-output>
+<runtime>`. Validation: eight shared-interface C# tests, 92 metadata groups, a C#-produced
+three-level generic dispatch fixture on CLR/native, the unchanged-source probe, and the
+collections application still matching its established output. Next: Sequence<T>'s
+interface indexer; ArrayList source also needs the implementation seed's RuntimeServices/
+CheckedStorage declarations. A fresh inventory's whole-library diagnostics still reflect
+that unsupported bootstrap, not a count of independent compiler defects.

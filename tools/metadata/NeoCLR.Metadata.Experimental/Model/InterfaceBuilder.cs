@@ -26,7 +26,8 @@ public sealed partial class AssemblyBuilder
 public sealed partial class TypeBuilder
 {
     private readonly List<TypeBuilder> baseInterfaces = [];
-    /// <summary>Gets the directly inherited interface definitions in declaration order.</summary>
+    /// <summary>Gets directly inherited nongeneric interface definitions in declaration order.</summary>
+    /// <remarks>Definition.Interfaces retains all declared edges, including constructed generic bases.</remarks>
     public IReadOnlyList<TypeBuilder> BaseInterfaces => baseInterfaces.AsReadOnly();
     /// <summary>Adds an owned nongeneric base interface without introducing class implementation semantics.</summary>
     /// <param name="baseInterface">A nongeneric interface from the same assembly.</param>
@@ -39,12 +40,27 @@ public sealed partial class TypeBuilder
         if (!IsInterface) throw new InvalidOperationException("base-interface declarations require an interface owner");
         Definition.Interfaces.Add(new InterfaceImplementation(baseInterface.Definition.ToReference()));
     }
-    internal void AttachBaseInterface(TypeBuilder baseInterface)
+    /// <summary>Adds an owned constructed generic base interface, including owner-parameter arguments.</summary>
+    /// <param name="baseInterface">An owned interface construction scoped to this declaring interface.</param>
+    /// <exception cref="ArgumentNullException">The base is null.</exception>
+    /// <exception cref="ArgumentException">Foreign/noninterface base, invalid arguments, duplicate edge, cycle or limit.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not an interface.</exception>
+    public void AddBaseInterface(GenericTypeInstance baseInterface)
+    {
+        ArgumentNullException.ThrowIfNull(baseInterface);
+        if (!IsInterface) throw new InvalidOperationException("base-interface declarations require an interface owner");
+        Definition.Interfaces.Add(new InterfaceImplementation(baseInterface.Definition.Definition.ToReference(), baseInterface.TypeArguments));
+    }
+    private bool Reaches(TypeBuilder target)
     {
         var seen = new HashSet<TypeBuilder>();
-        bool ReachesOwner(TypeBuilder current) => ReferenceEquals(current, this) || seen.Add(current) && current.BaseInterfaces.Any(ReachesOwner);
+        bool Visit(TypeBuilder current) => ReferenceEquals(current, target) || seen.Add(current) && current.InterfaceSignatures.Any(t => Visit(t.GenericInstance?.Definition ?? t.ClassType!));
+        return Visit(this);
+    }
+    internal void AttachBaseInterface(TypeBuilder baseInterface)
+    {
         if (!baseInterface.IsInterface || baseInterface.GenericParameterNames.Count != 0 || !ReferenceEquals(baseInterface.Assembly, Assembly) ||
-            baseInterfaces.Count >= 256 || baseInterfaces.Contains(baseInterface) || ReachesOwner(baseInterface))
+            baseInterfaces.Count >= 256 || baseInterfaces.Contains(baseInterface) || baseInterface.Reaches(this))
             throw new ArgumentException("invalid, duplicate or cyclic base interface", nameof(baseInterface));
         baseInterfaces.Add(baseInterface);
     }
@@ -54,29 +70,49 @@ public sealed partial class TypeBuilder
     public IReadOnlyList<TypeBuilder> ImplementedInterfaces => implementedInterfaces.AsReadOnly();
     private readonly List<GenericTypeInstance> constructedInterfaces = [];
     internal IEnumerable<SignatureType> InterfaceSignatures => InterfaceContracts.Select(t => (SignatureType)t).Concat(constructedInterfaces.Select(t => (SignatureType)t));
-    internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InterfaceMethods.Select(m => (m.Name, m.Signature)).Concat(
-        constructedInterfaces.SelectMany(i => i.Definition.Methods.Select(m => (m.Name, new ConstructedMethodReference(m, i.TypeArguments.ToArray(), []).Signature))));
+    private IEnumerable<SignatureType> InheritedContracts()
+    {
+        var seen = new HashSet<SignatureType>();
+        IEnumerable<SignatureType> Visit(SignatureType contract)
+        {
+            if (!seen.Add(contract)) yield break;
+            if (seen.Count > 4096) throw new InvalidDataException("interface inheritance expansion limit");
+            yield return contract;
+            var owner = contract.GenericInstance?.Definition ?? contract.ClassType!;
+            SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } index && contract.GenericInstance is { } instance ? instance.TypeArguments[index]
+                : type.GenericInstance is { } nested ? nested.Definition.MakeGenericInstance(nested.TypeArguments.Select(Substitute).ToArray())
+                : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
+            foreach (var parent in owner.InterfaceSignatures)
+                foreach (var inherited in Visit(Substitute(parent))) yield return inherited;
+        }
+        return InterfaceSignatures.SelectMany(Visit);
+    }
+    internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InheritedContracts().SelectMany(contract =>
+        (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name,
+            contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)));
     /// <summary>Declares a closed owned generic interface implementation on a nongeneric root class.</summary>
     /// <exception cref="ArgumentNullException">Contract is null.</exception>
-    /// <exception cref="ArgumentException">Foreign, open, duplicate, inherited or noninterface contract.</exception>
+    /// <exception cref="ArgumentException">Foreign, open, duplicate, cyclic or noninterface contract.</exception>
     /// <exception cref="InvalidOperationException">Owner is not a nongeneric root class.</exception>
     public void AddInterfaceImplementation(GenericTypeInstance contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
+        if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count != 0)
+            throw new InvalidOperationException("interface implementations require a nongeneric root class");
         Definition.Interfaces.Add(new InterfaceImplementation(contract.Definition.Definition.ToReference(), contract.TypeArguments));
     }
     internal void AttachConstructedInterface(GenericTypeInstance contract)
     {
-        if (IsInterface || IsStatic || IsValueType || GenericParameterNames.Count > 0) throw new InvalidOperationException("constructed interfaces require a nongeneric root class");
+        if (!IsInterface && (IsStatic || IsValueType || GenericParameterNames.Count > 0)) throw new InvalidOperationException("constructed interfaces require an interface or nongeneric root class");
         if (!contract.Definition.IsInterface || !ReferenceEquals(contract.Definition.Assembly, Assembly) ||
-            contract.Definition.BaseInterfaces.Count > 0 || constructedInterfaces.Count >= 256 || constructedInterfaces.Contains(contract))
+            contract.Definition.Reaches(this) || constructedInterfaces.Count >= 256 || constructedInterfaces.Contains(contract))
             throw new ArgumentException("unsupported or duplicate constructed interface");
-        foreach (var argument in contract.TypeArguments) argument.ValidateOwner(Assembly);
+        foreach (var argument in contract.TypeArguments) argument.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         constructedInterfaces.Add(contract);
     }
-    internal bool ConformsTo(GenericTypeInstance contract) => constructedInterfaces.Contains(contract);
+    internal bool ConformsTo(GenericTypeInstance contract) => InheritedContracts().Any(t => Equals(t.GenericInstance, contract));
     internal IEnumerable<TypeBuilder> InterfaceContracts => baseInterfaces.Concat(implementedInterfaces);
-    internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InterfaceContracts.Any(i => i.ConformsTo(contract));
+    internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InheritedContracts().Any(t => ReferenceEquals(t.ClassType, contract));
     internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
     internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
         RequiredInterfaceMethods.Any(c => c.Name == method.Name && c.Signature.Matches(method.Signature));

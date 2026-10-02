@@ -259,9 +259,14 @@ public sealed class NativeAssemblyDefinition
                     if (constructed) Shape(instance, "definition", "arguments");
                     int parent = types.FindIndex(t => t.NativeName == (constructed ? Text(instance, "definition") : Text(inherited, "Named")));
                     Require(parent >= 0, "missing inherited interface");
-                    Require(!constructed || types[parent].BaseInterfaces.Length == 0, "constructed interface inheritance is unsupported");
-                    if (constructed) signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent].MakeGenericInstance(
-                        Array(instance, "arguments", 32).Select(a => ReadType(a, false)).ToArray()));
+                    if (constructed)
+                    {
+                        typeArity = types[i].GenericNames.Length;
+                        var inheritedType = signatureOwners[parent].MakeGenericInstance(Array(instance, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
+                        if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(inheritedType);
+                        else signatureOwners[i].AddInterfaceImplementation(inheritedType);
+                        typeArity = 0;
+                    }
                     else if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(signatureOwners[parent]);
                     else signatureOwners[i].AddInterfaceImplementation(signatureOwners[parent]);
                 }
@@ -528,7 +533,7 @@ public sealed class NativeAssemblyDefinition
             foreach (var inherited in types[i].BaseInterfaces)
             {
                 var contract = ProjectType(inherited);
-                if (contract.GenericInstance is { } constructed) owners[i].AddInterfaceImplementation(constructed);
+                if (contract.GenericInstance is { } constructed) { if (types[i].IsInterface) owners[i].AddBaseInterface(constructed); else owners[i].AddInterfaceImplementation(constructed); }
                 else if (types[i].IsInterface) owners[i].AddBaseInterface(contract.ClassType!);
                 else owners[i].AddInterfaceImplementation(contract.ClassType!);
             }

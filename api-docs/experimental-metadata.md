@@ -4139,3 +4139,35 @@ checks declared scopes, text, duplicates and limits (256 modules, 4096 types, ar
 These retain projection provenance; they do not authorize calls or override runtime
 resolution/access checks. Hosts constructing AssemblyMetadata literals must initialize
 the new vectors. These host-only APIs remain outside the guest RavenDoc assembly.
+
+### Constructed interface inheritance (development, 2026-10-02)
+
+`TypeBuilder.AddBaseInterface(GenericTypeInstance baseInterface)` adds an owned
+constructed generic base to an interface. Arguments may reference the declaring
+interface's type parameters. The definition graph remains authoritative:
+`Definition.Interfaces` retains both ordinary and constructed edges; `BaseInterfaces`
+lists only directly inherited nongeneric definitions. Null throws
+`ArgumentNullException`; a noninterface owner throws `InvalidOperationException`.
+Foreign/noninterface bases, duplicate edges, definition cycles, out-of-scope arguments
+and the existing 256-constructed-edge limit throw `ArgumentException`. Mutating a later declaration
+cannot introduce a cycle through a constructed edge.
+
+Nongeneric root classes may implement closed inherited generic interfaces using the
+existing `AddInterfaceImplementation(GenericTypeInstance)` overload. Required methods
+are collected transitively with positional substitution before exact public instance
+implementation validation. Missing methods fail writing with `InvalidDataException`;
+inheritance expansion is bounded to 4096 distinct constructed contracts. This does not
+add generic class implementations, variance, interface default bodies or MethodImpl
+mappings. CLI uses ordinary InterfaceImpl/TypeSpec signatures; native metadata uses
+constructed interface signatures with the existing runtime dispatch semantics. No new
+instruction or runtime metadata category is introduced.
+
+`MethodBuilder.CallVirtual(ConstructedMethodReference method)` and
+`Emit(OpCode.Callvirt, ConstructedMethodReference)` dispatch owned constructed interface
+contracts. Constructors require Newobj, interface contracts require Callvirt, and other
+constructed methods retain Call. Null throws `ArgumentNullException`; invalid opcode,
+foreign target or invalid scope throws `ArgumentException`; instruction limits and
+invalid stacks fail with `InvalidDataException`. Both encodings preserve the same
+method signature and owner arguments. A C# fixture checks transitive positional
+substitution, CLI/native execution (42), PE reference projection, missing implementations,
+duplicate edges, cycles and invalid argument scopes.

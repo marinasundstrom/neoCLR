@@ -481,3 +481,9 @@ This is development work on the metadata/compiler feature branches. CLI snapshot
 provide symbols and the existing translation still supplies the runtime library; native
 semantic importing and complete class-library source emission remain open. The host
 metadata API and its restrictions are documented in the [API reference](/docs/).
+
+The next source-emission checkpoint compiles the unchanged collection interface sources
+through Collection<T>, including its constructed Iterable<T> base. An inherited-property
+consumer runs on CLR and neoCLR with both source orders; the real neoCLR target profile
+also passes. Sequence<T> indexers and the collection storage implementation remain work
+in progress. This does not yet compile the entire System library with the native backend.

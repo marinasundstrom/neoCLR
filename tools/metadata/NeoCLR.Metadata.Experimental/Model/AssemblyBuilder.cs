@@ -101,9 +101,7 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types)
                 foreach (var contract in type.InterfaceSignatures)
                 {
-                    if (contract.GenericInstance is { Definition.BaseInterfaces.Count: > 0 })
-                        throw new InvalidDataException("constructed interface inheritance is unsupported");
-                    contract.ValidateOwner(this, complete: true);
+                    contract.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
                 }
             foreach (var type in types)
                 foreach (var field in type.Fields) field.FieldType.ValidateOwner(this, typeArity: type.GenericParameterNames.Count, complete: true);
@@ -388,7 +386,8 @@ public sealed partial class AssemblyBuilder
             var declaring = reference.Definition.DeclaringType!;
             EntityHandle declaringHandle;
             if (typeHandles.TryGetValue(declaring, out var ownedHandle)) declaringHandle = ownedHandle;
-            else {
+            else
+            {
                 if (!CoreLibrary.Equals(declaring.Assembly.CoreLibrary)) throw new InvalidDataException("incompatible core identity");
                 declaringHandle = ImportOwner(declaring);
             }
