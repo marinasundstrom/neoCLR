@@ -3571,9 +3571,10 @@ existing shared paths: no new encoding, runtime opcode, compiler policy or Runti
 Contract change. CLI core/translated System bootstrap dependencies remain explicit.
 Generic/value owners and external implementation edges remain pending.
 
-Deferred diagnostic candidate: in the native probe, `func Wrong(value: Storage) ->
-Value => value` has no early GetDiagnostics error even though Storage does not implement
-Value. The emitter rejects it and leaves output empty; a typed local assignment already
-diagnoses. Reproduce independently with .NET references and inspect expression-bodied
-return binding before making a general compiler fix. This is not accepted native output
-or evidence that the default .NET target has the same gap.
+Resolved shared diagnostic gap (2026-10-02): incompatible expression-bodied returns
+were independently reproduced against .NET references. Raven now binds the complete
+arrow body during diagnostics, reusing existing return conversion validation. The 106
+focused .NET tests pass; the native probe requires RAV1503 before emission and an empty
+output on rejection. All six native consumers still execute with result 42. No Runtime
+Contract, encoding or runtime changes were required. Generic/value import and the CLI
+core/translated System bootstrap limitations remain open.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Close the shared Raven expression-bodied return diagnostic gap with an independently
+  reproduced .NET fix (106 focused tests). Native unrelated interface returns now
+  diagnose before emission; all six native import/emission consumers still execute (42).
+  No metadata format or runtime changes; generic import and bootstrap gaps remain.
+
 - Extend direct native reading to nongeneric top-level classes with primitive fields,
   methods and constructors. Preserve canonical declaration ownership, native origin
   tokens, visibility and readonly flags without inventing CLI signature blobs. Raven

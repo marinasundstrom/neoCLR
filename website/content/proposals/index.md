@@ -577,3 +577,8 @@ Development checkpoint (2026-10-02): interface-valued fields and arrays now have
 three-assembly Raven-to-neoCLR test. Imported signatures preserve identity, alias writes
 and dispatch after replacement (42), using the existing compiler and runtime paths.
 The primitive CLI bootstrap and broader generic/value import work remain.
+
+Development checkpoint (2026-10-02): a shared Raven fix now diagnoses incompatible
+expression-bodied returns before emission for .NET and native dependencies. The 106
+focused compiler tests and all six native runtime consumers pass. Native generic import
+and the full class-library bootstrap remain under development.
