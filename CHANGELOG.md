@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Author nested nongeneric class/value definitions through definition collections and
+  builder helpers, preserving CLI NestedClass rows and explicit native declaring owners.
+  Validate ownership, visibility and native/CLI origin agreement; nested constructor
+  execution returns 42 on CLR and neoCLR. Generic nesting and external nested imports
+  remain subsequent work toward the unchanged collections sample.
+
 - Support metadata-authored value constructors with field-assignment and construction
   receiver checks, plus imported public class/value constructors on generic owners.
   Raven opts native emission into imported constructors explicitly. Separate-library

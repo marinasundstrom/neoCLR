@@ -465,3 +465,7 @@ Development metadata and Raven emission now support imported value constructors,
 including generic owners, with explicit initialization checks. Separate-library consumers
 execute successfully (42). The larger collections sample still needs nested type identity
 support for its Option.None carrier; complete class-library execution remains open.
+
+Development metadata APIs now preserve nested nongeneric class/value declarations
+through CLI and native PE, with constructor execution checked on both runtimes.
+Nested imports and the broad Raven collections application remain in progress.

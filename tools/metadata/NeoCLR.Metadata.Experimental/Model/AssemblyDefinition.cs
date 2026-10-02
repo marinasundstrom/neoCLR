@@ -375,7 +375,7 @@ public sealed partial class TypeDefinition
     /// <summary>Gets the number of declared GenericParam rows, including captured outer parameters where encoded.</summary>
     public int GenericArity { get; internal set; }
     /// <summary>Gets the enclosing definition, or null for a top-level type.</summary>
-    public TypeDefinition? DeclaringType => MetadataToken == 0 ? null : Module.GetTypeDefinition(declaringToken);
+    public TypeDefinition? DeclaringType => MetadataToken == 0 ? AuthoredDeclaringType : Module.GetTypeDefinition(declaringToken);
     /// <summary>Gets methods declared directly by this type; global functions belong to Module.Functions.</summary>
     public IList<MethodDefinition> Methods => authoredMethods ?? (IList<MethodDefinition>)Module.GetDeclaredMethods(MetadataToken);
     /// <summary>Creates a nominal reference scoped to this module snapshot.</summary>

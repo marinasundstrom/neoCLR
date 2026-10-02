@@ -193,7 +193,7 @@ public sealed partial class AssemblyBuilder
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
-            types.Count >= 256 || types.Any(t => t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
+            types.Count >= 256 || types.Any(t => t.Definition.DeclaringType is null && t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
         var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames, isInterface, isValueType); Definition.MainModule.Types.Add(type.Definition); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>
@@ -532,9 +532,11 @@ public sealed partial class AssemblyBuilder
         foreach (var function in functions) EmitMethod(function);
         foreach (var type in types)
         {
-            var typeHandle = metadata.AddTypeDefinition((type.Visibility == TypeVisibility.Public ? TypeAttributes.Public : TypeAttributes.NotPublic) | (type.IsInterface ? TypeAttributes.Interface | TypeAttributes.Abstract : type.IsStatic ? TypeAttributes.Abstract | TypeAttributes.Sealed : type.IsValueType ? TypeAttributes.Sealed | TypeAttributes.SequentialLayout : 0),
+            var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
                 metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsValueType ? valueBase : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
+            if (type.Definition.DeclaringType is { } parent)
+                metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));
             genericRows.Add((typeHandle, MetadataTokens.GetRowNumber(typeHandle) * 2, type.GenericParameterNames));
             foreach (var field in type.Fields)
             {
@@ -623,8 +625,8 @@ public sealed partial class TypeBuilder
     public bool IsStatic => (Definition.Attributes & 0x180) == 0x180 && !IsInterface;
     /// <summary>Gets whether this declaration is a CLI value type rather than a reference type.</summary>
     public bool IsValueType => Definition.IsValueType;
-    /// <summary>Gets the declared top-level visibility.</summary>
-    public TypeVisibility Visibility => (Definition.Attributes & 7) == 1 ? TypeVisibility.Public : TypeVisibility.Internal;
+    /// <summary>Gets declared visibility within the assembly or enclosing type.</summary>
+    public TypeVisibility Visibility => (Definition.Attributes & 7) is 1 or 2 ? TypeVisibility.Public : TypeVisibility.Internal;
     /// <summary>Gets the owning assembly.</summary>
     public AssemblyBuilder Assembly { get; }
     /// <summary>Gets the declared namespace.</summary>
@@ -672,8 +674,8 @@ public sealed partial class TypeBuilder
     /// <param name="visibility">Public, Internal or Private.</param>
     /// <returns>An owned .ctor body with receiver at argument zero.</returns>
     /// <exception cref="ArgumentException">Invalid/duplicate contract or exceeded limit.</exception>
-    /// <exception cref="InvalidOperationException">The declaring type is static or a value type.</exception>
-    /// <remarks>CLI emission initializes System.Object before this body. Native root construction requires no base call. Constructor chaining is unsupported.</remarks>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
+    /// <remarks>CLI emission initializes System.Object before reference-class bodies; value bodies assign their own fields. Native root construction requires no base call. Constructor chaining is unsupported.</remarks>
     public MethodBuilder AddConstructor(IEnumerable<PrimitiveType> parameterTypes, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(".ctor", new(PrimitiveType.Void, parameterTypes), visibility, isStatic: false, constructor: true);
     /// <summary>Adds a constructor with an owned nominal/primitive signature whose result must be Void.</summary>
@@ -682,7 +684,7 @@ public sealed partial class TypeBuilder
     /// <returns>A constructor owned by this class or value type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Non-Void result, foreign class, duplicate signature or invalid visibility.</exception>
-    /// <exception cref="InvalidOperationException">The declaring type is static or a value type.</exception>
+    /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
     public MethodBuilder AddConstructor(MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(signature);

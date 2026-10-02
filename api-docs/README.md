@@ -658,3 +658,7 @@ The host metadata manual reference also covers value constructor admission,
 `ImportedMethodReference.IsConstructor`, imported `NewObject` overloads and matching raw
 Newobj emission. These host C# APIs remain outside the guest RavenDoc selection; no
 public guest signature changes are part of this constructor slice.
+
+Host metadata nested declaration APIs (NestedTypes, AddNestedClass, AddNestedValueType)
+are covered in [the experimental manual](experimental-metadata.md#nested-declarations-development-2026-10-02).
+They remain host C# APIs outside the guest RavenDoc selection.

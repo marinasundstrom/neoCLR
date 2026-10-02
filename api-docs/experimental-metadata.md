@@ -3966,3 +3966,31 @@ references, wrong dispatch opcodes and uninstantiated/invalid generic scopes thr
 `InvalidDataException`. `Call`/`Callvirt` reject constructor operands. Existing
 `RequiresManagedReceiver` describes the value member's implicit receiver; Newobj supplies
 its construction address rather than requiring a caller-supplied initialized address.
+
+
+## Nested declarations (development, 2026-10-02)
+
+`TypeDefinition.NestedTypes : IList<TypeDefinition>` exposes immediate children.
+Loaded snapshots are read-only. An attached authored owner accepts detached children
+with an empty namespace, no generic parameters and CLI NestedPublic (2) or
+NestedAssembly (5) visibility. The enclosing owner must also be nongeneric. Ownership
+is immutable after attachment; duplicate names are scoped to the enclosing definition.
+Cycles, reattachment, generic nesting and depth beyond 16 fail with ArgumentException;
+adding to a detached owner fails with InvalidOperationException. Module.Types continues
+to enumerate every physical declaration, including nested types. DeclaringType and
+ToReference().Resolve() preserve the same authored definition identity.
+
+`TypeBuilder.AddNestedClass(string name, TypeVisibility visibility = Public)` and
+`AddNestedValueType(string name, TypeVisibility visibility = Public)` attach definitions
+through that collection and return their builders. Internal maps to NestedAssembly.
+Neither helper synthesizes constructors. Existing AddConstructor and body APIs apply.
+These helpers reject duplicate/invalid names, generic owners, unsupported visibility
+and declaration/depth limits with ArgumentException.
+
+CLI writers emit NestedClass rows and nested visibility. Native writers retain both
+explicit module-local declaring_type and matching source declaring_type_token; readers
+validate that they identify the same preceding owner before reconstructing the reference
+projection. Runtime loading/execution is tested with a nested value constructor (42),
+alongside CLR execution, duplicate short names under different owners, deep navigation
+and malformed ownership rejection. Imported nested types and captured generic owner
+parameters are not yet supported. Existing top-level identities remain unchanged.

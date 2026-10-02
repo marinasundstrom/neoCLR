@@ -132,13 +132,15 @@ public sealed partial class AssemblyBuilder
     }
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
-        if (types.Count >= 256 || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name) ||
+        if (types.Count >= 256 || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
             definition.MetadataToken != 0 || definition.Producer is { } existing && !ReferenceEquals(existing.Assembly, this))
             throw new ArgumentException("foreign, duplicate or excessive type definition");
         if (definition.Producer is null)
         {
             var attributes = definition.Attributes;
-            var category = attributes & ~1u;
+            if (definition.DeclaringType is null ? (attributes & 7) is not (0 or 1) : (attributes & 7) is not (2 or 5))
+                throw new ArgumentException("visibility does not match lexical ownership");
+            var category = attributes & ~7u;
             if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x180 or 0x108 or 0xa0)) throw new ArgumentException("unsupported manual type shape");
             if (category == 0xa0)
             {

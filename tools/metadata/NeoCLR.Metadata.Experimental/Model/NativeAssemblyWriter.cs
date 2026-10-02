@@ -48,7 +48,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleName(AssemblyBuilder assembly) => ModuleIdentity(assembly.Identity);
         static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
-        static string TypeName(TypeBuilder type) => ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
+        static string TypeName(TypeBuilder type) => type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
         static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
@@ -172,7 +172,7 @@ public sealed partial class AssemblyBuilder
         object TypeOrigin(TypeBuilder type, int index)
         {
             var name = type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name;
-            if (type.Fields.Count == 0 && type.Properties.Count == 0)
+            if (type.Fields.Count == 0 && type.Properties.Count == 0 && type.Definition.DeclaringType is null)
                 return Origin(name, 0x02000002 + index, publiclyVisible: type.Visibility == TypeVisibility.Public);
             var origin = new Dictionary<string, object>
             {
@@ -185,6 +185,7 @@ public sealed partial class AssemblyBuilder
                 ["field_access"] = type.Fields.Select(f => f.Visibility == FieldVisibility.Internal ? "Assembly" : f.Visibility.ToString()).ToArray(),
                 ["field_readonly"] = type.Fields.Select(f => f.IsReadOnly).ToArray()
             };
+            if (type.Definition.DeclaringType is { } parent) origin["declaring_type_token"] = 0x02000002 + types.IndexOf(parent.Producer!);
             if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
             return origin;
         }
@@ -213,7 +214,7 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type))).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -258,6 +259,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string[]? generic_parameters,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object[]? generic_constraints);
+        object[]? generic_constraints,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object? declaring_type);
 
 }

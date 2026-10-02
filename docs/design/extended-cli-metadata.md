@@ -1650,3 +1650,24 @@ and native System library mapping remain pending.
 Evidence: [constructor execution](../experiments/extended-cli-metadata/imported-constructors-2026-10-02.json)
 and [unchanged collections assessment](../experiments/extended-cli-metadata/collections-after-constructors-2026-10-02.json),
 with Raven `codex/metadata-consumer` revision `5bc0d567e` and this metadata slice.
+
+
+### Nested declaration producer checkpoint (2026-10-02)
+
+The .NET baseline is explicit NestedClass ownership and nested visibility, not a dotted
+name convention. Following the existing ECMA-335/Cecil research above, the producer now
+preserves that relationship in authored definitions, CLI rows and native declaring_type
+identities. Parent-before-child construction makes identity validation deterministic;
+existing top-level native names stay stable. The cost is an explicit current restriction
+to nongeneric children/owners; captured generic parameters and external import are next.
+Module.Types retains its established complete row inventory while NestedTypes exposes
+immediate lexical children. This differs from Cecil's top-level collection convention and
+is documented rather than silently changing existing iteration behavior.
+
+A C# fixture emits a nested value constructor and executes to 42 on CLR and neoCLR through
+binary PE/#Neo. It verifies loaded/reference-projection ownership, repeated short names
+under different parents, two nesting levels, failed attachment and corrupt owner rejection.
+No runtime opcode or format version changes were needed. Raven remains at 5bc0d567e;
+the unchanged collections case remains blocked until nested imports and target mapping
+are connected. The author explicitly directed continuing beyond intermediate slices until
+the attempted samples compile and run successfully.

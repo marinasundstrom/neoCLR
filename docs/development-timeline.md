@@ -9962,3 +9962,16 @@ the author has not yet responded to that sequence. [Assessment and evidence](exp
 Evidence: [sample assessment](experiments/extended-cli-metadata/readiness-assessment-2026-10-02.md),
 [native controls](experiments/extended-cli-metadata/raven-ref-out-validation-2026-10-02.json),
 [unchanged collections](experiments/extended-cli-metadata/collections-after-raven-ref-out-2026-10-02.json).
+
+
+## 2026-10-02 — Continue through sample execution
+
+**Author:** “Keep working on this problem until you've solved it and the samples you
+are attempting to get working actually work. That they compile and they run successfully.”
+
+**Assistant response/action:** acknowledged that intermediate commits are checkpoints,
+not the stopping criterion. Committed imported constructor support (neoCLR a7569ca5,
+Raven 5bc0d567e), then implemented nested declaration ownership with CLR/native execution
+returning 42. The unchanged collections application still requires nested imports and
+further native codegen/dependency support; its successful execution is not yet reported.
+See the [metadata design checkpoints](design/extended-cli-metadata.md).

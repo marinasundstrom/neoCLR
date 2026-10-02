@@ -9,7 +9,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints);
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
@@ -122,6 +122,15 @@ public sealed class NativeAssemblyDefinition
                 var baseInterfaces = type.TryGetProperty("implements", out _) ? Array(type, "implements", 256).Select(b => b.Clone()).ToArray() : [];
                 if (type.TryGetProperty("implements", out _)) typeFields.Add("implements");
 
+                int declaringType = -1;
+                if (type.TryGetProperty("declaring_type", out var declaring))
+                {
+                    typeFields.Add("declaring_type"); Shape(declaring, "module", "revision", "index");
+                    declaringType = declaring.GetProperty("index").GetInt32();
+                    Require(Text(declaring, "module") == moduleName && Text(declaring, "revision") == identity.Version.ToString() &&
+                        declaringType >= 0 && declaringType < types.Count && types[declaringType].GenericNames.Length == 0 && typeNames.Length == 0,
+                        "invalid or unsupported nested owner");
+                }
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
                 var isValueType = !isInterface && !type.GetProperty("is_reference_type").GetBoolean();
@@ -147,13 +156,28 @@ public sealed class NativeAssemblyDefinition
                 Require(nextFieldToken + fieldRows.Count <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
                 Require(nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
-                var parts = nativeName[prefix.Length..].Split('_'); Require(parts.Length == 2, "invalid native type name");
-                var ns = Decode(parts[0]); var name = Decode(parts[1]);
+                string ns, name;
+                if (declaringType >= 0)
+                {
+                    var nestedPrefix = types[declaringType].NativeName + ".N_";
+                    Require(nativeName.StartsWith(nestedPrefix, StringComparison.Ordinal) && !isStatic && !isInterface, "invalid nested native type identity");
+                    ns = ""; name = Decode(nativeName[nestedPrefix.Length..]);
+                }
+                else
+                {
+                    var parts = nativeName[prefix.Length..].Split('_'); Require(parts.Length == 2, "invalid native type name");
+                    ns = Decode(parts[0]); name = Decode(parts[1]);
+                }
                 Require(name.Length > 0 && name != "<Module>" && ns.Length + name.Length <= 1024 && types.All(t => t.NativeName != nativeName), "invalid or duplicate native type");
                 Require(typeNames.Length == 0 || name.EndsWith("`" + typeNames.Length, StringComparison.Ordinal), "generic owner arity name mismatch");
                 CheckName(ns.Length == 0 ? name : ns + "." + name);
                 var origin = type.GetProperty("origin");
                 var originFields = new List<string> { "assembly", "module", "name", "token", "publicly_visible" };
+                if (declaringType >= 0)
+                {
+                    originFields.Add("declaring_type_token");
+                    Require(origin.GetProperty("declaring_type_token").GetInt32() == 0x02000002 + declaringType, "nested origin mismatch");
+                }
                 if (origin.TryGetProperty("property_tokens", out _))
                 {
                     originFields.Add("property_tokens");
@@ -180,7 +204,7 @@ public sealed class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType));
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
@@ -193,7 +217,7 @@ public sealed class NativeAssemblyDefinition
                 _ = ImportExternalType(signatureGraph, reference, importedArity, referenceIdentities, valueTypeReferences);
             }
             int genericArity = 0; int typeArity = 0;
-            var signatureOwners = types.Select(t => DefineType(signatureGraph, t)).ToArray();
+            var signatureOwners = DefineTypes(signatureGraph, types);
             for (int i = 0; i < types.Count; i++)
                 foreach (var inherited in types[i].BaseInterfaces)
                 {
@@ -430,7 +454,7 @@ public sealed class NativeAssemblyDefinition
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         var graph = new AssemblyBuilder(Identity, coreLibrary);
-        var owners = types.Select(t => DefineType(graph, t)).ToArray();
+        var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)
             foreach (var constraint in types[i].Constraints)
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
@@ -482,6 +506,18 @@ public sealed class NativeAssemblyDefinition
         foreach (var property in properties)
             owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
         return graph.WriteReferenceImage();
+    }
+    private static TypeBuilder[] DefineTypes(AssemblyBuilder graph, IReadOnlyList<TypeRow> rows)
+    {
+        var result = new TypeBuilder[rows.Count];
+        for (int i = 0; i < rows.Count; i++)
+        {
+            var type = rows[i];
+            result[i] = type.DeclaringType < 0 ? DefineType(graph, type) : type.IsValueType
+                ? result[type.DeclaringType].AddNestedValueType(type.Name, type.Visibility)
+                : result[type.DeclaringType].AddNestedClass(type.Name, type.Visibility);
+        }
+        return result;
     }
     private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
     {
