@@ -2921,3 +2921,11 @@ as an argument. This changes no binding or Runtime Contract configuration and ke
 ordinary .NET defaults. The unchanged collections sample passes `Single` admission
 and next reports unsupported union-pattern emission; it is not yet executable through
 the direct backend.
+
+Raven now admits checked union-case/member conditional branches and concrete value
+overrides in its native profile. Pattern extraction follows the existing .NET
+TryGet/getter behavior and branches before exposing payload bindings. Generated match
+failure uses the existing terminal-failure contract; .NET retains its exception body.
+Runtime Contracts and binding remain unchanged. 34 focused compiler tests pass,
+including imported-case extraction on .NET; direct collections emission next needs
+reference conversions. Native execution of that broad sample is still pending.

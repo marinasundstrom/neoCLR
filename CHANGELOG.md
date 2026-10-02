@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Extend Raven's opt-in shared plan with checked union-case branches and payload
+  extraction, compiler-generated match failure and concrete value override calls.
+  34 focused compiler tests pass; collections now reaches reference conversions.
+
 - Admit concrete imported value-type overrides as direct managed-receiver calls,
   matching CLR value dispatch. Nonfinal reference overrides remain rejected.
   C# coverage executes a real CLR override and a matching metadata-produced native
