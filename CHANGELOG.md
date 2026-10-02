@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Validate unchanged Raven callback comparer sources through native PE execution (42).
+  Raven now applies target capabilities to explicit instance field declarations, using
+  existing generic Function storage and interface dispatch. Capturing closures remain
+  outside this bounded check; no runtime or metadata encoding change is needed.
+
 - Bind explicitly core-marked CLI namespace containers to native assembly-level functions
   while preserving CLI reference identity. Reject unmarked or wrongly scoped containers
   and incompatible signatures. All 95 metadata contract groups pass. Raven now compiles

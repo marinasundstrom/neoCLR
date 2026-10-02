@@ -3180,3 +3180,16 @@ Validation: 95 C# metadata groups, focused compiler array/default checks and nat
 source consumers. [Source hashes, consumers and runtime results](experiments/extended-cli-metadata/array-list-source-2026-10-02/execution.json)
 identify the tested feature-branch bundle. Full class-library compilation and native
 symbol loading remain future work; next assess comparer implementations and HashMap.
+
+### Callback comparer source checkpoint (2026-10-02)
+
+Unchanged Comparer, EqualityComparer, FunctionComparer and FunctionEqualityComparer
+compile, verify and execute through native PE (42). Raven's explicit field declaration
+path now uses its existing target capability profile when admitting/mapping types.
+Generic stored callbacks use structural Function metadata and existing runtime storage
+and interface dispatch; the CLI representation remains core Func/Action signatures.
+This requires no runtime or metadata encoding change. Noncapturing callbacks are tested;
+capturing closures remain unsupported. The explicit implementation seed and translated
+System dependency are still required. Native importing will replace the CLI signatures.
+[Consumer/source hashes](experiments/extended-cli-metadata/comparer-source-2026-10-02.json)
+and [runtime results](experiments/extended-cli-metadata/comparer-execution-2026-10-02.json).

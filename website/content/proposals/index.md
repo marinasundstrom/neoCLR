@@ -491,3 +491,7 @@ copies, iteration, callback searches and Option results. Expected invalid-capaci
 index faults use System.Fail through explicit namespace-function binding. The authoring
 seed and translated System dependencies are still required. This bounded checkpoint
 does not yet compile the entire System library with the native backend.
+
+Unchanged callback comparer classes also compile and execute through native Function
+fields and interface dispatch. Noncapturing callbacks are covered; closure environments
+and complete library compilation remain outside this checkpoint.

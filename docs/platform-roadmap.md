@@ -9,7 +9,8 @@ and execute growth, copy independence, iteration, callback searches and Option r
 with expected negative-capacity/index faults. Explicit namespace-function dependency
 binding and configured array-shape length support complete this bounded source slice.
 Translated System remains required; full library source emission and native semantic
-symbol loading remain open. Next assess callback comparer implementations and HashMap.
+symbol loading remain open. Unchanged callback comparer implementations now also execute through Function fields
+and interface dispatch (42). Next assess HashMap source emission.
 Author-directed integration stays on the feature branches;
 no main-branch feature merge or roadmap milestone completion is implied.
 See [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)

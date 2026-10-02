@@ -1,0 +1,33 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Collections/Comparer.rvn",
+      "sha256": "BEA7287FDDAB87AD0716AAB38E82EB9837A03C121D6DD4FDE96AB2F87C793592"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "sha256": "820C9AB4936879F8F60A4882C3EA0BD266C3DE4F562C8F61C49B8AAC9801258B"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+      "sha256": "94BAEB9BB46D745819DF394C2A8E73A7CB82361FA2D81E4709EAB51AAC7F96D0"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "sha256": "3F98957438834DCBAC9D23EAEA41927FF52D74F358EDFC4FCB33490D0F3A15FF"
+    }
+  ],
+  "consumer": "func Main() -\u003E int {\n    let ordering = System.Collections.FunctionComparer\u003Cint\u003E((left, right) =\u003E left - right \u002B 5)\n    let policy: System.Collections.Comparer\u003Cint\u003E = ordering\n    if policy.Compare(7, 10) != 2 { return 1 }\n    if ordering.Compare(3, 3) != 5 { return 2 }\n    let equality = System.Collections.FunctionEqualityComparer\u003Cint\u003E((left, right) =\u003E left % 10 == right % 10, value =\u003E value % 10)\n    let equalPolicy: System.Collections.EqualityComparer\u003Cint\u003E = equality\n    if !equalPolicy.Equals(12, 22) { return 3 }\n    if equalPolicy.Equals(12, 23) { return 4 }\n    if equalPolicy.GetHashCode(32) != 2 { return 5 }\n    return 42\n}",
+  "phase": "emitted",
+  "bytes": 32768,
+  "bindingDiagnosticCount": 0,
+  "cliBridgeEmission": {
+    "success": true,
+    "bytes": 4096,
+    "diagnostics": []
+  },
+  "diagnostics": [],
+  "scope": "unchanged library source units; explicit authoring seed; execution, when requested, is recorded separately in execution.json"
+}
