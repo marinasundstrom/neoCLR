@@ -521,3 +521,7 @@ still pending; the general writer/runtime support is broader than this reader pr
 Fieldless instance classes, constructors and primitive instance methods now also pass
 the direct native import/emission/runtime path. Fields, richer signatures and reference
 comparison lowering remain gaps; the CLI primitive core bootstrap is still required.
+
+Primitive instance fields now load directly into metadata definitions and Raven symbols.
+A Raven-built stateful class executes through imported constructors and methods (42).
+Direct imported field emission and richer field signatures remain development gaps.

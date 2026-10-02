@@ -9,8 +9,10 @@ Native calls now import and execute across that boundary, including a Raven-prod
 library read directly and consumed by Raven (42). Fieldless nongeneric static classes
 and primitive static methods now also load directly into Raven; Boolean/Int32 overload
 calls execute in neoCLR (42). Fieldless instance classes now also support direct
-constructor/member import, allocation, local aliases and calls (42). Next broaden
-nominal signatures and storage declarations before full System loading.
+constructor/member import, allocation, local aliases and calls (42). Primitive fields
+now load into definitions/symbols, and a stateful class consumer returns 42 through its
+constructor and instance method. Direct imported field operands remain pending. Next
+broaden nominal signatures and field emission before full System loading.
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 

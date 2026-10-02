@@ -84,8 +84,19 @@ internal static class NativeDefinitionChecks
         var constructor = instanceType.AddConstructor(Array.Empty<PrimitiveType>()); constructor.Return();
         var value = instanceType.AddInstanceMethod("Value", new MethodSignature(PrimitiveType.Int32, []));
         value.LoadConstant(42); value.Return();
+        foreach (var primitive in new[] { PrimitiveType.Int32, PrimitiveType.Int64, PrimitiveType.Boolean, PrimitiveType.String })
+            instanceType.AddField(primitive.ToString(), primitive, FieldVisibility.Public, isReadOnly: primitive == PrimitiveType.String);
         var instanceRead = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core));
         var instanceDefinition = instanceRead.MainModule.Types.Single();
+        foreach (var field in instanceDefinition.Fields)
+        {
+            Check(field.TryGetPrimitiveType(out var primitive) && primitive.ToString() == field.Name, "native primitive field signature");
+            Check(ReferenceEquals(field, instanceRead.MainModule.GetFieldDefinition(field.MetadataToken)) && ReferenceEquals(field.DeclaringType, instanceDefinition), "canonical field identity/owner");
+            Check((field.Attributes & 7) == 6 && ((field.Attributes & 0x20) != 0) == (primitive == PrimitiveType.String), "field access/readonly flags");
+            Reject<NotSupportedException>(() => field.GetSignature());
+            Reject<InvalidOperationException>(() => field.Name = "Changed");
+        }
+        Check(instanceDefinition.Fields[0].MetadataToken == 0x04000001, "native field origin token");
         var ctorDefinition = instanceDefinition.Methods.Single(m => m.Name == ".ctor");
         var valueDefinition = instanceDefinition.Methods.Single(m => m.Name == "Value");
         Check(instanceDefinition.Attributes == 0x100001 && !ctorDefinition.IsStatic && (ctorDefinition.Attributes & 0x1800) == 0x1800, "instance and constructor attributes");
@@ -96,6 +107,8 @@ internal static class NativeDefinitionChecks
         Check(ctorImport.IsConstructor && !valueImport.IsStatic && valueImport.DeclaringTypeName == "Calculator", "instance import contract");
         var instanceCall = consumer.AddFunction("InstanceCall"); instanceCall.NewObject(ctorImport); instanceCall.Call(valueImport); instanceCall.Return();
         _ = consumer.WriteNativeAssembly();
+        instances.AddClass("Example", "UnsupportedStorage").AddField("Other", instanceType);
+        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core)));
         library.AddValueType("Example", "Unsupported");
         Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)));
         var generic = new AssemblyBuilder(new("Generic", new Version(1, 0, 0, 0)), core);

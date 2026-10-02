@@ -8,13 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
-- Extend direct native declaration reading to fieldless nongeneric top-level
-  static/instance classes and primitive methods/constructors. Preserve type origin
+- Extend direct native declaration reading to nongeneric top-level
+  static/instance classes and primitive fields/methods/constructors. Preserve type origin
   tokens, visibility and
   canonical method ownership; Raven now binds and emits these nominal calls without
   CLI projection. A Raven-built class library/consumer executes Boolean/Int32 overloads
   in neoCLR (42), including allocation, local reference storage and instance calls.
-  Static signature helpers reject instance methods. Richer type/signature profiles
+  Primitive fields retain origin identity, visibility and readonly flags; native fields
+  have no CLI signature blob. Stateful constructor/method consumers return 42; direct
+  external field emission remains unsupported. Static signature helpers reject instance methods. Richer type/signature profiles
   remain unsupported and reject the read.
 
 - Raven imports bounded primitive namespace-function libraries directly from native

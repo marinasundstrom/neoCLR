@@ -4359,3 +4359,26 @@ The loaded definition graph remains immutable. Fields/properties, value/interfac
 nested/generic classes and nominal parameter/result signatures are rejected by the
 current direct reader. Existing writer/runtime support is broader than this read profile.
 No additional guest API or RavenDoc type is introduced; this manual covers the host APIs.
+
+
+### Direct native primitive fields (development, 2026-10-02)
+
+ReadNativeAssembly now also admits Int32, Int64, Boolean and String instance fields on
+nongeneric top-level classes. TypeDefinition.Fields and Module.Fields expose canonical
+FieldDefinition instances; GetFieldDefinition(originToken) returns that same instance.
+DeclaringType, name, access and InitOnly/readonly flags retain their native contracts.
+Field tokens retain validated origin identities, starting at 0x04000001.
+
+FieldDefinition.TryGetPrimitiveType(out PrimitiveType type) recognizes these native
+fields without inventing CLI signature bytes. GetSignature throws NotSupportedException
+for native fields. FieldType remains the authored-only signature property (null for
+loaded declarations); use the existing primitive query in this bounded read profile.
+Loaded field names and collections remain immutable, and Write preserves the input PE.
+Nominal/vector/structural field signatures still reject the entire direct read.
+
+Raven exposes these native fields as compiler symbols, retaining type/access/readonly
+information. A native library's constructor and instance methods can initialize/read its
+own fields using existing source emission. Direct consumer field emission across the
+assembly boundary is not implemented: it reports NEOMETA001 and leaves output empty.
+The stateful method-call consumer is tested separately and returns 42. No guest API,
+encoded layout change or new public host member is introduced by this reader slice.

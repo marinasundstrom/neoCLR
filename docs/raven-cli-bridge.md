@@ -3354,3 +3354,27 @@ limit (NEOMETA001); that separate codegen gap remains open and is not a passing 
 
 Validation: all 96 metadata contract groups and three runtime consumers pass; the API
 snapshot check passes. [Instance-class evidence](experiments/extended-cli-metadata/native-instance-types-2026-10-02.json).
+
+### Direct native primitive storage checkpoint (2026-10-02)
+
+The native read model now materializes primitive instance fields into the existing
+FieldDefinition collection, preserving canonical owner/token identity, visibility and
+readonly flags. The compiler adds native field symbols with lazy core primitive mapping.
+No CLI blob or reflection field is fabricated: GetSignature rejects native fields and
+TryGetPrimitiveType supplies the supported logical type. Authored FieldType remains a
+separate existing contract until broader loaded signature materialization is implemented.
+
+The Raven library's Calculator constructor writes its private Int32 storage; Add reads
+it after the consumer constructs Calculator(20), stores a local alias and calls Add(22).
+The native runtime returns 42. Public field lookup/type binding and private field
+access diagnostics are also checked. Direct imported field emission still reports
+NEOMETA001 without output because the external field operand adapter is not implemented.
+This is distinct from the working cross-assembly method calls into stateful objects.
+
+Compared with CLI field metadata, names, owner/origin tokens and FieldAttributes retain
+the same model; only raw CLI signature access is unavailable for native input. Nominal
+field/method signatures, properties and wider type categories remain pending. Native
+format and runtime code are unchanged; the explicit CLI primitive core remains required.
+
+Validation: all 96 metadata contract groups, three runtime consumers and the API snapshot
+check pass. [Primitive-field evidence](experiments/extended-cli-metadata/native-primitive-fields-2026-10-02.json).
