@@ -46,9 +46,17 @@ internal static class MetadataLoadContextChecks
         Check(!ReferenceEquals(versions.Resolve(a.Identity).GetTypes().Single(), versions.Resolve(revision.Identity).GetTypes().Single()), "same name different version remains distinct");
         var genericBuilder = new AssemblyBuilder(Id("GenericViews"), core);
         var box = genericBuilder.AddGenericClass("Example", "Box", ["T"]);
-        box.AddField("Value", SignatureType.TypeParameter(0));
+        var stored = box.AddField("Value", SignatureType.TypeParameter(0));
         box.AddField("Items", SignatureType.ArrayOf(SignatureType.TypeParameter(0)));
         box.AddField("Next", box.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        var get = box.AddInstanceMethod("Get", new MethodSignature(SignatureType.TypeParameter(0), []));
+        get.LoadArgument(0); get.LoadField(stored); get.Return();
+        var mixed = box.AddMethod("Mixed", new MethodSignature(SignatureType.TypeParameter(0),
+            [SignatureType.MethodParameter(0), SignatureType.TypeParameter(0)], ["U"]));
+        mixed.LoadArgument(1); mixed.Return();
+        var identity = genericBuilder.AddFunction("Identity", new MethodSignature(SignatureType.ArrayOf(SignatureType.MethodParameter(0)),
+            [SignatureType.ArrayOf(SignatureType.MethodParameter(0))], ["T"]));
+        identity.LoadArgument(0); identity.Return();
         genericBuilder.AddGenericClass("Example", "Other", ["T"]);
         var genericSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(genericBuilder.WriteNativeAssembly(), core));
         var genericContext = new MetadataLoadContext([genericSnapshot]);
@@ -74,6 +82,25 @@ internal static class MetadataLoadContextChecks
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.TypeParameter(0)));
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(0)));
         Reject<NotSupportedException>(() => ((IList<TypeInfo>)closed.TypeArguments).Clear());
+        var getView = closed.GetMethods().Single(m => m.Name == "Get");
+        Check(ReferenceEquals(getView.ReturnType, intView) && getView.GetParameters().Count == 0, "constructed owner method result");
+        Check(ReferenceEquals(getView, closed.GetMethods().Single(m => m.Name == "Get")), "canonical method view");
+        var mixedView = closed.GetMethods().Single(m => m.Name == "Mixed");
+        var mixedParameters = mixedView.GetParameters();
+        Check(ReferenceEquals(mixedParameters[0].ParameterType, mixedView.GetGenericArguments()[0]) &&
+            ReferenceEquals(mixedParameters[1].ParameterType, intView) && ReferenceEquals(mixedView.ReturnType, intView), "separate owner and method scopes");
+        Check(mixedView.GetGenericArguments()[0] is MethodGenericParameterTypeInfo methodParameter &&
+            ReferenceEquals(methodParameter.DeclaringMethod, mixedView) && methodParameter.Position == 0, "method scope provenance");
+        var moduleView = genericContext.Resolve(genericSnapshot.Identity).GetModules().Single();
+        var functionView = moduleView.GetFunctions().Single();
+        Check(functionView.DeclaringType is null && functionView.ReturnType is ArrayTypeInfo functionArray &&
+            ReferenceEquals(functionArray.ElementType, functionView.GetGenericArguments()[0]) &&
+            ReferenceEquals(functionView.ReturnType, functionView.GetParameters()[0].ParameterType), "namespace generic vector signature");
+        Check(ReferenceEquals(functionView, genericContext.Resolve(genericSnapshot.MainModule.Functions.Single())), "function resolution identity");
+        Check(ReferenceEquals(genericContext.ResolveSignature(SignatureType.MethodParameter(0), boxView.GetGenericArguments(), [intView]), intView), "explicit method scope substitution");
+        Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(1), null, [intView]));
+        Reject<ArgumentException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(0), null, [nominal]));
+        Reject<NotSupportedException>(() => ((IList<NeoCLR.Metadata.Experimental.Introspection.ParameterInfo>)mixedParameters).Clear());
         var cli = new AssemblyBuilder(Id("Cli"), core);
         cli.AddGenericClass("Example", "Box", ["T"]);
         var cliSnapshot = AssemblyDefinition.ReadAssembly(cli.Write(), expectedExtended: false);

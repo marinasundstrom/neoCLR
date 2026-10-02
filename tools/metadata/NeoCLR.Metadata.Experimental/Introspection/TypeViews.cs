@@ -58,6 +58,8 @@ public sealed class ConstructedTypeInfo : TypeInfo
     /// <summary>Gets declared field views with simultaneous owner-argument substitution.</summary>
     /// <exception cref="InvalidDataException">A field signature or dependency is unsupported/unavailable.</exception>
     public IReadOnlyList<FieldInfo> GetFields() => fields.Value;
+    /// <summary>Gets declared non-constructor methods through this constructed owner.</summary>
+    public IReadOnlyList<MethodInfo> GetMethods() => Context.GetMethods(Definition.Definition, this);
     internal override int Depth => 1 + TypeArguments.Max(t => t.Depth);
     /// <inheritdoc/>
     public override string DisplayName => Definition.DisplayName + "<" + string.Join(", ", TypeArguments.Select(t => t.DisplayName)) + ">";
@@ -99,15 +101,27 @@ public sealed partial class MetadataLoadContext
     /// <exception cref="InvalidDataException">Missing dependency, invalid parameter scope or unsupported signature (including method parameters).</exception>
     public TypeInfo ResolveSignature(SignatureType signature, IReadOnlyList<TypeInfo>? typeArguments = null)
     {
-        ArgumentNullException.ThrowIfNull(signature);
-        if (typeArguments?.Count > 32) throw new ArgumentException("too many type arguments", nameof(typeArguments));
-        var arguments = typeArguments?.ToArray() ?? [];
-        if (arguments.Any(t => t is null || !ReferenceEquals(t.Context, this) || t is PrimitiveTypeInfo { Kind: PrimitiveType.Void })) throw new ArgumentException("foreign type argument", nameof(typeArguments));
-        lock (gate) return Project(signature, arguments);
+        return ResolveSignature(signature, typeArguments, null);
     }
 
-    private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments)
+    /// <summary>Projects a signature with separate owner and method parameter scopes.</summary>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">A supplied scope is excessive or contains null, foreign or Void arguments.</exception>
+    /// <exception cref="InvalidDataException">A referenced parameter or signature is unsupported or a dependency is missing.</exception>
+    public TypeInfo ResolveSignature(SignatureType signature, IReadOnlyList<TypeInfo>? typeArguments, IReadOnlyList<TypeInfo>? methodArguments)
     {
+        ArgumentNullException.ThrowIfNull(signature);
+        if (typeArguments?.Count > 32 || methodArguments?.Count > 32) throw new ArgumentException("too many type arguments", nameof(typeArguments));
+        var arguments = typeArguments?.ToArray() ?? [];
+        var methods = methodArguments?.ToArray() ?? [];
+        if (arguments.Concat(methods).Any(t => t is null || !ReferenceEquals(t.Context, this) || t is PrimitiveTypeInfo { Kind: PrimitiveType.Void })) throw new ArgumentException("foreign type argument", nameof(typeArguments));
+        lock (gate) return Project(signature, arguments, methods);
+    }
+
+    private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods)
+    {
+        if (signature.MethodParameterIndex is { } methodPosition)
+            return methodPosition < methods.Count ? methods[methodPosition] : throw new InvalidDataException("metadata method parameter outside supplied scope");
         if (signature.TypeParameterIndex is { } position)
             return position < arguments.Count ? arguments[position] : throw new InvalidDataException("metadata type parameter outside supplied scope");
         if (signature.Primitive is { } primitive)
@@ -117,13 +131,13 @@ public sealed partial class MetadataLoadContext
         }
         if (signature.ArrayElement is { } element)
         {
-            var type = Project(element, arguments);
+            var type = Project(element, arguments, methods);
             if (type.Depth >= 16) throw new InvalidDataException("metadata type nesting exceeds limit");
             if (!arrays.TryGetValue(type, out var view)) arrays.Add(type, view = new ArrayTypeInfo(this, type));
             return view;
         }
         if (signature.ReferencedGenericInstance is { } constructed)
-            return Construct(Resolve(constructed.Definition), constructed.TypeArguments.Select(t => Project(t, arguments)).ToArray());
+            return Construct(Resolve(constructed.Definition), constructed.TypeArguments.Select(t => Project(t, arguments, methods)).ToArray());
         if (signature.ReferencedType is { } reference) return Resolve(reference);
         throw new InvalidDataException("unsupported metadata facade signature");
     }

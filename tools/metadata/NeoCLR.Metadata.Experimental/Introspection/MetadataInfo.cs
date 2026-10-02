@@ -31,9 +31,11 @@ public sealed class AssemblyInfo
 public sealed class ModuleInfo
 {
     private readonly ModuleDefinition definition;
+    private readonly MetadataLoadContext context;
     private readonly Lazy<IReadOnlyList<NominalTypeInfo>> types;
     internal ModuleInfo(MetadataLoadContext context, AssemblyInfo assembly, ModuleDefinition definition)
     {
+        this.context = context;
         Assembly = assembly;
         this.definition = definition;
         types = new(() => Array.AsReadOnly(definition.Types.Where(t => t.Name != "<Module>").Select(context.GetType).ToArray()));
@@ -44,6 +46,8 @@ public sealed class ModuleInfo
     public AssemblyInfo Assembly { get; }
     /// <summary>Gets declared nominal types in metadata order, including nested types.</summary>
     public IReadOnlyList<NominalTypeInfo> GetTypes() => types.Value;
+    /// <summary>Gets namespace-level functions in metadata order.</summary>
+    public IReadOnlyList<MethodInfo> GetFunctions() => Array.AsReadOnly(definition.Functions.Select(context.Resolve).ToArray());
 }
 
 /// <summary>The initial metadata-only type facade; additional type families will extend this model.</summary>
@@ -84,6 +88,8 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <summary>Gets all declared fields in metadata order, without inherited-member or visibility filtering.</summary>
     /// <exception cref="InvalidDataException">A field signature is unsupported or its dependency is missing.</exception>
     public IReadOnlyList<FieldInfo> GetFields() => fields.Value;
+    /// <summary>Gets declared non-constructor methods without inherited lookup or visibility filtering.</summary>
+    public IReadOnlyList<MethodInfo> GetMethods() => context.GetMethods(definition, this);
     /// <summary>Gets the metadata name, including generic arity suffix.</summary>
     public string Name => definition.Name;
     /// <summary>Gets the declared namespace.</summary>

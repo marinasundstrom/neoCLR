@@ -776,3 +776,7 @@ Host facade coverage now also includes PrimitiveTypeInfo, ArrayTypeInfo,
 GenericParameterTypeInfo, ConstructedTypeInfo and FieldInfo, with every current member
 in [constructed and field views](experimental-metadata.md#constructed-and-field-views-development-2026-10-02).
 Method/property facade coverage remains explicitly pending.
+
+MethodInfo, ParameterInfo and MethodGenericParameterTypeInfo are now included in the
+[manual host facade reference](experimental-metadata.md#method-and-parameter-views-development-2026-10-02),
+including scope projection and module/type enumeration. Guest snapshot selection is unchanged.

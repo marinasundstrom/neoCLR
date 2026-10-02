@@ -693,3 +693,7 @@ this is not a new guest Introspection release.
 Development checkpoint (2026-10-02): the C# metadata facade now projects constructed
 types and declared fields, including generic substitution. Raven consumes those views;
 method/parameter projection and the guest implementation remain future work.
+
+Development checkpoint (2026-10-02): the C# facade now exposes metadata-only method and
+parameter views, preserving separate generic scopes. Raven delegates signature projection
+to those views. No runtime invocation or guest Introspection API change is introduced.

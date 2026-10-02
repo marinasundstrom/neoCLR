@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Method and parameter views](#method-and-parameter-views-development-2026-10-02): callable signatures and separate generic scopes.
+
 - [Constructed and field views](#constructed-and-field-views-development-2026-10-02): signature projection and declared field metadata.
 
 - [Introspection facade and MetadataLoadContext](#metadata-only-introspection-facade-development-2026-10-02): context-owned assembly, module and nominal-type views.
@@ -5240,3 +5242,47 @@ The names follow the runtime model; this prototype distinguishes nominal definit
 from constructed views explicitly. MethodInfo/ParameterInfo, properties, full access
 flags, function/byref views and open method generic scopes remain follow-up work.
 The new host types are covered here, not added to the guest RavenDoc assembly.
+
+
+### Method and parameter views (development, 2026-10-02)
+
+Namespace `NeoCLR.Metadata.Experimental.Introspection`:
+
+| Type | Public surface added |
+| --- | --- |
+| MetadataLoadContext | `Resolve(MethodDefinition): MethodInfo`; `ResolveSignature(SignatureType, IReadOnlyList<TypeInfo>? typeArguments, IReadOnlyList<TypeInfo>? methodArguments): TypeInfo` |
+| ModuleInfo | `GetFunctions(): IReadOnlyList<MethodInfo>` |
+| NominalTypeInfo / ConstructedTypeInfo | `GetMethods(): IReadOnlyList<MethodInfo>` |
+| MethodInfo | `Name`, `Namespace` (strings), `MetadataToken` (uint), `Module` (ModuleInfo), nullable `DeclaringType` (TypeInfo), `ReturnType` (TypeInfo), `GenericParameterNames` (IReadOnlyList<string>), `IsStatic`, `IsAbstract`, `IsVirtual` (bool); `GetParameters(): IReadOnlyList<ParameterInfo>`; `GetGenericArguments(): IReadOnlyList<TypeInfo>` |
+| ParameterInfo | `DeclaringMethod` (MethodInfo), `Position` (int), `ParameterType` (TypeInfo) |
+| MethodGenericParameterTypeInfo | `DeclaringMethod` (MethodInfo), `Position` (int), DisplayName (`!!ordinal`), IsNominalType=false |
+
+Resolve requires a method definition from an exact registered snapshot. Null input throws
+ArgumentNullException; missing snapshots/undecodable signatures throw InvalidDataException.
+Methods are interned by original definition and declaring owner view. GetMethods returns
+all declared non-constructor methods including accessors, without inherited lookup or
+visibility filtering. Module.GetFunctions enumerates namespace functions. Enumeration
+collections are read-only; repeated calls preserve element identities. Constructor
+metadata can be resolved directly as MethodInfo; a dedicated ConstructorInfo facade is
+not added. Names/tokens describe declarations, never runtime handles.
+
+Returns/parameters resolve lazily, throwing InvalidDataException for unavailable
+signature/dependency profiles. GetParameters preserves positions and canonical projected
+types. Parameter names/defaults/attributes are not fabricated when the current reader
+has not provided them. GenericParameterNames copies declared names. Method arguments
+have declaring-method identity distinct from owner parameters even at the same ordinal.
+Constructed owners substitute only their own arguments; method parameters remain open.
+
+The three-argument ResolveSignature accepts explicit copied type and method scopes,
+each at most 32 entries. Null signature throws ArgumentNullException; null/foreign/Void
+arguments or excessive scope length throw ArgumentException. Missing parameter slots,
+dependencies or unsupported signature shapes throw InvalidDataException. Supplied
+arguments are substituted simultaneously without recursively rebinding caller scopes.
+The existing overload remains; a method parameter with no supplied method scope rejects.
+
+Raven consumes method views for signature projection. Constraint/overload/access policy
+and compiler symbols remain Raven responsibilities. Method instantiation as a dedicated
+view, full parameter metadata, custom attributes, property views and broad CLI decoding
+remain pending. There is no Invoke API. Current MethodInfo/ParameterInfo names follow
+System.Introspection; this host prototype does not change guest APIs or commit a future
+identical implementation. All public host members are documented here outside RavenDoc.
