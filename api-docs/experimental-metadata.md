@@ -4226,3 +4226,15 @@ C# checks cover generic raw emission, native verification/execution (stored slot
 unread slot fault), projection loading, executable CLI refusal, invalid element and
 parameter scope, and an invalid length stack type. Raven separately tests the matched
 explicit authoring-seed mapping and its default-disabled configuration.
+
+### Native namespace-function dependency binding (development, 2026-10-02)
+
+BindNativeLibrary also recognizes public, nongeneric, abstract sealed top-level CLI
+containers carrying the exact configured core's System.Runtime.CompilerServices.TopLevelAttribute.
+The marker must have a parameterless constructor and no named arguments. Public static
+concrete methods bind to ownerless native functions named namespace.method, with existing
+arity, parameter, result and access validation. Container spelling is irrelevant.
+CLI output preserves the container reference; native output uses the bound function.
+Unmarked or incorrectly scoped containers do not receive namespace treatment. Raw CLI
+global-method imports remain unsupported. This is temporary CLI bridge interpretation,
+not a general public custom-attribute API or native semantic importer.

@@ -1,0 +1,51 @@
+{
+  "selection": "application-order-collections",
+  "expectedOutput": {
+    "path": "docs/experiments/raven-target/samples/application-order-collections.expected.txt",
+    "sha256": "A3AD3C2FEBA43048173845F14AD098CD7301B07A283E661A8F0D6A889C1A03BB",
+    "matched": true
+  },
+  "nativeSystem": {
+    "path": "/tmp/System-function-20261002.neox",
+    "sha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90"
+  },
+  "targetReference": "api-docs/reference/NeoCLR.CoreProbe.dll",
+  "targetReferenceSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "targetProfile": "CompilationOptions.NeoCLR plus native Self marker; CLI declaration snapshot, not a native symbol importer",
+  "hostProfile": "Existing direct-emitter .NET primitive bootstrap; no native library dependencies",
+  "methodology": "Unchanged sources; grouped foundational contracts, individual library units, selected applications and entire library. Binding failures stop emission. Target configuration rejection is recorded, not bypassed. No application with failed emission is run. Ordinary CLI bridge emission is a nonexecuted control using a reference-only core. Full diagnostics saved per case; report retains first 12.",
+  "cases": [
+    {
+      "id": "application-order-collections-target",
+      "profile": "target",
+      "sources": [
+        {
+          "path": "docs/experiments/raven-target/samples/application-order-collections.rvn",
+          "sha256": "D775C2C648591482CF53A0A735603CA51AEA48C2F2BB33633C95830E57B6550B"
+        }
+      ],
+      "phase": "emitted",
+      "bytes": 69632,
+      "diagnosticCount": 0,
+      "diagnostics": [],
+      "cliBridgeEmission": {
+        "success": true,
+        "bytes": 7168,
+        "diagnostics": []
+      },
+      "execution": {
+        "verification": {
+          "ExitCode": 0,
+          "Stdout": "NeoMetadata_13CF570388CE0B81106001226DE64209CC05068B4005CBE6DD54A13C6C7F872B: typed-stack/control-flow verification passed (3853 IL functions; maximum stack 7; runtime value checks remain)\n",
+          "Stderr": ""
+        },
+        "run": {
+          "ExitCode": 0,
+          "Stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+          "Stderr": ""
+        }
+      }
+    }
+  ]
+}

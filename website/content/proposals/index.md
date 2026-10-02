@@ -486,6 +486,8 @@ The next source-emission checkpoint compiles the unchanged collection interface 
 through Sequence<T>, including constructed interface bases and its indexer. An inherited
 property/indexer consumer runs on CLR and neoCLR with both source orders; the real
 neoCLR target profile also passes, including generic provider and iterator classes.
-The unchanged ArrayList source now binds against the implementation seed, but native
-emission now preserves checked-uninitialized storage reservation. Its next blocker is
-the System.Fail namespace-function dependency mapping. This does not yet compile the entire System library with the native backend.
+The unchanged ArrayList source now compiles to native PE and executes growth, independent
+copies, iteration, callback searches and Option results. Expected invalid-capacity and
+index faults use System.Fail through explicit namespace-function binding. The authoring
+seed and translated System dependencies are still required. This bounded checkpoint
+does not yet compile the entire System library with the native backend.

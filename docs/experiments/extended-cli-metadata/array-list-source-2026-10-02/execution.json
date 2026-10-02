@@ -1,0 +1,47 @@
+{
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "cases": [
+    {
+      "Name": "growth-copy-iterator",
+      "command": "verify",
+      "passed": true,
+      "exitCode": 0,
+      "text": "NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366: typed-stack/control-flow verification passed (3865 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "Name": "growth-copy-iterator",
+      "command": "run",
+      "passed": true,
+      "exitCode": 42,
+      "text": ""
+    },
+    {
+      "Name": "negative-capacity",
+      "command": "verify",
+      "passed": true,
+      "exitCode": 0,
+      "text": "NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366: typed-stack/control-flow verification passed (3857 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "Name": "negative-capacity",
+      "command": "run",
+      "passed": true,
+      "exitCode": 1,
+      "text": "Fault: ArrayList capacity must be non-negative [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:344] IL instruction 1\n  at NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031..ctor(Int32) owner=Constructed { definition: \u0022NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031\u0022, arguments: [Int32] } [NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366#1.0.0.0:2] IL instruction 5\n  at NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.F_4D61696E() [NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366#1.0.0.0:0] IL instruction 1\n"
+    },
+    {
+      "Name": "invalid-index",
+      "command": "verify",
+      "passed": true,
+      "exitCode": 0,
+      "text": "NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366: typed-stack/control-flow verification passed (3857 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "Name": "invalid-index",
+      "command": "run",
+      "passed": true,
+      "exitCode": 1,
+      "text": "Fault: ArrayList index out of range [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:344] IL instruction 1\n  at NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031.M_6765745F4974656D(Int32) owner=Constructed { definition: \u0022NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031\u0022, arguments: [Int32] } [NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366#1.0.0.0:5] IL instruction 14\n  at NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366.F_4D61696E() [NeoMetadata_87766EB2CF23FBE149F0D5A23B7F9EEE478CA86DC6686DFD57CA37BEF7C7F366#1.0.0.0:0] IL instruction 4\n"
+    }
+  ]
+}

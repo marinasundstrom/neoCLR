@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Bind explicitly core-marked CLI namespace containers to native assembly-level functions
+  while preserving CLI reference identity. Reject unmarked or wrongly scoped containers
+  and incompatible signatures. All 95 metadata contract groups pass. Raven now compiles
+  unchanged ArrayList and its interfaces to native PE and executes growth, independent
+  copies, iteration, callback searches and Option results, plus expected failure paths.
+  Target-configured array length and an isolated shared required-result fix complete
+  this bounded source checkpoint; full System source emission remains open.
+
 - Add native-only MethodBuilder.ReserveArray and typed raw ReserveArray emission,
   preserving checked uninitialized slots through PE/#Neo loading. Executable CLI writing
   rejects the operation; reference projections remain supported. Explicit Raven bootstrap

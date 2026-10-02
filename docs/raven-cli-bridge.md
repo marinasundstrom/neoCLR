@@ -3153,3 +3153,30 @@ Next is namespace-function dependency mapping. The CLI seed and translated Syste
 explicit temporary dependencies; native metadata importing remains their eventual
 replacement. Compiler support on its feature branch does not imply runtime publication
 or a main-branch merge.
+
+## ArrayList source execution (2026-10-02 development)
+
+The unchanged ArrayList implementation and its source interface hierarchy now compile
+to native PE/#Neo and execute on neoCLR. The consumer exercises growth, indexed writes,
+copy independence, iteration, FindAll, Exists, TrueForAll, Find/FindLast and their index
+variants, including absent Option results. Negative capacity and invalid indexing reach
+the expected System.Fail faults. The broad collections application retains exact output.
+
+Native namespace functions are temporarily imported through public abstract sealed CLI
+containers marked by the exact configured core's parameterless TopLevelAttribute. The
+metadata binding validates the public static method signature and maps namespace/name
+to an ownerless native function. CLI writing retains the original container MemberRef.
+Unmarked containers, wrong core scopes and mismatched signatures are rejected. Raw CLI
+global-function imports and general custom-attribute editing are outside this slice.
+Native semantic importing will replace this scoped CLI marker inspection.
+
+Raven recognizes Length on the explicitly configured RuntimeIterationContract array
+shape; ordinary .NET System.Array lowering remains supported. A separately isolated
+shared fix preserves BoundRequiredResultExpression values, needed by match-as-value.
+The library-authoring seed and BootstrapReference remain explicit; translated System
+still supplies dependencies such as Option and Fail. No seed stubs execute.
+
+Validation: 95 C# metadata groups, focused compiler array/default checks and native
+source consumers. [Source hashes, consumers and runtime results](experiments/extended-cli-metadata/array-list-source-2026-10-02/execution.json)
+identify the tested feature-branch bundle. Full class-library compilation and native
+symbol loading remain future work; next assess comparer implementations and HashMap.

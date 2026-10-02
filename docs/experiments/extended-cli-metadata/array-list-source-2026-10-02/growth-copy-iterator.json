@@ -1,0 +1,49 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330E194DC665A65A4A3A31CAE18C6FFB5473CB0086B14D02DF05D6DC69D8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101D76F2F4D2B950BC59ABD89938CB2E9EBEA1D6E43087E80309B0DE963A22D2"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262EA7362DE107EBC583E6887578F3FA69ECEF905DA52A8C0A9D718B535DD4"
+    }
+  ],
+  "consumer": "import System.Option.*\n\nfunc Main() -\u003E int {\n    let values = System.Collections.ArrayList\u003Cint\u003E()\n    var index = 1\n    while index \u003C= 6 {\n        values.Add(index)\n        index = index \u002B 1\n    }\n    if values.Count != 6 { return 1 }\n    if values.Capacity \u003C 6 { return 2 }\n    let copy = values.Copy()\n    values[0] = 9\n    if copy[0] != 1 { return 3 }\n    let iterator = copy.GetIterator()\n    var sum = 0\n    while iterator.MoveNext() { sum = sum \u002B iterator.Current }\n    iterator.Dispose()\n    if sum != 21 { return 4 }\n    let filtered = copy.FindAll(value =\u003E value \u003E 3)\n    if filtered.Count != 3 { return 5 }\n    if filtered[0] != 4 { return 6 }\n    if !copy.Exists(value =\u003E value == 4) { return 7 }\n    if !copy.TrueForAll(value =\u003E value \u003E 0) { return 8 }\n    let first = match copy.Find(value =\u003E value == 4) {\n        Some(let found) =\u003E found\n        None =\u003E -1\n    }\n    if first != 4 { return 9 }\n    let absent = match copy.Find(value =\u003E value == 99) {\n        Some(let found) =\u003E false\n        None =\u003E true\n    }\n    if !absent { return 10 }\n    let last = match copy.FindLast(value =\u003E value \u003E 3) {\n        Some(let found) =\u003E found\n        None =\u003E -1\n    }\n    if last != 6 { return 11 }\n    let firstIndex = match copy.FindIndex(value =\u003E value \u003E 3) {\n        Some(let position) =\u003E position\n        None =\u003E -1\n    }\n    if firstIndex != 3 { return 12 }\n    let lastIndex = match copy.FindLastIndex(value =\u003E value \u003E 3) {\n        Some(let position) =\u003E position\n        None =\u003E -1\n    }\n    if lastIndex != 5 { return 13 }\n    return 42\n}",
+  "phase": "emitted",
+  "bytes": 81920,
+  "bindingDiagnosticCount": 0,
+  "cliBridgeEmission": {
+    "success": true,
+    "bytes": 8704,
+    "diagnostics": []
+  },
+  "diagnostics": [],
+  "scope": "unchanged collection source hierarchy and ArrayList implementation; explicit authoring seed; emission inventory only, no runtime execution"
+}

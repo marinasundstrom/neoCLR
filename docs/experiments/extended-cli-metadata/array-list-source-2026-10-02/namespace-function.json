@@ -1,0 +1,31 @@
+{
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "cases": [
+    {
+      "unread": false,
+      "command": "verify",
+      "exitCode": 0,
+      "text": "NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD: typed-stack/control-flow verification passed (3838 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "unread": false,
+      "command": "run",
+      "exitCode": 42,
+      "text": ""
+    },
+    {
+      "unread": true,
+      "command": "verify",
+      "exitCode": 0,
+      "text": "NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD: typed-stack/control-flow verification passed (3838 IL functions; maximum stack 7; runtime value checks remain)\n"
+    },
+    {
+      "unread": true,
+      "command": "run",
+      "exitCode": 1,
+      "text": "Fault: namespace function failure [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:344] IL instruction 1\n  at NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD.F_53746F70(String) [NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD.F_4D61696E() [NeoMetadata_5269DDC3C9E9E6A3F148E5BE40E1E5C756E72A6AB284AEA4F2D10815B83441CD#1.0.0.0:1] IL instruction 3\n"
+    }
+  ]
+}

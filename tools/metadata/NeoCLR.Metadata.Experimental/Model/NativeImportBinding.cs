@@ -22,7 +22,7 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(coreLibrary) || reference.Identity.Equals(Identity) || importedGraphs.ContainsKey(reference.Identity) ||
             importedNominalTypes.Values.Any(t => t.AssemblyIdentity.Equals(reference.Identity)) || nativeBindings.Count >= 256)
             throw new InvalidDataException("native binding requires a matching core, distinct dependency and no prior imports");
-        var binding = new NativeImportBinding(reference, implementation);
+        var binding = new NativeImportBinding(reference, implementation, coreLibrary);
         nativeBindings.Add(reference.Identity, binding);
         importedGraphs.Add(reference.Identity, (reference.MainModule.Mvid, new AssemblyBuilder(reference.Identity, coreLibrary) { NativeBinding = binding }));
     }
@@ -31,11 +31,13 @@ public sealed partial class AssemblyBuilder
 public sealed partial class MethodBuilder
 {
     internal string? NativeImportName { get; set; }
+    internal bool NativeImportIsNamespaceFunction { get; set; }
     internal bool DiscardNativeImportResult { get; set; }
 }
 
-internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLibraryDefinition library)
+internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLibraryDefinition library, AssemblyIdentity core)
 {
+    private readonly Dictionary<uint, bool> namespaceContainers = [];
     internal NativeLibraryDefinition Library { get; } = library;
     internal string? Revision => Library.Declarations.TryGetProperty("revision", out var value) ? value.GetString() : null;
     internal static string SimpleName(string name) => name.Split('`')[0];
@@ -60,13 +62,23 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     internal void ValidateMethod(MethodDefinition definition, MethodBuilder target)
     {
         if (definition.DeclaringType is not { } owner) throw new InvalidDataException("translated free-function binding is not yet supported");
-        ValidateType(owner);
-        var name = TypeName(owner) + "." + definition.Name;
+        if (owner.Module.Mvid != reference.MainModule.Mvid) throw new InvalidDataException("native binding snapshot mismatch");
+        if (!namespaceContainers.TryGetValue(owner.MetadataToken, out var namespaceContainer))
+        {
+            namespaceContainer = owner.DeclaringType is null && owner.GenericArity == 0 && (owner.Attributes & 0x1a7) == 0x181 &&
+                reference.HasCoreTopLevelMarker(owner.MetadataToken, core);
+            namespaceContainers.Add(owner.MetadataToken, namespaceContainer);
+        }
+        if (namespaceContainer && (!definition.IsStatic || (definition.Attributes & 7) != 6 || (definition.Attributes & 0x440) != 0))
+            throw new InvalidDataException("namespace function must be public static and concrete");
+        if (!namespaceContainer) ValidateType(owner);
+        var name = (namespaceContainer ? owner.Namespace : TypeName(owner));
+        name = (name.Length == 0 ? "" : name + ".") + definition.Name;
         var parameters = target.Signature.ParameterTypes.Select(TypeKey).ToArray();
         var ownerName = TypeName(owner);
         var ownerKey = owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
         var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
-            f.GetProperty("name").GetString() == name && f.TryGetProperty("owner", out var nativeOwner) && TypeKey(nativeOwner) == ownerKey && Flag(f, "instance") == !definition.IsStatic &&
+            f.GetProperty("name").GetString() == name && f.TryGetProperty("owner", out var nativeOwner) && (namespaceContainer ? nativeOwner.ValueKind == JsonValueKind.Null : TypeKey(nativeOwner) == ownerKey) && Flag(f, "instance") == !definition.IsStatic &&
             Count(f, "generic_parameters") == definition.GenericArity &&
             f.GetProperty("parameters").EnumerateArray().Select(TypeKey).SequenceEqual(parameters)).Take(2).ToArray();
         if (matches.Length != 1) throw new InvalidDataException("native method missing or ambiguous: " + name);
@@ -80,6 +92,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var actualOutputs = Indices(function, "out_parameters").Concat(Indices(function, "out_when_true")).Distinct().Order();
         if (!actualOutputs.SequenceEqual(target.Signature.OutParameters.Order())) throw new InvalidDataException("native output contract mismatch: " + name);
         target.NativeImportName = name;
+        target.NativeImportIsNamespaceFunction = namespaceContainer;
         target.DiscardNativeImportResult = target.Signature.ReturnType.Primitive == PrimitiveType.Void && !Flag(function, "no_result");
     }
     internal static bool IsInhabitedVoid(ImportedTypeReference type) =>
