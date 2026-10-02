@@ -3680,3 +3680,14 @@ signatures and type-owned methods/fields still use loaded definitions; host setu
 lazy symbol loading are not yet independent of readers. The library generator remains
 planned. Explicit Runtime Contract selection, CLI primitive core and translated System
 requirements remain unchanged. See [107 C# groups and seven runtime consumers](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json).
+
+
+### Symbol-owned root-class identity (2026-10-02)
+
+Raven `690e81b3c` authors native public top-level root-class references from symbols
+and exact artifact values, including invariant unconstrained generic definitions.
+No input type-row search occurs on this path. Interface/inheritance, nested/value
+profiles and member references remain reader-backed; their conversion/dispatch data
+is not discarded. Explicit Runtime Contract and bootstrap requirements are unchanged.
+All seven consumers execute; the metadata generic-owner check executes with the new
+reference on CLR and both native containers. See [evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json).

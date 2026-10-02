@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Authored type references](#authored-type-references-development-2026-10-02): nominal reference-class identities without input definitions.
+
 - [Authored function references](#authored-function-references-development-2026-10-02): native call contracts without input definitions.
 
 - [ReferencedGenericType](#referencedgenerictype-development-2026-10-02): immutable constructed signatures in loaded snapshots.
@@ -4781,3 +4783,39 @@ The C# AuthoredFunctionReferenceChecks exercises creation without a reader and r
 contracts. NativeGenericMethodChecks reconstructs a generic vector reference from
 values and executes it in both native containers. The separate library IILGenerator
 API remains planned; the snippet uses the current MethodBuilder operations.
+
+
+## Authored type references (development, 2026-10-02)
+
+`AssemblyBuilder.CreateTypeReference(AssemblyIdentity dependency,
+AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
+string name, int genericArity = 0) -> ImportedTypeReference` authors an output-owned
+public top-level reference-class identity from resolved values, without a reader or
+resolver. `name` is the metadata name: a generic definition includes its backtick arity
+suffix. Arity is 0–32. Parameters are asserted invariant and unconstrained. Construct
+an open generic reference with `MakeGenericInstance` before using it in a signature.
+Matching references are interned, including subsequent imports from the same snapshot.
+
+Identity/core/digest rules match CreateFunctionReference: unsigned external identity,
+matching explicit core, and 64 hexadecimal SHA-256 digits. This does not verify the
+image, accessibility, members or generic constraints. It carries no inheritance or
+interface conversion information; value/nested/interface declarations are outside this
+API's contract. The digest detects conflicting selected snapshots within the output,
+not runtime integrity. Mixed reader imports and authored references share the checks.
+
+Null arguments throw ArgumentNullException; a malformed digest throws ArgumentException.
+Unsupported identity, metadata name/arity, core mismatch, snapshot conflict and resource
+limits throw InvalidDataException. The current limits are 4,096 nominal references and
+256 dependency identities. Returned construction arguments are copied and checked against
+the consuming output's scope by MakeGenericInstance.
+
+```csharp
+var box = output.CreateTypeReference(dependencyIdentity, coreIdentity,
+    dependencyImageSha256, "Example", "Box`1", 1);
+SignatureType integerBox = box.MakeGenericInstance(PrimitiveType.Int32);
+```
+
+AuthoredFunctionReferenceChecks covers reader-free nominal identity, interning, argument
+copying and negative contracts. NativeGenericOwnerChecks uses an authored Box reference
+alongside imported members, checking canonical identity and execution on CLR and both
+native containers. This does not imply that member references are reader-independent.

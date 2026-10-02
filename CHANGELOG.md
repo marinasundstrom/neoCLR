@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Author native top-level root-class references from resolved assembly/name/arity and
+  artifact values without input definitions; generic construction keeps copied arguments
+  and output ownership. Raven uses this path for public unconstrained root classes.
+  Interfaces, inheritance, nested/value types and member references retain the prior
+  path. No metadata format change; exact snapshot checks remain. All seven Raven
+  consumers execute (42); 107 metadata groups pass, and the authored generic owner
+  executes on CLR and both native containers (42). API snapshot check passes.
+
 - Add native function-reference authoring from explicit identity, artifact digest,
   namespace/name and signature values, without reader definitions or resolvers.
   Primitive, method-generic and vector contracts retain existing name/signature linking;

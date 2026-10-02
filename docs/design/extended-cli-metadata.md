@@ -2313,3 +2313,15 @@ type-owned members still depend on loaded definitions. Host configuration also s
 accepts metadata snapshots. This does not complete importer/emitter independence,
 reader lifetime separation, or the independent library generator API. Next migrate
 nominal type-reference authoring, then callable/field references using those types.
+
+
+### Symbol-owned nominal identities (2026-10-02)
+
+CreateTypeReference now authors top-level reference-class identities, including
+unconstrained generic definitions, from explicit dependency/digest/name/arity values.
+Raven maps public native root-class symbols to this API and constructs generic
+arguments through the existing symbol mapper. The path does not search type rows.
+Types requiring interface conversions or inheritance, interfaces, nested/value types
+and member imports retain the existing reader-backed route. This guard avoids losing
+conversion facts while migrating nominal identity. Member references and nominal
+namespace-function signatures are the next boundary to migrate.

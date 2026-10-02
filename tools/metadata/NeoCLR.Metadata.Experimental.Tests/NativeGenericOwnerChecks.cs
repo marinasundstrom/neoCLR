@@ -61,7 +61,10 @@ internal static class NativeGenericOwnerChecks
             "method-scoped constructed argument");
         Check(definition.Methods.Single(m => m.Name == "Same").TryGetSignature(out var sameSignature) &&
             sameSignature!.ReturnType.ReferencedGenericInstance!.TypeArguments[0].TypeParameterIndex == 0, "owner-scoped constructed argument");
-        var importedType = app.ImportReference(definition, core).MakeGenericInstance(PrimitiveType.Int32);
+        var authoredType = app.CreateTypeReference(library.Identity, core,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), definition.Namespace, definition.Name, 1);
+        Check(ReferenceEquals(authoredType, app.ImportReference(definition, core)), "authored/read type identity agreement");
+        var importedType = authoredType.MakeGenericInstance(PrimitiveType.Int32);
         ImportedConstructedMethodReference Import(string name) => app.ImportReference(definition.Methods.Single(m => m.Name == name), core).MakeConstructedReference([PrimitiveType.Int32]);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var local = main.DeclareLocal(importedType);

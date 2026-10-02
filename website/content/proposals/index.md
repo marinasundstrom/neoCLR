@@ -615,3 +615,9 @@ vector signatures, without reading imported method definitions on that path. Sev
 native consumers execute (42); 107 metadata C# groups pass. Nominal signatures and
 type-owned members still use the earlier reader-backed route. The independent library
 instruction-generator API remains planned. No native format change is required.
+
+
+The same development path now authors public native root-class identities, including
+unconstrained generic types, directly from Raven symbols. Other type profiles and member
+references still use reader-backed imports; this is a bounded architecture migration,
+not a new metadata format or complete reader/emitter independence.
