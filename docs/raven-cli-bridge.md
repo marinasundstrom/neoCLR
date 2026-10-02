@@ -3523,3 +3523,20 @@ Validation: 102 metadata groups and 75 focused .NET indexer/accessibility tests 
 General Raven fixes are isolated as 9ee5aad97 (indexer access) and 2df6f3f6d
 (qualified type-name crash in shared emission). Neither is merged into main here.
 See [hashed evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json).
+
+### Setter-only native indexers (2026-10-02 development)
+
+Raven now assigns through setter-only indexers loaded directly from native definitions.
+The shared binder uses the property parameter contract, already provided by the native
+reader, and emits the existing setter call. No metadata schema, runtime instruction,
+Runtime Contract or bootstrap configuration changes are required. Reading a setter-only
+indexer and compound assignment remain diagnostics because a getter is required.
+
+The payload/holder/consumer case includes a Boolean setter-only indexer with a nominal
+external value type, verifies its parameter/accessor identity in both reference orders,
+and replaces an object through it before reading via a separate indexer. All five native
+consumers return 42. The independent shared compiler correction is Raven e07477274,
+with 79 passing .NET indexer/accessibility tests. The unchanged metadata library retains
+its prior 102-group evidence. CLI primitive core and translated System remain explicit
+bootstrap inputs; native interfaces/generics/value owners and full System import remain
+pending. No native library is projected to CLI for symbol loading.

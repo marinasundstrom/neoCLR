@@ -36,7 +36,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   logical-signature overload. Raven binds overloaded native indexers and executes
   cross-library element replacement/read (42); inaccessible indexed setters diagnose.
   A separate shared Raven name-normalization fix closes a .NET emission crash exposed
-  by the indexer regression tests.
+  by the indexer regression tests. Raven now also assigns through setter-only native
+  indexers using the shared property parameter contract, independently tested on .NET.
+  Reads and compound assignments still require a getter; all native consumers pass (42).
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

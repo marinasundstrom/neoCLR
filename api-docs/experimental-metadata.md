@@ -4621,7 +4621,7 @@ GetSignature still throws NotSupportedException rather than inventing a CLI blob
 
 C# tests cover both containers, authored/native signatures, immutable parameter lists,
 setter-value exclusion, accessor identity, byte-preserving roundtrip and CLR execution
-of imported indexer methods. Raven consumes native indexers with getters, including
-read/write overloads; setter-only indexers are inspectable but the current binder still
-requires a getter to resolve indexed source access. This is a compiler limitation, not
-a metadata restriction. No CLI/native property encoding or runtime opcode changes.
+of imported indexer methods. Raven now consumes setter-only indexers as well as
+read/write overloads through the same property parameter contract. Source reads and
+compound assignments require an accessible getter. No CLI/native property encoding
+or runtime opcode changes.

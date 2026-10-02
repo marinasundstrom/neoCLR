@@ -2124,3 +2124,14 @@ primitive core and translated System remain bootstrap inputs.
 All 102 C# metadata groups and five runtime consumers pass.
 [Indexer evidence](../experiments/extended-cli-metadata/native-indexers-2026-10-02.json)
 records tested bundles and the independently isolated general Raven corrections.
+
+### Setter-only compiler closure (2026-10-02)
+
+The earlier setter-only source-access gap is now closed for assignment. Raven resolves
+indices from IPropertySymbol.Parameters for both .NET and native providers, retaining
+the existing metadata value/index separation. This matches CLR accessor behavior:
+a setter is sufficient for a write, while a read or compound write requires a getter.
+PE parameter lists are cached; native lists were already cached. No additional reader
+or runtime mechanism is introduced. The independent .NET fixture executes to 42, and
+the native three-assembly consumer does likewise. Broader owner categories remain open.
+[Hashed evidence](../experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json).

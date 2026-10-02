@@ -562,3 +562,7 @@ Development checkpoint (2026-10-02): direct native loading now also supports ind
 property signatures. Raven binds overloads and executes cross-library indexed reads
 and writes (42). The existing CLI-shaped property/accessor format is unchanged;
 setter-only source access and full native core loading remain pending.
+
+Development checkpoint (2026-10-02): setter-only native indexer assignments now compile
+and execute too (42), sharing the property parameter contract with .NET. Reads require
+a getter; the metadata format is unchanged. Full native core loading remains pending.
