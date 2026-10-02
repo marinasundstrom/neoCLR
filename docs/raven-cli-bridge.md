@@ -3715,3 +3715,16 @@ All 107 C# groups and API snapshot validation pass. Fields, virtual/interface/va
 nested profiles, host setup and semantic materialization remain reader-backed. Explicit
 Runtime Contract, CLI primitive core and translated System bootstrap requirements are
 unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
+
+
+### Explicit field linkage values (2026-10-02)
+
+Raven `43e565589` copies native field ordinals during import into a compiler-owned
+optional layout contract. Supported nongeneric root-class fields then author references
+from symbols, without consulting reader definitions. Ordinals include private slots
+and are scoped by exact owner/artifact identity. This is target-specific linkage data,
+not a requirement for ordinary .NET field lookup. The native format remains unchanged.
+All seven native consumers and 107 metadata C# groups pass; readonly stores reject.
+Interface/dispatch and richer layout profiles, host setup and semantic materialization
+remain reader-backed. Runtime Contract and bootstrap requirements are unchanged. See
+[evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json).

@@ -5,6 +5,8 @@ public sealed class ImportedFieldReference
 {
     internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
     { Owner = owner; DeclaringType = declaringType; Name = definition.Name; FieldType = type; IsReadOnly = (definition.Attributes & 0x20) != 0; NativeIndex = definition.Module.Assembly.IsNative ? index : null; }
+    internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, string name, SignatureType type, int index, bool readOnly)
+    { Owner = owner; DeclaringType = declaringType; Name = name; FieldType = type; NativeIndex = index; IsReadOnly = readOnly; }
     /// <summary>Gets the consuming builder.</summary>
     public AssemblyBuilder Owner { get; }
     /// <summary>Gets the exact external declaring class.</summary>
@@ -56,7 +58,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("conflicting imported field contract");
             return existing;
         }
-        if (importedFields.Count >= 4096) throw new InvalidDataException("too many imported fields");
+        if (importedFields.Count + authoredFields.Count >= 4096) throw new InvalidDataException("too many imported fields");
         var index = type.Fields.IndexOf(definition);
         if (index < 0) throw new InvalidDataException("field is not owned by its declaring snapshot");
         var reference = new ImportedFieldReference(this, owner, definition, storage, index);

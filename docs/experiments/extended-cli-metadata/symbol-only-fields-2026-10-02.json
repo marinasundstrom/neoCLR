@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-02",
+  "ravenCommit": "43e565589",
+  "metadataBaseCommit": "0d5c024f",
+  "metadataGroups": 107,
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "512A6CA4DAB4005A5BD211D41A63E69AB33135A039B8DAEBA509257CEC4FCA94",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "3EA05C830AD781059BFDB54230FA0ECB2FEDDAF1DF77820AEBBEA5A150C378B6",
+        "dependencySha256": "512A6CA4DAB4005A5BD211D41A63E69AB33135A039B8DAEBA509257CEC4FCA94",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "7ED99F1508B92E95845D9A9F21AB31439C00A923B693FA2DA9CF290F836B1958",
+        "dependencySha256": "C29038460CD9C76FBD90FA9FB647912BBF81AFD66EACD907BAD2264E61A86746",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "6E00CDACCA0BC1C56EA610710E478A154AA1B07501F4FA966F00404F1E77D8B1",
+        "dependencySha256": "476814334DB32CEB4E66855DCF08A7C9F943B2D77E5C7968B92EFF0653A27876",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "C0D7DFABD1E18BE5C4D0A13C786A3DCF1C7A2B529847C0CD1F5F892817DF38B7",
+        "dependencySha256": "476814334DB32CEB4E66855DCF08A7C9F943B2D77E5C7968B92EFF0653A27876",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "2786435C699E2C65A6D52F126A5BD8C3CAA3896D2E27C9DBE2C7C0A450A641E7",
+        "dependencySha256": "AE191F8EFA29247FC10DC6A8CD20F435BC4B79F3883278AF95CDF3C6ED399C8B",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "37726F9CBA5EEA4CC5AD6DA73D00F20B1805E59B2A226EA9A201C9F81676F223"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "87B3FC2374256AAF540C14AD011590980BD29D13CF32B59D7AD3099904F548DE",
+        "dependencySha256": "BBBB3F0A76CFA42BD0E673CB9D48E029B9B3F591AE9AAABF1241C8BF4129D930",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "0F200D560195FAEDADC0D6DB6B3AB8A0A1276A060C2865059646C5CE50BE5F7A"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "4786F9C7F5D560A2CFA4DFFFDDE889D5E46A5A0691704F649B31ACC1F069E9A9",
+        "dependencySha256": "CBB9587C492EE686E6C529B375D623143A4FA449923A549D9561FEAF176ED761",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "A95D23D20ECF1B9CB26DE335C716AC9FA98783AEBD6579FCF71DCB1AB7CF75A2"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "validation": "C# field contracts cover interning, slot/name/readonly conflicts, invalid owner/ordinal, body writing and readonly-store rejection. API snapshot check passes.",
+  "scope": "Public nongeneric native root-class fields with primitive, nominal or vector storage use symbols and explicit instance ordinals. Richer type/layout profiles, dispatch, host setup and symbol materialization remain reader-backed."
+}

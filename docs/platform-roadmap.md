@@ -9,8 +9,8 @@ Public top-level root-class identities, including unconstrained generics, now al
 author directly from symbols; other type profiles retain their existing conversion
 metadata path. Namespace-function signatures now also carry root-class constructions and vectors
 through symbol-only reference authoring. Public nonvirtual root-class methods and constructors now also reconstruct from
-symbols, including owner generic parameters. Next migrate field references and dispatch
-facts. See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
+symbols, including owner generic parameters. Public nongeneric root-class fields now also author from symbol storage and explicit
+layout ordinals. Next migrate interface dispatch and conversion facts. See [field evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json). See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
 See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json). See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 
 Author-directed priority (2026-10-02): proceed with direct native metadata import into

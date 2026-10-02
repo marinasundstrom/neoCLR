@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Authored field references](#authored-field-references-development-2026-10-02): explicit field contracts and native layout slots.
+
 - [Authored method references](#authored-method-references-development-2026-10-02): member contracts without input definitions.
 
 - [Authored type references](#authored-type-references-development-2026-10-02): nominal reference-class identities without input definitions.
@@ -4864,3 +4866,36 @@ NativeGenericOwnerChecks reconstructs constructor/Get/Set/Same contracts from va
 then executes construction, mutation and self-typed calls on CLR and both native
 containers. AuthoredFunctionReferenceChecks covers interning and invalid owner/scope/
 constructor/conflicting contracts. The separate library IILGenerator remains planned.
+
+
+## Authored field references (development, 2026-10-02)
+
+`AssemblyBuilder.CreateFieldReference(ImportedTypeReference declaringType, string name,
+SignatureType fieldType, int instanceStorageOrdinal, bool isReadOnly = false)
+-> ImportedFieldReference` authors a public instance-field contract without a reader.
+The owner must be an output-owned nongeneric top-level root reference class with a
+registered native artifact digest. The caller supplies the native zero-based instance
+slot, including private fields in the declaration order, and must assert that this
+layout matches the selected artifact. The library cannot verify a supplied ordinal
+against bytes it has not read. CLI output uses name/type MemberRef; native output uses
+the ordinal. This does not change the instruction set or encode the artifact digest.
+
+Storage supports primitive non-Void values, nongeneric external reference classes and
+single vectors thereof. Static/inherited fields, constructed owners, byrefs and value
+profiles are unsupported. Readonly loads work; stores reject during body validation.
+Matching contracts intern; conflicting names, ordinals, storage or readonly flags on
+the same owner reject. Null arguments throw ArgumentNullException; invalid owner,
+name, negative ordinal, unsupported type or foreign output signatures throw
+ArgumentException. Conflicts or the shared 4,096-field limit throw InvalidDataException.
+
+```csharp
+var value = output.CreateFieldReference(itemReference, "Value", PrimitiveType.Int32,
+    instanceStorageOrdinal: 2);
+method.LoadArgument(0);
+method.LoadField(value);
+method.Return();
+```
+
+C# authored-reference checks cover body writing, interning, slot conflicts, invalid
+owners/ordinals and readonly-store rejection. Raven's native consumers exercise direct
+field load/store and alias mutation with private fields preceding public fields.

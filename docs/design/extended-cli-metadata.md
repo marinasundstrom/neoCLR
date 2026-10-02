@@ -2350,3 +2350,15 @@ functions and methods for writer validation and resource limits. Virtual/interfa
 contracts, instance generic methods, value/nested profiles and fields remain outside
 this slice. Host setup and semantic materialization still use reader data. This is not
 a migration of the independent metadata-library body-generator API.
+
+
+### Explicit field layout contract (2026-10-02)
+
+Native field addressing requires an ordinal, unlike CLI named MemberRefs. Raven now
+copies that value during field enumeration into IInstanceFieldLayoutSymbol, scoped by
+the containing type and exact assembly artifact. No reader handle crosses that optional
+compiler contract. CreateFieldReference consumes the value, name, storage and readonly
+semantics with an output-owned type reference. The supplied slot is a host assertion;
+no dependency bytes are read to verify it. Root nongeneric primitive/nominal/vector
+fields use this path; constructed/inherited/interface/value/nested profiles remain
+excluded. Other reader-backed import paths and host setup remain pending migration.

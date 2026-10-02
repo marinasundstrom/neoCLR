@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Author native instance-field references from explicit type/storage/readonly/slot
+  contracts without reader definitions. Raven captures the ordinal during import in
+  an optional compiler-owned layout interface and emits supported root-class fields
+  from symbols. Exact artifact checks remain; ordinary .NET field addressing is unchanged.
+  All 107 C# groups and seven native consumers pass, including alias writes (42);
+  slot conflicts and readonly stores reject. API snapshot check passes.
+
 - Author public nonvirtual root-class methods and constructors from output-owned type
   references and signatures without reader methods. Support generic-owner substitution;
   reject invalid constructor/scope/owner contracts and instance generic methods. Raven

@@ -45,6 +45,16 @@ internal static class AuthoredFunctionReferenceChecks
         var foreign = new AssemblyBuilder(new("Foreign", new Version(1, 0, 0, 0)), core);
         SignatureType foreignType = foreign.CreateTypeReference(dependency, core, hash, "Example", "Item");
         Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "Foreign", new MethodSignature(foreignType, [])));
+        var item = app.CreateTypeReference(dependency, core, hash, "Example", "Item");
+        var valueField = app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2);
+        if (!ReferenceEquals(valueField, app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2))) throw new Exception("field interning");
+        Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Other", PrimitiveType.Int32, 2));
+        Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 3));
+        Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2, true));
+        Reject<ArgumentException>(() => app.CreateFieldReference(item, "Bad", PrimitiveType.Int32, -1));
+        Reject<ArgumentException>(() => app.CreateFieldReference(box, "Bad", PrimitiveType.Int32, 0));
+        var read = app.AddFunction("Read", new MethodSignature(PrimitiveType.Int32, [item]));
+        read.LoadArgument(0); read.LoadField(valueField); read.Return();
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.LoadConstant(42); main.Call(reference); main.Return();
         _ = app.WriteNativeAssembly();
@@ -54,6 +64,10 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateFunctionReference(dependency, new("Wrong", new Version(1, 0, 0, 0)), hash, "Example", "Identity", signature));
         Reject<InvalidDataException>(() => app.CreateFunctionReference(app.Identity, core, hash, "Example", "Identity", signature));
         Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "Broken", new MethodSignature(SignatureType.MethodParameter(0), [])));
+        var readonlyField = app.CreateFieldReference(item, "ReadOnly", PrimitiveType.Int32, 3, true);
+        var write = app.AddFunction("WriteReadOnly", new MethodSignature(PrimitiveType.Void, [item, PrimitiveType.Int32]));
+        write.LoadArgument(0); write.LoadArgument(1); write.StoreField(readonlyField); write.Return();
+        Reject<InvalidDataException>(() => app.WriteNativeAssembly());
     }
     private static void Reject<T>(Action action) where T : Exception
     {

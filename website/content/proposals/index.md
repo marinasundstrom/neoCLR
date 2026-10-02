@@ -632,3 +632,8 @@ Public nonvirtual root-class methods and constructors now also reconstruct from 
 symbols, including generic-owner parameters. Generic construction and mutation execute
 on CLR and neoCLR; interface/virtual profiles and fields still require further boundary
 work. The assembly format is unchanged.
+
+
+Native root-class field references now use symbol-owned storage signatures and explicit
+layout ordinals. .NET continues to use named field references. Richer layouts and
+interface dispatch remain further boundary work; the native instruction set is unchanged.
