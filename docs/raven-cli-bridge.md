@@ -3640,3 +3640,19 @@ Observed follow-up: qualified generic namespace calls GenericBridge.Forward(...)
 GenericBridge.ForwardArray(...) reported RAV0234. Imported unqualified calls execute.
 Reproduce independently before attributing this to a general binder defect or changing
 shared compiler behavior; this is not a metadata-format restriction.
+
+
+### Qualified native namespace functions resolved (2026-10-02)
+
+Raven shared lookup now includes directly namespace-owned static methods alongside
+CLI-container promotions, and binds these functions without a synthetic type receiver.
+Three positive .NET controls passed before the fix: this was a provider-neutral
+ownership contract gap exposed by native symbols, not a demonstrated .NET inference bug.
+The separate shared fix is Raven `0633ba18d`; native probe coverage is `36f67a097`.
+All seven consumers execute with exit 42, including three-assembly qualified inferred
+and explicit generic forwarding. An incompatible explicit argument diagnoses. The
+156-test focused .NET run and four qualified controls pass (three overlap).
+See [evidence](experiments/extended-cli-metadata/native-qualified-functions-2026-10-02.json).
+The explicit CLI primitive core and translated System bootstrap remain required.
+No metadata schema, instruction or runtime change was needed; reuse the unchanged
+106-group metadata evidence. Constraints and full native System import remain pending.

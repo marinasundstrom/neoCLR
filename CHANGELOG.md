@@ -24,8 +24,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   External generic constructions now retain exact dependency scope and arguments too;
   a three-assembly Raven consumer executes with both dependencies (42), and 106 C#
   metadata groups pass, including CLR forwarding and resolver rejection. Constraints
-  remain pending; qualified generic namespace lookup is tracked separately. No format
-  change.
+  remain pending. Shared Raven lookup now includes directly namespace-owned functions;
+  qualified inferred/explicit generic calls execute (all seven consumers return 42),
+  incompatible explicit arguments diagnose, and .NET controls retain their behavior.
+  No format change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now
