@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Record planned independent compiler import/emission contracts through Raven symbols
+  and a separate metadata-library instruction-generator API. Inventory current loader
+  coupling and scope the next symbol-only function-reference slice. This records
+  direction; no API migration or runtime behavior change is claimed.
+
 - Read native unconstrained static generic methods/functions into immutable definitions,
   preserving arity, names and method-parameter/vector signatures. Existing generic
   imports emit executable CLR and native calls (42 in both native containers; 104 C#

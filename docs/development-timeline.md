@@ -25,6 +25,32 @@ available original wording; other text is a summary.
 
 See the [changelog](../CHANGELOG.md) and linked design documents for technical status.
 
+## 2026-10-02: Separate compiler semantics from metadata authoring
+
+- **Author:** Asked for abstract Raven loader/emitter interfaces and an ILGenerator
+  interface in the Cecil-like library, with instruction operations off the builders.
+- **Assistant:** Identified Raven's existing IILBuilder and the library's direct
+  MethodBuilder operations, initially discussing them together.
+- **Author correction:** “You shouldn't mix the Raven IL builder with the Cecil-like
+  builder API, because those are different boundaries.”
+- **Assistant:** Accepted independent compiler and assembly-authoring contracts,
+  connected only by the target backend adapter.
+- **Author refinement:** Importers should populate symbols with all needed information;
+  emitters should use the semantic model and not reuse loader/importer objects. Type
+  resolution must account for each source while keeping those responsibilities separate.
+- **Investigation:** The native emitter still reads native method/field definitions,
+  passes a metadata resolver, and searches input definitions. Existing Raven IILBuilder
+  also exposes reflection operands; portable lowering contracts offer a better starting
+  point. These findings are current gaps, not completed fixes.
+- **Recorded action:** Documented ownership, required semantic identities/signatures,
+  native linkage and snapshot safeguards, and a bounded symbol-only function-reference
+  migration in both repositories. Raven design commit: `7354fa3fd`. Library generator
+  implementation and removal of importer coupling remain open. No migration is claimed.
+- **Separate completed work:** Qualified native generic function lookup now executes
+  across three assemblies; [seven-consumer evidence](experiments/extended-cli-metadata/native-qualified-functions-2026-10-02.json)
+  preserves .NET controls and identifies the shared fix separately. That evidence does
+  not establish the new architectural separation.
+
 ## 2026-10-02: Fail names the action; Fault names the result
 
 - **Author:** “System.Fault method should be called System.Fail(message)” and “The Fault

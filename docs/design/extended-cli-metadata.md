@@ -2256,3 +2256,43 @@ Missing and wrong-version resolvers reject. Raven's three-assembly generic consu
 executes closed/open constructions and vector aliases on neoCLR, with canonical original
 definitions and method scopes preserved in both reference orders. Qualified generic
 namespace-call lookup exposed RAV0234 separately and is tracked for independent repro.
+
+
+## Independent compiler and library generation boundaries (2026-10-02)
+
+Author direction: Raven's importer loads semantic information into compiler-owned
+symbols. The emitter consumes that information and the lowered program to reconstruct
+output references; it must not reuse importer/loader definitions, resolvers or handles.
+Resolving source dependencies belongs to import. Creating output references from resolved
+symbol identities belongs to emission. Exact assembly/declaration identity, recursive
+signatures, generic owner/ordinal, constraints and dispatch information must survive
+import as supported semantic contracts. Required unsupported information must diagnose.
+Native linkage ordinals or artifact identity, where still needed, require explicit
+compiler-owned values rather than access back into the reader. Target Runtime Contract
+mappings remain explicit, and ordinary .NET behavior remains the default.
+
+Raven's shared declaration/instruction interfaces and the Cecil-like metadata library's
+proposed IILGenerator are separate boundaries. The backend adapter translates between
+them. Neither interface should inherit the other; shared compiler code must not expose
+Reflection.Emit or NeoCLR metadata builder/definition/generator handles. The library's
+method builders declare members and provide generators; generators own instruction
+append operations, typed Emit overloads, helpers, locals and labels. Definitions store
+bodies; writers encode metadata and PE. Loaded-body editing is a separate concern.
+Existing MethodBuilder body operations have not yet moved to a generator.
+
+Current Raven native emission still reads NativeMethodSymbol.Definition and
+NativeFieldSymbol.Definition, resolves through loaded metadata, and searches CLI
+metadata definitions. This is a documented migration gap, not compliance with the
+new boundary. Start with one namespace-function reference: retain all required facts
+in symbols, author its output reference without an input definition, preserve exact
+identity checks and execute it. Then broaden to nominal/generic members and dispatch.
+Introduce the library generator independently; a compatibility facade alone does not
+complete either responsibility separation. .NET backend migration follows focused
+behavioral controls. No format or runtime change is implied by this design record.
+
+Raven records the detailed inventory and migration in
+`docs/compiler/metadata-backend-boundaries.md` (commit `7354fa3fd` on the metadata
+consumer branch). The existing .NET Reflection/Reflection.Emit path motivates explicit
+identity/signature mapping: more mapping code and caches, but input and output no longer
+need shared reflection objects. This is not a performance claim or a promise of lossless
+assembly rewriting through compiler symbols; definition readers/writers retain that role.

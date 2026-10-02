@@ -3656,3 +3656,15 @@ See [evidence](experiments/extended-cli-metadata/native-qualified-functions-2026
 The explicit CLI primitive core and translated System bootstrap remain required.
 No metadata schema, instruction or runtime change was needed; reuse the unchanged
 106-group metadata evidence. Constraints and full native System import remain pending.
+
+
+### Import/emission boundary direction (2026-10-02)
+
+The author requires independent importer and emitter paths through Raven's semantic
+symbol model. Current native emission still reaches reader definitions and resolvers;
+that temporary coupling must be removed incrementally. Raven compiler interfaces are
+separate from the metadata library's proposed IILGenerator body-authoring API. See
+[the boundary and migration direction](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
+No APIs have moved yet. Explicit Runtime Contract configuration and CLI primitive/
+translated System bootstrap remain unchanged; seven executing consumers establish
+current behavior, not completion of the planned separation.

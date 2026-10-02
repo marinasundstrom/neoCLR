@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Author clarification (2026-10-02): importer and emitter must communicate through Raven
+symbols, without emission reusing loader objects. Raven compiler contracts and the
+metadata library body-generator API are independent boundaries. The next bounded
+architecture slice is a symbol-only namespace-function output reference; broader
+generic import continues afterward. See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
+
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
 → metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
