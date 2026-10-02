@@ -294,6 +294,7 @@ var tests = new (string Name, Action Body)[]
     ("External native signature resolution", ExternalNativeSignatureChecks.Run),
     ("Native array signature materialization and import", NativeArraySignatureChecks.Run),
     ("Native property definitions and accessor imports", NativePropertyChecks.Run),
+    ("Native interface definitions and dispatch imports", NativeInterfaceDefinitionChecks.Run),
     ("Imported primitive field operands", ImportedFieldChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),

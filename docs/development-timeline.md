@@ -10045,3 +10045,23 @@ clarified the current scope: support both targets and how their assemblies load 
 and continue native read/import/emission integration under the existing architecture.
 **Performed outcome:** first native primitive-function definition materialization passes
 96 metadata groups; Raven semantic importer remains pending.
+
+## 2026-10-02 — Native integration as evidence for a future .NET backend
+
+**Author:** emphasized that neoCLR import/emission is important because it will help
+determine whether replacing Reflection and Reflection.Emit for the .NET target with
+Cecil or another mechanism is feasible. This follows the earlier decision to defer
+that migration while supporting both targets.
+
+**Assistant response:** treat native loading/emission as a test of provider-neutral
+semantic and codegen contracts. Keep general fixes isolated, native mappings behind
+target contracts, and .NET execution as a control. Do not interpret successful native
+slices as a completed .NET migration or a choice of Cecil.
+
+**Performed evidence:** native property/indexer import and execution, including
+setter-only access, already pass; this slice adds interface definitions and inherited
+dispatch. The six-consumer native harness and 103 metadata groups pass. The next
+planned work will check interface-valued storage across native assemblies. The CLI
+primitive core still uses the existing bootstrap loader, so the entire compilation
+pipeline is not yet independent of reflection. Broader native types and a dedicated
+.NET provider/backend evaluation remain open.

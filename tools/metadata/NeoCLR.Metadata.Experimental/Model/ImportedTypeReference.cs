@@ -51,6 +51,22 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, string, string, ImportedTypeReference?), ImportedTypeReference> importedNominalTypes = [];
+    private readonly Dictionary<ImportedTypeReference, TypeDefinition> nativeImportedDefinitions = [];
+    private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
+    internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
+    {
+        if (!nativeImportedDefinitions.TryGetValue(actual, out var source) || !nativeImportedDefinitions.TryGetValue(target, out var destination) ||
+            (destination.Attributes & 0x20) == 0 || actual.GenericArity != 0 || target.GenericArity != 0) return false;
+        if (nativeInterfaceConversions.TryGetValue((actual, target), out var known)) return known;
+        var seen = new HashSet<TypeDefinition>();
+        bool Visit(TypeDefinition type)
+        {
+            if (!seen.Add(type)) return false;
+            if (ReferenceEquals(type, destination)) return true;
+            return type.Interfaces.Any(i => Visit(i.InterfaceType.Resolve()));
+        }
+        return nativeInterfaceConversions[(actual, target)] = Visit(source);
+    }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
         => type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
             : type.Primitive is { } primitive ? primitive
@@ -59,8 +75,8 @@ public sealed partial class AssemblyBuilder
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);
-        if (definition.GenericArity != 0 || definition.DeclaringType is not null || definition.IsValueType || (definition.Attributes & 0x20) != 0)
-            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class");
+        if (definition.GenericArity != 0 || definition.DeclaringType is not null || definition.IsValueType)
+            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class or interface");
         return ImportReference(definition, core);
     }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
@@ -79,6 +95,7 @@ public sealed partial class AssemblyBuilder
         if (importedGraphs.TryGetValue(identity, out var prior) && prior.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
         if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));
+        if (definition.Module.Assembly.IsNative) nativeImportedDefinitions[result] = definition;
         return result;
     }
     private ImportedTypeReference? ImportDeclaringScope(TypeDefinition? type, AssemblyIdentity core, int depth = 0)

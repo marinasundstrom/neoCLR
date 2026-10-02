@@ -566,3 +566,9 @@ setter-only source access and full native core loading remain pending.
 Development checkpoint (2026-10-02): setter-only native indexer assignments now compile
 and execute too (42), sharing the property parameter contract with .NET. Reads require
 a getter; the metadata format is unchanged. Full native core loading remains pending.
+
+Development checkpoint (2026-10-02): direct native loading includes nongeneric
+interfaces and local inheritance/implementations. Raven compiles a consumer of two
+implementations and neoCLR executes inherited method/property dispatch (42). This keeps
+the existing CLI-shaped contract and callvirt behavior; generic interfaces and full
+native core loading remain pending.

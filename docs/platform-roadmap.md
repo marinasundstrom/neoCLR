@@ -3,7 +3,7 @@
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
 → metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
-(102 metadata groups pass). Raven now binds these native functions directly with
+(103 metadata groups pass). Raven now binds these native functions directly with
 exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
 Native calls now import and execute across that boundary, including a Raven-produced
 library read directly and consumed by Raven (42). Fieldless nongeneric static classes
@@ -24,8 +24,10 @@ in method/constructor/field signatures, including external element types; cross-
 array aliases and element replacement execute (42). Non-indexed properties now also load with canonical accessors and execute across native
 libraries (42), including static getters and nominal/vector setters. Private setter and
 read-only writes diagnose. Indexed properties now also load directly, including overloads; cross-library indexed
-reads/writes execute (42). Next broaden remaining declaration categories before full
-System loading. Setter-only indexed assignments now also compile and execute (42);
+reads/writes execute (42). Nongeneric interfaces and local inheritance/implementations now also load; inherited
+method/property dispatch executes across native assemblies (42). All six consumers pass.
+Next cover interface-valued storage and remaining categories before full System loading.
+See [interface evidence](experiments/extended-cli-metadata/native-interfaces-2026-10-02.json). Setter-only indexed assignments now also compile and execute (42);
 source reads still require a getter. See [setter-only evidence](experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json). See [indexer evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json). See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).

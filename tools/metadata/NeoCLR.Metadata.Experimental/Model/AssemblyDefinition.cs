@@ -262,7 +262,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, uint[]? NativeInterfaces = null);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -379,7 +379,9 @@ public sealed partial class TypeDefinition
     private readonly uint declaringToken;
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
     {
-        Module = module; MetadataToken = row.Token; Namespace = row.Namespace;
+        Module = module;
+        nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(token => new InterfaceImplementation(Module.GetTypeDefinition(token)!.ToReference()) { DeclaringType = this }).ToArray()));
+        MetadataToken = row.Token; Namespace = row.Namespace;
         Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
     /// <summary>Gets whether the declaration directly extends System.ValueType or System.Enum in the input metadata.</summary>

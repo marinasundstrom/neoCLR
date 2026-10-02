@@ -4625,3 +4625,31 @@ of imported indexer methods. Raven now consumes setter-only indexers as well as
 read/write overloads through the same property parameter contract. Source reads and
 compound assignments require an accessible getter. No CLI/native property encoding
 or runtime opcode changes.
+
+### Direct native interface definitions (development, 2026-10-02)
+
+ReadNativeAssembly now admits nongeneric top-level interfaces and local interface
+inheritance/root-class implementation relationships. TypeDefinition.Attributes retain
+CLI Interface/Abstract flags; interface methods retain Abstract/Virtual/NewSlot flags.
+Existing property/accessor and primitive/nominal/vector signature APIs apply.
+
+TypeDefinition.Interfaces returns a cached, read-only IList<InterfaceImplementation>
+for native snapshots, including an empty list for owners with no contracts. Each
+relationship has the exact DeclaringType and a reference resolving to the canonical
+local interface definition; TypeArguments is empty in this profile. Mutations throw
+NotSupportedException. Authored collections remain append-only; loaded CLI relationship
+materialization still throws NotSupportedException. Concurrent reads share relationship
+identity. Unchanged native images still write their original bytes.
+
+AssemblyBuilder.ImportReference now accepts interface-valued native signatures.
+Imported abstract interface methods require CallVirtual. Body validation admits native
+class/interface-to-interface conversions only when exact imported snapshots prove an
+inheritance/implementation path; unrelated interfaces still reject. This is cached
+nominal conformance, not duck typing, generic variance or an unrestricted reference cast.
+Existing core/identity/snapshot checks apply. Generic/value/nested owners, external
+interface implementation edges and loaded CLI relationship decoding remain unsupported.
+
+C# tests cover both native containers, canonical immutable relationships, abstract
+flags, byte-preserving roundtrip, unrelated-interface rejection and CLR execution of
+accessors imported from native definitions. Raven separately compiles interface
+factories and a consumer; neoCLR executes inherited method/property dispatch (42).

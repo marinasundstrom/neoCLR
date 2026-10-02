@@ -2135,3 +2135,28 @@ PE parameter lists are cached; native lists were already cached. No additional r
 or runtime mechanism is introduced. The independent .NET fixture executes to 42, and
 the native three-assembly consumer does likewise. Broader owner categories remain open.
 [Hashed evidence](../experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json).
+
+## Direct native interfaces (2026-10-02)
+
+The existing metadata interface records now materialize into the definition graph.
+Inheritance and implementation are read-only InterfaceImplementation associations over
+canonical definitions. Abstract/virtual flags retain the CLI-shaped method contract.
+Compared with the CLI/Cecil layers covered by the existing research, this fills reader
+and importer coverage without changing encoding or dispatch semantics. The benefit is
+direct interface symbol loading; the cost remains a nongeneric, local-relationship
+profile. Cross-assembly implementation edges and generic/value owners remain pending.
+
+Imported stack validation consults exact immutable native snapshots for interface
+conformance and caches results. It rejects unrelated interfaces. Raven resolves direct
+and transitive interfaces lazily after module publication and exposes canonical symbols.
+The six-consumer runtime harness now executes inherited interface method/property calls
+through two implementations (42). All 103 metadata groups pass, including equivalent
+CLR execution; the primitive CLI core/translated System bootstrap remains unchanged.
+
+Author clarification (2026-10-02): native import/emission is also evidence for assessing
+a future .NET backend using Cecil or another metadata mechanism. Success criteria are
+provider-neutral compiler symbols, explicit dependency identity, target-independent
+logical emission contracts and preserved .NET behavior. Native success does not select
+a replacement or prove full .NET parity: CLI core bootstrap loading and unimplemented
+type categories still limit that conclusion. Continue native integration before the
+separate .NET migration evaluation.

@@ -760,3 +760,7 @@ The indexed PropertyDefinition.TryGetSignature overload is covered by the
 [host manual](experimental-metadata.md#native-indexed-property-signatures-development-2026-10-02).
 It remains excluded from guest RavenDoc because it is a C# host API; the guest
 reference assembly and snapshot are unchanged.
+
+Native TypeDefinition.Interfaces materialization and interface import/conformance are
+covered in [the host manual](experimental-metadata.md#direct-native-interface-definitions-development-2026-10-02).
+These C# host APIs remain excluded from guest RavenDoc; guest snapshot signatures are unchanged.

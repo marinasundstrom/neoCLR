@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An authored interface inheritance or implementation relationship.</summary>
-/// <remarks>Same-assembly interface inheritance and root-class implementations admit constructed arguments, including declaring-type parameters.</remarks>
+/// <summary>An interface inheritance or implementation relationship.</summary>
+/// <remarks>Authored relationships admit same-assembly constructed arguments. Loaded native relationships currently admit nongeneric same-assembly interfaces.</remarks>
 public sealed class InterfaceImplementation
 {
     /// <summary>Creates an unattached relationship to an interface reference.</summary>
@@ -31,8 +31,10 @@ public sealed class InterfaceImplementation
 public sealed partial class TypeDefinition
 {
     private readonly IList<InterfaceImplementation>? authoredInterfaces;
-    /// <summary>Gets append-only authored interface relationships.</summary>
-    /// <exception cref="NotSupportedException">Relationship materialization for loaded snapshots is pending.</exception>
-    /// <remarks>Attach the owner to a module first. Appends validate ownership, target category, duplicates and cycles.</remarks>
-    public IList<InterfaceImplementation> Interfaces => authoredInterfaces ?? throw new NotSupportedException("loaded interface relationships are not materialized yet");
+    private readonly Lazy<IList<InterfaceImplementation>>? nativeInterfaces;
+    /// <summary>Gets append-only authored or read-only materialized native interface relationships.</summary>
+    /// <exception cref="NotSupportedException">Relationship materialization for loaded CLI snapshots is pending.</exception>
+    /// <remarks>Attach the owner to a module first. Authored appends validate ownership, target category, duplicates and cycles. Native collections are read-only with canonical declaring/target definitions.</remarks>
+    public IList<InterfaceImplementation> Interfaces => authoredInterfaces ?? nativeInterfaces?.Value
+        ?? throw new NotSupportedException("loaded CLI interface relationships are not materialized yet");
 }

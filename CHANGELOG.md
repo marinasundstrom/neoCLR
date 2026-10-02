@@ -39,6 +39,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   by the indexer regression tests. Raven now also assigns through setter-only native
   indexers using the shared property parameter contract, independently tested on .NET.
   Reads and compound assignments still require a getter; all native consumers pass (42).
+  Direct reading now includes nongeneric interfaces, local inheritance and class
+  implementations. Exact loaded relationships validate imported interface conversions;
+  Raven binds inherited methods/properties and neoCLR dispatches across assemblies (42).
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

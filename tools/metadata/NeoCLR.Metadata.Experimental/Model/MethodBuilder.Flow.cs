@@ -112,7 +112,9 @@ public sealed partial class MethodBuilder
                 var constructedConformance = stack.Count > 0 && stack[^1].GenericInstance is { } instance &&
                     (type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
                      type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance));
-                if (stack.Count == 0 || stack[^1] != type && !constructedConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
+                var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
+                    Assembly.HasNativeInterfaceConversion(importedActual, importedTarget);
+                if (stack.Count == 0 || stack[^1] != type && !importedConformance && !constructedConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
