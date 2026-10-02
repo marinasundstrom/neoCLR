@@ -2374,3 +2374,18 @@ interface methods are nongeneric abstract instance contracts and require CallVir
 Raven now supplies those facts from symbols, including root classes implementing
 interfaces. Generic interfaces and broader inheritance/dispatch profiles remain pending.
 This adds authoring contracts, not new opcodes or a runtime implementation of interfaces.
+
+
+### Library generator boundary implemented (2026-10-02)
+
+IILGenerator is the independent library body-authoring contract. GetILGenerator on a
+builder or attached authored definition returns one stable generator over the same body.
+Raven's NeoCLR adapter consumes it; shared Raven interfaces do not inherit or expose it.
+The initial implementation forwards to the established emission engine in MethodBuilder,
+whose public instruction methods remain compatibility APIs. This is a client-boundary
+migration, not completion of the internal builder/engine separation. Loaded opaque
+bodies and insertion/reordering remain unsupported. No format changes were required.
+
+Remaining reader dependencies include translated CLI bindings, unsupported dispatch/
+type profiles, host dependency setup and lazy semantic materialization. The newer native
+reference contracts do not establish reader disposal support for a whole compilation.

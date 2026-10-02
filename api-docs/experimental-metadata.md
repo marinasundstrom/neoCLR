@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
+
 - [Authored interface contracts](#authored-interface-contracts-development-2026-10-02): interface identity, conversions and dispatch.
 
 - [Authored field references](#authored-field-references-development-2026-10-02): explicit field contracts and native layout slots.
@@ -4934,3 +4936,132 @@ calls, cyclic/invalid edges and conflicting nominal classification. Raven suppli
 relationships from symbols and executes its interface inheritance, alias storage and
 method/property dispatch samples. Generic interfaces and class inheritance remain
 outside this authoring slice. The library instruction-generator API is still pending.
+
+
+## IILGenerator (development, 2026-10-02)
+
+`MethodBuilder.GetILGenerator() -> IILGenerator` returns a stable generator for the
+method's authored definition. `MethodDefinition.GetILGenerator() -> IILGenerator`
+returns that same instance for an attached authored definition; detached or loaded
+opaque definitions throw InvalidOperationException. Body generation does not turn a
+loaded snapshot into an editable authored body.
+
+The public library interface is independent of Raven's compiler emission interfaces.
+Raven's NeoCLR adapter translates its portable instruction stream into this library API.
+Builders describe declarations; the generator authors the existing definition-owned
+body. The current implementation delegates to the established builder emission engine,
+and old public builder instruction methods remain compatibility entry points. Moving
+those internals and removing legacy entry points are still pending. There is no duplicate
+instruction buffer and no changed encoding, opcode semantics or validation timing.
+
+`Locals: IReadOnlyList<LocalDefinition>` exposes the existing slot-ordered local view.
+All operations below preserve the corresponding MethodBuilder contract documented in
+this reference and in their interface XML documentation: exact typed operand validation,
+method-local label/local ownership, write-time stack checking and target capability
+limits. Wrong opcode/operand or foreign handles throw ArgumentException; null required
+operands throw ArgumentNullException; write-time validation/resource failures throw
+InvalidDataException. Per-overload exceptions and limits remain as documented for the
+matching operation; the interface does not admit new opcodes or operand categories.
+ClearBody removes instructions and retains locals, as before. Authoring is not thread-safe.
+Instruction insertion/reordering and loaded-body editing are not implemented.
+
+```csharp
+var entry = output.AddFunction("Main");
+output.EntryPoint = entry;
+IILGenerator il = entry.GetILGenerator();
+il.Emit(OpCode.Ldc_I4, 40);
+il.LoadConstant(2);
+il.Add();
+il.Return();
+```
+
+The complete operation signatures are listed below. These use library metadata handles,
+not System.Reflection.Emit or Raven interface types.
+
+```csharp
+void LoadConstant(int value);
+void WriteConsoleLine(string text);
+void WriteConsoleLine();
+void LoadArgument(int index);
+void StoreArgument(int index);
+void Add();
+void Subtract();
+void Multiply();
+void Divide();
+void Remainder();
+void BitwiseAnd();
+void BitwiseOr();
+void BitwiseXor();
+void ShiftLeft();
+void ShiftRight();
+void Call(MethodBuilder target);
+void Call(ImportedMethodReference target);
+void Call(NativeFunctionDefinition target);
+void Return();
+void ClearBody();
+void LoadField(ConstructedFieldReference field);
+void StoreField(ConstructedFieldReference field);
+void Emit(OpCode opCode, ConstructedFieldReference operand);
+void NewObject(ConstructedMethodReference constructor);
+void Call(ConstructedMethodReference method);
+void CallVirtual(ConstructedMethodReference method);
+void Emit(OpCode opCode, ConstructedMethodReference operand);
+void BindFunction(SignatureType functionType, MethodBuilder target);
+void Emit(OpCode opCode, FunctionBinding operand);
+void InvokeFunction(SignatureType functionType);
+void Call(GenericMethodInstance method);
+void Emit(OpCode opCode, GenericMethodInstance operand);
+void NewObject(ImportedMethodReference constructor);
+void NewObject(ImportedConstructedMethodReference constructor);
+void Call(ImportedConstructedMethodReference method);
+void CallVirtual(ImportedConstructedMethodReference method);
+void CallVirtual(ImportedMethodReference method);
+void Emit(OpCode opCode, ImportedConstructedMethodReference operand);
+void LoadField(ImportedFieldReference field);
+void StoreField(ImportedFieldReference field);
+void Emit(OpCode opCode, ImportedFieldReference operand);
+void Call(ImportedGenericMethodReference method);
+void Emit(OpCode opCode, ImportedGenericMethodReference operand);
+void CallVirtual(MethodBuilder target);
+void Emit(OpCode opCode, SignatureType elementType);
+void CastReference(SignatureType target);
+void NewArray(SignatureType elementType);
+void ReserveArray(SignatureType elementType);
+void LoadArrayElement(SignatureType elementType);
+void StoreArrayElement(SignatureType elementType);
+void LoadArrayLength();
+void Emit(OpCode opCode);
+void Emit(OpCode opCode, int operand);
+void Emit(OpCode opCode, long operand);
+void Emit(OpCode opCode, string operand);
+void Fail(string message);
+void Emit(OpCode opCode, MethodBuilder operand);
+void Emit(OpCode opCode, ImportedMethodReference operand);
+void Emit(OpCode opCode, NativeFunctionDefinition operand);
+void Emit(OpCode opCode, bool operand);
+void Emit(OpCode opCode, FieldBuilder operand);
+void Duplicate();
+void NewObject(MethodBuilder constructor);
+void LoadField(FieldBuilder field);
+void StoreField(FieldBuilder field);
+BranchLabel DefineLabel();
+void MarkLabel(BranchLabel label);
+void Emit(OpCode opCode, BranchLabel label);
+void LoadLocalAddress(LocalDefinition local);
+void InitializeObject(SignatureType type);
+void LoadDefault(SignatureType type);
+LocalDefinition DeclareInt32Local();
+LocalDefinition DeclareLocal(PrimitiveType type);
+LocalDefinition DeclareLocal(TypeBuilder type);
+LocalDefinition DeclareLocal(SignatureType type);
+void LoadLocal(LocalDefinition local);
+void StoreLocal(LocalDefinition local);
+void Emit(OpCode opCode, LocalDefinition local);
+void LoadObject(SignatureType type);
+void StoreObject(SignatureType type);
+```
+
+GeneratorChecks verifies identity, definition access, scope/operand rejection, local
+preservation and CLR execution (42). NativeGenericOwnerChecks uses the interface for
+construction/mutation/calls and executes on CLR and both native containers. All seven
+Raven native consumers use the new interface through the backend adapter.

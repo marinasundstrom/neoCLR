@@ -3739,3 +3739,15 @@ by the output graph, not reader queries on this path. Seven native consumers exe
 interfaces, broader inheritance/virtual profiles, unsupported members, host setup and
 semantic materialization remain outside the migration. Runtime Contract and bootstrap
 requirements are unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json).
+
+
+### Independent library generator (2026-10-02)
+
+Raven `47189b531` emits method bodies through the metadata library's IILGenerator in
+the NeoCLR adapter. Shared Raven compiler interfaces remain independent. Builder and
+attached authored-definition access return one stable generator over the canonical
+body; internal operations currently delegate to the existing builder engine. Legacy
+builder instruction methods remain available, and loaded/insertion editing is pending.
+All 108 C# groups and seven native consumers pass; generator-based generic-owner code
+executes on CLR and both native containers. Runtime Contract and bootstrap requirements
+are unchanged. See [evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json).

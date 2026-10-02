@@ -77,7 +77,8 @@ internal static class NativeGenericOwnerChecks
             };
             return app.CreateMethodReference(authoredType, name, signature).MakeConstructedReference([PrimitiveType.Int32]);
         }
-        var main = app.AddFunction("Main"); app.EntryPoint = main;
+        var entry = app.AddFunction("Main"); app.EntryPoint = entry;
+        IILGenerator main = entry.Definition.GetILGenerator();
         var local = main.DeclareLocal(importedType);
         main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Emit(OpCode.Pop); main.LoadConstant(19); main.NewObject(Import(".ctor")); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));

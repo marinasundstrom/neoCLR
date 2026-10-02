@@ -642,3 +642,9 @@ interface dispatch remain further boundary work; the native instruction set is u
 Nongeneric interface relationships and abstract dispatch references now also reconstruct
 from Raven symbols. Existing inheritance/dispatch and interface-storage consumers pass;
 generic interfaces and broader class inheritance remain pending.
+
+
+The development metadata library now exposes an independent IILGenerator for body
+authoring. Raven uses it through the NeoCLR adapter; shared compiler interfaces remain
+separate. Legacy builder instruction methods still work through the same body engine.
+Loaded-body editing and instruction insertion remain future work.
