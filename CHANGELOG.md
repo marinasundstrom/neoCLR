@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Connect Raven reference conversions to native castclass and preserve physical
+  union-case identity across carrier views. The unchanged collections sample now
+  passes these boundaries and stops at iterator for-loop lowering.
+
 - Add typed `CastReference`/raw `Castclass` metadata emission for nominal references
   and vectors, with reference-only stack checks and standard CLI/native castclass
   encoding. C# consumers retain interface dispatch and return 42 on both runtimes;

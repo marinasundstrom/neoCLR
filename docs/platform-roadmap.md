@@ -1,10 +1,13 @@
 # neoCLR platform roadmap
 
-Development checkpoint (2026-10-02): nested metadata imports execute through Raven
-and neoCLR (42). Author-directed integration now reuses the structural Function runtime
-branch for callback support on the metadata feature branch. Native Function API binding/invocation now executes across libraries (CLR/native 42);
-Raven Function codegen and System binding remain active work for the unchanged collections sample. This does
-not merge the feature into main or complete the integration milestone.
+Development checkpoint (2026-10-02): the metadata feature branch integrates the
+structural Function runtime. Metadata-produced cross-library callbacks and direct
+Raven static/lambda callbacks execute on neoCLR (42). Typed reference conversions and
+concrete value overrides execute on CLR and neoCLR; 89 metadata contract groups pass.
+The unchanged collections sample has progressed through callbacks, case patterns and
+reference conversion to iterator-loop lowering. Native System linkage remains required.
+This is author-directed integration work, not a main-branch feature merge or milestone
+completion. See the [latest sample evidence](experiments/extended-cli-metadata/collections-after-conversions-2026-10-02.json).
 
 **Updated 2026-10-02.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.

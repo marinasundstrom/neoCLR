@@ -2929,3 +2929,10 @@ failure uses the existing terminal-failure contract; .NET retains its exception 
 Runtime Contracts and binding remain unchanged. 34 focused compiler tests pass,
 including imported-case extraction on .NET; direct collections emission next needs
 reference conversions. Native execution of that broad sample is still pending.
+
+Raven's native adapter now enables logical reference conversion using metadata
+`castclass`. Ordinary .NET retains its existing path. Union-case storage matching
+uses exact assembly/physical-name/type-argument identity when semantic carrier views
+differ, notably for nongeneric None. Binding and Runtime Contracts are unchanged.
+Seven direct native profile controls pass; the unchanged collections sample next
+requires iterator-loop lowering. This still does not claim broad sample completion.
