@@ -2454,3 +2454,26 @@ The compiler reference still owns lazy semantic reader state. Runtime Contract,
 explicit CLI primitive core, translated System bootstrap and native format are unchanged.
 This is a Raven backend host API change, not a metadata-library or shared .NET API change.
 Existing 108-group C# metadata validation remains applicable to the unchanged library.
+
+
+### Closed generic field storage (2026-10-02)
+
+Raven 73e6555b1 and the metadata authoring API now support public instance fields whose
+storage is a closed generic reference class or a vector thereof, on nongeneric root
+owners. The test first reproduced NEOMETA001 from the native field contract, then
+passed after recursively admitting closed arguments. A second Raven-built library
+holds Box<int>/Box<int>[] from the generic library; its consumer checks replacement
+and aliasing across both dependencies. All seven native consumers execute (42).
+
+The C# metadata tests pass 108/108 groups and execute the equivalent scalar/vector
+field accesses on .NET and both native containers. Compared with .NET, the generic
+field signature and CLI MemberRef already represent this storage; neoCLR still uses
+its explicit ordinal layout contract. The change removes an authoring restriction
+without adding encoding or runtime machinery. The tradeoff remains caller-asserted
+layout accuracy when authoring from symbols, covered here by runtime execution.
+
+Open parameters, fields on generic declaring owners, static/inherited fields and
+unsupported value profiles remain outside this API path. Compiler symbols still own
+semantic information; emission does not reopen importer definitions. Runtime Contract,
+explicit primitive core and translated System bootstrap remain unchanged. Full generic
+collection interface import and full class-library consumption remain follow-up work.

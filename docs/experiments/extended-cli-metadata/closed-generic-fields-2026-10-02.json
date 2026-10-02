@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-02",
+  "ravenCommit": "73e6555b1",
+  "baseline": "New BoxStorage consumer bound successfully but emission failed NEOMETA001: native field requires a supported symbol-only emission contract and layout.",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "184282B73D133C2FF40C2838EA28E300703766990592768190C6A12F29042245",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "A89D88F43CD5F651E6A8C1286C00D87A2282F8E41C082E73C21A050F77319FB0",
+        "dependencySha256": "184282B73D133C2FF40C2838EA28E300703766990592768190C6A12F29042245",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0C90520873E2C0078496DFC1E9E70436EC8AFC05B2DF40C7A30F6B35A5CAD800",
+        "dependencySha256": "E7B2C088FD7095D30BF031E96196BB7347B8AD1B387673FA97AB561D1F05A905",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "57881679E50DB4DB8A33D8107A16CABE82015741CAE5C992D79977F3DD58255B",
+        "dependencySha256": "BD247BEBD373611A51F2FE0ECE40916A907040C509F6E33107412ACA97306692",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "C8A9EC0EE1C36DD76DB6A9C6A1208211B8A6C897F9AE8ACFA19EB3D082A53F3B",
+        "dependencySha256": "BD247BEBD373611A51F2FE0ECE40916A907040C509F6E33107412ACA97306692",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "E12F07B23C87D4A9E82A03DFCC54BD54F24979D56A80C84818E97E4096C26CDA",
+        "dependencySha256": "278F40E935FB40B14C7E6839FA55A98C3AF02C852E9C9E05EC27ABBDFBE5A829",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "E7B2374BECC0DE05C94052F1414E18EA8137B8DAEC761322A828729065F1345F"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "BD16F7663B62E82FE1A6A061B8D16F45F6E02C5CC587E24DDF7755C92BD167F6",
+        "dependencySha256": "DFD4FDB5D24C1102176D495724EF69B47B44DC32BB98766F2A70243FAB5E8794",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "6CD834E07E41E6A3EA075331F1CA4A907B9B3BF38D12D66D297F67CE7F8152C4"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "C538368B3FA12C342F903DAEC0FE4FF0DBC7F2D059F4400D81D02853F2A92BFD",
+        "dependencySha256": "71ED598B2723E34C160F86A8CD3376DB9917842F5E62E07AAAFC629FA5D4368F",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "8E3B5E9E8C7A804F919F064703C966210FA05EAB4E3FEB4F08D5B10976B11ED5"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "metadataValidation": {
+    "groupsPassed": 108,
+    "groupsTotal": 108,
+    "clrExecution": 42,
+    "nativeJsonContainerExecution": 42,
+    "nativeBinaryContainerExecution": 42,
+    "checks": [
+      "Closed generic scalar and vector field load/store",
+      "Open method/type parameter rejection",
+      "Bare generic definition rejection",
+      "Foreign signature rejection"
+    ]
+  },
+  "scope": "Closed generic field storage on nongeneric root owners, with unchanged encoding/runtime. Generic declaring owners and generic interface import remain pending."
+}

@@ -53,6 +53,13 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2, true));
         Reject<ArgumentException>(() => app.CreateFieldReference(item, "Bad", PrimitiveType.Int32, -1));
         Reject<ArgumentException>(() => app.CreateFieldReference(box, "Bad", PrimitiveType.Int32, 0));
+        var nominalField = app.CreateFieldReference(item, "Box", nominal, 4);
+        var vectorField = app.CreateFieldReference(item, "Boxes", SignatureType.ArrayOf(nominal), 5);
+        if (nominalField.FieldType != nominal || vectorField.FieldType.ArrayElement != nominal) throw new Exception("closed field signature");
+        Reject<ArgumentException>(() => app.CreateFieldReference(item, "Open", open, 6));
+        Reject<ArgumentException>(() => app.CreateFieldReference(item, "Definition", box, 6));
+        Reject<ArgumentException>(() => app.CreateFieldReference(item, "Foreign", foreignType, 6));
+        Reject<ArgumentException>(() => app.CreateFieldReference(item, "Parameter", SignatureType.TypeParameter(0), 6));
         var read = app.AddFunction("Read", new MethodSignature(PrimitiveType.Int32, [item]));
         read.LoadArgument(0); read.LoadField(valueField); read.Return();
         var contract = app.CreateInterfaceReference(dependency, core, hash, "Example", "IValue");

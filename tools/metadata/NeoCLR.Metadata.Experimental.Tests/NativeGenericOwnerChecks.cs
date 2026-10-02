@@ -33,6 +33,12 @@ internal static class NativeGenericOwnerChecks
         var selfType = type.MakeGenericInstance(parameter);
         var same = type.AddInstanceMethod("Same", new MethodSignature(selfType, [selfType]));
         same.LoadArgument(1); same.Return();
+        var storage = library.AddClass("Example", "Storage");
+        var storedBox = storage.AddField("Box", closed, FieldVisibility.Public);
+        var storedBoxes = storage.AddField("Boxes", SignatureType.ArrayOf(closed), FieldVisibility.Public);
+        var storageCtor = storage.AddConstructor(new MethodSignature(PrimitiveType.Void, [closed, SignatureType.ArrayOf(closed)]));
+        storageCtor.LoadArgument(0); storageCtor.LoadArgument(1); storageCtor.StoreField(storedBox);
+        storageCtor.LoadArgument(0); storageCtor.LoadArgument(2); storageCtor.StoreField(storedBoxes); storageCtor.Return();
         var native = library.WriteNativeAssembly();
         var image = binary ? RuntimeAssemblyContainer.WriteBinary(native, core) : RuntimeAssemblyContainer.Write(native, core);
         var read = AssemblyDefinition.ReadNativeAssembly(image);
@@ -40,7 +46,7 @@ internal static class NativeGenericOwnerChecks
         Check(definition.Name == "Box`1" && definition.GenericArity == 1 && definition.GenericParameterNames!.SequenceEqual(new[] { "TItem" }), "owner identity and parameter names");
         Reject<NotSupportedException>(() => ((IList<string>)definition.GenericParameterNames!)[0] = "Changed");
         Check(definition.SpecialConstraints.Count == 0 && definition.GenericConstraints.Count == 0, "unconstrained owner");
-        Check(definition.Fields.Single().TryGetSignature(out var storage) && storage!.TypeParameterIndex == 0, "type parameter field");
+        Check(definition.Fields.Single().TryGetSignature(out var fieldSignature) && fieldSignature!.TypeParameterIndex == 0, "type parameter field");
         Check(definition.Methods.Single(m => m.Name == "Get").TryGetSignature(out var signature) && signature!.ReturnType.TypeParameterIndex == 0, "type parameter return");
         Check(definition.Methods.Single(m => m.Name == "ArrayIdentity").TryGetSignature(out var vector) && vector!.ReturnType.ArrayElement!.TypeParameterIndex == 0, "type parameter vector");
         Check(read.Write().SequenceEqual(image), "opaque generic owner roundtrip");
@@ -82,7 +88,18 @@ internal static class NativeGenericOwnerChecks
         var local = main.DeclareLocal(importedType);
         main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Emit(OpCode.Pop); main.LoadConstant(19); main.NewObject(Import(".ctor")); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
         main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));
-        main.LoadLocal(local); main.LoadLocal(local); main.Call(Import("Same")); main.Call(Import("Get")); main.Return();
+        var storageReference = app.CreateTypeReference(library.Identity, core,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "Storage");
+        var boxField = app.CreateFieldReference(storageReference, "Box", importedType, 0);
+        var boxesField = app.CreateFieldReference(storageReference, "Boxes", SignatureType.ArrayOf(importedType), 1);
+        var storageConstructor = app.CreateMethodReference(storageReference, ".ctor",
+            new MethodSignature(PrimitiveType.Void, [importedType, SignatureType.ArrayOf(importedType)]));
+        var storageLocal = main.DeclareLocal(storageReference);
+        main.LoadLocal(local); main.LoadConstant(1); main.NewArray(importedType);
+        main.NewObject(storageConstructor); main.StoreLocal(storageLocal);
+        main.LoadLocal(storageLocal); main.LoadField(boxesField); main.LoadConstant(0); main.LoadLocal(local); main.StoreArrayElement(importedType);
+        main.LoadLocal(storageLocal); main.LoadLocal(storageLocal); main.LoadField(boxesField); main.LoadConstant(0); main.LoadArrayElement(importedType); main.StoreField(boxField);
+        main.LoadLocal(storageLocal); main.LoadField(boxField); main.LoadLocal(local); main.Call(Import("Same")); main.Call(Import("Get")); main.Return();
         _ = app.WriteNativeAssembly();
         return (library, app, image);
     }

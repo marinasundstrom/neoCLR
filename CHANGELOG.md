@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Admit closed generic reference values and vectors in authored native field contracts
+  on nongeneric owners. Preserve CLI signature/MemberRef and native ordinal encoding;
+  reject open/bare-generic/foreign storage. C# metadata checks pass 108/108 groups and
+  scalar/vector field execution passes on .NET and both native containers. Raven's
+  cross-assembly holder consumer verifies replacement/aliasing; seven consumers run (42).
+
 - Record Raven native host dependency binding without a separately supplied reader
   definition or image roundtrip. Legacy CLI/snapshot bindings remain available; the
   legacy Definition accessor throws for new native bindings. Seven consumers compile

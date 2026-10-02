@@ -671,3 +671,9 @@ registered native compiler reference without separately supplying its metadata r
 definition. Seven native consumers compile and execute. Lazy symbol loading and the
 explicit primitive-core/translated-System bootstrap remain; this does not change the
 published metadata format or promise complete class-library support.
+
+
+Development checkpoint (2026-10-02): native cross-assembly fields can now hold closed
+generic class values and arrays of them. Raven's generic consumer tests replacement
+and aliasing, and metadata tests execute the same storage on .NET and neoCLR. Fields
+on generic declaring types remain a separate development gap.

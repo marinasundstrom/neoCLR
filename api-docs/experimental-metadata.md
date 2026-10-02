@@ -4884,8 +4884,10 @@ layout matches the selected artifact. The library cannot verify a supplied ordin
 against bytes it has not read. CLI output uses name/type MemberRef; native output uses
 the ordinal. This does not change the instruction set or encode the artifact digest.
 
-Storage supports primitive non-Void values, nongeneric external reference classes and
-single vectors thereof. Static/inherited fields, constructed owners, byrefs and value
+Storage supports primitive non-Void values, external reference classes (including
+closed generic constructions) and single vectors thereof. Construction arguments are
+checked recursively; open type/method parameters, bare generic definitions and foreign
+output signatures reject. Static/inherited fields, constructed owners, byrefs and value
 profiles are unsupported. Readonly loads work; stores reject during body validation.
 Matching contracts intern; conflicting names, ordinals, storage or readonly flags on
 the same owner reject. Null arguments throw ArgumentNullException; invalid owner,
@@ -5073,3 +5075,12 @@ identity for an authored static method reference on a static class. This does no
 that the container is an instantiable signature value. Raven keeps these admissions
 separate. NativeGenericMethodChecks now authors static generic references from values
 for both CLR and native consumers, without passing reader definitions.
+
+
+Closed generic field validation (development, 2026-10-02):
+NativeGenericOwnerChecks authors scalar/vector fields containing an imported Box<Int32>,
+loads and stores them, and executes the resulting CLI assembly on .NET and native
+assembly on both containers. AuthoredFunctionReferenceChecks rejects open parameters,
+unconstructed generic definitions and foreign references. This extends storage
+signatures only; the field's declaring owner must still be nongeneric. No new API
+signature or metadata encoding is introduced.

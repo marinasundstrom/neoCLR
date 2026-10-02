@@ -6,7 +6,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Authors a native instance-field contract from explicit semantic and layout values.</summary>
     /// <param name="declaringType">Owned nongeneric top-level root reference-class definition.</param>
     /// <param name="name">Nonempty metadata field name.</param>
-    /// <param name="fieldType">Primitive, external nominal or single-vector storage type.</param>
+    /// <param name="fieldType">Primitive, external nominal (including closed generic constructions) or single-vector storage type.</param>
     /// <param name="instanceStorageOrdinal">Zero-based native field slot in the selected declaring artifact, including private fields.</param>
     /// <param name="isReadOnly">Whether external stores are forbidden.</param>
     /// <returns>An interned output-owned field reference.</returns>
@@ -37,7 +37,8 @@ public sealed partial class AssemblyBuilder
         authoredFields.Add(reference); return reference;
 
         static bool Supported(SignatureType type) => type.Primitive is { } primitive ? primitive != PrimitiveType.Void :
-            type.ImportedType is { IsValueType: false, DeclaringType: null, GenericArity: 0 } ||
+            type.ImportedType is { IsValueType: false, DeclaringType: null } imported &&
+            imported.TypeArguments.Count == imported.GenericArity && imported.TypeArguments.All(Supported) ||
             type.ArrayElement is { ArrayElement: null } element && Supported(element);
     }
 }
