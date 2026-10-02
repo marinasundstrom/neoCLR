@@ -755,3 +755,8 @@ PropertyDefinition.TryGetSignature and the native property read profile are docu
 in [the host metadata manual](experimental-metadata.md#native-non-indexed-properties-development-2026-10-02).
 They are C# host tooling APIs, explicitly excluded from guest RavenDoc selection;
 the guest reference assembly and documentation snapshot signatures are unchanged.
+
+The indexed PropertyDefinition.TryGetSignature overload is covered by the
+[host manual](experimental-metadata.md#native-indexed-property-signatures-development-2026-10-02).
+It remains excluded from guest RavenDoc because it is a C# host API; the guest
+reference assembly and snapshot are unchanged.

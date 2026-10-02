@@ -5,11 +5,13 @@ public sealed partial class PropertyDefinition
 {
     private readonly byte[] signature;
     private readonly SignatureType? nativeType;
+    private readonly IReadOnlyList<SignatureType>? nativeParameters;
     private readonly uint owner, getter, setter;
     internal PropertyDefinition(ModuleDefinition module, AssemblyDefinition.PropertyRow row)
     {
         Module = module; MetadataToken = row.Token; Name = row.Name; Attributes = row.Attributes;
         nativeType = row.NativeType?.Materialize(module);
+        nativeParameters = row.NativeParameters is null ? null : Array.AsReadOnly(row.NativeParameters.Select(p => p.Materialize(module)).ToArray());
         signature = (byte[])row.Signature.Clone(); owner = row.DeclaringToken; getter = row.Getter; setter = row.Setter;
         OtherMethods = Array.AsReadOnly(row.Others.Select(token => module.GetMethodDefinition(token)!).ToArray());
     }
@@ -39,12 +41,25 @@ public sealed partial class PropertyDefinition
     /// <returns>True for authored non-indexed properties, supported native properties and primitive non-indexed CLI properties.</returns>
     public bool TryGetSignature(out SignatureType? type, out bool isStatic)
     {
-        type = nativeType ?? (ParameterTypes is { Count: 0 } ? PropertyType : null);
+        type = (nativeParameters is { Count: > 0 } ? null : nativeType) ?? (ParameterTypes is { Count: 0 } ? PropertyType : null);
         isStatic = false;
         if (type is not null) { isStatic = (GetMethod ?? SetMethod)!.IsStatic; return true; }
         if (!TryGetPrimitiveSignature(out var primitive, out isStatic)) return false;
         type = primitive;
         return true;
+    }
+    /// <summary>Reads a supported logical property signature including ordered index parameters.</summary>
+    /// <param name="type">Property value type on success; null otherwise.</param>
+    /// <param name="parameters">Immutable index types on success; empty otherwise. Excludes the setter value.</param>
+    /// <param name="isStatic">True for static accessors on success; false otherwise.</param>
+    /// <returns>True for authored/native properties and the bounded non-indexed primitive CLI profile.</returns>
+    public bool TryGetSignature(out SignatureType? type, out IReadOnlyList<SignatureType> parameters, out bool isStatic)
+    {
+        type = nativeType ?? PropertyType;
+        parameters = nativeParameters ?? ParameterTypes ?? Array.Empty<SignatureType>();
+        isStatic = false;
+        if (type is not null) { isStatic = (GetMethod ?? SetMethod)!.IsStatic; return true; }
+        return TryGetSignature(out type, out isStatic);
     }
     /// <summary>Recognizes an exact non-indexed primitive property signature, without resolving types or validating accessor signatures.</summary>
     /// <param name="type">Int32/Int64/Boolean/String on success; Void otherwise.</param>
@@ -52,7 +67,7 @@ public sealed partial class PropertyDefinition
     /// <returns>False for malformed, indexed or other unsupported encodings.</returns>
     public bool TryGetPrimitiveSignature(out PrimitiveType type, out bool isStatic)
     {
-        if (nativeType is { } native)
+        if (nativeType is { } native && nativeParameters is not { Count: > 0 })
         {
             type = native.Primitive ?? PrimitiveType.Void;
             isStatic = type != PrimitiveType.Void && (GetMethod ?? SetMethod)!.IsStatic;

@@ -2104,3 +2104,23 @@ unchanged. The CLI primitive core and translated System are still bootstrap inpu
 
 All five runtime consumers return 42, and 102 C# metadata contract groups pass. See
 [hashed property evidence](../experiments/extended-cli-metadata/native-properties-2026-10-02.json).
+
+## Direct native indexed properties (2026-10-02)
+
+The existing property record already stores index parameters. The definition reader
+now retains them as immutable ordered signature shapes and exposes them through an
+explicit full-signature overload. This follows the CLI/Cecil separation of property
+signatures from accessor call operands in the existing research. It adds inspection
+and compiler coverage without changing the wire format, instruction set or runtime.
+The non-indexed helper remains narrow to avoid silently dropping arguments.
+
+Raven maps indexers to canonical accessor symbols and cached parameter lists, sharing
+existing overload binding and call emission. Source indexer type admission uses the
+NeoCLR target capabilities. Getter-only/set-only metadata remains representable;
+source access to setter-only indexers still needs binder work. Generic/value/interface
+owners and full native System loading remain outside this profile. The explicit CLI
+primitive core and translated System remain bootstrap inputs.
+
+All 102 C# metadata groups and five runtime consumers pass.
+[Indexer evidence](../experiments/extended-cli-metadata/native-indexers-2026-10-02.json)
+records tested bundles and the independently isolated general Raven corrections.

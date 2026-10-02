@@ -3503,3 +3503,23 @@ System remain explicit bootstrap inputs; the metadata library owns broader reade
 support, Raven owns symbol mapping, and native core loading/source compilation remain
 their eventual replacement. Indexers, generic/value/interface owners and full native
 System loading remain open.
+
+### Direct native indexed properties (2026-10-02 development)
+
+The independent metadata reader now retains indexed-property signatures, and Raven
+imports them with canonical getter/setter symbols and cached index parameters. Source
+indexers use explicit NeoCLR signature capabilities; emission imports the existing
+accessor method operands. No metadata schema, opcode or Runtime Contract changes are
+needed. Libraries are read directly from native definitions without CLI projection.
+
+The payload/holder/consumer case now replaces and reads an external-class array element
+through an imported indexer. An overloaded String indexer reads the nominal property;
+private-setter and wrong-index-type assignments diagnose. All five native consumers
+return 42. The CLI primitive core and translated System remain explicit bootstrap
+inputs. Setter-only indexers can be inspected but source access remains a binder gap;
+full native System importing and broader owner categories remain pending.
+
+Validation: 102 metadata groups and 75 focused .NET indexer/accessibility tests pass.
+General Raven fixes are isolated as 9ee5aad97 (indexer access) and 2df6f3f6d
+(qualified type-name crash in shared emission). Neither is merged into main here.
+See [hashed evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json).

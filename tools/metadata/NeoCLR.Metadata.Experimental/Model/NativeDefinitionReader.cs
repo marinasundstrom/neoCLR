@@ -5,8 +5,8 @@ public sealed partial class AssemblyDefinition
     /// <summary>Reads authoritative native namespace-function and bounded class declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/interface/generic types, unsupported field types, indexed properties and signatures beyond primitives/nominal classes and their vectors.</exception>
-    /// <remarks>This first materialization profile admits nongeneric functions/methods with primitive, nominal class or vector signatures, top-level classes with primitive, nominal class or vector fields/non-indexed properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/interface/generic types, unsupported field types and signatures beyond primitives/nominal classes and their vectors.</exception>
+    /// <remarks>This first materialization profile admits nongeneric functions/methods with primitive, nominal class or vector signatures, top-level classes with primitive, nominal class or vector fields/properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -31,7 +31,7 @@ public sealed partial class NativeAssemblyDefinition
             type.ImportedType is { IsValueType: false, GenericArity: 0, DeclaringType: null };
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && SupportedScalar(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Any(p => p.Parameters.Length != 0 || !Supported(p.Type)) || types.Any(t => t.IsInterface || t.IsValueType || t.DeclaringType >= 0 ||
+        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.IsInterface || t.IsValueType || t.DeclaringType >= 0 ||
             t.GenericNames.Length != 0 || t.Fields.Any(f => !Supported(f.Signature!)) || t.BaseInterfaces.Length != 0 || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             m.Signature.GenericParameterNames.Count != 0 || !Supported(m.Signature.ReturnType) ||
@@ -75,7 +75,7 @@ public sealed partial class NativeAssemblyDefinition
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
-            property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type))).ToArray();
+            property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray())).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
         return AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
     }

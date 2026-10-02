@@ -60,9 +60,40 @@ internal static class NativePropertyChecks
             Check(read.Write().SequenceEqual(image), "opaque property image roundtrip");
         }
         var index = box.AddInstanceMethod("Index", new(PrimitiveType.Int32, [PrimitiveType.Int32])); index.LoadArgument(1); index.Return();
-        box.AddProperty("Item", PrimitiveType.Int32, index);
-        var indexedImage = RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core);
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(indexedImage));
+        var authoredIndex = box.AddProperty("Item", PrimitiveType.Int32, index);
+        Check(authoredIndex.Definition.TryGetSignature(out _, out var authoredIndices, out _) && authoredIndices.Count == 1, "authored indexed signature");
+        var writeAt = box.AddInstanceMethod("WriteAt", new(PrimitiveType.Void, [PrimitiveType.Int32, PrimitiveType.String])); writeAt.Return();
+        box.AddProperty("WriteOnly", PrimitiveType.String, setter: writeAt);
+        foreach (var binary in new[] { false, true })
+        {
+            var native = library.WriteNativeAssembly();
+            var indexedImage = binary ? RuntimeAssemblyContainer.WriteBinary(native, core) : RuntimeAssemblyContainer.Write(native, core);
+            var read = AssemblyDefinition.ReadNativeAssembly(indexedImage);
+            var indexed = read.MainModule.Properties.Single(p => p.Name == "Item");
+            Check(indexed.TryGetSignature(out var valueType, out var indices, out var isStatic) &&
+                valueType!.Primitive == PrimitiveType.Int32 && indices.Count == 1 && indices[0].Primitive == PrimitiveType.Int32 && !isStatic,
+                "indexed logical signature");
+            Check(!indexed.TryGetSignature(out _, out _) && !indexed.TryGetPrimitiveSignature(out _, out _), "non-indexed helpers reject indexer");
+            Reject<NotSupportedException>(() => ((IList<SignatureType>)indices)[0] = PrimitiveType.String);
+            Check(ReferenceEquals(indexed.GetMethod, indexed.DeclaringType.Methods.Single(m => m.Name == "Index")), "indexed accessor identity");
+            var writeOnly = read.MainModule.Properties.Single(p => p.Name == "WriteOnly");
+            Check(writeOnly.GetMethod is null && writeOnly.TryGetSignature(out var writtenType, out var writtenIndices, out _) &&
+                writtenType!.Primitive == PrimitiveType.String && writtenIndices.Count == 1 && writtenIndices[0].Primitive == PrimitiveType.Int32,
+                "write-only index excludes setter value");
+            Check(read.Write().SequenceEqual(indexedImage), "indexed image roundtrip");
+            var app = new AssemblyBuilder(new("IndexConsumer", new Version(1, 0, 0, 0)), core);
+            var main = app.AddFunction("Main"); app.EntryPoint = main;
+            main.NewObject(app.ImportReference(indexed.DeclaringType.Methods.Single(m => m.Name == ".ctor"), core));
+            main.LoadConstant(42); main.Call(app.ImportReference(indexed.GetMethod!, core)); main.Return();
+            _ = app.WriteNativeAssembly();
+            var context = new AssemblyLoadContext("native-index-" + binary, true);
+            try
+            {
+                context.LoadFromStream(new MemoryStream(library.Write()));
+                Check((int)context.LoadFromStream(new MemoryStream(app.Write())).EntryPoint!.Invoke(null, null)! == 42, "CLR imported indexed accessor execution");
+            }
+            finally { context.Unload(); }
+        }
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static void Reject<T>(Action action) where T : Exception

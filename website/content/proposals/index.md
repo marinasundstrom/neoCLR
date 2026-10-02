@@ -557,3 +557,8 @@ assemblies, including class/array setters and static getters (42). This extends 
 existing CLI-shaped property/accessor model without a new encoding. Indexers and full
 native core loading remain pending; CLI core/translated System bootstrap inputs remain.
 [Evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/native-properties-2026-10-02.json)
+
+Development checkpoint (2026-10-02): direct native loading now also supports indexed
+property signatures. Raven binds overloads and executes cross-library indexed reads
+and writes (42). The existing CLI-shaped property/accessor format is unchanged;
+setter-only source access and full native core loading remain pending.

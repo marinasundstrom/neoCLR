@@ -4597,3 +4597,31 @@ No property schema or runtime opcode changes are made. C# checks cover both cont
 ownership, signatures, static/read-only/write-only accessors, CLR accessor execution,
 opaque roundtrip and indexer rejection. Raven consumes separately compiled native
 properties through the same accessor definitions.
+
+### Native indexed property signatures (development, 2026-10-02)
+
+ReadNativeAssembly now also admits indexed properties in the existing supported
+root-class profile. Ordered index types are immutable signature shapes, with the same
+primitive/nominal/vector support and exact dependency resolution as value types.
+Accessor associations retain canonical method identity and their existing visibility.
+
+```csharp
+public bool TryGetSignature(out SignatureType? type,
+    out IReadOnlyList<SignatureType> parameters, out bool isStatic);
+```
+
+The new PropertyDefinition overload returns the value type, ordered index parameters
+(excluding the setter value), and accessor staticness. It supports authored/native
+properties, including getter-only and setter-only indexers, and the existing bounded
+non-indexed primitive CLI profile. On failure outputs are null, an empty list and false.
+The returned parameter collection is read-only. It does not resolve dependencies or
+materialize bodies. The existing two-output overload and TryGetPrimitiveSignature
+continue to reject indexers. PropertyType/ParameterTypes remain authored-only; native
+GetSignature still throws NotSupportedException rather than inventing a CLI blob.
+
+C# tests cover both containers, authored/native signatures, immutable parameter lists,
+setter-value exclusion, accessor identity, byte-preserving roundtrip and CLR execution
+of imported indexer methods. Raven consumes native indexers with getters, including
+read/write overloads; setter-only indexers are inspectable but the current binder still
+requires a getter to resolve indexed source access. This is a compiler limitation, not
+a metadata restriction. No CLI/native property encoding or runtime opcode changes.

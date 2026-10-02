@@ -23,8 +23,9 @@ All five native consumers pass. Primitive and nominal class arrays now also load
 in method/constructor/field signatures, including external element types; cross-library
 array aliases and element replacement execute (42). Non-indexed properties now also load with canonical accessors and execute across native
 libraries (42), including static getters and nominal/vector setters. Private setter and
-read-only writes diagnose. Next broaden indexed properties and remaining declaration
-categories before full System loading. See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
+read-only writes diagnose. Indexed properties now also load directly, including overloads; cross-library indexed
+reads/writes execute (42). Next broaden remaining declaration categories before full
+System loading; setter-only source access remains a binder limitation. See [indexer evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json). See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 

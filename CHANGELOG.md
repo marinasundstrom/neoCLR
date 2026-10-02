@@ -32,6 +32,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   accessor definitions and logical primitive/nominal/vector signatures. Raven consumes
   instance/static properties across native libraries (42), rejecting read-only/private
   setter writes; a general setter-accessibility binder fix is independently tested on .NET.
+  Indexed properties now retain ordered immutable parameter signatures through a new
+  logical-signature overload. Raven binds overloaded native indexers and executes
+  cross-library element replacement/read (42); inaccessible indexed setters diagnose.
+  A separate shared Raven name-normalization fix closes a .NET emission crash exposed
+  by the indexer regression tests.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata
