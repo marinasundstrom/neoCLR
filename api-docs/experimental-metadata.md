@@ -4458,3 +4458,34 @@ false for nominal signatures. Use TryGetSignature to inspect the richer native p
 C# tests read both native container variants and execute imported factory/instance calls
 on the CLR; Raven tests compile and execute factories, nominal function/method signatures
 and constructor arguments in neoCLR. These are host development APIs, not guest APIs.
+
+### Native local nominal fields (development, 2026-10-02)
+
+`FieldDefinition.TryGetSignature(out SignatureType? type)` returns true for authored
+field types, direct native primitive/local class fields and primitive CLI field blobs.
+It returns false with null for other loaded CLI signatures; unsupported does not mean
+absent. No body or dependency is loaded. A native nominal signature's ReferencedType
+resolves to its snapshot's canonical TypeDefinition, shared with method signature types.
+Forward/cyclic local references are supported. Loaded FieldType remains the existing
+authored-only property; use TryGetSignature for a loaded field's logical type.
+
+ReadNativeAssembly now admits fields referring to local nongeneric root classes.
+Unsupported external, array, generic, value/interface field shapes still reject the
+read with InvalidDataException. Native GetSignature still throws NotSupportedException
+because no CLI blob exists; TryGetPrimitiveType returns false/Void for nominal fields.
+Loaded declarations remain immutable and Write still copies the original native image.
+
+`AssemblyBuilder.ImportReference(FieldDefinition, core)` additionally accepts these
+native nominal fields when both the owner and referenced storage type satisfy existing
+public class import rules. ImportedFieldReference.FieldType contains an output-owned
+ImportedTypeReference signature. LoadField, StoreField and raw Ldfld/Stfld operands use
+the existing exact receiver/value checks and readonly-store rejection. Null/foreign
+operands retain their existing errors; unsupported signatures/core/snapshot/layout
+contracts throw InvalidDataException. CLI writing emits a nominal field MemberRef;
+native writing uses the existing validated ordinal. CLI nominal field decoding/import
+remains outside this bounded profile. No PE/#Neo schema or opcode change is introduced.
+
+C# tests cover forward/cyclic references, field/method signature identity, both native
+containers, immutable fields, incorrect primitive/nominal stores and readonly stores.
+They execute the emitted equivalent on .NET (42); Raven consumers execute replacement,
+nested mutation and original-object independence in neoCLR (42).

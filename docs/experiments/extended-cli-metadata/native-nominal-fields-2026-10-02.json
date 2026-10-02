@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-02",
+  "metadataBranch": "codex/extended-cli-metadata",
+  "ravenBranch": "codex/metadata-consumer",
+  "metadataBaseCommit": "891648d0",
+  "ravenBaseCommit": "084fb7a14",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "935B972E9A652CFAF21E9A163459A0A3766C11102F34A1B652253B40EF8C9A91",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0A931D011D3855328B21B2A3EF2BD647B54DCB2E1FCEB4C56FA03E565743E0D0",
+        "dependencySha256": "935B972E9A652CFAF21E9A163459A0A3766C11102F34A1B652253B40EF8C9A91"
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0D7967865020920F6C4A86C82FA8A38B2BBE43578234B3222D55C69869BEF2FC",
+        "dependencySha256": "B4CAE4771413AE4A6703502BF4D261324BDA2DDFD3A9AA39FB0B0A7548C57E11"
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "249680624D6E7A4254957ABC8CD8B44FB4A608625CD8D19EEDE1346730021B7E",
+        "dependencySha256": "4CC2AA8F8D13C3BC1494684728536FA62D420A770AA58445C79289400BDEABCB"
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "0EB0A4A872E55CD589816EFAE0FBFB0A4287B103BEACD5EAC1D5B71CC83734F4",
+        "dependencySha256": "4CC2AA8F8D13C3BC1494684728536FA62D420A770AA58445C79289400BDEABCB"
+      }
+    ],
+    "scope": "native primitive/local-class signature import and cross-assembly execution; explicit CLI primitive core retained"
+  },
+  "checks": {
+    "metadataContractGroups": 99,
+    "apiSnapshot": "passed",
+    "cli": "Native nominal field imports emit CLI MemberRefs and execute on .NET, returning 42, for both native container variants",
+    "identity": "Forward/cyclic local field references, shared field/method signature identity, canonical Raven field type, replacement and original-object independence",
+    "rejections": [
+      "nominal field reported as primitive",
+      "loaded field mutation",
+      "primitive value stored to nominal field",
+      "wrong nominal class stored to field",
+      "external readonly store",
+      "unsupported CLI nominal field signature"
+    ]
+  },
+  "reproduce": "NeoClrMetadataProbe --native-symbols-runtime <core.dll> <neoclr> <System.neox> <fresh-output>",
+  "limits": "Local nongeneric root class fields only. External signature dependencies and generic/value/interface/array fields remain pending. CLI primitive core and translated System runtime bootstrap retained. No format/opcode changes."
+}

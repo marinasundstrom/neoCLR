@@ -1,9 +1,9 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive instance-field reference owned by one output assembly.</summary>
+/// <summary>An immutable primitive or local nominal instance-field reference owned by one output assembly.</summary>
 public sealed class ImportedFieldReference
 {
-    internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, PrimitiveType type, int index)
+    internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
     { Owner = owner; DeclaringType = declaringType; Name = definition.Name; FieldType = type; IsReadOnly = (definition.Attributes & 0x20) != 0; NativeIndex = definition.Module.Assembly.IsNative ? index : null; }
     /// <summary>Gets the consuming builder.</summary>
     public AssemblyBuilder Owner { get; }
@@ -11,7 +11,7 @@ public sealed class ImportedFieldReference
     public ImportedTypeReference DeclaringType { get; }
     /// <summary>Gets the metadata field name.</summary>
     public string Name { get; }
-    /// <summary>Gets the primitive storage signature.</summary>
+    /// <summary>Gets the output-owned primitive or imported nominal storage signature.</summary>
     public SignatureType FieldType { get; }
     /// <summary>Gets whether stores from this external consumer are forbidden.</summary>
     public bool IsReadOnly { get; }
@@ -21,7 +21,7 @@ public sealed class ImportedFieldReference
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<(AssemblyIdentity, uint), ImportedFieldReference> importedFields = [];
-    /// <summary>Imports a public primitive instance field on a public nongeneric top-level reference class.</summary>
+    /// <summary>Imports a public primitive or native local-class instance field on a public nongeneric top-level reference class.</summary>
     /// <param name="definition">Immutable CLI or native field definition.</param>
     /// <param name="dependencyCoreLibrary">Explicit core identity, matching this output.</param>
     /// <returns>An interned reference owned by this builder.</returns>
@@ -35,21 +35,24 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("field import requires a loaded immutable snapshot");
         var type = definition.DeclaringType;
         if ((definition.Attributes & 7) != 6 || (definition.Attributes & ~0x27) != 0 ||
-            !definition.TryGetPrimitiveType(out var primitive) || type.IsValueType || type.GenericArity != 0 || type.DeclaringType is not null ||
+            !definition.TryGetSignature(out var signature) || type.IsValueType || type.GenericArity != 0 || type.DeclaringType is not null ||
             (type.Attributes & 0x20) != 0 || type.Fields.Any(field => (field.Attributes & 0x10) != 0) || NativeBindingFor(type.Module.Assembly.Identity) is not null)
             throw new InvalidDataException("unsupported imported field contract");
         var owner = ImportReference(type, dependencyCoreLibrary);
+        SignatureType storage = signature!.Primitive is { } primitive ? primitive
+            : signature.ReferencedType is { } nominal ? ImportReference(nominal.Resolve(), dependencyCoreLibrary)
+            : throw new InvalidDataException("unsupported imported field signature");
         var key = (type.Module.Assembly.Identity, definition.MetadataToken);
         if (importedFields.TryGetValue(key, out var existing))
         {
-            if (existing.Name != definition.Name || existing.FieldType != primitive || existing.IsReadOnly != ((definition.Attributes & 0x20) != 0) || !ReferenceEquals(existing.DeclaringType, owner))
+            if (existing.Name != definition.Name || existing.FieldType != storage || existing.IsReadOnly != ((definition.Attributes & 0x20) != 0) || !ReferenceEquals(existing.DeclaringType, owner))
                 throw new InvalidDataException("conflicting imported field contract");
             return existing;
         }
         if (importedFields.Count >= 4096) throw new InvalidDataException("too many imported fields");
         var index = type.Fields.IndexOf(definition);
         if (index < 0) throw new InvalidDataException("field is not owned by its declaring snapshot");
-        var reference = new ImportedFieldReference(this, owner, definition, primitive, index);
+        var reference = new ImportedFieldReference(this, owner, definition, storage, index);
         importedFields.Add(key, reference);
         return reference;
     }
@@ -57,9 +60,9 @@ public sealed partial class AssemblyBuilder
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Loads a primitive field from its exact external receiver type.</summary>
+    /// <summary>Loads a primitive or nominal field from its exact external receiver type.</summary>
     public void LoadField(ImportedFieldReference field) => Emit(OpCode.Ldfld, field);
-    /// <summary>Stores a primitive field on its exact external receiver type; readonly stores fail validation.</summary>
+    /// <summary>Stores a primitive or nominal field on its exact external receiver type; readonly stores fail validation.</summary>
     public void StoreField(ImportedFieldReference field) => Emit(OpCode.Stfld, field);
     /// <summary>Appends Ldfld or Stfld with an imported field operand.</summary>
     /// <param name="opCode">Ldfld or Stfld.</param>

@@ -535,3 +535,8 @@ class parameter/result signatures. A Raven-produced native library and consumer 
 factory, identity-call and constructor-argument paths in neoCLR (42). This remains a
 bounded feature-branch profile with an explicit CLI primitive core; full native System
 loading is pending.
+
+Development checkpoint (2026-10-02): class-valued fields now participate in direct native
+metadata loading and Raven emission. A native library consumer replaces and mutates a
+stored object while preserving the original (42). Existing nominal CLR behavior and
+PE/#Neo encoding are retained; cross-dependency signature loading remains pending.

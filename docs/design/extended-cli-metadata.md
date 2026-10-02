@@ -2011,3 +2011,23 @@ The tradeoff versus full CLI loading remains deliberately bounded coverage: nomi
 fields, external signature types, inheritance, generics, interfaces and value types are
 not admitted by this native reader profile. The explicit CLI primitive core/bootstrap
 contract is unchanged. No performance improvement or full System import is claimed.
+
+## Native local nominal fields (2026-10-02)
+
+The direct reader now uses the same snapshot-owned nominal signatures for fields and
+methods. Type definitions are published before fields are materialized, admitting
+forward/cyclic local references without retaining parser builders. Compared with the
+.NET/Cecil nominal field model reviewed above, this preserves declared nominal type
+identity and typed field access; it remains a bounded subset rather than a new storage
+or object identity model. The benefit is direct native field inspection/import using
+existing CLI MemberRef/native ordinal writers, at the cost of explicit current shape
+limits: no external signature types, generic/value/interface/array fields or general
+CLI nominal field decoding. No format or runtime instruction change is needed.
+
+Raven lazily resolves a field's signature to its canonical module type, caching the
+result after module publication. A native library consumer replaces a class-valued
+field, mutates the replacement and checks the original object remains unchanged (42).
+All four runtime consumers and 99 C# metadata contract groups pass; C# also executes
+the equivalent native-snapshot import on .NET. See [hashed evidence](../experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json).
+The CLI primitive core and translated System remain explicit bootstrap dependencies;
+full native System import is not claimed.

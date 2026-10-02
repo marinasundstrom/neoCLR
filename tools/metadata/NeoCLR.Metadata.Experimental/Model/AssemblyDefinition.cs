@@ -248,7 +248,7 @@ public sealed partial class AssemblyDefinition
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others);
-    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, PrimitiveType? NativeType = null);
+    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
     internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken)
     {
         internal SignatureType Materialize(ModuleDefinition module) => Primitive is { } primitive ? primitive
@@ -306,7 +306,7 @@ public sealed partial class ModuleDefinition
         TypeReferences = Array.AsReadOnly(typeReferences.Select(row => new TypeReference(this, row)).ToArray());
         MemberReferences = Array.AsReadOnly(memberReferenceRows.Select(row => new MemberReference(this, row)).ToArray());
     }
-    // Used only while constructing loaded methods, before the snapshot is published.
+    // Used only while constructing loaded fields and methods, before the snapshot is published.
     private readonly Dictionary<uint, SignatureType> nativeSignatureTypes = [];
     internal SignatureType GetNativeSignatureType(uint token)
     {

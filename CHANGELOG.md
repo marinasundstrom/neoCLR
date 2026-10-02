@@ -18,8 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Native method/function/constructor signatures now also retain local nominal class
   references in the immutable definition graph and import them into output-owned types.
   Raven factory, identity-call and nominal-constructor consumers execute (42).
-  Primitive-only helpers reject nominal signatures. Cross-dependency signature types,
-  generic/value/interface profiles and nominal fields still reject direct reading.
+  Primitive-only helpers reject nominal signatures. Local class-valued fields now also
+  expose immutable signatures and import for CLI/native load/store emission; Raven
+  replacement/mutation consumers preserve object identity (42). Cross-dependency
+  signature types and generic/value/interface profiles still reject direct reading.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata
