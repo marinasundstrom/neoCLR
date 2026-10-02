@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Enforce symbol-only native callable emission in Raven by removing its reader-definition
+  fallback; incomplete contracts diagnose. Seven consumers execute (42), including direct
+  concrete implementation calls. Clarify that native implementation flags differ from
+  CLI projection flags; no metadata/runtime change or final-virtual extension is made.
+
 - Validate authored static-container generic calls on CLR and both native containers.
   Raven now reconstructs these owners/methods from symbols while keeping static classes
   out of value signatures. No API or format changes; remaining reader-backed bindings

@@ -2410,3 +2410,18 @@ the value-signature predicate continues to exclude them. Existing authored type/
 APIs suffice; no new API or format change is needed. Generic-static contracts reconstructed
 from values execute on CLR and both native container formats. Final/virtual class
 contracts and host/lifetime/translated-binding dependencies remain to be migrated.
+
+
+### Native callable boundary enforced (2026-10-02)
+
+Raven no longer falls back to native MethodDefinition objects when reconstructing a
+callable. Unsupported/incomplete native symbol contracts diagnose; the unused native
+method definition property is removed. Translated CLI compatibility still uses its
+explicit bindings. Native signature materialization, type/field fallbacks and host
+reference configuration remain separate work.
+
+The final/virtual audit corrected a CLI projection assumption: the native writer marks
+abstract interface contracts virtual, while concrete implementations are ordinary
+methods. Do not copy projection flags into native semantics. No new final-virtual
+contract or format extension was needed. Added direct concrete-implementation calls
+and getters execute alongside the existing interface-dispatch tests.

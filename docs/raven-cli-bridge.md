@@ -3773,3 +3773,14 @@ generic-static contract is authored from values and executes on CLR and both nat
 containers. Translated CLI and remaining virtual/profile bindings, host setup and lazy
 materialization remain reader-backed. Runtime Contract/bootstrap requirements are
 unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).
+
+
+### Native callable fallback removed (2026-10-02)
+
+Raven `4a3af6271` now requires supported native callable facts in symbols, without
+falling back to reader definitions. Incomplete contracts diagnose. The unused method
+definition property is removed. All seven consumers execute (42), including direct
+concrete interface-implementation calls. Native concrete implementations do not carry
+the CLI projection's final/virtual flags; no metadata change is made. CLI compatibility,
+type/field/host paths and lazy symbol materialization remain separate pending work.
+Runtime Contract/bootstrap requirements are unchanged. See [evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json).
