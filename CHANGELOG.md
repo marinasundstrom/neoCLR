@@ -42,6 +42,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Direct reading now includes nongeneric interfaces, local inheritance and class
   implementations. Exact loaded relationships validate imported interface conversions;
   Raven binds inherited methods/properties and neoCLR dispatches across assemblies (42).
+  Follow-on storage tests exercise interface-valued fields, constructor arguments and
+  arrays in a second native library, preserving aliases and dispatch after replacement
+  (42). The existing compiler/metadata paths require no additional implementation.
+  Invalid interface returns reject emission with empty output; earlier expression-body
+  diagnostics are tracked for independent .NET investigation.
 
 - Raven imports bounded primitive namespace-function libraries directly from native
   definitions into compiler-owned symbols and emits their calls through the metadata

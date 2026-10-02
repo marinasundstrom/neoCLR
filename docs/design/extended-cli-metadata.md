@@ -2160,3 +2160,19 @@ logical emission contracts and preserved .NET behavior. Native success does not 
 a replacement or prove full .NET parity: CLI core bootstrap loading and unimplemented
 type categories still limit that conclusion. Continue native integration before the
 separate .NET migration evaluation.
+
+## Interface-valued native storage (2026-10-02)
+
+A second native library now stores an external interface and an array of that interface,
+accepts both through its constructor, and dispatches through the stored value. The
+consumer supplies derived-interface values, replaces the field and an array element,
+and verifies both alias visibility and original-reference independence before returning
+42. C# metadata tests separately execute class-to-interface field/array stores on CLR.
+All six native consumers and 103 metadata groups pass. No further reader, compiler or
+runtime implementation was needed after the preceding interface slice.
+
+Compared with .NET, this preserves nominal conformance and ordinary reference aliasing.
+It does not add interface-array covariance or cross-assembly implementation declarations.
+The evidence strengthens the provider-neutral path identified by the author, while the
+CLI primitive bootstrap and incomplete generic/value support still limit any conclusion
+about replacing the entire .NET reflection/emit pipeline.

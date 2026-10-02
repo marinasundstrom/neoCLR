@@ -572,3 +572,8 @@ interfaces and local inheritance/implementations. Raven compiles a consumer of t
 implementations and neoCLR executes inherited method/property dispatch (42). This keeps
 the existing CLI-shaped contract and callvirt behavior; generic interfaces and full
 native core loading remain pending.
+
+Development checkpoint (2026-10-02): interface-valued fields and arrays now have a
+three-assembly Raven-to-neoCLR test. Imported signatures preserve identity, alias writes
+and dispatch after replacement (42), using the existing compiler and runtime paths.
+The primitive CLI bootstrap and broader generic/value import work remain.

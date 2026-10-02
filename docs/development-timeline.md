@@ -10065,3 +10065,10 @@ planned work will check interface-valued storage across native assemblies. The C
 primitive core still uses the existing bootstrap loader, so the entire compilation
 pipeline is not yet independent of reflection. Broader native types and a dedicated
 .NET provider/backend evaluation remain open.
+
+**Follow-on outcome (2026-10-02):** the planned interface-storage check now passes.
+A three-assembly Raven consumer preserves interface field/array aliases and executes
+dispatch after replacement (42); C# tests run equivalent imports on CLR. No additional
+reader/compiler/runtime code was required after interface loading, providing a concrete
+example of reusing the contracts. This does not resolve the bootstrap and broader
+.NET replacement questions recorded above.

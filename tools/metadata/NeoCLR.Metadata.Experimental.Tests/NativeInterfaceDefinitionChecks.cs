@@ -14,6 +14,8 @@ internal static class NativeInterfaceDefinitionChecks
         var unrelated = library.AddInterface("Example", "Unrelated"); unrelated.AddInterfaceMethod("Get", new(PrimitiveType.Int32, []));
         var derived = library.AddInterface("Example", "Derived"); derived.AddBaseInterface(contract);
         var owner = library.AddClass("Example", "Concrete"); owner.AddInterfaceImplementation(derived);
+        owner.AddField("Stored", contract, FieldVisibility.Public);
+        owner.AddField("Items", SignatureType.ArrayOf(contract), FieldVisibility.Public);
         var ctor = owner.AddConstructor(Array.Empty<PrimitiveType>()); ctor.Return();
         var get = owner.AddInstanceMethod("Get", new(PrimitiveType.Int32, [])); get.LoadConstant(42); get.Return();
         var factory = library.AddType("Example", "Factory");
@@ -53,6 +55,27 @@ internal static class NativeInterfaceDefinitionChecks
                 Check((int)context.LoadFromStream(new MemoryStream(app.Write())).EntryPoint!.Invoke(null, null)! == 42, "CLR imported native interface dispatch");
             }
             finally { context.Unload(); }
+            var stored = app.ImportReference(readOwner.Fields.Single(f => f.Name == "Stored"), core);
+            var items = app.ImportReference(readOwner.Fields.Single(f => f.Name == "Items"), core);
+            Check(stored.FieldType.ImportedType == items.FieldType.ArrayElement!.ImportedType, "canonical imported interface storage");
+            main.ClearBody();
+            var instance = main.DeclareLocal(app.ImportReference(readOwner, core));
+            var values = main.DeclareLocal(items.FieldType);
+            main.NewObject(app.ImportReference(readOwner.Methods.Single(m => m.Name == ".ctor"), core)); main.StoreLocal(instance);
+            main.LoadLocal(instance); main.LoadLocal(instance); main.StoreField(stored);
+            main.LoadConstant(1); main.NewArray(stored.FieldType); main.StoreLocal(values);
+            main.LoadLocal(values); main.LoadConstant(0); main.LoadLocal(instance); main.StoreArrayElement(stored.FieldType);
+            main.LoadLocal(instance); main.LoadLocal(values); main.StoreField(items);
+            main.LoadLocal(instance); main.LoadField(items); main.LoadConstant(0); main.LoadArrayElement(stored.FieldType);
+            main.CallVirtual(imported); main.Return();
+            _ = app.WriteNativeAssembly();
+            var storageContext = new AssemblyLoadContext("native-interface-storage-" + binary, true);
+            try
+            {
+                storageContext.LoadFromStream(new MemoryStream(library.Write()));
+                Check((int)storageContext.LoadFromStream(new MemoryStream(app.Write())).EntryPoint!.Invoke(null, null)! == 42, "CLR interface field and array dispatch");
+            }
+            finally { storageContext.Unload(); }
         }
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

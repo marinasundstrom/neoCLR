@@ -4653,3 +4653,10 @@ C# tests cover both native containers, canonical immutable relationships, abstra
 flags, byte-preserving roundtrip, unrelated-interface rejection and CLR execution of
 accessors imported from native definitions. Raven separately compiles interface
 factories and a consumer; neoCLR executes inherited method/property dispatch (42).
+
+Interface-valued fields and arrays are also covered by C# import/emission tests.
+A concrete native class with a proven local implementation path can be stored in
+an imported interface field or exact-interface array and dispatched on CLR. Raven's
+three-assembly consumer verifies equivalent native storage and alias behavior. These
+use existing FieldDefinition and MethodDefinition signature/import APIs; no new public
+API or array covariance rule is introduced.

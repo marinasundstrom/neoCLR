@@ -26,7 +26,9 @@ libraries (42), including static getters and nominal/vector setters. Private set
 read-only writes diagnose. Indexed properties now also load directly, including overloads; cross-library indexed
 reads/writes execute (42). Nongeneric interfaces and local inheritance/implementations now also load; inherited
 method/property dispatch executes across native assemblies (42). All six consumers pass.
-Next cover interface-valued storage and remaining categories before full System loading.
+Interface-valued fields, constructor parameters and arrays now also work across native
+libraries, preserving aliases and dispatch after replacement (42). Next reproduce the deferred early-return diagnostic gap independently on .NET, then
+broaden generic declarations and remaining categories before full System loading. See [storage evidence](experiments/extended-cli-metadata/native-interface-storage-2026-10-02.json).
 See [interface evidence](experiments/extended-cli-metadata/native-interfaces-2026-10-02.json). Setter-only indexed assignments now also compile and execute (42);
 source reads still require a getter. See [setter-only evidence](experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json). See [indexer evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json). See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing
