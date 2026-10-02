@@ -424,6 +424,18 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(member);
         }
+        var importedFieldMembers = new Dictionary<ImportedFieldReference, MemberReferenceHandle>();
+        int ImportedFieldToken(ImportedFieldReference reference)
+        {
+            if (!importedFieldMembers.TryGetValue(reference, out var member))
+            {
+                var signature = new BlobBuilder();
+                EncodeType(new BlobEncoder(signature).FieldSignature(), reference.FieldType);
+                member = metadata.AddMemberReference(ImportedTypeHandle(reference.DeclaringType), metadata.GetOrAddString(reference.Name), metadata.GetOrAddBlob(signature));
+                importedFieldMembers.Add(reference, member);
+            }
+            return MetadataTokens.GetToken(member);
+        }
         var functionMembers = new Dictionary<(SignatureType, bool), MemberReferenceHandle>();
         int FunctionMember(SignatureType type, bool constructor)
         {
@@ -487,7 +499,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => 12,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -513,6 +525,10 @@ public sealed partial class AssemblyBuilder
                         code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "duplicate": code.WriteByte(0x25); break;
                     case "new.object": code.WriteByte(0x73); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                    case "field.import.load":
+                    case "field.import.store":
+                        code.WriteByte(instruction.Op == "field.import.load" ? (byte)0x7b : (byte)0x7d);
+                        code.WriteInt32(ImportedFieldToken(instruction.ImportedField!)); break;
                     case "field.load":
                     case "field.store":
                         code.WriteByte(instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
@@ -776,7 +792,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null, ImportedFieldReference? ImportedField = null);
     internal List<Operation> Instructions => Definition.Body.Instructions;
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

@@ -3378,3 +3378,23 @@ format and runtime code are unchanged; the explicit CLI primitive core remains r
 
 Validation: all 96 metadata contract groups, three runtime consumers and the API snapshot
 check pass. [Primitive-field evidence](experiments/extended-cli-metadata/native-primitive-fields-2026-10-02.json).
+
+### Direct native field access checkpoint (2026-10-02)
+
+The imported field operand gap is closed for public primitive instance fields on public
+nongeneric top-level reference classes. AssemblyBuilder imports an immutable typed
+reference from the exact definition snapshot. The CLI writer emits a field MemberRef;
+the native writer uses the validated native field ordinal. CLI snapshots cannot supply
+native ordinals and reject native writing. No translated-layout guesses or new native
+opcode encoding are introduced. Readonly stores, wrong receivers and foreign output
+ownership reject before an assembly is returned.
+
+Raven resolves the bound native field through its explicit dependency binding. Its
+consumer writes Visible through an alias, reads through the original reference and
+calls the stateful method (42). NativeFieldConsumer also performs a direct constructor/
+field-load round trip (42). A private field preceding Visible tests ordinal preservation.
+The explicit CLI primitive core remains; nominal signatures, generic/value owners,
+translated field layouts and reference-comparison lowering remain pending.
+
+Validation: 97 metadata contract groups (including actual CLR execution), four neoCLR
+consumers and the API snapshot check pass. [Field-operand evidence](experiments/extended-cli-metadata/native-field-operands-2026-10-02.json).

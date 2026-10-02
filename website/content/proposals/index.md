@@ -525,3 +525,7 @@ comparison lowering remain gaps; the CLI primitive core bootstrap is still requi
 Primitive instance fields now load directly into metadata definitions and Raven symbols.
 A Raven-built stateful class executes through imported constructors and methods (42).
 Direct imported field emission and richer field signatures remain development gaps.
+
+Direct public primitive field loads and stores now execute across native assembly
+boundaries, including writes through a local alias. The metadata library also emits
+ordinary CLI field MemberRefs. Richer signatures and field-owner categories remain open.

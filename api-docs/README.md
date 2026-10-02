@@ -725,3 +725,8 @@ The development host APIs AssemblyDefinition.ReadNativeAssembly/IsNative and
 MethodDefinition.TryGetSignature are covered in the [direct native declaration manual](experimental-metadata.md#direct-native-declaration-reading-development-2026-10-02).
 They are C# tooling APIs outside the guest reference assembly/RavenDoc selection;
 no guest runtime API is added by this reader slice.
+
+ImportedFieldReference, AssemblyBuilder.ImportReference(FieldDefinition, core) and the
+MethodBuilder LoadField/StoreField/raw Emit overloads are host C# development APIs covered
+in [the imported-field manual](experimental-metadata.md#imported-primitive-field-operands-development-2026-10-02).
+They are outside the guest RavenDoc selection; no guest public type/signature is added.

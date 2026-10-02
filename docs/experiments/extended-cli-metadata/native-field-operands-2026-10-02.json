@@ -1,0 +1,90 @@
+{
+  "date": "2026-10-02",
+  "semanticAndEmission": {
+    "passed": true,
+    "nativeSha256": "F33680317C10CC48EF093BF822BE5F0F2FECB20B5F1FB44730DD066D6A53E811",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, overloads, constructors and stateful instance calls and direct field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "911F8FBDB5D6442A90CE657320970E9A6782713D1A93A6634174AD508F9357C9",
+        "dependencySha256": "F33680317C10CC48EF093BF822BE5F0F2FECB20B5F1FB44730DD066D6A53E811"
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "D04538B5955E5AFCB5CF96631439817336CD9E739A0DA2C221CF14C8186ECA9C",
+        "dependencySha256": "0089A0D2A17616EBCD2C5A4E6D193A02F92DB4DD60BEF1387F4AD1457E43B61A"
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "E8CC9435534B583C256F59318C6CB3A8A12F1BCFF0A9E422005A6DF090110057",
+        "dependencySha256": "2F648E7D93A3EC24ECF05F239B036D116B754B80BF6BD952B732238687A5C9A6"
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "B24C5A1960772B4FFE30F55D34436AA62200CA234C8C7E5C8D60981069C6FD3A",
+        "dependencySha256": "2F648E7D93A3EC24ECF05F239B036D116B754B80BF6BD952B732238687A5C9A6"
+      }
+    ],
+    "scope": "native primitive function/class import and cross-assembly execution; explicit CLI primitive core retained"
+  },
+  "checks": {
+    "metadataContractGroups": 97,
+    "apiSnapshot": "passed",
+    "cli": "Imported field MemberRefs execute on CLR from CLI and native snapshots, returning 42",
+    "rejections": [
+      "readonly store",
+      "wrong receiver/value",
+      "foreign output operand",
+      "wrong opcode",
+      "incompatible core",
+      "conflicting native snapshot",
+      "private field",
+      "authored/detached input",
+      "CLI field snapshot used for native output"
+    ]
+  },
+  "reproduce": "NeoClrMetadataProbe --native-symbols-runtime <core.dll> <neoclr> <System.neox> <fresh-output>",
+  "limits": "Public primitive instance fields on public nongeneric top-level reference classes; native output requires a native snapshot. Nominal signatures, generic/value owners and translated layouts remain pending."
+}

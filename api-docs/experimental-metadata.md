@@ -4382,3 +4382,50 @@ own fields using existing source emission. Direct consumer field emission across
 assembly boundary is not implemented: it reports NEOMETA001 and leaves output empty.
 The stateful method-call consumer is tested separately and returns 42. No guest API,
 encoded layout change or new public host member is introduced by this reader slice.
+
+
+### Imported primitive field operands (development, 2026-10-02)
+
+`AssemblyBuilder.ImportReference(FieldDefinition definition, AssemblyIdentity dependencyCoreLibrary)`
+returns an interned `ImportedFieldReference` for a public Int32/Int64/Boolean/String
+instance field on a public nongeneric top-level reference class. The owner must contain
+only instance fields; constructed/value/interface/static owners and translated layout
+bindings are unsupported. Null arguments throw ArgumentNullException. Unsupported
+contracts, core/snapshot conflicts and the 4096-import limit throw InvalidDataException.
+Existing exact type identity and snapshot checks apply before a cached reference is reused.
+Authored/detached mutable field definitions reject; read an immutable snapshot first.
+
+ImportedFieldReference exposes read-only Owner (consuming AssemblyBuilder), DeclaringType
+(ImportedTypeReference), Name, FieldType (primitive SignatureType) and IsReadOnly. It owns
+no mutable producer graph or executable body. Native field ordinals remain internal.
+
+MethodBuilder.LoadField(ImportedFieldReference), StoreField(ImportedFieldReference) and
+Emit(OpCode, ImportedFieldReference) support Ldfld/Stfld. Null operands throw
+ArgumentNullException; wrong opcodes/foreign output ownership throw ArgumentException.
+Write validates the exact receiver, primitive value stack types and readonly restriction;
+violations throw InvalidDataException. Imported readonly fields may be loaded but never
+stored by the external consumer, including its constructors.
+
+CLI writing emits a TypeRef-scoped field MemberRef and ordinary ldfld/stfld instructions.
+Native writing requires an imported **native** definition snapshot so the field ordinal
+is established by validated native metadata. A CLI field snapshot can emit CLI but
+native writing rejects it: no CLI-to-native layout equivalence is guessed. Supply the
+exact matching native library artifact to the runtime. The existing native field opcode
+format is unchanged.
+
+```csharp
+var library = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes("Library.dll"));
+var field = library.MainModule.Types.Single(t => t.Name == "Calculator")
+    .Fields.Single(f => f.Name == "Visible");
+var imported = output.ImportReference(field, explicitCoreIdentity);
+body.LoadLocal(receiver); // local uses imported.DeclaringType
+body.LoadConstant(42);
+body.StoreField(imported);
+body.LoadLocal(receiver);
+body.Emit(OpCode.Ldfld, imported);
+```
+
+C# contract tests execute CLI field accesses on the CLR from both CLI and native
+read-model inputs, and cover readonly/receiver/opcode/ownership/core/snapshot rejection.
+Raven consumers execute direct native field stores and loads across assemblies (42).
+These host C# APIs use this manual reference and remain outside guest RavenDoc selection.

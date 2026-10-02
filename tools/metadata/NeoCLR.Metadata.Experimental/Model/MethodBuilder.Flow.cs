@@ -121,6 +121,17 @@ public sealed partial class MethodBuilder
                 case "duplicate":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.Add(stack[^1]); break;
+                case "field.import.load":
+                case "field.import.store":
+                    var importedField = instruction.ImportedField!;
+                    if (instruction.Op == "field.import.store")
+                    {
+                        if (importedField.IsReadOnly) throw new InvalidDataException("cannot store an external readonly field");
+                        Pop(importedField.FieldType);
+                    }
+                    Pop((SignatureType)importedField.DeclaringType);
+                    if (instruction.Op == "field.import.load") stack.Add(importedField.FieldType);
+                    break;
                 case "field.load":
                 case "field.store":
                     if (instruction.Op == "field.store")

@@ -289,6 +289,7 @@ var tests = new (string Name, Action Body)[]
     ("Checked reserved arrays", ReservedArrayChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
+    ("Imported primitive field operands", ImportedFieldChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),
