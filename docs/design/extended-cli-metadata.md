@@ -1618,3 +1618,35 @@ invalid carrier that still raises NullReferenceException on .NET. The unchanged
 collections source passes the guard and reaches imported carrier construction from None;
 its CLI control remains 7168 bytes. No full native propagation consumer executes yet:
 these tests establish the metadata runtime contract and Raven guard admission separately.
+
+
+### Imported constructor checkpoint (2026-10-02)
+
+Value constructors now use standard CLI instance metadata and the existing native
+managed construction receiver. The producer tracks field assignment per branch and
+rejects premature reads, incomplete normal returns and construction receiver escape.
+Public top-level reference/value constructors import with exact signatures, and generic
+owners substitute their arguments before Newobj emission. There is no constructor
+chaining, byref constructor parameter support or implicit default-field workaround.
+
+Raven opts into imported constructor admission through `AllowsExternalConstructors`.
+The native reference resolver emits allocation for constructor handles consistently,
+including defined source constructors. The ordinary .NET shared profile does not opt
+into the new capability, retaining existing fallback emission. Binding and Runtime
+Contract configuration are unchanged; CLI snapshots still supply symbols. This shared
+emission feature remains an integration-line candidate for the shared compiler, not an
+independent binder regression fix.
+
+A separately authored native library and Raven consumer now construct ordinary and
+generic values directly and execute mutation/output calls (42). Metadata C# consumers
+also execute imported value/generic/reference constructors on CLR and neoCLR. All 84
+metadata groups, 29 focused compiler tests and five native profile controls pass.
+The unchanged collections sample still rejects Option<Order> construction from None:
+its nested System.Option.None signature is outside the explicit top-level import model.
+Next add native nested-type definitions/references and reader/writer identity support;
+do not flatten declaring-type identity into a dotted name. Full collections execution
+and native System library mapping remain pending.
+
+Evidence: [constructor execution](../experiments/extended-cli-metadata/imported-constructors-2026-10-02.json)
+and [unchanged collections assessment](../experiments/extended-cli-metadata/collections-after-constructors-2026-10-02.json),
+with Raven `codex/metadata-consumer` revision `5bc0d567e` and this metadata slice.

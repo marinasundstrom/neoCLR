@@ -66,7 +66,6 @@ internal static class ValueReceiverChecks
         main.ClearBody(); main.LoadDefault(number.SignatureType); main.LoadLocalAddress(output); main.Call(change); main.LoadLocal(output); main.Return();
         Reject(app, "value instead of address receiver");
         try { main.CallVirtual(change); throw new Exception("value callvirt admitted without constrained semantics"); } catch (ArgumentException) { }
-        try { library.Types[0].AddConstructor(Array.Empty<PrimitiveType>()); throw new Exception("value constructor admitted"); } catch (InvalidOperationException) { }
         var alias = new AssemblyBuilder(new("AliasReceiver", new Version(1, 0, 0, 0)), library.CoreLibrary);
         var type = alias.AddValueType("Example", "Value");
         var fill = type.AddInstanceMethod("Fill", new MethodSignature(PrimitiveType.Void, [SignatureType.ByReference(type)], outParameters: [0]));

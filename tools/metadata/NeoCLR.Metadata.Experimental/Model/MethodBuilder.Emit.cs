@@ -68,7 +68,7 @@ public enum OpCode
     Shr,
     /// <summary>Duplicates the top evaluation-stack value, preserving object identity.</summary>
     Dup,
-    /// <summary>Allocates and invokes a root-class constructor.</summary>
+    /// <summary>Allocates class or value storage and invokes its constructor.</summary>
     Newobj,
     /// <summary>Loads a mutable instance field.</summary>
     Ldfld,
@@ -210,7 +210,7 @@ public sealed partial class MethodBuilder
     }
 
     /// <summary>Appends a call to an owned imported read-only method reference.</summary>
-    /// <param name="opCode">Call, or Callvirt when RequiresVirtualDispatch is true.</param>
+    /// <param name="opCode">Newobj for a constructor; otherwise Call, or Callvirt when RequiresVirtualDispatch is true.</param>
     /// <param name="operand">Reference imported by this output assembly builder.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong dispatch opcode, an uninstantiated generic definition, or a reference from another builder.</exception>
@@ -218,10 +218,10 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, ImportedMethodReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != (operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
+        if (opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
         if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
-        Append(new(operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : (SignatureType)operand.DeclaringReference!));
+        Append(new(operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : (SignatureType)operand.DeclaringReference!));
     }
 
     /// <summary>Appends a native-only call to a loaded static Int32 System declaration.</summary>
@@ -269,7 +269,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
     public void Duplicate() => Emit(OpCode.Dup);
     /// <summary>Allocates an object and invokes its constructor, consuming the declared arguments.</summary>
-    /// <param name="constructor">Root-class constructor.</param>
+    /// <param name="constructor">Class or value constructor.</param>
     /// <exception cref="ArgumentException">Not a constructor.</exception>
     /// <exception cref="ArgumentNullException">Constructor is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>

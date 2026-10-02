@@ -653,3 +653,8 @@ Host metadata development adds `MethodBuilder.Fail(string)` and `OpCode.Fail` to
 existing manual [experimental metadata reference](experimental-metadata.md). They remain
 host C# APIs outside the guest RavenDoc assembly/type selection; the manual entry covers
 CLI/native differences, operands, errors and flow restrictions.
+
+The host metadata manual reference also covers value constructor admission,
+`ImportedMethodReference.IsConstructor`, imported `NewObject` overloads and matching raw
+Newobj emission. These host C# APIs remain outside the guest RavenDoc selection; no
+public guest signature changes are part of this constructor slice.

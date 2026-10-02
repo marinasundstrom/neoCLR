@@ -3934,3 +3934,35 @@ and branch joins retain ordinary flow validation. Definitions can use the same l
 opcode/string operand through the existing body model. Dynamic diagnostics remain the
 runtime library's `System.Fail(message)` contract; this bounded builder instruction
 accepts a literal only.
+
+
+### Value and imported constructors (development, 2026-10-02)
+
+The existing `TypeBuilder.AddConstructor` overloads and authored `.ctor` definitions
+now admit value types, including unconstrained generic owners. CLI emission uses
+ordinary instance constructor metadata/CIL without injecting an Object base call into
+a value constructor. Native emission uses the existing managed construction receiver.
+Every own field must be assigned on every normal return. Reading a field before its
+assignment, using the whole construction receiver through ldobj/stobj, passing it to
+ordinary calls or storing it elsewhere is rejected when writing. A terminal failure
+path need not complete initialization. Constructor chaining remains unsupported.
+These conservative producer restrictions preserve the runtime's construction contract;
+they are not a claim that every CLR-valid constructor body is admitted.
+
+`AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)` now admits public
+constructors of supported top-level classes and value types. The definition must have
+the CLI special-name/runtime-special-name flags, a nonstatic/nonvirtual/nongeneric
+Void signature and no byref parameters. Type initializers, nested owners and nested
+nominal parameter types remain unsupported. Imports still require exact dependency/core
+identity and the native writer's naming contract.
+
+`ImportedMethodReference.IsConstructor` identifies allocation references.
+`MethodBuilder.NewObject(ImportedMethodReference)` and
+`NewObject(ImportedConstructedMethodReference)` consume the substituted constructor
+arguments and push the resulting declaring reference or value. Raw `Emit(OpCode.Newobj,
+reference)` is equivalent. Null references throw `ArgumentNullException`; foreign
+references, wrong dispatch opcodes and uninstantiated/invalid generic scopes throw
+`ArgumentException`. Instruction limits and invalid stack/initialization flow fail with
+`InvalidDataException`. `Call`/`Callvirt` reject constructor operands. Existing
+`RequiresManagedReceiver` describes the value member's implicit receiver; Newobj supplies
+its construction address rather than requiring a caller-supplied initialized address.

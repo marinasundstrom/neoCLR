@@ -460,3 +460,8 @@ uses the existing fault instruction; ordinary CLI metadata can express the corre
 throwing path. Raven distinguishes its generated propagation guards from source throws
 and preserves .NET behavior. The unchanged collections sample now reaches imported
 carrier construction; complete native propagation/application execution remains pending.
+
+Development metadata and Raven emission now support imported value constructors,
+including generic owners, with explicit initialization checks. Separate-library consumers
+execute successfully (42). The larger collections sample still needs nested type identity
+support for its Option.None carrier; complete class-library execution remains open.

@@ -404,7 +404,7 @@ public sealed partial class AssemblyBuilder
             var failureType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("InvalidOperationException"));
             failureConstructor = metadata.AddMemberReference(failureType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 1, 1, 0x0e }));
         }
-        var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
+        var objectConstructor = methods.Any(m => m.IsConstructor && !m.DeclaringType!.IsValueType) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
         var bodyEncoder = new MethodBodyStreamEncoder(bodies);
         metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
@@ -431,7 +431,7 @@ public sealed partial class AssemblyBuilder
             }
             var code = new BlobBuilder();
             var offsets = new int[method.Instructions.Count + 1];
-            offsets[0] = method.IsConstructor ? 6 : 0;
+            offsets[0] = method.IsConstructor && !method.DeclaringType!.IsValueType ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
@@ -446,7 +446,7 @@ public sealed partial class AssemblyBuilder
                 });
             var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
-            else if (method.IsConstructor)
+            else if (method.IsConstructor && !method.DeclaringType!.IsValueType)
             {
                 code.WriteByte(0x02); // ldarg.0: initialize the sole supported CLI root base.
                 code.WriteByte(0x28); code.WriteInt32(MetadataTokens.GetToken(objectConstructor));
@@ -667,7 +667,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
     public MethodBuilder AddInstanceMethod(string name, MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(name, signature, visibility, isStatic: false, constructor: false);
-    /// <summary>Adds a root-class constructor with primitive declared parameters and no result.</summary>
+    /// <summary>Adds a class or value constructor with primitive declared parameters and no result.</summary>
     /// <param name="parameterTypes">At most 256 primitive parameters, excluding the receiver.</param>
     /// <param name="visibility">Public, Internal or Private.</param>
     /// <returns>An owned .ctor body with receiver at argument zero.</returns>
@@ -679,21 +679,20 @@ public sealed partial class TypeBuilder
     /// <summary>Adds a constructor with an owned nominal/primitive signature whose result must be Void.</summary>
     /// <param name="signature">Void result and up to 256 primitive/owned-class declared parameters.</param>
     /// <param name="visibility">Public, Internal or Private.</param>
-    /// <returns>A constructor owned by this root class.</returns>
+    /// <returns>A constructor owned by this class or value type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Non-Void result, foreign class, duplicate signature or invalid visibility.</exception>
     /// <exception cref="InvalidOperationException">The declaring type is static or a value type.</exception>
     public MethodBuilder AddConstructor(MethodSignature signature, MethodVisibility visibility = MethodVisibility.Public)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        if (signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic constructors unsupported", nameof(signature));
+        if (signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new ArgumentException("generic or byref constructor parameters unsupported", nameof(signature));
         if (signature.ReturnType != PrimitiveType.Void) throw new ArgumentException("constructor must have no result", nameof(signature));
         return AddMethodCore(".ctor", signature, visibility, false, true);
     }
     private MethodBuilder AddMethodCore(string name, MethodSignature signature, MethodVisibility visibility, bool isStatic, bool constructor, bool abstractContract = false)
     {
         if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
-        if (constructor && IsValueType) throw new InvalidOperationException("value constructors are unsupported");
         if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic nominal type");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));

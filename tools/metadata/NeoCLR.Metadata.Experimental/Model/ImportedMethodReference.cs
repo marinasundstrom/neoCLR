@@ -7,13 +7,15 @@ public sealed partial class ImportedMethodReference
     internal ImportedMethodReference(AssemblyBuilder owner, MethodBuilder target) { Owner = owner; Target = target; }
     internal MethodBuilder Target { get; }
     internal ImportedTypeReference? DeclaringReference { get; init; }
+    /// <summary>Gets whether this reference allocates through Newobj rather than an ordinary call.</summary>
+    public bool IsConstructor => Target.IsConstructor;
     /// <summary>Gets whether this member has no receiver.</summary>
     public bool IsStatic => Target.IsStatic;
     /// <summary>Gets whether this member requires interface dispatch.</summary>
     public bool IsInterfaceMethod => Target.IsAbstract;
     /// <summary>Gets whether the imported contract requires a null-checking virtual call.</summary>
     public bool RequiresVirtualDispatch { get; internal init; }
-    /// <summary>Gets whether an instance call requires the managed address of an initialized value receiver.</summary>
+    /// <summary>Gets whether this value member's implicit receiver is a managed address; Newobj supplies the constructor receiver.</summary>
     public bool RequiresManagedReceiver => !IsStatic && Target.DeclaringType!.IsValueType;
     /// <summary>Gets the consuming assembly builder.</summary>
     public AssemblyBuilder Owner { get; }
@@ -57,6 +59,7 @@ public sealed partial class AssemblyBuilder
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
             throw new InvalidDataException("unsupported external assembly identity");
+        if (definition.Name == ".cctor") throw new InvalidDataException("type initializer import unsupported");
         bool isInterface = type is not null && (type.Attributes & 0x20) != 0;
         bool isVirtual = (definition.Attributes & 0x40) != 0;
         bool isAbstract = (definition.Attributes & 0x400) != 0;
@@ -64,12 +67,16 @@ public sealed partial class AssemblyBuilder
         if (type?.DeclaringType is not null || type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
-            definition.Name is ".ctor" or ".cctor" || (definition.Attributes & 7) != 6 ||
+            definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
             (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal)))
             throw new InvalidDataException("unsupported imported instance method contract");
+        if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
+            throw new InvalidDataException("invalid imported constructor contract");
         var declaringReference = type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
         var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary);
+        if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
+            throw new InvalidDataException("constructor requires a nongeneric void signature without byref parameters");
         if (!importedGraphs.TryGetValue(identity, out var imported))
         {
             if (importedGraphs.Count >= 256) throw new InvalidDataException("too many imported assemblies");

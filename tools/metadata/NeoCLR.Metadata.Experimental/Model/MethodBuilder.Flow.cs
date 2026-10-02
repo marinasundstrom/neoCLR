@@ -51,7 +51,7 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
@@ -59,7 +59,7 @@ public sealed partial class MethodBuilder
     }
     private BodyValueType ArgumentType(int index)
     {
-        if (!IsStatic && index == 0) return BodyValueType.Receiver(DeclaringType!);
+        if (!IsStatic && index == 0) return BodyValueType.Receiver(DeclaringType!) with { ConstructionReceiver = IsConstructor && DeclaringType!.IsValueType };
         int parameter = index - (IsStatic ? 0 : 1);
         BodyValueType type = Signature.ParameterTypes[parameter];
         return type.ByReferenceElement is null ? type : type with { AddressedParameter = parameter };
@@ -86,7 +86,7 @@ public sealed partial class MethodBuilder
         MaxStack = 0;
         var states = new FlowState?[Instructions.Count];
         var work = new Queue<int>();
-        var initiallyAssigned = new bool[locals.Count + ParameterCount];
+        var initiallyAssigned = new bool[locals.Count + ParameterCount + (IsConstructor && DeclaringType!.IsValueType ? DeclaringType.Fields.Count : 0)];
         for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.OutParameters.Contains(i);
         states[0] = new([], initiallyAssigned); work.Enqueue(0);
         while (work.TryDequeue(out var index))
@@ -97,6 +97,8 @@ public sealed partial class MethodBuilder
             // Preserve native primitive identity across stack operations and joins.
             void Pop(BodyValueType type, bool output = false)
             {
+                if (stack.Count > 0 && stack[^1].ConstructionReceiver)
+                    throw new InvalidDataException("construction receiver cannot escape or be used for ordinary access");
                 if (type.ByReferenceElement is { } target && stack.Count > 0)
                 {
                     var referenceValue = stack[^1];
@@ -126,7 +128,15 @@ public sealed partial class MethodBuilder
                     }
                     SignatureType fieldOwner = instruction.ConstructedField is { } fieldReference
                         ? fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature;
-                    if (instruction.Field!.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].AddressedLocal is { } receiverLocal)
+                    if (stack.Count > 0 && stack[^1].ConstructionReceiver)
+                    {
+                        if (!ReferenceEquals(instruction.Field!.DeclaringType, DeclaringType)) throw new InvalidDataException("constructor requires an owned field");
+                        var fieldSlot = locals.Count + ParameterCount + instruction.Field.Index;
+                        if (instruction.Op == "field.load" && !assigned[fieldSlot]) throw new InvalidDataException("constructor field read before assignment");
+                        if (instruction.Op == "field.store") assigned[fieldSlot] = true;
+                        stack.RemoveAt(stack.Count - 1);
+                    }
+                    else if (instruction.Field!.DeclaringType.IsValueType && stack.Count > 0 && stack[^1].AddressedLocal is { } receiverLocal)
                     {
                         if (!assigned[receiverLocal] || locals[receiverLocal].SignatureType != fieldOwner)
                             throw new InvalidDataException("value-type field receiver requires an initialized local of the exact owner type");
@@ -160,10 +170,10 @@ public sealed partial class MethodBuilder
                 case "new.constructed":
                     var constructor = instruction.ConstructedTarget!;
                     for (int i = constructor.Signature.ParameterTypes.Count - 1; i >= 0; i--) Pop(constructor.Signature.ParameterTypes[i]);
-                    stack.Add((SignatureType)constructor.Definition.DeclaringType!.MakeGenericInstance(constructor.DeclaringTypeArguments.ToArray())); break;
+                    stack.Add(instruction.Type ?? (SignatureType)constructor.Definition.DeclaringType!.MakeGenericInstance(constructor.DeclaringTypeArguments.ToArray())); break;
                 case "new.object":
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--) Pop(instruction.Target.Signature.ParameterTypes[i]);
-                    stack.Add(BodyValueType.Receiver(instruction.Target.DeclaringType!)); break;
+                    stack.Add(instruction.Type ?? instruction.Target.DeclaringType!.OpenSignature); break;
                 case "pop":
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.RemoveAt(stack.Count - 1); break;
@@ -193,6 +203,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "object.store") Pop(instruction.Type!);
                     if (stack.Count == 0) throw new InvalidDataException("object operation requires a managed reference");
                     var address = stack[^1];
+                    if (address.ConstructionReceiver) throw new InvalidDataException("whole construction receiver access unsupported");
                     if (address.AddressedLocal is { } addressed)
                     {
                         if (locals[addressed].SignatureType != instruction.Type)
@@ -287,6 +298,8 @@ public sealed partial class MethodBuilder
                     MaxStack = Math.Max(MaxStack, 1); // CLI diagnostic/exception construction.
                     continue;
                 case "return":
+                    if (IsConstructor && DeclaringType!.IsValueType && assigned.Skip(locals.Count + ParameterCount).Any(value => !value))
+                        throw new InvalidDataException("value constructor must assign every field on every normal return");
                     if (Signature.OutParameters.Any(i => !assigned[locals.Count + i]))
                         throw new InvalidDataException("out parameter must be assigned on every normal return");
                     if (ReturnsValue) Pop(Signature.ReturnType);

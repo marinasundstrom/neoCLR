@@ -1,0 +1,18 @@
+{
+  "verified": true,
+  "result": 42,
+  "coreSha256": "B7F2B143BE11B25FBB91441ADC988EB0F2B8DD0A4B9E49F9F8760BAE22297EAB",
+  "runtimeSha256": "703A5CD99F902BC45746F34939761709826F7AB69E00D895E596B6C6E1D4885E",
+  "constructors": true,
+  "scope": "Raven imported value-receiver mutation and generic value-owner out calls; no union lowering or native System mapping",
+  "ravenRevision": "5bc0d567e",
+  "ravenBranch": "codex/metadata-consumer",
+  "metadataBranch": "codex/extended-cli-metadata",
+  "metadataControls": {
+    "contractGroups": 84,
+    "clrConstructorResult": 42,
+    "nativeConstructorResult": 42,
+    "compilerTests": 29,
+    "nativeProfileControls": 5
+  }
+}

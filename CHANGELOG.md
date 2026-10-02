@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Support metadata-authored value constructors with field-assignment and construction
+  receiver checks, plus imported public class/value constructors on generic owners.
+  Raven opts native emission into imported constructors explicitly. Separate-library
+  metadata and Raven consumers execute successfully (42); 84 metadata groups, 29 compiler
+  tests and five native controls pass. Collections remains blocked by the nested
+  System.Option.None signature; nested identities are not flattened or silently admitted.
+
 - Add literal terminal failure to the metadata body API through `Fail(string)` and raw
   `Emit(OpCode.Fail, string)`. Native execution uses the existing UserFault instruction;
   CLI execution throws InvalidOperationException with the diagnostic. Validate empty-stack

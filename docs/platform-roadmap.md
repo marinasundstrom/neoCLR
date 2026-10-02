@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Imported constructor checkpoint (2026-10-02):** value constructors and imported
+class/value constructors preserve CLI/native identity and construction safety. Raven
+constructs imported generic values and executes against a separate native library (42).
+All 84 metadata groups, 29 focused compiler tests and five native controls pass. The
+unchanged collections sample still rejects Option<Order>(None) because None is a nested
+CLI type. Next implement nested definitions/references and exact declaring-type identity
+in the metadata/import contracts, then return to native System dependencies.
+
 **Propagation guard checkpoint (2026-10-02):** the metadata API emits literal terminal
 failure using the existing native fault instruction, with C# success/failure execution
 on CLR and neoCLR. Raven explicitly marks generated invalid-carrier guards; its .NET
