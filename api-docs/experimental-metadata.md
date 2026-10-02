@@ -4068,3 +4068,18 @@ nonfinal virtual/override methods on reference classes. The same explicit owner/
 and signature validation applies. C# fixtures execute an actual CLR override and a
 matching native implementation emitted by the API, returning the expected string and
 42. This does not add general class virtual dispatch or boxed value receivers.
+
+### Reference conversion bodies (development, 2026-10-02)
+
+`MethodBuilder.CastReference(SignatureType target)` and
+`Emit(OpCode.Castclass, SignatureType)` consume a reference and push the same object
+through the target reference signature. Targets are owned/imported nonstatic nominal
+reference types or vectors, including constructed generic reference types. Value types,
+managed addresses, Function shapes and unbounded generic parameters are not admitted.
+The operand must belong to the output assembly; invalid target/owner throws
+`ArgumentException`, null throws `ArgumentNullException`, and invalid source stacks or
+instruction limits produce `InvalidDataException` when validated. No boxing occurs.
+CLI output uses ECMA `castclass`; native output uses its existing `castclass` verifier
+and runtime contract, which may reject unsupported conversions. These methods do not
+promise general .NET downcast coverage. A C# fixture checks inherited interface dispatch
+through two implementations on CLR and neoCLR (42), and rejects value operands.

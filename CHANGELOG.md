@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add typed `CastReference`/raw `Castclass` metadata emission for nominal references
+  and vectors, with reference-only stack checks and standard CLI/native castclass
+  encoding. C# consumers retain interface dispatch and return 42 on both runtimes;
+  all 89 metadata contract groups pass.
+
 - Extend Raven's opt-in shared plan with checked union-case branches and payload
   extraction, compiler-generated match failure and concrete value override calls.
   34 focused compiler tests pass; collections now reaches reference conversions.

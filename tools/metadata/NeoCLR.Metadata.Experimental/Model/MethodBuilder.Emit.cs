@@ -4,6 +4,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Numeric enum values are not serialized opcodes. This is not the complete CLI or neoIL instruction set.</remarks>
 public enum OpCode
 {
+    /// <summary>Checks and converts a reference to a nominal reference or vector signature.</summary>
+    Castclass,
     /// <summary>Pushes a Function bound through a FunctionBinding operand.</summary>
     BindFunction,
     /// <summary>Pushes an Int32 constant; requires an Int32 operand.</summary>

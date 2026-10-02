@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--reference-cast-integration")
+{
+    await ReferenceCastChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--value-override-integration")
 {
     await ValueOverrideChecks.RunRuntime(args[1], args[2]); return 0;
@@ -263,6 +267,7 @@ var tests = new (string Name, Action Body)[]
     ("Imported nested constructors", () => ValueConstructorChecks.Run(nested: true)),
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
+    ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),
     ("Constructed generic instance classes", GenericClassChecks.Run),
     ("Nominal type constraints", TypeConstraintChecks.Run),

@@ -486,7 +486,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => 12,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -536,6 +536,7 @@ public sealed partial class AssemblyBuilder
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.address": code.WriteByte(0xfe); code.WriteByte(0x0d); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "reference.cast": code.WriteByte(0x74); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.load": code.WriteByte(0x71); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.store": code.WriteByte(0x81); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "local.initialize": code.WriteByte(0xfe); code.WriteByte(0x15); code.WriteInt32(ElementToken(instruction.Type!)); break;

@@ -477,3 +477,7 @@ support; it is not yet an executable integration milestone.
 The experimental host metadata API now emits structural Function values and checked static
 bindings, with CLI Func/Action projection and cross-assembly CLR/native execution (42).
 Raven's direct Function body emission remains under development.
+
+The development metadata producer also supports checked reference conversions through
+its typed body API, validated with interface dispatch on CLR and neoCLR. This remains
+feature-branch work and does not imply a complete native compiler backend.
