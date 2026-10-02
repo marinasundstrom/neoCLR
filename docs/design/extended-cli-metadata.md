@@ -1837,3 +1837,23 @@ diamond, legal-cycle and conflicting-input C# tests as the native session is con
 
 The existing resolver is implemented for current definitions; native materialization,
 cycle-aware import sessions and these native semantic tests are planned follow-on work.
+
+### Native definition materialization checkpoint (2026-10-02)
+
+ReadNativeAssembly now materializes the first bounded native profile into existing
+AssemblyDefinition/ModuleDefinition/MethodDefinition objects: primitive nongeneric
+namespace functions, exact dependency references and entry identity. No CLI projection
+is generated or read. Native method signatures are immutable logical signatures, with
+no builder references, and loaded bodies remain opaque. Unsupported types/signatures
+fail instead of disappearing. Original container bytes are retained for unchanged copy,
+not editable re-emission. The native manifest has no MVID; consumers must use snapshot
+ownership and assembly/definition identity rather than the empty MVID alone.
+
+Both JSON and binary execution container profiles, input ownership, namespace overloads,
+entry identity, read-only behavior and missing/mismatched dependency resolution pass;
+96 C# metadata groups pass. This fulfills the first limited read-model slice, not the
+whole materialization plan. The native validator still uses its existing private model
+and builder-backed validation internally; broader typed reference migration remains
+necessary before nominal signatures can enter this public read path. Next connect a
+native dependency to Raven's semantic-loader boundary while preserving .NET loading
+and emission. No reflection replacement or native semantic importer is claimed here.

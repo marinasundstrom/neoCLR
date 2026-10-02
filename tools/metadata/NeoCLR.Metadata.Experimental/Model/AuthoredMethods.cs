@@ -63,8 +63,8 @@ public sealed partial class MethodDefinition
         GenericArity = signature.GenericParameterNames.Count;
         declarationAttributes = attributes; this.signature = []; IsTypeDeclaration = true;
     }
-    /// <summary>Gets the authored source namespace; null for a loaded physical declaration.</summary>
-    public string? Namespace => Producer?.DeclaringType?.Namespace ?? authoredNamespace;
+    /// <summary>Gets the authored or native source namespace; null for a loaded physical CLI declaration.</summary>
+    public string? Namespace => nativeNamespace ?? Producer?.DeclaringType?.Namespace ?? authoredNamespace;
     /// <summary>Gets the authored signature shared by the builder; null for a loaded physical signature.</summary>
     /// <remarks>Raw signature recognizers apply to loaded declarations. Encode and reread for physical tokens and signature blobs.</remarks>
     public MethodSignature? AuthoredSignature { get; }

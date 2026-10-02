@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An owned physical MethodDef declaration, including type-independent global functions.</summary>
+/// <summary>An owned callable declaration, including type-independent global functions.</summary>
 /// <remarks>Signature bytes preserve CLI encodings; general signatures are opaque until a decoder supports them.
 /// No body is decoded and no runtime assembly is loaded.</remarks>
 public sealed partial class MethodDefinition
@@ -21,12 +21,14 @@ public sealed partial class MethodDefinition
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
         outParameters = row.OutParameters;
+        nativeSignature = row.NativeSignature;
+        nativeNamespace = row.NativeNamespace;
     }
     /// <summary>Gets the owning module snapshot.</summary>
     public ModuleDefinition Module { get; internal set; } = null!;
     /// <summary>Gets the owned declaring type, or null for a global function.</summary>
     public TypeDefinition? DeclaringType => Producer is { } producer ? producer.DeclaringType?.Definition : AuthoredSignature is not null ? null : Module.GetTypeDefinition(declaringToken);
-    /// <summary>Gets the physical MethodDef token, meaningful only within this module.</summary>
+    /// <summary>Gets the module-local MethodDef token, or validated native origin token.</summary>
     public uint MetadataToken { get; }
     /// <summary>Gets the declared metadata name.</summary>
     public string Name { get; }
@@ -41,9 +43,10 @@ public sealed partial class MethodDefinition
     public int GenericArity { get; }
     /// <summary>Gets whether the MethodAttributes.Static bit is set.</summary>
     public bool IsStatic => (declarationAttributes & 0x10) != 0;
-    /// <summary>Copies the CLI signature blob without resolving its type references.</summary>
+    /// <summary>Copies a loaded CLI signature blob without resolving its type references.</summary>
     /// <returns>New owned bytes; unsupported encodings remain opaque rather than being simplified.</returns>
-    public byte[] GetSignature() => AuthoredSignature is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use AuthoredSignature");
+    /// <exception cref="NotSupportedException">Native declarations have no CLI signature blob; use TryGetSignature.</exception>
+    public byte[] GetSignature() => nativeSignature is not null ? throw new NotSupportedException("native declarations have no CLI signature blob; use TryGetSignature") : AuthoredSignature is null ? (byte[])signature.Clone() : throw new InvalidOperationException("authored signature tokens are assigned when writing; use AuthoredSignature");
 
     /// <summary>Recognizes the writer's static, nongeneric Int32 parameter/result or no-result signature subset.</summary>
     /// <param name="parameterCount">On success, Int32 parameter count (0–256); otherwise zero.</param>
@@ -54,6 +57,11 @@ public sealed partial class MethodDefinition
     {
         parameterCount = 0;
         returnsValue = false;
+        if (nativeSignature is { } native)
+        {
+            if (GenericArity != 0 || native.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void) || native.ParameterTypes.Any(p => p.Primitive != PrimitiveType.Int32)) return false;
+            parameterCount = native.ParameterTypes.Count; returnsValue = native.ReturnType.Primitive == PrimitiveType.Int32; return true;
+        }
         if (!IsStatic || GenericArity != 0) return false;
         return TryDecodeStaticInt32Signature(signature, out parameterCount, out returnsValue);
     }
@@ -75,6 +83,11 @@ public sealed partial class MethodDefinition
     public bool TryGetStaticPrimitiveSignature(out PrimitiveMethodSignature? decoded)
     {
         decoded = null;
+        if (nativeSignature is { } native)
+        {
+            decoded = new PrimitiveMethodSignature(native.ReturnType.Primitive!.Value, native.ParameterTypes.Select(p => p.Primitive!.Value));
+            return true;
+        }
         return IsStatic && GenericArity == 0 && TryDecodeStaticPrimitiveSignature(signature, out decoded);
     }
 
@@ -84,7 +97,8 @@ public sealed partial class MethodDefinition
     /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
-        decoded = null;
+        decoded = nativeSignature;
+        if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
 
@@ -107,6 +121,7 @@ public sealed partial class MethodDefinition
 
     internal MethodSignature DecodeImportedSignature(AssemblyBuilder consumer, AssemblyIdentity core)
     {
+        if (nativeSignature is not null) throw new InvalidDataException("native declarations require a native import adapter");
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");
         try

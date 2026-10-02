@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Read native primitive namespace functions directly into the existing assembly/module/
+  method definitions through ReadNativeAssembly, without a CLI projection round trip.
+  Preserve exact references, namespace ownership, entry identity and original PE bytes;
+  expose logical signatures with TryGetSignature. Unsupported nominal/generic declarations
+  fail explicitly. Both container encodings and existing dependency resolution pass in
+  96 C# metadata groups. Raven symbol integration and wider declarations remain pending.
+
 - Record the author-directed priority of native metadata semantic import into Raven,
   fulfilling the existing builders/definitions/metadata/PE architecture. Audit native
   reader materialization and reflection-owned compiler setup; sequence definition

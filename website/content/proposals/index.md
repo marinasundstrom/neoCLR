@@ -503,3 +503,7 @@ interfaces. Translated System still supplies remaining library dependencies.
 Source-built collection checks also cover reference payloads and shared object identity.
 The full application with source-built queries remains blocked at the source/seed
 iteration contract boundary; its existing translated-library execution is separate.
+
+Direct native metadata reading has begun: the experimental host library now materializes
+primitive namespace functions into shared definitions without a CLI projection. Broader
+metadata coverage and Raven native symbol importing remain development work.

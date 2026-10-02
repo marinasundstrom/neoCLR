@@ -3251,3 +3251,14 @@ then adapt Raven's semantic loader and preserve native identities into emission.
 Projection APIs remain existing compatibility/test tools; no new projection constitutes
 native import. Current runtime contract configuration and shipped behavior are unchanged.
 The importer and native System contract resolution remain unimplemented.
+
+### Direct native reader foundation (2026-10-02)
+
+The metadata library now reads primitive nongeneric namespace functions from native
+PE/#Neo directly into shared definitions, including scoped references and entry identity.
+The compiler can inspect these via TryGetSignature without a CLI projection or reflection.
+Existing exact dependency resolution accepts the snapshots. Both container encodings
+and compatibility tests pass (96 groups); loaded bodies remain opaque and unsupported
+nominal/generic declarations fail explicitly. Raven still uses the existing CLI importer:
+connecting native definitions to compiler symbols and preserving their identity into
+codegen is next. Existing Runtime Contract settings and .NET behavior are unchanged.

@@ -4238,3 +4238,49 @@ CLI output preserves the container reference; native output uses the bound funct
 Unmarked or incorrectly scoped containers do not receive namespace treatment. Raw CLI
 global-method imports remain unsupported. This is temporary CLI bridge interpretation,
 not a general public custom-attribute API or native semantic importer.
+
+### Direct native declaration reading (development, 2026-10-02)
+
+`AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte> image)` reads API-produced
+PE/#Neo schema-1/2 containers into the existing definition model. This first profile
+admits assemblies containing only nongeneric namespace functions with Int32, Int64,
+Boolean, String or no-result signatures. It rejects nominal types and all unsupported
+signatures with InvalidDataException rather than silently returning a partial assembly.
+Input/container limits and required-schema/binding checks still apply. No dependency
+is loaded, CLI assembly generated, method body translated or host reflection used.
+
+`AssemblyDefinition.IsNative` identifies snapshots populated from authoritative native
+metadata. Identity and MainModule.AssemblyReferences retain exact declared scopes.
+MainModule.Functions/Methods contain the same canonical MethodDefinition objects,
+including namespace ownership via MethodDefinition.Namespace. MetadataToken and
+EntryPointToken retain validated native origin identifiers, local to the module.
+MainModule.Mvid is Guid.Empty because the native manifest declares no MVID; consumers
+must not use it alone as a snapshot identity. Profile is null for this execution profile.
+
+`MethodDefinition.TryGetSignature(out MethodSignature? decoded)` returns an immutable
+logical signature for native functions, authored methods and the existing bounded
+static CLI primitive/vector/generic profiles. It returns false for other loaded CLI
+signatures requiring contextual decoding. Void means no result, not an inhabited value.
+Existing static primitive/value signature helpers also recognize these native functions.
+GetSignature throws NotSupportedException for native methods; there is no CLI blob.
+Body remains unsupported for loaded methods; no empty executable body is fabricated.
+
+Write returns a fresh copy of the original complete PE, preserving opaque bodies.
+Loaded mutation, builder attachment and native rewriting remain unsupported. The
+existing IAssemblyResolver/AssemblyReference.Resolve contract accepts these snapshots
+and rechecks exact identity, including version; missing/mismatched dependencies fail.
+It supplies metadata definitions, not runtime reflection objects.
+
+```csharp
+var assembly = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes("Library.dll"));
+foreach (var function in assembly.MainModule.Functions) {
+    if (function.TryGetSignature(out var signature)) {
+        Console.WriteLine($"{function.Namespace}.{function.Name}: {signature!.ParameterTypes.Count} parameters");
+    }
+}
+```
+
+Raven semantic loading, type/member materialization, structural signatures and native
+call imports are subsequent slices. Standalone translated System inventory is not
+admitted by this PE function-only entry point. Existing CLI readers/writers remain
+unchanged. These host C# APIs are covered here rather than the guest RavenDoc selection.

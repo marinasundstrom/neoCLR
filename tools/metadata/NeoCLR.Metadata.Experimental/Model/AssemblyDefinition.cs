@@ -9,6 +9,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyDefinition
 {
     private readonly byte[] image;
+    /// <summary>Whether declarations were read from authoritative native metadata rather than CLI tables.</summary>
+    public bool IsNative { get; private set; }
     private AssemblyDefinition(AssemblyIdentity identity, string moduleName, Guid mvid,
         IReadOnlyList<TypeRow> rows, IReadOnlyList<FieldRow> fields, IReadOnlyList<PropertyRow> properties, IReadOnlyList<MethodRow> methods, IReadOnlyList<MemberReferenceRow> memberReferences, IReadOnlyList<ReferenceRow> references, IReadOnlyList<TypeReferenceRow> typeReferences, MetadataProfileDocument? profile, byte[] image, uint entryPointToken)
     {
@@ -26,7 +28,7 @@ public sealed partial class AssemblyDefinition
     /// <summary>Gets locally validated extended metadata, or null for explicitly admitted ordinary input.</summary>
     public MetadataProfileDocument? Profile { get; }
 
-    /// <summary>Gets the managed MethodDef entry token, or zero for a library.</summary>
+    /// <summary>Gets the managed MethodDef or native origin entry token, or zero for a library.</summary>
     public uint EntryPointToken { get; }
     /// <summary>Gets the entry-point definition, or null for a library; authored assemblies also permit assignment.</summary>
     /// <exception cref="InvalidOperationException">Assignment to a loaded snapshot.</exception>
@@ -243,7 +245,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature);
-    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters);
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, MethodSignature? NativeSignature = null, string? NativeNamespace = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore);

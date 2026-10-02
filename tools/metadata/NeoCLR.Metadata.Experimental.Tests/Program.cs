@@ -288,6 +288,7 @@ var tests = new (string Name, Action Body)[]
     ("Generic class interface implementation", GenericImplementationChecks.Run),
     ("Checked reserved arrays", ReservedArrayChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
+    ("Direct native definition materialization", NativeDefinitionChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),

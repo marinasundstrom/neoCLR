@@ -720,3 +720,8 @@ The development constructed-interface `AddBaseInterface` and constructed `CallVi
 overloads are documented in the [host metadata manual](experimental-metadata.md#constructed-interface-inheritance-development-2026-10-02).
 They share the existing C# host-library exclusion from the guest RavenDoc snapshot;
 no guest class-library public signature changed in this slice.
+
+The development host APIs AssemblyDefinition.ReadNativeAssembly/IsNative and
+MethodDefinition.TryGetSignature are covered in the [direct native declaration manual](experimental-metadata.md#direct-native-declaration-reading-development-2026-10-02).
+They are C# tooling APIs outside the guest reference assembly/RavenDoc selection;
+no guest runtime API is added by this reader slice.

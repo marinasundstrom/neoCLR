@@ -10037,3 +10037,11 @@ requiring dependency resolution during symbol loading. **Assistant audit:** foun
 existing exact-identity IAssemblyResolver and reference identity checks. Recorded use
 of that contract with native definitions and explicit compiler import-session dependency
 policy, rather than reflection emulation. Native cycle/session work remains planned.
+
+**Further author direction (2026-10-02):** after implementing the neoCLR target, consider
+investigating Cecil as a replacement for .NET target reflection usage. The author then
+clarified the current scope: support both targets and how their assemblies load and emit.
+**Assistant response:** keep Cecil evaluation deferred, preserve current .NET behavior,
+and continue native read/import/emission integration under the existing architecture.
+**Performed outcome:** first native primitive-function definition materialization passes
+96 metadata groups; Raven semantic importer remains pending.

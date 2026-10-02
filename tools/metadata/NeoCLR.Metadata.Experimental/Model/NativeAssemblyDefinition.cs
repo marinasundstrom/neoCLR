@@ -7,7 +7,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>Read-only declaration snapshot of the bounded metadata writer's native format-5 output.</summary>
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
-public sealed class NativeAssemblyDefinition
+public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
@@ -19,8 +19,9 @@ public sealed class NativeAssemblyDefinition
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases)
-    { this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
+    private readonly uint entryPointToken;
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases, uint entryPointToken)
+    { this.entryPointToken = entryPointToken; this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
@@ -483,12 +484,14 @@ public sealed class NativeAssemblyDefinition
                 }
             }
             var entry = Text(root, "entry");
+            uint entryPointToken = 0;
             if (entry.Length != 0)
             {
                 var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
+                entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases);
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases, entryPointToken);
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
