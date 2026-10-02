@@ -4727,8 +4727,10 @@ supported field/property/method signature categories, including vectors. Argumen
 include bounded primitive, nominal, vector and nested closed construction signatures.
 Scoped parameters inside a local construction (`Box<T>`) are now retained, including
 method and owner parameters and vectors of constructions. Ordinals are validated against
-the declaring scope by the native reader. Constructions of external generic owners,
-constraints and generic inheritance remain rejected with InvalidDataException.
+the declaring scope by the native reader. External generic constructions now retain exact assembly-scoped definition references
+and ordered arguments too. Resolving/importing them requires the explicit resolver
+overload, just like external nongeneric signatures. Missing or wrong-version dependencies
+throw InvalidDataException. Constraints and generic inheritance remain unsupported.
 
 Loaded construction signatures are not builder operands: using one directly in an
 authored method fails ownership validation with ArgumentException. Import the containing

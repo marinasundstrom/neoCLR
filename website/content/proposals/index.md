@@ -603,3 +603,7 @@ Development checkpoint (2026-10-02): scoped local constructions such as Box<T> a
 vectors now retain method/owner parameter identity through direct native import. Raven
 inferred calls execute successfully. External generic constructions and constraints
 remain pending.
+
+Development checkpoint (2026-10-02): external generic constructions now preserve exact
+assembly scope through native metadata and Raven. A three-assembly generic consumer
+executes successfully. Constraint import and full native core/bootstrap remain pending.

@@ -21,7 +21,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   factory/identity calls carrying Box<int> execute on CLR and neoCLR. Scoped local
   constructions such as Box<T> now retain method/owner parameters recursively; Raven
   inferred calls and vectors of open constructions execute using scope-owned caches.
-  External constructions and constraints remain pending; no format change.
+  External generic constructions now retain exact dependency scope and arguments too;
+  a three-assembly Raven consumer executes with both dependencies (42), and 106 C#
+  metadata groups pass, including CLR forwarding and resolver rejection. Constraints
+  remain pending; qualified generic namespace lookup is tracked separately. No format
+  change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now

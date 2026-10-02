@@ -3626,3 +3626,17 @@ functions and Box<TItem>.Same compile and execute; the seven native consumers re
 C# metadata tests pass (105 groups), including CLR/native instantiated open-signature
 calls. No Runtime Contract, CLI bridge or runtime encoding change. External generic
 constructions, constraints and full native System/bootstrap remain pending.
+
+### External generic construction integration (2026-10-02 development)
+
+A Raven-produced native bridge now forwards Box<T> signatures owned by another native
+library, including closed results and vectors. Exact resolver identity and the original
+definition survive both reference orders; missing dependencies diagnose. The consumer
+loads both libraries and executes (42); all seven consumers and 106 C# metadata groups
+pass. Existing Raven semantic/emission paths needed no implementation changes. No
+Runtime Contract, encoding or bootstrap change; constraints and inheritance remain pending.
+
+Observed follow-up: qualified generic namespace calls GenericBridge.Forward(...) and
+GenericBridge.ForwardArray(...) reported RAV0234. Imported unqualified calls execute.
+Reproduce independently before attributing this to a general binder defect or changing
+shared compiler behavior; this is not a metadata-format restriction.

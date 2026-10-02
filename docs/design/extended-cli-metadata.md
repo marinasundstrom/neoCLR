@@ -2241,3 +2241,18 @@ without storing scoped symbols in a module-wide cache. The native consumer cover
 inferred OpenBox/OpenBoxes and Box<TItem>.Same. C# symbol checks retain exact parameter
 owners and reject incompatible Box<bool>/Box<int> returns. External constructions and
 constraint materialization remain pending.
+
+### External constructed signature resolution (2026-10-02)
+
+Constructed signatures now retain external TypeRefs and their exact AssemblyRef scope,
+using the same immutable ReferencedGenericType model as local constructions. Both
+closed and scoped arguments survive materialization. Existing explicit resolution and
+recursive import produce output-owned constructed references; no global assembly loading
+or CLI projection is introduced. This follows the existing CLI TypeRef/AssemblyRef and
+GENERICINST comparison, preserving the same ownership costs and failure boundaries.
+
+C# tests cover both native containers and execute a three-assembly CLR forwarding case.
+Missing and wrong-version resolvers reject. Raven's three-assembly generic consumer
+executes closed/open constructions and vector aliases on neoCLR, with canonical original
+definitions and method scopes preserved in both reference orders. Qualified generic
+namespace-call lookup exposed RAV0234 separately and is tracked for independent repro.
