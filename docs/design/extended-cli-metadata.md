@@ -2518,3 +2518,16 @@ relationships. Variance, constrained/value/nested profiles and instance generic 
 remain outside this native reader profile. Explicit primitive core, translated System
 bootstrap and Runtime Contract configuration remain unchanged. This does not claim full
 class-library import or remove the lazy semantic reader lifetime.
+
+
+### Pure metadata resolution views (2026-10-02)
+
+Author follow-up proposes a dependency-aware projection above reader/writer definitions,
+without recreating Reflection. The [resolution-view design](metadata-resolution-views.md)
+records the proposed context, constructed-member views, ownership and acceptance tests.
+Existing definitions and IAssemblyResolver remain the foundation; this is design work,
+not a shipped public API. Raven importer integration must not leak the context into emission.
+
+Author clarification: implement this as a prototype for .NET-hosted Raven. Future
+NeoCLR-hosted compiler/introspection use may inform the design but does not require
+the same implementation or API, nor commit to a port.

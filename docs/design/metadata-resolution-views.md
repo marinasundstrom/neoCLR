@@ -1,0 +1,148 @@
+# Metadata resolution contexts and resolved views
+
+Design checkpoint: 2026-10-02. Proposed architecture, not an implemented public API.
+This supports the native metadata milestone and the existing builders → definitions →
+metadata → PE architecture. It does not add another serialized representation.
+
+## Author direction and existing foundation
+
+The author proposes a pure metadata projection above the reader/writer infrastructure
+so information can be accessed uniformly for local and external declarations, with
+explicit dependency resolution. This is not a request to recreate Reflection.
+
+Existing AssemblyReference.Resolve and TypeReference.Resolve use IAssemblyResolver
+and recheck exact assembly identities. Loaded definitions own their snapshots.
+ReferencedGenericType retains a definition reference plus arguments. Native interface
+relationships now retain constructed arguments. Physical MemberReference resolution
+remains bounded. Raven currently supplies its own dependency resolver and maps these
+shapes into compiler-owned symbols.
+
+The missing convenience is a coherent session and resolved, constructed member view.
+A second type resolver, compiler symbol system or CLI projection would duplicate the
+existing infrastructure rather than fill that gap.
+
+## Proposed responsibilities
+
+1. **Reader and definitions:** preserve declaration identity, ownership, original
+   signatures, references and unsupported data. Reading an assembly must not silently
+   load its dependency closure. Definitions describe what the declaring assembly says.
+2. **Resolution context:** own one explicit catalog/source policy and stable snapshot
+   identity for a bounded operation. Reuse IAssemblyResolver. Exact dependency lookup,
+   conflict detection, caching and diagnostic provenance belong here. No implicit
+   filesystem search, package restore, version unification or runtime assembly loading.
+3. **Resolved metadata views:** expose a resolved definition together with the type and
+   method arguments under which it is being inspected. A field view exposes both its
+   original declaration and substituted field type. Method/property/interface views do
+   the same. Preserve declaring assembly identity and parameter-owner scope even when
+   two assemblies contain identically named types.
+4. **Consumers:** Raven imports the view into its own symbols. Future Introspection can
+   consume the same metadata contracts. Writers/builders may explicitly import from a
+   resolved view into their own output graph; a view is never an output-owned operand.
+
+Definitions and views are different: Box<T>.Value stays T in the loaded definition;
+a view of Box<Int32>.Value reports Int32 and still points to the original declaration.
+Resolution should work the same way when Box is local or comes through an AssemblyRef.
+No API names are committed by these examples.
+
+## Prototype scope and possible future consumers
+
+Author clarification: NeoCLR will eventually need this kind of metadata-only library.
+Subsequent clarification: the present work is a prototype for the .NET-hosted Raven
+compiler, not a requirement to use this exact implementation or API in NeoCLR.
+It may inform a future compiler bootstrapped to compile for NeoCLR while running on
+NeoCLR. That reuse or port remains exploratory, not an implementation commitment. A metadata-only introspection layer must read dependencies without
+loading them into the execution runtime, and be usable by System.Runtime.Reflection.Emit.
+That API's namespace does not imply that metadata inspection requires runtime Reflection.
+
+The reusable contracts are assembly/type/member identity, declaration navigation,
+signature construction/substitution, dependency resolution and explicit output import.
+The current C# implementation proves those contracts on .NET; a possible future Raven/NeoCLR
+implementation can reuse lessons from them without depending on
+System.Reflection.Assembly/Type/MemberInfo, AssemblyLoadContext or execution handles.
+Host-specific byte access and dependency search remain adapters. A direct dependency
+from NeoCLR's future library onto the host C# binary is not assumed.
+
+The prototype and potential future consumers have independent roles:
+
+- Raven maps metadata views into compiler symbols and emits from symbols.
+- Metadata-only Introspection exposes declaration information without invocation or
+  runtime object inspection.
+- System.Runtime.Reflection.Emit uses builders and IL generators, explicitly importing
+  metadata contracts into output-owned definitions before encoding an assembly.
+
+No constructor execution, static initialization or code loading is needed for these
+operations. If generated code is later loaded for execution, that is a separate explicit
+runtime boundary. The metadata layer must not silently acquire execution capability.
+It may inspect assembly bytes produced by Emit through the same reader/context path.
+
+The existing runtime Introspection API and naming do not automatically become this
+metadata-only layer. Inventory their contracts before migration or reuse; distinguish
+metadata queries from runtime-backed operations. Public namespace/type names and the
+porting choice and schedule remain open. Prototype names and APIs need not be preserved
+in a later implementation. The separation of metadata from execution remains an author
+requirement; speculative portability must not delay a useful .NET-hosted prototype.
+
+## Identity, lifetime and failure contracts
+
+Start with an immutable catalog of already-read snapshots. Reject multiple snapshot
+objects for the same full identity unless the same object is registered again; do not
+silently pick an artifact or introduce implicit hashing on each lookup. Keep provenance
+available so a later source-backed context can distinguish conflicting artifacts.
+Canonicalize resolved definitions and constructed views within a context, not globally.
+Cache only against that fixed catalog; failed lookups in one context must not poison a
+new context. The context retains snapshots for the lifetime of its views.
+
+Register declaration identities before traversing signatures. Legal assembly dependency
+cycles and diamond graphs must share definitions; invalid interface/inheritance cycles
+remain errors. The initial preloaded catalog needs no asynchronous loading state machine.
+If lazy artifact loading is added later, specify loading/ready/failed states and concurrent
+publication first. Do not expose half-built views.
+
+Distinguish missing dependency, identity mismatch, conflicting snapshot, absent/ambiguous
+member and unsupported metadata profile. Include the requested identity and reference
+path. Reuse existing resolver exceptions initially where appropriate; do not change all
+public error types incidentally. Unsupported signatures must stay explicit, not become
+Object, empty member lists or invented semantic facts.
+
+Views enumerate declared members first. Inherited member lookup, visibility filtering,
+overload resolution, language conversions and runtime dispatch are separate concerns.
+Raven's binder continues to own language semantics. No Invoke, instance construction,
+execution handles or Reflection-compatible Type/MemberInfo hierarchy is proposed.
+
+## Compatibility, costs and comparison
+
+Reuse the ECMA-335/Cecil/MetadataReader research recorded in
+[extended metadata design](extended-cli-metadata.md). Relative to low-level .NET metadata
+handles, this layer adds dependency navigation and constructed signatures. Relative to
+Reflection, it stays in the metadata domain with explicit inputs and no runtime type
+loading. Cecil-like definitions and references remain the underlying model.
+
+Benefits are one reusable resolution/substitution implementation and fewer importer
+adapters. Costs are view/cache allocations, retained snapshots, explicit context lifetime
+and another API whose invariants need testing. No performance improvement is claimed.
+Resolve lazily on demand and cache within the context; do not eagerly expand the graph.
+The same model should support .NET and native metadata where readers already support
+those categories, without pretending their current coverage is equal.
+
+This layer does not make native external interface declarations legal by itself. That
+writer/runtime capability remains separate, as do type forwarders, multimodule resolution,
+variance, constraints, full CLI member decoding and broader native declaration profiles.
+
+## First implementation slices and acceptance
+
+1. Add the explicit snapshot catalog/context over IAssemblyResolver. C# tests cover
+   exact identities, same-name/different-version assemblies, duplicate/conflicting inputs,
+   missing dependencies, diamond identity, legal assembly cycles and context isolation.
+2. Add nominal/constructed type views and declared field/method signatures, preserving
+   open type/method parameter owners and simultaneous substitution. Test local versus
+   external equivalence, nested constructed/vector signatures and wrong arity/scope.
+3. Adapt one Raven importer path to consume views. Compare symbol identity, diagnostics
+   and emitted runtime behavior against current native generic field/interface consumers.
+   The emitter must have no reference to the context, resolver or loaded definitions.
+4. Extend views to properties, interface relationships and broader reference categories
+   only with focused tests. Continue external-interface emission as a distinct slice.
+
+First success means a separately compiled native dependency is inspected through the
+context, imported into Raven symbols, emitted through symbol contracts and executed in
+neoCLR. Keep .NET metadata tests as a compatibility control. The current seven-consumer
+runtime results are baseline evidence, not evidence that these proposed views exist.

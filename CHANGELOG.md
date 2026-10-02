@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Record the proposed pure metadata resolution context and constructed-view layer over
+  existing definitions/resolvers, including identity/lifetime rules, staged C# tests and future NeoCLR metadata-only
+  Introspection/Emit use cases. This is a .NET-hosted Raven prototype direction,
+  not a commitment to the same future implementation, API or port.
+  This is architectural direction; no public API or runtime behavior is added.
+
 - Import unconstrained generic native interfaces with constructed inheritance,
   parameter scopes and invariant argument checks; emit dispatch from semantic contracts.
   Reader imports also bind generic-owner fields. All seven Raven consumers execute (42),

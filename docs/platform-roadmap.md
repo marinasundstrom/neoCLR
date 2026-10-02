@@ -29,7 +29,11 @@ reader relationships retain owner arguments, emitted references are symbol-autho
 and generic inherited dispatch executes for primitive and nominal payloads. All seven
 Raven consumers and 108 metadata groups pass, with .NET and both-container execution.
 See [generic field/interface evidence](experiments/extended-cli-metadata/generic-fields-interfaces-2026-10-02.json).
-Next address external interface implementation/inheritance declarations for separately
+Author follow-up proposes a pure metadata resolution/view layer to unify local and
+external inspection. Begin with the bounded catalog/context design and tests in
+[metadata resolution views](design/metadata-resolution-views.md); this is not yet an API.
+External interface implementation/inheritance declarations remain subsequent work.
+Previously identified next capability: external interface implementation/inheritance declarations for separately
 compiled class-library consumers; the current reader admits relationships within one
 native assembly. Reader lifetime independence is not a prerequisite.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).

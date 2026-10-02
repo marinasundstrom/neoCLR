@@ -3878,3 +3878,10 @@ relationships. Variance, constrained/value/nested profiles and instance generic 
 remain outside this native reader profile. Explicit primitive core, translated System
 bootstrap and Runtime Contract configuration remain unchanged. This does not claim full
 class-library import or remove the lazy semantic reader lifetime.
+
+
+Resolution-view direction (2026-10-02, proposed):
+[metadata resolution contexts and views](design/metadata-resolution-views.md) will provide
+pure metadata dependency navigation and constructed signatures to importers. Raven
+symbols remain the only importer/emitter boundary. No Runtime Contract, bootstrap,
+encoding or implemented behavior changes in this design checkpoint.

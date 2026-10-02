@@ -10098,3 +10098,44 @@ dispatch after replacement (42); C# tests run equivalent imports on CLR. No addi
 reader/compiler/runtime code was required after interface loading, providing a concrete
 example of reusing the contracts. This does not resolve the bootstrap and broader
 .NET replacement questions recorded above.
+
+
+## 2026-10-02 — Dependency-aware pure metadata views
+
+**Author:** proposed a projection layer above the metadata reader/writer infrastructure
+for dependency resolution and inspection of imported/external declarations, explicitly
+saying it should be “pure metadata” rather than a reflection layer.
+
+**Assistant audit:** found exact-identity AssemblyReference/TypeReference resolution,
+loaded constructed signatures and generic interface relationships already implemented.
+The missing uniform session and substituted-member views should build on those contracts.
+
+**Assistant proposal:** keep raw definitions, a context with explicit dependency policy,
+and read-only constructed views separate. Raven's importer consumes these views and
+copies semantic information into symbols; the emitter remains independent. Start with
+a fixed snapshot catalog before adding lazy loading or wider member decoding.
+
+**Performed outcome:** recorded the [architecture and staged acceptance tests](design/metadata-resolution-views.md),
+linked it from the roadmap and Raven integration documentation. No new public API,
+compiler behavior or runtime capability is claimed. Context implementation, view caching,
+consumer migration and external-interface emission remain open.
+
+
+**Author clarification:** the same library will be needed in NeoCLR itself for
+metadata-only introspection and as input to System.Runtime.Reflection.Emit, independently
+of loading assemblies into the execution runtime.
+
+**Assistant response and performed action:** extended the design with three consumers
+(Raven importer, metadata-only Introspection and Emit), an explicit input-to-output
+import boundary, and host-independent semantics for a future Raven/NeoCLR port. Existing
+runtime Introspection must be audited before reuse; no port or execution-independent
+replacement has been implemented by this documentation slice.
+
+
+**Subsequent author correction:** this need not be the exact future library. The current
+work is a prototype, potentially only for the .NET-based Raven compiler, which may
+inform later work after bootstrapping Raven to compile for NeoCLR on NeoCLR.
+
+**Assistant response and action:** clarified the design's immediate .NET-hosted scope
+and removed any implied requirement for identical future APIs or a direct port. Reuse
+and eventual library shape remain exploratory; metadata/execution separation is retained.
