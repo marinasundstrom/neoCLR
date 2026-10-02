@@ -249,15 +249,16 @@ public sealed partial class AssemblyDefinition
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
     internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
-    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null)
+    internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null)
     {
         internal SignatureType Materialize(ModuleDefinition module) => Element is { } element ? SignatureType.ArrayOf(element.Materialize(module))
+            : MethodParameter is { } parameter ? SignatureType.MethodParameter(parameter)
             : Primitive is { } primitive ? primitive
             : module.GetNativeSignatureType(TypeToken);
     }
-    internal sealed record NativeMethodSignatureRow(NativeSignatureTypeRow Result, NativeSignatureTypeRow[] Parameters)
+    internal sealed record NativeMethodSignatureRow(NativeSignatureTypeRow Result, NativeSignatureTypeRow[] Parameters, string[]? GenericNames = null)
     {
-        internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)));
+        internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)), GenericNames);
     }
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);

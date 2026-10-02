@@ -68,7 +68,8 @@ public sealed partial class AssemblyBuilder
         return nativeInterfaceConversions[(actual, target)] = Visit(source);
     }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
-        => type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
+        => type.MethodParameterIndex is { } parameter ? SignatureType.MethodParameter(parameter)
+            : type.ArrayElement is { } element ? SignatureType.ArrayOf(ImportNativeSignatureType(element, core, resolver))
             : type.Primitive is { } primitive ? primitive
             : type.ReferencedType is { } reference ? ImportNativeSignatureReference(reference, core, resolver)
             : throw new InvalidDataException("unsupported native signature type");

@@ -2176,3 +2176,20 @@ It does not add interface-array covariance or cross-assembly implementation decl
 The evidence strengthens the provider-neutral path identified by the author, while the
 CLI primitive bootstrap and incomplete generic/value support still limit any conclusion
 about replacing the entire .NET reflection/emit pipeline.
+
+## Native generic method definition checkpoint (2026-10-02)
+
+The direct declaration reader now retains unconstrained static method/function generic
+parameters and vector signatures in the existing immutable definitions. This follows
+the existing ECMA-335 comparison above: method parameters have positional identity,
+with GenericParam/MVAR/MethodSpec in CLI emission and the existing native equivalents.
+There is no new schema or reflection-shaped API. Reusing generic imports and calls
+avoids a second instantiation model; the cost is retaining the bounded profile while
+owner constraints and instance generics need separate support.
+
+C# contract checks cover both native schemas, preserved names/arity, canonical lookup,
+opaque roundtrip, nongeneric-helper rejection and CLR execution. Native verification
+and execution pass with generic static identity and namespace array-identity calls (42).
+Raven method-parameter symbols are the next integration step. The writer/runtime
+reserved generic-name mismatch (`Value`) was observed and remains explicitly tracked;
+these tests use valid `TItem`/`TElement` names.

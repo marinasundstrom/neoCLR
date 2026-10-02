@@ -582,3 +582,7 @@ Development checkpoint (2026-10-02): a shared Raven fix now diagnoses incompatib
 expression-bodied returns before emission for .NET and native dependencies. The 106
 focused compiler tests and all six native runtime consumers pass. Native generic import
 and the full class-library bootstrap remain under development.
+
+The development metadata reader now preserves unconstrained static generic methods
+and namespace functions. C# consumers execute imported generic calls on CLR and neoCLR;
+Raven semantic generic integration is the next step. This is not full generic import.

@@ -3578,3 +3578,13 @@ focused .NET tests pass; the native probe requires RAV1503 before emission and a
 output on rejection. All six native consumers still execute with result 42. No Runtime
 Contract, encoding or runtime changes were required. Generic/value import and the CLI
 core/translated System bootstrap limitations remain open.
+
+### Native generic definition groundwork (2026-10-02)
+
+The metadata library now reads and imports unconstrained static generic functions and
+methods on nongeneric owners directly. C# consumers execute imported generic identity
+on CLR and native static/namespace generic calls on neoCLR (42, both containers).
+Raven still rejects these assemblies at NeoClrMetadataReference.ReadAssembly until
+method type-parameter symbols are implemented; no partial generic symbols are exposed.
+No Runtime Contract or temporary CLI encoding changes. Generic owners, constraints,
+instance methods and complete native System import remain subsequent work.

@@ -29,8 +29,10 @@ method/property dispatch executes across native assemblies (42). All six consume
 Interface-valued fields, constructor parameters and arrays now also work across native
 libraries, preserving aliases and dispatch after replacement (42). The early-return diagnostic gap is now independently reproduced and fixed on .NET
 (106 focused tests); the native negative case diagnoses before emission and all six
-consumers still execute (42). Next broaden generic declarations and remaining categories
-before full System loading. See [return diagnostic evidence](experiments/extended-cli-metadata/native-return-diagnostics-2026-10-02.json). See [storage evidence](experiments/extended-cli-metadata/native-interface-storage-2026-10-02.json).
+consumers still execute (42). The metadata reader/import API now preserves static generic methods/functions,
+including parameter vectors; CLR and native execution pass (42, both containers).
+Next integrate method type-parameter symbols into Raven, then broaden generic owners
+and remaining categories before full System loading. See [return diagnostic evidence](experiments/extended-cli-metadata/native-return-diagnostics-2026-10-02.json). See [storage evidence](experiments/extended-cli-metadata/native-interface-storage-2026-10-02.json).
 See [interface evidence](experiments/extended-cli-metadata/native-interfaces-2026-10-02.json). Setter-only indexed assignments now also compile and execute (42);
 source reads still require a getter. See [setter-only evidence](experiments/extended-cli-metadata/native-writeonly-indexers-2026-10-02.json). See [indexer evidence](experiments/extended-cli-metadata/native-indexers-2026-10-02.json). See [property evidence](experiments/extended-cli-metadata/native-properties-2026-10-02.json). See [array evidence](experiments/extended-cli-metadata/native-array-signatures-2026-10-02.json). See [external signature evidence](experiments/extended-cli-metadata/native-external-signatures-2026-10-02.json). See [nominal field evidence](experiments/extended-cli-metadata/native-nominal-fields-2026-10-02.json) and [nominal signature evidence](experiments/extended-cli-metadata/native-nominal-signatures-2026-10-02.json).
 Native reading/import now precede further source-library/bootstrap expansion. CLI projections remain existing

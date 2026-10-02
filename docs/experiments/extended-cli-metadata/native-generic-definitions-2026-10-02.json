@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-02",
+  "metadataBaseCommit": "62048e40",
+  "contractGroups": 104,
+  "runtimeCommand": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --native-generic-runtime <runtime> <output>",
+  "runtimeResult": "verify=0, run=42 for both container schemas",
+  "runtimeSha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+  "artifacts": {
+    "App-False.dll": "1451218bc11c71f30834bedefa6400704ed0c52b5cf74f87c01a9a631a16e374",
+    "App-True.dll": "044d4ae68f5b745dd7bc4ed4c18b277e3faf92bf66898fc1dd4a1c6ceab041b0",
+    "Library-False.dll": "ec0f7729936a699aa02808ceb98bca08756f367ef2041f5bcca250dadd9416b3",
+    "Library-True.dll": "4b613fbd463f7a4b2d94f8caf2ffd0fef3c7b8e2b1cf462c72cf6f8eea8f0ff6"
+  },
+  "scope": "Direct generic static/namespace imports, vector substitution, CLR static generic invocation. Raven generic symbols are next."
+}

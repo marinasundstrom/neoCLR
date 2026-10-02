@@ -85,7 +85,7 @@ public sealed partial class MethodDefinition
         decoded = null;
         if (nativeSignature is { } native)
         {
-            if (!IsStatic || native.ReturnType.Primitive is null || native.ParameterTypes.Any(p => p.Primitive is null)) return false;
+            if (!IsStatic || GenericArity != 0 || native.ReturnType.Primitive is null || native.ParameterTypes.Any(p => p.Primitive is null)) return false;
             decoded = new PrimitiveMethodSignature(native.ReturnType.Primitive!.Value, native.ParameterTypes.Select(p => p.Primitive!.Value));
             return true;
         }
@@ -99,18 +99,22 @@ public sealed partial class MethodDefinition
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
         static bool Value(SignatureType type) => type.Primitive is not null || type.ArrayElement?.Primitive is not null;
-        decoded = IsStatic && nativeSignature is { } native && Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
+        decoded = IsStatic && GenericArity == 0 && nativeSignature is { } native && Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
         if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
     }
 
     /// <summary>Recognizes unconstrained static generic primitive/vector signatures with scoped method parameters.</summary>
-    /// <param name="decoded">Immutable signature with positional parameter names on success; null otherwise.</param>
+    /// <param name="decoded">Immutable signature with preserved native or positional CLI parameter names on success; null otherwise.</param>
     /// <returns>False for nongeneric, constrained, malformed or unsupported declarations.</returns>
     /// <remarks>At most 32 method parameters. No nominal types, declaring-type parameters or nested vectors.</remarks>
     public bool TryGetStaticGenericValueSignature(out MethodSignature? decoded)
     {
-        decoded = null;
+        static bool Scalar(SignatureType type) => type.Primitive is not null || type.MethodParameterIndex is not null;
+        static bool Value(SignatureType type) => Scalar(type) || type.ArrayElement is { } element && Scalar(element);
+        decoded = IsStatic && GenericArity is > 0 and <= 32 && nativeSignature is { } native &&
+            Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
+        if (decoded is not null) return true;
         return IsStatic && !unsupportedGenericParameters && GenericArity is > 0 and <= 32 &&
             TryDecodeStaticValueSignature(signature, out decoded, GenericArity) && ApplyOutputs(ref decoded);
     }
@@ -125,10 +129,10 @@ public sealed partial class MethodDefinition
     {
         if (nativeSignature is not null)
         {
-            if ((!IsStatic && DeclaringType is null) || GenericArity != 0)
+            if (!IsStatic && (DeclaringType is null || GenericArity != 0))
                 throw new InvalidDataException("unsupported native callable import");
             return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver),
-                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)));
+                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)), nativeSignature.GenericParameterNames);
         }
         if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");

@@ -5,8 +5,8 @@ public sealed partial class AssemblyDefinition
     /// <summary>Reads authoritative native namespace-function and bounded class/interface declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/generic types, unsupported field types and signatures beyond primitives/nominal references and their vectors.</exception>
-    /// <remarks>This first materialization profile admits nongeneric functions/methods with primitive, nominal class or vector signatures, top-level classes/interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value/generic owners and generic instance methods, unsupported field types and signatures beyond primitives/nominal references and their vectors.</exception>
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method parameters, primitive, nominal reference or vector signatures, and nongeneric top-level classes/interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -29,14 +29,16 @@ public sealed partial class NativeAssemblyDefinition
         static bool SupportedScalar(SignatureType type) => type.Primitive is not null ||
             type.ClassType is { IsStatic: false, IsValueType: false } ||
             type.ImportedType is { IsValueType: false, GenericArity: 0, DeclaringType: null };
+        static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
+            type.ArrayElement is { } element && element.MethodParameterIndex is not null || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && SupportedScalar(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
         if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.IsValueType || t.DeclaringType >= 0 ||
             t.GenericNames.Length != 0 || t.Fields.Any(f => !Supported(f.Signature!)) || t.BaseInterfaces.Any(i => !i.TryGetProperty("Named", out _)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
-            m.Signature.GenericParameterNames.Count != 0 || !Supported(m.Signature.ReturnType) ||
-            m.Signature.ParameterTypes.Any(p => !Supported(p))))
-            throw new InvalidDataException("native definition materialization requires nongeneric primitive/nominal-reference/vector signatures and top-level classes/interfaces");
+            (m.Instance && m.Signature.GenericParameterNames.Count != 0) || !SupportedMethod(m.Signature.ReturnType) ||
+            m.Signature.ParameterTypes.Any(p => !SupportedMethod(p))))
+            throw new InvalidDataException("native definition materialization requires bounded static generic or nongeneric signatures and nongeneric top-level classes/interfaces");
         var nominalTokens = types.Select((type, index) => (type, token: 0x02000002u + (uint)index))
             .ToDictionary(item => (item.type.Namespace, item.type.Name), item => item.token);
         var referenceTokens = References.Select((identity, index) => (identity, token: 0x23000001u + (uint)index)).ToDictionary(item => item.identity, item => item.token);
@@ -44,6 +46,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.MethodParameterIndex is { } parameter) return new(null, 0, MethodParameter: parameter);
             if (type.ArrayElement is { } element) return new(null, 0, Copy(element));
             if (type.Primitive is { } primitive) return new(primitive, 0);
             if (type.ClassType is { } local) return new(null, nominalTokens[(local.Namespace, local.Name)]);
@@ -71,8 +74,8 @@ public sealed partial class NativeAssemblyDefinition
         var accessors = properties.SelectMany(p => new[] { p.Getter, p.Setter }).Where(index => index >= 0).ToHashSet();
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
-            (ushort)((method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, 0, [], false, [],
-            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray()), method.Namespace)).ToArray();
+            (ushort)((method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, method.Signature.GenericParameterNames.Count, [], false, [],
+            new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray()), method.Namespace)).ToArray();
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
@@ -89,7 +92,7 @@ public sealed partial class MethodDefinition
 
     /// <summary>Reads the supported logical signature without serializing a CLI blob or resolving dependencies.</summary>
     /// <param name="decoded">The immutable signature on success; otherwise null.</param>
-    /// <returns>True for authored signatures, native primitive/nominal-class/vector functions/methods, and the existing bounded static CLI value/generic profiles.</returns>
+    /// <returns>True for authored signatures, native bounded generic or nongeneric functions/methods, and the existing bounded static CLI value/generic profiles.</returns>
     /// <remarks>False does not mean an absent signature: other loaded CLI signatures require contextual decoding.
     /// Native signatures retain native no-result semantics. This operation never materializes a method body.</remarks>
     public bool TryGetSignature(out MethodSignature? decoded)

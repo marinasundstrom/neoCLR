@@ -4660,3 +4660,26 @@ an imported interface field or exact-interface array and dispatched on CLR. Rave
 three-assembly consumer verifies equivalent native storage and alias behavior. These
 use existing FieldDefinition and MethodDefinition signature/import APIs; no new public
 API or array covariance rule is introduced.
+
+### Direct native static generic methods (2026-10-02 development)
+
+`AssemblyDefinition.ReadNativeAssembly` now also admits unconstrained static generic
+methods and namespace functions on nongeneric owners. `MethodDefinition.GenericArity`
+and `TryGetSignature` preserve parameter names, positional `SignatureType.MethodParameter`
+references and their one-dimensional vectors. `TryGetStaticGenericValueSignature`
+recognizes the primitive/parameter/vector subset; nongeneric helpers reject even unused
+generic parameters. `GetSignature` still rejects native CLI-blob requests.
+
+`AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)` retains this
+signature; `ImportedMethodReference.MakeGenericInstance` uses the existing arity and
+consumer-ownership checks. `MethodBuilder.Call` accepts that instantiated reference.
+Static methods can emit CLI MemberRef/MethodSpec or native generic calls; namespace
+functions remain native-only imports. Both native container schemas are covered.
+
+Generic owners, generic instance methods, constraints, byrefs and nested vectors remain
+outside this direct-reading profile and throw InvalidDataException. Loaded definitions
+are immutable; Write preserves the original image. Raven's native symbol layer still
+rejects generic declarations until its method-parameter integration is implemented.
+Native parameter names must also satisfy runtime slot-name rules; the existing writer
+can accept reserved names such as `Value` that runtime verification rejects. This writer
+validation mismatch remains a follow-up, not an accepted runtime contract.
