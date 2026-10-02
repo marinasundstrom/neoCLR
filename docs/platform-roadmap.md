@@ -5,6 +5,16 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Propagation guard checkpoint (2026-10-02):** the metadata API emits literal terminal
+failure using the existing native fault instruction, with C# success/failure execution
+on CLR and neoCLR. Raven explicitly marks generated invalid-carrier guards; its .NET
+adapter retains null-throw behavior, while native emission terminates with a diagnostic.
+All 83 metadata checks and 14 focused Raven tests pass. The unchanged collections sample
+now passes the guard and reaches imported carrier construction from None; CLI control
+still emits 7168 bytes. Next implement imported value/union carrier constructors and
+continue into native System dependencies; no full application execution is claimed.
+[Sample evidence](experiments/extended-cli-metadata/collections-after-terminal-guard-2026-10-02.json).
+
 **Author-directed naming correction (2026-10-02):** the terminal namespace action is
 `System.Fail(message)`; `Fault` remains the result. Update the matching compiler,
 reference and library bundle together. This correction precedes, and does not replace,

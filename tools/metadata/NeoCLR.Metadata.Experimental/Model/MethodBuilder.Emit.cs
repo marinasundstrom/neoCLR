@@ -91,7 +91,9 @@ public enum OpCode
     /// <summary>Loads through an initialized owned local address or byref parameter of the exact SignatureType.</summary>
     Ldobj,
     /// <summary>Stores through an owned local address or byref parameter of the exact SignatureType; local stores establish assignment.</summary>
-    Stobj
+    Stobj,
+    /// <summary>Terminates with a literal diagnostic: native UserFault, or CLI InvalidOperationException.</summary>
+    Fail
 }
 
 public sealed partial class MethodBuilder
@@ -156,8 +158,8 @@ public sealed partial class MethodBuilder
         Append(new("constant64", LongValue: operand));
     }
 
-    /// <summary>Appends a string literal shared by CLI and native emission.</summary>
-    /// <param name="opCode">Ldstr; other opcodes reject.</param>
+    /// <summary>Appends a string literal or terminal failure shared by CLI and native emission.</summary>
+    /// <param name="opCode">Ldstr or Fail; other opcodes reject.</param>
     /// <param name="operand">Non-null valid Unicode text, at most 64 KiB in UTF-8; empty text is supported.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Incorrect opcode, invalid Unicode or oversized literal.</exception>
@@ -165,10 +167,18 @@ public sealed partial class MethodBuilder
     /// <remarks>Rejects unpaired UTF-16 surrogates instead of substituting replacement characters.</remarks>
     public void Emit(OpCode opCode, string operand)
     {
-        if (opCode != OpCode.Ldstr) throw OperandError(opCode);
+        if (opCode is not (OpCode.Ldstr or OpCode.Fail)) throw OperandError(opCode);
         ValidateLiteral(operand);
-        Append(new("string", Text: operand));
+        Append(new(opCode == OpCode.Fail ? "fail" : "string", Text: operand));
     }
+
+    /// <summary>Terminates the invocation with a literal message. Requires an empty stack; no normal return or output assignment follows.</summary>
+    /// <param name="message">Valid Unicode diagnostic, at most 64 KiB UTF-8.</param>
+    /// <exception cref="ArgumentNullException">Message is null.</exception>
+    /// <exception cref="ArgumentException">Message contains invalid Unicode or exceeds the UTF-8 size limit.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; body-flow errors are reported when writing.</exception>
+    /// <remarks>Native execution produces UserFault without guest exception handling. CLI execution throws InvalidOperationException, which CLR callers can catch.</remarks>
+    public void Fail(string message) => Emit(OpCode.Fail, message);
 
     /// <summary>Appends a call or allocation using a local or external builder method.</summary>
     /// <param name="opCode">Call, Callvirt or Newobj; Callvirt currently requires an owned interface method.</param>

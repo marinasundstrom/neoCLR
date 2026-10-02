@@ -454,3 +454,9 @@ Development naming correction: terminal guest failure is requested with
 `System.Fail(message)`; the host receives a `Fault`. The former `System.Fault` call
 spelling requires migration and a matching compiler/reference/runtime bundle. This does
 not add guest exception handling or process-abort behavior.
+
+Development metadata emission now includes literal terminal failure. Native execution
+uses the existing fault instruction; ordinary CLI metadata can express the corresponding
+throwing path. Raven distinguishes its generated propagation guards from source throws
+and preserves .NET behavior. The unchanged collections sample now reaches imported
+carrier construction; complete native propagation/application execution remains pending.

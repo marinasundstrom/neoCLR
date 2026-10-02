@@ -8,6 +8,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add literal terminal failure to the metadata body API through `Fail(string)` and raw
+  `Emit(OpCode.Fail, string)`. Native execution uses the existing UserFault instruction;
+  CLI execution throws InvalidOperationException with the diagnostic. Validate empty-stack
+  termination, unreachable code and output assignment only on normal returns. This does
+  not add native exception handling or change the runtime System.Fail API. Raven marks
+  generated propagation guards explicitly and preserves .NET null-throw behavior; the
+  unchanged collections sample advances to imported carrier construction from None.
+  All 83 metadata groups and 14 focused Raven tests pass.
+
 - Rename the public terminal namespace function from `System.Fault(message)` to
   `System.Fail(message)`, distinguishing the action from the resulting host `Fault`.
   Migrate source consumers, Raven terminal-call recognition, CLI reference metadata and

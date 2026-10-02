@@ -1590,3 +1590,31 @@ All 28 focused Raven external-signature/capability/shared-emission C# tests pass
 as an unclassified independent investigation in Raven's compiler documentation; it has
 not been isolated against main or fixed in this slice. Native execution still tests
 inline output locals.
+
+
+### Compiler propagation failure guards (2026-10-02)
+
+The metadata builder now has a literal terminal operation (`Fail`, also raw `Emit`).
+Native emission reuses the existing fault instruction; runtime loading/verifying/execution
+needs no new opcode or format version. CLI emission uses standard InvalidOperationException
+construction and throw. Native faults end an invocation while CLR exceptions may be
+caught: this target difference is explicit. It preserves a diagnostic without allocating
+a guest exception or disguising failure as a normal return. General native exception
+handling remains unsupported; the runtime `System.Fail` API and host `Fault` are unchanged.
+
+Raven marks only its compiler-generated invalid propagation-carrier guards. Its shared
+plan carries that marker through an explicit logical instruction supported selectively
+by the adapters. The .NET adapter retains the previous ldnull/throw behavior (therefore
+NullReferenceException); the native adapter requests a terminal diagnostic. Ordinary
+source throws are still rejected by the bounded native plan. Binding, Runtime Contract
+configuration and temporary CLI symbol projection are unchanged. This is an emission
+capability feature, not a general binder fix or a native symbol importer.
+
+Validation: 83/83 C# metadata groups pass, including success (42), Unicode terminal
+diagnostics on CLR and native execution, malformed stack/unreachable body rejection and
+terminal-only output parameters. The compiler regeneration/build succeeds; 14 focused
+Raven propagation/external-signature/shared-emission tests pass, including a deliberately
+invalid carrier that still raises NullReferenceException on .NET. The unchanged
+collections source passes the guard and reaches imported carrier construction from None;
+its CLI control remains 7168 bytes. No full native propagation consumer executes yet:
+these tests establish the metadata runtime contract and Raven guard admission separately.

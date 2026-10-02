@@ -282,6 +282,10 @@ public sealed partial class MethodBuilder
                     stack.Add(PrimitiveType.Int32); break;
                 case "branch.true": case "branch.false": Pop(PrimitiveType.Boolean); break;
                 case "branch": break;
+                case "fail":
+                    if (stack.Count != 0) throw new InvalidDataException("terminal failure requires an empty stack");
+                    MaxStack = Math.Max(MaxStack, 1); // CLI diagnostic/exception construction.
+                    continue;
                 case "return":
                     if (Signature.OutParameters.Any(i => !assigned[locals.Count + i]))
                         throw new InvalidDataException("out parameter must be assigned on every normal return");

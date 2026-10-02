@@ -648,3 +648,8 @@ The C# metadata host's `ImportedMethodReference.RequiresManagedReceiver`, expand
 `TypeBuilder.AddInstanceMethod`/definition attachment and receiver validation contract
 are covered by [managed value receivers](experimental-metadata.md#managed-value-receivers-development-2026-10-02).
 The existing host-only RavenDoc exclusion applies; guest reference signatures are unchanged.
+
+Host metadata development adds `MethodBuilder.Fail(string)` and `OpCode.Fail` to the
+existing manual [experimental metadata reference](experimental-metadata.md). They remain
+host C# APIs outside the guest RavenDoc assembly/type selection; the manual entry covers
+CLI/native differences, operands, errors and flow restrictions.

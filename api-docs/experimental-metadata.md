@@ -3910,3 +3910,27 @@ InvalidDataException. Import/dispatch argument failures retain existing exceptio
 TryGet(out T), CLI/native projection and rejection cases. Run
 `--value-receiver-integration <runtime> <fresh-output>` for CLR and native verify/run 42.
 Raven source value declarations and constrained interface calls are not implied.
+
+
+### Literal terminal failure (development, 2026-10-02)
+
+`MethodBuilder.Fail(string message)` and `Emit(OpCode.Fail, string message)` append a
+terminal instruction with no stack operand or result. The body stack must be empty.
+The native writer emits the existing `fault` instruction: execution ends with a host
+`Fault` classified as `UserFault`, preserving the message. No guest catch/finally
+semantics or host-process abort is introduced. The executable CLI writer instead
+constructs and throws `System.InvalidOperationException(message)` using ordinary CLI
+metadata/CIL; CLR callers can catch it. This is an explicit target difference, not a
+claim that CLR exceptions and native faults are interchangeable. The CLI core identity
+must supply that standard exception type. Native reference projections keep their
+existing nonexecutable throwing stubs.
+
+Messages follow `Ldstr` validation: null throws `ArgumentNullException`; unpaired UTF-16
+surrogates or text exceeding 64 KiB UTF-8 throw `ArgumentException`; empty text is valid.
+Instruction limits throw `InvalidDataException`. Writers reject a nonempty failure stack,
+reachable fallthrough and unreachable instructions after failure. Out parameters need
+assignment only on normal returns; a terminal-only path need not assign them. Labels
+and branch joins retain ordinary flow validation. Definitions can use the same logical
+opcode/string operand through the existing body model. Dynamic diagnostics remain the
+runtime library's `System.Fail(message)` contract; this bounded builder instruction
+accepts a literal only.

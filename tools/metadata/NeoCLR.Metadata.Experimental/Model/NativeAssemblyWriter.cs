@@ -120,6 +120,7 @@ public sealed partial class AssemblyBuilder
             "shift.left" => new { op = "shl" },
             "shift.right" => new { op = "shr" },
             "return" => new { op = "ret" },
+            "fail" => new { op = "fault", arg = instruction.Text! },
             _ => throw new InvalidDataException("unsupported instruction")
         };
         IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)

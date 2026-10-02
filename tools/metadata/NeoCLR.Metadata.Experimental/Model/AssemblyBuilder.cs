@@ -398,6 +398,12 @@ public sealed partial class AssemblyBuilder
             return MetadataTokens.GetToken(member);
         }
         var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
+        var failureConstructor = default(MemberReferenceHandle);
+        if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "fail")))
+        {
+            var failureType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("InvalidOperationException"));
+            failureConstructor = metadata.AddMemberReference(failureType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 1, 1, 0x0e }));
+        }
         var objectConstructor = methods.Any(m => m.IsConstructor) ? metadata.AddMemberReference(objectType, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 })) : default;
         var bodies = new BlobBuilder();
         var bodyEncoder = new MethodBodyStreamEncoder(bodies);
@@ -430,6 +436,7 @@ public sealed partial class AssemblyBuilder
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
                     "constant64" => 9,
+                    "fail" => 11,
                     "label" => 0,
                     "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
@@ -499,6 +506,10 @@ public sealed partial class AssemblyBuilder
                     case "new.constructed": case "call.constructed": case "call.virtual.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : instruction.Op == "call.virtual.constructed" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                    case "fail":
+                        code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!)));
+                        code.WriteByte(0x73); code.WriteInt32(MetadataTokens.GetToken(failureConstructor));
+                        code.WriteByte(0x7a); break;
                     case "return": code.WriteByte(0x2a); break;
                     default: throw new InvalidDataException("operation requires native emission: " + instruction.Op);
                 }
