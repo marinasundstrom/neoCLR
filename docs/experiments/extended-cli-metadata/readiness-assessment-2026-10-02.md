@@ -78,3 +78,13 @@ having completed the broad application integration.
 The earlier October 1 assessments remain historical records. Their blanket target-profile
 rejection is superseded by current native controls and target library verification;
 remaining first-failure observations are captured above without claiming later coverage.
+
+
+## Subsequent same-day integration
+
+Raven `e6912a285` implements step 1's bounded ref/out path. Five native controls now
+pass, including source output forwarding and mutation (42); 64 focused C# tests pass.
+The [refreshed unchanged collections case](collections-after-raven-ref-out-2026-10-02.json)
+advances to imported value-receiver TryGetOutput invocation admission. The inventory
+above remains the pre-integration observation; other rejected samples were not rerun
+or declared solved. Step 2 is now the immediate blocker.

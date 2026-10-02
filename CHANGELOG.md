@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Connect Raven ref/out emission through the shared portable codegen plan and explicit
+  adapter capabilities. Five native controls now pass, including source output forwarding
+  and ref mutation; 64 focused C# tests pass. The unchanged collections sample advances
+  from uninitialized-local admission to imported value-receiver TryGetOutput admission.
+  Record the remaining propagation gap without changing Runtime Contracts or runtime IL.
+
 - Reassess unchanged Raven samples after ref/out metadata support: all four small native
   execution controls pass, four library inventory attempts emit and verify, but all twelve
   selected applications still stop before native execution. Record the collections

@@ -5,6 +5,16 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Raven ref/out checkpoint (2026-10-02):** shared .NET/neoCLR emission now preserves
+ref/out signatures, local addresses, indirect access and uninitialized output locals.
+Five native controls pass, including source forwarding/mutation (42); 64 focused C#
+tests pass. The unchanged collections sample now rejects imported value-receiver
+`TryGetOutput(out Order)` invocation admission, with CLI control still 7168 bytes.
+Next implement exact imported value-receiver/member contracts, then follow the same
+sample through propagation failure/Unit and native System identity requirements.
+[Controls](experiments/extended-cli-metadata/raven-ref-out-validation-2026-10-02.json),
+[collections](experiments/extended-cli-metadata/collections-after-raven-ref-out-2026-10-02.json).
+
 **Sample reassessment (2026-10-02):** four small native execution controls pass; the
 31-case inventory has four library emit/verify successes, eighteen emission rejections
 and nine binding failures. All twelve selected applications emit their CLI controls but

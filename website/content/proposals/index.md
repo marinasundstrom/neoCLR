@@ -435,3 +435,9 @@ Explicit output contracts now preserve CLI Param Out flags and native out_parame
 through metadata imports and projection. Test producers prove assignment on normal
 return, including forwarded outputs, and separate library/consumer execution returns
 42 on both runtimes. Raven admission and imported value receivers remain integration work.
+
+
+Raven's shared emission path now consumes those ref/out contracts. Five native controls
+pass, including source forwarding/mutation, with 64 focused C# tests passing. The
+unchanged collections sample advances to imported value-receiver TryGetOutput admission;
+full application and runtime-library compilation remain incomplete.

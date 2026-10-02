@@ -9924,3 +9924,26 @@ and runtime-contract identity conflicts, not a valid full-library bootstrap. The
 assistant proposes target-profile/bootstrap integration first, then collection/library
 boundaries and shared union/callback emission. These are proposed next milestones;
 the author has not yet responded to that sequence. [Assessment and evidence](experiments/extended-cli-metadata/readiness-assessment-2026-10-01.md).
+
+## 2026-10-02 — Reassess samples after output metadata, then reconnect Raven
+
+- **Author:** asked, “Asses samples after this”, following ref/out metadata work,
+  then directed, “Continue solving this afterwards”.
+- **Assistant proposal/action:** finished the output-contract slice, rebuilt the Raven
+  probe, and assessed unchanged samples before selecting the next codegen task. The
+  31-case inventory showed four library emit/verify successes; all twelve selected
+  applications still stopped before native execution despite successful CLI controls.
+  The four small native execution controls passed. The assistant proposed connecting
+  Raven's ref/out path next instead of adding unrelated metadata features.
+- **Performed outcome:** Raven `e6912a285` adds the explicit shared managed-reference
+  capability and connects signatures, local addresses and indirect operations to both
+  adapters. Five native controls now pass, including output forwarding/ref mutation;
+  64 focused C# tests pass. Collections moves past output-local admission to imported
+  value-receiver TryGetOutput invocation admission. The full application is not complete.
+- **Open:** imported value receivers, propagation failure/Unit handling, exact native
+  System identities and implementation-bootstrap dependencies. The author did not
+  independently approve each detailed API choice; continuation directed further work.
+
+Evidence: [sample assessment](experiments/extended-cli-metadata/readiness-assessment-2026-10-02.md),
+[native controls](experiments/extended-cli-metadata/raven-ref-out-validation-2026-10-02.json),
+[unchanged collections](experiments/extended-cli-metadata/collections-after-raven-ref-out-2026-10-02.json).

@@ -1501,3 +1501,30 @@ partial-path writes, non-address inputs, invalid indices, mismatched interface c
 and aliased ref/out inputs. Conditional out_when_true and readonly contracts remain
 future work. This slice does not yet change Raven's admission or the collections
 application's observed blocker. Runtime binary is unchanged from the preceding checkpoint.
+
+
+### Raven source ref/out integration (2026-10-02)
+
+Raven `e6912a285` connects the preceding metadata contract to compiler-owned portable
+signatures and instructions. `AllowsManagedReferences` is explicit adapter admission;
+both .NET and neoCLR map local addresses and indirect operations, while native signatures
+preserve output indices in the independent metadata API. Inline out declarations gain
+uninitialized storage when addressed, and synthesized out locals no longer require
+invented initializers. Binding retains language assignment rules; native producer flow
+checks independently reject invalid bodies. Runtime Contract configuration is unchanged.
+
+The temporary CLI snapshot remains symbol input; emitted binaries use native metadata
+and actual runtime loading. Native metadata symbol loading, readonly references,
+escaping byrefs, field/array addresses and imported value receivers remain pending.
+This is an emission capability feature, not an independently discovered binder fix;
+it remains on the integration branch. Existing isolated shared-lowering fixes are
+unaffected. A separate shared-line capability port remains a review candidate.
+
+[Five native controls](../experiments/extended-cli-metadata/raven-ref-out-validation-2026-10-02.json)
+verify/run, with source out forwarding and ref mutation returning 42. The 64 focused
+C# emission/parity/propagation/byref tests pass (24 baseline before edits); Debug and
+Release assert shared admission and CLR behavior, not opcode sequences. The
+[unchanged collections application](../experiments/extended-cli-metadata/collections-after-raven-ref-out-2026-10-02.json)
+now reaches imported value-receiver TryGetOutput invocation admission. CLI control
+still emits 7168 bytes; the whole native application remains incomplete. No runtime
+instruction or metadata encoding change accompanies this Raven integration slice.

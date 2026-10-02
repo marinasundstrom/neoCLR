@@ -1,0 +1,55 @@
+{
+  "bindingProfile": "CompilationOptions.NeoCLR with CLI declaration snapshot; no host core reference",
+  "coreReference": "api-docs/reference/NeoCLR.CoreProbe.dll",
+  "coreSha256": "48480EAB560AD928F0B92F7914CC403904B89F045357D2A8AE6AC2C53EF02063",
+  "runtimeSha256": "3A254FAC354A0878DB897C17E46C66FDC19BDDF1136D6659274033B25D063F0D",
+  "cases": [
+    {
+      "Name": "NativeProfileRefOut",
+      "Result": 42,
+      "Output": "",
+      "verified": true
+    },
+    {
+      "Name": "NativeProfileHello",
+      "Result": 42,
+      "Output": "Hello World\n",
+      "verified": true
+    },
+    {
+      "Name": "NativeProfileDispatch",
+      "Result": 42,
+      "Output": "",
+      "verified": true
+    },
+    {
+      "Name": "NativeProfileArray",
+      "Result": 42,
+      "Output": "",
+      "verified": true
+    },
+    {
+      "Name": "NativeProfileUnit",
+      "Result": 0,
+      "Output": "Hello World\n",
+      "verified": true
+    }
+  ],
+  "rejected": [
+    "wrong core name",
+    "wrong core version"
+  ],
+  "scope": "primitive/Unit/array/function/interface emission and runtime loading; not implementation bootstrap or native metadata symbol import",
+  "revisions": {
+    "metadata": "1c284c9412b12e3ac4eee3f16ed8ed8bff5f6e2b",
+    "raven": "e6912a285",
+    "metadataBranch": "codex/extended-cli-metadata",
+    "ravenBranch": "codex/metadata-consumer"
+  },
+  "focusedCompilerTests": {
+    "passed": 64,
+    "failed": 0,
+    "framework": "net11.0",
+    "filter": "SharedEmissionParityTests|EmissionCapabilityTests|PropagationCodeGenTests|ByRefParameterTests"
+  }
+}
