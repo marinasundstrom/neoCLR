@@ -14,7 +14,9 @@ layout ordinals. Nongeneric interface identities, direct relationships and abstr
 author from symbols. The library now exposes its own IILGenerator, consumed only behind Raven’s NeoCLR
 adapter. The audit identifies translated CLI bindings, unsupported profiles, host setup
 and lazy symbol materialization as remaining reader dependencies. The generator now also owns body-authoring internals; builder methods forward while
-writer-side validation remains unchanged. Continue the audited reader-boundary migrations.
+writer-side validation remains unchanged. Static native containers now also reconstruct as declaration owners from symbols,
+with value signatures still excluding static classes. Next migrate remaining supported
+final/virtual member contracts. See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).
 See [body-engine evidence](experiments/extended-cli-metadata/body-engine-2026-10-02.json). See [generator evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json). See [interface evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json). See [field evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json). See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
 See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json). See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 

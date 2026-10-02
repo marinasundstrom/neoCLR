@@ -653,3 +653,8 @@ Loaded-body editing and instruction insertion remain future work.
 The metadata library generator now owns body-authoring logic internally too. Legacy
 builder instruction methods forward to it, and both paths share definition-owned storage.
 Writer validation and encodings remain unchanged.
+
+
+Native static-container calls, including generic methods, now reconstruct from Raven
+symbols too. Static classes remain declaration owners rather than valid value types.
+Translated CLI bindings and remaining virtual/profile cases are unchanged.

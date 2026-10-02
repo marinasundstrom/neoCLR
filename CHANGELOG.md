@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Validate authored static-container generic calls on CLR and both native containers.
+  Raven now reconstructs these owners/methods from symbols while keeping static classes
+  out of value signatures. No API or format changes; remaining reader-backed bindings
+  are documented separately. All 108 C# groups and seven native consumers pass (42);
+  API snapshot validation passes.
+
 - Add the metadata library's IILGenerator with stable builder/attached-definition access,
   typed Emit overloads, helpers, locals and labels. Raven's NeoCLR adapter now uses it
   without changing shared compiler interfaces. Definition bodies remain canonical;

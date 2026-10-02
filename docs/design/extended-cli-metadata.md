@@ -2400,3 +2400,13 @@ handle checks and mixed legacy/generator calls. Definitions still store instruct
 locals and labels. Writer-side graph/flow validation and the existing internal operation
 representation remain in place; this does not move every validation concern off builders
 or introduce loaded-body rewriting. Raven's adapter and shared interfaces are unchanged.
+
+
+### Static declaration-owner admission (2026-10-02)
+
+Raven now reconstructs native static-container references without reader method/type
+lookups. A distinct owner predicate admits public unconstrained static containers while
+the value-signature predicate continues to exclude them. Existing authored type/method
+APIs suffice; no new API or format change is needed. Generic-static contracts reconstructed
+from values execute on CLR and both native container formats. Final/virtual class
+contracts and host/lifetime/translated-binding dependencies remain to be migrated.

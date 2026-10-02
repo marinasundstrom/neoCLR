@@ -35,11 +35,14 @@ internal static class NativeGenericMethodChecks
         Check(ReferenceEquals(method, read.MainModule.GetMethodDefinition(method.MetadataToken)), "canonical generic definition");
         Check(read.Write().SequenceEqual(image), "opaque generic image roundtrip");
         var app = new AssemblyBuilder(new("NativeGenericApp", new Version(1, 0, 0, 0)), core);
-        var imported = app.ImportReference(method, core);
+        var container = app.CreateTypeReference(library.Identity, core,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "Functions");
+        var imported = app.CreateMethodReference(container, "Identity",
+            new MethodSignature(parameter, [parameter], ["TItem"]), isStatic: true);
         Reject<ArgumentException>(() => imported.MakeGenericInstance());
         Reject<ArgumentException>(() => imported.MakeGenericInstance(PrimitiveType.Void));
         Check(imported.Signature.GenericParameterNames[0] == "TItem", "import preserves generic names");
-        Check(ReferenceEquals(imported, app.ImportReference(method, core)), "generic reference interning");
+        Check(ReferenceEquals(imported, app.CreateMethodReference(container, "Identity", imported.Signature, isStatic: true)), "authored generic reference interning");
         // Reconstruct a reference from semantic values, with no reader definition passed.
         var importedArray = app.CreateFunctionReference(library.Identity, core,
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "ArrayIdentity",
@@ -57,12 +60,14 @@ internal static class NativeGenericMethodChecks
     {
         foreach (var binary in new[] { false, true })
         {
-            var (library, _, _) = Create(binary);
+            var (library, _, image) = Create(binary);
             // CLI global call references remain intentionally unsupported. Execute the
-            // same imported static generic contract in a separate CLI consumer.
-            var read = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), library.CoreLibrary));
+            // same authored static generic contract in a separate CLI consumer.
             var cli = new AssemblyBuilder(new("GenericCliConsumer", new Version(1, 0, 0, 0)), library.CoreLibrary);
-            var imported = cli.ImportReference(read.MainModule.Types.Single().Methods.Single(m => m.Name == "Identity"), library.CoreLibrary);
+            var owner = cli.CreateTypeReference(library.Identity, library.CoreLibrary,
+                Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "Functions");
+            var parameter = SignatureType.MethodParameter(0);
+            var imported = cli.CreateMethodReference(owner, "Identity", new MethodSignature(parameter, [parameter], ["TItem"]), isStatic: true);
             var main = cli.AddFunction("Main"); cli.EntryPoint = main;
             main.LoadConstant(42); main.Call(imported.MakeGenericInstance(PrimitiveType.Int32)); main.Return();
             var context = new AssemblyLoadContext("native-generic-" + binary, true);

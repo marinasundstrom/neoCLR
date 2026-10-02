@@ -3762,3 +3762,14 @@ on the established path. Raven's adapter and shared contracts need no further ch
 108 C# groups and seven native consumers pass; the generic-owner sample executes
 on CLR and both native containers (42). Runtime Contract and bootstrap requirements
 remain unchanged. See [evidence](experiments/extended-cli-metadata/body-engine-2026-10-02.json).
+
+
+### Symbol-owned static containers (2026-10-02)
+
+Raven `d32b2dcb4` admits static classes as declaration owners when reconstructing native
+method references from symbols; value signatures remain separate and exclude static
+classes. Seven native consumers execute (42), and 108 metadata C# groups pass. The
+generic-static contract is authored from values and executes on CLR and both native
+containers. Translated CLI and remaining virtual/profile bindings, host setup and lazy
+materialization remain reader-backed. Runtime Contract/bootstrap requirements are
+unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).

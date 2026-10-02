@@ -5066,3 +5066,10 @@ GeneratorChecks verifies identity, definition access, scope/operand rejection, l
 preservation and CLR execution (42). NativeGenericOwnerChecks uses the interface for
 construction/mutation/calls and executes on CLR and both native containers. All seven
 Raven native consumers use the new interface through the backend adapter.
+
+
+Static container validation (2026-10-02): CreateTypeReference may supply declaration
+identity for an authored static method reference on a static class. This does not assert
+that the container is an instantiable signature value. Raven keeps these admissions
+separate. NativeGenericMethodChecks now authors static generic references from values
+for both CLR and native consumers, without passing reader definitions.
