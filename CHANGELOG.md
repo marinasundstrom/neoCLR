@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Author nongeneric interface identities, direct conversion edges and abstract member
+  references from semantic contracts. Derive transitive conversions and reject cycles
+  or conflicting nominal classification. Raven now supplies interface relationships and
+  dispatch flags from symbols; no metadata format change. Generic interfaces and richer
+  class inheritance remain outside this slice. All 107 metadata C# groups and seven
+  native consumers pass (42), including inherited dispatch and storage aliases; API
+  snapshot validation passes.
+
 - Author native instance-field references from explicit type/storage/readonly/slot
   contracts without reader definitions. Raven captures the ordinal during import in
   an optional compiler-owned layout interface and emits supported root-class fields

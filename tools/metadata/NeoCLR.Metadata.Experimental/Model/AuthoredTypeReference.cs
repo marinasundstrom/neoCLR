@@ -18,6 +18,10 @@ public sealed partial class AssemblyBuilder
     /// The digest is an output-local consistency check, not an encoded runtime integrity guarantee.</remarks>
     public ImportedTypeReference CreateTypeReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
         string artifactSha256, string @namespace, string name, int genericArity = 0)
+        => CreateNominalReference(dependency, dependencyCoreLibrary, artifactSha256, @namespace, name, genericArity, false);
+
+    private ImportedTypeReference CreateNominalReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
+        string artifactSha256, string @namespace, string name, int genericArity, bool isInterface)
     {
         ArgumentNullException.ThrowIfNull(dependency);
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
@@ -31,8 +35,16 @@ public sealed partial class AssemblyBuilder
         if (importedGraphs.TryGetValue(dependency, out var prior) && prior.Snapshot != snapshot)
             throw new InvalidDataException("conflicting dependency module snapshots");
         var reference = ImportTypeIdentity(dependency, @namespace, name, genericArity);
+        RegisterNominalKind(reference, isInterface);
         if (!importedGraphs.ContainsKey(dependency))
             importedGraphs.Add(dependency, (snapshot, new AssemblyBuilder(dependency, dependencyCoreLibrary)));
         return reference;
+    }
+    private readonly Dictionary<ImportedTypeReference, bool> nominalKinds = [];
+    private void RegisterNominalKind(ImportedTypeReference reference, bool isInterface)
+    {
+        if (nominalKinds.TryGetValue(reference, out var prior) && prior != isInterface)
+            throw new InvalidDataException("conflicting nominal type classification");
+        nominalKinds[reference] = isInterface;
     }
 }

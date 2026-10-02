@@ -3728,3 +3728,14 @@ All seven native consumers and 107 metadata C# groups pass; readonly stores reje
 Interface/dispatch and richer layout profiles, host setup and semantic materialization
 remain reader-backed. Runtime Contract and bootstrap requirements are unchanged. See
 [evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json).
+
+
+### Symbol-owned interface graph and dispatch (2026-10-02)
+
+Raven `6a28042f3` authors nongeneric interface identities, direct interface edges and
+abstract virtual member references from symbols. Transitive assignability is derived
+by the output graph, not reader queries on this path. Seven native consumers execute
+(42), including interface inheritance and storage aliases; 107 C# groups pass. Generic
+interfaces, broader inheritance/virtual profiles, unsupported members, host setup and
+semantic materialization remain outside the migration. Runtime Contract and bootstrap
+requirements are unchanged. See [evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json).

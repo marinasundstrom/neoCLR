@@ -2,8 +2,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyBuilder
 {
-    /// <summary>Authors a public nonvirtual root-class method or constructor reference without a reader definition.</summary>
-    /// <param name="declaringType">Output-owned top-level reference-class definition, not a construction.</param>
+    /// <summary>Authors a public nonvirtual root-class member or abstract interface method reference without a reader definition.</summary>
+    /// <param name="declaringType">Output-owned top-level class/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
     /// <param name="signature">Primitive, scoped parameter, external reference-class construction or vector signature.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
@@ -11,8 +11,8 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
-    /// <remarks>The caller supplies public, concrete, nonvirtual semantics. No dependency is loaded or verified.
-    /// Instance generic methods, byrefs, value/nested owners and interface dispatch are unsupported.
+    /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
+    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Instance generic methods, byrefs and value/nested owners are unsupported.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false)
@@ -24,6 +24,9 @@ public sealed partial class AssemblyBuilder
             declaringType.TypeArguments.Count != 0 || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph))
             throw new ArgumentException("method requires an owned reference-class definition", nameof(declaringType));
         bool constructor = name == ".ctor";
+        bool isInterface = authoredInterfaces.Contains(declaringType);
+        if (isInterface && (isStatic || constructor || signature.GenericParameterNames.Count != 0))
+            throw new ArgumentException("interface contract requires a nongeneric instance method");
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" || name.Any(char.IsControl) ||
             constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
             !isStatic && signature.GenericParameterNames.Count != 0)
@@ -42,9 +45,9 @@ public sealed partial class AssemblyBuilder
         }
         if (authoredCallableReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
         var owner = new TypeBuilder(graph.Graph, declaringType.Namespace, declaringType.Name, isStatic: false,
-            genericNames: Enumerable.Range(0, declaringType.GenericArity).Select(i => "T" + i).ToArray());
+            genericNames: Enumerable.Range(0, declaringType.GenericArity).Select(i => "T" + i).ToArray(), isInterface: isInterface);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
-        { DeclaringReference = declaringType };
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface };
         authoredCallableReferences.Add(reference);
         return reference;
 

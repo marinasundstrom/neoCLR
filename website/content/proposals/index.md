@@ -637,3 +637,8 @@ work. The assembly format is unchanged.
 Native root-class field references now use symbol-owned storage signatures and explicit
 layout ordinals. .NET continues to use named field references. Richer layouts and
 interface dispatch remain further boundary work; the native instruction set is unchanged.
+
+
+Nongeneric interface relationships and abstract dispatch references now also reconstruct
+from Raven symbols. Existing inheritance/dispatch and interface-storage consumers pass;
+generic interfaces and broader class inheritance remain pending.

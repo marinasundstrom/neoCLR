@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Authored interface contracts](#authored-interface-contracts-development-2026-10-02): interface identity, conversions and dispatch.
+
 - [Authored field references](#authored-field-references-development-2026-10-02): explicit field contracts and native layout slots.
 
 - [Authored method references](#authored-method-references-development-2026-10-02): member contracts without input definitions.
@@ -4841,8 +4843,8 @@ arguments. Static generic methods are supported; instance generic methods are no
 
 Signatures admit primitive values, a Void result, scoped owner/method parameters,
 output-owned external reference-class constructions and vectors. `.ctor` requires an
-instance nongeneric Void signature. Byrefs/out parameters, nested/value owners, interface
-dispatch and virtual contracts are unsupported. No members or access rules are resolved
+instance nongeneric Void signature. Byrefs/out parameters, nested/value owners, class virtual contracts are unsupported. Authored interface dispatch is supported as
+described below. No members or access rules are resolved
 from the dependency: the caller asserts the semantic contract. This API does not imply
 that an arbitrary interface reference can be treated as a reference-class owner.
 
@@ -4899,3 +4901,36 @@ method.Return();
 C# authored-reference checks cover body writing, interning, slot conflicts, invalid
 owners/ordinals and readonly-store rejection. Raven's native consumers exercise direct
 field load/store and alias mutation with private fields preceding public fields.
+
+
+## Authored interface contracts (development, 2026-10-02)
+
+`AssemblyBuilder.CreateInterfaceReference(AssemblyIdentity dependency,
+AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
+string name) -> ImportedTypeReference` authors a public nongeneric top-level interface.
+Identity/core/digest/name validation, errors and limits follow CreateTypeReference.
+Class/interface classification conflicts throw InvalidDataException, including when
+mixing authored references and reader imports. The caller asserts truthful declaration
+facts; the dependency is not loaded or inspected.
+
+`AssemblyBuilder.AddInterfaceConversion(ImportedTypeReference source,
+ImportedTypeReference target) -> void` registers direct interface inheritance or class
+implementation. Both references belong to this output; the source is nongeneric,
+top-level and reference-shaped, and the target must come from CreateInterfaceReference.
+Edges are idempotent and transitive conversions are derived using graph traversal.
+Null endpoints throw ArgumentNullException; foreign/unsupported endpoints, noninterface
+targets and cycles throw ArgumentException. More than 4096 distinct direct edges throws
+InvalidDataException. Register relationships before writing bodies that depend on them.
+This records conversions; it does not generate implementations in the runtime dependency.
+
+CreateMethodReference on an authored interface now creates a nongeneric abstract instance
+contract requiring virtual dispatch. Static members, constructors and generic methods
+reject. IsInterfaceMethod and RequiresVirtualDispatch are true, and CallVirtual emits the
+existing dispatch instruction. Classes retain the nonvirtual contract. Native field
+ordinals and artifact checks are unchanged.
+
+C# checks cover transitive class-to-interface return conversion, inherited interface
+calls, cyclic/invalid edges and conflicting nominal classification. Raven supplies
+relationships from symbols and executes its interface inheritance, alias storage and
+method/property dispatch samples. Generic interfaces and class inheritance remain
+outside this authoring slice. The library instruction-generator API is still pending.

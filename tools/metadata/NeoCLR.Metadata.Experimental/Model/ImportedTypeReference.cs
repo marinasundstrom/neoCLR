@@ -55,6 +55,7 @@ public sealed partial class AssemblyBuilder
     private readonly Dictionary<(ImportedTypeReference, ImportedTypeReference), bool> nativeInterfaceConversions = [];
     internal bool HasNativeInterfaceConversion(ImportedTypeReference actual, ImportedTypeReference target)
     {
+        if (authoredInterfaces.Contains(target) && HasAuthoredInterfaceConversion(actual, target)) return true;
         if (!nativeImportedDefinitions.TryGetValue(actual, out var source) || !nativeImportedDefinitions.TryGetValue(target, out var destination) ||
             (destination.Attributes & 0x20) == 0 || actual.GenericArity != 0 || target.GenericArity != 0) return false;
         if (nativeInterfaceConversions.TryGetValue((actual, target), out var known)) return known;
@@ -99,6 +100,7 @@ public sealed partial class AssemblyBuilder
         if (importedGraphs.TryGetValue(identity, out var prior) && prior.Snapshot != definition.Module.Assembly.ImportSnapshotIdentity) throw new InvalidDataException("conflicting dependency module snapshots");
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
         if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));
+        RegisterNominalKind(result, (definition.Attributes & 0x20) != 0);
         if (definition.Module.Assembly.IsNative) nativeImportedDefinitions[result] = definition;
         return result;
     }

@@ -2362,3 +2362,15 @@ semantics with an output-owned type reference. The supplied slot is a host asser
 no dependency bytes are read to verify it. Root nongeneric primitive/nominal/vector
 fields use this path; constructed/inherited/interface/value/nested profiles remain
 excluded. Other reader-backed import paths and host setup remain pending migration.
+
+
+### Authored interface graph (2026-10-02)
+
+CreateInterfaceReference establishes nongeneric interface classification, and
+AddInterfaceConversion records direct inheritance/implementation edges supplied by the
+semantic model. The output derives transitive conversions without input definitions.
+Cycles and classification conflicts reject; direct edges are bounded to 4096. Authored
+interface methods are nongeneric abstract instance contracts and require CallVirtual.
+Raven now supplies those facts from symbols, including root classes implementing
+interfaces. Generic interfaces and broader inheritance/dispatch profiles remain pending.
+This adds authoring contracts, not new opcodes or a runtime implementation of interfaces.

@@ -55,6 +55,20 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<ArgumentException>(() => app.CreateFieldReference(box, "Bad", PrimitiveType.Int32, 0));
         var read = app.AddFunction("Read", new MethodSignature(PrimitiveType.Int32, [item]));
         read.LoadArgument(0); read.LoadField(valueField); read.Return();
+        var contract = app.CreateInterfaceReference(dependency, core, hash, "Example", "IValue");
+        var derived = app.CreateInterfaceReference(dependency, core, hash, "Example", "IDerived");
+        app.AddInterfaceConversion(derived, contract);
+        app.AddInterfaceConversion(item, derived);
+        app.AddInterfaceConversion(item, derived); // Idempotent.
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, derived));
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, item));
+        Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, core, hash, "Example", "IValue"));
+        var valueMethod = app.CreateMethodReference(contract, "Get", new MethodSignature(PrimitiveType.Int32, []));
+        if (!valueMethod.RequiresVirtualDispatch || !valueMethod.IsInterfaceMethod) throw new Exception("interface dispatch flags");
+        var conversion = app.AddFunction("AsValue", new MethodSignature(contract, [item]));
+        conversion.LoadArgument(0); conversion.Return();
+        var dispatch = app.AddFunction("Dispatch", new MethodSignature(PrimitiveType.Int32, [derived]));
+        dispatch.LoadArgument(0); dispatch.CallVirtual(valueMethod); dispatch.Return();
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.LoadConstant(42); main.Call(reference); main.Return();
         _ = app.WriteNativeAssembly();
