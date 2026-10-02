@@ -33,8 +33,8 @@ Author follow-up proposes a pure metadata resolution/view layer to unify local a
 external inspection. The initial C# MetadataLoadContext and assembly/module/nominal facade are implemented;
 Raven uses them instead of its private dependency resolver. 109 metadata test groups pass;
 [all seven consumers execute](experiments/extended-cli-metadata/introspection-context-2026-10-02.json).
-Next add constructed/member views to move reusable metadata projection out of Raven's
-loader; see [metadata resolution views](design/metadata-resolution-views.md).
+Constructed type and field views now project signatures for Raven; canonical view-to-symbol
+mapping preserves array identity. Next add method/parameter views and open method scopes; see [metadata resolution views](design/metadata-resolution-views.md).
 External interface implementation/inheritance declarations remain subsequent work.
 Previously identified next capability: external interface implementation/inheritance declarations for separately
 compiled class-library consumers; the current reader admits relationships within one

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add constructed/array/primitive/owner-parameter metadata views and declared
+  field projection. Raven consumes facade field types and closed signatures, preserving
+  canonical array symbols. Method/parameter views and open method scopes remain pending.
+
 - Add a C# metadata-only Introspection facade with a fixed MetadataLoadContext and
   canonical assembly/module/nominal views. Raven replaces its private nominal resolver
   with the shared context; constructed/member views remain pending. Validate exact

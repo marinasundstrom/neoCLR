@@ -689,3 +689,7 @@ Development checkpoint (2026-10-02): the C# metadata prototype now has an Intros
 shaped facade and explicit metadata load context. Raven uses it for local/external type
 resolution without runtime loading. Constructed and member views remain development work;
 this is not a new guest Introspection release.
+
+Development checkpoint (2026-10-02): the C# metadata facade now projects constructed
+types and declared fields, including generic substitution. Raven consumes those views;
+method/parameter projection and the guest implementation remain future work.

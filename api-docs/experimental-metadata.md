@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Constructed and field views](#constructed-and-field-views-development-2026-10-02): signature projection and declared field metadata.
+
 - [Introspection facade and MetadataLoadContext](#metadata-only-introspection-facade-development-2026-10-02): context-owned assembly, module and nominal-type views.
 
 - [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
@@ -5193,3 +5195,48 @@ missing dependencies, diamonds, legal cycles, foreign snapshot rejection, concur
 context isolation and collection immutability. Raven now uses this context for nominal
 resolution; its emission remains based on symbols. This host-only namespace is manually
 documented here and is not included in the guest RavenDoc reference assembly.
+
+
+### Constructed and field views (development, 2026-10-02)
+
+In `NeoCLR.Metadata.Experimental.Introspection`:
+
+| Type | Public members added |
+| --- | --- |
+| MetadataLoadContext | `ResolveSignature(SignatureType signature, IReadOnlyList<TypeInfo>? typeArguments = null): TypeInfo` |
+| NominalTypeInfo | `GetGenericArguments(): IReadOnlyList<TypeInfo>`, `MakeGenericType(params TypeInfo[] arguments): ConstructedTypeInfo`, `GetFields(): IReadOnlyList<FieldInfo>` |
+| PrimitiveTypeInfo | `PrimitiveType Kind`, DisplayName, IsNominalType=false |
+| ArrayTypeInfo | `TypeInfo ElementType`, DisplayName, IsNominalType=false |
+| GenericParameterTypeInfo | `NominalTypeInfo DeclaringType`, `int Position`, DisplayName, IsNominalType=false |
+| ConstructedTypeInfo | `NominalTypeInfo Definition`, `IReadOnlyList<TypeInfo> TypeArguments`, `GetFields(): IReadOnlyList<FieldInfo>`, DisplayName, IsNominalType=true |
+| FieldInfo | `string Name`, `uint MetadataToken`, `TypeInfo DeclaringType`, `TypeInfo FieldType`, `bool IsStatic`, `bool IsReadOnly` |
+
+Views are library-created and interned by context/type structure. Field collections are
+stable and read-only per owner view. GetFields returns all declared fields in metadata
+order, with no inherited lookup or visibility filtering. The token always identifies
+the original declaration in Definition.Module. Primitive views describe signature
+categories, not invented core-library declarations. Open parameter identity includes
+the declaring nominal definition; DisplayName (`!0`, etc.) is not identity.
+
+MakeGenericType copies exactly one same-context argument per parameter. Null arguments
+throw ArgumentNullException; wrong arity, foreign/null/Void/bare-generic arguments,
+nongeneric owners and excessive nesting throw ArgumentException. Scoped caller parameters
+are allowed. This projects metadata, not language-level generic constraint satisfaction.
+
+ResolveSignature accepts reader primitives, nominal references, constructions, vectors
+and owner parameters. Up to 32 owner arguments are copied before projection; null
+signature throws ArgumentNullException, foreign/null/Void/excessive arguments throw
+ArgumentException. Missing dependencies, unsupported signatures or absent parameter
+scope throw InvalidDataException. Output-builder types and method-scoped parameters are
+not supported. Nesting is bounded to 16. Substitution is simultaneous: supplying another
+owner's !0 returns that parameter unchanged rather than substituting it again.
+
+GetFields decodes through the current reader profile and throws InvalidDataException
+for unavailable signatures/dependencies. Broader CLI signatures retain reader limitations.
+For a recursive Box<T>.Next: Box<T>, projecting Box<Int32> returns the existing constructed
+view without expanding its fields recursively. No runtime objects are inspected or mutated.
+
+The names follow the runtime model; this prototype distinguishes nominal definitions
+from constructed views explicitly. MethodInfo/ParameterInfo, properties, full access
+flags, function/byref views and open method generic scopes remain follow-up work.
+The new host types are covered here, not added to the guest RavenDoc assembly.

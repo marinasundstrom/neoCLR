@@ -51,7 +51,9 @@ public sealed class ModuleInfo
 /// Missing capabilities are not fabricated as empty collections or runtime handles.</remarks>
 public abstract class TypeInfo
 {
-    private protected TypeInfo() { }
+    private protected TypeInfo(MetadataLoadContext context) { Context = context; }
+    internal MetadataLoadContext Context { get; }
+    internal virtual int Depth => 0;
     /// <summary>Gets a display label, not a binding identity.</summary>
     public abstract string DisplayName { get; }
     /// <summary>Gets whether this represents a nominal declaration.</summary>
@@ -64,8 +66,24 @@ public sealed class NominalTypeInfo : TypeInfo
 {
     private readonly MetadataLoadContext context;
     private readonly TypeDefinition definition;
-    internal NominalTypeInfo(MetadataLoadContext context, TypeDefinition definition)
-    { this.context = context; this.definition = definition; }
+    internal NominalTypeInfo(MetadataLoadContext context, TypeDefinition definition) : base(context)
+    {
+        this.context = context; this.definition = definition;
+        parameters = Array.AsReadOnly(Enumerable.Range(0, definition.GenericArity).Select(i => (TypeInfo)new GenericParameterTypeInfo(context, this, i)).ToArray());
+        fields = new(() => context.ProjectFields(definition, this, parameters));
+    }
+    private readonly IReadOnlyList<TypeInfo> parameters;
+    private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
+    internal TypeDefinition Definition => definition;
+    /// <summary>Gets stable owner-scoped generic parameter views in declaration order.</summary>
+    public IReadOnlyList<TypeInfo> GetGenericArguments() => parameters;
+    /// <summary>Constructs this generic definition using copied, same-context arguments.</summary>
+    /// <exception cref="ArgumentException">Wrong arity, foreign/Void arguments or excessive nesting.</exception>
+    /// <exception cref="ArgumentNullException">Arguments are null.</exception>
+    public ConstructedTypeInfo MakeGenericType(params TypeInfo[] arguments) => context.Construct(this, arguments);
+    /// <summary>Gets all declared fields in metadata order, without inherited-member or visibility filtering.</summary>
+    /// <exception cref="InvalidDataException">A field signature is unsupported or its dependency is missing.</exception>
+    public IReadOnlyList<FieldInfo> GetFields() => fields.Value;
     /// <summary>Gets the metadata name, including generic arity suffix.</summary>
     public string Name => definition.Name;
     /// <summary>Gets the declared namespace.</summary>

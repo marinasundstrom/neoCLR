@@ -771,3 +771,8 @@ MetadataLoadContext, AssemblyInfo, ModuleInfo, TypeInfo and NominalTypeInfo. All
 members are covered in the [host manual](experimental-metadata.md#metadata-only-introspection-facade-development-2026-10-02).
 These host-only types are not guest Raven APIs and do not belong in the RavenDoc input
 assembly. Constructed/member facade coverage remains pending rather than silently omitted.
+
+Host facade coverage now also includes PrimitiveTypeInfo, ArrayTypeInfo,
+GenericParameterTypeInfo, ConstructedTypeInfo and FieldInfo, with every current member
+in [constructed and field views](experimental-metadata.md#constructed-and-field-views-development-2026-10-02).
+Method/property facade coverage remains explicitly pending.

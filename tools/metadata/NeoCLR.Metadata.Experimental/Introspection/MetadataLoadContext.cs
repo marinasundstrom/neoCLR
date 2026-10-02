@@ -5,7 +5,7 @@ namespace NeoCLR.Metadata.Experimental.Introspection;
 /// <summary>A fixed catalog of loaded metadata snapshots and context-owned introspection views.</summary>
 /// <remarks>No filesystem probing, runtime loading or execution occurs. Views retain their snapshots.
 /// Identity is scoped to this context; no global cache or disposal of shared snapshots is involved.</remarks>
-public sealed class MetadataLoadContext
+public sealed partial class MetadataLoadContext
 {
     private readonly Dictionary<AssemblyIdentity, AssemblyInfo> assemblies = [];
     private readonly Dictionary<TypeDefinition, NominalTypeInfo> types = [];

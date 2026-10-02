@@ -164,3 +164,22 @@ The runtime interfaces informed names and navigation, but remain unchanged: this
 has no execution handles, no invocation and no guest implementation. Next move scoped
 generic and member projection into the facade, using current symbol-loader behavior as
 regression evidence. Language binding and diagnostic policy remain Raven responsibilities.
+
+
+Constructed/field facade checkpoint (2026-10-02): the C# Introspection model now has
+canonical primitive, vector, owner-parameter and constructed-type views plus declared
+FieldInfo views. Definitions remain open; constructed owners substitute field signatures
+simultaneously, preserving caller parameter scope and declaration identity. Recursive
+nominal fields resolve without eagerly expanding members. Foreign/Void/bare-generic
+arguments, wrong arity and unsupported method-parameter scopes reject explicitly.
+
+Raven now consumes facade field types and closed signature projections, caching symbol
+mapping by canonical view identity. This preserves array identity across fields, methods
+and constructors; the existing integration assertion caught and verified that boundary.
+Open method-signature adaptation remains in Raven until method/parameter views exist.
+No emitter dependency on the context, Runtime Contract change, bootstrap change or
+runtime/metadata encoding change is introduced. The runtime model informs names and
+semantics but its guest implementation is unchanged. No performance claim is made.
+
+Validation: 109/109 C# groups and all seven Raven runtime consumers pass. See
+[field-view evidence](../experiments/extended-cli-metadata/introspection-field-views-2026-10-02.json).
