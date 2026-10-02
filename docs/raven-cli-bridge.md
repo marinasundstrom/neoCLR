@@ -2909,3 +2909,8 @@ its existing path. Lambda synthesis, captured receivers, generic/imported bindin
 and inhabited-Void callbacks remain pending in this producer profile; these are not
 permanent native Function restrictions. Runtime integration remains on the feature
 branch `codex/extended-cli-metadata`.
+
+The subsequent compiler slice supports noncapturing synchronous lambdas through
+internal assembly-function definitions and the shared lowered body planner. The
+direct lambda consumer returns 42. Capturing, async, iterator and generic lambda
+targets remain producer gaps; .NET closure generation and Runtime Contracts are unchanged.
