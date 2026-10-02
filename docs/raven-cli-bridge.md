@@ -2936,3 +2936,9 @@ uses exact assembly/physical-name/type-argument identity when semantic carrier v
 differ, notably for nongeneric None. Binding and Runtime Contracts are unchanged.
 Seven direct native profile controls pass; the unchanged collections sample next
 requires iterator-loop lowering. This still does not claim broad sample completion.
+
+The portable reference-iterator helper now consumes compiler-selected GetEnumerator,
+MoveNext and Current members through ordinary bound calls, locals and branches. The
+native adapter opts in; .NET retains its existing generator and Runtime Contracts.
+The unchanged collections application completes body planning and now needs explicit
+linkage between the matching CLI reference snapshot and translated native System.

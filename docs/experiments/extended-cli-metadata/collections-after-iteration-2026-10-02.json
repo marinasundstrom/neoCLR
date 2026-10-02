@@ -1,0 +1,33 @@
+{
+  "selection": "application-order-collections",
+  "targetReference": "api-docs/reference/NeoCLR.CoreProbe.dll",
+  "targetReferenceSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "runtimeSha256": "4B18A856E78DA581713BE4228EC6F4096B2A80F2FC7F941A3C1C5FBB251641BF",
+  "targetProfile": "CompilationOptions.NeoCLR plus native Self marker; CLI declaration snapshot, not a native symbol importer",
+  "hostProfile": "Existing direct-emitter .NET primitive bootstrap; no native library dependencies",
+  "methodology": "Unchanged sources; grouped foundational contracts, individual library units, selected applications and entire library. Binding failures stop emission. Target configuration rejection is recorded, not bypassed. No application with failed emission is run. Ordinary CLI bridge emission is a nonexecuted control using a reference-only core. Full diagnostics saved per case; report retains first 12.",
+  "cases": [
+    {
+      "id": "application-order-collections-target",
+      "profile": "target",
+      "sources": [
+        {
+          "path": "docs/experiments/raven-target/samples/application-order-collections.rvn",
+          "sha256": "D775C2C648591482CF53A0A735603CA51AEA48C2F2BB33633C95830E57B6550B"
+        }
+      ],
+      "phase": "emission",
+      "bytes": 0,
+      "diagnosticCount": 1,
+      "diagnostics": [
+        "error NEOMETA001: Native emission does not support unregistered dependency type: interface MutableMap\u003CK, V\u003E."
+      ],
+      "cliBridgeEmission": {
+        "success": true,
+        "bytes": 7168,
+        "diagnostics": []
+      },
+      "execution": null
+    }
+  ]
+}

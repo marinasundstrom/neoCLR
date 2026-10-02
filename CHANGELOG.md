@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add Raven's opt-in shared reference-iterator lowering. The unchanged collections
+  sample now completes body planning and reaches explicit native System dependency
+  linkage; no full native application execution is claimed yet.
+
 - Connect Raven reference conversions to native castclass and preserve physical
   union-case identity across carrier views. The unchanged collections sample now
   passes these boundaries and stops at iterator for-loop lowering.
