@@ -9,6 +9,16 @@ public sealed class GenericTypeInstance : IEquatable<GenericTypeInstance>
     public TypeBuilder Definition { get; }
     /// <summary>Gets copied arguments in declaration order.</summary>
     public IReadOnlyList<SignatureType> TypeArguments { get; }
+    internal bool ConformsTo(SignatureType contract)
+    {
+        SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute)
+            : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref))
+            : type.ImportedType is { } imported ? imported.Substitute(Substitute)
+            : type.TypeParameterIndex is { } index ? TypeArguments[index]
+            : type.GenericInstance is { } nested ? nested.Definition.MakeGenericInstance(nested.TypeArguments.Select(Substitute).ToArray())
+            : type.ArrayElement is { } element ? SignatureType.ArrayOf(Substitute(element)) : type;
+        return Definition.InheritedContracts().Any(inherited => Substitute(inherited) == contract);
+    }
     /// <summary>Compares definition identity and argument values.</summary>
     public bool Equals(GenericTypeInstance? other) => other is not null && ReferenceEquals(Definition, other.Definition) && TypeArguments.SequenceEqual(other.TypeArguments);
     /// <summary>Compares construction identity.</summary>

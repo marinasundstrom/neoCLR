@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--generic-implementation-runtime")
+{
+    await GenericImplementationChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--constructed-inheritance-runtime")
 {
     await ConstructedInheritanceChecks.RunRuntime(args[1], args[2]); return 0;
@@ -277,6 +281,7 @@ var tests = new (string Name, Action Body)[]
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
     ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),
     ("Constructed interface inheritance", ConstructedInheritanceChecks.Run),
+    ("Generic class interface implementation", GenericImplementationChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),

@@ -109,7 +109,10 @@ public sealed partial class MethodBuilder
                     stack.RemoveAt(stack.Count - 1);
                     return;
                 }
-                if (stack.Count == 0 || stack[^1] != type && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
+                var constructedConformance = stack.Count > 0 && stack[^1].GenericInstance is { } instance &&
+                    (type.Class is { IsInterface: true } interfaceType && instance.ConformsTo(interfaceType) ||
+                     type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance));
+                if (stack.Count == 0 || stack[^1] != type && !constructedConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)

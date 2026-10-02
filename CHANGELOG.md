@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Admit generic root-class implementations of owned interfaces, including constructed
+  owner arguments and transitive substitution. Metadata stack checks validate the
+  actual generic receiver before interface dispatch; CLI/native C# execution returns 42
+  and all 93 metadata groups pass. Raven generic providers and iterators execute against
+  unchanged Sequence contracts. An explicit authoring seed binds unchanged ArrayList;
+  native emission now reaches the missing CheckedStorage.Reserve intrinsic mapping.
+
 - Support owned constructed interface inheritance and transitive positional argument
   substitution in the metadata producer/reader, plus constructed interface CallVirtual.
   Cycle, scope and implementation checks remain enforced. Unchanged Raven collection

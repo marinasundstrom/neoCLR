@@ -1,0 +1,13 @@
+{
+  "scenario": "Implementation\u003CUnused,T\u003E implements Middle\u003CT\u003E inheriting Root\u003CT\u003E; Echo dispatch through Root\u003Cint\u003E",
+  "cliResult": 42,
+  "nativeResult": 42,
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "binarySha256": "3560D89759F4E94F3C31B8D91759E122D3A64CB6631B0647502E5965C1D78170",
+  "rejectionChecks": [
+    "wrong owner argument in implementation signature",
+    "incompatible constructed receiver",
+    "out-of-scope owner argument",
+    "out-of-scope method argument"
+  ]
+}

@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An authored interface inheritance or implementation relationship.</summary>
-/// <remarks>Same-assembly nongeneric inheritance and root-class implementations of nongeneric or closed generic interfaces are admitted.</remarks>
+/// <remarks>Same-assembly interface inheritance and root-class implementations admit constructed arguments, including declaring-type parameters.</remarks>
 public sealed class InterfaceImplementation
 {
     /// <summary>Creates an unattached relationship to an interface reference.</summary>

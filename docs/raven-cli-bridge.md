@@ -3067,3 +3067,48 @@ translated System. The eventual replacement loads native declarations directly a
 compiles System implementation sources. Next is the implementation seed needed for
 ArrayList's RuntimeServices/CheckedStorage dependencies. No public metadata API changed
 in this slice; its existing property/accessor and generic interface contracts suffice.
+
+
+### Generic implementation source checkpoint (2026-10-02, development)
+
+The metadata producer now admits root-class implementations of owned interfaces with
+owner type parameters. Required methods and receiver conformance substitute the actual
+arguments through inherited contracts. This follows CLR InterfaceImpl/TypeSpec and
+callvirt behavior, reusing existing neoCLR runtime dispatch; there is no new instruction
+or encoded category. Static/value implementation owners, variance, MethodImpl and default
+interface bodies remain unsupported. The [host API reference](../api-docs/experimental-metadata.md#generic-class-interface-implementations-development-2026-10-02)
+documents builders, definitions, errors and the remaining loaded-CLI reader limitation.
+
+Raven commit `0406a6d4d` on `codex/metadata-consumer` exposes
+`AllowsConstructedInterfaceImplementations` as an opt-in shared capability;
+CLR/native profiles enable it. Its adapter resolves constructed interfaces through their
+original definitions and preserves owner arguments. Open root classes use the existing
+nonsealed metadata shape. Unchanged Sequence hierarchy sources run with generic provider
+and iterator classes: constructors store T, and inherited Count/indexer/iterator dispatch
+returns 42 on CLR and neoCLR in both source orders. The native target uses
+CompilationOptions.NeoCLR and the matched CoreProbe Self contract. [Source and bundle evidence](experiments/extended-cli-metadata/generic-collection-contracts-2026-10-02.json).
+
+The C# metadata fixture independently executes transitive generic dispatch and rejects
+mismatched implementations, incompatible constructed receivers and invalid argument scopes
+([evidence](experiments/extended-cli-metadata/generic-interface-implementation-2026-10-02.json)).
+All 93 metadata groups and 32 focused Raven interface tests pass. The existing broad application still returns its exact
+expected stdout, exit 0 and empty stderr
+([regression evidence](experiments/extended-cli-metadata/collections-after-generic-implementation-2026-10-02.json)).
+
+The bridge already has an authoring seed distinct from the consumer core. Generate it
+with `raven-target/Probe --reference-library-core <seed.dll>`, then run Raven's
+`NeoClrMetadataProbe --library-source <neo-root> <fresh-output> <seed.dll> <System.neox>`.
+This binds unchanged ArrayList plus its interface hierarchy with zero binding errors;
+the nonexecuted CLI control emits 6144 bytes. Imported Option declarations bind explicitly
+to translated System. Native output remains empty with a CheckedStorage.Reserve<T>
+diagnostic ([complete report and hashes](experiments/extended-cli-metadata/array-list-authoring-seed-2026-10-02.json)).
+The reference bodies are never executed. Consumer references continue to omit these
+implementation-only RuntimeServices/CheckedStorage declarations.
+
+Next is a native producer mapping for checked uninitialized reservation. The existing
+translator uses array.reserve; ordinary CLR newarr initializes every element and cannot
+replace it without changing read-before-write behavior. Raven owns target recognition,
+the metadata library must preserve the operation, and neoCLR already owns its checked
+execution semantics. This boundary is not evidence that ArrayList or all System sources
+now execute through the native producer. Native semantic importing remains future work;
+CLI authoring declarations and translated System still supply the temporary bootstrap.

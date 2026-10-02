@@ -485,5 +485,6 @@ metadata API and its restrictions are documented in the [API reference](/docs/).
 The next source-emission checkpoint compiles the unchanged collection interface sources
 through Sequence<T>, including constructed interface bases and its indexer. An inherited
 property/indexer consumer runs on CLR and neoCLR with both source orders; the real
-neoCLR target profile also passes. The collection storage implementation bootstrap
-remains work in progress. This does not yet compile the entire System library with the native backend.
+neoCLR target profile also passes, including generic provider and iterator classes.
+The unchanged ArrayList source now binds against the implementation seed, but native
+emission still needs the checked-uninitialized storage reservation mapping. This does not yet compile the entire System library with the native backend.

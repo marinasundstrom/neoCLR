@@ -3558,7 +3558,7 @@ pending; this does not resolve the collections Option<Order> import gap.
 null throws `ArgumentNullException`. `InterfaceType` retains the exact immutable reference.
 `DeclaringType` is null until successful attachment. Append to the new
 `TypeDefinition.Interfaces : IList<InterfaceImplementation>` on an attached authored type.
-For interfaces this declares inheritance; for nongeneric root classes it declares implicit
+For interfaces this declares inheritance; for root classes it declares implicit
 implementation. Builders add to this same collection; their existing handle lists are
 encoding caches over these immutable edges.
 
@@ -3783,7 +3783,7 @@ dependency registration and rejection of currently unsupported declarations.
 | `MethodBuilder.Emit(OpCode, ImportedMethodReference)` and `Emit(OpCode, ImportedConstructedMethodReference)` | Raw typed operands retain the same ownership, dispatch and generic-scope checks as helpers. No unrestricted integer/token escape hatch. |
 | `InterfaceImplementation(TypeReference, IEnumerable<SignatureType>)` | Definition-owned relationship with copied arguments; attachment validates ownership and shape. |
 | `InterfaceImplementation.TypeArguments : IReadOnlyList<SignatureType>` | Empty for nongeneric relationships, copied ordered arguments for a construction. |
-| `TypeBuilder.AddInterfaceImplementation(GenericTypeInstance)` | Appends the same definition relationship. Supports nongeneric root classes implementing closed owned generic interfaces with no inherited interface edges. Existing nongeneric overload is unchanged. |
+| `TypeBuilder.AddInterfaceImplementation(GenericTypeInstance)` | Appends the same definition relationship. Supports root classes, including generic owners, implementing owned generic interfaces with inherited edges and declaring-type arguments. |
 
 Null inputs throw `ArgumentNullException`; invalid construction/ownership/opcodes
 throw `ArgumentException` (an invalid implementation owner throws
@@ -4152,12 +4152,12 @@ Foreign/noninterface bases, duplicate edges, definition cycles, out-of-scope arg
 and the existing 256-constructed-edge limit throw `ArgumentException`. Mutating a later declaration
 cannot introduce a cycle through a constructed edge.
 
-Nongeneric root classes may implement closed inherited generic interfaces using the
+Root classes, including generic owners, may implement inherited generic interfaces using the
 existing `AddInterfaceImplementation(GenericTypeInstance)` overload. Required methods
 are collected transitively with positional substitution before exact public instance
 implementation validation. Missing methods fail writing with `InvalidDataException`;
 inheritance expansion is bounded to 4096 distinct constructed contracts. This does not
-add generic class implementations, variance, interface default bodies or MethodImpl
+add variance, interface default bodies or MethodImpl
 mappings. CLI uses ordinary InterfaceImpl/TypeSpec signatures; native metadata uses
 constructed interface signatures with the existing runtime dispatch semantics. No new
 instruction or runtime metadata category is introduced.
@@ -4171,3 +4171,29 @@ invalid stacks fail with `InvalidDataException`. Both encodings preserve the sam
 method signature and owner arguments. A C# fixture checks transitive positional
 substitution, CLI/native execution (42), PE reference projection, missing implementations,
 duplicate edges, cycles and invalid argument scopes.
+
+
+### Generic class interface implementations (development, 2026-10-02)
+
+`TypeBuilder.AddInterfaceImplementation(TypeBuilder contract)` now also accepts a
+nongeneric interface on a generic root class. The `GenericTypeInstance` overload
+accepts constructed interfaces whose arguments refer to that class's type parameters.
+The same relationships can be attached manually through `Definition.Interfaces`.
+Static/value/interface owners remain invalid implementation owners
+(`InvalidOperationException`); foreign/noninterface/duplicate edges and invalid owner
+or method parameter scopes remain `ArgumentException`. Existing edge limits apply.
+
+Required inherited methods are substituted positionally and must have matching public
+instance implementations when writing (`InvalidDataException` otherwise). Stack checking
+also substitutes the actual generic receiver's arguments before permitting interface
+assignment or dispatch; it does not admit arbitrary generic conversions or variance.
+CLI output uses standard InterfaceImpl TypeSpecs and callvirt, and native metadata
+retains the same owner arguments for its existing runtime dispatch. No opcode changed.
+
+C# tests execute `Implementation<Unused,T> : Middle<T> : Root<T>` with an Int32 Echo
+through Root<int> on CLR and neoCLR (42), reproject native metadata to CLI, and reject
+missing/mismatched implementations and out-of-scope type/method parameters. Raven's
+unchanged collection interfaces additionally execute with generic provider and iterator
+implementations, including constructor fields and inherited property/indexer calls.
+Loaded CLI `TypeDefinition.Interfaces` enumeration remains an explicit reader limitation;
+this change expands authored definitions and native round trips, not that reader view.
