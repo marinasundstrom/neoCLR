@@ -648,3 +648,8 @@ The development metadata library now exposes an independent IILGenerator for bod
 authoring. Raven uses it through the NeoCLR adapter; shared compiler interfaces remain
 separate. Legacy builder instruction methods still work through the same body engine.
 Loaded-body editing and instruction insertion remain future work.
+
+
+The metadata library generator now owns body-authoring logic internally too. Legacy
+builder instruction methods forward to it, and both paths share definition-owned storage.
+Writer validation and encodings remain unchanged.

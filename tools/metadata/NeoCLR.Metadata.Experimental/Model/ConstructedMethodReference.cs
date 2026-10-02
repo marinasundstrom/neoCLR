@@ -52,28 +52,20 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Not a constructor, foreign owner or invalid caller scope.</exception>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void NewObject(ConstructedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
+    public void NewObject(ConstructedMethodReference constructor) => GetILGenerator().NewObject(constructor);
     /// <summary>Calls a method on a constructed generic owner.</summary>
-    public void Call(ConstructedMethodReference method) => Emit(OpCode.Call, method);
+    public void Call(ConstructedMethodReference method) => GetILGenerator().Call(method);
     /// <summary>Dispatches an owned constructed interface method.</summary>
     /// <param name="method">A constructed interface contract from this assembly.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Foreign owner, noninterface method or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
-    public void CallVirtual(ConstructedMethodReference method) => Emit(OpCode.Callvirt, method);
+    public void CallVirtual(ConstructedMethodReference method) => GetILGenerator().CallVirtual(method);
     /// <summary>Appends Call, Callvirt or Newobj with a constructed owner/method reference.</summary>
     /// <param name="opCode">Newobj for constructors, Callvirt for interface contracts, Call otherwise.</param>
     /// <param name="operand">Owned reference, valid in the caller's type/method scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Foreign owner, wrong opcode or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
-    public void Emit(OpCode opCode, ConstructedMethodReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.IsAbstract ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("constructor requires Newobj, interface contract Callvirt, other members Call");
-        if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("constructed calls require an owned definition");
-        foreach (var type in operand.DeclaringTypeArguments.Concat(operand.MethodArguments))
-            type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.IsAbstract ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition, ConstructedTarget: operand));
-    }
+    public void Emit(OpCode opCode, ConstructedMethodReference operand) => GetILGenerator().Emit(opCode, operand);
 }

@@ -13,8 +13,9 @@ symbols, including owner generic parameters. Public nongeneric root-class fields
 layout ordinals. Nongeneric interface identities, direct relationships and abstract dispatch now also
 author from symbols. The library now exposes its own IILGenerator, consumed only behind Raven’s NeoCLR
 adapter. The audit identifies translated CLI bindings, unsupported profiles, host setup
-and lazy symbol materialization as remaining reader dependencies. Next separate the
-internal body engine and continue those boundary migrations. See [generator evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json). See [interface evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json). See [field evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json). See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
+and lazy symbol materialization as remaining reader dependencies. The generator now also owns body-authoring internals; builder methods forward while
+writer-side validation remains unchanged. Continue the audited reader-boundary migrations.
+See [body-engine evidence](experiments/extended-cli-metadata/body-engine-2026-10-02.json). See [generator evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json). See [interface evidence](experiments/extended-cli-metadata/symbol-only-interfaces-2026-10-02.json). See [field evidence](experiments/extended-cli-metadata/symbol-only-fields-2026-10-02.json). See [member evidence](experiments/extended-cli-metadata/symbol-only-members-2026-10-02.json).
 See [nominal call evidence](experiments/extended-cli-metadata/symbol-only-nominal-calls-2026-10-02.json). See [type-reference evidence](experiments/extended-cli-metadata/symbol-only-types-2026-10-02.json). See [validation and remaining scope](experiments/extended-cli-metadata/symbol-only-functions-2026-10-02.json). See [direction and current gaps](design/extended-cli-metadata.md#independent-compiler-and-library-generation-boundaries-2026-10-02).
 
 Author-directed priority (2026-10-02): proceed with direct native metadata import into

@@ -2389,3 +2389,14 @@ bodies and insertion/reordering remain unsupported. No format changes were requi
 Remaining reader dependencies include translated CLI bindings, unsupported dispatch/
 type profiles, host dependency setup and lazy semantic materialization. The newer native
 reference contracts do not establish reader disposal support for a whole compilation.
+
+
+### Body-authoring engine moved (2026-10-02)
+
+MethodILGenerator now implements append operations, typed operand checks, local/label
+creation and helpers. The 80 builder operations forward to GetILGenerator instead of
+the reverse. Local/label ownership remains the declaration identity, preserving foreign
+handle checks and mixed legacy/generator calls. Definitions still store instructions,
+locals and labels. Writer-side graph/flow validation and the existing internal operation
+representation remain in place; this does not move every validation concern off builders
+or introduce loaded-body rewriting. Raven's adapter and shared interfaces are unchanged.

@@ -40,20 +40,12 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Reference is null.</exception>
     /// <exception cref="ArgumentException">Reference belongs to another output or arguments exceed caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
-    public void Call(ImportedGenericMethodReference method) => Emit(OpCode.Call, method);
+    public void Call(ImportedGenericMethodReference method) => GetILGenerator().Call(method);
     /// <summary>Appends a generic imported call using the raw typed operand API.</summary>
     /// <param name="opCode">Call only.</param>
     /// <param name="operand">An instantiation owned by this output.</param>
     /// <exception cref="ArgumentNullException">Reference is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, consuming owner or caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, ImportedGenericMethodReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
-        if (!ReferenceEquals(operand.Definition.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
-        foreach (var type in operand.TypeArguments)
-            type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new("call.generic", Target: operand.Target.Definition, GenericTarget: operand.Target));
-    }
+    public void Emit(OpCode opCode, ImportedGenericMethodReference operand) => GetILGenerator().Emit(opCode, operand);
 }

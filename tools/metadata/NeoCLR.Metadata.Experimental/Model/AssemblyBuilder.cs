@@ -823,87 +823,70 @@ public sealed partial class MethodBuilder
     public bool ReturnsValue => Signature.ReturnType != PrimitiveType.Void;
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
-    public void LoadConstant(int value) => Emit(OpCode.Ldc_I4, value);
+    public void LoadConstant(int value) => GetILGenerator().LoadConstant(value);
     /// <summary>Appends a native System.Console.WriteLine call with a constant UTF-8 string.</summary>
     /// <param name="text">Unicode text, at most 64 KiB when UTF-8 encoded.</param>
     /// <exception cref="ArgumentNullException">Text is null.</exception>
     /// <exception cref="ArgumentException">Invalid Unicode or text exceeds the limit.</exception>
     /// <remarks>Native emission only; ordinary CLI Write rejects this operation. Does not alter the surrounding primitive stack.</remarks>
-    public void WriteConsoleLine(string text)
-    {
-        ValidateLiteral(text);
-        Append(new("console.line", Text: text));
-    }
+    public void WriteConsoleLine(string text) => GetILGenerator().WriteConsoleLine(text);
     /// <summary>Consumes a String stack value and writes it through native System.Console.WriteLine.</summary>
     /// <remarks>Native-only bootstrap; discards bundled System's inhabited Void result. Ordinary CLI output rejects this operation.</remarks>
     /// <exception cref="InvalidDataException">Instruction limit exceeded, or stack mismatch when writing.</exception>
-    public void WriteConsoleLine() => Append(new("console.write"));
+    public void WriteConsoleLine() => GetILGenerator().WriteConsoleLine();
 
-    private static void ValidateLiteral(string text)
-    {
-        ArgumentNullException.ThrowIfNull(text);
-        try
-        {
-            if (new System.Text.UTF8Encoding(false, true).GetByteCount(text) > 65536)
-                throw new ArgumentException("string literal exceeds 64 KiB", nameof(text));
-        }
-        catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid Unicode", nameof(text), error); }
-    }
+
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Argument slot index; instance receiver is zero and declared parameters start at one.</param>
-    public void LoadArgument(int index) => Emit(OpCode.Ldarg, index);
+    public void LoadArgument(int index) => GetILGenerator().LoadArgument(index);
     /// <summary>Stores a value into a by-value argument slot in this invocation.</summary>
     /// <param name="index">Argument slot index; instance declared parameters start at one. Bounds and exact type are checked when writing.</param>
     /// <exception cref="InvalidDataException">Instruction limit exceeded, or invalid index/stack type when writing.</exception>
     /// <remarks>Does not update caller storage. Receiver stores and by-reference parameters are unsupported.</remarks>
-    public void StoreArgument(int index) => Emit(OpCode.Starg, index);
+    public void StoreArgument(int index) => GetILGenerator().StoreArgument(index);
     /// <summary>Appends matching-width Int32/Int64 addition.</summary>
-    public void Add() => Emit(OpCode.Add);
+    public void Add() => GetILGenerator().Add();
     /// <summary>Appends matching-width Int32/Int64 subtraction.</summary>
-    public void Subtract() => Emit(OpCode.Sub);
+    public void Subtract() => GetILGenerator().Subtract();
     /// <summary>Appends matching-width Int32/Int64 multiplication.</summary>
-    public void Multiply() => Emit(OpCode.Mul);
+    public void Multiply() => GetILGenerator().Multiply();
     /// <summary>Appends matching-width signed Int32/Int64 division, truncating toward zero.</summary>
     /// <remarks>Zero and minimum-value divided by -1 fault at execution, not when writing.</remarks>
-    public void Divide() => Emit(OpCode.Div);
+    public void Divide() => GetILGenerator().Divide();
     /// <summary>Appends matching-width signed Int32/Int64 remainder, with the dividend's sign.</summary>
     /// <remarks>Zero faults at execution, not when writing. Native minimum/-1 faults; CLI follows the host CLR edge behavior.</remarks>
-    public void Remainder() => Emit(OpCode.Rem);
+    public void Remainder() => GetILGenerator().Remainder();
     /// <summary>Appends bitwise AND of matching Int32/Int64 or Boolean operands.</summary>
-    public void BitwiseAnd() => Emit(OpCode.And);
+    public void BitwiseAnd() => GetILGenerator().BitwiseAnd();
     /// <summary>Appends bitwise OR of matching Int32/Int64 or Boolean operands.</summary>
-    public void BitwiseOr() => Emit(OpCode.Or);
+    public void BitwiseOr() => GetILGenerator().BitwiseOr();
     /// <summary>Appends bitwise XOR of matching Int32/Int64 or Boolean operands.</summary>
-    public void BitwiseXor() => Emit(OpCode.Xor);
+    public void BitwiseXor() => GetILGenerator().BitwiseXor();
     /// <summary>Appends an Int32/Int64 left shift with an Int32 count.</summary>
     /// <remarks>CLI out-of-range counts are unspecified; native counts are masked to 5 or 6 bits.</remarks>
-    public void ShiftLeft() => Emit(OpCode.Shl);
+    public void ShiftLeft() => GetILGenerator().ShiftLeft();
     /// <summary>Appends a sign-extending Int32/Int64 right shift with an Int32 count.</summary>
     /// <remarks>CLI out-of-range counts are unspecified; native counts are masked to 5 or 6 bits.</remarks>
-    public void ShiftRight() => Emit(OpCode.Shr);
+    public void ShiftRight() => GetILGenerator().ShiftRight();
     /// <summary>Appends a call; foreign methods are imported during Write.</summary>
     /// <param name="target">Local or external builder method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
-    public void Call(MethodBuilder target) => Emit(OpCode.Call, target);
+    public void Call(MethodBuilder target) => GetILGenerator().Call(target);
     /// <summary>Appends a call to an imported read-only method contract.</summary>
     /// <param name="target">Reference imported by this method's assembly builder.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Foreign reference, open generic definition, or a contract requiring Callvirt.</exception>
-    public void Call(ImportedMethodReference target) => Emit(OpCode.Call, target);
+    public void Call(ImportedMethodReference target) => GetILGenerator().Call(target);
     /// <summary>Calls a static Int32 function selected from an explicitly loaded native System inventory.</summary>
     /// <param name="target">Owned System function whose parameters and result are Int32.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="InvalidDataException">Module is not System or the callable signature is unsupported.</exception>
     /// <remarks>Native-only bootstrap. The host must supply the matching System assembly to neoCLR;
     /// no assembly revision or image digest is encoded. Ordinary CLI output rejects this operation.</remarks>
-    public void Call(NativeFunctionDefinition target) => Emit(OpCode.Call, target);
+    public void Call(NativeFunctionDefinition target) => GetILGenerator().Call(target);
     /// <summary>Appends return with the declared stack shape; no values may remain afterward.</summary>
-    public void Return() => Emit(OpCode.Ret);
+    public void Return() => GetILGenerator().Return();
     /// <summary>Clears instructions for editing before another Write; local declarations and handles are retained.</summary>
-    public void ClearBody() => Definition.Body.ClearInstructions();
-    private void Append(Operation operation)
-    {
-        if (Instructions.Count >= 4096) throw new InvalidDataException("method instruction limit exceeded");
-        Instructions.Add(operation);
-    }
+    public void ClearBody() => GetILGenerator().ClearBody();
+
 }

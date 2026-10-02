@@ -70,19 +70,14 @@ public sealed partial class AssemblyBuilder
 public sealed partial class MethodBuilder
 {
     /// <summary>Loads a primitive, nominal or vector field from its exact external receiver type.</summary>
-    public void LoadField(ImportedFieldReference field) => Emit(OpCode.Ldfld, field);
+    public void LoadField(ImportedFieldReference field) => GetILGenerator().LoadField(field);
     /// <summary>Stores a primitive, nominal or vector field on its exact external receiver type; readonly stores fail validation.</summary>
-    public void StoreField(ImportedFieldReference field) => Emit(OpCode.Stfld, field);
+    public void StoreField(ImportedFieldReference field) => GetILGenerator().StoreField(field);
     /// <summary>Appends Ldfld or Stfld with an imported field operand.</summary>
     /// <param name="opCode">Ldfld or Stfld.</param>
     /// <param name="operand">Reference owned by this output builder.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or foreign reference.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack and readonly checks run on write.</exception>
-    public void Emit(OpCode opCode, ImportedFieldReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("foreign imported field", nameof(operand));
-        Append(new(opCode switch { OpCode.Ldfld => "field.import.load", OpCode.Stfld => "field.import.store", _ => throw OperandError(opCode) }, ImportedField: operand));
-    }
+    public void Emit(OpCode opCode, ImportedFieldReference operand) => GetILGenerator().Emit(opCode, operand);
 }

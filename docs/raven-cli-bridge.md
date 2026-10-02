@@ -3751,3 +3751,14 @@ builder instruction methods remain available, and loaded/insertion editing is pe
 All 108 C# groups and seven native consumers pass; generator-based generic-owner code
 executes on CLR and both native containers. Runtime Contract and bootstrap requirements
 are unchanged. See [evidence](experiments/extended-cli-metadata/body-generator-2026-10-02.json).
+
+
+### Generator owns body authoring (2026-10-02)
+
+The 80 legacy builder body operations now forward to MethodILGenerator, which owns
+appends, helpers, operand checks and local/label creation. Definition-owned storage
+and declaration-scoped handles are unchanged; writer-side graph/flow validation stays
+on the established path. Raven's adapter and shared contracts need no further change.
+108 C# groups and seven native consumers pass; the generic-owner sample executes
+on CLR and both native containers (42). Runtime Contract and bootstrap requirements
+remain unchanged. See [evidence](experiments/extended-cli-metadata/body-engine-2026-10-02.json).

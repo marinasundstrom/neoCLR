@@ -33,19 +33,14 @@ public sealed partial class FieldBuilder
 public sealed partial class MethodBuilder
 {
     /// <summary>Loads a field from an exactly matching constructed receiver.</summary>
-    public void LoadField(ConstructedFieldReference field) => Emit(OpCode.Ldfld, field);
+    public void LoadField(ConstructedFieldReference field) => GetILGenerator().LoadField(field);
     /// <summary>Stores a field on an exactly matching constructed receiver.</summary>
-    public void StoreField(ConstructedFieldReference field) => Emit(OpCode.Stfld, field);
+    public void StoreField(ConstructedFieldReference field) => GetILGenerator().StoreField(field);
     /// <summary>Appends Ldfld or Stfld with a constructed field reference.</summary>
     /// <param name="opCode">Ldfld or Stfld.</param>
     /// <param name="operand">Owned reference, valid in the caller's parameter scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign definition or out-of-scope argument.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; receiver, value and readonly checks run on write.</exception>
-    public void Emit(OpCode opCode, ConstructedFieldReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        ((SignatureType)operand.DeclaringType).ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand.Definition, ConstructedField: operand));
-    }
+    public void Emit(OpCode opCode, ConstructedFieldReference operand) => GetILGenerator().Emit(opCode, operand);
 }

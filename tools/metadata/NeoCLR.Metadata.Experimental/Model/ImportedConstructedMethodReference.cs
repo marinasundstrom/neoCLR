@@ -46,34 +46,25 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">The reference is null.</exception>
     /// <exception cref="ArgumentException">The reference is not a constructor, belongs to another output, or has invalid generic scope.</exception>
     /// <exception cref="InvalidDataException">The instruction limit is exceeded; stack validity is checked on write.</exception>
-    public void NewObject(ImportedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
+    public void NewObject(ImportedMethodReference constructor) => GetILGenerator().NewObject(constructor);
     /// <summary>Allocates through an imported constructor on a constructed generic owner.</summary>
     /// <param name="constructor">A constructor reference owned by this output assembly.</param>
     /// <exception cref="ArgumentNullException">The reference is null.</exception>
     /// <exception cref="ArgumentException">The reference is not a constructor, belongs to another output, or has invalid generic scope.</exception>
     /// <exception cref="InvalidDataException">The instruction limit is exceeded; stack validity is checked on write.</exception>
-    public void NewObject(ImportedConstructedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
+    public void NewObject(ImportedConstructedMethodReference constructor) => GetILGenerator().NewObject(constructor);
 
     /// <summary>Appends a direct imported call on a constructed nominal owner.</summary>
-    public void Call(ImportedConstructedMethodReference method) => Emit(OpCode.Call, method);
+    public void Call(ImportedConstructedMethodReference method) => GetILGenerator().Call(method);
     /// <summary>Appends interface dispatch to an imported constructed contract.</summary>
-    public void CallVirtual(ImportedConstructedMethodReference method) => Emit(OpCode.Callvirt, method);
+    public void CallVirtual(ImportedConstructedMethodReference method) => GetILGenerator().CallVirtual(method);
     /// <summary>Appends interface dispatch to an imported nongeneric contract.</summary>
-    public void CallVirtual(ImportedMethodReference method) => Emit(OpCode.Callvirt, method);
+    public void CallVirtual(ImportedMethodReference method) => GetILGenerator().CallVirtual(method);
     /// <summary>Emits Newobj for constructors, Call for concrete/static methods or Callvirt for interface contracts.</summary>
     /// <param name="opCode">Opcode matching the imported member dispatch kind.</param>
     /// <param name="operand">Reference owned by the current output.</param>
     /// <exception cref="ArgumentNullException">Reference is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign consumer, or invalid caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
-    public void Emit(OpCode opCode, ImportedConstructedMethodReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (!ReferenceEquals(operand.Definition.Owner, Assembly) || opCode != (operand.Definition.IsConstructor ? OpCode.Newobj : operand.Definition.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call))
-            throw new ArgumentException("incorrect imported owner or dispatch opcode");
-        foreach (var type in operand.DeclaringType.TypeArguments.Concat(operand.MethodArguments))
-            type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(operand.Definition.IsConstructor ? "new.constructed" : operand.Definition.RequiresVirtualDispatch ? "call.virtual.constructed" : "call.constructed", Target: operand.Definition.Target,
-            ConstructedTarget: operand.Target, Type: operand.Definition.IsStatic ? null : (SignatureType)operand.DeclaringType));
-    }
+    public void Emit(OpCode opCode, ImportedConstructedMethodReference operand) => GetILGenerator().Emit(opCode, operand);
 }

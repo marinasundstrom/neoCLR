@@ -11,8 +11,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add the metadata library's IILGenerator with stable builder/attached-definition access,
   typed Emit overloads, helpers, locals and labels. Raven's NeoCLR adapter now uses it
   without changing shared compiler interfaces. Definition bodies remain canonical;
-  implementation delegates to the existing engine and builder instruction methods remain
-  compatibility APIs. Loaded-body editing and instruction insertion are not added.
+  body-authoring implementation now lives in the generator, with builder instruction
+  methods forwarding as compatibility APIs. Writer-side validation remains unchanged. Loaded-body editing and instruction insertion are not added.
   All 108 C# groups and seven native consumers pass; generator-authored generic-owner
   code executes on CLR and both native containers (42). API snapshot check passes.
 

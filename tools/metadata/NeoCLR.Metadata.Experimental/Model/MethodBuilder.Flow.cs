@@ -15,38 +15,21 @@ public sealed partial class MethodBuilder
     /// <summary>Creates an unmarked branch destination. ClearBody retains label handles.</summary>
     /// <returns>A label owned by this method.</returns>
     /// <exception cref="InvalidDataException">4096-label limit exceeded.</exception>
-    public BranchLabel DefineLabel()
-    {
-        if (labels.Count >= 4096) throw new InvalidDataException("label limit exceeded");
-        var label = new BranchLabel(this, labels.Count); labels.Add(label); return label;
-    }
+    public BranchLabel DefineLabel() => GetILGenerator().DefineLabel();
     /// <summary>Marks a label at the current instruction position.</summary>
     /// <param name="label">An unmarked label owned by this method.</param>
     /// <exception cref="ArgumentNullException">Label is null.</exception>
     /// <exception cref="ArgumentException">Foreign or already marked label.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void MarkLabel(BranchLabel label)
-    {
-        CheckLabel(label);
-        if (Instructions.Any(i => i.Op == "label" && i.Value == label.Index)) throw new ArgumentException("label already marked", nameof(label));
-        Append(new("label", label.Index));
-    }
+    public void MarkLabel(BranchLabel label) => GetILGenerator().MarkLabel(label);
     /// <summary>Appends a branch. Conditional branches consume a Boolean comparison result.</summary>
     /// <param name="opCode">Br, Brtrue or Brfalse.</param>
     /// <param name="label">Destination owned by this method; it must be marked before writing.</param>
     /// <exception cref="ArgumentNullException">Label is null.</exception>
     /// <exception cref="ArgumentException">Foreign label or incorrect opcode.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, BranchLabel label)
-    {
-        CheckLabel(label);
-        Append(new(opCode switch { OpCode.Br => "branch", OpCode.Brtrue => "branch.true", OpCode.Brfalse => "branch.false", _ => throw OperandError(opCode) }, label.Index));
-    }
-    private void CheckLabel(BranchLabel label)
-    {
-        ArgumentNullException.ThrowIfNull(label);
-        if (!ReferenceEquals(label.Method, this)) throw new ArgumentException("label belongs to another method", nameof(label));
-    }
+    public void Emit(OpCode opCode, BranchLabel label) => GetILGenerator().Emit(opCode, label);
+
     internal Dictionary<int, int> LabelPositions()
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);

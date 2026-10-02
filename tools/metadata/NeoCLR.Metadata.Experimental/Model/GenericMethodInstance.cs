@@ -41,19 +41,12 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Reference is null.</exception>
     /// <exception cref="ArgumentException">Foreign definition or out-of-scope type arguments.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack shape is validated on write.</exception>
-    public void Call(GenericMethodInstance method) => Emit(OpCode.Call, method);
+    public void Call(GenericMethodInstance method) => GetILGenerator().Call(method);
     /// <summary>Appends a generic call using an explicit typed reference.</summary>
     /// <param name="opCode">Call only.</param>
     /// <param name="operand">Instantiation; see Call(GenericMethodInstance).</param>
     /// <exception cref="ArgumentException">Wrong opcode, foreign definition or invalid generic scope.</exception>
     /// <exception cref="ArgumentNullException">Reference is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, GenericMethodInstance operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
-        if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("generic calls require an owned definition", nameof(operand));
-        foreach (var type in operand.TypeArguments) type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new("call.generic", Target: operand.Definition, GenericTarget: operand));
-    }
+    public void Emit(OpCode opCode, GenericMethodInstance operand) => GetILGenerator().Emit(opCode, operand);
 }

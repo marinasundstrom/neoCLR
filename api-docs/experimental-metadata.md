@@ -4949,10 +4949,11 @@ loaded snapshot into an editable authored body.
 The public library interface is independent of Raven's compiler emission interfaces.
 Raven's NeoCLR adapter translates its portable instruction stream into this library API.
 Builders describe declarations; the generator authors the existing definition-owned
-body. The current implementation delegates to the established builder emission engine,
-and old public builder instruction methods remain compatibility entry points. Moving
-those internals and removing legacy entry points are still pending. There is no duplicate
-instruction buffer and no changed encoding, opcode semantics or validation timing.
+body. The generator owns append operations, locals/labels and immediate operand validation.
+Old public builder instruction methods forward to that generator as compatibility entry
+points. Write-time graph/stack validation still uses the existing writer path and internal
+operation representation; relocating those is separate from body authoring. There is no
+duplicate instruction buffer or changed encoding, opcode semantics or validation timing.
 
 `Locals: IReadOnlyList<LocalDefinition>` exposes the existing slot-ordered local view.
 All operations below preserve the corresponding MethodBuilder contract documented in

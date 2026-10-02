@@ -165,7 +165,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void CallVirtual(MethodBuilder target) => Emit(OpCode.Callvirt, target);
+    public void CallVirtual(MethodBuilder target) => GetILGenerator().CallVirtual(target);
 
     /// <summary>Gets whether this is a bodyless abstract interface method.</summary>
     public bool IsAbstract => DeclaringType?.IsInterface == true;

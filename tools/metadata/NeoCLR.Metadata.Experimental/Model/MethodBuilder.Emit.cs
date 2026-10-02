@@ -109,60 +109,21 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
-    public void Emit(OpCode opCode)
-        => Append(new(opCode switch
-        {
-            OpCode.Ldlen => "array.length",
-            OpCode.Dup => "duplicate",
-            OpCode.Neg => "negate",
-            OpCode.Not => "complement",
-            OpCode.Conv_I8 => "convert64",
-            OpCode.Conv_I4 => "convert32",
-            OpCode.Pop => "pop",
-            OpCode.Ceq => "equal",
-            OpCode.Clt => "less",
-            OpCode.Cgt => "greater",
-            OpCode.Shl => "shift.left",
-            OpCode.Shr => "shift.right",
-            OpCode.And => "and",
-            OpCode.Or => "or",
-            OpCode.Xor => "xor",
-            OpCode.Rem => "remainder",
-            OpCode.Div => "divide",
-            OpCode.Add => "add",
-            OpCode.Sub => "subtract",
-            OpCode.Mul => "multiply",
-            OpCode.Ret => "return",
-            _ => throw OperandError(opCode)
-        }));
+    public void Emit(OpCode opCode) => GetILGenerator().Emit(opCode);
 
     /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
     /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc, Ldloca or Stloc.</param>
     /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, int operand)
-        => Append(new(opCode switch
-        {
-            OpCode.Ldc_I4 => "constant",
-            OpCode.Ldarg => "argument",
-            OpCode.Starg => "argument.store",
-            OpCode.Ldloca => "local.address",
-            OpCode.Ldloc => "local.load",
-            OpCode.Stloc => "local.store",
-            _ => throw OperandError(opCode)
-        }, operand));
+    public void Emit(OpCode opCode, int operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends an exact signed Int64 constant.</summary>
     /// <param name="opCode">Ldc_I8; other opcodes reject.</param>
     /// <param name="operand">Constant value, including Int64 extrema.</param>
     /// <exception cref="ArgumentException">Incorrect opcode.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, long operand)
-    {
-        if (opCode != OpCode.Ldc_I8) throw OperandError(opCode);
-        Append(new("constant64", LongValue: operand));
-    }
+    public void Emit(OpCode opCode, long operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends a string literal or terminal failure shared by CLI and native emission.</summary>
     /// <param name="opCode">Ldstr or Fail; other opcodes reject.</param>
@@ -171,12 +132,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Incorrect opcode, invalid Unicode or oversized literal.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Rejects unpaired UTF-16 surrogates instead of substituting replacement characters.</remarks>
-    public void Emit(OpCode opCode, string operand)
-    {
-        if (opCode is not (OpCode.Ldstr or OpCode.Fail)) throw OperandError(opCode);
-        ValidateLiteral(operand);
-        Append(new(opCode == OpCode.Fail ? "fail" : "string", Text: operand));
-    }
+    public void Emit(OpCode opCode, string operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Terminates the invocation with a literal message. Requires an empty stack; no normal return or output assignment follows.</summary>
     /// <param name="message">Valid Unicode diagnostic, at most 64 KiB UTF-8.</param>
@@ -184,7 +140,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Message contains invalid Unicode or exceeds the UTF-8 size limit.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; body-flow errors are reported when writing.</exception>
     /// <remarks>Native execution produces UserFault without guest exception handling. CLI execution throws InvalidOperationException, which CLR callers can catch.</remarks>
-    public void Fail(string message) => Emit(OpCode.Fail, message);
+    public void Fail(string message) => GetILGenerator().Fail(message);
 
     /// <summary>Appends a call or allocation using a local or external builder method.</summary>
     /// <param name="opCode">Call, Callvirt or Newobj; Callvirt currently requires an owned interface method.</param>
@@ -192,28 +148,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or constructor usage.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, MethodBuilder operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (operand.Signature.GenericParameterNames.Count != 0 || operand.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic calls require an instantiation", nameof(operand));
-        if (opCode == OpCode.Callvirt)
-        {
-            if (!operand.IsAbstract || !ReferenceEquals(operand.Assembly, Assembly))
-                throw new ArgumentException("callvirt requires an owned interface method", nameof(operand));
-            Append(new("call.virtual", Target: operand));
-        }
-        else if (opCode == OpCode.Newobj)
-        {
-            if (!operand.IsConstructor) throw new ArgumentException("newobj requires a constructor", nameof(operand));
-            Append(new("new.object", Target: operand));
-        }
-        else
-        {
-            RequireCall(opCode);
-            if (operand.IsConstructor) throw new ArgumentException("constructor chaining is unsupported", nameof(operand));
-            Append(new("call", Target: operand));
-        }
-    }
+    public void Emit(OpCode opCode, MethodBuilder operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends a call to an owned imported read-only method reference.</summary>
     /// <param name="opCode">Newobj for a constructor; otherwise Call, or Callvirt when RequiresVirtualDispatch is true.</param>
@@ -221,14 +156,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong dispatch opcode, an uninstantiated generic definition, or a reference from another builder.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, ImportedMethodReference operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != (operand.IsConstructor ? OpCode.Newobj : operand.RequiresVirtualDispatch ? OpCode.Callvirt : OpCode.Call)) throw new ArgumentException("wrong dispatch opcode", nameof(opCode));
-        if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("reference belongs to another output builder", nameof(operand));
-        if (operand.Signature.GenericParameterNames.Count != 0 || operand.Target.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic import must be instantiated", nameof(operand));
-        Append(new(operand.IsConstructor ? "new.object" : operand.RequiresVirtualDispatch ? "call.virtual" : "call", Target: operand.Target, Type: operand.IsStatic ? null : (SignatureType)operand.DeclaringReference!));
-    }
+    public void Emit(OpCode opCode, ImportedMethodReference operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends a native-only call to a loaded static Int32 System declaration.</summary>
     /// <param name="opCode">Call.</param>
@@ -237,25 +165,14 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentException">Opcode is not Call.</exception>
     /// <exception cref="InvalidDataException">Unsupported module/signature or instruction limit exceeded.</exception>
     /// <remarks>Same matching-System runtime requirement as Call(NativeFunctionDefinition). Ordinary CLI output rejects this instruction.</remarks>
-    public void Emit(OpCode opCode, NativeFunctionDefinition operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        RequireCall(opCode);
-        if (operand.Library.ModuleName != "System" || !operand.TryGetStaticInt32Signature(out _))
-            throw new InvalidDataException("native call requires a static Int32 System function");
-        Append(new("native.call", NativeTarget: operand));
-    }
+    public void Emit(OpCode opCode, NativeFunctionDefinition operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Pushes a Boolean constant for branch conditions.</summary>
     /// <param name="opCode">Ldc_Bool.</param>
     /// <param name="operand">The Boolean value.</param>
     /// <exception cref="ArgumentException">Incorrect opcode.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, bool operand)
-    {
-        if (opCode != OpCode.Ldc_Bool) throw OperandError(opCode);
-        Append(new("boolean", operand ? 1 : 0));
-    }
+    public void Emit(OpCode opCode, bool operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends a field load/store using an owned output-field handle.</summary>
     /// <param name="opCode">Ldfld or Stfld.</param>
@@ -263,40 +180,29 @@ public sealed partial class MethodBuilder
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign field or generic definition field outside its declaring type.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, FieldBuilder operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (!ReferenceEquals(operand.DeclaringType.Assembly, Assembly)) throw new ArgumentException("field belongs to another output", nameof(operand));
-        if (operand.DeclaringType.GenericParameterNames.Count > 0 && !ReferenceEquals(DeclaringType, operand.DeclaringType))
-            throw new ArgumentException("generic definition fields require the declaring type scope");
-        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand));
-    }
+    public void Emit(OpCode opCode, FieldBuilder operand) => GetILGenerator().Emit(opCode, operand);
     /// <summary>Duplicates the top stack value.</summary>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
-    public void Duplicate() => Emit(OpCode.Dup);
+    public void Duplicate() => GetILGenerator().Duplicate();
     /// <summary>Allocates an object and invokes its constructor, consuming the declared arguments.</summary>
     /// <param name="constructor">Class or value constructor.</param>
     /// <exception cref="ArgumentException">Not a constructor.</exception>
     /// <exception cref="ArgumentNullException">Constructor is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void NewObject(MethodBuilder constructor) => Emit(OpCode.Newobj, constructor);
+    public void NewObject(MethodBuilder constructor) => GetILGenerator().NewObject(constructor);
     /// <summary>Consumes a receiver and loads its field value.</summary>
     /// <param name="field">Owned instance field.</param>
     /// <exception cref="ArgumentException">Foreign field.</exception>
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void LoadField(FieldBuilder field) => Emit(OpCode.Ldfld, field);
+    public void LoadField(FieldBuilder field) => GetILGenerator().LoadField(field);
     /// <summary>Consumes a receiver followed by a value and stores the field.</summary>
     /// <param name="field">Owned instance field.</param>
     /// <exception cref="ArgumentException">Foreign field.</exception>
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void StoreField(FieldBuilder field) => Emit(OpCode.Stfld, field);
+    public void StoreField(FieldBuilder field) => GetILGenerator().StoreField(field);
 
-    private static ArgumentException OperandError(OpCode opCode)
-        => new($"Unsupported opcode or operand kind: {opCode}", nameof(opCode));
-    private static void RequireCall(OpCode opCode)
-    {
-        if (opCode != OpCode.Call) throw OperandError(opCode);
-    }
+
+
 }

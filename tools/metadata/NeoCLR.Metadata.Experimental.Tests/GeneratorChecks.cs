@@ -18,7 +18,8 @@ internal static class GeneratorChecks
         il.LoadConstant(7); il.Return(); il.ClearBody();
         if (il.Locals.Count != 1 || !ReferenceEquals(local, il.Locals[0])) throw new Exception("clear preserves locals");
         var end = il.DefineLabel();
-        il.Emit(OpCode.Ldc_I4, 21); il.Call(twice); il.StoreLocal(local);
+        // Legacy and generator entry points share one engine and body.
+        entry.Emit(OpCode.Ldc_I4, 21); il.Call(twice); il.StoreLocal(local);
         il.Emit(OpCode.Br, end); il.MarkLabel(end); il.LoadLocal(local); il.Emit(OpCode.Ret);
         Reject<ArgumentException>(() => helper.LoadLocal(local));
         Reject<ArgumentException>(() => helper.MarkLabel(end));

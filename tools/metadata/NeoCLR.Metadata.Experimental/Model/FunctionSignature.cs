@@ -70,24 +70,18 @@ public sealed partial class MethodBuilder
     /// <param name="target">Owned nongeneric static target.</param>
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
-    public void BindFunction(SignatureType functionType, MethodBuilder target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));
+    public void BindFunction(SignatureType functionType, MethodBuilder target) => GetILGenerator().BindFunction(functionType, target);
     /// <summary>Emits a checked Function binding; consumes no receiver and pushes the callable value.</summary>
     /// <param name="opCode">BindFunction.</param>
     /// <param name="operand">The exact static binding owned by this assembly.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign target or invalid generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
-    public void Emit(OpCode opCode, FunctionBinding operand)
-    {
-        ArgumentNullException.ThrowIfNull(operand);
-        if (opCode != OpCode.BindFunction || !ReferenceEquals(operand.Target.Assembly, Assembly)) throw new ArgumentException("binding requires BindFunction and an owned target");
-        operand.FunctionType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new("function.bind", Target: operand.Target, Type: operand.FunctionType));
-    }
+    public void Emit(OpCode opCode, FunctionBinding operand) => GetILGenerator().Emit(opCode, operand);
     /// <summary>Consumes a Function receiver followed by its arguments, then pushes its result if any.</summary>
     /// <param name="functionType">Exact structural Function type.</param>
     /// <exception cref="ArgumentException">Not a Function or invalid generic scope/owner.</exception>
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
-    public void InvokeFunction(SignatureType functionType) => Emit(OpCode.Callvirt, functionType);
+    public void InvokeFunction(SignatureType functionType) => GetILGenerator().InvokeFunction(functionType);
 }
