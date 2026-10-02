@@ -112,10 +112,10 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "field.import.store")
                     {
                         if (importedField.IsReadOnly) throw new InvalidDataException("cannot store an external readonly field");
-                        Pop(importedField.FieldType);
+                        Pop(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
                     }
-                    Pop((SignatureType)importedField.DeclaringType);
-                    if (instruction.Op == "field.import.load") stack.Add(importedField.FieldType);
+                    Pop(instruction.Type ?? (SignatureType)importedField.DeclaringType);
+                    if (instruction.Op == "field.import.load") stack.Add(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
                     break;
                 case "field.load":
                 case "field.store":

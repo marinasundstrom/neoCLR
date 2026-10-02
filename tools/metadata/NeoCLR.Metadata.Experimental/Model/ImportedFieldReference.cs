@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An immutable primitive, nominal or vector instance-field reference owned by one output assembly.</summary>
-public sealed class ImportedFieldReference
+public sealed partial class ImportedFieldReference
 {
     internal ImportedFieldReference(AssemblyBuilder owner, ImportedTypeReference declaringType, FieldDefinition definition, SignatureType type, int index)
     { Owner = owner; DeclaringType = declaringType; Name = definition.Name; FieldType = type; IsReadOnly = (definition.Attributes & 0x20) != 0; NativeIndex = definition.Module.Assembly.IsNative ? index : null; }

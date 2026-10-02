@@ -162,6 +162,13 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Wrong opcode, foreign consumer, or invalid caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
     void Emit(OpCode opCode, ImportedConstructedMethodReference operand);
+    /// <summary>Loads an imported field on a constructed receiver.</summary>
+    void LoadField(ImportedConstructedFieldReference field);
+    /// <summary>Stores an imported field on a constructed receiver; readonly checks run on write.</summary>
+    void StoreField(ImportedConstructedFieldReference field);
+    /// <summary>Appends Ldfld/Stfld; rejects null, foreign, wrong-opcode or out-of-scope operands. Stack checks run on write.</summary>
+    void Emit(OpCode opCode, ImportedConstructedFieldReference operand);
+
     /// <summary>Loads a primitive, nominal or vector field from its exact external receiver type.</summary>
     void LoadField(ImportedFieldReference field);
     /// <summary>Stores a primitive, nominal or vector field on its exact external receiver type; readonly stores fail validation.</summary>

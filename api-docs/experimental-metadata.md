@@ -4877,7 +4877,7 @@ constructor/conflicting contracts. The separate library IILGenerator remains pla
 `AssemblyBuilder.CreateFieldReference(ImportedTypeReference declaringType, string name,
 SignatureType fieldType, int instanceStorageOrdinal, bool isReadOnly = false)
 -> ImportedFieldReference` authors a public instance-field contract without a reader.
-The owner must be an output-owned nongeneric top-level root reference class with a
+The owner must be an output-owned top-level root reference-class definition with a
 registered native artifact digest. The caller supplies the native zero-based instance
 slot, including private fields in the declaration order, and must assert that this
 layout matches the selected artifact. The library cannot verify a supplied ordinal
@@ -4887,7 +4887,7 @@ the ordinal. This does not change the instruction set or encode the artifact dig
 Storage supports primitive non-Void values, external reference classes (including
 closed generic constructions) and single vectors thereof. Construction arguments are
 checked recursively; open type/method parameters, bare generic definitions and foreign
-output signatures reject. Static/inherited fields, constructed owners, byrefs and value
+output signatures reject. Static/inherited fields, byrefs and value
 profiles are unsupported. Readonly loads work; stores reject during body validation.
 Matching contracts intern; conflicting names, ordinals, storage or readonly flags on
 the same owner reject. Null arguments throw ArgumentNullException; invalid owner,
@@ -5084,3 +5084,21 @@ assembly on both containers. AuthoredFunctionReferenceChecks rejects open parame
 unconstructed generic definitions and foreign references. This extends storage
 signatures only; the field's declaring owner must still be nongeneric. No new API
 signature or metadata encoding is introduced.
+
+
+### ImportedConstructedFieldReference (development, 2026-10-02)
+
+`ImportedFieldReference.MakeConstructedReference(params SignatureType[] typeArguments)`
+returns an immutable constructed field with `Definition`, `DeclaringType` and substituted
+`FieldType` properties. The definition may now contain owner type parameters (including
+vectors and nominal constructions). Arguments are copied; wrong arity, nongeneric owner,
+Void or foreign arguments throw ArgumentException, and null arguments throw
+ArgumentNullException. Substitution is simultaneous and preserves caller parameters.
+
+`IILGenerator` and the forwarding `MethodBuilder` offer `LoadField`, `StoreField` and
+`Emit(OpCode, ImportedConstructedFieldReference)`. Only Ldfld/Stfld are admitted. Null
+operands throw ArgumentNullException; foreign, unconstructed generic, wrong-opcode or
+out-of-scope operands throw ArgumentException. Writing validates receiver, storage and
+readonly rules and throws InvalidDataException for invalid bodies. CLI writes a MemberRef
+with open storage signature and a constructed parent; native writes the existing slot.
+These host APIs are covered by this manual reference, not the guest RavenDoc snapshot.

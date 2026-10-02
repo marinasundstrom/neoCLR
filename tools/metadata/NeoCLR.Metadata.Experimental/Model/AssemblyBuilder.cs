@@ -424,15 +424,17 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(member);
         }
-        var importedFieldMembers = new Dictionary<ImportedFieldReference, MemberReferenceHandle>();
-        int ImportedFieldToken(ImportedFieldReference reference)
+        var importedFieldMembers = new Dictionary<(ImportedFieldReference, ImportedTypeReference), MemberReferenceHandle>();
+        int ImportedFieldToken(ImportedFieldReference reference, ImportedConstructedFieldReference? construction)
         {
-            if (!importedFieldMembers.TryGetValue(reference, out var member))
+            var declaring = construction?.DeclaringType ?? reference.DeclaringType;
+            var key = (reference, declaring);
+            if (!importedFieldMembers.TryGetValue(key, out var member))
             {
                 var signature = new BlobBuilder();
                 EncodeType(new BlobEncoder(signature).FieldSignature(), reference.FieldType);
-                member = metadata.AddMemberReference(ImportedTypeHandle(reference.DeclaringType), metadata.GetOrAddString(reference.Name), metadata.GetOrAddBlob(signature));
-                importedFieldMembers.Add(reference, member);
+                member = metadata.AddMemberReference(MetadataTokens.EntityHandle(ElementToken(declaring)), metadata.GetOrAddString(reference.Name), metadata.GetOrAddBlob(signature));
+                importedFieldMembers.Add(key, member);
             }
             return MetadataTokens.GetToken(member);
         }
@@ -528,7 +530,7 @@ public sealed partial class AssemblyBuilder
                     case "field.import.load":
                     case "field.import.store":
                         code.WriteByte(instruction.Op == "field.import.load" ? (byte)0x7b : (byte)0x7d);
-                        code.WriteInt32(ImportedFieldToken(instruction.ImportedField!)); break;
+                        code.WriteInt32(ImportedFieldToken(instruction.ImportedField!, instruction.ImportedConstructedField)); break;
                     case "field.load":
                     case "field.store":
                         code.WriteByte(instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
@@ -792,7 +794,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null, ImportedFieldReference? ImportedField = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null, ImportedFieldReference? ImportedField = null, ImportedConstructedFieldReference? ImportedConstructedField = null);
     internal List<Operation> Instructions => Definition.Body.Instructions;
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

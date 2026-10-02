@@ -52,7 +52,14 @@ internal static class AuthoredFunctionReferenceChecks
         Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 3));
         Reject<InvalidDataException>(() => app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2, true));
         Reject<ArgumentException>(() => app.CreateFieldReference(item, "Bad", PrimitiveType.Int32, -1));
-        Reject<ArgumentException>(() => app.CreateFieldReference(box, "Bad", PrimitiveType.Int32, 0));
+        var genericField = app.CreateFieldReference(box, "Value", SignatureType.TypeParameter(0), 0);
+        Reject<ArgumentException>(() => genericField.MakeConstructedReference());
+        Reject<ArgumentException>(() => genericField.MakeConstructedReference(foreignType));
+        Reject<ArgumentException>(() => app.CreateFieldReference(box, "Bad", SignatureType.TypeParameter(1), 1));
+        var fieldReader = app.AddFunction("ReadBox", new MethodSignature(PrimitiveType.Int32, [nominal]));
+        Reject<ArgumentException>(() => fieldReader.LoadField(genericField));
+        Reject<ArgumentException>(() => fieldReader.LoadField(genericField.MakeConstructedReference(SignatureType.MethodParameter(0))));
+        fieldReader.LoadArgument(0); fieldReader.LoadField(genericField.MakeConstructedReference(PrimitiveType.Int32)); fieldReader.Return();
         var nominalField = app.CreateFieldReference(item, "Box", nominal, 4);
         var vectorField = app.CreateFieldReference(item, "Boxes", SignatureType.ArrayOf(nominal), 5);
         if (nominalField.FieldType != nominal || vectorField.FieldType.ArrayElement != nominal) throw new Exception("closed field signature");

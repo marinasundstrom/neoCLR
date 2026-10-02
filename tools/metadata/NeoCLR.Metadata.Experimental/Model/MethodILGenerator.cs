@@ -154,8 +154,20 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, ImportedFieldReference operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
-        if (!ReferenceEquals(operand.Owner, Assembly)) throw new ArgumentException("foreign imported field", nameof(operand));
+        if (!ReferenceEquals(operand.Owner, Assembly) || operand.DeclaringType.GenericArity != 0)
+            throw new ArgumentException("foreign or unconstructed imported field", nameof(operand));
         Append(new(opCode switch { OpCode.Ldfld => "field.import.load", OpCode.Stfld => "field.import.store", _ => throw OperandError(opCode) }, ImportedField: operand));
+    }
+
+    public void LoadField(ImportedConstructedFieldReference field) => Emit(OpCode.Ldfld, field);
+    public void StoreField(ImportedConstructedFieldReference field) => Emit(OpCode.Stfld, field);
+    public void Emit(OpCode opCode, ImportedConstructedFieldReference operand)
+    {
+        ArgumentNullException.ThrowIfNull(operand);
+        if (!ReferenceEquals(operand.Definition.Owner, Assembly)) throw new ArgumentException("foreign imported field", nameof(operand));
+        ((SignatureType)operand.DeclaringType).ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        Append(new(opCode switch { OpCode.Ldfld => "field.import.load", OpCode.Stfld => "field.import.store", _ => throw OperandError(opCode) },
+            ImportedField: operand.Definition, ImportedConstructedField: operand, Type: operand.DeclaringType));
     }
 
     public void Call(ImportedGenericMethodReference method) => Emit(OpCode.Call, method);

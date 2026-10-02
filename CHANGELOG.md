@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Support imported fields on constructed generic root-class owners through
+  scoped, output-owned field references. Preserve CLI open signatures and native slots.
+  Seven Raven consumers and .NET/both-container field tests execute (42); 108 C# groups pass.
+
 - Admit closed generic reference values and vectors in authored native field contracts
   on nongeneric owners. Preserve CLI signature/MemberRef and native ordinal encoding;
   reject open/bare-generic/foreign storage. C# metadata checks pass 108/108 groups and

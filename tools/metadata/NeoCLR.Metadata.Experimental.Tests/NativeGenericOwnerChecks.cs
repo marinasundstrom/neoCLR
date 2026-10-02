@@ -12,7 +12,7 @@ internal static class NativeGenericOwnerChecks
         var library = new AssemblyBuilder(new("NativeOwnerLibrary", new Version(1, 0, 0, 0)), core);
         var type = library.AddGenericClass("Example", "Box", ["TItem"]);
         var parameter = SignatureType.TypeParameter(0);
-        var field = type.AddField("Value", parameter);
+        var field = type.AddField("Value", parameter, FieldVisibility.Public);
         var ctor = type.AddConstructor(new MethodSignature(PrimitiveType.Void, [parameter]));
         ctor.LoadArgument(0); ctor.LoadArgument(1); ctor.StoreField(field); ctor.Return();
         var get = type.AddInstanceMethod("Get", new MethodSignature(parameter, []));
@@ -87,7 +87,9 @@ internal static class NativeGenericOwnerChecks
         IILGenerator main = entry.Definition.GetILGenerator();
         var local = main.DeclareLocal(importedType);
         main.LoadConstant(19); main.Call(app.ImportReference(createDefinition, core)); main.Emit(OpCode.Pop); main.LoadConstant(19); main.NewObject(Import(".ctor")); main.Call(app.ImportReference(echoDefinition, core)); main.Call(app.ImportReference(openDefinition, core).MakeGenericInstance(PrimitiveType.Int32)); main.StoreLocal(local);
-        main.LoadLocal(local); main.LoadConstant(42); main.Call(Import("Set"));
+        var importedField = app.CreateFieldReference(authoredType, "Value", parameter, 0).MakeConstructedReference(PrimitiveType.Int32);
+        main.LoadLocal(local); main.LoadConstant(42); main.StoreField(importedField);
+        main.LoadLocal(local); main.LoadField(importedField); main.Emit(OpCode.Pop);
         var storageReference = app.CreateTypeReference(library.Identity, core,
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image)), "Example", "Storage");
         var boxField = app.CreateFieldReference(storageReference, "Box", importedType, 0);
