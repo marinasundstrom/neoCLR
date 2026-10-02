@@ -3217,3 +3217,27 @@ and [native execution](experiments/extended-cli-metadata/hashmap-execution-2026-
 include source, seed, System and runtime hashes. All 14 focused Raven interface tests
 pass, and the ArrayList source success/failure consumers still pass after this change.
 This is feature-branch evidence only.
+
+### Source collections with reference payloads (2026-10-02)
+
+The HashMap source runtime probe now also uses internal Order objects. Growth, map
+lookup, filtering, shared mutation visibility, replacement independence and iterator reads
+verify and execute (42), alongside the numeric collision/policy consumer. This reuses
+existing generic reference storage, Function and interface-dispatch support without
+compiler, metadata or runtime encoding changes.
+
+The unchanged broad application was separately assessed with source collections and
+translated queries. Single cannot bind because the translated extension expects its
+own nominal Iterable identity. Including unchanged Operators.rvn resolves that lookup,
+but both its iteration and the application hit RAVT001: the configured iteration assembly
+is the seed, while source Iterable/Iterator now shadow those metadata names. Array shape
+still belongs to the seed. A coherent source bootstrap core/iteration contract is next;
+do not treat these distinct nominal types as interchangeable. Source query declaration
+emission and the remainder of the file are not yet validated. Native semantic importing
+remains deferred, and the previously working translated-System application is unaffected.
+
+[Reference consumer](experiments/extended-cli-metadata/source-reference-2026-10-02/reference-identity.json),
+[execution](experiments/extended-cli-metadata/source-reference-2026-10-02/execution.json),
+[translated query assessment](experiments/extended-cli-metadata/source-reference-2026-10-02/translated-queries.json)
+and [source query assessment](experiments/extended-cli-metadata/source-reference-2026-10-02/source-queries.json)
+record consumers, diagnostics and matching source/bundle hashes.

@@ -1,0 +1,69 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330E194DC665A65A4A3A31CAE18C6FFB5473CB0086B14D02DF05D6DC69D8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101D76F2F4D2B950BC59ABD89938CB2E9EBEA1D6E43087E80309B0DE963A22D2"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262EA7362DE107EBC583E6887578F3FA69ECEF905DA52A8C0A9D718B535DD4"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "sha256": "820C9AB4936879F8F60A4882C3EA0BD266C3DE4F562C8F61C49B8AAC9801258B"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "sha256": "3F98957438834DCBAC9D23EAEA41927FF52D74F358EDFC4FCB33490D0F3A15FF"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Map.rvn",
+      "sha256": "2E62350AEC516E1F74EED496EC08375FE367AF09655BD42397680B275636640D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableMap.rvn",
+      "sha256": "109B64C49882B813D5C532E6CF7CCC06CB907D38CB5EB6E3FFDFAF2CA72AF627"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/HashMap.rvn",
+      "sha256": "6018BDE81A80D1E742BED28442ED499F843A3AAF177AE5103C0DFDC3A3B2486C"
+    }
+  ],
+  "consumer": "import System.Option.*\n\nclass Order {\n    var Number: int\n    var Pending: bool\n    init(number: int) {\n        Number = number\n        Pending = true\n    }\n}\n\nfunc Main() -\u003E int {\n    let map = System.Collections.HashMap\u003Cint, Order\u003E((left, right) =\u003E left == right, value =\u003E value)\n    let orders = System.Collections.ArrayList\u003COrder\u003E()\n    var index = 0\n    while index \u003C 9 {\n        let order = Order(index)\n        if !map.TryAdd(index, order) { return 1 }\n        orders.Add(order)\n        index = index \u002B 1\n    }\n    let pending = orders.FindAll(order =\u003E order.Pending)\n    if pending.Count != 9 { return 2 }\n    let first = match map.Find(0) {\n        Some(let order) =\u003E order\n        None =\u003E Order(-1)\n    }\n    first.Pending = false\n    if pending[0].Pending { return 3 }\n    if orders[0].Pending { return 4 }\n    let replacement = Order(42)\n    map.Set(0, replacement)\n    let updated = match map.Find(0) {\n        Some(let order) =\u003E order\n        None =\u003E Order(-1)\n    }\n    if updated.Number != 42 { return 5 }\n    if pending[0].Number != 0 { return 6 }\n    let iterator = orders.GetIterator()\n    var count = 0\n    while iterator.MoveNext() {\n        if iterator.Current.Pending { count = count \u002B 1 }\n    }\n    iterator.Dispose()\n    if count != 8 { return 7 }\n    return 42\n}",
+  "phase": "emitted",
+  "bytes": 135168,
+  "bindingDiagnosticCount": 0,
+  "cliBridgeEmission": {
+    "success": true,
+    "bytes": 11264,
+    "diagnostics": []
+  },
+  "diagnostics": [],
+  "scope": "unchanged library source units; explicit authoring seed; execution, when requested, is recorded separately in execution.json"
+}

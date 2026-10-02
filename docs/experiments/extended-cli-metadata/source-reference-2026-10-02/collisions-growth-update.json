@@ -1,0 +1,69 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330E194DC665A65A4A3A31CAE18C6FFB5473CB0086B14D02DF05D6DC69D8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101D76F2F4D2B950BC59ABD89938CB2E9EBEA1D6E43087E80309B0DE963A22D2"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262EA7362DE107EBC583E6887578F3FA69ECEF905DA52A8C0A9D718B535DD4"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "sha256": "820C9AB4936879F8F60A4882C3EA0BD266C3DE4F562C8F61C49B8AAC9801258B"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "sha256": "3F98957438834DCBAC9D23EAEA41927FF52D74F358EDFC4FCB33490D0F3A15FF"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Map.rvn",
+      "sha256": "2E62350AEC516E1F74EED496EC08375FE367AF09655BD42397680B275636640D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableMap.rvn",
+      "sha256": "109B64C49882B813D5C532E6CF7CCC06CB907D38CB5EB6E3FFDFAF2CA72AF627"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/HashMap.rvn",
+      "sha256": "6018BDE81A80D1E742BED28442ED499F843A3AAF177AE5103C0DFDC3A3B2486C"
+    }
+  ],
+  "consumer": "import System.Option.*\n\nfunc Main() -\u003E int {\n    let map = System.Collections.HashMap\u003Cint, int\u003E((left, right) =\u003E left == right, value =\u003E 1)\n    let mutable: System.Collections.MutableMap\u003Cint, int\u003E = map\n    var index = 0\n    while index \u003C 12 {\n        if !mutable.TryAdd(index, index * 3) { return 1 }\n        index = index \u002B 1\n    }\n    if mutable.TryAdd(5, 999) { return 2 }\n    let view: System.Collections.Map\u003Cint, int\u003E = map\n    if view.Count != 12 { return 3 }\n    if !view.ContainsKey(11) { return 4 }\n    if view.ContainsKey(20) { return 5 }\n    let keys = view.Keys\n    mutable.Set(5, 42)\n    mutable.Set(20, 60)\n    if keys.Count != 12 { return 6 }\n    if view.Count != 13 { return 7 }\n    let found = match view.Find(5) {\n        Some(let value) =\u003E value\n        None =\u003E -1\n    }\n    if found != 42 { return 8 }\n    let absent = match view.Find(99) {\n        Some(let value) =\u003E false\n        None =\u003E true\n    }\n    if !absent { return 9 }\n    index = 0\n    while index \u003C 12 {\n        let actual = match view.Find(index) {\n            Some(let value) =\u003E value\n            None =\u003E -1\n        }\n        if index != 5 \u0026\u0026 actual != index * 3 { return 10 }\n        index = index \u002B 1\n    }\n    let policy = System.Collections.FunctionEqualityComparer\u003Cint\u003E((left, right) =\u003E left % 10 == right % 10, value =\u003E value % 10)\n    let custom = System.Collections.HashMap\u003Cint, int\u003E(policy)\n    if !custom.TryAdd(12, 42) { return 11 }\n    if custom.TryAdd(22, 7) { return 12 }\n    let equivalent = match custom.Find(32) {\n        Some(let value) =\u003E value\n        None =\u003E -1\n    }\n    return equivalent\n}",
+  "phase": "emitted",
+  "bytes": 131072,
+  "bindingDiagnosticCount": 0,
+  "cliBridgeEmission": {
+    "success": true,
+    "bytes": 11264,
+    "diagnostics": []
+  },
+  "diagnostics": [],
+  "scope": "unchanged library source units; explicit authoring seed; execution, when requested, is recorded separately in execution.json"
+}

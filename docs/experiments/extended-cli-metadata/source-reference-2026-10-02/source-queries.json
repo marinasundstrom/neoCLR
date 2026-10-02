@@ -1,0 +1,72 @@
+{
+  "nativeSystemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "seedSha256": "A29679DBCA2677DF8E10F3E542059A579DA3043E428D757E78E3C29233C8CFB3",
+  "sources": [
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899F28A3F77A1E2B463689C2E25E19CE39200EA519F49FFBA9A77CF0D35769D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6FC46377ACE7C8F7AF8BE7C9A90B574DFD878D37333982EF04CFC144C7196A14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5C6AE049841D4EA32993A92D283F68DD9A36806958C683AA5866CB377D0F8F06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656DC5518001C9F925FC2427CB55CEB8B4D329D156C9C473889BFD5F5251DB"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493EBBB8F28CB614D5E09AB5D9604C43DD5EE8596D16D6DDA826BAE0894C8A"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330E194DC665A65A4A3A31CAE18C6FFB5473CB0086B14D02DF05D6DC69D8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101D76F2F4D2B950BC59ABD89938CB2E9EBEA1D6E43087E80309B0DE963A22D2"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262EA7362DE107EBC583E6887578F3FA69ECEF905DA52A8C0A9D718B535DD4"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "sha256": "820C9AB4936879F8F60A4882C3EA0BD266C3DE4F562C8F61C49B8AAC9801258B"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "sha256": "3F98957438834DCBAC9D23EAEA41927FF52D74F358EDFC4FCB33490D0F3A15FF"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Map.rvn",
+      "sha256": "2E62350AEC516E1F74EED496EC08375FE367AF09655BD42397680B275636640D"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableMap.rvn",
+      "sha256": "109B64C49882B813D5C532E6CF7CCC06CB907D38CB5EB6E3FFDFAF2CA72AF627"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/HashMap.rvn",
+      "sha256": "6018BDE81A80D1E742BED28442ED499F843A3AAF177AE5103C0DFDC3A3B2486C"
+    },
+    {
+      "path": "runtime/raven/src/System/Linq/Operators.rvn",
+      "sha256": "615A01A8FA987959ABA0A5B49A35FA479088B7AA15482A18B1C16E09470FB53B"
+    }
+  ],
+  "consumer": "import System.*\nimport System.Collections.*\nimport System.Linq.*\nimport System.Option.*\nimport System.Result.*\nimport System.Console.*\n\nclass Order {\n    var Number: int\n    var Pending: bool\n\n    init(number: int, pending: bool) {\n        Number = number\n        Pending = pending\n    }\n}\n\nfunc SameNumber(left: int, right: int) -\u003E bool {\n    return left == right\n}\n\nfunc HashNumber(number: int) -\u003E int {\n    return number\n}\n\nfunc Register(index: MutableMap\u003Cint, Order\u003E, orders: ArrayList\u003COrder\u003E, order: Order) -\u003E bool {\n    if !index.TryAdd(order.Number, order) {\n        return false\n    }\n    orders.Add(order)\n    return true\n}\n\nfunc PendingOrder(index: Map\u003Cint, Order\u003E, number: int) -\u003E Option\u003COrder\u003E {\n    let order = index.Find(number)?\n    if !order.Pending {\n        return Option\u003COrder\u003E(None())\n    }\n    return Option\u003COrder\u003E(Some\u003COrder\u003E(order))\n}\n\nfunc OnlyPending(orders: Iterable\u003COrder\u003E) -\u003E Result\u003COrder, SingleError\u003E {\n    let order = orders.Single((order: Order) -\u003E bool =\u003E order.Pending)?\n    return .Ok(order)\n}\n\nfunc PrintPending(orders: Iterable\u003COrder\u003E) {\n    match OnlyPending(orders) {\n        Ok(let order) =\u003E WriteLine(order.Number)\n        Error(let error) =\u003E WriteLine(error.ToString())\n    }\n}\n\nfunc Main() {\n    let index = HashMap\u003Cint, Order\u003E(SameNumber, HashNumber)\n    let orders = ArrayList\u003COrder\u003E()\n    let batch: Order[] = [Order(101, true), Order(202, false), Order(303, true)]\n    for order in batch {\n        Register(index, orders, order)\n    }\n    if !Register(index, orders, Order(101, false)) {\n        WriteLine(\u0022Duplicate order rejected\u0022)\n    }\n    WriteLine(index.Count)\n    WriteLine(orders.Count)\n\n    match PendingOrder(index, 999) {\n        Some(let order) =\u003E WriteLine(order.Number)\n        None =\u003E WriteLine(\u0022Unknown order\u0022)\n    }\n    match PendingOrder(index, 202) {\n        Some(let order) =\u003E WriteLine(order.Number)\n        None =\u003E WriteLine(\u0022Order already shipped\u0022)\n    }\n    PrintPending(orders)\n\n    // Concrete filtering creates separate list storage, retaining order identities.\n    let pending = orders.FindAll((order: Order) -\u003E bool =\u003E order.Pending)\n    WriteLine(pending.Count)\n    match index.Find(101) {\n        Some(let order) =\u003E order.Pending = false\n        None =\u003E WriteLine(\u0022Missing registered order\u0022)\n    }\n    if !pending[0].Pending {\n        WriteLine(\u0022Filtered orders share identity\u0022)\n    }\n    WriteLine(pending.Count)\n    PrintPending(orders)\n\n    // Interface queries compose; array iteration uses the same Iterable contract.\n    let numbers = batch.Filter((order: Order) -\u003E bool =\u003E order.Pending)\n        .Map((order: Order) -\u003E int =\u003E order.Number).ToList()\n    for number in numbers {\n        WriteLine(number)\n    }\n    match orders.FindIndex((order: Order) -\u003E bool =\u003E order.Number == 101) {\n        Some(let position) =\u003E WriteLine(position)\n        None =\u003E WriteLine(\u0022No matching position\u0022)\n    }\n    match index.Find(303) {\n        Some(let order) =\u003E order.Pending = false\n        None =\u003E WriteLine(\u0022Missing registered order\u0022)\n    }\n    PrintPending(orders)\n}\n",
+  "phase": "binding",
+  "bytes": 0,
+  "bindingDiagnosticCount": 2,
+  "cliBridgeEmission": null,
+  "diagnostics": [
+    "error RAVT001: Runtime iteration contract \u0027System.Collections.Iterable\u00601\u0027 cannot be used: missing or incompatible iterable/iterator declarations.",
+    "error RAVT001: Runtime iteration contract \u0027System.Collections.Iterable\u00601\u0027 cannot be used: missing or incompatible iterable/iterator declarations."
+  ],
+  "scope": "unchanged library source units; explicit authoring seed; execution, when requested, is recorded separately in execution.json"
+}

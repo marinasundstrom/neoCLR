@@ -12,9 +12,11 @@ Translated System remains required; full library source emission and native sema
 symbol loading remain open. Unchanged callback comparer implementations now also execute
 through Function fields and interface dispatch (42). HashMap and its source dependencies
 now also compile and execute collision/growth,
-update, key-snapshot, inherited-interface and Option lookup checks (42). Next extend
-source coverage toward the broad application; closure environments and remaining System
-source units still require assessment.
+update, key-snapshot, inherited-interface and Option lookup checks (42). Reference-payload consumers now also verify shared object identity and replacement
+independence (42). The broad application with source collections exposes a mixed
+source/seed iteration identity boundary, still present when query operators are included
+as source. Next establish a coherent source bootstrap core/iteration contract before
+extending query emission; closure environments and remaining System units remain open.
 Author-directed integration stays on the feature branches;
 no main-branch feature merge or roadmap milestone completion is implied.
 See [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)

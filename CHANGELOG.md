@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Extend unchanged source collection execution to internal reference payloads, proving
+  map/list/filter identity, mutation visibility, replacement independence and iteration
+  after growth (42). Record broad application assessments with translated and source
+  queries: the remaining blocker is mixed source/seed iteration identity. No full
+  source bootstrap or query-operator emission is claimed.
+
 - Compile unchanged HashMap, its collection interfaces, ArrayList and equality-policy
   implementation together into native PE and execute collision/growth, duplicate,
   update, key-snapshot and Option lookup checks (42). Shared interface planning now

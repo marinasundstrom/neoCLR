@@ -499,3 +499,7 @@ and complete library compilation remain outside this checkpoint.
 HashMap and its source dependencies now compile together and execute native PE, covering
 collisions, growth, updates, independent key snapshots and Option lookups through map
 interfaces. Translated System still supplies remaining library dependencies.
+
+Source-built collection checks also cover reference payloads and shared object identity.
+The full application with source-built queries remains blocked at the source/seed
+iteration contract boundary; its existing translated-library execution is separate.
