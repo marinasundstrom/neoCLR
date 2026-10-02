@@ -88,9 +88,9 @@ public enum OpCode
     Initobj,
     /// <summary>Dispatches an owned nongeneric interface instance method; requires a MethodBuilder operand.</summary>
     Callvirt,
-    /// <summary>Loads through an initialized owned local address of the exact SignatureType.</summary>
+    /// <summary>Loads through an initialized owned local address or byref parameter of the exact SignatureType.</summary>
     Ldobj,
-    /// <summary>Stores through an owned local address of the exact SignatureType, establishing assignment.</summary>
+    /// <summary>Stores through an owned local address or byref parameter of the exact SignatureType; local stores establish assignment.</summary>
     Stobj
 }
 

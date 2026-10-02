@@ -5,6 +5,14 @@ milestone sequencing and scope. Explicit author directions take precedence.
 
 ## Current work
 
+**Byref-call checkpoint (2026-10-02):** writable managed-reference parameters now
+survive CLI/native emission, generic substitution, imports and CLI projection. An
+initialized local can be passed and mutated through a separate assembly; metadata C#
+checks execute on CLR and native verify/run returns 42. Out assignment contracts and
+imported value receivers remain the next propagation gaps; Raven admission and the
+unchanged collections sample are not yet advanced by this metadata-only slice.
+[Contract and checks](design/extended-cli-metadata.md#writable-ref-parameters-2026-10-02).
+
 **Managed-local checkpoint (2026-10-02):** metadata builders now emit typed ldobj/stobj
 for owned local addresses, including generic copies, with definite-assignment checks.
 The same C# producer executes on CLR and loads/verifies/runs as a native binary (42).

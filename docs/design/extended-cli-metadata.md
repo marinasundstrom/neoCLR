@@ -1442,3 +1442,33 @@ checks cover uninitialized reads, value and address type mismatch, non-address o
 Void and non-dominating writes. Run the C# contract executable, then its
 `--local-object-integration <runtime> <fresh-output>` mode for actual native binary
 loading, verification and execution. The runtime needs no rebuild for this slice.
+
+
+### Writable ref parameters (2026-10-02)
+
+Extend the preceding local-object slice with standard CLI BYREF parameters (ECMA-335
+sixth edition, Partition II signatures; existing primary baseline above), mapped to
+native ByRef without a new opcode or representation. This is a metadata producer gap,
+not a .NET limitation. Definitions retain immutable typed signatures; builders append
+ordinary argument, object and call operations. Readers, imports and reference projection
+preserve the same shape. Generic substitution descends through the reference target.
+
+Require initialized caller locals for this ref contract. Do not treat every byref call
+as assigning its argument: CLI byref alone does not convey a C# out assignment guarantee.
+Supporting out next needs explicit direction/assignment tracking, including callee
+validation, and comparison with existing runtime verification. This costs an additional
+contract rather than unsafe assignment inference. Readonly references, escaping returns,
+byref locals, receiver addresses and argument rebinding remain rejected. No performance
+claim or change to ordinary Raven/.NET emission is made.
+
+`ByReferenceChecks.cs` verifies generic replacement, forwarded references, direct and
+separate imported library/consumer execution (42), CLI snapshot and native projection
+imports, and rejection of uninitialized/non-address/wrong-target calls and invalid type
+positions. `--byref-integration <runtime> <fresh-output>` writes binary assemblies and
+runs verify/run for both standalone and dependency-backed cases. The native runtime is
+unchanged. The original collections application's out-local blocker remains open.
+
+Validation recorded on 2026-10-02: 80/80 C# metadata checks passed; standalone and
+separate-consumer native verify/run passed (42). Runtime binary SHA-256:
+`3a254fac354a0878db897c17e46c66fdc19bddf1136d6659274033b25d063f0d`
+on the `codex/extended-cli-metadata` integration worktree. API snapshot validation passed.

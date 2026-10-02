@@ -1,9 +1,22 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter or vector signature type.</summary>
+/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector or managed-reference parameter signature type.</summary>
 public sealed record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null) { ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null) { ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    /// <summary>Gets the target of a writable managed-reference parameter, or null.</summary>
+    public SignatureType? ByReferenceElement { get; }
+    /// <summary>Creates a writable managed-reference parameter type. Ref arguments must be initialized before calls.</summary>
+    /// <param name="elementType">Non-Void, non-byref type; scoped parameters are supported.</param>
+    /// <exception cref="ArgumentNullException">Element is null.</exception>
+    /// <exception cref="ArgumentException">Void, nested byref or nesting limit exceeded.</exception>
+    public static SignatureType ByReference(SignatureType elementType)
+    {
+        ArgumentNullException.ThrowIfNull(elementType);
+        if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
+            throw new ArgumentException("invalid managed-reference target", nameof(elementType));
+        return new(null, null, byReferenceElement: elementType);
+    }
     /// <summary>Gets the primitive kind, or null for a class or vector reference.</summary>
     public PrimitiveType? Primitive { get; }
     /// <summary>Gets the exact owned nominal identity (class, interface or value type), or null for other signatures.</summary>
@@ -17,7 +30,7 @@ public sealed record SignatureType
     public static SignatureType ArrayOf(SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
-        if (elementType.Primitive == PrimitiveType.Void || elementType.ArrayElement is not null || elementType.NestingDepth >= 16)
+        if (elementType.Primitive == PrimitiveType.Void || elementType.ArrayElement is not null || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
             throw new ArgumentException("array element must be a supported scalar", nameof(elementType));
         return new(null, null, elementType);
     }
@@ -51,9 +64,14 @@ public sealed record SignatureType
         if (type.GenericArity != type.TypeArguments.Count) throw new ArgumentException("imported generic definition requires construction", nameof(type));
         return new(null, null, importedType: type);
     }
-    internal int NestingDepth => ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
-    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false)
+    internal int NestingDepth => ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
+    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false)
     {
+        if (ByReferenceElement is { } target)
+        {
+            if (!allowByReference) throw new ArgumentException("managed references are supported only as method parameters");
+            target.ValidateOwner(assembly, genericArity, typeArity, complete);
+        }
         if (ImportedType is { } imported)
         {
             if (!ReferenceEquals(imported.Owner, assembly)) throw new ArgumentException("imported type belongs to another output");
@@ -82,7 +100,7 @@ public sealed record SignatureType
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
@@ -92,7 +110,7 @@ public class MethodSignature
     /// <param name="returnType">Supported primitive, Void, owned nominal or imported reference type.</param>
     /// <param name="parameterTypes">Copied non-Void parameter sequence.</param>
     /// <exception cref="ArgumentNullException">Result or parameters are null.</exception>
-    /// <exception cref="ArgumentException">Null/Void parameter or more than 256 parameters.</exception>
+    /// <exception cref="ArgumentException">Null/Void parameter, byref result or more than 256 parameters.</exception>
     /// <param name="genericParameterNames">Copied unique method parameter names, at most 32; omitted for nongeneric signatures.</param>
     public MethodSignature(SignatureType returnType, IEnumerable<SignatureType> parameterTypes, IEnumerable<string>? genericParameterNames = null)
     {
@@ -108,6 +126,7 @@ public class MethodSignature
         var parameters = parameterTypes.Take(257).ToArray();
         if (parameters.Length > 256 || parameters.Any(p => p is null || p.Primitive == PrimitiveType.Void))
             throw new ArgumentException("invalid parameter signature", nameof(parameterTypes));
+        if (returnType.ByReferenceElement is not null) throw new ArgumentException("byref returns are unsupported", nameof(returnType));
         ReturnType = returnType; ParameterTypes = Array.AsReadOnly(parameters);
     }
     /// <summary>Creates a primitive-only signature.</summary>
@@ -121,7 +140,8 @@ public class MethodSignature
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
     internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false)
     {
-        foreach (var type in ParameterTypes.Append(ReturnType)) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
+        ReturnType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
+        foreach (var type in ParameterTypes) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowByReference: true);
     }
     internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes);
 }

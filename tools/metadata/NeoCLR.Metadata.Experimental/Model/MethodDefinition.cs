@@ -131,7 +131,7 @@ public sealed partial class MethodDefinition
         var parameters = new SignatureType[count];
         for (int i = 0; i < count; i++)
         {
-            if (!ReadType(signature, ref position, false, out var parameter, genericArity)) return false;
+            if (!ReadType(signature, ref position, false, out var parameter, genericArity, allowByReference: true)) return false;
             parameters[i] = parameter!;
         }
         if (position != signature.Length) return false;
@@ -139,11 +139,17 @@ public sealed partial class MethodDefinition
         return true;
     }
 
-    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity)
+    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity, bool allowByReference = false)
     {
         type = null;
         if (position >= signature.Length) return false;
         var code = signature[position++];
+        if (code == 0x10 && allowByReference)
+        {
+            if (!ReadType(signature, ref position, false, out var target, genericArity)) return false;
+            type = SignatureType.ByReference(target!);
+            return true;
+        }
         var vector = code == 0x1d;
         if (vector)
         {

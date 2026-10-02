@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add writable managed-reference method parameters to the experimental metadata API:
+  standard CLI BYREF signatures and native ByRef types survive generic substitution,
+  imported calls and CLI projection. Initialized local addresses and forwarded ref
+  arguments execute through separate library/consumer binaries on CLR and neoCLR (42).
+  Out assignment contracts, readonly references, byref returns/locals and Raven admission
+  remain unsupported; this adds no runtime opcode or wire-format extension.
+
 - Add typed `ldobj`/`stobj` emission and `LoadObject`/`StoreObject` helpers to the
   experimental metadata API for owned local addresses, with exact-type and path-sensitive
   assignment checks. The C# consumer exercises generic copies and branch-merged updates

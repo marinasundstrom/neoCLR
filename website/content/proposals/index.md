@@ -423,3 +423,9 @@ The next development slice exposes standard typed `ldobj`/`stobj` through the me
 API for owned local addresses. C# producer tests execute generic copies and local
 updates on CLR and neoCLR (42), with definite-assignment rejection tests. Byref
 parameter/call support and the full collections application remain incomplete.
+
+
+Writable managed-reference parameters now survive metadata emission, generic substitution,
+imports and CLI projection. Separate test assemblies mutate a caller local on CLR and
+neoCLR (42). Out assignment guarantees and Raven propagation admission remain subsequent
+work; this metadata-only slice does not complete the collections application.

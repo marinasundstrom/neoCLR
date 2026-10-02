@@ -51,11 +51,11 @@ public sealed partial class MethodBuilder
         => Instructions.Select((instruction, index) => (instruction, index)).Where(p => p.instruction.Op == "label")
             .ToDictionary(p => p.instruction.Value, p => p.index);
 
-    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null)
+    private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.OpenSignature;
         public static implicit operator BodyValueType(PrimitiveType type) => new(type);
-        public static implicit operator BodyValueType(SignatureType type) => type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
+        public static implicit operator BodyValueType(SignatureType type) => type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : new(type.Primitive!.Value);
     }
     private BodyValueType ArgumentType(int index) => !IsStatic && index == 0
         ? BodyValueType.Receiver(DeclaringType!) : Signature.ParameterTypes[index - (IsStatic ? 0 : 1)];
@@ -90,6 +90,13 @@ public sealed partial class MethodBuilder
             // Preserve native primitive identity across stack operations and joins.
             void Pop(BodyValueType type)
             {
+                if (type.ByReferenceElement is { } target && stack.Count > 0 && stack[^1].AddressedLocal is { } local)
+                {
+                    if (!assigned[local] || locals[local].SignatureType != target)
+                        throw new InvalidDataException("ref call requires an initialized local of the exact type");
+                    stack.RemoveAt(stack.Count - 1);
+                    return;
+                }
                 if (stack.Count == 0 || stack[^1] != type && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
             }
@@ -158,20 +165,30 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("integer conversion requires Int32/Int64 or array length for conv.i4");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
-                case "argument.store": Pop(ArgumentType(instruction.Value)); break;
+                case "argument.store":
+                    if (ArgumentType(instruction.Value).ByReferenceElement is not null)
+                        throw new InvalidDataException("managed-reference argument rebinding is unsupported");
+                    Pop(ArgumentType(instruction.Value)); break;
                 case "argument": stack.Add(ArgumentType(instruction.Value)); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.address": stack.Add(new BodyValueType(PrimitiveType.Void, AddressedLocal: instruction.Value)); break;
                 case "object.load":
                 case "object.store":
                     if (instruction.Op == "object.store") Pop(instruction.Type!);
-                    if (stack.Count == 0 || stack[^1].AddressedLocal is not { } addressed || locals[addressed].SignatureType != instruction.Type)
-                        throw new InvalidDataException("object operation requires an owned local address of the exact type");
-                    if (instruction.Op == "object.load" && !assigned[addressed])
-                        throw new InvalidDataException("indirect local loaded before store on some path");
+                    if (stack.Count == 0) throw new InvalidDataException("object operation requires a managed reference");
+                    var address = stack[^1];
+                    if (address.AddressedLocal is { } addressed)
+                    {
+                        if (locals[addressed].SignatureType != instruction.Type)
+                            throw new InvalidDataException("object operation address type mismatch");
+                        if (instruction.Op == "object.load" && !assigned[addressed])
+                            throw new InvalidDataException("indirect local loaded before store on some path");
+                        if (instruction.Op == "object.store") assigned[addressed] = true;
+                    }
+                    else if (address.ByReferenceElement is null || address.ByReferenceElement != instruction.Type)
+                        throw new InvalidDataException("object operation requires an exact managed-reference target");
                     stack.RemoveAt(stack.Count - 1);
-                    if (instruction.Op == "object.store") assigned[addressed] = true;
-                    else stack.Add(instruction.Type!);
+                    if (instruction.Op == "object.load") stack.Add(instruction.Type!);
                     break;
                 case "local.initialize":
                     if (stack.Count == 0 || stack[^1].AddressedLocal is not { } initialized || locals[initialized].SignatureType != instruction.Type)

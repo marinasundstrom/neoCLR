@@ -313,7 +313,7 @@ public sealed partial class AssemblyBuilder
                     else EncodeType(result.Type(), method.Signature.ReturnType);
                 }, parameters =>
                 {
-                    foreach (var type in method.Signature.ParameterTypes) EncodeType(parameters.AddParameter().Type(), type);
+                    foreach (var type in method.Signature.ParameterTypes) EncodeType(parameters.AddParameter().Type(isByRef: type.ByReferenceElement is not null), type.ByReferenceElement ?? type);
 
                 });
             return metadata.GetOrAddBlob(signature);

@@ -16,16 +16,17 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
         if (count > 256) throw new InvalidDataException("imported parameter limit");
         var result = Type(true, 0);
         var parameters = new SignatureType[count];
-        for (var i = 0; i < count; i++) parameters[i] = Type(false, 0);
+        for (var i = 0; i < count; i++) parameters[i] = Type(false, 0, true);
         if (position != signature.Length) throw new InvalidDataException("trailing imported signature bytes");
         return new(result, parameters, Enumerable.Range(0, arity).Select(i => "T" + i));
     }
 
-    private SignatureType Type(bool allowVoid, int depth)
+    private SignatureType Type(bool allowVoid, int depth, bool allowByReference = false)
     {
         if (depth >= 16) throw new InvalidDataException("imported signature nesting limit");
         switch (Byte())
         {
+            case 0x10 when allowByReference: return SignatureType.ByReference(Type(false, depth + 1));
             case 0x01 when allowVoid: return PrimitiveType.Void;
             case 0x02: return PrimitiveType.Boolean;
             case 0x08: return PrimitiveType.Int32;

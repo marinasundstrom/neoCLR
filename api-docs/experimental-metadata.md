@@ -2625,8 +2625,7 @@ accepts `SignatureType`. `MethodBuilder.LoadLocalAddress(LocalDefinition)` and
 an uninitialized local; initialization establishes definite assignment only for that
 exact local. Both writers reject a mismatched type, non-address operand, an address
 escaping through value storage/calls/returns, and later loads not initialized on every
-reachable path. General managed-reference signatures are not
-part of this bounded API. Address values at joins must identify the same local.
+reachable path. Writable managed-reference parameters are supported as described below. Address values at joins must identify the same local.
 
 `OpCode.Ldobj` and `OpCode.Stobj` accept an exact non-Void `SignatureType` through
 `Emit(OpCode, SignatureType)`. The corresponding helpers are
@@ -2640,7 +2639,7 @@ ArgumentException before appending. Instruction limits and invalid stack/address
 or assignment contracts throw InvalidDataException (the latter on writing).
 CLI uses standard ldobj/stobj tokens, including TypeSpec for generic/vector operands;
 native emits its existing typed ldobj/stobj. This does not admit pointers, field/array
-addresses, escaping references or byref parameters. See `LocalObjectChecks.cs` for an
+addresses or escaping references. Ldobj/Stobj also accept managed-reference parameters. See `LocalObjectChecks.cs` for an
 executable generic copy and branch-merged local update.
 
 `MethodBuilder.LoadDefault(SignatureType)` declares one scratch local, initializes it
@@ -3815,3 +3814,33 @@ written library/consumer on CLR and neoCLR (42), checks native null-receiver fai
 wrong arity/opcode/owner rejection and reference projection. Raven's corresponding
 probe executes constructed interface and final class calls (42); the unchanged
 collections sample advances to propagation-expression lowering.
+
+
+### Writable managed-reference parameters (development, 2026-10-02)
+
+`SignatureType.ByReference(SignatureType elementType)` creates a managed-reference
+parameter signature; `SignatureType.ByReferenceElement` returns its target or null.
+The target is a non-Void supported type, including vectors and scoped generic parameters.
+Null throws ArgumentNullException; Void, nested byrefs or exceeding the 16-level nesting
+bound throws ArgumentException. Ownership and generic scope are checked on use.
+Only method parameters admit this type: byref returns, fields, locals, array elements
+and generic arguments reject. ToString appends `&` to the target diagnostic name.
+
+MethodSignature, owned and imported method calls, generic substitution and native CLI
+projection preserve BYREF. CLI uses ELEMENT_TYPE_BYREF in parameter signatures; native
+uses its existing ByRef type. The bounded static value/generic signature readers recognize
+byref primitive/vector/MVAR parameters; primitive-only readers continue to return false
+for those signatures. No Param Out/In flag or readonly modifier is emitted or inferred.
+
+Call consumes an initialized exact local address or a matching forwarded ref parameter.
+It cannot establish assignment for an uninitialized caller local. `LoadArgument` loads
+the reference; `LoadObject`/`StoreObject` (or raw Ldobj/Stobj) read/write the referenced
+value. Argument rebinding with Starg rejects; Initobj remains local-address-only.
+The body validator rejects mismatched targets, non-address operands and uninitialized
+ref calls when either writer runs. References cannot escape via results or value locals.
+This slice does not admit ref receiver methods or Raven `out` propagation calls.
+
+`ByReferenceChecks.cs` demonstrates generic replacement and reference forwarding, with
+independent library/consumer execution from both CLI snapshots and native projections.
+Run `--byref-integration <runtime> <fresh-output>` for native binary verification and
+execution (42); the regular C# tests include positive and rejection checks.

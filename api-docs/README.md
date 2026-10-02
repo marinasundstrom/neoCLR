@@ -629,3 +629,8 @@ The experimental host-only `MethodBuilder.LoadObject`, `StoreObject`, and `OpCod
 `Stobj` are documented in the [typed local operations reference](experimental-metadata.md#typed-local-initialization-development).
 They remain excluded from the guest RavenDoc assembly because the metadata producer is
 C#, not a guest runtime API. The guest API snapshot is unchanged by this slice.
+
+Host-only `SignatureType.ByReference`/`ByReferenceElement` and updated method-signature
+readers are covered by the [managed-reference manual](experimental-metadata.md#writable-managed-reference-parameters-development-2026-10-02).
+The existing guest RavenDoc exclusion applies: these APIs belong to the C# metadata
+producer, so no guest reference-assembly snapshot changes are required.
