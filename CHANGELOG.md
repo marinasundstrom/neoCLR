@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Raven now imports bounded primitive namespace-function libraries directly from native
+  definitions into compiler-owned symbols, without a CLI projection. Exact dependency
+  identities, overload/accessibility checks and compilation isolation are validated;
+  67 .NET target/symbol-equality regressions pass. An explicit CLI core remains the
+  bootstrap. Native call emission and broader declaration importing remain pending.
+
 - Read native primitive namespace functions directly into the existing assembly/module/
   method definitions through ReadNativeAssembly, without a CLI projection round trip.
   Preserve exact references, namespace ownership, entry identity and original PE bytes;

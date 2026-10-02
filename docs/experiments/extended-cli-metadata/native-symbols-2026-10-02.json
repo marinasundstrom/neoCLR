@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "nativeSha256": "2575CC86684F9E9C9BD4B491371601FC877CA1A0962255DE98CED063B69FEF89",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "cases": [
+    "native namespace overloads",
+    "both reference orders",
+    "semantic type and symbol identity",
+    "compilation isolation",
+    "accessibility",
+    "invalid argument",
+    "unsupported emission leaves output empty",
+    "duplicate identity",
+    "wrong target",
+    "missing dependency",
+    "registered dependency",
+    "exact version identity"
+  ],
+  "scope": "direct native dependency symbols with explicit CLI primitive core; native emission not yet exercised"
+}

@@ -1857,3 +1857,19 @@ and builder-backed validation internally; broader typed reference migration rema
 necessary before nominal signatures can enter this public read path. Next connect a
 native dependency to Raven's semantic-loader boundary while preserving .NET loading
 and emission. No reflection replacement or native semantic importer is claimed here.
+
+### Native function semantic consumer checkpoint (2026-10-02)
+
+The first Raven provider consumes ReadNativeAssembly definitions directly, retaining
+namespace ownership and exact native assembly identity in compilation-owned symbols.
+The existing definition reader/resolver design supplies this input; no new compiler-only
+metadata model or reflection facade was added. The compiler's provider boundary now
+composes native references with the existing CLI core loader for the bounded bootstrap.
+
+C# semantic checks pass for overload/type binding, accessibility, stable declaration
+identity, isolation, reference ordering and explicit dependency/version failures; 67
+ordinary .NET target and symbol-equality tests pass. Native assembly versions cannot
+collapse under simple-name symbol equality. Unsupported emission leaves output empty.
+Next add direct native call references to the metadata library and Raven adapter, then
+execute the imported call. Nominal/generic native importing and full core replacement
+remain open. This advances the existing read → definitions → symbols direction.

@@ -3262,3 +3262,27 @@ and compatibility tests pass (96 groups); loaded bodies remain opaque and unsupp
 nominal/generic declarations fail explicitly. Raven still uses the existing CLI importer:
 connecting native definitions to compiler symbols and preserving their identity into
 codegen is next. Existing Runtime Contract settings and .NET behavior are unchanged.
+
+### First direct native semantic imports (2026-10-02)
+
+Raven's explicit NeoClrMetadataReference.ReadAssembly now consumes the existing native
+function definition reader directly. Native namespace/method symbols participate in
+GetSymbolInfo/GetTypeInfo, overload resolution and accessibility without reflection
+objects or nominal container types. An explicit CLI primitive core remains required;
+Runtime Contract configuration is unchanged and full native System import is pending.
+
+The compiler owns symbols per compilation, with provider-owned exact assembly identity
+for equality and dependency matching. Native dependencies must be registered explicitly;
+missing/version-mismatched, duplicate and wrong-target configurations produce RAVT003.
+No filesystem probing, package resolution or reflection API is introduced. Positional
+parameters have implicit ordinal display names because this profile lacks source names.
+Direct dependencies are tested; full cyclic dependency qualification remains future work.
+
+Default CLI emission rejects native semantic references; native calls currently reach
+the missing adapter diagnostic, both without output. Next connect native definition
+identity to the metadata emitter and run a cross-assembly call. The 67 focused .NET
+target and symbol-equality regressions pass. The C# semantic probe checks both reference
+orders, namespace overloads, semantic types, stable lookup, compilation isolation,
+visibility, invalid arguments, exact version identity and dependency rejection.
+[Recorded semantic evidence](experiments/extended-cli-metadata/native-symbols-2026-10-02.json).
+This is symbol-loading evidence, not a new runtime execution claim.

@@ -3,7 +3,9 @@
 Author-directed priority (2026-10-02): proceed with direct native metadata import into
 Raven, developing the reader/writer library toward its existing builders → definitions
 → metadata → PE architecture. Primitive namespace functions now materialize directly into the existing definitions
-(96 metadata groups pass); Raven native symbol integration is next. Native reading/import
+(96 metadata groups pass). Raven now binds these native functions directly with
+exact dependency identity and compilation-owned symbols; 67 .NET regressions pass.
+Next import native call references into emission and execute across that boundary. Native reading/import
 now precede further source-library/bootstrap expansion. CLI projections remain existing
 controls, not the new integration route. See the [implementation alignment](design/extended-cli-metadata.md#direct-native-semantic-import-implementation-alignment-2026-10-02).
 
