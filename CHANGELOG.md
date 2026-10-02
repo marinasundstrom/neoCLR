@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-02
 
+- Add explicit CLI declaration/native implementation bindings to the metadata API,
+  preserving PE reference scopes while validating selected native signatures. Support
+  local core TypeRefs/Function carriers and inhabited Void storage/result adaptation.
+  Matching runtimes accept the new manifest mapping fields; older experimental bundles
+  must be updated together. The unchanged Raven collections application now emits native
+  PE, verifies and runs with exact expected output against translated System (exit 0).
+  91 C# metadata contract groups and native binary fixture validation pass.
+
 - Preserve access to caller-supplied internal types when generic library code invokes
   a structural Function. Open signatures still reject explicit foreign internal
   types; a cross-module regression reproduces the former execution fault and now

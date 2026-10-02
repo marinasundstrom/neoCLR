@@ -13,6 +13,32 @@ pub struct AssemblyMetadata {
     /// External nominal value categories required by metadata-only CLI projection.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub value_type_references: Vec<String>,
+    /// Explicit compiler-reference to native-module linkage for translated libraries.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub native_module_bindings: Vec<NativeModuleBinding>,
+    /// Physical CLI type scopes retained for reference projection; execution uses native_name.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub native_type_bindings: Vec<NativeTypeBinding>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeModuleBinding {
+    pub assembly: String,
+    pub module: String,
+    pub revision: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeTypeBinding {
+    pub native_name: String,
+    pub assembly: String,
+    pub namespace: String,
+    pub name: String,
+    pub arity: usize,
+    pub value_type: bool,
+    pub declaring: Option<String>,
 }
 
 /// Original CLI member accessibility, independent of lowered helper visibility.
@@ -78,6 +104,34 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
     }
     for assembly in &module.assemblies {
+        if assembly.native_module_bindings.len() > 256 || assembly.native_type_bindings.len() > 4096
+        {
+            return Err(Fault::new("native reference binding limit exceeded"));
+        }
+        let mut bound_assemblies = HashSet::new();
+        for binding in &assembly.native_module_bindings {
+            if !text(&binding.assembly)
+                || !text(&binding.module)
+                || binding.revision.as_ref().is_some_and(|r| !text(r))
+                || !assembly.references.contains(&binding.assembly)
+                || !bound_assemblies.insert(&binding.assembly)
+            {
+                return Err(Fault::new("invalid native module binding"));
+            }
+        }
+        let mut bound_types = HashSet::new();
+        for binding in &assembly.native_type_bindings {
+            if !text(&binding.native_name)
+                || !text(&binding.name)
+                || binding.arity > 32
+                || (!binding.namespace.is_empty() && !text(&binding.namespace))
+                || binding.declaring.as_ref().is_some_and(|d| !text(d))
+                || !bound_assemblies.contains(&binding.assembly)
+                || !bound_types.insert((&binding.native_name, binding.arity))
+            {
+                return Err(Fault::new("invalid native type binding"));
+            }
+        }
         let mut seen = HashSet::new();
         if assembly.value_type_references.len() > 4096 {
             return Err(Fault::new("value type reference limit exceeded"));

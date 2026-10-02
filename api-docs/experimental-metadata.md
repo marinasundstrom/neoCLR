@@ -4083,3 +4083,59 @@ CLI output uses ECMA `castclass`; native output uses its existing `castclass` ve
 and runtime contract, which may reject unsupported conversions. These methods do not
 promise general .NET downcast coverage. A C# fixture checks inherited interface dispatch
 through two implementations on CLR and neoCLR (42), and rejects value operands.
+
+### Explicit translated-library linkage (development, 2026-10-02)
+
+`AssemblyBuilder.BindNativeLibrary(AssemblyDefinition reference,
+NativeLibraryDefinition implementation, AssemblyIdentity coreLibrary)` registers one
+explicit declaration/implementation pair before importing any types or members from
+that dependency. All parameters are required (`ArgumentNullException`); the core must
+match the output core, the dependency must differ from the output, prior imports or a
+duplicate binding are rejected, and at most 256 dependencies are admitted
+(`InvalidDataException`). Registration returns no value. It does not execute or verify
+library bodies. Supply the implementation module separately when loading the consumer.
+
+Subsequent `ImportReference` calls validate the selected public native declaration's
+name, arity, value/reference/interface category, instance/static shape, generic arity,
+parameter/result signatures, managed receiver and output contract. Unsupported or
+ambiguous matches fail with `InvalidDataException`. Translated names remove the CLI
+backtick arity suffix and join nesting with dots; this is an explicit temporary bridge,
+not a universal resolver or a general name-remapping API. Generic constraints and
+unsupported imported shapes retain their existing restrictions. Native interface
+members must have empty bodies. Static namespace carriers may use the translator's
+legacy value-like representation. Unused declarations are not individually validated.
+
+CLI output preserves original AssemblyRef/TypeRef scopes. Native output uses the bound
+module name and exact revision when present (otherwise a name-only module reference),
+and records `native_module_bindings`/`native_type_bindings` in its manifest so the PE
+reference projection can recover the CLI identities. Readers reject undeclared scopes,
+duplicate aliases, invalid categories and cyclic declaring scopes. Older experimental
+runtimes do not understand these added manifest fields; use a matching compiler/library/
+runtime bundle. No forwarding, dependency download or host assembly probing occurs.
+
+Dependency-local TypeRefs, including local-core values extending a TypeDef
+`System.ValueType`, are accepted without an external resolver. Func/Action carriers
+also recognize the explicitly selected local core. Its inhabited nominal `System.Void`
+is mapped to native Void storage while remaining a nominal value in the CLI projection;
+CLI ELEMENT_TYPE_VOID still means no result. A CLI no-result call to an inhabited-Void
+native method emits a result discard, with branch offsets adjusted. This bridge does
+not erase an out parameter or add general CLI inhabited-void execution support.
+
+The C# linkage fixture executes on CLR and neoCLR (42), tests versioned/unversioned
+bindings and malformed mappings, and provides the checked-in binary runtime fixture.
+`LocalCoreSignatureChecks` covers local nominal/core Function signatures and cyclic
+TypeRef rejection. The unchanged Raven collections application additionally exercises
+inhabited Void through Option residual propagation.
+
+The Rust host metadata model exposes `metadata_origin::AssemblyMetadata`'s new
+`native_module_bindings: Vec<NativeModuleBinding>` and
+`native_type_bindings: Vec<NativeTypeBinding>` fields. Both default to empty on read and
+are omitted when empty on write. `NativeModuleBinding` has `assembly: String`,
+`module: String`, `revision: Option<String>`; `NativeTypeBinding` has
+`native_name`, `assembly`, `namespace`, `name` (`String`), `arity: usize`,
+`value_type: bool`, and `declaring: Option<String>`. They derive Debug, Clone,
+PartialEq, Eq, Serialize and Deserialize; unknown fields are rejected. Runtime admission
+checks declared scopes, text, duplicates and limits (256 modules, 4096 types, arity 32).
+These retain projection provenance; they do not authorize calls or override runtime
+resolution/access checks. Hosts constructing AssemblyMetadata literals must initialize
+the new vectors. These host-only APIs remain outside the guest RavenDoc assembly.

@@ -13,12 +13,14 @@ public sealed class NativeAssemblyDefinition
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter);
+    private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
+    private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
     private readonly HashSet<string> valueTypeReferences;
     private readonly PropertyRow[] properties;
     private readonly TypeRow[] types;
     private readonly MethodRow[] methods;
-    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences)
-    { this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
+    private NativeAssemblyDefinition(AssemblyIdentity identity, TypeRow[] types, MethodRow[] methods, PropertyRow[] properties, AssemblyIdentity[] references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases)
+    { this.nativeTypeAliases = nativeTypeAliases; this.valueTypeReferences = valueTypeReferences; Identity = identity; this.types = types; this.methods = methods; this.properties = properties; References = System.Array.AsReadOnly(references); }
     /// <summary>Gets the exact unsigned assembly identity retained from the native metadata manifest.</summary>
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets owned exact identities of direct native dependencies in manifest order.</summary>
@@ -50,6 +52,30 @@ public sealed class NativeAssemblyDefinition
                 foreach (var valueReference in Array(manifest, "value_type_references", 4096))
                     Require(valueReference.ValueKind == JsonValueKind.String && valueTypeReferences.Add(valueReference.GetString()!), "invalid or duplicate value type reference");
             }
+            var nativeTypeAliases = new Dictionary<(string Name, int Arity), NativeTypeAlias>();
+            var nativeModuleAliases = new Dictionary<AssemblyIdentity, (string Module, string? Revision)>();
+            if (manifest.TryGetProperty("native_module_bindings", out _))
+            {
+                manifestFields.Add("native_module_bindings");
+                foreach (var binding in Array(manifest, "native_module_bindings", 256))
+                {
+                    Shape(binding, "assembly", "module", "revision");
+                    var assemblyIdentity = ReadIdentity(Text(binding, "assembly"));
+                    var module = Text(binding, "module"); CheckName(module);
+                    Require(nativeModuleAliases.TryAdd(assemblyIdentity, (module, binding.GetProperty("revision").GetString())), "duplicate native module binding");
+                }
+            }
+            if (manifest.TryGetProperty("native_type_bindings", out _))
+            {
+                manifestFields.Add("native_type_bindings");
+                foreach (var binding in Array(manifest, "native_type_bindings", 4096))
+                {
+                    Shape(binding, "native_name", "assembly", "namespace", "name", "arity", "value_type", "declaring");
+                    var alias = new NativeTypeAlias(Text(binding, "native_name"), ReadIdentity(Text(binding, "assembly")), binding.GetProperty("namespace").GetString()!, Text(binding, "name"), binding.GetProperty("arity").GetInt32(), binding.GetProperty("value_type").GetBoolean(), binding.GetProperty("declaring").GetString());
+                    CheckName(alias.NativeName);
+                    Require(alias.Arity is >= 0 and <= 32 && alias.Namespace is not null && nativeTypeAliases.TryAdd((alias.NativeName, alias.Arity), alias), "invalid native type binding");
+                }
+            }
             Shape(manifest, manifestFields.ToArray());
             var identityText = Text(manifest, "full_name");
             var identity = ReadIdentity(identityText);
@@ -66,11 +92,14 @@ public sealed class NativeAssemblyDefinition
             var referenceIdentities = new List<AssemblyIdentity>();
             for (int i = 0; i < references.Length; i++)
             {
-                var reference = ReadIdentity(referenceNames[i]); Shape(references[i], "name", "revision");
+                var reference = ReadIdentity(referenceNames[i]);
+                if (references[i].ValueKind != JsonValueKind.String) Shape(references[i], "name", "revision");
                 Require(!reference.Equals(identity) && seenReferences.Add(reference), "duplicate or self native reference");
-                Require(Text(references[i], "name") == ModuleName(referenceNames[i]) && Text(references[i], "revision") == reference.Version.ToString(), "native reference identity mismatch");
+                var expected = nativeModuleAliases.TryGetValue(reference, out var nativeModule) ? nativeModule : (ModuleName(referenceNames[i]), reference.Version.ToString());
+                Require(references[i].ValueKind == JsonValueKind.String ? references[i].GetString() == expected.Item1 && expected.Item2 is null : Text(references[i], "name") == expected.Item1 && references[i].GetProperty("revision").GetString() == expected.Item2, "native reference identity mismatch");
                 referenceIdentities.Add(reference);
             }
+            Require(nativeModuleAliases.Keys.All(seenReferences.Contains) && nativeTypeAliases.Values.All(a => nativeModuleAliases.ContainsKey(a.Assembly)), "unscoped native binding");
             var typeElements = Array(root, "types", 256);
             var types = new List<TypeRow>();
             int nextPropertyToken = 0x17000001;
@@ -210,12 +239,16 @@ public sealed class NativeAssemblyDefinition
             var signatureGraph = new AssemblyBuilder(identity, identity);
             foreach (var reference in valueTypeReferences)
             {
-                var simpleName = Decode(reference[(reference.LastIndexOf('_') + 1)..]);
+                var nativeMatches = nativeTypeAliases.Values.Where(a => a.NativeName == reference && a.ValueType).ToArray();
+                Require(nativeMatches.Length <= 1, "ambiguous native value binding");
+                var simpleName = nativeMatches.Length == 1 ? nativeMatches[0].Name : Decode(reference[(reference.LastIndexOf('_') + 1)..]);
                 int marker = simpleName.LastIndexOf('`');
                 int importedArity = 0;
                 if (marker >= 0) Require(int.TryParse(simpleName[(marker + 1)..], out importedArity) && importedArity > 0, "invalid imported value arity");
-                _ = ImportExternalType(signatureGraph, reference, importedArity, referenceIdentities, valueTypeReferences);
+                _ = ImportExternalType(signatureGraph, reference, importedArity, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             }
+            foreach (var alias in nativeTypeAliases.Values)
+                _ = ImportExternalType(signatureGraph, alias.NativeName, alias.Arity, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             int genericArity = 0; int typeArity = 0;
             var signatureOwners = DefineTypes(signatureGraph, types);
             for (int i = 0; i < types.Count; i++)
@@ -243,7 +276,12 @@ public sealed class NativeAssemblyDefinition
                 foreach (var (parameter, flags) in types[i].SpecialConstraints) signatureOwners[i].SetSpecialConstraints(parameter, flags);
             SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false)
             {
-                if (element.ValueKind == JsonValueKind.String) return ReadPrimitive(element.GetString(), allowVoid);
+                if (element.ValueKind == JsonValueKind.String)
+                {
+                    if (!allowVoid && element.GetString() == "Void" && nativeTypeAliases.TryGetValue(("System.Void", 0), out var unit) && unit.ValueType && unit.Namespace == "System" && unit.Name == "Void")
+                        return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                    return ReadPrimitive(element.GetString(), allowVoid);
+                }
                 if (element.TryGetProperty("Function", out var function))
                 {
                     Shape(element, "Function"); Shape(function, "parameters", "returns", "no_result");
@@ -281,12 +319,12 @@ public sealed class NativeAssemblyDefinition
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
                     var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray();
                     return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
-                        : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences).MakeGenericInstance(arguments);
+                        : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences, nativeTypeAliases).MakeGenericInstance(arguments);
                 }
                 Shape(element, "Named");
                 var index = types.FindIndex(t => t.NativeName == Text(element, "Named") && !t.IsStatic);
                 return index >= 0 ? (SignatureType)signatureOwners[index]
-                    : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences);
+                    : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             }
             foreach (var type in types)
             {
@@ -366,7 +404,7 @@ public sealed class NativeAssemblyDefinition
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
-                var resultType = ReadType(method.GetProperty("returns"), true);
+                var resultType = ReadType(method.GetProperty("returns"), noResult);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
@@ -445,7 +483,7 @@ public sealed class NativeAssemblyDefinition
                 var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
             }
-            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences);
+            return new(identity, types.ToArray(), methods.ToArray(), properties.ToArray(), referenceIdentities.ToArray(), valueTypeReferences, nativeTypeAliases);
         }
         catch (Exception error) when (error is JsonException or InvalidOperationException or KeyNotFoundException or FormatException or ArgumentException or OverflowException)
         { throw new InvalidDataException("invalid native metadata", error); }
@@ -461,6 +499,8 @@ public sealed class NativeAssemblyDefinition
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
+        if (nativeTypeAliases.TryGetValue(("System.Void", 0), out var unitAlias) && !unitAlias.Assembly.Equals(coreLibrary))
+            throw new InvalidDataException("inhabited Void projection requires the explicit core scope");
         var graph = new AssemblyBuilder(Identity, coreLibrary);
         var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)
@@ -468,7 +508,7 @@ public sealed class NativeAssemblyDefinition
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
-        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? (SignatureType)ReadPrimitive(type.GetString(), false)
+        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Void" && nativeTypeAliases.ContainsKey(("System.Void", 0)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
@@ -477,15 +517,16 @@ public sealed class NativeAssemblyDefinition
         SignatureType ProjectNamed(string name)
         {
             int index = System.Array.FindIndex(types, row => row.NativeName == name);
-            return index >= 0 ? (SignatureType)owners[index] : ImportExternalType(graph, name, 0, References, valueTypeReferences);
+            return index >= 0 ? (SignatureType)owners[index] : ImportExternalType(graph, name, 0, References, valueTypeReferences, nativeTypeAliases);
         }
         SignatureType ProjectConstruction(string name, SignatureType[] arguments)
         {
             int index = System.Array.FindIndex(types, row => row.NativeName == name);
-            return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References, valueTypeReferences).MakeGenericInstance(arguments);
+            return index >= 0 ? owners[index].MakeGenericInstance(arguments) : ImportExternalType(graph, name, arguments.Length, References, valueTypeReferences, nativeTypeAliases).MakeGenericInstance(arguments);
         }
         for (int i = 0; i < types.Length; i++)
-            foreach (var inherited in types[i].BaseInterfaces) {
+            foreach (var inherited in types[i].BaseInterfaces)
+            {
                 var contract = ProjectType(inherited);
                 if (contract.GenericInstance is { } constructed) owners[i].AddInterfaceImplementation(constructed);
                 else if (types[i].IsInterface) owners[i].AddBaseInterface(contract.ClassType!);
@@ -549,8 +590,20 @@ public sealed class NativeAssemblyDefinition
             : graph.AddGenericClass(type.Namespace, name, type.GenericNames, type.Visibility);
     }
 
-    private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references, HashSet<string> valueTypeReferences)
+    private static ImportedTypeReference ImportExternalType(AssemblyBuilder graph, string name, int arity, IEnumerable<AssemblyIdentity> references, HashSet<string> valueTypeReferences, Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases)
     {
+        if (nativeTypeAliases.TryGetValue((name, arity), out var alias)) return ImportAlias(alias, 0);
+        ImportedTypeReference ImportAlias(NativeTypeAlias item, int depth)
+        {
+            Require(depth < 16 && references.Contains(item.Assembly) && (!item.ValueType || valueTypeReferences.Contains(item.NativeName)), "invalid native type alias scope/category");
+            ImportedTypeReference? parent = null;
+            if (item.Declaring is { } declaring)
+            {
+                Require(nativeTypeAliases.TryGetValue((declaring, 0), out var enclosing) && enclosing.Assembly.Equals(item.Assembly), "invalid native declaring binding");
+                parent = ImportAlias(enclosing!, depth + 1);
+            }
+            return graph.ImportTypeIdentity(item.Assembly, item.Namespace, item.Name, item.Arity, item.ValueType, parent);
+        }
         foreach (var identity in references)
         {
             var text = JsonSerializer.Serialize(new[] { identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(CultureInfo.InvariantCulture) });

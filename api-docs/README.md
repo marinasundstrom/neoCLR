@@ -709,3 +709,9 @@ receiver/direct-call restrictions (2026-10-02); no Raven public API was added.
 
 The manual host API reference includes CastReference and raw Castclass operands,
 reference-only validation, native conversion limits and executable evidence (2026-10-02).
+
+Development explicit library binding (`AssemblyBuilder.BindNativeLibrary`) and the
+Rust host `metadata_origin` binding structs/AssemblyMetadata vectors are covered by
+[the host metadata manual](experimental-metadata.md#explicit-translated-library-linkage-development-2026-10-02).
+They remain excluded from the guest RavenDoc reference because that assembly contains
+Raven class-library APIs, not these C#/Rust host APIs. No guest snapshot signature changes.

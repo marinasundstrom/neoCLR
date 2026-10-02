@@ -40,20 +40,20 @@ public sealed partial class AssemblyBuilder
         }
         foreach (var type in importedNominalTypes.Values)
             if (!dependencies.ContainsKey(type.AssemblyIdentity))
-                dependencies.Add(type.AssemblyIdentity, new AssemblyBuilder(type.AssemblyIdentity, CoreLibrary));
+                dependencies.Add(type.AssemblyIdentity, importedGraphs.TryGetValue(type.AssemblyIdentity, out var graph) ? graph.Graph : new AssemblyBuilder(type.AssemblyIdentity, CoreLibrary));
         if (dependencies.Count > 256) throw new InvalidDataException("too many imported assemblies");
         static string IdentityText(AssemblyIdentity identity) => JsonSerializer.Serialize(new[] {
             identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(System.Globalization.CultureInfo.InvariantCulture)
         });
-        static string ModuleName(AssemblyBuilder assembly) => ModuleIdentity(assembly.Identity);
+        static string ModuleName(AssemblyBuilder assembly) => assembly.NativeBinding?.Library.ModuleName ?? ModuleIdentity(assembly.Identity);
         static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
-        static string TypeName(TypeBuilder type) => type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName);
+        static string TypeName(TypeBuilder type) => type.Assembly.NativeBinding is { } binding ? binding.TypeName(type.Definition) : type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
+        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName));
         static object? Owner(MethodBuilder method) => method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
-        static string ExternalName(ImportedTypeReference type) => type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static object ExternalValue(ImportedTypeReference type) => type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
+        static string ExternalName(ImportedTypeReference type) => type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
+        static object ExternalValue(ImportedTypeReference type) => NativeImportBinding.IsInhabitedVoid(type) ? "Void" : type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
         static object SignatureValue(SignatureType type) => type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
@@ -128,6 +128,8 @@ public sealed partial class AssemblyBuilder
         };
         IEnumerable<object> NativeInstructions(MethodBuilder.Operation instruction)
         {
+            if (instruction.Target is { DiscardNativeImportResult: true } && instruction.Op is "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic")
+                return new[] { Instruction(instruction), new { op = "pop" } };
             // Legacy native stores through managed references return an inhabited Void.
             // The producer contract follows CLI stfld, which leaves no stack value.
             if (instruction.Op == "field.store" && instruction.Field!.DeclaringType.IsValueType)
@@ -158,7 +160,7 @@ public sealed partial class AssemblyBuilder
         {
             var offsets = new int[method.Instructions.Count + 1];
             for (int i = 0; i < method.Instructions.Count; i++)
-                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, "field.store" when method.Instructions[i].Field!.DeclaringType.IsValueType => 2, _ => 1 });
+                offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch { "label" => 0, "console.line" => 3, "console.write" => 2, "call" or "call.virtual" or "call.constructed" or "call.virtual.constructed" or "call.generic" when method.Instructions[i].Target?.DiscardNativeImportResult == true => 2, "field.store" when method.Instructions[i].Field!.DeclaringType.IsValueType => 2, _ => 1 });
             var labels = method.LabelPositions();
             return method.Instructions.SelectMany(instruction => instruction.Op switch
             {
@@ -202,6 +204,24 @@ public sealed partial class AssemblyBuilder
             return result.Count == 0 ? null : result.ToArray();
         }
         var manifest = new Dictionary<string, object> { ["name"] = Identity.Name, ["full_name"] = IdentityText(Identity), ["modules"] = new[] { Identity.Name + ".dll" }, ["references"] = dependencies.Keys.Select(IdentityText).ToArray() };
+        var moduleBindings = dependencies.Values.Where(d => d.NativeBinding is not null).Select(d => new
+        {
+            assembly = IdentityText(d.Identity),
+            module = ModuleName(d),
+            revision = d.NativeBinding!.Revision
+        }).ToArray();
+        if (moduleBindings.Length != 0) manifest["native_module_bindings"] = moduleBindings;
+        var typeBindings = importedNominalTypes.Values.Where(t => NativeBindingFor(t.AssemblyIdentity) is not null).Select(t => new
+        {
+            native_name = ExternalName(t),
+            assembly = IdentityText(t.AssemblyIdentity),
+            @namespace = t.Namespace,
+            name = t.Name,
+            arity = t.GenericArity,
+            value_type = t.IsValueType,
+            declaring = t.DeclaringType is null ? null : ExternalName(t.DeclaringType)
+        }).ToArray();
+        if (typeBindings.Length != 0) manifest["native_type_bindings"] = typeBindings;
         var importedValues = importedNominalTypes.Values.Where(t => t.IsValueType).Select(ExternalName).Order().ToArray();
         if (importedValues.Length != 0) manifest["value_type_references"] = importedValues;
         var artifact = new
@@ -209,7 +229,7 @@ public sealed partial class AssemblyBuilder
             format = 5,
             name = ModuleName(this),
             revision = Identity.Version.ToString(),
-            references = dependencies.Values.Select(d => new { name = ModuleName(d), revision = d.Identity.Version.ToString() }).ToArray(),
+            references = dependencies.Values.Select(d => d.NativeBinding is { Revision: null } ? (object)ModuleName(d) : new { name = ModuleName(d), revision = d.NativeBinding is { } binding ? binding.Revision : d.Identity.Version.ToString() }).ToArray(),
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(

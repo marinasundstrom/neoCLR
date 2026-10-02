@@ -9999,3 +9999,16 @@ and reference bundle and ran focused runtime/metadata checks. This is feature-br
 integration, not a main merge or a declaration that direct native Raven callback emission
 is complete. Next: expose Function signatures and binding through the metadata API and
 shared compiler emission plan, then run the unchanged broad collections sample directly.
+
+
+**Assistant outcome (same date):** completed metadata Function signatures/static binding,
+Raven static method groups and noncapturing lambdas, case patterns and propagation,
+reference conversions, portable iteration and explicit translated-library linkage. The
+unchanged collections application now emits native PE/#Neo, verifies and runs with exact
+expected output and exit 0. A runtime access regression was reproduced: generic Function
+invocation incorrectly rejected the caller's internal type; the fix preserves open-context
+access checks and keeps explicit foreign internal-type use rejected. See the
+[bundle-hashed acceptance record](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json).
+This meets the requested broad application execution checkpoint. Complete native runtime
+library source emission and native semantic metadata loading remain open; System is still
+the explicitly matched translated implementation, and the input symbols use CLI metadata.

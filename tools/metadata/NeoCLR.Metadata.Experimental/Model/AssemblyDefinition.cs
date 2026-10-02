@@ -147,7 +147,7 @@ public sealed partial class AssemblyDefinition
                     : type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Namespace) == "System" && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum");
                 bool unsupportedParameters = type.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0 || p.GetConstraints().Count != 0).Any();
                 rows.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(type.Namespace), ReadName(type.Name),
-                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) == "ValueType" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : null));
+                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) == "ValueType" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : valueType && type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Name) == "ValueType" ? identity : null));
             }
             var parents = rows.ToDictionary(row => row.Token, row => row.DeclaringToken);
             foreach (var row in rows)

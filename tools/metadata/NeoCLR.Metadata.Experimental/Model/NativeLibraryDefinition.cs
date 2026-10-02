@@ -8,6 +8,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed class NativeLibraryDefinition
 {
     private readonly JsonElement root;
+    internal JsonElement Declarations => root;
     private NativeLibraryDefinition(JsonElement root)
     {
         this.root = root;

@@ -71,28 +71,55 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
 
     private ImportedTypeReference Nominal(bool valueType, int token)
     {
-        // Cross-dependency TypeRefs need an explicit resolver contract; never guess scope.
-        if ((token & 3) != 0 || token >> 2 == 0)
-            throw new InvalidDataException("imported nominal signature requires a dependency-local TypeDef");
-        var definition = module.GetTypeDefinition(0x02000000u | (uint)(token >> 2))
-            ?? throw new InvalidDataException("missing imported signature TypeDef");
+        // Module-scoped TypeRefs are another encoding of a dependency-local definition.
+        // Assembly-scoped references still require an explicit resolver and are rejected.
+        var definition = (token & 3) switch
+        {
+            0 when token >> 2 != 0 => module.GetTypeDefinition(0x02000000u | (uint)(token >> 2)),
+            1 when token >> 2 != 0 => LocalReference(0x01000000u | (uint)(token >> 2), 0),
+            _ => null
+        } ?? throw new InvalidDataException("missing dependency-local nominal signature definition");
         if (definition.IsValueType != valueType) throw new InvalidDataException("nominal signature category disagrees with declaration");
         return consumer.ImportReference(definition, core);
+    }
+
+    private TypeDefinition LocalReference(uint token, int depth)
+    {
+        if (depth >= 16) throw new InvalidDataException("imported declaring reference nesting limit");
+        var row = module.TypeReferences.SingleOrDefault(r => r.MetadataToken == token)
+            ?? throw new InvalidDataException("missing imported TypeRef");
+        var parent = row.ResolutionScopeToken == 1 ? null : row.ResolutionScopeToken >> 24 == 1
+            ? LocalReference(row.ResolutionScopeToken, depth + 1)
+            : throw new InvalidDataException("imported nominal signature requires a dependency-local scope");
+        var candidates = module.Types.Where(t => t.Namespace == row.Namespace && t.Name == row.Name && ReferenceEquals(t.DeclaringType, parent)).Take(2).ToArray();
+        return candidates.Length == 1 ? candidates[0] : throw new InvalidDataException("missing or ambiguous imported local TypeRef");
     }
 
     private bool FunctionCarrier(int token, out int count, out bool action)
     {
         count = 0; action = false;
-        if ((token & 3) != 1 || token >> 2 == 0) return false;
-        var coreIdentity = core;
-        var reference = module.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | (uint)(token >> 2)));
-        if (reference is null || reference.Namespace != "System" ||
-            !module.AssemblyReferences.Any(a => a.MetadataToken == reference.ResolutionScopeToken && a.Identity.Equals(coreIdentity))) return false;
-        action = reference.Name == "Action" || reference.Name.StartsWith("Action`", StringComparison.Ordinal);
-        if (reference.Name == "Action") return true;
+        string name;
+        if ((token & 3) == 1 && token >> 2 != 0)
+        {
+            var coreIdentity = core;
+            var reference = module.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | (uint)(token >> 2)));
+            if (reference is null || reference.Namespace != "System" ||
+                !(reference.ResolutionScopeToken == 1 && module.Assembly.Identity.Equals(coreIdentity)) &&
+                !module.AssemblyReferences.Any(a => a.MetadataToken == reference.ResolutionScopeToken && a.Identity.Equals(coreIdentity))) return false;
+            name = reference.Name;
+        }
+        else if ((token & 3) == 0 && token >> 2 != 0 && module.Assembly.Identity.Equals(core))
+        {
+            var definition = module.GetTypeDefinition(0x02000000u | (uint)(token >> 2));
+            if (definition is null || definition.Namespace != "System" || definition.DeclaringType is not null) return false;
+            name = definition.Name;
+        }
+        else return false;
+        action = name == "Action" || name.StartsWith("Action`", StringComparison.Ordinal);
+        if (name == "Action") return true;
         var prefix = action ? "Action`" : "Func`";
-        return reference.Name.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(reference.Name[prefix.Length..], out count) &&
-            count >= 1 && count <= (action ? 16 : 17) && reference.Name == prefix + count;
+        return name.StartsWith(prefix, StringComparison.Ordinal) && int.TryParse(name[prefix.Length..], out count) &&
+            count >= 1 && count <= (action ? 16 : 17) && name == prefix + count;
     }
 
     private byte Byte()

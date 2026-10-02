@@ -106,6 +106,7 @@ public sealed partial class AssemblyBuilder
         }
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        NativeBindingFor(identity)?.ValidateMethod(definition, reference.Target);
         importedReferences.Add(key, reference);
         return reference;
     }

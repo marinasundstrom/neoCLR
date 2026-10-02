@@ -1,13 +1,16 @@
 # neoCLR platform roadmap
 
 Development checkpoint (2026-10-02): the metadata feature branch integrates the
-structural Function runtime. Metadata-produced cross-library callbacks and direct
-Raven static/lambda callbacks execute on neoCLR (42). Typed reference conversions and
-concrete value overrides execute on CLR and neoCLR; 89 metadata contract groups pass.
-The unchanged collections sample has progressed through callbacks, case patterns and
-reference conversion to iterator-loop lowering. Native System linkage remains required.
-This is author-directed integration work, not a main-branch feature merge or milestone
-completion. See the [latest sample evidence](experiments/extended-cli-metadata/collections-after-conversions-2026-10-02.json).
+structural Function runtime and direct Raven Function emission. The unchanged collections
+application now compiles to native PE/#Neo, verifies and executes with exact expected
+output against the explicitly bound translated System library. 91 metadata contract
+groups and native binary fixture checks pass. This establishes the requested broad
+application end-to-end case; it does not complete native class-library source emission
+or native semantic symbol loading. Next assess library-source emission against this
+working application baseline. Author-directed integration stays on the feature branches;
+no main-branch feature merge or roadmap milestone completion is implied.
+See [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)
+and [integration contracts](raven-cli-bridge.md#unchanged-collections-end-to-end-acceptance-2026-10-02-development).
 
 **Updated 2026-10-02.** This is the authoritative default for work priorities,
 milestone sequencing and scope. Explicit author directions take precedence.

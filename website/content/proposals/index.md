@@ -468,16 +468,16 @@ support for its Option.None carrier; complete class-library execution remains op
 
 Development metadata APIs now preserve nested nongeneric class/value declarations
 through CLI and native PE, with constructor execution checked on both runtimes.
-Nested imports and the broad Raven collections application remain in progress.
+The following checkpoint records the integrated compiler consumer.
 
-Nested imports and generic value children now execute through Raven and native metadata
-(42). The unchanged collections application has advanced to extension/delegate signature
-support; it is not yet an executable integration milestone.
+Nested imports, generic values and structural Function callbacks now execute through
+Raven's direct metadata backend. The unchanged collections application compiles to
+native PE/#Neo, verifies and runs against explicitly bound translated System, with map
+lookup, union propagation, queries, shared object identity and iteration checked against
+expected output. The experimental metadata API retains CLI reference identity while
+binding selected signatures to their native implementation.
 
-The experimental host metadata API now emits structural Function values and checked static
-bindings, with CLI Func/Action projection and cross-assembly CLR/native execution (42).
-Raven's direct Function body emission remains under development.
-
-The development metadata producer also supports checked reference conversions through
-its typed body API, validated with interface dispatch on CLR and neoCLR. This remains
-feature-branch work and does not imply a complete native compiler backend.
+This is development work on the metadata/compiler feature branches. CLI snapshots still
+provide symbols and the existing translation still supplies the runtime library; native
+semantic importing and complete class-library source emission remain open. The host
+metadata API and its restrictions are documented in the [API reference](/docs/).

@@ -2954,3 +2954,46 @@ and operand checks still reject a library explicitly naming a foreign internal t
 target access is checked at binding. The two-module native regression returns 42 and
 checks the negative case. The unchanged Raven collections application exposed this at
 `System.Linq.Operators.Single<Order>`; no source visibility change was needed.
+
+### Unchanged collections end-to-end acceptance (2026-10-02 development)
+
+The `codex/extended-cli-metadata` and Raven `codex/metadata-consumer` branches now compile
+`application-order-collections.rvn` directly to a 69,632-byte PE/#Neo binary assembly,
+load it with translated native System, verify and execute it with exit 0 and exact
+[expected output](experiments/raven-target/samples/application-order-collections.expected.txt).
+The [bundle-hashed evidence](experiments/extended-cli-metadata/collections-end-to-end-2026-10-02.json)
+records source, declaration-reference, implementation and runtime hashes. This supersedes
+the earlier collection blockers without claiming complete backend/class-library support.
+
+Configuration uses `CompilationOptions.NeoCLR`, the explicit CoreProbe Self marker,
+and a `NeoClrMetadataDependency(reference, definition, coreLibrary, nativeImplementation)`.
+The optional `NativeImplementation` property carries the matching translated binary
+inventory. Raven registers it with the independent metadata API before imports; the API
+validates selected declaration contracts and owns the CLI/native identity mapping.
+Default .NET compilation and dependencies without this option retain their paths.
+The output application body is generated directly by the metadata backend, not translated
+from CLI or executed as JSON. The existing library translation remains a temporary
+implementation dependency. CLI input still supplies symbols; native semantic importing,
+native emission of the complete runtime library, closures and broader Function emission
+remain future work. Bridge losses include unsupported semantic metadata beyond the
+selected CLI shapes; the binding is not an arbitrary native library symbol loader.
+
+Compared with CLR's single declaration/implementation assembly identity, this bridge
+explicitly pairs the CLI snapshot with a native implementation module. It allows testing
+native application codegen against the existing library, at the cost of matched-bundle
+maintenance and a restricted signature/name convention. The eventual native metadata
+loader/backend should consume one native declaration/implementation contract directly.
+The metadata library owns that replacement; Raven owns target capabilities and symbol
+mapping; the runtime owns admission, access, specialization and execution.
+
+Run Raven's `NeoClrMetadataProbe --readiness-linked-sample <neo-root> <fresh-output>
+<runtime> application-order-collections <matching-System.neox>`. The selected sample's
+`.expected.txt` is now an assertion: emission, verification or execution failure, nonzero
+exit, stderr or different stdout fails the command after saving diagnostics. The System
+binary used here is assembled from the matching translated `System.neoil` with
+`neoclr assemble <System.neoil> <System.neox> --format neox`.
+
+Validation: 91 C# metadata contract groups; a C# CLI/native linkage consumer (42); six
+runtime metadata-container tests including the C# fixture and malformed scopes; 44
+Function/object tests (including the reproduced internal-type regression); matching API
+snapshot check; and the [seven native profile controls](experiments/extended-cli-metadata/native-controls-after-linkage-2026-10-02.json). No website build or performance claim.
