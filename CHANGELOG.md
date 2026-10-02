@@ -11,8 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Read native unconstrained static generic methods/functions into immutable definitions,
   preserving arity, names and method-parameter/vector signatures. Existing generic
   imports emit executable CLR and native calls (42 in both native containers; 104 C#
-  groups pass). Nongeneric helpers reject unused generic parameters. Raven generic
-  symbols, generic owners and constraints remain pending; no format change.
+  groups pass). Nongeneric helpers reject unused generic parameters. Raven now imports
+  this profile with method-owned parameters and shared inference/substitution; all seven
+  native consumers execute (42). Generic owners and constraints remain pending; no
+  format change.
 
 - Close the shared Raven expression-bodied return diagnostic gap with an independently
   reproduced .NET fix (106 focused tests). Native unrelated interface returns now

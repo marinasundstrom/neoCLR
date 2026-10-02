@@ -585,4 +585,6 @@ and the full class-library bootstrap remain under development.
 
 The development metadata reader now preserves unconstrained static generic methods
 and namespace functions. C# consumers execute imported generic calls on CLR and neoCLR;
-Raven semantic generic integration is the next step. This is not full generic import.
+Raven now imports this profile and executes generic forwarding, overloads and array
+aliases; all seven native consumers pass (42). Generic owners and constraints remain
+pending. This is not full generic import.

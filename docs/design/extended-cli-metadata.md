@@ -2190,6 +2190,7 @@ owner constraints and instance generics need separate support.
 C# contract checks cover both native schemas, preserved names/arity, canonical lookup,
 opaque roundtrip, nongeneric-helper rejection and CLR execution. Native verification
 and execution pass with generic static identity and namespace array-identity calls (42).
-Raven method-parameter symbols are the next integration step. The writer/runtime
+Raven method-parameter symbols now consume this profile, with shared inference and
+constructed-method substitution; its seventh native consumer executes (42). The writer/runtime
 reserved generic-name mismatch (`Value`) was observed and remains explicitly tracked;
 these tests use valid `TItem`/`TElement` names.

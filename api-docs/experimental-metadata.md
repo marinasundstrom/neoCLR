@@ -4678,8 +4678,8 @@ functions remain native-only imports. Both native container schemas are covered.
 
 Generic owners, generic instance methods, constraints, byrefs and nested vectors remain
 outside this direct-reading profile and throw InvalidDataException. Loaded definitions
-are immutable; Write preserves the original image. Raven's native symbol layer still
-rejects generic declarations until its method-parameter integration is implemented.
+are immutable; Write preserves the original image. Raven's native symbol layer now consumes this same static generic profile through
+method-owned parameters and shared constructed-method substitution.
 Native parameter names must also satisfy runtime slot-name rules; the existing writer
 can accept reserved names such as `Value` that runtime verification rejects. This writer
 validation mismatch remains a follow-up, not an accepted runtime contract.

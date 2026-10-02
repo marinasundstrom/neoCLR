@@ -3584,7 +3584,12 @@ core/translated System bootstrap limitations remain open.
 The metadata library now reads and imports unconstrained static generic functions and
 methods on nongeneric owners directly. C# consumers execute imported generic identity
 on CLR and native static/namespace generic calls on neoCLR (42, both containers).
-Raven still rejects these assemblies at NeoClrMetadataReference.ReadAssembly until
-method type-parameter symbols are implemented; no partial generic symbols are exposed.
+An initial Raven rejection boundary kept the profile explicit during the library
+expansion. Raven now owns native method type parameters and reuses shared constructed
+methods, inference and generic call emission. Its seventh native consumer builds the
+library from Raven, imports it directly, and executes namespace/static generic calls,
+forwarding, overloads, vector mutation and reference aliases (42). C# checks cover
+parameter/vector identity, compilation isolation, both reference orders and invalid
+arguments. All seven runtime consumers pass.
 No Runtime Contract or temporary CLI encoding changes. Generic owners, constraints,
 instance methods and complete native System import remain subsequent work.
