@@ -16,3 +16,6 @@ public static class RuntimeFailure
         Environment.Exit(1);
     }
 }
+
+/// <summary>Empty CLR value used for the source library's inhabited unit.</summary>
+public readonly struct UnitValue { }

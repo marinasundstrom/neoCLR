@@ -189,3 +189,17 @@ Current outcome: adapters pass, library emits, consumer rejects invalid CLR Syst
 storage through a TypeLoadException. This is a recorded blocker, not a dual-target pass.
 Explicit unit storage mapping, failure-before-publication and .NET array/interface backing
 remain to be completed. Native `--application` continues to pass.
+
+#### .NET unit milestone
+
+The driver now uses dotnet-ownership.json and asserts its Libraries catalog matches the
+native array manifest. The additional Unit contract explicitly maps source System.Void
+to the adapter's fieldless UnitValue; it does not replace the CLR core. Following library
+compilation, reference-only union, ArrayList, HashMap and query consumers must execute with
+exit 42 and expected stdout. These pass, as do the service adapter tests.
+
+The full .NET application compiles and starts, but remains a failing assessment: its
+array-query section terminates abnormally because CLR arrays have no implementation of
+the selected custom iteration interface. An explicit .NET adapter conversion is next.
+The driver still returns nonzero and records the partial output, rather than counting
+successful compilation or a prefix as broad application success.

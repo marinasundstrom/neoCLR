@@ -6073,3 +6073,10 @@ The separate `NeoCLR.DotNetServices` test assembly under the bootstrap tooling e
 These executable host adapters contain no reader/writer APIs or source library types and
 are not selected for guest RavenDoc publication. They support the paired .NET assessment,
 which currently fails later on unit storage mapping.
+
+The development .NET acceptance service additionally exposes the public readonly empty
+`System.Runtime.CompilerServices.UnitValue` struct. It is the inhabited unit storage type
+selected by the explicit .NET bootstrap manifest; default initialization is its sole value.
+It is not CLR System.Void and adds no metadata reader/writer or guest runtime API. The host
+compiler contract and ordinary CLI signatures carry this mapping without a native format
+extension. See the integration documentation for the remaining array-adapter limitation.

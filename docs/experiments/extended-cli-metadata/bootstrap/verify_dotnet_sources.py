@@ -55,7 +55,11 @@ def main():
             run(['dotnet', str(app)], expected, '', error)
 
         stage = 'source library compilation'
-        manifest = HERE / 'array-ownership.json'
+        manifest = HERE / 'dotnet-ownership.json'
+        native_manifest = HERE / 'array-ownership.json'
+        if json.loads(manifest.read_text())['libraries'] != json.loads(native_manifest.read_text())['libraries']:
+            raise RuntimeError('Source ownership differs between target manifests')
+        artifacts.append(native_manifest)
         sources = [ROOT / p for p in json.loads(manifest.read_text())['libraries'][0]['sources']]
         # The library's real namespace function delegates to the target service adapter.
         sources.append(ROOT / 'runtime/raven/src/System/Functions.rvn')
@@ -63,6 +67,15 @@ def main():
         artifacts += [manifest, library] + sources
         configured = common + ['--bootstrap-ownership', str(manifest)]
         run(configured + ['--output-type', 'classlib', '-o', str(library)] + [str(p) for p in sources])
+        for name in ['union', 'arraylist', 'hashmap', 'query']:
+            stage = name + ' reference-only consumer'
+            source = HERE / (name + '-consumer.rvn')
+            app = output / (name + '.dll')
+            artifacts += [source, app]
+            run(configured + ['--refs', str(library), '-o', str(app), str(source)])
+            runtime_config(name)
+            expected_text = 'Option.Some(40)\nResult.Error(7)\n' if name == 'union' else ''
+            run(['dotnet', str(app)], 42, expected_text, '')
         stage = 'separate consumer compilation'
         source = ROOT / 'docs/experiments/raven-target/samples/application-order-collections.rvn'
         expected = source.with_suffix('.expected.txt')
@@ -79,7 +92,7 @@ def main():
         for name in ['Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll']:
             artifacts.append(compiler.parent / name)
         report = dict(passed=passed, stage=stage, failure=failure,
-                      ownership='Same source ownership as native gate; additional unchanged System/Functions.rvn delegates to explicit .NET services. Embedded shims avoid Raven.Core union copies.',
+                      ownership='Same source ownership as native gate, asserted against array-ownership.json; explicit .NET unit mapping and unchanged System/Functions.rvn with executable services. Embedded shims avoid Raven.Core union copies.',
                       revisions={name: subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'], text=True).strip()
                                  for name, path in [('neoclr', ROOT), ('compiler', compiler.parent)]},
                       commands=commands,

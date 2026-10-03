@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Configure an explicit .NET inhabited-unit value without replacing the CLR core.
+  Unchanged source unions/collections now separately compile, import and execute in four
+  focused .NET consumers. Native broad execution is preserved. The .NET broad sample
+  advances to custom array-interface execution and remains failing; no paired-gate success
+  is claimed. Shared compiler changes are isolated and tested on the main-based fix branch.
+
 - Add executable .NET CheckedStorage and terminal-failure bootstrap adapters and a
   paired source-library assessment driver. Isolate and validate Raven's stronger-reference
   override return fix on its main-based branch (13 tests); native broad execution still

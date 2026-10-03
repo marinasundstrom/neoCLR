@@ -4844,3 +4844,33 @@ The current CLI RuntimeUnitContract couples the unit scope to TargetCoreAssembly
 relaxing that boundary needs focused design and roundtrip tests. The assessment also records
 output publication after failure; compiler crashes are not accepted diagnostics or success.
 Custom array-interface adaptation still needs .NET execution evidence after the unit blocker.
+
+### Explicit CLR unit value and separately executed consumers (2026-10-03)
+
+The .NET ownership manifest adds Unit with assembly NeoCLR.DotNetServices, type
+System.Runtime.CompilerServices.UnitValue and MapClrVoidToUnit=true. Its Libraries catalog
+must equal the native manifest's catalog (the driver asserts this). The adapter value is a
+public empty readonly CLR struct. No fake core, input-source rewriting, native projection
+fallback or metadata-format extension is involved.
+
+The compiler opt-in binds source System.Void type syntax as unit in declaration and
+expression contexts. An explicit assembly-scoped representation supplies emitted storage;
+ordinary imported/no-result CLI void remains void. The existing unit projection now covers
+interface and MethodImpl relationships as well as generic signatures/locals. Default
+.NET and native profiles are unchanged. The compiler rejects invalid representation types
+and incompatible core/target configurations. This bounded API extension changes the host
+record constructor; binary consumers must rebuild.
+
+The shared changes are isolated on Raven's main-based fix branch (eb5df24b1); integration
+is 97d07b901. Both lines pass 22 focused C# tests, including normal unit behavior, out-unit
+interface dispatch, metadata scope inspection and invalid selection diagnostics. Ordinary
+commands separately compile and execute unchanged union, ArrayList, HashMap and query
+consumers (42); adapter storage/failure tests also pass. Native application-order-collections
+still matches its complete expected output with exit 0.
+
+The .NET broad consumer compiles and prints the expected prefix through PrintPending's
+303, then terminates with signal 10 on this macOS host at array query use. Semantic
+ArraysImplementIterable metadata cannot make CLR vectors implement a custom interface.
+The next step is explicit .NET array adaptation at conversion emission, retaining source
+library definitions and shared element identities, plus rejection when an adapter is
+unavailable. The full .NET broad gate is still failing; partial output is not completion.

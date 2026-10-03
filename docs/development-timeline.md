@@ -10395,3 +10395,17 @@ argument in the emitted Option/Propagatable metadata. The assistant identified e
 unit-value mapping as the next task and retained the sources unchanged. Both executable
 service consumers pass; emitting the library alone is not counted as success. The failed
 consumer leaves no Application.dll. [Evidence](experiments/extended-cli-metadata/dotnet-source-assessment-2026-10-03.json).
+
+### 2026-10-03 — Explicit .NET unit storage and the next array boundary
+
+Following the continuing paired-target work, the assistant implemented an opt-in .NET
+source-void alias backed by a fieldless service-assembly unit value. This preserves ordinary
+CLR no-result signatures without replacing the core or rewriting class-library sources.
+The common compiler changes are isolated on the main-based fix branch (eb5df24b1) and
+integrated as 97d07b901; 22 focused tests pass on both lines. No main merge was performed.
+
+Assistant-verified results: separate .NET union, ArrayList, HashMap and query consumers
+execute successfully; native broad execution remains passing. The .NET broad application
+compiles and prints the expected prefix, then terminates at custom array-interface use.
+The minimal array consumer reproduces signal 10. This is recorded as failure, with explicit
+.NET array conversion/adaptation as the next bounded task. [Evidence](experiments/extended-cli-metadata/dotnet-unit-execution-2026-10-03.json).

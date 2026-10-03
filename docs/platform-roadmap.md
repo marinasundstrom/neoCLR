@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Paired .NET unit milestone (2026-10-03): explicit source-void/unit mapping removes invalid
+CLR generic storage. Separate union, ArrayList, HashMap and query consumers run successfully
+on .NET; 22 unit-contract tests pass on both Raven branches. Native broad execution remains
+passing. The .NET broad consumer now compiles and executes its expected prefix before
+custom array-interface execution terminates abnormally. Next bounded task: an explicit
+.NET array adapter conversion, with unsupported configurations rejected before emission.
+[Evidence](experiments/extended-cli-metadata/dotnet-unit-execution-2026-10-03.json).
+
 Paired .NET assessment (2026-10-03): executable storage/failure adapters pass. The shared
 safe override-return strengthening fix is independently validated on Raven's main-based
 fix branch. Native broad execution remains green. The unchanged .NET source library emits,
