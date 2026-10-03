@@ -2550,3 +2550,18 @@ private dependency resolver, reuses one context per immutable compilation, and m
 resolved metadata identity/token to symbols. Signature/member projection remains pending.
 Runtime Contract, primitive core, System bootstrap, emission ownership and encoding are
 unchanged. See [the facade design](metadata-resolution-views.md) and host API manual for current scope.
+
+### Array backing direction (author clarification, 2026-10-03)
+
+For the Raven/NeoCLR integration gate, keep arrays backed by nominal System.Array<T>.
+Vector signatures and runtime storage remain special array representations; this does
+not make their member/iteration contract a new structural type. Select the nominal
+shape explicitly and preserve canonical dependency identities across symbols, emission
+and runtime dispatch. Revisit structural array semantics only in structural-types work.
+
+The source shape and iterator compile unchanged. A separate vector-query consumer
+currently fails at runtime interface implementation selection. Close that backing/linking
+contract instead of adding consumer stubs or selecting interfaces by matching names.
+The old translated adapter remains historical evidence, not an implicit native fallback.
+Compared with CLI arrays, the common principle is specialized storage plus a library
+member contract; no performance or API advantage is claimed for this provisional choice.

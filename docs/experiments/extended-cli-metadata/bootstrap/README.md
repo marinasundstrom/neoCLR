@@ -135,3 +135,26 @@ close it using the existing CLI/native instruction. The unchanged broad applicat
 still rejects `Order[].Filter` during binding. The next task is canonical array iteration
 contract participation in extension receiver inference/conversion, followed by native
 emission and runtime verification. No sample rewrite is used to bypass that failure.
+
+### Nominal Array<T> assessment (not an execution gate)
+
+Author direction on 2026-10-03 keeps arrays backed by nominal Array<T>; structural array
+identity changes are deferred to structural-types work. Vector storage remains distinct
+from the nominal member/iteration contract, just as CLI vectors have special storage.
+
+`array-ownership.json` extends the cumulative source set with unchanged System/Array.rvn,
+selects `ArrayShapeTypeName = System.Array`1`, and explicitly selects source-owned
+Propagatable for NeoCLR propagation. Its library compiles and imports. The independent
+`array-consumer.rvn` compiles, but execution fails while converting the vector to the
+source-owned Iterable contract: the runtime cannot select a matching implementation.
+This is a linking/backing contract gap, not grounds for structuralizing arrays or
+rewriting the application. The ordinary `--queries` success gate remains unchanged.
+
+Reproduce by using the same ordinary driver arguments as the query evidence, substituting
+`array-ownership.json`, compiling its source list to `NeoCLR.Collections.dll` in a fresh
+directory, then compiling only `array-consumer.rvn` against that artifact and running it
+with the same seed. Exact commands and artifact hashes are recorded in
+[the nominal array assessment](../nominal-array-assessment-2026-10-03.json).
+Next connect vector storage to the output-owned nominal Array<T> descriptor and its
+source-authored iterator through explicit identity-aware compiler/runtime contracts.
+Do not rely on the old translated System.ArrayEnumerable adapter's hard-coded names.

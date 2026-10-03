@@ -1,5 +1,10 @@
 # neoCLR platform roadmap
 
+Author clarification (2026-10-03): retain nominal Array<T> backing and defer structural
+array decisions. Source Array/iterator and separate consumer compilation succeed; the
+next bounded task is identity-aware vector-to-nominal interface backing/runtime dispatch.
+[Assessment](experiments/extended-cli-metadata/nominal-array-assessment-2026-10-03.json).
+
 Query gate update (2026-10-03): unchanged complete query sources now compile and import
 into an executing native consumer (OfType/Filter/Map/ToList/Single, boxed values and shared
 reference identity). [Evidence](experiments/extended-cli-metadata/query-import-2026-10-03.json).

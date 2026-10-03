@@ -1,0 +1,216 @@
+{
+  "scope": "Nominal Array<T> source compiles and imports. Separate vector-query consumer compiles but runtime nominal interface backing remains unsupported. Not a successful execution gate.",
+  "revisions": {
+    "neoclr": "fff6653c4cc29f953c1a5ac040bab1b4814f2181",
+    "raven": "e3556fabeefcf81a33e4b12aeb78fa7a78a1a26b"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/queries-recorded/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--library",
+        "-o",
+        "/tmp/nominal-array-recorded/NeoCLR.Collections.dll",
+        "runtime/raven/src/System/Disposable.rvn",
+        "runtime/raven/src/System/Collections/Iterator.rvn",
+        "runtime/raven/src/System/Collections/Iterable.rvn",
+        "runtime/raven/src/System/Collections/Collection.rvn",
+        "runtime/raven/src/System/Collections/Sequence.rvn",
+        "runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "runtime/raven/src/System/Collections/List.rvn",
+        "runtime/raven/src/System/Propagatable.rvn",
+        "runtime/raven/src/System/Option.rvn",
+        "runtime/raven/src/System/Result.rvn",
+        "runtime/raven/src/System/Collections/ArrayList.rvn",
+        "runtime/raven/src/System/Collections/Comparer.rvn",
+        "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+        "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+        "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+        "runtime/raven/src/System/Collections/Map.rvn",
+        "runtime/raven/src/System/Collections/MutableMap.rvn",
+        "runtime/raven/src/System/Collections/HashMap.rvn",
+        "runtime/raven/src/System/Linq/SingleError.rvn",
+        "runtime/raven/src/System/Linq/Operators.rvn",
+        "runtime/raven/src/System/Array.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/queries-recorded/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/nominal-array-recorded/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/nominal-array-recorded/Consumer.dll",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/tmp/nominal-array-recorded/Consumer.dll",
+        "--module",
+        "/tmp/nominal-array-recorded/NeoCLR.Collections.dll",
+        "--system",
+        "/tmp/queries-recorded/System.neox"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: type must declare exactly one matching interface implementation (directly or transitively) [code=RuntimeError] at NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD.F_4D61696E:12\n  at NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD.F_4D61696E() [NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD#1.0.0.0:0] IL instruction 12\n"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+      "sha256": "354091db7c6ac28d84718359e9c5bcc590b05ee870d60014afeb0b36e9a0cacf"
+    },
+    {
+      "path": "docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn",
+      "sha256": "9e2a4444b4b9451a5be6f02ee5021428ec1d4b034952c86728ca8521f5721577"
+    },
+    {
+      "path": "/tmp/ArrayListCore.dll",
+      "sha256": "d299ac3b6c6c2a8f7522a0af79580a396d0c383653e66e343e0983118adb0e73"
+    },
+    {
+      "path": "/tmp/queries-recorded/System.neox",
+      "sha256": "fec099a20cfcaef54306aa2b9cec3d4c2166cba4f7d32a8ec910d772a93d98c0"
+    },
+    {
+      "path": "/tmp/nominal-array-recorded/NeoCLR.Collections.dll",
+      "sha256": "99baa3c7a5f231def2a70fc00d8f7541e393c7f3212d3b8b5907c3ef501be17a"
+    },
+    {
+      "path": "/tmp/nominal-array-recorded/Consumer.dll",
+      "sha256": "1fcf8b14f3e73da303827e39d1fa5927069af70b983bee1d86d57d967a1c0162"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "sha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "sha256": "099fc7af22c408321b9c108a1d864dc6b3d41a0fe67777ff31f6da2047b6f96c"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll",
+      "sha256": "a978aaeb4d68a364141d9b3a9faf34334f2388eda07b953366b0072a35e4c9bb"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll",
+      "sha256": "2a253e2a4ad43d31281a70af0ed6e10ff5bf0fd8dfe130a3a792584acbca8f59"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll",
+      "sha256": "099485218ccae0a8733862eea9ef2d5fdc378313f2095640aaa971795089c64c"
+    },
+    {
+      "path": "runtime/raven/src/System/Disposable.rvn",
+      "sha256": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterator.rvn",
+      "sha256": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Iterable.rvn",
+      "sha256": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Collection.rvn",
+      "sha256": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Sequence.rvn",
+      "sha256": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "sha256": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/List.rvn",
+      "sha256": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+    },
+    {
+      "path": "runtime/raven/src/System/Propagatable.rvn",
+      "sha256": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e"
+    },
+    {
+      "path": "runtime/raven/src/System/Option.rvn",
+      "sha256": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+    },
+    {
+      "path": "runtime/raven/src/System/Result.rvn",
+      "sha256": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "sha256": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Comparer.rvn",
+      "sha256": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+      "sha256": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "sha256": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "sha256": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/Map.rvn",
+      "sha256": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/MutableMap.rvn",
+      "sha256": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627"
+    },
+    {
+      "path": "runtime/raven/src/System/Collections/HashMap.rvn",
+      "sha256": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c"
+    },
+    {
+      "path": "runtime/raven/src/System/Linq/SingleError.rvn",
+      "sha256": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4"
+    },
+    {
+      "path": "runtime/raven/src/System/Linq/Operators.rvn",
+      "sha256": "615a01a8fa987959aba0a5b49a35fa479088b7aa15482a18b1c16e09470fb53b"
+    },
+    {
+      "path": "runtime/raven/src/System/Array.rvn",
+      "sha256": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f"
+    }
+  ]
+}

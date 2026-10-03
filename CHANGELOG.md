@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the author-directed nominal Array<T> backing policy; structural array changes
+  remain deferred. Unchanged source Array and an independent consumer compile, but runtime
+  vector/interface backing fails. Add reproducible assessment evidence without claiming
+  execution support or changing the successful query gate.
+
 - Add IL-generator/raw UnboxAny authoring with CLI/native encoding and typed stack checks.
   Exact value boxes and reference identity follow existing runtime semantics. Unchanged
   query sources now separately compile, import and execute (42); 126 metadata C# groups

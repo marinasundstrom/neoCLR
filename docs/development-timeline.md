@@ -10336,3 +10336,25 @@ adapter and application-order-collections gate remain open. A newly written test
 an unrelated possible pattern-variable shadowing issue (reusing an outer `error` name inside
 an Error case makes the outer name unavailable afterward); it is recorded as an unisolated
 binder investigation, not fixed or claimed validated for main in this slice.
+
+### 2026-10-03 — Retain nominal Array<T> backing during native integration
+
+- Author recalled that arrays used to map to Array<T>, and that the Function experiment
+  may have changed them to structural types. This was a recollection, not a confirmed
+  account of the exact introducing change.
+- Assistant inspected the current integration: compiler arrays retain IArrayTypeSymbol
+  storage and the explicit RuntimeIterationContract.ArrayShapeTypeName projection;
+  the Function experiment documents structural array introspection. No structural
+  array change was made in response.
+- Author directed: “We should keep it backed with Array<T> and decide what to do later
+  when we work on structural types”. Assistant accepted nominal backing for this gate
+  and deferred structural identity changes.
+- Investigation: enabling the existing array iteration selection gets the broad sample
+  past Filter lookup. Selecting the source Propagatable contract avoids the default
+  CLR exception-catching propagation rewrite; the next broad binding/emission gap is
+  the bounded seed's missing Console.WriteLine(Int32). These exploratory settings did
+  not establish execution support and were not substituted for the existing query gate.
+- Performed assessment: unchanged Array.rvn compiles with the cumulative library and a
+  separate array-query consumer compiles. Execution fails to match the vector's
+  source-owned interface implementation. Nominal descriptor/storage linking and
+  iterator dispatch remain open. See [recorded evidence](experiments/extended-cli-metadata/nominal-array-assessment-2026-10-03.json).

@@ -4725,3 +4725,14 @@ The unchanged broad sample now rejects Order[].Filter during binding and publish
 output. Array participation in the configured iteration contract for extension receiver
 inference/conversion is next. See [query evidence](experiments/extended-cli-metadata/query-import-2026-10-03.json)
 and [broad assessment](experiments/extended-cli-metadata/query-broad-assessment-2026-10-03.json).
+
+### Nominal array backing remains the integration contract (2026-10-03)
+
+Author direction keeps arrays backed by Array<T>, with structural semantics deferred.
+Unchanged source Array.rvn compiles into the cumulative library and a separate array
+query consumer compiles against it. Runtime execution fails interface implementation
+selection; it is not an end-to-end pass. The next integration task is explicit nominal
+array descriptor/storage/iterator linking using canonical dependency identities.
+The configured shape and source propagation selections are in `array-ownership.json`;
+existing successful query acceptance configuration is unchanged. See
+[nominal array evidence](experiments/extended-cli-metadata/nominal-array-assessment-2026-10-03.json).
