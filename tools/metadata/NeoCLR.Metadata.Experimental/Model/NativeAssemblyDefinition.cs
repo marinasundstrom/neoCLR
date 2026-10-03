@@ -355,8 +355,8 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 if (element.TryGetProperty("ArrayRef", out var arrayElement))
                 {
-                    Require(allowArray, "nested arrays unsupported"); Shape(element, "ArrayRef");
-                    return SignatureType.ArrayOf(ReadType(arrayElement, false, false, allowSelf: allowSelf));
+                    Require(allowArray, "array signature unsupported here"); Shape(element, "ArrayRef");
+                    return SignatureType.ArrayOf(ReadType(arrayElement, false, allowSelf: allowSelf));
                 }
                 if (element.TryGetProperty("Constructed", out var construction))
                 {

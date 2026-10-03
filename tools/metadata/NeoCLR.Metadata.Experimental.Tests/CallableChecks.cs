@@ -52,7 +52,7 @@ internal static class CallableChecks
             [0], // Truncation.
             [0, 0, 0x10, 8], // Managed-reference result.
             [0, 0, 0x1d], // Truncated vector.
-            [0, 0, 0x1d, 0x1d, 8], // Nested vector.
+            [0, 0, 0x1d, 0x1d, 0x10, 8], // By-reference vector element.
             [0, 0, 0x1d, 1], // Void vector result.
             [0, 1, 1, 0x1d, 1], // Void vector parameter.
             [0, 1, 1, 0x1d, 0x1c], // Unsupported element.
@@ -92,7 +92,7 @@ internal static class CallableChecks
             [0x10, 1, 0, 0x1e, 1], // Index outside scope.
             [0x10, 1, 0, 0x1e, 0x80, 0], // Noncanonical index.
             [0x10, 1, 0, 0x13, 0], // Declaring-type parameter.
-            [0x10, 1, 0, 0x1d, 0x1d, 0x1e, 0], // Nested vector.
+            [0x10, 1, 0, 0x1d, 0x1d, 0x10, 0x1e, 0], // By-reference vector element.
             [0x10, 2, 0, 8], // Signature/table arity mismatch.
             [0x10, 0, 0, 8], // Generic bit with zero arity.
             [0x10, 0x80, 1, 0, 8], // Noncanonical arity.

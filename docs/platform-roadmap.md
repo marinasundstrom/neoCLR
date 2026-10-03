@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Native array callbacks (2026-10-03): Raven `35464aabf` preserves imported no-result
+callback contracts separately from inhabited source unit and emits receivers through the
+configured nominal array backing. The metadata library admits nested vector signatures
+using existing CLI SZARRAY/native ArrayRef encodings; the runtime accepts exact nominal
+backing casts without copying storage. Unchanged library-array-callbacks and a nonempty
+nested-array mutation consumer now pass alongside the broad source-library application.
+Validation: 127 C# metadata groups, 27 focused .NET tests, 19 runtime tests and seven native
+consumers pass. Next bounded native gap: captured callbacks in library-list-filters.
+[Evidence](experiments/extended-cli-metadata/native-array-callbacks-2026-10-03.json).
+
 Native end-to-end sample expansion (2026-10-03): Raven `3367f3200` fixes vector
 receivers for projected inherited interface accessors, exposed by Array<int>.Count in
 unchanged collection-capabilities. Existing reference conversion uses semantic symbols

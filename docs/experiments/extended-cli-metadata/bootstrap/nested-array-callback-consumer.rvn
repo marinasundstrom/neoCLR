@@ -1,0 +1,11 @@
+func Increment(values: int[]) {
+    values[0] = values[0] + 1
+}
+
+func Main() -> int {
+    let first = [40]
+    let second = [0]
+    let rows: int[][] = [first, second]
+    rows.ForEach(Increment)
+    return first[0] + second[0]
+}

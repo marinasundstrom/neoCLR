@@ -4998,3 +4998,25 @@ operand without reopening importer objects. Bootstrap ownership and Runtime Cont
 options do not change. No CLI bridge expansion, metadata API addition or format fork is
 required. The ordinary .NET emitter remains in use; this portable-planner adjustment is a
 deferred general candidate until an independent main-line caller is established.
+
+### No-result callbacks and nested array execution
+
+Native array callbacks (2026-10-03): Raven `35464aabf` preserves imported no-result
+callback contracts separately from inhabited source unit and emits receivers through the
+configured nominal array backing. The metadata library admits nested vector signatures
+using existing CLI SZARRAY/native ArrayRef encodings; the runtime accepts exact nominal
+backing casts without copying storage. Unchanged library-array-callbacks and a nonempty
+nested-array mutation consumer now pass alongside the broad source-library application.
+Validation: 127 C# metadata groups, 27 focused .NET tests, 19 runtime tests and seven native
+consumers pass. Next bounded native gap: captured callbacks in library-list-filters.
+[Evidence](experiments/extended-cli-metadata/native-array-callbacks-2026-10-03.json).
+
+The importer uses a compiler-owned explicit no-result factory rather than the source
+unit policy. Emission uses symbol contracts only. Runtime Contract options and bootstrap
+ownership remain unchanged. This is the existing nominal callback transport, not structural
+Function branch integration. Nested vectors match CLR jagged-array encoding; rectangular
+arrays and covariance remain unsupported. Native array backing casts require the registered
+nominal definition and exact element arguments, preserving the same storage. No format
+version change, new opcode or CLI fallback is involved. Older readers may reject the newly
+admitted nested vectors. Ordinary .NET loading/emission remains the established backend.
+The known stale guest API snapshot remains open; host C# manual documentation is updated.

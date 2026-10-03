@@ -48,7 +48,7 @@ internal static class GenericCallChecks
         if (immutable.TypeArguments[0].Primitive != PrimitiveType.Int32 || immutable.Signature.ReturnType.Primitive != PrimitiveType.Int32)
             throw new Exception("instantiation retained mutable argument array");
         var single = graph.Functions.Single(m => m.Name == "Single");
-        Reject(() => single.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)));
+        if (single.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)).Signature.ReturnType.ArrayElement?.ArrayElement?.Primitive != PrimitiveType.Int32) throw new Exception("nested generic result substitution");
         if (!Equals(Assembly.Load(graph.Write()).EntryPoint!.Invoke(null, null), 42)) throw new Exception("rejection mutated body");
         var entry = graph.EntryPoint!; entry.ClearBody();
         entry.LoadConstant(1); entry.Call(identity.MakeGenericInstance(PrimitiveType.Boolean)); entry.Emit(OpCode.Pop); entry.LoadConstant(42); entry.Return();

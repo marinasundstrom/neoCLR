@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Support bounded nested vectors in metadata authoring/native materialization, using
+  existing CLI SZARRAY and native ArrayRef encoding. Preserve exact nominal Array<T>
+  backing casts and storage identity at runtime. With Raven `35464aabf`, unchanged
+  array callbacks and nested mutation execute against the source-built library.
+  All 127 metadata groups, 27 focused .NET tests, 19 runtime tests and seven native
+  consumers pass. Older readers can reject nested vectors; no format version change.
+
 - Expand native source-library acceptance with an array Count/mutation regression
   and unchanged Option, propagation and collection-capabilities samples. Raven
   `3367f3200` fixes projected array interface receivers; the broad native application,

@@ -2513,8 +2513,9 @@ SignatureType LocalDefinition.SignatureType { get; }
 ```
 
 `ArrayOf` creates a one-dimensional zero-based vector of Int32, Int64, Boolean,
-String or an owned non-static root class. Null throws ArgumentNullException; Void
-and nested arrays throw ArgumentException. Declaration APIs reject foreign element
+String, an owned non-static root class or another vector (jagged arrays). Null throws
+ArgumentNullException; Void, by-reference elements and nesting beyond the existing
+16-level signature bound throw ArgumentException. Declaration APIs reject foreign element
 owners before mutation. Method, field and property signatures share this contract;
 `DeclareLocal` also rejects Void and enforces the existing 256-slot limit.
 `SignatureType.ArrayElement` is null for scalar types. `LocalDefinition.Type` and

@@ -228,3 +228,15 @@ callback import; `library-list-filters` needs captured function emission;
 are distinct layers and are not evidence for resuming CLR source-library adapter work.
 Next bounded native step: no-result callback import/emission with array callback execution,
 keeping CLI void separate from inhabited unit and structural Function experiments separate.
+
+## Native array callback milestone (2026-10-03)
+
+The array/application gates additionally execute unchanged `library-array-callbacks.rvn`
+with exact output `7`, `42`, `First`, `Second` and exit 0. Its explicit no-result
+callback imports retain Action-shaped symbols independently of inhabited source unit.
+Nested vectors now round-trip through metadata; the runtime's registered nominal array
+backing cast preserves storage identity with exact element arguments. The additional
+`nested-array-callback-consumer.rvn` mutates nonempty inner arrays through callbacks and
+returns 42 through the original aliases. This replaces the previously recorded callback
+blocker; captured function emission in list-filters remains open. No structural Function
+branch integration, rectangular arrays or array covariance is implied.

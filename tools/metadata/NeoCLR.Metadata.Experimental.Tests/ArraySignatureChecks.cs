@@ -17,6 +17,9 @@ internal static class ArraySignatureChecks
         var integers = SignatureType.ArrayOf(PrimitiveType.Int32);
         var other = graph.AddFunction("IdentityArray", new MethodSignature(integers, [integers]));
         other.LoadArgument(0); other.Return();
+        var nested = SignatureType.ArrayOf(integers);
+        var nestedIdentity = graph.AddFunction("IdentityNestedArray", new MethodSignature(nested, [nested]));
+        nestedIdentity.LoadArgument(0); nestedIdentity.Return();
         var field = owner.AddField("Items", items);
         var get = owner.AddInstanceMethod("GetItems", new MethodSignature(items, []));
         get.LoadArgument(0); get.LoadField(field); get.Return();
@@ -30,6 +33,17 @@ internal static class ArraySignatureChecks
     {
         var graph = Create();
         var loaded = Assembly.Load(graph.Write());
+        int[][] nested = [[42], []];
+        var nestedIdentity = loaded.ManifestModule.GetMethods().Single(m => m.Name == "IdentityNestedArray");
+        if (!ReferenceEquals(nested, nestedIdentity.Invoke(null, [nested]))) throw new Exception("nested vector identity");
+        var native = AssemblyDefinition.ReadNativeAssembly(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(graph));
+        var context = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([native]);
+        var function = context.Resolve(native.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "IdentityNestedArray");
+        if (function.ReturnType is not NeoCLR.Metadata.Experimental.Introspection.ArrayTypeInfo { ElementType: NeoCLR.Metadata.Experimental.Introspection.ArrayTypeInfo })
+            throw new Exception("nested vector introspection roundtrip");
+        SignatureType depth = PrimitiveType.Int32;
+        for (int i = 0; i < 16; i++) depth = SignatureType.ArrayOf(depth);
+        try { SignatureType.ArrayOf(depth); throw new Exception("excessive vector nesting accepted"); } catch (ArgumentException) { }
         var order = loaded.GetType("Example.Order")!;
         var array = Array.CreateInstance(order, 2);
         var identity = loaded.ManifestModule.GetMethods().Single(m => m.Name == "IdentityArray" && m.ReturnType == order.MakeArrayType());
@@ -48,7 +62,7 @@ internal static class ArraySignatureChecks
                 !type.Properties.Zip(copy.Properties).All(p => p.First.GetSignature().SequenceEqual(p.Second.GetSignature())))
                 throw new Exception("array declaration projection");
         }
-        foreach (var element in new SignatureType[] { PrimitiveType.Void, SignatureType.ArrayOf(PrimitiveType.Int32) })
+        foreach (var element in new SignatureType[] { PrimitiveType.Void, SignatureType.ByReference(PrimitiveType.Int32) })
         {
             try { SignatureType.ArrayOf(element); throw new Exception("invalid array element accepted"); } catch (ArgumentException) { }
         }

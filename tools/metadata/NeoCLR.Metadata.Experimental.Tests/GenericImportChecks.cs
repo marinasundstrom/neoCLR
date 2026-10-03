@@ -35,7 +35,7 @@ internal static class GenericImportChecks
         Reject<ArgumentException>(() => imported.MakeGenericInstance(PrimitiveType.Void));
         Reject<ArgumentException>(() => entry.Call(imported.MakeGenericInstance(parameter)));
         Reject<ArgumentException>(() => entry.Call(imported.MakeGenericInstance(SignatureType.TypeParameter(0))));
-        Reject<ArgumentException>(() => imported.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)));
+        Check(imported.MakeGenericInstance(SignatureType.ArrayOf(PrimitiveType.Int32)).Signature.ParameterTypes[0].ArrayElement?.ArrayElement?.Primitive == PrimitiveType.Int32, "nested imported substitution");
         Reject<ArgumentNullException>(() => imported.MakeGenericInstance(null!));
         Reject<ArgumentException>(() => entry.Emit(OpCode.Add, call));
         var other = new AssemblyBuilder(new("Other", new Version(1, 0, 0, 0)), core);

@@ -3214,6 +3214,10 @@ fn interpret_instructions_with_dispatch(
                                 }
                                 object.view =
                                     matches!(target, Type::ArrayRef(_)).then(|| target.clone());
+                            } else if module.array_nominal(concrete).as_ref() == Some(target) {
+                                // The selected nominal backing is a view of this same
+                                // vector, with its exact element type and storage identity.
+                                object.view = Some(target.clone());
                             } else if module.is_reference_type(target)
                                 && crate::inheritance::require_base(module, concrete, target)
                                     .is_ok()

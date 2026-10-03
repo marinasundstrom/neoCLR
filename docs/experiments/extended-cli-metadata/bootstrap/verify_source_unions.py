@@ -85,6 +85,8 @@ def main():
     if args.arrays:
         samples = [
             (HERE / 'array-interface-count-consumer.rvn', 42, ''),
+            (HERE / 'nested-array-callback-consumer.rvn', 42, ''),
+            (ROOT / 'docs/experiments/raven-target/samples/library-array-callbacks.rvn', 0, '7\n42\nFirst\nSecond\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-option.rvn', 0, '42\nProduct not found\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-option-propagation.rvn', 0, 'Value found\n42\nAbsent\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-collection-capabilities.rvn', 0,

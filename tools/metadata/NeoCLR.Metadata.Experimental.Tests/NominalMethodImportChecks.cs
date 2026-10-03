@@ -56,7 +56,7 @@ internal static class NominalMethodImportChecks
             [0, 0, 0x11, 4],             // Value type is not a reference.
             [0, 0, 0x15, 0x11, 4, 1, 8], // Value-type construction.
             [0, 0, 0x1e, 0],             // Unscoped method parameter.
-            [0, 0, 0x1d, 0x1d, 8],       // Nested vector.
+            [0, 0, 0x1d, 0x1d, 0x10, 8],       // By-reference vector element.
             [0, 0, 8, 0]                 // Trailing bytes.
         })
         {

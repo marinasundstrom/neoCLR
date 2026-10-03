@@ -60,7 +60,7 @@ internal static class GenericOwnerChecks
         void Reject(Action action) { try { action(); } catch (ArgumentException) { return; } throw new Exception("invalid owner contract accepted"); }
         Reject(() => method.MakeConstructedReference([]));
         Reject(() => method.MakeConstructedReference([PrimitiveType.Void]));
-        Reject(() => method.MakeConstructedReference([SignatureType.ArrayOf(PrimitiveType.Int32)]));
+        if (method.MakeConstructedReference([SignatureType.ArrayOf(PrimitiveType.Int32)]).Signature.ParameterTypes[0].ArrayElement?.ArrayElement?.Primitive != PrimitiveType.Int32) throw new Exception("nested owner substitution");
         Reject(() => graph.EntryPoint!.Call(method));
         Reject(() => graph.EntryPoint!.Call(method.MakeConstructedReference([SignatureType.TypeParameter(0)])));
         Reject(() => graph.AddFunction("BadOwner", new MethodSignature(SignatureType.TypeParameter(0), [])));

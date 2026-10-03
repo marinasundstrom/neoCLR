@@ -28,15 +28,15 @@ public sealed partial record SignatureType
     public TypeBuilder? ClassType { get; }
     /// <summary>Gets the element type for a zero-based vector, or null for a scalar.</summary>
     public SignatureType? ArrayElement { get; }
-    /// <summary>Creates a one-dimensional zero-based vector of primitives, owned root classes or method parameters.</summary>
-    /// <param name="elementType">Non-Void scalar type; nested and multidimensional arrays are not admitted.</param>
+    /// <summary>Creates a one-dimensional zero-based vector, including vectors of vectors.</summary>
+    /// <param name="elementType">Supported non-Void element signature, including another vector; multidimensional arrays are not admitted.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
-    /// <exception cref="ArgumentException">Element is Void, another array, or exceeds the 16-level nesting bound.</exception>
+    /// <exception cref="ArgumentException">Element is Void, by-reference, or exceeds the 16-level nesting bound.</exception>
     public static SignatureType ArrayOf(SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
-        if (elementType.Primitive == PrimitiveType.Void || elementType.ArrayElement is not null || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
-            throw new ArgumentException("array element must be a supported scalar", nameof(elementType));
+        if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
+            throw new ArgumentException("array element must be a supported value type", nameof(elementType));
         return new(null, null, elementType);
     }
     /// <summary>Gets the positional method generic parameter, or null for other types.</summary>

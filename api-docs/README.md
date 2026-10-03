@@ -912,3 +912,8 @@ experimental-metadata.md, including native declaration identity and the CLI
 NotSupportedException limitation. It is not a guest runtime API and does not require a
 RavenDoc guest type selection. `build-api-docs.py --check` still reports the previously
 recorded stale guest snapshot; verified guest artifacts were not overwritten.
+
+2026-10-03: host metadata ArrayOf now admits nested vectors within its existing
+16-level signature bound; manual reference and C# contracts updated. No guest API
+added. The guest snapshot check still reports the previously stale snapshot; no
+reference artifacts were overwritten for this host-only API adjustment.
