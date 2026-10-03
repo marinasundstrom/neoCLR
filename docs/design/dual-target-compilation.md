@@ -5,6 +5,27 @@ source-built library subset, not the entire runtime library. The author accepted
 explicit CLI primitive bootstrap and documented runtime seed for this gate. Native
 application/rebuilt-library references must use direct metadata import.
 
+## Integration priority clarification (2026-10-03)
+
+The author reaffirmed CLI metadata as the physical baseline, then clarified that the
+immediate objective is Raven targeting neoCLR, without concentrating on new semantics.
+Finish the selected end-to-end case first. Do not make a wholesale CLI-authoritative
+container/loader migration a prerequisite for union support. Extend the existing metadata
+infrastructure only where a reproduced compiler/importer/runtime failure requires it,
+reusing ordinary CLI tables, signatures, attribute contracts and IL where expressible.
+
+The existing PE/#Neo transport still executes its native payload and exposes conventional
+CLI declarations as a reference projection. This is a documented interim representation,
+not completion of the CLI-compatible encoding goal. Format reconciliation and experimental
+semantics remain later work unless a concrete acceptance failure requires a bounded change.
+Existing extensions remain supported within their stated limits; this does not expand the
+scope of Self or structural Function work.
+
+The next acceptance step remains union/case metadata preservation and imported symbol
+reconstruction, followed by separately compiled union execution. Passing source-body
+preflight alone is insufficient. No new runtime execution result is claimed by this
+scope clarification.
+
 ## Ordered slices and acceptance
 
 1. Paired driver-level Hello/helper and separate library/consumer execution baseline.

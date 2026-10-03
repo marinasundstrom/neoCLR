@@ -10251,3 +10251,20 @@ not Self dispatch evidence. Raven integration and implementation substitution re
 - **Open:** custom-attribute authoring/reader/introspection coverage, native union/case
   semantic reconstruction, then separately compiled union consumer execution. This is
   a work direction and partial implementation report, not completed union support.
+
+## 2026-10-03 — CLI baseline with Raven integration first
+
+- **Author:** “We should follow CLI Metadata format unless we diverge.” Ordinary metadata
+  should use the same database format; structural types and module-level functions are
+  examples of differences to account for explicitly.
+- **Assistant:** identified the current native-authoritative PE/#Neo transport and proposed
+  moving ordinary metadata authority to CLI tables instead of extending parallel encoding.
+- **Author clarification:** “As it is now we want Raven to target neoCLR.” New semantics
+  should not dominate current work; the format can be adjusted during later experiments.
+- **Assistant response/action:** retained CLI compatibility as the architectural baseline,
+  but deferred wholesale container migration as a prerequisite. Updated the roadmap,
+  metadata direction and dual-target plan to prioritize demonstrated union/import/emission/
+  execution gaps. Existing uncommitted attribute implementation work remains in progress.
+- **Open:** union metadata preservation, native semantic reconstruction and executable
+  separate-library consumers. This entry records scope; no format migration or new
+  runtime acceptance result was completed by this documentation change.

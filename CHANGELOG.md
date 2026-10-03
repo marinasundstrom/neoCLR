@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Clarify Raven-to-neoCLR execution as the immediate integration priority. Retain CLI
+  metadata as the baseline while deferring wider format migration and new semantic
+  experiments; explicitly retain the current PE/#Neo transport limitation.
+
 - Record Raven case-branch/Boolean pattern lowering and configured unit storage.
   Native unit out/value argument execution returns 42. Unchanged Option passes
   source-body preflight; union/case attribute round trips remain the publication gate.

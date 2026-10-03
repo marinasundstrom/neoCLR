@@ -35,6 +35,17 @@ Physical payload/loader differences must not be described as a new semantic base
 Existing intentional differences need their own documented decisions. New ordinary
 compiler support should reuse standard CLI metadata and instruction semantics.
 
+## Integration before further format experiments — 2026-10-03
+
+The author reaffirmed encoding ordinary constructs as CLI metadata, while subsequently
+clarifying the immediate priority: Raven must target neoCLR and execute the selected
+end-to-end case. New semantics and wider format adjustments are later experiments.
+The assistant's proposed shift to a CLI-authoritative container is therefore a deferred
+migration direction, not a new prerequisite for current union integration. Preserve the
+compatibility baseline above and explicitly document the current transport limitations;
+make bounded writer/reader/runtime changes needed by observable integration failures.
+See the [current integration scope](dual-target-compilation.md#integration-priority-clarification-2026-10-03).
+
 ## Purpose and inputs
 
 Define a CLI-derived metadata format that can carry neoCLR semantics across compiler,

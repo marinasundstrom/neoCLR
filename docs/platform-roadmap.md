@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Author priority clarification (2026-10-03): finish Raven targeting neoCLR and executable
+end-to-end compilation. CLI tables, signatures and instructions remain the baseline;
+new semantics and broader format redesign are subsequent experiments, not prerequisites
+for the current gate. Make only metadata changes required by demonstrated integration
+failures. The current PE/#Neo execution transport remains transitional; retaining it for
+this gate does not establish ordinary CLI metadata or IL as authoritative at runtime.
+See [scope clarification](design/dual-target-compilation.md#integration-priority-clarification-2026-10-03).
+
 Author-approved implementation gate (2026-10-03): [dual-target driver and source-library plan](design/dual-target-compilation.md).
 Paired ordinary-driver Hello and separate generic library/consumer cases now execute on
 both targets; native references load directly with explicit --core-reference. Next the broad
