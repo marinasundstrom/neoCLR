@@ -432,3 +432,14 @@ are not claimed. The source Option ownership probe now reaches an unregistered S
 residual type argument. This requires a coherent unit-value/bootstrap contract, not removal
 of source declarations or a fallback to CLI library imports. The API documentation guest
 snapshot remains stale for the previously recorded bridge issue.
+
+
+### Inhabited unit contract (author clarification, 2026-10-03)
+
+NeoCLR unit is an ordinary inhabited value type, including generic payloads and residuals.
+No-result callables remain explicit through `no_result`; the shared compiler must distinguish
+value positions from discarded/statement results. Materialize unit where a value is required,
+and allow omission where it is unused without dropping side effects. Native Type.Void and
+Value.Void already provide runtime representation. Ordinary .NET semantics remain the default
+outside the explicit RuntimeUnitContract. Closing source-library ownership and generic unit
+case construction are the next integration checks, not a new-format prerequisite.

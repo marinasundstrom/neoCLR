@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the author's inhabited unit direction: value-bearing parameters, storage and
+  generic arguments remain distinct from no-result callables. Track generic union binding
+  and source-library bootstrap ownership as remaining integration gaps.
+
 - Preserve declared parameter names through CLI/native encoding and constructed
   introspection views. Author external value and nested type/method references from
   explicit identity/digest contracts, without reopening reader objects. C# metadata

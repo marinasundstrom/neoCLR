@@ -10294,3 +10294,20 @@ probe passes union declaration admission but rejects an unregistered System.Void
 type dependency. Option/Result and the broad library/application gate remain open.
 See the separate-union evidence and dual-target integration tracker. This continues the
 existing Raven integration priority; it does not authorize a format fork or new semantics.
+
+
+### 2026-10-03 — Inhabited unit versus no-result returns
+
+The author clarified that neoCLR's void/unit type may have a value and be passed as an
+ordinary type. The compiler may materialize that value when needed and omit it otherwise.
+The assistant accepted that direction: parameters, storage and generic arguments require
+an inhabited value contract; a no-result return is a distinct callable property. Existing
+runtime Type.Void/Value.Void and function no_result already express this distinction.
+The compiler must preserve side effects when discarding a result. This is a target contract,
+not permission to admit CLI System.Void as an ordinary .NET generic argument.
+
+The existing native unit-storage driver passes against the current union integration
+(exit 42), exercising storage, out assignment and ordinary arguments. An additional generic union with a System.Void payload currently rejects its
+case constructor during binding (RAV1501), while the source Option ownership probe rejects
+an unregistered System.Void dependency. These are separate compiler/bootstrap gaps; neither
+justifies prohibiting inhabited unit in neoCLR. Full Option/Result execution remains open.

@@ -1,0 +1,60 @@
+{
+  "scope": "Native ordinary-command configured inhabited unit storage/out argument executes42; not a dual-target case.",
+  "driverSha256": "5F8315C7C82ED3D943EBDDE323CE7169FA8A8923F7BA22BB0E0B5E75F48F853F",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "sourceSha256": "D9FC442E82BB2056F948AAD5FBC9A2C6FC60143F4CD2F56FB1B901B4BCF0D323",
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "-o",
+        "/tmp/raven-unit-contract-confirmed/UnitStorage.native.dll",
+        "/tmp/raven-unit-contract-confirmed/UnitStorage.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/raven-unit-contract-confirmed/UnitStorage.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_B1C93B6C491CB42340D7779E8E0FAC6D7D0E69F5D30620DC8CDA559274D2303C: typed-stack/control-flow verification passed (3839 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/raven-unit-contract-confirmed/UnitStorage.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "revisions": {
+    "raven": "4e7ac589c",
+    "neoclr": "1e426ff2"
+  },
+  "genericUnionProbe": {
+    "source": "union Residual<T> {\n    case Present(value: T)\n    case Absent\n}\nfunc Consume(value: System.Void) -> int => 42\nfunc Main() -> int {\n    let residual: System.Void = ()\n    let wrapped: Residual<System.Void> = Residual<System.Void>.Present(residual)\n    return match wrapped {\n        .Present(let value) => Consume(value)\n        .Absent => 1\n        _ => 2\n    }\n}\n",
+    "result": "RAV1501: No overload for constructor for type Present takes 1 arguments; output not published",
+    "status": "open binding gap"
+  }
+}
