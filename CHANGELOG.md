@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add bounded type custom-attribute definitions/builders and metadata-only introspection.
+  CLI rows/blobs and existing native attribute records preserve String/Int32/Boolean
+  fixed arguments and explicit constructor owners. C# tests verify CLR decoding and
+  separate native attribute dependency loading/execution without running constructors.
+  Union compiler emission/import remains pending; native transport remains transitional.
+
 - Clarify Raven-to-neoCLR execution as the immediate integration priority. Retain CLI
   metadata as the baseline while deferring wider format migration and new semantic
   experiments; explicitly retain the current PE/#Neo transport limitation.

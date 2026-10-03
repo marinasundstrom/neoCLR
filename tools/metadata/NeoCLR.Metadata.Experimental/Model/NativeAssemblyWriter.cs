@@ -15,6 +15,16 @@ public sealed partial class AssemblyBuilder
     public byte[] WriteNativeAssembly()
     {
         var methods = ValidateGraph();
+        var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
+        foreach (var type in types)
+            foreach (var attribute in type.Definition.CustomAttributes)
+            {
+                attribute.ValidateOwner(type.Definition);
+                var reference = attribute.AttributeType;
+                attributeOwners[attribute] = reference.ExplicitScope is { } scope
+                    ? ImportTypeIdentity(scope, reference.Namespace, reference.Name, 0)
+                    : reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner");
+            }
         if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box" || i.Op == "reference.test" && !MethodBuilder.IsReferenceSignature(i.Type!))))
             (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing/value type tests require an explicit System core binding")).ValidateBoxingCore();
 
@@ -214,6 +224,17 @@ public sealed partial class AssemblyBuilder
             if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
             return origin;
         }
+        object Attribute(CustomAttributeDefinition attribute)
+        {
+            var owner = attributeOwners[attribute];
+            var name = owner.ClassType is { } local ? TypeName(local) : ExternalName(owner.ImportedType!);
+            var arguments = attribute.GetArguments();
+            return new
+            {
+                constructor = new { name = name + "..ctor", owner = SignatureValue(owner), instance = true, parameters = arguments.Select(a => a.Type.ToString()).ToArray() },
+                arguments = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.ToString()] = a.Value }).ToArray()
+            };
+        }
         object? Accessor(MethodBuilder? method) => method is null ? null : new { name = FunctionName(method), owner = Owner(method), instance = !method.IsStatic, parameters = Parameters(method) };
         object[]? Constraints(TypeBuilder type)
         {
@@ -257,7 +278,7 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null)).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, type.Definition.CustomAttributes.Count == 0 ? null : type.Definition.CustomAttributes.Select(Attribute).ToArray())).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -306,6 +327,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? generic_constraints,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object? declaring_type);
+        object? declaring_type,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? custom_attributes);
 
 }

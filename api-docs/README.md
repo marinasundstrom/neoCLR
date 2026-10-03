@@ -877,3 +877,10 @@ coverage. The known stale guest RavenDoc snapshot remains tracked; no snapshot m
 2026-10-03: bounded core Object.ToString import/call behavior is covered in the host
 metadata manual and XML; no new guest API selection. Existing stale snapshot and
 SourceUnionReferences.Project refresh blocker remain unchanged.
+
+
+Host-only type custom-attribute model and introspection APIs are covered by XML and the
+[manual reference](experimental-metadata.md#type-custom-attributes-development-2026-10-03).
+These C# APIs are not guest Raven types and are excluded from RavenDoc's guest type selection.
+The existing stale guest snapshot/source-union refresh blocker remains separate; this
+change does not overwrite the last verified reference assembly or claim regeneration.

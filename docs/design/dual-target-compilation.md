@@ -360,3 +360,21 @@ Generated union declaration collection, Byte discriminators, full synthesized un
 contracts and symbol-authored external value/case operands remain pending. This test
 contains ordinary nested declarations; it does not claim that unchanged Option or the
 broad class-library consumer compiles yet.
+
+
+## Union attribute foundation (2026-10-03)
+
+The host metadata library now authors and reads bounded type custom attributes through
+both definitions and builders; introspection resolves owners through the explicit catalog.
+CLI output uses standard attribute rows/blobs. Native output reuses the existing runtime
+attribute records, preserving the documented transitional PE/#Neo representation.
+This is missing writer/reader coverage, not new union semantics. It follows the constructor/
+typed-argument model used by [Cecil](https://github.com/jbevain/cecil/blob/master/Mono.Cecil/CustomAttribute.cs)
+and the standard [CLI writer contract](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.metadata.ecma335.metadatabuilder.addcustomattribute?view=net-10.0).
+The bounded API omits named/array/enum/Type arguments, unlike Cecil's broader model.
+
+A C# fixture verifies actual CLR attribute decoding and native attribute data/owner round
+trips, then verifies/runs a two-assembly NeoCLR consumer (42). Its attribute constructor
+fails if invoked, proving metadata loading does not execute it. Missing native dependencies
+reject. No Runtime Contract selection or Raven emitter behavior changes in this slice;
+Raven union emission and imported semantic reconstruction remain pending.

@@ -8,6 +8,11 @@ failures. The current PE/#Neo execution transport remains transitional; retainin
 this gate does not establish ordinary CLI metadata or IL as authoritative at runtime.
 See [scope clarification](design/dual-target-compilation.md#integration-priority-clarification-2026-10-03).
 
+Union continuation (2026-10-03): bounded type custom-attribute authoring, native/CLI
+round trips and catalog-based introspection now provide the metadata foundation.
+Raven union publication and imported semantic reconstruction remain pending; see the
+[foundation scope](design/dual-target-compilation.md#union-attribute-foundation-2026-10-03).
+
 Author-approved implementation gate (2026-10-03): [dual-target driver and source-library plan](design/dual-target-compilation.md).
 Paired ordinary-driver Hello and separate generic library/consumer cases now execute on
 both targets; native references load directly with explicit --core-reference. Next the broad

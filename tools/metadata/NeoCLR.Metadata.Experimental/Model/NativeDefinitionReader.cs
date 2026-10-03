@@ -93,7 +93,12 @@ public sealed partial class NativeAssemblyDefinition
             property.Getter < 0 ? 0 : 0x06000001u + (uint)property.Getter,
             property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray())).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
-        return AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
+        var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
+        var result = AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
+        for (int i = 0; i < types.Length; i++)
+            result.MainModule.GetTypeDefinition(0x02000002u + (uint)i)!.SetLoadedAttributes(attributes[i].Select(a =>
+                new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+        return result;
     }
 }
 

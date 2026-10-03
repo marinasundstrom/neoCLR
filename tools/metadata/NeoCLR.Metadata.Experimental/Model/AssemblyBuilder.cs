@@ -98,6 +98,8 @@ public sealed partial class AssemblyBuilder
         {
             ValidateValueLayouts();
             foreach (var type in types)
+                foreach (var attribute in type.Definition.CustomAttributes) attribute.ValidateContract(type.Definition);
+            foreach (var type in types)
                 foreach (var contract in type.InheritedContracts()) { _ = contract; }
             foreach (var type in types.Where(t => !t.IsInterface))
                 foreach (var contract in type.RequiredInterfaceMethods)
@@ -636,6 +638,16 @@ public sealed partial class AssemblyBuilder
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));
             genericRows.Add((typeHandle, MetadataTokens.GetRowNumber(typeHandle) * 2, type.GenericParameterNames));
+            foreach (var attribute in type.Definition.CustomAttributes)
+            {
+                attribute.ValidateOwner(type.Definition);
+                var reference = attribute.AttributeType;
+                EntityHandle attributeOwner = reference.ExplicitScope is { } scope
+                    ? metadata.AddTypeReference(ImportAssembly(scope), metadata.GetOrAddString(reference.Namespace), metadata.GetOrAddString(reference.Name))
+                    : typeHandles[reference.Resolve().Producer ?? throw new InvalidDataException("detached attribute owner")];
+                var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(attribute.GetConstructorSignature()));
+                metadata.AddCustomAttribute(typeHandle, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
+            }
             foreach (var field in type.Fields)
             {
                 var signature = new BlobBuilder();

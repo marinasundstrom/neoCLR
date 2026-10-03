@@ -9,7 +9,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; }
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
+    private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
@@ -134,6 +135,7 @@ public sealed partial class NativeAssemblyDefinition
                         constraints.Add((parameter, Text(bound, "Named")));
                     }
                 }
+                if (type.TryGetProperty("custom_attributes", out _)) typeFields.Add("custom_attributes");
                 if (type.TryGetProperty("properties", out _)) typeFields.Add("properties");
                 var propertyElements = type.TryGetProperty("properties", out _) ? Array(type, "properties", 256) : [];
                 var visibility = TypeVisibility.Public;
@@ -234,7 +236,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count;
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType));
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
@@ -350,6 +352,34 @@ public sealed partial class NativeAssemblyDefinition
                 return index >= 0 ? (SignatureType)signatureOwners[index]
                     : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             }
+            foreach (var type in types)
+                foreach (var attribute in type.RawAttributes)
+                {
+                    Shape(attribute, "constructor", "arguments");
+                    var constructor = attribute.GetProperty("constructor"); Shape(constructor, "name", "owner", "instance", "parameters");
+                    var ownerValue = constructor.GetProperty("owner"); Shape(ownerValue, "Named");
+                    Require(constructor.GetProperty("instance").GetBoolean() && Text(constructor, "name") == Text(ownerValue, "Named") + "..ctor", "invalid attribute constructor");
+                    var owner = ReadType(ownerValue, false);
+                    Require(owner.ClassType is { IsValueType: false, IsStatic: false, GenericParameterNames.Count: 0 } || owner.ImportedType is { IsValueType: false, GenericArity: 0 }, "invalid attribute type");
+                    var parameters = Array(constructor, "parameters", 256);
+                    var arguments = Array(attribute, "arguments", 256);
+                    Require(parameters.Length == arguments.Length, "attribute argument count mismatch");
+                    var decoded = new List<CustomAttributeArgument>();
+                    for (int i = 0; i < arguments.Length; i++)
+                    {
+                        var parameter = parameters[i].GetString();
+                        Require(parameter is "String" or "Int32" or "Boolean", "unsupported attribute parameter");
+                        Shape(arguments[i], parameter!);
+                        var value = arguments[i].GetProperty(parameter!);
+                        decoded.Add(parameter switch
+                        {
+                            "String" => new(PrimitiveType.String, value.ValueKind == JsonValueKind.Null ? null : value.GetString()),
+                            "Int32" => new(PrimitiveType.Int32, value.GetInt32()),
+                            _ => new(PrimitiveType.Boolean, value.GetBoolean())
+                        });
+                    }
+                    type.Attributes.Add(new(owner, decoded.ToArray()));
+                }
             for (int typeIndex = 0; typeIndex < types.Count; typeIndex++)
             {
                 var type = types[typeIndex];
@@ -600,6 +630,14 @@ public sealed partial class NativeAssemblyDefinition
         }
         foreach (var property in properties)
             owners[property.Owner].AddProperty(property.Name, Remap(property.Type), property.Getter < 0 ? null : projectedMethods[property.Getter], property.Setter < 0 ? null : projectedMethods[property.Setter]);
+        for (int i = 0; i < types.Length; i++)
+            foreach (var attribute in types[i].Attributes)
+            {
+                var owner = Remap(attribute.Owner);
+                var reference = owner.ClassType is { } local ? local.Definition.ToReference()
+                    : graph.Definition.MainModule.ImportReference(owner.ImportedType!.AssemblyIdentity, owner.ImportedType.Namespace, owner.ImportedType.Name);
+                owners[i].AddCustomAttribute(new(reference, attribute.Arguments));
+            }
         return graph.WriteReferenceImage();
     }
     private static TypeBuilder[] DefineTypes(AssemblyBuilder graph, IReadOnlyList<TypeRow> rows)

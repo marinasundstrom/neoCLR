@@ -240,7 +240,31 @@ public sealed partial class AssemblyDefinition
                 signatureBytes += length;
                 memberReferences.Add(new((uint)MetadataTokens.GetToken(handle), parent, ReadName(member.Name), reader.GetBlobBytes(member.Signature)));
             }
-            return new(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, fields, properties, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
+            if (reader.CustomAttributes.Count > 4096) throw new InvalidDataException("too many custom attributes");
+            var result = new AssemblyDefinition(identity, ReadName(module.Name), reader.GetGuid(module.Mvid), rows, fields, properties, methods, memberReferences, references, typeReferences, artifact?.Profile, owned, entryPointToken);
+            int attributeBytes = 0;
+            foreach (var handle in reader.TypeDefinitions)
+            {
+                var attributes = new List<CustomAttributeDefinition>();
+                foreach (var attributeHandle in reader.GetTypeDefinition(handle).GetCustomAttributes())
+                {
+                    if (attributes.Count >= 256) throw new InvalidDataException("too many type attributes");
+                    var attribute = reader.GetCustomAttribute(attributeHandle);
+                    uint token = (uint)MetadataTokens.GetToken(attribute.Constructor);
+                    var signature = attribute.Constructor.Kind switch
+                    {
+                        HandleKind.MethodDefinition => reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor).Signature,
+                        HandleKind.MemberReference => reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor).Signature,
+                        _ => throw new InvalidDataException("invalid attribute constructor token")
+                    };
+                    int length = reader.GetBlobReader(signature).Length + reader.GetBlobReader(attribute.Value).Length;
+                    if (length > MetadataArtifactReader.MaxImageSize - attributeBytes) throw new InvalidDataException("decoded attribute data exceeds limit");
+                    attributeBytes += length;
+                    attributes.Add(new(result.MainModule, token, reader.GetBlobBytes(signature), reader.GetBlobBytes(attribute.Value)));
+                }
+                result.MainModule.GetTypeDefinition((uint)MetadataTokens.GetToken(handle))!.SetLoadedAttributes(attributes);
+            }
+            return result;
         }
         catch (BadImageFormatException error)
         {

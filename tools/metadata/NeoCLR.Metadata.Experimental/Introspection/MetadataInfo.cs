@@ -78,13 +78,18 @@ public sealed class NominalTypeInfo : TypeInfo
         properties = new(() => context.ProjectProperties(definition, this, parameters));
         interfaces = new(() => context.ProjectInterfaces(definition, parameters));
         allInterfaces = new(() => context.ProjectInterfaceClosure(this));
+        attributes = new(() => Array.AsReadOnly(definition.CustomAttributes.Select(a => new CustomAttributeInfo(context, a)).ToArray()));
     }
     private readonly IReadOnlyList<TypeInfo> parameters;
     private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
     private readonly Lazy<IReadOnlyList<PropertyInfo>> properties;
     private readonly Lazy<IReadOnlyList<TypeInfo>> interfaces;
     private readonly Lazy<IReadOnlyList<TypeInfo>> allInterfaces;
+    private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
     internal TypeDefinition Definition => definition;
+    /// <summary>Gets declared metadata-only attribute records without loading dependencies or executing constructors.</summary>
+    /// <remarks>Fixed-argument decoding is bounded; raw CLI blobs preserve other loaded categories.</remarks>
+    public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => attributes.Value;
     /// <summary>Gets stable owner-scoped generic parameter views in declaration order.</summary>
     public IReadOnlyList<TypeInfo> GetGenericArguments() => parameters;
     /// <summary>Constructs this generic definition using copied, same-context arguments.</summary>

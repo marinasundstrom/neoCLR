@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-03",
+  "scope": "Bounded custom-attribute foundation; Raven union emission remains blocked",
+  "sourceBaseRevision": "bdbbc045c4b6534e3784b6cf77d708b8fd9faf6f",
+  "tests": {
+    "metadataGroups": "122/122",
+    "runtime": "verify 0; run 42; missing dependency rejects",
+    "attributeConstructor": "Fail body, never invoked during loading",
+    "apiSnapshot": "check fails: existing stale guest snapshot; host API manually documented"
+  },
+  "runtimeSha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+  "artifacts": {
+    "Library.dll": "83ed215745743810f3949214e5f978e61c33b148bb474ff456654c6ed91f2e24",
+    "Consumer.dll": "e48053d4711d80e87c5ccb01d954e20e963fd140f39554fcf0677ef6242a23a0"
+  },
+  "commands": [
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --custom-attribute-runtime target/release/neoclr <output-directory>"
+  ]
+}

@@ -5840,3 +5840,54 @@ calls remain unsupported. Runtime Contract and importer/emitter boundaries are u
 API-authored boxed value overrides execute through Object; ordinary Raven commands
 print `42` and `text` on both targets. The union preflight now reaches a synthesized
 get_Value null literal. Full native union/case metadata and execution remain pending.
+
+
+### Type custom attributes (development, 2026-10-03)
+
+Host-only namespace `NeoCLR.Metadata.Experimental.Model`:
+
+- `CustomAttributeArgument(PrimitiveType type, object? value)` stores immutable `Type`
+  and `Value`. Supported fixed arguments are String (including null), Int32 and Boolean.
+  Other type/value combinations throw ArgumentException. Strings are strict UTF-8 and
+  bounded to 65,536 UTF-16 code units.
+- `CustomAttributeDefinition(TypeReference attributeType, IEnumerable<CustomAttributeArgument> arguments)`
+  authors an instance `.ctor` reference without implicitly loading dependencies.
+  Overloads taking `MethodDefinition constructor` or `ImportedMethodReference constructor`
+  additionally validate the fixed arguments against the constructor signature. Owned
+  constructors must be public; references must belong to the output module.
+- `AttributeType` exposes the nominal owner; `GetConstructorSignature()` and `GetValue()`
+  return owned copies of the CLI constructor signature and custom-attribute blob.
+  `GetArguments()` returns read-only decoded fixed arguments. Inspection never runs a
+  constructor. Unsupported argument/signature categories throw NotSupportedException;
+  malformed supported data throws InvalidDataException.
+- `TypeDefinition.CustomAttributes : IList<CustomAttributeDefinition>` is append-only on
+  authored, attached definitions and read-only on loaded snapshots. The corresponding
+  `TypeBuilder.AddCustomAttribute(CustomAttributeDefinition attribute)` uses the same
+  ownership/limit validation. Foreign references throw ArgumentException; missing local
+  constructors or exceeded graph limits reject on write. At most 256 attributes per type
+  and 256 fixed arguments per attribute are supported.
+
+Host-only namespace `NeoCLR.Metadata.Experimental.Introspection`:
+
+- `NominalTypeInfo.GetCustomAttributes() : IReadOnlyList<CustomAttributeInfo>` returns
+  cached metadata-only views in declaration order.
+- `CustomAttributeInfo.Namespace` and `Name` inspect the stored owner identity;
+  `GetArguments()` decodes data without resolving dependencies.
+- `CustomAttributeInfo.GetAttributeType() : NominalTypeInfo` resolves the canonical
+  owner through the explicit MetadataLoadContext catalog. Missing or mismatched
+  dependencies throw InvalidDataException. No runtime reflection or constructor execution
+  is involved.
+
+Authoring is limited to top-level nongeneric nominal owners and type-level attributes.
+Named arguments, enum/array/System.Type arguments and other parent categories are not
+newly supported. Loaded CLI blobs remain available as raw copies even when typed decoding
+is unsupported. This does not add mutable loaded-assembly rewriting.
+
+CLI output uses the existing CustomAttribute table, constructor MemberRef and standard
+prolog/fixed-argument/named-count blob. Native PE/#Neo output uses the runtime's existing
+custom_attributes records; its CLI projection contains equivalent standard blobs. This
+is an interim dual representation, not a CLI-authoritative runtime format or a new union
+wire category. Native constructor-bearing records currently do not enforce CLI
+System.Attribute inheritance; the .NET execution control uses System.ObsoleteAttribute.
+C# tests cover actual CLR decoding, native round trips, explicit dependency resolution,
+malformed records and runtime verification/execution without invoking an attribute ctor.
