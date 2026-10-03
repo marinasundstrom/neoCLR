@@ -4811,3 +4811,36 @@ Cross-repository validation: Raven `80f57d2f9`, runtime `97cd6e90`, metadata cha
 committed with [broad-native-execution-2026-10-03.json](experiments/extended-cli-metadata/broad-native-execution-2026-10-03.json).
 The evidence records compiler payloads, source ownership, artifact hashes and exact
 commands/output. The optional host API parameter requires rebuilding binary consumers.
+
+### Executable .NET adapters and unit-storage assessment (2026-10-03)
+
+`bootstrap/verify_dotnet_sources.py --compiler <rvnc.dll> --output <fresh-directory>` uses
+ordinary compiler commands, .NET targeting-pack references, --emit-core-types-only and
+the same array ownership manifest. Embedded-core mode avoids conflicting Raven.Core union
+copies. A separate .NET service assembly provides CheckedStorage.Reserve<T> using CLR array
+allocation and RuntimeFailure.Terminate using stderr plus process exit 1. The unchanged
+System/Functions.rvn delegates System.Fail to that service. No collection/union declaration
+or consumer body is replaced. Dedicated Raven consumers prove storage mutation (42) and
+terminal failure (message, exit 1).
+
+Compared with native reserved vectors, CLR arrays eagerly provide default-initialized slots;
+the library tracks its used extent. This adapter does not reproduce native uninitialized-slot
+faults. Terminate exits the host process and cannot be recovered by guest exception handling.
+These bounded execution adapters are not published guest library APIs.
+
+SingleError's nonnullable ToString exposed the shared binder's exact return-nullability rule.
+Allowing the same underlying reference type to strengthen a nullable return follows the
+[C# override contract](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/classes#1565-override-methods).
+The isolated main-based fix is Raven 54fc1e0aa; integration is 1836ca9ef. Thirteen focused
+semantic/execution tests pass, including weaker return rejection and value-nullable ABI
+regressions. The unchanged native broad application is revalidated. No merge into main
+was performed.
+
+The .NET library emits but is not a valid execution gate: separate consumer emission fails
+loading Propagatable<Option<T>,T,System.Void>. CLR void cannot be an ordinary generic/storage
+value. Native inhabited Void and .NET unit representation need an explicit target mapping,
+without modifying library sources or retargeting all primitive types to a fake core.
+The current CLI RuntimeUnitContract couples the unit scope to TargetCoreAssemblyName;
+relaxing that boundary needs focused design and roundtrip tests. The assessment also records
+output publication after failure; compiler crashes are not accepted diagnostics or success.
+Custom array-interface adaptation still needs .NET execution evidence after the unit blocker.

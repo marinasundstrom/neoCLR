@@ -1,0 +1,9 @@
+func Main() -> int {
+    let values = System.Runtime.CompilerServices.CheckedStorage.Reserve<int>(2)
+    if values[0] != 0 {
+        return 1
+    }
+    values[0] = 20
+    values[1] = 22
+    return values[0] + values[1]
+}

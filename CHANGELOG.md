@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add executable .NET CheckedStorage and terminal-failure bootstrap adapters and a
+  paired source-library assessment driver. Isolate and validate Raven's stronger-reference
+  override return fix on its main-based branch (13 tests); native broad execution still
+  passes. The .NET consumer exposes invalid CLR void generic storage in Propagatable;
+  library emission alone is explicitly not counted as successful execution.
+
 - Execute unchanged application-order-collections against a separately compiled native
   source-library subset with exact stdout and exit 0. Add the retained seed's Int32 console
   overload using existing runtime services. Preserve inherited-slot facts through metadata

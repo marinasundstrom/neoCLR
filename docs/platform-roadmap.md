@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Paired .NET assessment (2026-10-03): executable storage/failure adapters pass. The shared
+safe override-return strengthening fix is independently validated on Raven's main-based
+fix branch. Native broad execution remains green. The unchanged .NET source library emits,
+but consumer compilation fails loading Propagatable instantiated with CLR System.Void.
+Next bounded task: explicit source-unit/CLR-value projection and rejection of invalid void
+storage before publishing an assembly. Then prove .NET array/interface adaptation and the
+unchanged broad consumer. [Evidence](experiments/extended-cli-metadata/dotnet-source-assessment-2026-10-03.json).
+
 Broad native gate update (2026-10-03): unchanged application-order-collections compiles
 against the separately emitted source library and executes with exact checked-in output
 and exit 0, including collection mutation, callback/query composition, union propagation,

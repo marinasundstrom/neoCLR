@@ -6059,3 +6059,17 @@ unchanged. Wider overrides remain unsupported.
 
 The optional isOverride parameter preserves source calls but changes the experimental host
 method signature; rebuild binary consumers with the matching metadata library.
+
+### .NET acceptance service adapters (development tooling only)
+
+The separate `NeoCLR.DotNetServices` test assembly under the bootstrap tooling exposes:
+
+- `System.Runtime.CompilerServices.CheckedStorage.Reserve<T>(int length) -> T[]`: allocates
+  a real CLR array. Negative lengths and allocation failures propagate CLR exceptions.
+  Slots have CLR default initialization; native tracked-uninitialized storage is not emulated.
+- `System.Runtime.CompilerServices.RuntimeFailure.Terminate(string message) -> void`:
+  writes the message to stderr and exits the process with status 1. Marked DoesNotReturn.
+
+These executable host adapters contain no reader/writer APIs or source library types and
+are not selected for guest RavenDoc publication. They support the paired .NET assessment,
+which currently fails later on unit storage mapping.

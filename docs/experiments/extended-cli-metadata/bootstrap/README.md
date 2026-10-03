@@ -174,3 +174,18 @@ The library's source methods, unions and arrays are imported natively. Evidence 
 source/artifact hashes, ownership, compiler payloads and executed commands. This passes
 the native broad gate; .NET source-library service adapters and paired execution remain
 open. Earlier assessments above describe the failure state before this gate.
+
+### Paired .NET assessment
+
+Run `python3 verify_dotnet_sources.py --compiler /absolute/path/rvnc.dll --output /tmp/fresh`
+from this directory (or use its full repository path). The driver builds the real
+`dotnet-services` adapter, compiles and executes its storage/failure consumers, then builds
+the same unchanged class-library sources plus System/Functions.rvn. The broad consumer
+receives emitted references only. Runtimeconfig files explicitly select .NET 10; no
+probe-only compiler setup or reference-only service bodies are used.
+
+The driver always writes validation.json and returns failure when a later gate fails.
+Current outcome: adapters pass, library emits, consumer rejects invalid CLR System.Void
+storage through a TypeLoadException. This is a recorded blocker, not a dual-target pass.
+Explicit unit storage mapping, failure-before-publication and .NET array/interface backing
+remain to be completed. Native `--application` continues to pass.

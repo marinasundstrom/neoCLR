@@ -1,0 +1,3 @@
+func Main() {
+    System.Runtime.CompilerServices.RuntimeFailure.Terminate("adapter failure")
+}

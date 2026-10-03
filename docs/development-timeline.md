@@ -10380,3 +10380,18 @@ sources absent from consumer compilation, and executes with exact expected stdou
 This is assistant-verified native evidence, not completion of the paired .NET gate or the
 entire runtime library. Next is the .NET source-library execution adapter gate.
 [Evidence](experiments/extended-cli-metadata/broad-native-execution-2026-10-03.json).
+
+### 2026-10-03 — Paired .NET assessment and independent binding fix
+
+Continuing the author's dual-target goal, the assistant added executable .NET allocation
+and process-failure adapters, then compiled the unchanged library source set. The compiler's
+existing exact-nullability override rule rejected SingleError.ToString; a bounded safe
+reference-return strengthening fix was isolated on the author-requested main-based Raven
+fix branch (54fc1e0aa) and tested independently (13 cases), then integrated as 1836ca9ef.
+No main merge was performed. The native broad application still executes successfully.
+
+The .NET assessment does not pass: consumer compilation exposes CLR void used as a generic
+argument in the emitted Option/Propagatable metadata. The assistant identified explicit
+unit-value mapping as the next task and retained the sources unchanged. Both executable
+service consumers pass; emitting the library alone is not counted as success. The failed
+consumer leaves no Application.dll. [Evidence](experiments/extended-cli-metadata/dotnet-source-assessment-2026-10-03.json).
