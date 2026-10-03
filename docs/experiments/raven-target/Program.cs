@@ -228,6 +228,12 @@ if (args.Length == 2 && args[0] == "--async-ref-contract-checks")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-primitive-core")
+{
+    CoreDeclarations.Write(args[1]);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-library-core")
 {
     CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true, libraryBootstrap: true);

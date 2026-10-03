@@ -10185,3 +10185,17 @@ requires explicit complete external contracts; native reading uses the metadata 
 Authored PE emission retains the validated graph rather than reloading dependencies.
 Existing native encoding and runtime dispatch required no changes for this case.
 The broader source-library gate remains open; see the [implementation tracker](design/dual-target-compilation.md).
+
+
+### Follow-up: source ownership and native Self (2026-10-03)
+
+The author directed continuation, then added: “We also need to support the Self “type” signature in neoclr metadata” The assistant agreed to preserve native Self across metadata
+signatures, introspection, Raven symbols and emission, rather than relying on the CLI
+marker. Existing runtime SelfType and structural-description encoding were found; the
+Cecil-like assembly signature path is not yet implemented. This remains open work.
+
+The ownership slice independently reached execution: seven unchanged iteration/collection
+source units compile as a library and a separate consumer executes on both targets.
+The explicit ownership manifest rejects competing CoreProbe declarations and configures
+only the runtime contracts supplied by the selected bootstrap. No full-System or broad
+application completion is claimed; see the dual-target tracker and matching evidence.

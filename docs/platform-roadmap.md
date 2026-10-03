@@ -46,8 +46,10 @@ Constructor/member classification and accessibility metadata now live in the fac
 paired driver execution passes. External generic interface implementation/inheritance now
 works across separately compiled contracts, implementation and consumer assemblies,
 including diamond traversal and dispatch on both targets. See [driver evidence](experiments/extended-cli-metadata/dual-driver-external-2026-10-03.json).
-Next establish the explicit bootstrap/source ownership manifest and independently compiled
-iteration/collection contracts. The broad source-library/application gate remains open.
+A checked-in ownership manifest and primitive-only bootstrap now support separately
+compiled iteration/collection contracts on both targets. Next extend ownership to the
+retained seed and ArrayList dependencies; also implement the author-requested native Self
+signature path through the metadata APIs. The broad source-library/application gate remains open.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).
 See [native host binding evidence](experiments/extended-cli-metadata/native-host-bindings-2026-10-02.json).
 See [native reference boundary evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json). See [callable boundary evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json). See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).

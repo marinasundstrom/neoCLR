@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Establish a source-owned iteration/collection contract bootstrap: seven unchanged
+  Raven source units compile into a separate library consumed and executed on .NET
+  and neoCLR. A checked-in ownership manifest selects the iteration contract; a
+  minimal CLI core excludes competing collection declarations. Ownership failures
+  reject before publication. The retained System seed and ArrayList remain later steps.
+
 - Support external generic interface inheritance and implementation declarations, with
   explicit complete contracts, definition/builder parity and metadata-only resolution.
   Authored PE emission preserves validated CLI implementation flags without dependency

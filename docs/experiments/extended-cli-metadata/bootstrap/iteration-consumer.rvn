@@ -1,0 +1,40 @@
+import System.Collections.*
+
+class Counter : Iterator<int> {
+    private var position = 0
+
+    func MoveNext() -> bool {
+        position = position + 1
+        return position <= 3
+    }
+
+    val Current: int => position
+
+    func Dispose() { }
+}
+
+class Numbers : Collection<int> {
+    val Count: int => 3
+
+    func GetIterator() -> Iterator<int> => Counter()
+}
+
+func Main() -> int {
+    var sum = 0
+    let numbers: Collection<int> = Numbers()
+    if numbers.Count != 3 { return 4 }
+    for value in numbers {
+        sum = sum + value
+    }
+    let array: int[] = [4, 5]
+    for value in array {
+        sum = sum + value
+    }
+    let cursor: Iterator<int> = Counter()
+    let alias = cursor
+    if !cursor.MoveNext() { return 1 }
+    if alias.Current != 1 { return 2 }
+    cursor.Dispose()
+    if sum != 15 { return 3 }
+    return sum + 27
+}

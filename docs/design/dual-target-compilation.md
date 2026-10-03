@@ -113,3 +113,48 @@ See [driver evidence](../experiments/extended-cli-metadata/dual-driver-external-
 
 Next: the explicit bootstrap/source ownership manifest and source-built iteration contracts.
 The broad collections/source-library completion gate is still open.
+
+
+## Source-owned contract bootstrap (2026-10-03)
+
+The first ownership stage is implemented with
+[`bootstrap/iteration-ownership.json`](../experiments/extended-cli-metadata/bootstrap/iteration-ownership.json).
+It assigns Disposable, Iterator, Iterable, Collection, Sequence, MutableSequence and List
+to `NeoCLR.Collections`. The acceptance runner reads its source catalog and copies the
+unchanged runtime-library units into a temporary build directory, removing those copies
+before compiling the consumer against the emitted artifact. Both ordinary drivers read
+`--bootstrap-ownership` to select runtime contracts and reject missing, competing or
+wrongly owned declarations. Exact artifact identity checks remain in the native importer.
+
+The primitive-only CoreProbe mode retains compiler marker declarations and the existing
+small Console/Math bootstrap surface; it does not contain collection or union declarations.
+This first stage references no retained System seed. It does not establish ownership of
+the entire runtime library. The manifest explicitly leaves TypeOf and Propagation
+contracts null because the bootstrap does not supply their dependencies. Unsupported
+emission remains subject to ordinary target capability checks; the expanded default
+NeoCLR profile is unchanged when no manifest is selected.
+
+Acceptance exercises source-defined Collection/Iterable/Iterator inheritance, an external
+implementation, interface Count/Current/MoveNext/Dispose calls, `for` iteration, explicit
+array iteration and alias identity. Both targets return 42. Wrong owners, duplicate owner
+entries, unsupported manifest versions and the expanded conflicting CoreProbe reject
+without output. [Evidence](../experiments/extended-cli-metadata/source-iteration-ownership-2026-10-03.json).
+
+Reproduce after building rvnc with its native metadata project:
+
+```sh
+dotnet run --project docs/experiments/raven-target/Probe.csproj \
+  -p:RavenRoot=/absolute/path/to/Raven -p:UseRavenCoreReference=false -p:WarningLevel=0 \
+  -- --reference-primitive-core /tmp/NeoCLR.PrimitiveCore.dll
+python3 scripts/check-source-iteration.py --raven-root /absolute/path/to/Raven \
+  --core /tmp/NeoCLR.PrimitiveCore.dll --output /tmp/fresh-iteration-check
+```
+
+Next source-library dependencies include CheckedStorage, Fail, callback signatures and
+Option. The source/seed partition for those declarations remains open. The author also
+explicitly requires native Self signatures: the runtime already understands SelfType,
+but the Cecil-like SignatureType/readers/introspection/compiler path must preserve that
+semantic form rather than the temporary CLI marker. This is additional required metadata
+work, not a change to the structural Function branch boundary.
+
+Source-owned contract driver implementation: Raven `codex/metadata-consumer` commit `f9841b0f6`, with neoCLR metadata `8c08829e`. The native runtime executable is unchanged.

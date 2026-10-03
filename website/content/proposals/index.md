@@ -717,3 +717,5 @@ accessibility facts consumed by Raven. Paired driver execution works for Hello W
 a separate generic library on both targets; the broad source-library gate is still open.
 
 Development checkpoint (2026-10-03): external generic interface contracts now cross separately compiled Raven libraries and execute on both targets, including diamond dispatch. The source-built collections application gate remains open.
+
+Development checkpoint (2026-10-03): source-built iteration/collection interfaces now support separately compiled consumers on both targets using explicit bootstrap ownership. The retained-seed partition, ArrayList and broad application remain in development.

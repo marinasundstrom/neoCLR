@@ -1,0 +1,307 @@
+{
+  "scope": "source-built iteration contracts; no retained System seed is referenced",
+  "manifestSha256": "9578fb5f2f530537c36c513e12473ccec3c84b83aecfd24a911ad157da50cb88",
+  "consumerSha256": "4f16bee56af36fa185e96318f320fe1af6352ac3922b568312da68ec5d24591b",
+  "sources": {
+    "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+    "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+    "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+    "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+    "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+    "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+    "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+  },
+  "artifacts": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "0266182bae7671cc74d8ad3893c3b69f9056ae9ef10f97a94cd2428a93409c48",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+    "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll": "6f7bd6db8a141f0e1416c1fd1a36d6d44bc01c0da31ce9880be6ddd047869ada",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4"
+  },
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "8c08829e79b6d8e4cc6095b5c0d314af4db1d02f",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven": "023ea01401e2554817eee870e4d0551d4018fce8"
+  },
+  "commands": [
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/NeoCLR.Collections.dll",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/0-Disposable.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/1-Iterator.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/2-Iterable.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/3-Collection.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/4-Sequence.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/5-MutableSequence.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/library-source/6-List.rvn"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--refs",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/IterationConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdout": "Build succeeded in 1,3s\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/IterationConsumer.dll"
+      ],
+      "exitCode": 42,
+      "expectedExitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/wrong-owner.json",
+        "--refs",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/wrong-owner.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'WrongOwner'; found NeoCLR.Collections.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/duplicate-owner.json",
+        "--refs",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/duplicate-owner.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "Duplicate or invalid bootstrap type owner: System.Disposable\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/unsupported-version.json",
+        "--refs",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/dotnet/unsupported-version.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "Unsupported bootstrap ownership manifest version or library catalog.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--library",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/0-Disposable.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/1-Iterator.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/2-Iterable.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/3-Collection.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/4-Sequence.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/5-MutableSequence.rvn",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/library-source/6-List.rvn"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/IterationConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/IterationConsumer.dll",
+        "--module",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll"
+      ],
+      "exitCode": 0,
+      "expectedExitCode": 0,
+      "stdout": "NeoMetadata_10556E48BEBB1F93992DF8010E6CC6C293B352DF2C95D02ACE37BDADBC144C94: typed-stack/control-flow verification passed (649 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/IterationConsumer.dll",
+        "--module",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll"
+      ],
+      "exitCode": 42,
+      "expectedExitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/wrong-owner.json",
+        "--reference",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/wrong-owner.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'WrongOwner'; found NeoCLR.Collections.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/duplicate-owner.json",
+        "--reference",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/duplicate-owner.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Duplicate or invalid bootstrap type owner: System.Disposable\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.PrimitiveCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/unsupported-version.json",
+        "--reference",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/unsupported-version.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Unsupported bootstrap ownership manifest version or library catalog.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/NeoCLR.Collections.dll",
+        "-o",
+        "/private/tmp/source-iteration-ownership4-20261003/neoclr/duplicate-bootstrap.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "expectedExitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'NeoCLR.Collections'; found NeoCLR.Collections, NeoCLR.CoreProbe.\n"
+    }
+  ],
+  "passed": true,
+  "dotnet": {
+    "librarySha256": "2f42d4b9c692dd2c940921a71cde373f41138f73e5a4589c123066e15d7ff99c",
+    "applicationSha256": "1ef6fdb91bab658ff1db7bace4b982a2fa33e5860527b769543933a67b44dfe2",
+    "exitCode": 42
+  },
+  "neoclr": {
+    "librarySha256": "e5b9a1b3b2b19d4f6a311fb4fa60e5ebbd6e4b615836d39972cb77582bae99c8",
+    "applicationSha256": "1f3d913dee1155ec4622ab8e5c791f94bb033f827b508582c29caf2db94989e4",
+    "exitCode": 42
+  }
+}
