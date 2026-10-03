@@ -1,0 +1,274 @@
+{
+  "passed": true,
+  "driverSha256": "96E20A870EF9D5056B427CFA478C97FF9C3171A78A741DF9F3812B9109FAEB30",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "runtimeConfigSha256": "F9BC8E9F0C46247078ED47309F19A7576B4B94E4300E9DE0003917D6BD2D667A",
+  "sourceSha256": {
+    "hello": "F95F29308310D57401051FDFEE0477B10C39675CB4ABFC74677F94D10CF727FD",
+    "library": "F33719C88B797E1FB3345E539DD0018698566134EB3B66DA814C4ACA2DA66814",
+    "consumer": "C98453E37A131CFB113055366CC1465FAC025AAC9EC92ECA90334B039C34D932",
+    "externalContracts": "17008F2071BF2469D3B439CABE2C9BFC06B7E2D3247805A500095089709C6095",
+    "externalImplementation": "D4DBDC8FFBBD8CB2A7A8748C6E539B0A0485A57767AC52F6970CB5F284CA5D80"
+  },
+  "bootstrap": "Explicit .NET host core / NeoCLR.CoreProbe bootstrap; no System seed or reference-only control counts as execution",
+  "cases": [
+    {
+      "target": "dotnet",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "FFC51E0C7D6D81280B7C847EED06151BB331C0760D5D88EB50292FE0708E627A",
+      "dependencySha256": null
+    },
+    {
+      "target": "dotnet",
+      "scenario": "library",
+      "passed": true,
+      "error": null,
+      "appSha256": "A7F7B68E2DCF52128E5FC805A681C8814BBADF9372E26FB60E333A20660A7A07",
+      "dependencySha256": "77D229CE5D3CCE20B83B604BD27CDDECC972EDAA7D5FFB0B0F575F4CC0F68AAD"
+    },
+    {
+      "target": "neoclr",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "29FAF383B2D2DFC12DF101C4F21298EB259C2562D80C61B971E9898DD58BABB7",
+      "dependencySha256": null
+    },
+    {
+      "target": "neoclr",
+      "scenario": "library",
+      "passed": true,
+      "error": null,
+      "appSha256": "4F513E79420E5FD15F430CF614FE87EFBF94B2277D133F34C308509852630194",
+      "dependencySha256": "94D5E166182A6FC20E457362A4C61E4C9A44B07B40359AC49840E98E2208F8C3"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/dotnet/hello.dll",
+        "/tmp/dual-driver-diamond-20261003/dotnet/hello.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,6s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/dual-driver-diamond-20261003/dotnet/hello.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "Hello World\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Contracts.dll",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Contracts.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 0,8s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "--refs",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Contracts.dll",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Implementation.dll",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Implementation.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "../../../tmp/dual-driver-diamond-20261003/dotnet/Implementation.rvn(4,5): warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n\n../../../tmp/dual-driver-diamond-20261003/dotnet/Implementation.rvn(5,5): warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n\n../../../tmp/dual-driver-diamond-20261003/dotnet/Implementation.rvn(6,5): warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n\n../../../tmp/dual-driver-diamond-20261003/dotnet/Implementation.rvn(7,5): warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n\nBuild succeeded with 4 warning(s) in 0,9s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Contracts.dll",
+        "--refs",
+        "/tmp/dual-driver-diamond-20261003/dotnet/Implementation.dll",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/dotnet/library.dll",
+        "/tmp/dual-driver-diamond-20261003/dotnet/library.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,1s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/dual-driver-diamond-20261003/dotnet/library.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/neoclr/hello.dll",
+        "/tmp/dual-driver-diamond-20261003/neoclr/hello.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/dual-driver-diamond-20261003/neoclr/hello.dll"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "NeoMetadata_D3918998E1B436443DAD52EC1CB2969D8A8008BD71576B98CBA45BFBBFC6CA10: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/dual-driver-diamond-20261003/neoclr/hello.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "Hello World\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--library",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.dll",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--library",
+        "--reference",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.dll",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Implementation.dll",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Implementation.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\nwarning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\nwarning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\nwarning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--reference",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.dll",
+        "--reference",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Implementation.dll",
+        "-o",
+        "/tmp/dual-driver-diamond-20261003/neoclr/library.dll",
+        "/tmp/dual-driver-diamond-20261003/neoclr/library.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/dual-driver-diamond-20261003/neoclr/library.dll",
+        "--module",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.dll",
+        "--module",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Implementation.dll"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C3FD0C14C76FC37B6F2F01F450990AAACF3CF9D5CBB3EDBC639B9BBF5EFC2A95: typed-stack/control-flow verification passed (646 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/dual-driver-diamond-20261003/neoclr/library.dll",
+        "--module",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Contracts.dll",
+        "--module",
+        "/tmp/dual-driver-diamond-20261003/neoclr/Implementation.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

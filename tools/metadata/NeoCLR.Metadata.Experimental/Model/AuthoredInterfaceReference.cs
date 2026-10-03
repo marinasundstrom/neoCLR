@@ -3,7 +3,47 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly HashSet<ImportedTypeReference> authoredInterfaces = [];
+    private readonly Dictionary<ImportedTypeReference, ImportedMethodReference[]> completedInterfaceContracts = [];
     private int authoredInterfaceEdgeCount;
+
+    /// <summary>Declares that all direct methods and base-interface conversions of an authored interface have been supplied.</summary>
+    /// <param name="reference">An output-owned open interface definition created by CreateInterfaceReference.</param>
+    /// <exception cref="ArgumentNullException">The reference is null.</exception>
+    /// <exception cref="ArgumentException">The reference is foreign, constructed or not an authored interface.</exception>
+    /// <remarks>This is a caller assertion, not dependency verification. Repeated completion is idempotent.
+    /// Existing method references remain reusable; new methods and base edges are rejected after completion.
+    /// An explicitly completed empty interface is valid. Inherited interfaces must also be completed before implementation validation.</remarks>
+    public void CompleteInterfaceReference(ImportedTypeReference reference)
+    {
+        ArgumentNullException.ThrowIfNull(reference);
+        if (!ReferenceEquals(reference.Owner, this) || reference.TypeArguments.Count != 0 || !IsAuthoredInterface(reference))
+            throw new ArgumentException("completion requires an owned open interface reference", nameof(reference));
+        if (completedInterfaceContracts.ContainsKey(reference)) return;
+        completedInterfaceContracts.Add(reference, authoredCallableReferences.Where(m => Equals(m.DeclaringReference, reference)).ToArray());
+    }
+
+    internal IEnumerable<ImportedTypeReference> ExternalInterfaceBases(ImportedTypeReference reference)
+    {
+        var definition = InterfaceDefinition(reference);
+        if (!completedInterfaceContracts.ContainsKey(definition))
+            throw new InvalidDataException("external interface contract is incomplete: " + reference);
+        if (!authoredInterfaceBases.TryGetValue(definition, out var bases)) return [];
+        return bases.Select(b => b.Substitute(t => SubstituteExternalInterfaceType(t, reference)));
+    }
+
+    internal IEnumerable<(string Name, MethodSignature Signature)> ExternalInterfaceMethods(ImportedTypeReference reference)
+    {
+        if (!completedInterfaceContracts.TryGetValue(InterfaceDefinition(reference), out var methods))
+            throw new InvalidDataException("external interface contract is incomplete: " + reference);
+        return methods.Select(m => (m.Name, new MethodSignature(SubstituteExternalInterfaceType(m.Signature.ReturnType, reference),
+            m.Signature.ParameterTypes.Select(t => SubstituteExternalInterfaceType(t, reference)))));
+    }
+
+    private static SignatureType SubstituteExternalInterfaceType(SignatureType type, ImportedTypeReference owner) =>
+        type.TypeParameterIndex is { } index && owner.TypeArguments.Count != 0 ? owner.TypeArguments[index]
+        : type.ArrayElement is { } element ? SignatureType.ArrayOf(SubstituteExternalInterfaceType(element, owner))
+        : type.ImportedType is { } imported ? imported.Substitute(t => SubstituteExternalInterfaceType(t, owner)) : type;
+
     private readonly Dictionary<ImportedTypeReference, HashSet<ImportedTypeReference>> authoredInterfaceBases = [];
 
     /// <summary>Authors a public nongeneric interface; see the generic-arity overload for validation and ownership.</summary>
@@ -35,6 +75,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Foreign/unsupported endpoint, noninterface target or cyclic edge.</exception>
     /// <exception cref="InvalidDataException">More than 4096 direct conversion edges.</exception>
+    /// <exception cref="InvalidOperationException">A new edge is added after source interface completion.</exception>
     /// <remarks>No definition lookup occurs. Transitive conversions are derived from these edges.
     /// The caller is responsible for truthful declarations; this does not synthesize runtime implementations.</remarks>
     public void AddInterfaceConversion(ImportedTypeReference source, ImportedTypeReference target)
@@ -45,11 +86,22 @@ public sealed partial class AssemblyBuilder
             InterfaceDefinition(source).Equals(InterfaceDefinition(target)) || HasAuthoredInterfaceConversion(target, source, definitionsOnly: true))
             throw new ArgumentException("invalid or cyclic interface conversion");
         ((SignatureType)target).ValidateOwner(this, typeArity: source.GenericArity);
-        if (!authoredInterfaceBases.TryGetValue(source, out var edges)) authoredInterfaceBases.Add(source, edges = []);
-        if (edges.Contains(target)) return;
+        authoredInterfaceBases.TryGetValue(source, out var edges);
+        if (edges?.Contains(target) == true) return;
+        if (completedInterfaceContracts.ContainsKey(source)) throw new InvalidOperationException("interface contract is complete");
+        if (edges is null) authoredInterfaceBases.Add(source, edges = []);
         if (authoredInterfaceEdgeCount >= 4096) throw new InvalidDataException("too many interface conversion edges");
         edges.Add(target); authoredInterfaceEdgeCount++;
         nativeInterfaceConversions.Clear();
+    }
+
+    internal ImportedTypeReference FindAuthoredInterface(TypeReference reference)
+    {
+        if (!ReferenceEquals(reference.Module, Definition.MainModule) || reference.ExplicitScope is null)
+            throw new ArgumentException("external relationship requires an output-owned scoped reference");
+        return authoredInterfaces.SingleOrDefault(t => t.AssemblyIdentity.Equals(reference.ExplicitScope) &&
+            t.Namespace == reference.Namespace && t.Name == reference.Name)
+            ?? throw new ArgumentException("external relationship requires an authored interface contract");
     }
 
     private ImportedTypeReference InterfaceDefinition(ImportedTypeReference type) =>

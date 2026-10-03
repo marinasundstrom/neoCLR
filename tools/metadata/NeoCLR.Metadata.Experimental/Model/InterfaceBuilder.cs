@@ -54,7 +54,7 @@ public sealed partial class TypeBuilder
     private bool Reaches(TypeBuilder target)
     {
         var seen = new HashSet<TypeBuilder>();
-        bool Visit(TypeBuilder current) => ReferenceEquals(current, target) || seen.Add(current) && current.InterfaceSignatures.Any(t => Visit(t.GenericInstance?.Definition ?? t.ClassType!));
+        bool Visit(TypeBuilder current) => ReferenceEquals(current, target) || seen.Add(current) && current.InterfaceSignatures.Any(t => t.ImportedType is null && Visit(t.GenericInstance?.Definition ?? t.ClassType!));
         return Visit(this);
     }
     internal void AttachBaseInterface(TypeBuilder baseInterface)
@@ -69,7 +69,45 @@ public sealed partial class TypeBuilder
     /// <summary>Gets the directly implemented nongeneric interfaces of a root class.</summary>
     public IReadOnlyList<TypeBuilder> ImplementedInterfaces => implementedInterfaces.AsReadOnly();
     private readonly List<GenericTypeInstance> constructedInterfaces = [];
-    internal IEnumerable<SignatureType> InterfaceSignatures => InterfaceContracts.Select(t => (SignatureType)t).Concat(constructedInterfaces.Select(t => (SignatureType)t));
+    private readonly List<ImportedTypeReference> externalInterfaces = [];
+
+    /// <summary>Adds a base-interface relationship to an output-owned external interface contract.</summary>
+    /// <remarks>Call AssemblyBuilder.CompleteInterfaceReference for the interface and its bases before writing.</remarks>
+    /// <exception cref="ArgumentException">The reference is foreign, unregistered, duplicate or has invalid generic scope.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not an interface.</exception>
+    public void AddBaseInterface(ImportedTypeReference contract)
+    {
+        if (!IsInterface) throw new InvalidOperationException("base-interface declarations require an interface owner");
+        AddExternalInterface(contract);
+    }
+
+    /// <summary>Adds an external interface implementation to a root class.</summary>
+    /// <remarks>All required public instance methods are checked against the completed external contracts when writing.</remarks>
+    /// <exception cref="ArgumentException">The reference is foreign, unregistered, duplicate or has invalid generic scope.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not a root class.</exception>
+    public void AddInterfaceImplementation(ImportedTypeReference contract)
+    {
+        if (IsInterface || IsStatic || IsValueType) throw new InvalidOperationException("interface implementations require a root class");
+        AddExternalInterface(contract);
+    }
+
+    private void AddExternalInterface(ImportedTypeReference contract)
+    {
+        ArgumentNullException.ThrowIfNull(contract);
+        if (!ReferenceEquals(contract.Owner, Assembly)) throw new ArgumentException("foreign interface reference", nameof(contract));
+        var reference = Definition.Module.ImportReference(contract.AssemblyIdentity, contract.Namespace, contract.Name);
+        Definition.Interfaces.Add(new InterfaceImplementation(reference, contract.TypeArguments));
+    }
+
+    internal void AttachExternalInterface(ImportedTypeReference contract)
+    {
+        if (!IsInterface && (IsStatic || IsValueType)) throw new InvalidOperationException("interface relationship requires an interface or root class");
+        SignatureType signature = contract;
+        signature.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        if (externalInterfaces.Contains(contract) || externalInterfaces.Count >= 256) throw new ArgumentException("duplicate or excessive interface relationship");
+        externalInterfaces.Add(contract);
+    }
+    internal IEnumerable<SignatureType> InterfaceSignatures => InterfaceContracts.Select(t => (SignatureType)t).Concat(constructedInterfaces.Select(t => (SignatureType)t)).Concat(externalInterfaces.Select(t => (SignatureType)t));
     internal IEnumerable<SignatureType> InheritedContracts()
     {
         var seen = new HashSet<SignatureType>();
@@ -78,6 +116,12 @@ public sealed partial class TypeBuilder
             if (!seen.Add(contract)) yield break;
             if (seen.Count > 4096) throw new InvalidDataException("interface inheritance expansion limit");
             yield return contract;
+            if (contract.ImportedType is { } external)
+            {
+                foreach (var parent in Assembly.ExternalInterfaceBases(external))
+                    foreach (var inherited in Visit(parent)) yield return inherited;
+                yield break;
+            }
             var owner = contract.GenericInstance?.Definition ?? contract.ClassType!;
             SignatureType Substitute(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Substitute) : type.ByReferenceElement is { } byref ? SignatureType.ByReference(Substitute(byref)) : type.ImportedType is { } imported ? imported.Substitute(Substitute) : type.TypeParameterIndex is { } index && contract.GenericInstance is { } instance ? instance.TypeArguments[index]
                 : type.GenericInstance is { } nested ? nested.Definition.MakeGenericInstance(nested.TypeArguments.Select(Substitute).ToArray())
@@ -88,6 +132,7 @@ public sealed partial class TypeBuilder
         return InterfaceSignatures.SelectMany(Visit);
     }
     internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InheritedContracts().SelectMany(contract =>
+        contract.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
         (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name,
             contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)));
     /// <summary>Declares an owned generic interface implementation on a root class, including owner-parameter arguments.</summary>

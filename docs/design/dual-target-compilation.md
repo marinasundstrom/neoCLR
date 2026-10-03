@@ -84,3 +84,32 @@ round-trip, and runtime dependency/dispatch verification. Current writer/reader 
 attachment requires owned definitions. Do not simply remove admission checks or duplicate
 contracts into the implementation assembly. No compiler/runtime behavior changes in this
 baseline test slice.
+
+## External interface gate completed (2026-10-03)
+
+External relationships now use output-owned interface identities and complete semantic
+contracts. Raven records every direct method (including accessors), inherited edge and
+constructed argument before completing each contract. The metadata writer rejects
+incomplete contracts and missing/mismatched public implementations. Only implementing
+methods receive CLI virtual/final/newslot flags. Definition collections and builder
+convenience methods share relationship validation.
+
+The native reader preserves assembly-scoped interface relationships; Introspection resolves
+them through the explicit catalog and substitutes inherited arguments. No runtime loading
+occurs during symbol import or emission. Existing format-5 relationships and linked runtime
+dispatch suffice: no schema/version or runtime implementation change was needed.
+
+The PE writer accepts the authored graph directly, preserving its validated CLI projection.
+Reconstructing that projection from native bytes alone cannot recover external method
+contracts and rejects explicitly; compiler emission uses the authored-graph overload.
+This is a transport/reference projection limitation, not a native semantic restriction.
+
+The three-assembly driver test now includes a local generic interface inheriting two
+external paths to one base, a generic implementation, property dispatch and alias mutation.
+Both targets execute 42 with library sources absent. C# tests additionally execute CLI
+and native dispatch, test definition/builder authoring, incomplete/missing/mismatched
+contracts, completion freezing, exact flags and missing metadata dependencies.
+See [driver evidence](../experiments/extended-cli-metadata/dual-driver-external-2026-10-03.json).
+
+Next: the explicit bootstrap/source ownership manifest and source-built iteration contracts.
+The broad collections/source-library completion gate is still open.

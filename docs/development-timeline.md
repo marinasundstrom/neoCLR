@@ -10170,3 +10170,18 @@ library and accepted the bounded primitive CLI bootstrap/runtime seed. The autho
 explicitly requested implementation of the seven-slice plan. Work begins with paired
 ordinary driver commands and direct native import, retaining the .NET backend. The broad
 sample/full-library outcomes are still open; see the [implementation plan](design/dual-target-compilation.md).
+
+
+## 2026-10-03 — Continue the dual-target application gate
+
+The author asked to plan work toward the end-to-end case, then explicitly requested
+implementation of the resulting plan. The assistant proposed completing external
+interfaces first, followed by canonical bootstrap/source ownership, independently built
+collection libraries, the unchanged broad application and a refreshed inventory.
+
+The external-interface slice now passes the separate contracts/implementation/consumer
+case on both targets, including a generic diamond and alias mutation. Metadata authoring
+requires explicit complete external contracts; native reading uses the metadata context.
+Authored PE emission retains the validated graph rather than reloading dependencies.
+Existing native encoding and runtime dispatch required no changes for this case.
+The broader source-library gate remains open; see the [implementation tracker](design/dual-target-compilation.md).

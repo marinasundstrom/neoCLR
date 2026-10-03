@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-03",
+  "status": "external interface slice passed; broad source-library gate remains open",
+  "sourceState": {
+    "neoclrBase": "101ab9c83d862d3746e2ff3838711f8558a10c57",
+    "ravenBase": "1d4235dc1250dcb6b59c62ee49633de689555182",
+    "description": "tested feature worktrees including the external-interface changes committed with this evidence"
+  },
+  "checks": {
+    "metadataContractGroups": {
+      "passed": 110,
+      "failed": 0
+    },
+    "dotnetFocusedTests": {
+      "passed": 11,
+      "failed": 0,
+      "filter": "InterfaceMetadataEmissionTests|EmissionBackendTests|NominalLocalEmissionTests"
+    },
+    "nativeConsumers": {
+      "passed": 7,
+      "expectedExitCode": 42
+    },
+    "pairedDriver": "passed including invalid reference/no-publication checks",
+    "separateContractsImplementationConsumer": "passed both targets; generic diamond, property dispatch, alias mutation",
+    "apiSnapshot": "passed",
+    "runtimeChanges": "none"
+  },
+  "artifacts": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "96e20a870ef9d5056b427cfa478c97ff9c3171a78a741df9f3812b9109faeb30",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "b71f5cb46d4134f53b353b791664bd1d0016e543e76327a81725f98bb9473e83"
+  }
+}

@@ -72,6 +72,13 @@ public sealed partial class TypeDefinition
         {
             if (Producer is null) throw new InvalidOperationException("attach the owner before adding interface relationships");
             if (relationship.DeclaringType is not null) throw new ArgumentException("interface relationship already attached");
+            if (relationship.InterfaceType.ExplicitScope is not null)
+            {
+                var reference = Producer.Assembly.FindAuthoredInterface(relationship.InterfaceType);
+                Producer.AttachExternalInterface(relationship.TypeArguments.Count == 0 ? reference : reference.MakeGenericInstance(relationship.TypeArguments.ToArray()));
+                relationship.DeclaringType = this;
+                return;
+            }
             TypeDefinition target;
             try { target = relationship.InterfaceType.Resolve(); }
             catch (InvalidDataException error) { throw new ArgumentException("interface relationship requires an owned definition reference", error); }

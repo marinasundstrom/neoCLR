@@ -1,7 +1,7 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
 /// <summary>An interface inheritance or implementation relationship.</summary>
-/// <remarks>Authored relationships admit same-assembly constructed arguments. Loaded native relationships retain same-assembly generic interface arguments and their declaring type scope.</remarks>
+/// <remarks>Authored relationships admit owned definitions or explicitly registered external interface contracts. Loaded native relationships retain exact dependency scope and generic arguments.</remarks>
 public sealed class InterfaceImplementation
 {
     /// <summary>Creates an unattached relationship to an interface reference.</summary>

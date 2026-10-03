@@ -798,3 +798,5 @@ They remain outside guest RavenDoc inputs because they are C# host APIs.
 Host MetadataAccessibility and declaration/constructor view members are covered in the
 [manual reference](experimental-metadata.md#declaration-facts-development-2026-10-03).
 These C# APIs do not belong in the guest RavenDoc input; guest signatures are unchanged.
+
+2026-10-03: external interface completion/relationship overloads and authored-graph binary PE emission are covered in the [host metadata manual](experimental-metadata.md#external-interface-declarations-development-2026-10-03); these C# host APIs remain outside guest RavenDoc selection.

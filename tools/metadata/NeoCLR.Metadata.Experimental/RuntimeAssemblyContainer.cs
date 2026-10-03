@@ -32,7 +32,22 @@ public static class RuntimeAssemblyContainer
     public static byte[] WriteBinary(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary)
         => WriteCore(nativeImage, coreLibrary, binary: true);
 
-    private static byte[] WriteCore(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary, bool binary)
+    /// <summary>Builds a binary native PE directly from an authored graph and its validated CLI reference projection.</summary>
+    /// <param name="assembly">The complete output graph, including completed external interface contracts.</param>
+    /// <returns>A PE with authoritative native metadata and non-executable CLI reference bodies.</returns>
+    /// <exception cref="ArgumentNullException">The graph is null.</exception>
+    /// <exception cref="InvalidDataException">The graph, dependency contracts or encoding are invalid.</exception>
+    /// <remarks>No dependency reader is consulted. Use this overload for external interface declarations;
+    /// the native-bytes overload cannot reconstruct external method contracts for its CLI projection.</remarks>
+    public static byte[] WriteBinary(AssemblyBuilder assembly)
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+        var native = assembly.WriteNativeAssembly();
+        var projection = assembly.WriteReferenceImage();
+        return WriteCore(native, assembly.CoreLibrary, binary: true, projection);
+    }
+
+    private static byte[] WriteCore(ReadOnlySpan<byte> nativeImage, AssemblyIdentity coreLibrary, bool binary, byte[]? projection = null)
     {
         ArgumentNullException.ThrowIfNull(coreLibrary);
         if (!binary && nativeImage.Length > MetadataEnvelope.MaxImageSize - 32)
@@ -42,7 +57,7 @@ public static class RuntimeAssemblyContainer
         byte[] payloadBytes = binary ? NativeBinaryCodec.Encode(nativeImage) : nativeImage.ToArray();
         var envelope = MetadataEnvelope.Write([new MetadataSection(256, schema, true, payloadBytes)],
             new Dictionary<ushort, ushort> { [256] = schema });
-        var image = definition.CreateReferenceAssembly(coreLibrary);
+        var image = projection ?? definition.CreateReferenceAssembly(coreLibrary);
         using var pe = new PEReader(new MemoryStream(image, writable: false));
         var headers = pe.PEHeaders;
         var metadata = pe.GetMetadata().GetContent().ToArray();

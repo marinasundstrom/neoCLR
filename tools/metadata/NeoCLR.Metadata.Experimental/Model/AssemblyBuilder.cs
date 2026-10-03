@@ -93,6 +93,8 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {
+            foreach (var type in types)
+                foreach (var contract in type.InheritedContracts()) { _ = contract; }
             foreach (var type in types.Where(t => !t.IsInterface))
                 foreach (var contract in type.RequiredInterfaceMethods)
                     if (!type.Methods.Any(m => !m.IsStatic && m.Visibility == MethodVisibility.Public && m.Name == contract.Name &&

@@ -715,3 +715,5 @@ views do not invoke code; Raven retains inference and compiler symbol constructi
 Development checkpoint (2026-10-03): native metadata views now expose constructor and
 accessibility facts consumed by Raven. Paired driver execution works for Hello World and
 a separate generic library on both targets; the broad source-library gate is still open.
+
+Development checkpoint (2026-10-03): external generic interface contracts now cross separately compiled Raven libraries and execute on both targets, including diamond dispatch. The source-built collections application gate remains open.

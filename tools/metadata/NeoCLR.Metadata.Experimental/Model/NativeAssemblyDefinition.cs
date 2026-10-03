@@ -259,7 +259,15 @@ public sealed partial class NativeAssemblyDefinition
                     Shape(inherited, constructed ? "Constructed" : "Named");
                     if (constructed) Shape(instance, "definition", "arguments");
                     int parent = types.FindIndex(t => t.NativeName == (constructed ? Text(instance, "definition") : Text(inherited, "Named")));
-                    Require(parent >= 0, "missing inherited interface");
+                    if (parent < 0)
+                    {
+                        typeArity = types[i].GenericNames.Length;
+                        var external = ReadType(inherited, false);
+                        Require(external.ImportedType is { IsValueType: false }, "invalid external interface relationship");
+                        types[i].InterfaceSignatures.Add(external);
+                        typeArity = 0;
+                        continue;
+                    }
                     if (constructed)
                     {
                         typeArity = types[i].GenericNames.Length;
@@ -543,6 +551,7 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var inherited in types[i].BaseInterfaces)
             {
                 var contract = ProjectType(inherited);
+                if (contract.ImportedType is not null) throw new NotSupportedException("CLI projection of external interface declarations requires resolved contracts; use native metadata import");
                 if (contract.GenericInstance is { } constructed) { if (types[i].IsInterface) owners[i].AddBaseInterface(constructed); else owners[i].AddInterfaceImplementation(constructed); }
                 else if (types[i].IsInterface) owners[i].AddBaseInterface(contract.ClassType!);
                 else owners[i].AddInterfaceImplementation(contract.ClassType!);

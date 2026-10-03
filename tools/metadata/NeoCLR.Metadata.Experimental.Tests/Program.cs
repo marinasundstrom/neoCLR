@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--external-interface-runtime")
+{
+    await ExternalInterfaceChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-owner-runtime")
 {
     await NativeGenericOwnerChecks.RunRuntime(args[1], args[2]); return 0;
@@ -300,6 +304,7 @@ var tests = new (string Name, Action Body)[]
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),
     ("Native generic class definitions", NativeGenericOwnerChecks.Run),
     ("External native generic signatures", ExternalGenericSignatureChecks.Run),
+    ("External interface declarations", ExternalInterfaceChecks.Run),
     ("Authored native function references", AuthoredFunctionReferenceChecks.Run),
     ("Definition body generator", GeneratorChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),

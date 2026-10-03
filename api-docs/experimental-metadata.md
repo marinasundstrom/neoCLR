@@ -32,6 +32,7 @@ and guest Introspection assembly loading remain pending.
 - [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
 
 - [Authored interface contracts](#authored-interface-contracts-development-2026-10-02): interface identity, conversions and dispatch.
+- [External interface declarations](#external-interface-declarations-development-2026-10-03): complete contracts, relationships and authored PE emission.
 
 - [Authored field references](#authored-field-references-development-2026-10-02): explicit field contracts and native layout slots.
 
@@ -3590,7 +3591,8 @@ For interfaces this declares inheritance; for root classes it declares implicit
 implementation. Builders add to this same collection; their existing handle lists are
 encoding caches over these immutable edges.
 
-Targets must resolve locally to attached, same-assembly nongeneric interfaces. Foreign,
+The original local overload requires attached, same-assembly nongeneric interfaces.
+External overloads are documented under [external interface declarations](#external-interface-declarations-development-2026-10-03). Foreign,
 noninterface, detached, unresolved, duplicate or cyclic targets and reused edge objects
 throw `ArgumentException`; unsupported/detached owners throw `InvalidOperationException`.
 Replacement, removal and clearing throw `NotSupportedException`. Loaded `Interfaces`
@@ -5340,7 +5342,7 @@ catalog dependencies. Signature scope/construction bounds from `ResolveSignature
 apply. `GetDeclaredInterfaces()` throws `InvalidDataException` for invalid relationships
 or missing dependencies and `NotSupportedException` when reader relationship materialization
 is unavailable (currently CLI snapshots). The native reader currently supports
-same-assembly interface declarations; this facade does not broaden that encoding.
+local and external interface declarations; exact dependencies are resolved through the context catalog.
 
 Unlike .NET Reflection property access, this reports metadata only. Index types are
 exposed directly instead of manufacturing method-owned ParameterInfo objects for a
@@ -5420,3 +5422,59 @@ Enumeration does not execute initializers or load runtime types. The C# fixture 
 public constructors/private fields, internal declarations, readonly/static facts and
 closed-owner constructor parameters. Raven supports public/internal/private native access;
 other categories fail explicitly rather than being treated as private.
+
+
+## External interface declarations (development, 2026-10-03)
+
+These additions extend the earlier authored relationship profile to external definitions;
+existing local overloads and encodings remain unchanged.
+
+- `AssemblyBuilder.CompleteInterfaceReference(ImportedTypeReference reference) -> void`
+  asserts that all direct `CreateMethodReference` contracts (including accessor methods)
+  and `AddInterfaceConversion` base edges have been supplied. The reference must be an
+  output-owned open interface definition. Null throws `ArgumentNullException`; foreign,
+  constructed or noninterface references throw `ArgumentException`. Completion is
+  idempotent and permits explicitly empty interfaces. Adding a new method or base edge
+  afterwards throws `InvalidOperationException`; reusing existing methods/edges remains valid.
+  This is a caller assertion; it does not inspect the dependency or replace runtime linking.
+- `TypeBuilder.AddBaseInterface(ImportedTypeReference contract) -> void` declares an
+  external base on an interface. `AddInterfaceImplementation(ImportedTypeReference contract)`
+  declares an external implementation on a root class. Arguments can use owner generic
+  parameters. Null throws `ArgumentNullException`; foreign/unregistered targets, invalid
+  scope, duplicate edges or limits throw `ArgumentException`; invalid owners throw
+  `InvalidOperationException`. Each external interface and inherited base must be completed
+  before writing. Incomplete contracts and missing/mismatched implementations throw
+  `InvalidDataException`. Only matching public instance methods acquire CLI implementation flags.
+- Direct definitions use `new InterfaceImplementation(module.ImportReference(identity,
+  namespace, metadataName), arguments)` appended to `TypeDefinition.Interfaces`, after
+  registering the matching output-owned interface contract. It shares builder validation.
+- `RuntimeAssemblyContainer.WriteBinary(AssemblyBuilder assembly) -> byte[]` validates and
+  encodes the authored graph with its CLI reference projection. Null throws
+  `ArgumentNullException`; invalid contracts/encoding throw `InvalidDataException`.
+  No reader/importer is consulted. Native payloads remain authoritative and CLI bodies
+  remain non-executable. Existing native-bytes container overloads cannot reconstruct
+  external interface method contracts and throw `NotSupportedException` for these
+  declarations; use the graph overload. This restriction also applies to
+  `NativeAssemblyDefinition.CreateReferenceAssembly` without resolved external contracts.
+
+Reader snapshots preserve exact scoped interface identities and constructed arguments;
+`GetDeclaredInterfaces`/`GetInterfaces` resolve them through the explicit metadata context.
+Missing or wrongly classified dependencies reject during resolution. Generic diamonds
+retain canonical views and deduplicate the common construction.
+
+```csharp
+var value = output.CreateInterfaceReference(dependency, core, digest, "Example", "Value`1", 1);
+output.CreateMethodReference(value, "Get", new(SignatureType.TypeParameter(0), []));
+output.CompleteInterfaceReference(value);
+var box = output.AddClass("Example", "Box");
+box.AddInterfaceImplementation(value.MakeGenericInstance(PrimitiveType.Int32));
+var get = box.AddInstanceMethod("Get", new(PrimitiveType.Int32, []));
+get.GetILGenerator().LoadConstant(42);
+get.GetILGenerator().Return();
+var image = RuntimeAssemblyContainer.WriteBinary(output);
+```
+
+`ExternalInterfaceChecks` validates definition/builder parity, CLI flags and execution,
+PE/native round trips, external generic diamond resolution and native linked dispatch.
+No format version change is required. The C# development API remains documented here
+rather than through guest RavenDoc.

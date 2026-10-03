@@ -11,6 +11,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
+    /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
     /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
     /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Instance generic methods, byrefs and value/nested owners are unsupported.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
@@ -43,6 +44,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
+        if (completedInterfaceContracts.ContainsKey(declaringType)) throw new InvalidOperationException("interface contract is complete");
         if (authoredCallableReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
         var owner = new TypeBuilder(graph.Graph, declaringType.Namespace, declaringType.Name, isStatic: false,
             genericNames: Enumerable.Range(0, declaringType.GenericArity).Select(i => "T" + i).ToArray(), isInterface: isInterface);
