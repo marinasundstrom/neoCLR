@@ -4682,3 +4682,26 @@ metadata or runtime behavior changed; .NET executable library adapters and query
 application acceptance remain pending. See
 [reproducible workflow](experiments/extended-cli-metadata/bootstrap/README.md#separately-compiled-hashmap-and-comparers)
 and [evidence](experiments/extended-cli-metadata/hashmap-import-2026-10-03.json).
+
+### Extension declarations reach native separate-library execution (2026-10-03)
+
+Raven's extension declaration lowering is now consumed by the native adapter: receiver
+generics are lifted onto methods in a nongeneric static container, as on the CLR backend.
+A bounded embedded ExtensionAttribute on that container survives native reading and the
+introspection facade. Native namespaces implement Raven's existing extension discovery
+contract. Binding still owns applicability and inference; emission authors from symbols.
+The retained seed and explicit collection primitive Runtime Contract are unchanged.
+
+A separate extension library and native consumer execute receiver-generic predicates
+and a method-generic selector (42); the cumulative HashMap gate also executes. This is
+an isolated regression, not a stub for System.Linq. The unchanged full Operators source
+still fails before publication at object-to-generic conversion in OfType<U>. Constrained
+extensions, static extension members and extension properties are not newly supported.
+The embedded marker uses the same temporary nominal constructor profile as unions,
+without a CLI Attribute base; ordinary .NET metadata retains its existing backend.
+No format version change is required. See the
+[workflow](experiments/extended-cli-metadata/bootstrap/README.md#native-extension-declarationimport-regression).
+
+Validation: Raven `0cca93a00`; 23 focused shared capability and .NET codegen tests pass.
+The native extension/HashMap driver gate and unsupported-property publication guard pass.
+Source and compiler payload hashes are recorded with the executable evidence.

@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Query integration update (2026-10-03): native extension declaration/import now executes
+a separate generic extension library and consumer. The unchanged full query library
+advances to OfType object-to-generic conversion, which still rejects before publication.
+[Assessment](experiments/extended-cli-metadata/query-source-assessment-2026-10-03.json).
+The broad application and full dual-target source-library gate remain open.
+
 Source-library gate update (2026-10-03): unchanged HashMap and comparer sources now
 compile into a separately imported native library and execute collisions, growth,
 replacement, callback dispatch and shared object mutation. No backend change was needed.

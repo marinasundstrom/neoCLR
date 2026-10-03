@@ -21,7 +21,9 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--collections', action='store_true', help='Verify separately compiled ArrayList including callback import')
     parser.add_argument('--hashmap', action='store_true', help='Verify cumulative HashMap and comparer source library')
+    parser.add_argument('--extensions', action='store_true', help='Also verify a separate generic extension library and consumer')
     args = parser.parse_args()
+    args.hashmap = args.hashmap or args.extensions
     args.collections = args.collections or args.hashmap
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -60,6 +62,25 @@ def main():
         failure = run([runtime, 'run', str(invalid), '--module', str(library), '--system', str(seed)], 1)
         if 'ArrayList capacity must be non-negative' not in failure.stderr:
             raise RuntimeError('Terminal failure adapter did not preserve the capacity error')
+    extension_paths = []
+    if args.extensions:
+        extension_source = HERE / 'extension-library.rvn'
+        extension_consumer_source = HERE / 'extension-consumer.rvn'
+        extension_library = output / 'Query.dll'
+        extension_consumer = output / 'QueryConsumer.dll'
+        run(common + ['--library', '--reference', str(library), '-o', str(extension_library), str(extension_source)])
+        run(common + ['--reference', str(library), '--reference', str(extension_library),
+                      '-o', str(extension_consumer), str(extension_consumer_source)])
+        modules = ['--module', str(library), '--module', str(extension_library), '--system', str(seed)]
+        run([runtime, 'verify', str(extension_consumer)] + modules)
+        run([runtime, 'run', str(extension_consumer)] + modules, 42, '')
+        unsupported_source = output / 'UnsupportedExtension.rvn'
+        unsupported_source.write_text('public extension Unsupported for int { val Value: int => self }\n')
+        unsupported_output = output / 'UnsupportedExtension.dll'
+        failure = run(common + ['--library', '--reference', str(library), '-o', str(unsupported_output), str(unsupported_source)], 1)
+        if unsupported_output.exists() or 'implemented instance extension methods' not in failure.stderr:
+            raise RuntimeError('Unsupported extension property did not reject before publication')
+        extension_paths = [extension_source, extension_consumer_source, extension_library, extension_consumer, unsupported_source]
     rejected = output / 'MissingLibrary.dll'
     run(common + ['-o', str(rejected), str(consumer_source)], 1)
     if rejected.exists():
@@ -73,16 +94,18 @@ def main():
     failure = run(bad_args + ['--library', '-o', str(rejected)] + sources, 1)
     if rejected.exists() or 'duplicates a source-owned declaration' not in failure.stderr:
         raise RuntimeError('Duplicate seed ownership was not rejected before output')
+    compiler_payloads = [Path(compiler).parent / name for name in
+                         ['Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll']]
     paths = [Path(__file__).resolve(), Path(compiler), Path(runtime), Path(core), seed, library, manifest,
-             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources]
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + compiler_payloads
     revisions = {}
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

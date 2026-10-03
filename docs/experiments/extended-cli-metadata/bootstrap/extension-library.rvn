@@ -1,0 +1,24 @@
+namespace Query
+public extension Operators<T> for System.Collections.Iterable<T> {
+    func Any(predicate: (T) -> bool) -> bool {
+        let iterator = self.GetIterator()
+        while iterator.MoveNext() {
+            if predicate(iterator.Current) {
+                iterator.Dispose()
+                return true
+            }
+        }
+        iterator.Dispose()
+        return false
+    }
+    func Apply<U>(selector: (T) -> U, fallback: U) -> U {
+        let iterator = self.GetIterator()
+        if iterator.MoveNext() {
+            let result = selector(iterator.Current)
+            iterator.Dispose()
+            return result
+        }
+        iterator.Dispose()
+        return fallback
+    }
+}

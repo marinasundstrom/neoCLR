@@ -95,3 +95,27 @@ No metadata, compiler or runtime changes were necessary for this extension. The 
 contract mirrors the supported CLR generic interfaces and callable operations; no new
 NeoCLR semantics or format version is introduced. Query composition and the broad
 application remain the next acceptance boundary.
+
+### Native extension declaration/import regression
+
+Use `--extensions` with the same paths and primitive core. This runs the cumulative
+HashMap gate, then builds `extension-library.rvn` as a second native library and compiles
+`extension-consumer.rvn` against both artifacts with library sources absent. Generic
+receiver predicates and a method-generic selector execute (empty stdout, exit 42).
+This is an isolated compiler regression, not a replacement for runtime query sources.
+
+Raven uses its existing CLR lowering: extension receiver type parameters become method
+parameters on a nongeneric static container. The container carries the standard
+`System.Runtime.CompilerServices.ExtensionAttribute` marker through the same bounded
+embedded-attribute profile as native unions. Native namespace discovery reads the marker
+through introspection, then leaves receiver applicability and inference to Raven binding.
+No format version, instruction or runtime dispatch change was needed. Constrained
+extensions, static extension members and extension properties are outside this slice.
+
+`query-ownership.json` records the cumulative *assessment* sources, including unchanged
+SingleError and Operators. Compilation now stops at the object-to-generic conversion in
+`OfType<U>`, publishing no library. Do not use that manifest as proof of executable query
+support. See [extension evidence](../extension-import-2026-10-03.json) and
+[full source assessment](../query-source-assessment-2026-10-03.json). Next add the supported
+CLI-equivalent unboxing/generic-cast operation through shared emission, metadata and
+runtime validation, then resume the unchanged broad application.

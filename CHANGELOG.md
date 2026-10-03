@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add a separate native generic extension-library acceptance case alongside HashMap.
+  Receiver-generic predicates and method-generic selectors execute (42) through Raven
+  extension metadata discovery. Assess unchanged query sources: OfType object-to-generic
+  conversion remains unsupported and fails before output publication. No format change.
+
 - Extend the native source-library acceptance driver to unchanged comparers and HashMap.
   Separate import and execution verify collisions, growth, replacement, missing keys,
   callback dispatch, key snapshots and shared object mutation (exit 42). Record revisions

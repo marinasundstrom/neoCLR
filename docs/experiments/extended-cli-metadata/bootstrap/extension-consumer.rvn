@@ -1,0 +1,10 @@
+import System.Collections.*
+import Query.*
+func Main() -> int {
+    let values = ArrayList<int>()
+    values.Add(20)
+    if !values.Any(value => value == 20) {
+        return 1
+    }
+    return values.Apply(value => value + 22, 0)
+}
