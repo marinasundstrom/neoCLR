@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Native primitive capture prerequisite (2026-10-04): Raven `1b15715bf` admits immutable
+Int32/Int64/Boolean/Byte local captures through the existing closure frames. A separately
+compiled FunctionEqualityComparer/HashMap consumer executes with a captured divisor,
+escaped callbacks and distinct per-iteration native values. Mixed-width arithmetic now
+honors the bound operator's promoted operand types. Broad native acceptance, seven
+consumers and 37 focused .NET/C# checks pass. No metadata/runtime or bootstrap change.
+Next: explicit StringComparer runtime-service and primitive CompareTo ownership for the
+unchanged comparer sample; arbitrary structs/mutable/parameter/receiver captures remain
+outside this profile. [Evidence](experiments/extended-cli-metadata/primitive-captures-2026-10-04.json).
+
 Native query acceptance (2026-10-04): unchanged library-query-basics and
 library-query-names compile and run with checked-in expected output against the
 separately compiled native source library. An instrumented iterator consumer confirms

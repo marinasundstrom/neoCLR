@@ -88,6 +88,7 @@ def main():
             (HERE / 'nested-array-callback-consumer.rvn', 42, ''),
             (HERE / 'instance-callback-consumer.rvn', 42, ''),
             (HERE / 'captured-reference-consumer.rvn', 42, ''),
+            (HERE / 'primitive-capture-consumer.rvn', 42, ''),
             (HERE / 'query-lifetime-consumer.rvn', 42, ''),
             (ROOT / 'docs/experiments/raven-target/samples/library-list-filters.rvn', 0,
              '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
@@ -113,9 +114,16 @@ def main():
         mutable_source.write_text('class Cell {}\nfunc Main() -> int {\n    var cell = Cell()\n    let callback: () -> object = () => cell\n    cell = Cell()\n    return 42\n}\n')
         mutable_output = output / 'MutableCapture.dll'
         failure = run(common + ['--reference', str(library), '-o', str(mutable_output), str(mutable_source)], 1)
-        if mutable_output.exists() or 'closure capture requires an immutable reference local' not in failure.stderr:
+        if mutable_output.exists() or 'closure capture requires an immutable reference or supported primitive local' not in failure.stderr:
             raise RuntimeError('Mutable capture did not reject before publication')
         sample_paths.append(mutable_source)
+        mutable_scalar_source = output / 'MutableScalarCapture.rvn'
+        mutable_scalar_source.write_text('func Main() -> int {\n    var value = 1\n    let callback: () -> int = () => value\n    value = 2\n    return callback()\n}\n')
+        mutable_scalar_output = output / 'MutableScalarCapture.dll'
+        failure = run(common + ['--reference', str(library), '-o', str(mutable_scalar_output), str(mutable_scalar_source)], 1)
+        if mutable_scalar_output.exists() or 'closure capture requires an immutable reference or supported primitive local' not in failure.stderr:
+            raise RuntimeError('Mutable scalar capture did not reject before publication')
+        sample_paths.append(mutable_scalar_source)
     query_paths = []
     if args.queries:
         bad_cast_source = output / 'BadCast.rvn'

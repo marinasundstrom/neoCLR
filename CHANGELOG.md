@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Record Raven `1b15715bf` native primitive captures and promoted integer operand
+  emission. Captured comparer policies, escaped/per-iteration values and mixed-width
+  arithmetic execute; mutable captures reject before output. Broad native gate,
+  seven consumers and 37 focused .NET/C# tests pass; metadata/runtime are unchanged.
+
 - Expand native source-library acceptance with unchanged query-basics/query-names
   and observable lazy iteration/disposal checks through imported Filter/Map/Take.
   The broad application gate passes. Record missing numeric/comparer/introspection

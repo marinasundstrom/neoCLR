@@ -157,3 +157,9 @@ requires synthesized null literal emission; native union execution is still pend
 Development continuation (2026-10-03): unchanged Option now passes native source-body
 preflight. Preserving union/case attributes through metadata and native semantic import
 remains required before native union output or execution can be claimed.
+
+Development native callback coverage now includes immutable reference and supported
+primitive local captures (Int32, Int64, Boolean and Byte). Separate-library execution
+checks shared object mutation and distinct captured loop values. Mutable local captures
+and general closure support remain outside this bounded native profile; ordinary Raven
+.NET closure support follows its existing compiler path.

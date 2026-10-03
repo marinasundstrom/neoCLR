@@ -1,0 +1,52 @@
+import System.Collections.*
+
+func Keep(value: int) -> () -> int {
+    let captured = value
+    return () => captured
+}
+
+func Main() -> int {
+    let divisor = 10
+    let policy = FunctionEqualityComparer<int>(
+        (left, right) => left % divisor == right % divisor,
+        value => 0)
+    let values = HashMap<int, int>(policy)
+    values.Set(12, 40)
+    values.Set(22, 42)
+    if values.Count != 1 || !values.ContainsKey(32) {
+        return 1
+    }
+    let first = Keep(20)
+    let second = Keep(22)
+    if first() + second() != 42 {
+        return 2
+    }
+    let enabled = true
+    let wide: long = 4294967296
+    let small: byte = 42
+    let signed = -1
+    if small + wide != 4294967338 || wide + signed != 4294967295 || !(signed < wide) {
+        return 6
+    }
+    let read: () -> long = () => {
+        if enabled {
+            return wide + small
+        }
+        return 0
+    }
+    if read() != 4294967338 {
+        return 3
+    }
+    let callbacks = ArrayList<() -> int>()
+    let items: int[] = [1, 2, 3]
+    for item in items {
+        callbacks.Add(() => item)
+    }
+    if callbacks[0]() * 100 + callbacks[1]() * 10 + callbacks[2]() != 123 {
+        return 4
+    }
+    return match values.Find(32) {
+        .Some(let value) => value
+        .None => 5
+    }
+}
