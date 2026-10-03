@@ -145,6 +145,7 @@ difference is recorded separately from native execution evidence.
 
 Development continuation: explicit core-bound boxing is now available in the metadata
 IL generator and Raven's native target. Focused generated assemblies execute, but union
-display null/reference operations and union metadata preservation still block native source unions.
+core virtual dispatch and union metadata preservation still block native source unions.
+Focused null/type tests now execute through both targets.
 Owned mutable field addresses now preserve nested value mutation and object aliases in
 focused .NET/NeoCLR executions. Imported and readonly field addresses remain outside this profile.

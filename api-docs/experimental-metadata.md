@@ -5805,3 +5805,27 @@ ldflda layout ordinal. No format or runtime behavior change is required.
 C# tests execute nested field mutation through a constructed generic holder and verify
 that its object alias sees 42 on CLR and NeoCLR. They also reject readonly and foreign
 operands, temporary value receivers and uninitialized local receivers.
+
+
+### Reference tests (development, 2026-10-03)
+
+`IILGenerator.IsNull()` / `Emit(OpCode.ReferenceIsNull)` consume an ordinary nominal,
+interface, vector or String reference and push Boolean. They perform a null identity test,
+not a user-defined equality operation. CLI uses ldnull/ceq and accounts for its temporary
+stack slot; native uses ref.isnull. Managed references and unboxed values reject on write.
+
+`IsInstance(SignatureType target)` / `Emit(OpCode.Isinst, target)` implement standard
+isinst: a matching reference or null, with no unboxing or exception on type mismatch.
+Reference targets retain their signature (including String). Value and scoped generic
+targets produce CoreObjectType, representing a box or null. Void, Self, Function, managed
+references, foreign owners and out-of-scope parameters reject before instruction append.
+A native value/generic type test requires the same explicit System core binding as boxing.
+No target or dependency is inferred from the executing host.
+
+`CastReference` / `Emit(Castclass, target)` additionally accept String targets and String
+inputs. Failed checked casts retain runtime InvalidCast behavior; null remains null.
+ArgumentNullException/ArgumentException describe null or invalid operands; stack, limit
+and native-binding failures throw InvalidDataException before an image is returned.
+These operations add no metadata format or runtime behavior. C# tests exercise null and
+matching/nonmatching primitive/reference type tests, generic scopes and String identity
+on CLR; native binary tests verify/run 42 with the explicit retained-System bootstrap.

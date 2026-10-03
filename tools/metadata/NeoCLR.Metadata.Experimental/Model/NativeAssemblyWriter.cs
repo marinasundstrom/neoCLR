@@ -15,8 +15,8 @@ public sealed partial class AssemblyBuilder
     public byte[] WriteNativeAssembly()
     {
         var methods = ValidateGraph();
-        if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box")))
-            (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing requires an explicit System core binding")).ValidateBoxingCore();
+        if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box" || i.Op == "reference.test" && !MethodBuilder.IsReferenceSignature(i.Type!))))
+            (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing/value type tests require an explicit System core binding")).ValidateBoxingCore();
 
         static void CheckText(string text)
         {
@@ -122,6 +122,8 @@ public sealed partial class AssemblyBuilder
             "field.address" or "field.load" or "field.store" => new { op = instruction.Op == "field.address" ? "ldflda" : instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
             "object.box" => new { op = "box", arg = SignatureValue(instruction.Type!) },
+            "reference.isnull" => new { op = "ref.isnull" },
+            "reference.test" => new { op = "isinst", arg = SignatureValue(instruction.Type!) },
             "reference.cast" => new { op = "castclass", arg = SignatureValue(instruction.Type!) },
             "object.load" or "object.store" => new { op = instruction.Op == "object.load" ? "ldobj" : "stobj", arg = SignatureValue(instruction.Type!) },
             "local.initialize" => new { op = "initobj", arg = SignatureValue(instruction.Type!) },

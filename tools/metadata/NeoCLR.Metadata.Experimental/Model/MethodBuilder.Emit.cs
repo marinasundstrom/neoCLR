@@ -105,13 +105,17 @@ public enum OpCode
     /// <summary>Boxes a value or scoped generic parameter as the explicit core System.Object.</summary>
     Box,
     /// <summary>Loads a managed address of an owned mutable instance field.</summary>
-    Ldflda
+    Ldflda,
+    /// <summary>Pushes a compatible reference or null for a typed runtime test.</summary>
+    Isinst,
+    /// <summary>Consumes a reference and pushes whether it is null (CLI ldnull/ceq).</summary>
+    ReferenceIsNull
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>

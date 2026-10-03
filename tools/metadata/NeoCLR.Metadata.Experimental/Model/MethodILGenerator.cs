@@ -190,6 +190,14 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
+        if (opCode == OpCode.Isinst)
+        {
+            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
+                throw new ArgumentException("Isinst requires a storage type or scoped generic parameter", nameof(elementType));
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+            if (!IsReferenceSignature(elementType)) _ = Assembly.CoreObjectType;
+            Append(new("reference.test", Type: elementType)); return;
+        }
         if (opCode == OpCode.Box)
         {
             if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
@@ -229,6 +237,10 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         }, Type: elementType));
     }
 
+    public void IsInstance(SignatureType target) => Emit(OpCode.Isinst, target);
+
+    public void IsNull() => Emit(OpCode.ReferenceIsNull);
+
     public void Box(SignatureType type) => Emit(OpCode.Box, type);
 
     public void CastReference(SignatureType target) => Emit(OpCode.Castclass, target);
@@ -250,6 +262,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode)
         => Append(new(opCode switch
         {
+            OpCode.ReferenceIsNull => "reference.isnull",
             OpCode.Ldlen => "array.length",
             OpCode.Dup => "duplicate",
             OpCode.Neg => "negate",

@@ -1289,3 +1289,17 @@ preservation are next; full union execution is not claimed.
 
 [Field-address evidence](experiments/extended-cli-metadata/owned-field-addresses-2026-10-03.json)
 records commands, artifact/source hashes and Raven c951e33c0.
+
+Reference-test continuation (2026-10-03): the metadata IL generator now supports IsNull,
+IsInstance and String checked casts. CLI uses standard ldnull/ceq, isinst and castclass;
+native uses existing ref.isnull/isinst/castclass, with no runtime or format change. Raven
+has explicit null-test/discard-type-test capabilities; non-user-defined null comparisons
+reuse bound operator facts. Overloaded equality is not replaced. .NET retains its general
+backend and Runtime Contract settings are unchanged. API and normal driver executions
+return 42 on both targets; 121 metadata groups and focused capability tests pass. Source
+union preflight now stops at Object.ToString dispatch inside the formatting helper, with
+no native output. Wider patterns, core virtual dispatch, remaining formatting and native
+union/case metadata remain open.
+
+[Reference-test evidence](experiments/extended-cli-metadata/reference-tests-2026-10-03.json)
+records commands/hashes and Raven 5bb8f4dfc.

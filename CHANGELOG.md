@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add IL-generator null identity/type tests and String checked casts using standard CLI
+  instructions and existing native operations. Value/generic tests require explicit core
+  binding. C# contracts (121 groups), API runtime tests and Raven ordinary-command null/
+  type-test consumers pass. Union preflight now reaches Object.ToString dispatch; native
+  union output remains blocked.
+
 - Add owned mutable field-address operations to the IL generator, including constructed
   generic fields, using standard CLI/native ldflda. Reject readonly, foreign, temporary
   value and uninitialized receivers. API and Raven driver executions preserve nested

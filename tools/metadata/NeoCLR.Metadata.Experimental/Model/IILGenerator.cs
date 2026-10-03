@@ -224,19 +224,30 @@ public interface IILGenerator
 
 
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
-    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, or Callvirt for a Function signature.</param>
+    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, Isinst, or Callvirt for a Function signature.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, unsupported element or foreign owner.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
     void Emit(OpCode opCode, SignatureType elementType);
     /// <summary>Consumes a reference and pushes the same object through a checked target reference signature.</summary>
-    /// <param name="target">Owned or imported nominal reference or vector type.</param>
+    /// <param name="target">Owned or imported nominal reference, String or vector type.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Target is not a supported reference or belongs to another assembly.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; input stack validation occurs on write.</exception>
     /// <remarks>CLI uses castclass; native uses castclass and its verifier/runtime conversion contract. This does not box values.</remarks>
     void CastReference(SignatureType target);
+    /// <summary>Tests a reference and pushes a compatible reference or null.</summary>
+    /// <param name="target">Supported reference/value type or in-scope generic parameter; Void, Self, managed references and Function reject.</param>
+    /// <remarks>Reference targets retain their signature, including String. Value/generic targets produce CoreObjectType (a box or null). No unboxing occurs.</remarks>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    /// <exception cref="ArgumentException">Unsupported target or scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; input reference and native core binding validated on write.</exception>
+    void IsInstance(SignatureType target);
+    /// <summary>Consumes an object, String, array or interface reference and pushes Boolean nullness.</summary>
+    /// <remarks>CLI emits ldnull/ceq; native emits ref.isnull. This is identity nullness, not an overloaded equality call.</remarks>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded or input is not a reference on write.</exception>
+    void IsNull();
     /// <summary>Converts a storage value to the explicit core System.Object signature.</summary>
     /// <param name="type">Exact input signature, including an in-scope generic parameter. Void, managed references, Self and Function reject.</param>
     /// <remarks>CLI uses box; native uses box. Values are copied; references preserve identity. String uses the runtime object representation. The resulting signature is AssemblyBuilder.CoreObjectType.</remarks>
@@ -264,7 +275,7 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
     void LoadArrayLength();
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>

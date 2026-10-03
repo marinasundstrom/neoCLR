@@ -272,11 +272,17 @@ public sealed partial class MethodBuilder
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "object.box":
                     Pop(instruction.Type!); stack.Add((SignatureType)Assembly.CoreObjectType); break;
+                case "reference.test":
+                case "reference.isnull":
                 case "reference.cast":
                     if (stack.Count == 0 || stack[^1] is not { ConstructionReceiver: false, ByReferenceElement: null, AddressedLocal: null, AddressedParameter: null } value ||
-                        !(value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
-                        throw new InvalidDataException("reference cast requires a reference value");
-                    stack.RemoveAt(stack.Count - 1); stack.Add(instruction.Type!); break;
+                        !(value.Primitive == PrimitiveType.String || value.ArrayElement is not null || value.Class is { IsValueType: false, IsStatic: false } || value.GenericInstance?.Definition is { IsValueType: false, IsStatic: false } || value.ImportedType is { IsValueType: false }))
+                        throw new InvalidDataException("reference operation requires a reference value");
+                    if (instruction.Op == "reference.isnull") MaxStack = Math.Max(MaxStack, stack.Count + 1);
+                    stack.RemoveAt(stack.Count - 1);
+                    stack.Add(instruction.Op == "reference.isnull" ? (SignatureType)PrimitiveType.Boolean
+                        : instruction.Op == "reference.test" && !IsReferenceSignature(instruction.Type!) ? (SignatureType)Assembly.CoreObjectType : instruction.Type!);
+                    break;
                 case "function.bind":
                     stack.Add(instruction.Type!); MaxStack = Math.Max(MaxStack, stack.Count + 1); break;
                 case "function.invoke":

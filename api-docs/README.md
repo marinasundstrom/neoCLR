@@ -869,3 +869,7 @@ Host-only IILGenerator.LoadFieldAddress overloads and OpCode.Ldflda are covered 
 and [owned field addresses](experimental-metadata.md#owned-field-addresses-development-2026-10-03).
 The imported-field overloads still reject Ldflda. These C# APIs remain outside guest
 RavenDoc selection; the known stale runtime snapshot remains unchanged.
+
+Host-only IILGenerator.IsNull/IsInstance, their raw opcodes, and String CastReference
+support have XML and [manual reference](experimental-metadata.md#reference-tests-development-2026-10-03)
+coverage. The known stale guest RavenDoc snapshot remains tracked; no snapshot mutation.
