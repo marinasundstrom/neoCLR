@@ -126,4 +126,5 @@ Source-union emission and separate native value-library consumption remain in pr
 
 The development native emitter also handles bounded nested source class/value declarations
 under nongeneric owners. Paired .NET/native execution checks constructor and copy behavior;
-generated union declarations and byte discriminators remain work in progress.
+Byte discriminator signatures, storage and conversions now execute on both targets;
+generated union declarations remain work in progress.

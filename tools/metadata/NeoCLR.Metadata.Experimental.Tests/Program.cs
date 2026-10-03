@@ -298,6 +298,7 @@ var tests = new (string Name, Action Body)[]
     ("Output parameters assignment imports and projection", OutParameterChecks.Run),
     ("Value receivers and imported generic output calls", ValueReceiverChecks.Run),
     ("Terminal failure flow and diagnostics", TerminalFailureChecks.Run),
+    ("Byte discriminator storage and conversions", ByteDiscriminatorChecks.Run),
     ("Tagged generic value payload layouts", TaggedValueLayoutChecks.Run),
     ("Direct native nested value constructor import", () => ValueConstructorChecks.Run(nested: true, native: true)),
     ("Direct native value constructor import", () => ValueConstructorChecks.Run(native: true)),

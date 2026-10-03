@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Support Byte signatures/storage and `IILGenerator.Emit(OpCode.Conv_U1)` in the
+  experimental metadata API, preserving Int32 stack values and exact by-reference
+  identity. CLI/native readers and introspection retain Byte; CLR/native execution
+  checks truncation and zero extension. Raven native emission/import now maps Byte
+  explicitly. Generated union declarations remain pending; native format/runtime
+  operations are unchanged. API snapshot regeneration remains blocked as documented.
+
 - Advance source-union prerequisites with Raven native nested declaration emission:
   same-named payloads retain distinct owners; generic nested values, nongeneric classes
   and value copies execute on both targets. Generic enclosing capture remains unsupported.

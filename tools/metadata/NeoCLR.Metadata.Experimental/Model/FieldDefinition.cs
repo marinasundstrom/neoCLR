@@ -54,7 +54,7 @@ public sealed partial class FieldDefinition
         if (nativeType is { } native) { type = native.Primitive ?? PrimitiveType.Void; return type != PrimitiveType.Void; }
         if (FieldType is { } authored) { type = authored.Primitive ?? PrimitiveType.Void; return type != PrimitiveType.Void; }
         type = signature.Length == 2 && signature[0] == 0x06 ? signature[1] switch {
-            0x08 => PrimitiveType.Int32, 0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
+            0x08 => PrimitiveType.Int32, 0x05 => PrimitiveType.Byte, 0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
             _ => PrimitiveType.Void } : PrimitiveType.Void;
         return type != PrimitiveType.Void;
     }

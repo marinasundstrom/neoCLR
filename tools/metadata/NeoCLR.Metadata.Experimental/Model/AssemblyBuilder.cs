@@ -342,6 +342,7 @@ public sealed partial class AssemblyBuilder
             {
                 case PrimitiveType.Int32: encoder.Int32(); break;
                 case PrimitiveType.Int64: encoder.Int64(); break;
+                case PrimitiveType.Byte: encoder.Byte(); break;
                 case PrimitiveType.Boolean: encoder.Boolean(); break;
                 case PrimitiveType.String: encoder.String(); break;
                 default: throw new InvalidDataException("unsupported value type");
@@ -562,6 +563,7 @@ public sealed partial class AssemblyBuilder
                     case "constant64": code.WriteByte(0x21); code.WriteInt64(instruction.LongValue); break;
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
+                    case "convertByte": code.WriteByte(0xd2); break;
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;

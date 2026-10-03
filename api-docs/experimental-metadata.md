@@ -5615,3 +5615,25 @@ This is a reader/importer prerequisite for union cases, not source union complet
 Nested types that capture generic enclosing parameters remain unsupported. Source union
 declaration collection, nested definition emission, Byte discriminators and complete
 synthesized union contracts remain pending. Existing immutable snapshot behavior is unchanged.
+
+## Byte signatures and IL generation (development, 2026-10-03)
+
+`PrimitiveType.Byte` denotes unsigned 8-bit storage, encoded as CLI `ELEMENT_TYPE_U1`
+and native `Byte`. It is available in primitive method signatures, fields, locals,
+array elements and imported signatures. Readers and introspection retain the Byte
+identity. As in CLI, loading Byte produces an Int32 evaluation-stack value; storing
+into Byte truncates to eight bits, and loading zero-extends. `ref Byte` remains distinct
+from `ref Int32`; stack normalization does not erase storage or managed-pointer identity.
+
+`method.GetILGenerator().Emit(OpCode.Conv_U1)` consumes an Int32 or Int64 and produces
+an Int32 containing the low unsigned eight bits. It encodes CLI/native `conv.u1` and
+performs unchecked truncation, including -1 → 255 and 298 → 42. Other input categories
+reject during body validation; floating-point conversion is outside this writer profile.
+The legacy `MethodBuilder.Emit` forwarding API accepts the same opcode, but new code
+should use `IILGenerator`. No new native format version or runtime operation is required.
+
+This matches CLI small-integer storage/evaluation behavior; the explicit Byte signature
+costs another supported primitive category but avoids widening union tags in metadata.
+C# coverage checks CLI/native round trips, field/method imports, local/array/field storage,
+conversion boundaries, CLR execution and incompatible by-reference rejection. The native
+artifact executes using the runtime's existing Byte storage and conversion implementation.

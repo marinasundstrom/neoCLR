@@ -65,7 +65,9 @@ See [nested case evidence](experiments/extended-cli-metadata/nested-cases-2026-1
 Ordinary nested source class/value declaration emission now also executes on both
 targets, with scoped payload identity and copy checks; see
 [nested source evidence](experiments/extended-cli-metadata/source-nested-2026-10-03.json).
-Generated union declaration collection, byte tags, synthesized union
+Byte discriminator storage, conversions and signatures now execute on both targets;
+see [byte evidence](experiments/extended-cli-metadata/byte-discriminator-2026-10-03.json).
+Generated union declaration collection, synthesized union
 members and symbol-authored external value operands remain pending; this is not source Option completion. See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires

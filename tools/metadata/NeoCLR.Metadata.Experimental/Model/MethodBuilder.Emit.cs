@@ -99,13 +99,15 @@ public enum OpCode
     /// <summary>Terminates with a literal diagnostic: native UserFault, or CLI InvalidOperationException.</summary>
     Fail,
     /// <summary>Native-only checked uninitialized vector reservation; requires a SignatureType operand and Int32 length.</summary>
-    ReserveArray
+    ReserveArray,
+    /// <summary>Truncates an integer to unsigned 8-bit, leaving an Int32 evaluation value.</summary>
+    Conv_U1
 }
 
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Neg, Not, Ldlen or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>

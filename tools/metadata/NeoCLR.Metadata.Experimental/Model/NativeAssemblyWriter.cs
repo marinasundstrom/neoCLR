@@ -73,6 +73,7 @@ public sealed partial class AssemblyBuilder
             "constant64" => new { op = "ldc.i8", arg = (object)instruction.LongValue },
             "convert64" => new { op = "conv.i8" },
             "convert32" => new { op = "conv.i4" },
+            "convertByte" => new { op = "conv.u1" },
             "pop" => new { op = "pop" },
             "equal" => new { op = "ceq" },
             "less" => new { op = "clt" },

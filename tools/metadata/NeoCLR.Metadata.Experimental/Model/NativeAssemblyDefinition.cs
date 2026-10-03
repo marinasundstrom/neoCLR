@@ -657,6 +657,7 @@ public sealed partial class NativeAssemblyDefinition
     private static PrimitiveType ReadPrimitive(string? name, bool allowVoid) => name switch
     {
         "String" => PrimitiveType.String,
+        "Byte" => PrimitiveType.Byte,
         "Int64" => PrimitiveType.Int64,
         "Int32" => PrimitiveType.Int32,
         "Boolean" => PrimitiveType.Boolean,

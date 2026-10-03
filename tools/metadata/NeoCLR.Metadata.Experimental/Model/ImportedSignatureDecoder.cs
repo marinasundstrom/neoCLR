@@ -30,6 +30,7 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             case 0x01 when allowVoid: return PrimitiveType.Void;
             case 0x02: return PrimitiveType.Boolean;
             case 0x08: return PrimitiveType.Int32;
+            case 0x05: return PrimitiveType.Byte;
             case 0x0a: return PrimitiveType.Int64;
             case 0x0e: return PrimitiveType.String;
             case 0x13:

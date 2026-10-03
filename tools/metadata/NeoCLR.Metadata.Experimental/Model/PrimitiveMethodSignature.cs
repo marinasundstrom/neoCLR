@@ -12,15 +12,17 @@ public enum PrimitiveType
     /// <summary>A signed 64-bit integer.</summary>
     Int64,
     /// <summary>Unicode text; native literals must be representable as UTF-8.</summary>
-    String
+    String,
+    /// <summary>An unsigned 8-bit storage/signature type; evaluation uses Int32.</summary>
+    Byte
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>
 public sealed class PrimitiveMethodSignature : MethodSignature
 {
     /// <summary>Copies parameter types and validates the bounded signature.</summary>
-    /// <param name="returnType">Void, Int32, Int64, Boolean or String.</param>
-    /// <param name="parameterTypes">At most 256 Int32/Int64/Boolean/String parameters in order.</param>
+    /// <param name="returnType">Void, Byte, Int32, Int64, Boolean or String.</param>
+    /// <param name="parameterTypes">At most 256 Byte/Int32/Int64/Boolean/String parameters in order.</param>
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     /// <exception cref="ArgumentException">Invalid type or too many parameters.</exception>
     public PrimitiveMethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes)

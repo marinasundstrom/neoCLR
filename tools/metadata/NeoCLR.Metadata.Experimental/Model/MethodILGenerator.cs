@@ -243,6 +243,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Not => "complement",
             OpCode.Conv_I8 => "convert64",
             OpCode.Conv_I4 => "convert32",
+            OpCode.Conv_U1 => "convertByte",
             OpCode.Pop => "pop",
             OpCode.Ceq => "equal",
             OpCode.Clt => "less",
@@ -400,7 +401,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
 
     public LocalDefinition DeclareLocal(PrimitiveType type)
     {
-        if (type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String)) throw new ArgumentException("unsupported local type", nameof(type));
+        if (type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String or PrimitiveType.Byte)) throw new ArgumentException("unsupported local type", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(bodyBuilder, locals.Count, type); locals.Add(local); return local;
     }
