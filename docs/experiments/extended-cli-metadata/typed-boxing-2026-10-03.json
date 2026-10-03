@@ -1,0 +1,314 @@
+{
+  "date": "2026-10-03",
+  "scope": "Typed metadata boxing and Raven integration; native union execution remains blocked by generated payload addressing.",
+  "revisions": {
+    "neoclrBase": "56ff5bbcd2c4f13ff5c616ef2ddf4a28385c8d52",
+    "neoclrChanges": "source hashes below identify this boxing slice",
+    "raven": "5584629677ad38c8b845e36fe2fca1130e5e3b0a",
+    "mainBasedFix": "c96305e50",
+    "mainUnchanged": true
+  },
+  "sourceSha256": {
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyBuilder.cs": "8613be68f5cd2a649bba63fcdd03e3be502c38459a3c5bec222c8b6155ac003d",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyDefinition.cs": "c25697a68057897d9b0b8475081102a20703e02eacb482a7e7e3f62f38b35e01",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyIdentity.cs": "f8b522d9014c84d07d2f26bc19c8c0a6d8fd35112dfc80cb34ecf463db77b935",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredDefinitions.cs": "9ca258a265584b83aaeb17466115a57382aff7845f434c06b2583db49e928a74",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredFieldReference.cs": "a808f0df061ff8bf1a2a87721f23086f2ccad12e7f4728d670864401af5023ee",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredFunctionReference.cs": "fdbbf41bfa21e86f1b8c65a4b1b734a1525ff39992f34f4b079f88b1ec2853ec",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredGenericTypes.cs": "e11ea703ede5cf4ffee5569c144b1127f5279165118c35ebc5ffd01ddfc5d434",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredInterfaceReference.cs": "dc4ffc817c2b4fe2dd1d499efbe8cfe221809d922ecf54caca3fa6b5f5bd9a2f",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredMethodReference.cs": "47a1f86e057c17913a07169503b6a445876ac0216072b578e6acb2551c8306c5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredMethods.cs": "ac0cb4a4e040a1b335782df62118da7b531c44cafaa812982cf35d7fd11b4e21",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredProperties.cs": "41b7c94583ac7d57f393962807ab8f0e7e4ac4d65280babc572b75e3d56f250f",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredTypeReference.cs": "811480bb5619f2cc7dad90fc2d57536077747b87802ba4980dae0b3c7ecb03de",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ConstructedFieldReference.cs": "a63eb700a75b472bac345045be3095e5a56a67b20162f29ca3757f7ea01120c2",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ConstructedMethodReference.cs": "316d5ebd8cf1c3c03629ed4ac6f7bc4732205270a958d83236be8627621fd00a",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/FieldBuilder.cs": "209f91feedbc1eaf074b6dfce51d7a84dd3e08f03c2f2ae3fae0ac9c4d6cd9ae",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/FieldDefinition.cs": "7e9a2a1b63e3b261ac54a20b610af9ccec24234a3464ba11d8a14d4a7c3c9f3d",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/FunctionNamespaceEncoding.cs": "a914428157ca3ca6b8096399cb11b554a01a9b0a813c7570f8933eaeb20c6a6d",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/FunctionSignature.cs": "651b57f7d779c65aea81455758963cb0c44803cdcd14c58d2da91fdd70c6360e",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericMethodInstance.cs": "1cf2f60531ee5b00023ae44140360527147be3c9d6860f1f5a9cc9a459e9baa8",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericTypeConstraint.cs": "8cd7127e7b29318a5ec5158600b9fabecea8f9b3ba11b62306f0677041b7ae07",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericTypeInstance.cs": "1a642ca7c586ea08b4762ce961f869e0755220d214308cf855250113ee6a8524",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/IILGenerator.cs": "c9f0fa729015637cfdb9dcb17a19a806d4b24c5488e6a55bc6d83febcb67a003",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedConstructedFieldReference.cs": "9741aca4df5534e521537d62f52f0b0f044a4525c1791fdf24ad8c91eec514b5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedConstructedMethodReference.cs": "05f14c076702b76c376ba20f0c49f2ae90bcebd06de321599d5f82428b529475",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedFieldReference.cs": "e15dd8af21b1e999372ee24594e4810ae77e0108c16d8448ebf498743f1919f5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedGenericMethodReference.cs": "200166a96e420d604f355d93541ee7c22c7e41c85636a550bfbf31faab7e5564",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedMethodReference.cs": "c382c4836447e4ae0478c26da3de5dd794058722ec85e0a6f7a3ebd706474b0f",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedSignatureDecoder.cs": "0e879846e927119e271f9fda5c508bdc1d04766452ccd04282abedb592daf63f",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedTypeReference.cs": "40bbfe0265a530450099de29d573d775fae77cb87f8ab0208803bf99973df647",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/InterfaceBuilder.cs": "736628d534573966c01f95313d9fac8900cecc54877e1fe67498bce8d91f61c6",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/InterfaceImplementation.cs": "23d31c6e87f439d2b11f6b909fdd70d95033fe622f11be0ff0dad9232a6f85c5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MemberReference.cs": "44c90eed34a6dc3e15244f93a366385d640321af3653aae2e5709f20c9c1a128",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBodyDefinition.cs": "8adb0776524d03b55c5d21dd5d5c962af5c52d4eaa9aa471f281d2283ab670ef",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBodyGenerator.cs": "8ee52ded0a6edb365e5201954bd7b3d42f2666d6687cecc5cfdeba2444832708",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Arrays.cs": "d37749da972d9024d88f6a812280f8665ed5365c4161e031673fa3686c00baae",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Emit.cs": "1b7e23dc51dcca83ad2b336906a57d66ac12c5d8864c3bd7a183258d768be894",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Flow.cs": "7be99ea39d71f0e39417096237a14595e3aa6c91f3456172439535b092c34981",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Initialization.cs": "a63174387cec606911af42e3940632149af084d5f6847fd5281aeef59eb2ef4b",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Locals.cs": "139c635a7e43755b95427e76e23b945a4f217eefc050aacbfe3d843cab7ad9ce",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Objects.cs": "d88edf4fd4b0a7451b9112cfb4c5d280b570fa2d8386bb4160b0844217b7ac06",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodDefinition.cs": "ff3455e4391bd12bff49af54cc2b0c2a07d0e31bc9d8ba103e2c0c05b8ec6553",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodILGenerator.cs": "6ed0a9e022b394ffde657ed580403a0e639c5b3530170c1cf8f567675212e047",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodSignature.cs": "e9397ffbd7c72920ae4ad683cbe5d070dfdd0b646f1730c4155d639060e5f1e5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NamespaceFunctionBridge.cs": "c1dcab1c4d35a53c997416d05949bee070688297b352549e8c464348aea79006",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyDefinition.cs": "a58581740a1bdede6be25719362a5a77721ce6f88a042c862089abdd6149f190",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyWriter.cs": "c3b02a89fb123c60db70b4d1e318a92b3d223b41916d0422c15620bd5ed9de37",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeDefinitionReader.cs": "19b5de4d8fead35d6d7985e0b72636d4722369babd6fef16b1a0d21019b34443",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeImportBinding.cs": "f3e2a23978a63208c1838951724d08b2689ce2e8433356a5bb3f367ac61ee4f6",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeLibraryDefinition.cs": "f807a6e49bd2806409ff32a21137a088a5fd8ba2d0e58eaf195460df576ed3e5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NestedTypes.cs": "0a789c047da13ccfad6050056991c7e3384f87c40c9c0bb54dfcb495e7215460",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/PrimitiveMethodSignature.cs": "cf9542257c7019d3eac238c454f128a84fbd2d14e3e9f3f58d3e81adb9569ac1",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/PropertyBuilder.cs": "64748a6306845c1fe69680225e6df0646f085041d8f536345f0e25610fb99510",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/PropertyDefinition.cs": "2a56dcb817423388d9929430df60a4cd94328c6bfee533b2cc6a40538486158d",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ReferencedGenericType.cs": "e71daa1e7b850a4a5d7673a3b4c0470ecbbdcfeeccea13f6cea877ae3fe77d73",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ValueTypeBuilder.cs": "5a3c53ddee51c00651f3d9f191102e6c972a5f6eaa2703f59726adcdb7de5005",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ValueTypeLayout.cs": "2573ffd393bab7f407b8e356ef48ba322d31a26090018c5be33b946f2d2cc1d6",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/BoxingChecks.cs": "7b97d7be119cc7a6c517881fc9876e1dd4a3207363a300737d420dc26bdf96d4",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeValueOverrideChecks.cs": "857dc8ee87b3bbea60bc72af28f8e3aeb9a603274b08965e19aa166e0bc34c32"
+  },
+  "runtimeSha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+  "metadataContractTests": {
+    "passed": 119,
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+    "logSha256": "bb39995a42779de8933f301ac64d92b6bde9e34bd0499e9f8840bd212b3dbf1e"
+  },
+  "nativeApi": {
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --native-value-override target/release/neoclr /tmp/override-System.neox api-docs/reference/NeoCLR.CoreProbe.dll /tmp/native-api-boxing",
+    "log": "Native override roundtrips, imported direct call and boxed Object dispatch passed (42).\n",
+    "artifacts": {
+      "Boxing.dll": "dd20814f4894e38f73ccd8ae54db4795d0ac455bfcb37adfed4f3a57a23930bf",
+      "Boxed.neoil": "e3991e7013a759344504c1580bbd4ec55a926d21e3d68a8d042aa9355f2ca887",
+      "Library.dll": "46525fdf31a68e35ff9c29846cec37043e2f51d951dc61bbf033413c8269d9e9",
+      "Consumer.dll": "ec7953041ace01f8bf3bca44b54419146b74d640109671d8e58599c2dd33f66b"
+    },
+    "assertions": [
+      "generic value boxing and Object override dispatch",
+      "primitive boxed Int32 display",
+      "generic reference preserves identity",
+      "native metadata reread",
+      "missing System dependency rejects"
+    ]
+  },
+  "driver": {
+    "scope": "Dual-target ordinary-command boxing smoke; detailed value/identity assertions live in C# metadata and CLR conversion tests, not this discarded-result smoke.",
+    "driverSha256": "8EA4F86E5A89660EEB680D782D4B7C4D8C66D9444F5AA737D72EA3BC9778754E",
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "sourceSha256": "C9DD7BFB72876E69CFA7447D717095A0FE9C6E74FE841D5AD6285EF10B7B7F0A",
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-boxing-acceptance-final/Box.clr.dll",
+          "/tmp/raven-boxing-acceptance-final/Box.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-boxing-acceptance-final/Box.rvn(5,9): warning RAV9027: Value 'integer' is never used.\n\n../../../../../../tmp/raven-boxing-acceptance-final/Box.rvn(6,9): warning RAV9027: Value 'text' is never used.\n\nBuild succeeded with 2 warning(s) in 1,8s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-boxing-acceptance-final/Box.clr.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "boxed\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-boxing-acceptance-final/Box.native.dll",
+          "/tmp/raven-boxing-acceptance-final/Box.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "verify",
+          "/tmp/raven-boxing-acceptance-final/Box.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_BAE9A03607583415F208BA26A10734C3B0BC7C1EAA2D5070A1100D3652C2D40F: typed-stack/control-flow verification passed (3838 IL functions; maximum stack 7; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "run",
+          "/tmp/raven-boxing-acceptance-final/Box.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "boxed\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-boxing-acceptance-final/MissingSeed.dll",
+          "/tmp/raven-boxing-acceptance-final/Box.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA001: Native emission does not support unregistered dependency type: class object.\n"
+      }
+    ]
+  },
+  "unionGate": {
+    "scope": "Union declaration discovery baseline; native union execution remains blocked by generated display payload addressing.",
+    "driverSha256": "8EA4F86E5A89660EEB680D782D4B7C4D8C66D9444F5AA737D72EA3BC9778754E",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "evidence": [
+      {
+        "name": "Plain",
+        "sourceSha256": "E6947C1CA8CBB9368E6F0534E2A3DA3CA5C657EA2CD5798E408EF62780C1A90E",
+        "dotnetAssemblySha256": "748C81D1A58EDFD34786AE4320FA5F80BF5D6B23F409C1DBD731203647BA8E99",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      },
+      {
+        "name": "Generic",
+        "sourceSha256": "5AA0B46C1AEDFE1D1EA48A87821A09E226E8E83076C4C864DD237AAE1D3AF50F",
+        "dotnetAssemblySha256": "95CCDFB718951614AAD8A80358A620A022E728403C99510791C1DDCC77DB981E",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      }
+    ],
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-boxing-gate/Plain.dll",
+          "/tmp/raven-union-boxing-gate/Plain.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-boxing-gate/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,4s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-boxing-gate/Plain.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-boxing-gate/Plain.native.dll",
+          "/tmp/raven-union-boxing-gate/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body ToString: value receiver requires an owned local or ref/out parameter.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-boxing-gate/Generic.dll",
+          "/tmp/raven-union-boxing-gate/Generic.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-boxing-gate/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,3s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-boxing-gate/Generic.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-boxing-gate/Generic.native.dll",
+          "/tmp/raven-union-boxing-gate/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body ToString: value receiver requires an owned local or ref/out parameter.\n"
+      }
+    ]
+  },
+  "ravenTests": {
+    "focused": 14,
+    "expressionBodies": 10,
+    "mainBasedBaseline": 8,
+    "mainBasedFix": 10
+  },
+  "apiSnapshot": {
+    "status": "known stale snapshot; host APIs documented in XML/manual reference",
+    "check": "python3 scripts/build-api-docs.py --check",
+    "regenerationBlocker": "previously recorded SourceUnionReferences.Project / RAV0103 None is not in scope"
+  },
+  "limits": [
+    "No full native union emission",
+    "No compiler Object virtual invocation yet",
+    "Driver smoke discards boxed values; API tests provide observable semantics",
+    "No runtime instruction/format changes",
+    "No performance claims"
+  ]
+}

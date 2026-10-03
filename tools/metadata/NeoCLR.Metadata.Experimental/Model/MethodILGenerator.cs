@@ -187,6 +187,14 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void Emit(OpCode opCode, SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
+        if (opCode == OpCode.Box)
+        {
+            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
+                throw new ArgumentException("Box requires a storage value or scoped generic parameter", nameof(elementType));
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+            _ = Assembly.CoreObjectType;
+            Append(new("object.box", Type: elementType)); return;
+        }
         if (opCode == OpCode.Castclass)
         {
             if (!IsReferenceSignature(elementType)) throw new ArgumentException("Castclass requires a reference target", nameof(elementType));
@@ -217,6 +225,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             _ => throw OperandError(opCode)
         }, Type: elementType));
     }
+
+    public void Box(SignatureType type) => Emit(OpCode.Box, type);
 
     public void CastReference(SignatureType target) => Emit(OpCode.Castclass, target);
 

@@ -29,6 +29,9 @@ public sealed partial class AssemblyBuilder
     public AssemblyIdentity Identity { get; }
     /// <summary>Gets the explicit core-library identity.</summary>
     public AssemblyIdentity CoreLibrary { get; }
+    /// <summary>Gets the output-owned System.Object reference in the explicit core assembly.</summary>
+    /// <remarks>No assembly is loaded. Native boxing additionally requires an explicit matching System bootstrap binding.</remarks>
+    public ImportedTypeReference CoreObjectType => ImportTypeIdentity(CoreLibrary, "System", "Object", 0);
     /// <summary>Gets the current owned type definitions.</summary>
     public IReadOnlyList<TypeBuilder> Types => types.AsReadOnly();
     /// <summary>Gets assembly-owned functions, which have no declaring type.</summary>
@@ -514,7 +517,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => 12,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -569,6 +572,7 @@ public sealed partial class AssemblyBuilder
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
                     case "local.address": code.WriteByte(0xfe); code.WriteByte(0x0d); code.WriteUInt16((ushort)instruction.Value); break;
+                    case "object.box": code.WriteByte(0x8c); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "reference.cast": code.WriteByte(0x74); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.load": code.WriteByte(0x71); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.store": code.WriteByte(0x81); code.WriteInt32(ElementToken(instruction.Type!)); break;

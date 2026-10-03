@@ -49,18 +49,29 @@ internal static class NativeValueOverrideChecks
         await Execute("run", appPath, true, libraryPath);
         await Execute("verify", appPath, false, libraryPath, includeSystem: false);
 
-        // Boxing is not yet in the metadata generator profile. This runtime harness
-        // consumes the unmodified API-produced library and exercises its actual slot.
+        // The generated generic method boxes values and preserves reference identity.
+        // The harness exercises its result through the actual runtime Object slot.
+        var boxing = Create(system);
+        var parameter = SignatureType.MethodParameter(0);
+        var box = boxing.AddFunction("Box", new(boxing.CoreObjectType, [parameter], ["T"]));
+        var boxIl = box.GetILGenerator(); boxIl.LoadArgument(0); boxIl.Box(parameter); boxIl.Return();
+        var boxingJson = boxing.WriteNativeAssembly();
+        var boxingPath = Path.Combine(directory, "Boxing.dll");
+        File.WriteAllBytes(boxingPath, RuntimeAssemblyContainer.WriteBinary(boxingJson, core));
+        _ = AssemblyDefinition.ReadNativeAssembly(File.ReadAllBytes(boxingPath));
+        var boxName = JsonNode.Parse(boxingJson)!["functions"]!.AsArray().Single(f => f!["name"]!.GetValue<string>().EndsWith(".F_426F78"))!["name"]!.GetValue<string>();
         var names = JsonNode.Parse(json)!["types"]!.AsArray().Select(t => t!["name"]!.GetValue<string>()).ToArray();
         var harness = new StringBuilder(".module OverrideHarness\n.entry Main\n.function Main() -> Int32\n");
         // Use fresh default values; no duplicate class declarations or replacement bodies.
         foreach (var name in new[] { names[0], names[1] + "<Int32>" })
-            harness.Append($"newobj {name}\nbox {name}\ncallvirt instance System.Object::ToString()\nldstr \"native override\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n");
+            harness.Append($"newobj {name}\ncall {boxName}<{name}>({name})\ncallvirt instance System.Object::ToString()\nldstr \"native override\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n");
+        harness.Append($"newobj {names[0]}\ncall {boxName}<{names[0]}>({names[0]})\ndup\ncall {boxName}<System.Object>(System.Object)\nceq\nbrfalse failed\n");
+        harness.Append($"ldc.i4 42\ncall {boxName}<Int32>(Int32)\ncallvirt instance System.Object::ToString()\nldstr \"42\"\ncall neoCLR.Runtime.StringCompareOrdinal(String,String)\nbrtrue failed\n");
         harness.Append("ldc.i4 42\nret\nfailed:\nldc.i4 1\nret\n.end\n");
         var harnessPath = Path.Combine(directory, "Boxed.neoil");
         File.WriteAllText(harnessPath, harness.ToString());
-        await Execute("verify", harnessPath, true, libraryPath);
-        await Execute("run", harnessPath, true, libraryPath, expectedOutput: "");
+        await Execute("verify", harnessPath, true, boxingPath);
+        await Execute("run", harnessPath, true, boxingPath, expectedOutput: "");
 
         var unrelated = new AssemblyBuilder(new("UnrelatedBootstrap", new Version(1, 0, 0, 0)), core);
         var unrelatedSnapshot = AssemblyDefinition.ReadAssembly(unrelated.Write(), expectedExtended: false);

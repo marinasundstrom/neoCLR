@@ -46,6 +46,13 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         (type.Namespace.Length == 0 ? "" : type.Namespace + ".") + SimpleName(type.Name);
     internal string TypeName(ImportedTypeReference type) => type.DeclaringType is { } parent ? TypeName(parent) + "." + SimpleName(type.Name) :
         (type.Namespace.Length == 0 ? "" : type.Namespace + ".") + SimpleName(type.Name);
+    internal void ValidateBoxingCore()
+    {
+        var owners = reference.MainModule.Types.Where(t => t.Namespace == "System" && t.Name == "Object" && t.DeclaringType is null).ToArray();
+        if (Library.ModuleName != "System" || owners.Length != 1 || owners[0].IsValueType || (owners[0].Attributes & 0x27) != 1)
+            throw new InvalidDataException("native boxing requires a public System.Object class in the explicit core binding");
+        ValidateType(owners[0]);
+    }
     internal void ValidateObjectToStringSlot()
     {
         if (reference.IsNative) throw new InvalidDataException("Object bootstrap binding requires an explicit CLI declaration snapshot");

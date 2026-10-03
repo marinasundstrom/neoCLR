@@ -5737,9 +5737,44 @@ checks the linked dependency's actual definitions. Reader validation is not proo
 runtime bodies or external artifacts have been verified.
 
 The C# `--native-value-override` integration mode writes a native library, rereads it,
-emits a separate direct-call consumer and executes it. A neoIL harness boxes ordinary
-and generic values from that same API-produced library and calls Object.ToString; both
-return 42 using the real retained System bundle. Boxing is not yet an operation exposed
-by the metadata generator, so this harness does not claim Raven union execution.
+emits a separate direct-call consumer and executes it. A neoIL harness calls an API-produced generic boxing method with ordinary
+and generic values, then calls Object.ToString; it also checks reference identity and
+primitive display, returning 42 using the real retained System bundle. This does not
+claim Raven union execution.
 Raven now consumes the bounded override with explicit runtime-seed binding. Generated
 display conversions/formatting operations and union/case metadata preservation remain pending.
+
+
+### Typed boxing (development, 2026-10-03)
+
+`AssemblyBuilder.CoreObjectType : ImportedTypeReference` returns an interned,
+output-owned System.Object reference in the explicitly supplied CoreLibrary. It performs
+no loading or dependency discovery. A signed core identity is supported for this exact
+reference; other imported signed nominal identities remain outside the bounded profile.
+
+`IILGenerator.Box(SignatureType type)` and `Emit(OpCode.Box, SignatureType type)`
+consume the exact storage signature and push CoreObjectType. Types may include primitives,
+owned/imported nominal types, vectors and in-scope owner/method generic parameters.
+Void, managed references, Self, Function, foreign owners and out-of-scope parameters reject.
+Operand errors throw ArgumentException (null throws ArgumentNullException); stack errors
+and missing native bindings throw InvalidDataException before an image is returned.
+The new operation belongs to the IL generator, not the method builder.
+
+CLI encoding is standard `box` (0x8c) with a TypeDef/TypeRef/TypeSpec operand. Native
+encoding uses the existing `box` instruction and nominal System.Object result. Value
+storage is copied; reference instantiations preserve object identity, including null on
+CLR. Native String uses the runtime's object representation. Native writing requires a
+BindNativeLibrary mapping for the exact core identity, module System, and a matching public
+System.Object class. No runtime format change, automatic dependency load or application
+reference projection is introduced. C# tests execute method/owner generic scopes on CLR;
+the native integration harness exercises generic value boxing, primitive display and
+reference identity against the retained System seed.
+
+```csharp
+var t = SignatureType.MethodParameter(0);
+var method = assembly.AddFunction("Box", new(assembly.CoreObjectType, [t], ["T"]));
+var il = method.GetILGenerator();
+il.LoadArgument(0);
+il.Box(t);
+il.Return();
+```

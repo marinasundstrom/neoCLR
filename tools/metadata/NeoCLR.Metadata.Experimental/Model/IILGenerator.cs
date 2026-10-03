@@ -218,7 +218,7 @@ public interface IILGenerator
 
 
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
-    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, or Callvirt for a Function signature.</param>
+    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, or Callvirt for a Function signature.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, unsupported element or foreign owner.</exception>
@@ -231,6 +231,13 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded; input stack validation occurs on write.</exception>
     /// <remarks>CLI uses castclass; native uses castclass and its verifier/runtime conversion contract. This does not box values.</remarks>
     void CastReference(SignatureType target);
+    /// <summary>Converts a storage value to the explicit core System.Object signature.</summary>
+    /// <param name="type">Exact input signature, including an in-scope generic parameter. Void, managed references, Self and Function reject.</param>
+    /// <remarks>CLI uses box; native uses box. Values are copied; references preserve identity. String uses the runtime object representation. The resulting signature is AssemblyBuilder.CoreObjectType.</remarks>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
+    /// <exception cref="ArgumentException">Invalid type or owner scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack and native core binding are checked on write.</exception>
+    void Box(SignatureType type);
     /// <summary>Consumes an Int32 length and creates a default-initialized reference vector.</summary>
     /// <param name="elementType">Supported scalar element; see Emit(OpCode, SignatureType).</param>
     void NewArray(SignatureType elementType);

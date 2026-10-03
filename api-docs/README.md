@@ -859,3 +859,8 @@ The value override profile now includes explicit retained-System native binding,
 round trips and call-name preservation; the same manual entry and XML document the
 bounded contract. C# native execution uses the checked-in CoreProbe bootstrap and a
 freshly assembled System bundle. The existing runtime snapshot check remains stale.
+
+Host-only CoreObjectType, IILGenerator.Box and OpCode.Box are documented in XML and
+[typed boxing](experimental-metadata.md#typed-boxing-development-2026-10-03).
+They remain outside the guest RavenDoc selection; the existing snapshot regeneration
+blocker is tracked above, not silently removed from API coverage.

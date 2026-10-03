@@ -101,7 +101,9 @@ public enum OpCode
     /// <summary>Native-only checked uninitialized vector reservation; requires a SignatureType operand and Int32 length.</summary>
     ReserveArray,
     /// <summary>Truncates an integer to unsigned 8-bit, leaving an Int32 evaluation value.</summary>
-    Conv_U1
+    Conv_U1,
+    /// <summary>Boxes a value or scoped generic parameter as the explicit core System.Object.</summary>
+    Box
 }
 
 public sealed partial class MethodBuilder

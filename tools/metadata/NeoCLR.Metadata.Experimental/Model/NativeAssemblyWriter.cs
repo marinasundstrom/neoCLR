@@ -15,6 +15,8 @@ public sealed partial class AssemblyBuilder
     public byte[] WriteNativeAssembly()
     {
         var methods = ValidateGraph();
+        if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box")))
+            (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing requires an explicit System core binding")).ValidateBoxingCore();
 
         static void CheckText(string text)
         {
@@ -119,6 +121,7 @@ public sealed partial class AssemblyBuilder
             "field.import.load" or "field.import.store" => new { op = instruction.Op == "field.import.load" ? "ldfld" : "stfld", arg = (object)(instruction.ImportedField!.NativeIndex ?? throw new InvalidDataException("native field emission requires a native layout ordinal")) },
             "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
+            "object.box" => new { op = "box", arg = SignatureValue(instruction.Type!) },
             "reference.cast" => new { op = "castclass", arg = SignatureValue(instruction.Type!) },
             "object.load" or "object.store" => new { op = instruction.Op == "object.load" ? "ldobj" : "stobj", arg = SignatureValue(instruction.Type!) },
             "local.initialize" => new { op = "initobj", arg = SignatureValue(instruction.Type!) },

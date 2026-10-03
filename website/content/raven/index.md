@@ -142,3 +142,7 @@ Raven now emits local ordinary/generic value overrides using an explicit runtime
 Source-union declarations pass override admission; generated display conversions and union
 metadata remain in progress. The existing .NET/native bootstrap return-nullability
 difference is recorded separately from native execution evidence.
+
+Development continuation: explicit core-bound boxing is now available in the metadata
+IL generator and Raven's native target. Focused generated assemblies execute, but union
+display payload addressing and union metadata preservation still block native source unions.

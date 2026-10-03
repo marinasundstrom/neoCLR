@@ -126,7 +126,11 @@ public sealed partial class AssemblyBuilder
     }
     internal ImportedTypeReference ImportTypeIdentity(AssemblyIdentity identity, string ns, string name, int arity, bool isValueType = false, ImportedTypeReference? declaringType = null)
     {
-        if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0 || arity is < 0 or > 32 ||
+        // The explicit core Object signature must also work with a signed CLR core.
+        // This does not admit arbitrary signed dependency imports.
+        var isCoreObject = identity.Equals(CoreLibrary) && ns == "System" && name == "Object" &&
+            arity == 0 && !isValueType && declaringType is null;
+        if (identity.Equals(Identity) || (identity.PublicKeyToken.Length != 0 || identity.Flags != 0) && !isCoreObject || arity is < 0 or > 32 ||
             name.Length == 0 || name == "<Module>" || ns.Length + name.Length > 1024 || (ns + name).Any(char.IsControl) ||
             (arity == 0 ? name.Contains('`') : !name.EndsWith("`" + arity, StringComparison.Ordinal))) throw new InvalidDataException("unsupported imported type identity");
         if (declaringType is not null && (!ReferenceEquals(declaringType.Owner, this) || !declaringType.AssemblyIdentity.Equals(identity) ||

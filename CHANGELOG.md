@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add typed IL-generator boxing and an explicit core Object reference. CLI uses standard
+  box tokens; native output requires the validated System core binding and uses the
+  existing instruction format. Generic value dispatch, primitive display and reference
+  identity execute; 119 C# metadata groups pass. Raven adopts an explicit boxing
+  capability; full generated union display and native union metadata remain pending.
+  Independently isolate Raven's arrow-method return-conversion fix (697a093d7 / main-based
+  c96305e50), validated by ten tests on each line; main remains unchanged.
+
 - Integrate bounded value Object overrides into Raven callable contracts and the
   NeoCLR adapter (`29268815d`), with explicit --runtime-seed host binding and seed/source
   ownership rejection. Ordinary/generic native driver cases execute; the existing CLR

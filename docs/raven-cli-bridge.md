@@ -4463,3 +4463,21 @@ bodies. Ordinary/generic union controls and unchanged source Option now reach
 The next slice is generated display conversion/formatting support, then union/case metadata
 preservation. Compiler boxing and separately imported override reference authoring remain
 unproven. See [driver and source evidence](experiments/extended-cli-metadata/raven-value-overrides-2026-10-03.json).
+
+Typed boxing continuation (2026-10-03): the metadata IL generator now exposes Box and
+raw Emit(Box, signature), producing standard CLI and existing native boxing instructions.
+Raven's target-owned capability lowers value/generic-to-object conversions without
+changing binding; .NET retains its existing backend. The normal native command executes a generic box
+smoke case with the explicit core/retained-System seed. C# API tests separately observe
+value dispatch, primitive display and reference identity; the smoke case alone does not
+prove these semantics. Union preflight now stops at generated value-payload addressing;
+Object virtual calls/formatting and union metadata preservation remain open. Runtime
+Contract settings and format versions are unchanged. No implicit reference fallback.
+
+An independent .NET arrow-method bug exposed by this regression work is fixed by
+consuming the existing bound return block, retaining implicit generic boxing. Ten tests
+pass both on the integration line (Raven 697a093d7) and the main-based fixes branch
+(c96305e50); main is unchanged. No new language/Runtime Contract rule is introduced.
+
+See [typed-boxing evidence](experiments/extended-cli-metadata/typed-boxing-2026-10-03.json)
+for commands, source/artifact hashes and cross-repository validation (Raven 558462967).
