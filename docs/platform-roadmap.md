@@ -107,7 +107,8 @@ this is not source Option completion. See
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires
 Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
-remain pending. The broad source-library/application gate remains open.
+remain pending. Configured unit generic union payloads now bind and execute (42); ordinary CLI void
+remains rejected without the unit contract. The broad source-library/application gate remains open.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).
 See [native host binding evidence](experiments/extended-cli-metadata/native-host-bindings-2026-10-02.json).
 See [native reference boundary evidence](experiments/extended-cli-metadata/no-native-reference-fallback-2026-10-02.json). See [callable boundary evidence](experiments/extended-cli-metadata/no-native-callable-fallback-2026-10-02.json). See [static-owner evidence](experiments/extended-cli-metadata/symbol-only-static-owners-2026-10-02.json).

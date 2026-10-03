@@ -10311,3 +10311,10 @@ The existing native unit-storage driver passes against the current union integra
 case constructor during binding (RAV1501), while the source Option ownership probe rejects
 an unregistered System.Void dependency. These are separate compiler/bootstrap gaps; neither
 justifies prohibiting inhabited unit in neoCLR. Full Option/Result execution remains open.
+
+
+2026-10-03 follow-up outcome: the generic System.Void union constructor rejection was
+an unconditional special-void check in overload resolution. Raven now honors the exact
+selected unit contract; the negative ordinary-CLI control still rejects. Generic union
+payload execution returns 42 and all 16 focused tests pass on both the integration and
+isolated main-based fix branches. Source Option's bootstrap ownership gap remains open.

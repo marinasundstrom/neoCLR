@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Validate inhabited unit through generic union construction, payload matching and an
+  ordinary argument on neoCLR (42). Raven now respects the explicit unit contract in
+  overload validation; the fix is isolated and tested on a main-based branch. No native
+  metadata/runtime encoding change is needed; source Option ownership remains open.
+
 - Record the author's inhabited unit direction: value-bearing parameters, storage and
   generic arguments remain distinct from no-result callables. Track generic union binding
   and source-library bootstrap ownership as remaining integration gaps.

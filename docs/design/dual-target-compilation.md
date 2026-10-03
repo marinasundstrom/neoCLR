@@ -443,3 +443,16 @@ and allow omission where it is unused without dropping side effects. Native Type
 Value.Void already provide runtime representation. Ordinary .NET semantics remain the default
 outside the explicit RuntimeUnitContract. Closing source-library ownership and generic unit
 case construction are the next integration checks, not a new-format prerequisite.
+
+
+### Generic inhabited unit execution (2026-10-03)
+
+The exact RuntimeUnitContract is now honored by Raven overload argument validation.
+Unconfigured CLI void remains rejected. The new regression reproduces RAV1501 before
+the fix and passes afterward. Native driver execution constructs Residual<System.Void>
+with an out-initialized unit, matches the payload and passes it as an ordinary argument,
+returning 42. Runtime and metadata representation were already sufficient; this was a
+binding gap. The compiler fix is independently validated on the main-based fixes branch
+(fc32e3b9e), with 16 focused tests passing there and on the integration branch (ca7164aa2).
+Main is unchanged. See [execution evidence](../experiments/extended-cli-metadata/inhabited-unit-execution-2026-10-03.json).
+Unchanged Option still requires coherent bootstrap/source ownership before execution.

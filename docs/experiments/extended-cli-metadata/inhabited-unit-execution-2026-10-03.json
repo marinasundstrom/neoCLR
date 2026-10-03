@@ -1,0 +1,59 @@
+{
+  "scope": "Native ordinary-command configured inhabited unit storage/out argument and generic union payload execute42; not a dual-target case.",
+  "driverSha256": "AAEA48DE54D6D7A80EDE0BECF1BD8CB88243C91D876071E07C847EC1B9D307EA",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "sourceSha256": "2BCC342DD1A336E642F5EAE055F91CFD5CF5C6E3217A643F4BD6035127EB50CA",
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "-o",
+        "/tmp/raven-unit-union-verified/UnitStorage.native.dll",
+        "/tmp/raven-unit-union-verified/UnitStorage.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/raven-unit-union-verified/UnitStorage.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_B1C93B6C491CB42340D7779E8E0FAC6D7D0E69F5D30620DC8CDA559274D2303C: typed-stack/control-flow verification passed (3858 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/raven-unit-union-verified/UnitStorage.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "compilerFix": "ca7164aa2",
+  "mainBasedFix": "fc32e3b9e",
+  "metadataRevision": "eb8aab9b",
+  "baseline": "Configured generic union constructor failed RAV1501 before overload fix; unconfigured CLI void remains rejected.",
+  "tests": {
+    "integrationBranch": "16/16 unit contract tests",
+    "mainBasedFixBranch": "16/16 unit contract tests"
+  }
+}
