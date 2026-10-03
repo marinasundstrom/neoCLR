@@ -4903,3 +4903,19 @@ focused .NET tests pass; unchanged native application-order-collections and a la
 nested array-loop program execute successfully. The lexical closure-lifetime bug on main
 remains unresolved, explicitly outside passing results.
 [Evidence](experiments/extended-cli-metadata/portable-array-boundary-2026-10-03.json).
+
+
+### Native field/property import cleanup (2026-10-03)
+
+Raven `12b545bc1` consumes existing introspection FieldInfo/PropertyInfo views directly
+and resolves their accessors to canonical Raven method symbols. Raven still owns language
+accessibility policy. No Runtime Contract, CLI representation, public metadata API or
+encoding changes. Definitions remain in other native declaration categories; no claim of
+a completely facade-only importer is made. All seven native consumers execute before and
+after; generic/external signatures, fields, indexers and private/static accessor contracts
+remain covered. Ordinary .NET loading and emission are unchanged.
+
+The caller inventory in Raven `docs/compiler/metadata-backend-boundaries.md` retains the
+explicit primitive/runtime seed binding, CLI comparison probes and opt-in partial System
+projection. Those are not fallback paths for native application/library references.
+[Validation](experiments/extended-cli-metadata/native-member-facade-2026-10-03.json).

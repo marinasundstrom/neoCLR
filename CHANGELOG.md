@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Simplify Raven native field/property loading through existing introspection views
+  (`12b545bc1`), removing duplicate definition/accessor lookup work. Native semantic
+  contracts and seven executable consumers pass before/after. Record the explicit legacy
+  callers; no metadata format, .NET backend or public metadata API changes.
+
 - Scope Raven vector-loop expansion to portable planning (`19a3e84c0`), preserving
   ordinary .NET loop emission and native nominal-array behavior. All 86 focused checks,
   native broad execution and native labeled/nested-loop execution pass. Restore main's

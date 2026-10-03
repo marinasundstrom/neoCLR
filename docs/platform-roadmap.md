@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+Native importer cleanup (2026-10-03): Raven `12b545bc1` consumes field/property
+introspection views directly and reuses canonical accessor symbols. Seven native consumers
+pass before/after. The remaining legacy references have explicit seed/probe callers;
+none were removed speculatively. Continue reviewing remaining declaration construction
+against existing facade facts, preserving ordinary .NET behavior.
+[Evidence](experiments/extended-cli-metadata/native-member-facade-2026-10-03.json).
+
 Array-lowering boundary (2026-10-03): Raven `19a3e84c0` confines vector expansion to
 portable body planning; ordinary .NET retains its established loop emitter. The 86
 focused checks, native broad application and native labeled-loop case pass. Loop capture
