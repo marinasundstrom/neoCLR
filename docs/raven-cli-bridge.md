@@ -4961,3 +4961,18 @@ Physical metadata nesting remains distinct from Raven union membership. The impo
 uses facade ownership to preserve both; emission still receives symbol facts and host
 artifact identities. No new bridge encoding, fallback or public metadata API is added.
 The known stale guest API snapshot and full dual-target gate remain open.
+
+### Native catalog validation
+
+Native catalog validation (2026-10-03): Raven `42503ec23` converts conflicts between
+native snapshots and the explicit primitive bootstrap into RAVT003, including failures
+while constructing the introspection catalog. A C# regression reproduces the previous
+uncaught exception and now verifies both reference orders and unchanged output bytes/
+position on failed emission. Seven native consumers pass. No Runtime Contract, format,
+runtime or ordinary .NET behavior changes; prior broad-application evidence is reused.
+[Evidence](experiments/extended-cli-metadata/native-catalog-validation-2026-10-03.json).
+
+The metadata context owns exact identity checks; the native compiler adapter translates
+invalid/unsupported catalog failures before semantic setup and publication. Native inputs
+never fall back to a CLI projection. This target-specific correction requires no general
+binder fix or new host metadata API. Full dual-target completion remains open.

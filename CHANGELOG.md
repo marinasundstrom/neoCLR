@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven `42503ec23` diagnostic handling for native/bootstrap catalog identity
+  conflicts, replacing an uncaught exception. C# rejection/unchanged-output coverage
+  and seven native execution consumers pass; runtime and format remain unchanged.
+
 - Record Raven `777499170` native type/union construction through introspection,
   removing obsolete reader-signature helpers. Source-union library and broad native
   application execution plus seven native consumers pass; no format/runtime changes.

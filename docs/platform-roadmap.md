@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Native catalog validation (2026-10-03): Raven `42503ec23` converts conflicts between
+native snapshots and the explicit primitive bootstrap into RAVT003, including failures
+while constructing the introspection catalog. A C# regression reproduces the previous
+uncaught exception and now verifies both reference orders and unchanged output bytes/
+position on failed emission. Seven native consumers pass. No Runtime Contract, format,
+runtime or ordinary .NET behavior changes; prior broad-application evidence is reused.
+[Evidence](experiments/extended-cli-metadata/native-catalog-validation-2026-10-03.json).
+
 Native type materialization cleanup (2026-10-03): Raven `777499170` constructs ordinary
 type and union/case/companion symbols from canonical introspection views and removes
 obsolete raw-signature mapping helpers. The separately compiled source-union library
