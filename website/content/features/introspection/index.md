@@ -290,3 +290,7 @@ signatures in declared member views. This is separate from guest introspection a
 not yet provide Raven native Self dispatch. See the
 [experimental metadata API](/docs/experimental-metadata/#native-self-signatures-development-2026-10-03)
 for supported signatures and remaining limits.
+
+The development host facade preserves writable `ref`/`out` parameter modes separately
+from their element types, including constructed generic owners. Readonly modes remain
+unsupported; this does not add runtime invocation to introspection.

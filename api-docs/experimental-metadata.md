@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Parameter passing modes](#parameter-passing-modes-development-2026-10-03): native and supported CLI ref/out metadata.
+
 - [Native Self signatures](#native-self-signatures-development-2026-10-03): implementing-type contracts and scoped views.
 
 - [Declaration facts](#declaration-facts-development-2026-10-03): constructors, flags and accessibility.
@@ -5522,3 +5524,33 @@ Raven native symbol projection/emission and general byref/function introspection
 subsequent work. Existing runtime Self execution does not imply these host APIs are ready.
 Tests: `SelfSignatureChecks` (C#), with a generated PE/#Neo loaded and verified by NeoCLR;
 its entry point returns 42 independently of Self dispatch.
+
+
+## Parameter passing modes (development, 2026-10-03)
+
+`Introspection.ParameterInfo.PassingMode : ParameterPassingMode` preserves the declared
+calling convention. `ParameterPassingMode.Value` means a copied value, `Ref` means a
+writable reference initialized by the caller, and `Out` means a writable reference assigned
+by the callee before normal return. `ParameterType` exposes the value/element type, not a
+byref wrapper. Position and canonical DeclaringMethod remain unchanged. There are no
+runtime objects, argument addresses or invocation operations in these views.
+
+Native method materialization retains existing `ByRef` nodes and `out_parameters` indices
+in MethodSignature. Parameter views substitute owner/method arguments within the referenced
+element, including vectors. Copying a snapshot preserves the same modes. Neither native
+format 5 nor the binary container schema changes. Unsupported readonly `In` metadata is
+rejected by signature recognition and introspection instead of fabricated as writable ref;
+byref constructors, byref returns and general readonly signatures remain unsupported.
+Existing supported CLI static signatures expose the same ref/out distinction.
+
+`AssemblyBuilder.CreateMethodReference` accepts writable ref/out parameter signatures on
+supported class/interface methods. Its MethodSignature carries `ByReference(element)` and
+zero-based `outParameters`; conflicting ref/out contracts reject with InvalidDataException.
+Constructed external interface traversal substitutes elements and retains output indices.
+Constructor byrefs still reject. Namespace-function symbol-authored references retain their
+previous bounded signature profile. No dependency definitions are reopened to discover modes.
+
+Validation: C# `ParameterModeChecks` covers manual/builder declarations, both native
+containers, open/constructed scopes, CLI mode parity, readonly rejection and conflicting
+contracts. The Raven three-assembly driver case executes inherited generic ref/out dispatch
+on both targets with library sources removed; incompatible implementations publish nothing.

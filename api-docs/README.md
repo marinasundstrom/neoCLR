@@ -823,3 +823,8 @@ still causes `build-api-docs.py --check` to fail; no snapshot hashes have been r
 The 2026-10-03 storage-bootstrap generator mode also changes tracked generator inputs.
 It adds no public guest or host metadata API; the existing expanded-reference refresh
 blocker remains open. The old reference snapshot is intentionally preserved.
+
+2026-10-03: `ParameterInfo.PassingMode` and the `ParameterPassingMode` enum are covered by
+[the host metadata manual](experimental-metadata.md#parameter-passing-modes-development-2026-10-03).
+These C# host APIs remain excluded from guest RavenDoc because it consumes Raven guest
+declarations. The separately recorded expanded-reference refresh blocker remains open.

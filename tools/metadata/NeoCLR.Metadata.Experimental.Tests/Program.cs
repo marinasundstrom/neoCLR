@@ -307,6 +307,7 @@ var tests = new (string Name, Action Body)[]
     ("External interface declarations", ExternalInterfaceChecks.Run),
     ("Authored native function references", AuthoredFunctionReferenceChecks.Run),
     ("Definition body generator", GeneratorChecks.Run),
+    ("Native parameter passing modes", ParameterModeChecks.Run),
     ("Native Self signatures and scoped views", SelfSignatureChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),

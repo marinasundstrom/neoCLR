@@ -81,7 +81,8 @@ public sealed partial class AssemblyBuilder
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
-        => type.ReferencedGenericInstance is { } constructed
+        => type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
+            : type.ReferencedGenericInstance is { } constructed
             ? ImportReference(constructed.Definition.Resolve(resolver), core).MakeGenericInstance(constructed.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver)).ToArray())
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)
             : type.MethodParameterIndex is { } parameter ? SignatureType.MethodParameter(parameter)

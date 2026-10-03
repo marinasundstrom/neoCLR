@@ -52,8 +52,10 @@ retained seed and ArrayList dependencies; also implement the author-requested na
 signature path through the metadata APIs. Ordinary native driver opt-in now enables the
 existing checked-storage intrinsic, with separately compiled generic helper consumers
 executing 42 and rejecting uninitialized reads. The unchanged Option/Propagatable native
-emission blocker is interface out-parameter support; ArrayList also requires Fail/callback
-bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
+interface out-parameter blocker is now resolved: metadata views preserve modes and
+three-assembly ref/out dispatch executes on both targets. Unchanged Propagatable emits;
+Option now reaches source-union/declaration emission rejection. ArrayList also requires
+Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
 remain pending. The broad source-library/application gate remains open.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).

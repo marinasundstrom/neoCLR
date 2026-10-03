@@ -13,7 +13,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
     /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
-    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Instance generic methods, byrefs and value/nested owners are unsupported.
+    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Writable ref/out parameters are supported; byref constructors, instance generic methods and value/nested owners are unsupported.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false)
@@ -32,7 +32,7 @@ public sealed partial class AssemblyBuilder
             constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
             !isStatic && signature.GenericParameterNames.Count != 0)
             throw new ArgumentException("unsupported method or constructor contract", nameof(name));
-        if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t, false)) || signature.OutParameters.Count != 0)
+        if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
             throw new InvalidDataException("unsupported authored method signature");
         signature.ValidateOwner(this, declaringType.GenericArity);
         foreach (var existing in authoredCallableReferences)

@@ -1,0 +1,406 @@
+{
+  "passed": true,
+  "driverSha256": "B4FE249FBEA9EC8D9185E70C769C0AD9531482B6A14B22B8978565452CBB99B7",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "runtimeConfigSha256": "F9BC8E9F0C46247078ED47309F19A7576B4B94E4300E9DE0003917D6BD2D667A",
+  "sourceSha256": {
+    "hello": "F95F29308310D57401051FDFEE0477B10C39675CB4ABFC74677F94D10CF727FD",
+    "library": "F33719C88B797E1FB3345E539DD0018698566134EB3B66DA814C4ACA2DA66814",
+    "consumer": "C3A026CD37576F1C90330C08133288D569B1CE834BD23AD26CC90F9AA8447C1A",
+    "externalContracts": "05F327EC756DBE465DC08E33F94C5CCDBFD49D7476AC6ED97C32B05E23C21AE5",
+    "externalImplementation": "BD5D734F3A0B801D028EA3E102A814DE3B42E58A0F82E15F7BED409D22F18A53"
+  },
+  "bootstrap": "Explicit .NET host core / NeoCLR.CoreProbe bootstrap; no System seed or reference-only control counts as execution",
+  "cases": [
+    {
+      "target": "dotnet",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "5C1F0B68CDE3ED827F195A7E6190D0612F551F6907E4633F3C6372777D714B41",
+      "dependencySha256": null
+    },
+    {
+      "target": "dotnet",
+      "scenario": "library",
+      "passed": true,
+      "error": null,
+      "appSha256": "F07E333EC21FD6B99DC4DF4227A82B38E75B0E7E7D5AD1ACBBC5C3F067E85C59",
+      "dependencySha256": "E816A6A7F70CD9CE1123B931046F13AFCF9939B9FF499E2DDB0D573A8ED511E6"
+    },
+    {
+      "target": "dotnet",
+      "scenario": "incompatible-parameter-mode",
+      "passed": true
+    },
+    {
+      "target": "neoclr",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "2425137B1E826DBD28E8E1940F07138646DCB6B8CAA577C8E7E6ADCA357B85DD",
+      "dependencySha256": null
+    },
+    {
+      "target": "neoclr",
+      "scenario": "library",
+      "passed": true,
+      "error": null,
+      "appSha256": "5B389F55C7D917DF688C9A08170B32B76F1043FE81736DA62394733EE2545FB8",
+      "dependencySha256": "0E641C04A968980D9352C768D36C8A9948567C4B99F064434629B2B9C8F9AD9B"
+    },
+    {
+      "target": "neoclr",
+      "scenario": "incompatible-parameter-mode",
+      "passed": true
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/refout-driver-final-20261003/dotnet/hello.dll",
+        "/tmp/refout-driver-final-20261003/dotnet/hello.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,6s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/refout-driver-final-20261003/dotnet/hello.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "Hello World\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/tmp/refout-driver-final-20261003/dotnet/Contracts.dll",
+        "/tmp/refout-driver-final-20261003/dotnet/Contracts.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 0,9s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "--refs",
+        "/tmp/refout-driver-final-20261003/dotnet/Contracts.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/dotnet/Implementation.dll",
+        "/tmp/refout-driver-final-20261003/dotnet/Implementation.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "../../../tmp/refout-driver-final-20261003/dotnet/Implementation.rvn(3,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../tmp/refout-driver-final-20261003/dotnet/Implementation.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../tmp/refout-driver-final-20261003/dotnet/Implementation.rvn(8,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\nBuild succeeded with 3 warning(s) in 1,0s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/tmp/refout-driver-final-20261003/dotnet/Contracts.dll",
+        "--refs",
+        "/tmp/refout-driver-final-20261003/dotnet/Implementation.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/dotnet/library.dll",
+        "/tmp/refout-driver-final-20261003/dotnet/library.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/refout-driver-final-20261003/dotnet/library.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "--refs",
+        "/tmp/refout-driver-final-20261003/dotnet/Contracts.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/dotnet/InvalidMode.dll",
+        "/tmp/refout-driver-final-20261003/dotnet/InvalidMode.rvn"
+      ],
+      "expectedExitCode": 1,
+      "exitCode": 1,
+      "stdout": "../../../tmp/refout-driver-final-20261003/dotnet/InvalidMode.rvn(2,14): error RAV0330: Type 'Box' does not implement abstract member 'Bump(ref value: int)' from base type 'Output<int>'\n\n../../../tmp/refout-driver-final-20261003/dotnet/InvalidMode.rvn(3,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../tmp/refout-driver-final-20261003/dotnet/InvalidMode.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../tmp/refout-driver-final-20261003/dotnet/InvalidMode.rvn(8,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\nBuild failed with 1 error(s)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/neoclr/hello.dll",
+        "/tmp/refout-driver-final-20261003/neoclr/hello.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/refout-driver-final-20261003/neoclr/hello.dll"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "NeoMetadata_D3918998E1B436443DAD52EC1CB2969D8A8008BD71576B98CBA45BFBBFC6CA10: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/refout-driver-final-20261003/neoclr/hello.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "Hello World\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--library",
+        "-o",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--library",
+        "--reference",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/neoclr/Implementation.dll",
+        "/tmp/refout-driver-final-20261003/neoclr/Implementation.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--reference",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "--reference",
+        "/tmp/refout-driver-final-20261003/neoclr/Implementation.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/neoclr/library.dll",
+        "/tmp/refout-driver-final-20261003/neoclr/library.rvn"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/refout-driver-final-20261003/neoclr/library.dll",
+        "--module",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "--module",
+        "/tmp/refout-driver-final-20261003/neoclr/Implementation.dll"
+      ],
+      "expectedExitCode": 0,
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C3FD0C14C76FC37B6F2F01F450990AAACF3CF9D5CBB3EDBC639B9BBF5EFC2A95: typed-stack/control-flow verification passed (645 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/refout-driver-final-20261003/neoclr/library.dll",
+        "--module",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "--module",
+        "/tmp/refout-driver-final-20261003/neoclr/Implementation.dll"
+      ],
+      "expectedExitCode": 42,
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--library",
+        "--reference",
+        "/tmp/refout-driver-final-20261003/neoclr/Contracts.dll",
+        "-o",
+        "/tmp/refout-driver-final-20261003/neoclr/InvalidMode.dll",
+        "/tmp/refout-driver-final-20261003/neoclr/InvalidMode.rvn"
+      ],
+      "expectedExitCode": 1,
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0330: Type 'Box' does not implement abstract member 'Bump(ref int)' from base type 'Output<int>'\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    }
+  ],
+  "date": "2026-10-03",
+  "scope": "Writable native parameter modes and three-assembly inherited generic interface dispatch; broad source-library gate incomplete",
+  "sourceBases": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "c94f8b07bbaedfa3d054ef153d0a5e193fe18c48",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven": "a87338ccba57ccfdb41beb239f92a8937902b26b"
+  },
+  "sourceHashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/Program.cs": "67d745a3c3a571d261323dd17dcc03274a0a0d92c92b4d5e470e427fa2da5ac9",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Introspection/MethodInfo.cs": "86bed73e5c58856466450b6d75e2cb0dca77429834e896ef6b2b9a7442587fce",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyDefinition.cs": "89738b9f35e45ccec5ee18167dc791a51efcec65087f3ba0860e610901385cea",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredInterfaceReference.cs": "dc4ffc817c2b4fe2dd1d499efbe8cfe221809d922ecf54caca3fa6b5f5bd9a2f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredMethodReference.cs": "47a1f86e057c17913a07169503b6a445876ac0216072b578e6acb2551c8306c5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedTypeReference.cs": "2df3f4e9cee3d6e1fbd3b1a8874fc6cb00d93046e61f764a4baa8eee73e64689",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodDefinition.cs": "94aca8c76817417f80fd05fd71c13f53d110f982cd18cda76abb97280197c598",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeDefinitionReader.cs": "3ab9717aab3ebf1d87486939382f07a72d899129e146a3e7960f4a97a8f722c9",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/ParameterModeChecks.cs": "88993b568b4f78c4d1b889579c4c5416de7cc61d90ba0711fec25f165db3e52a",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/Int32Emitter.cs": "e481f51e61e9995295181a6bb7b1d911cdab4fff43c01be5920932eb9fd70c5e",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeAssemblySymbol.cs": "6bb4de9d470f65f9ad622d6e964770b95609fcf3a787ba76078214b325d1aeb7",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis/CodeGen/Portable/SourceInterfacePlan.cs": "a2f17d89c85620c270821e5cda51b221af7f605ff3fca20effdc7193e6cb4d50",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/DualTargetDriverChecks.cs": "464c36fe606db6532fa34a875c94981c3be0fc61d61f0c8c82ef0f0c682dfa63",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/Program.cs": "266459ce6c1b9c192498b2e2ccbed45b1a96b2d9c1416c5ad390cd7ec00c386b"
+  },
+  "validation": {
+    "metadataGroups": "112/112 passed",
+    "dotnetRegressions": "11/11 InterfaceMetadataEmissionTests, EmissionBackendTests, NominalLocalEmissionTests",
+    "apiSnapshot": "Previously recorded stale expanded-reference fingerprint; --check still fails; no snapshot relabelled"
+  },
+  "sourceLibraryInventory": {
+    "propagation": {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "-o",
+        "/tmp/refout-propagation-20261003/NeoCLR.Collections.dll",
+        "runtime/raven/src/System/Disposable.rvn",
+        "runtime/raven/src/System/Collections/Iterator.rvn",
+        "runtime/raven/src/System/Collections/Iterable.rvn",
+        "runtime/raven/src/System/Collections/Collection.rvn",
+        "runtime/raven/src/System/Collections/Sequence.rvn",
+        "runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "runtime/raven/src/System/Collections/List.rvn",
+        "runtime/raven/src/System/Propagatable.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "option": {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "-o",
+        "/tmp/refout-option-20261003/NeoCLR.Collections.dll",
+        "runtime/raven/src/System/Disposable.rvn",
+        "runtime/raven/src/System/Collections/Iterator.rvn",
+        "runtime/raven/src/System/Collections/Iterable.rvn",
+        "runtime/raven/src/System/Collections/Collection.rvn",
+        "runtime/raven/src/System/Collections/Sequence.rvn",
+        "runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "runtime/raven/src/System/Collections/List.rvn",
+        "runtime/raven/src/System/Propagatable.rvn",
+        "runtime/raven/src/System/Option.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support only top-level functions and supported source class declarations.\n"
+    }
+  },
+  "bootstrapCoreSha256": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad"
+}

@@ -26,7 +26,8 @@ public sealed class MethodInfo
         var typeArguments = owner switch { NominalTypeInfo nominal => nominal.GetGenericArguments(), ConstructedTypeInfo constructed => constructed.TypeArguments, _ => Array.Empty<TypeInfo>() };
         returns = new(() => context.ResolveMemberSignature(signature.ReturnType, typeArguments, genericArguments, owner));
         parameters = new(() => Array.AsReadOnly(signature.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
-            context.ResolveMemberSignature(type, typeArguments, genericArguments, owner))).ToArray()));
+            context.ResolveMemberSignature(type.ByReferenceElement ?? type, typeArguments, genericArguments, owner),
+            type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref)).ToArray()));
     }
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }
@@ -71,15 +72,28 @@ public sealed class MethodInfo
     public bool IsVirtual { get; }
 }
 
+/// <summary>The supported metadata parameter passing conventions.</summary>
+public enum ParameterPassingMode
+{
+    /// <summary>A value is copied into the parameter.</summary>
+    Value,
+    /// <summary>A writable managed reference whose target is initialized by the caller.</summary>
+    Ref,
+    /// <summary>A writable managed reference assigned by the callee before normal return.</summary>
+    Out
+}
+
 /// <summary>A metadata parameter with position and type; absent native parameter names are not invented.</summary>
 public sealed class ParameterInfo
 {
-    internal ParameterInfo(MethodInfo method, int position, TypeInfo type) { DeclaringMethod = method; Position = position; ParameterType = type; }
+    internal ParameterInfo(MethodInfo method, int position, TypeInfo type, ParameterPassingMode passingMode) { DeclaringMethod = method; Position = position; ParameterType = type; PassingMode = passingMode; }
     /// <summary>Gets the canonical owning method view.</summary>
     public MethodInfo DeclaringMethod { get; }
     /// <summary>Gets the zero-based parameter index.</summary>
     public int Position { get; }
-    /// <summary>Gets the projected parameter type.</summary>
+    /// <summary>Gets the declared value, ref or out passing convention.</summary>
+    public ParameterPassingMode PassingMode { get; }
+    /// <summary>Gets the projected value type, or the referenced element type for ref/out parameters.</summary>
     public TypeInfo ParameterType { get; }
 }
 

@@ -331,3 +331,11 @@ Self inheritance and Raven semantic/emission integration remain open. See the
 [API contract](../../api-docs/experimental-metadata.md#native-self-signatures-development-2026-10-03).
 
 [Executable evidence](../experiments/extended-cli-metadata/self-contracts-2026-10-03.json) records source/artifact hashes and the remaining gates.
+
+## Writable parameter modes (2026-10-03)
+
+Native declaration views now preserve writable ref/out modes and substitute their element
+types through open/constructed owner and method scopes. Raven maps those explicit facade
+facts to RefKind; it no longer supplies a by-value default for every native parameter.
+Readonly/In remains an explicit unsupported category. External interface contract substitution
+retains out indices. See the host API manual and dual-target driver evidence for validation.

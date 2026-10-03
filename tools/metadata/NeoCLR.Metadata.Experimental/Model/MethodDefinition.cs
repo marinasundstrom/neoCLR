@@ -9,6 +9,7 @@ public sealed partial class MethodDefinition
     private readonly int[] outParameters = [];
     private readonly uint declaringToken;
     private readonly bool unsupportedGenericParameters;
+    private readonly bool unsupportedParameterModes;
     internal MethodDefinition(ModuleDefinition module, AssemblyDefinition.MethodRow row)
     {
         Module = module;
@@ -18,6 +19,7 @@ public sealed partial class MethodDefinition
         ImplementationAttributes = row.ImplementationAttributes;
         GenericArity = row.Arity;
         unsupportedGenericParameters = row.UnsupportedGenericParameters;
+        unsupportedParameterModes = row.UnsupportedParameterModes;
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
         outParameters = row.OutParameters;
@@ -132,9 +134,9 @@ public sealed partial class MethodDefinition
             if (!IsStatic && (DeclaringType is null || GenericArity != 0))
                 throw new InvalidDataException("unsupported native callable import");
             return new MethodSignature(consumer.ImportNativeSignatureType(nativeSignature.ReturnType, core, resolver),
-                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)), nativeSignature.GenericParameterNames);
+                nativeSignature.ParameterTypes.Select(type => consumer.ImportNativeSignatureType(type, core, resolver)), nativeSignature.GenericParameterNames, nativeSignature.OutParameters);
         }
-        if (unsupportedGenericParameters || GenericArity is < 0 or > 32)
+        if (unsupportedParameterModes || unsupportedGenericParameters || GenericArity is < 0 or > 32)
             throw new InvalidDataException("unsupported imported method declaration");
         try
         {

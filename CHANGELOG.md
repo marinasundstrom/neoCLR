@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Preserve writable ref/out parameter modes through native definitions, introspection
+  and symbol-authored external method contracts, including generic interface substitution.
+  Existing encodings are unchanged; readonly parameter metadata rejects explicitly.
+  Separately compiled inherited interface dispatch runs on .NET and neoCLR. Unchanged
+  Propagatable now emits natively; Option reaches a later source-declaration emission gap.
+
 - Add a minimal checked-storage bootstrap and ordinary-driver acceptance for separately
   compiled generic reservation helpers. With explicit Raven bootstrap opt-in, native
   consumers preserve array alias mutation (42) and reject uninitialized reads. Source-owned
