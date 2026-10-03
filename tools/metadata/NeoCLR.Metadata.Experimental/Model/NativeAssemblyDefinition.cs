@@ -164,7 +164,7 @@ public sealed partial class NativeAssemblyDefinition
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
                 var isValueType = !isInterface && !type.GetProperty("is_reference_type").GetBoolean();
-                Require((!isValueType || !isStatic && baseInterfaces.Length == 0) &&
+                Require((!isValueType || !isStatic) &&
                     type.GetProperty("is_reference_type").GetBoolean() == (!isInterface && !isValueType) && type.GetProperty("is_sealed").GetBoolean() == (isStatic || isValueType) &&
                     (!isInterface || !type.GetProperty("is_abstract").GetBoolean() && Array(type, "fields", 256).Length == 0), "unsupported native type shape");
                 var fieldRows = new List<FieldRow>();

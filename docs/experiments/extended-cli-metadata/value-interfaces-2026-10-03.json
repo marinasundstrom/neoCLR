@@ -1,0 +1,174 @@
+{
+  "passed": true,
+  "scope": "Ordinary-driver value-type interface declarations and concrete addressed calls, not boxed interface conversion.",
+  "driverSha256": "A0FE4BFF33F0AEF54A8FDEEC131FFEB85E25B8846973D3E4B1553FED99D6FF0E",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "results": [
+    {
+      "target": "dotnet",
+      "passed": true,
+      "assemblySha256": "6716AF3A94DDBEA36BAA31F3DE9C32A874F736396185306E6F7BDD83E09B6593",
+      "sourceSha256": "876577C403D67DB82FDEA36A5C0C5F07EBEDE1544C84229354AA5815DADCDFBC"
+    },
+    {
+      "target": "neoclr",
+      "passed": true,
+      "assemblySha256": "3891E7E0B9594D79F91B84DCEC20CD5FE821373ED6E807DBA1AADF43B3C76C26",
+      "sourceSha256": "876577C403D67DB82FDEA36A5C0C5F07EBEDE1544C84229354AA5815DADCDFBC"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/value-interface-driver-final-20261003/dotnet.dll",
+        "/tmp/value-interface-driver-final-20261003/dotnet.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/value-interface-driver-final-20261003/dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/value-interface-driver-final-20261003/neoclr.dll",
+        "/tmp/value-interface-driver-final-20261003/neoclr.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/value-interface-driver-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AFAA8F4253B1CB34FF6CBD4B453F9C3A4DCFB31A288EB8B03A77C6898F60F130: typed-stack/control-flow verification passed (644 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/value-interface-driver-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/value-interface-driver-final-20261003/Rejected.dll",
+        "/tmp/value-interface-driver-final-20261003/Rejected.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support lowered expression BoundConversionExpression.\n"
+    }
+  ],
+  "date": "2026-10-03",
+  "ravenRevision": "ee1c05ddc84f95f39b7fe44ea84aa6a5c638468c",
+  "neoClrBaseRevision": "eb1e6755400ae328ebdc37a5b0687bd00dc22e4a",
+  "metadataChanges": "Value interfaces and constrained IL generator calls in the commit containing this evidence; runtime implementation unchanged.",
+  "metadataTests": {
+    "passed": 117,
+    "total": 117
+  },
+  "ravenTests": {
+    "passed": 11,
+    "filter": "FullyQualifiedName~SourceUnionDeclarationPlanTests|FullyQualifiedName~EmissionBackendTests|FullyQualifiedName~NominalLocalEmissionTests"
+  },
+  "constrainedRuntime": {
+    "exitCode": 42,
+    "stdout": "",
+    "stderr": "=> Int32(42)\n",
+    "artifactSha256": "f295a48e04b24e8f248068b7d2f953098813ed3c5d44039b926d636d8416a2e5"
+  },
+  "option": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/NeoCLR.StorageCore-20261003.dll",
+      "--bootstrap-intrinsics",
+      "--library",
+      "--bootstrap-ownership",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+      "-o",
+      "/tmp/value-interface-option-20261003/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support union callable contract: virtual override func ToString() -> string.\n",
+    "sourceHashes": {
+      "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+      "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+      "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+      "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+      "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+      "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+      "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+      "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+    }
+  },
+  "apiSnapshot": "Existing stale snapshot/regeneration blocker; manual host reference and XML updated.",
+  "limits": [
+    "Metadata constrained calls currently require owned nongeneric value and interface operands.",
+    "Raven exercises concrete addressed calls; general constrained lowering and boxing remain pending.",
+    "Source Option still rejects synthesized ToString; no source union execution claimed."
+  ],
+  "metadataSourceHashes": {
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/Program.cs": "560515c273ac622de818d81c18a17d0ed93d8dddbe0a89071a84567405956b66",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyBuilder.cs": "9f5f4a5f89655010abe2efa3152f6ed6ad8c47edaca37bfe6d06f93adf7a3a02",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/IILGenerator.cs": "cfccffaf1ae582b7624f18269766986fc7ffb16a15bf3ecdfd6811fc830e21a8",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/InterfaceBuilder.cs": "736628d534573966c01f95313d9fac8900cecc54877e1fe67498bce8d91f61c6",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/InterfaceImplementation.cs": "23d31c6e87f439d2b11f6b909fdd70d95033fe622f11be0ff0dad9232a6f85c5",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBuilder.Flow.cs": "ce2a1d41761220a02062e65c06ee0481bd74226de1f666f59101aee967959f77",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodILGenerator.cs": "ed322aba860e4369db2d1819be106045c083ffb19e8a75cddb2ac7b44077835f",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyDefinition.cs": "fb21bc7393ee574c098964b288447c9589935e18e050ee8d4784846ba0051b54",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyWriter.cs": "1fbfe7d9dab37aaa3f8dd881e6df2fc8c27a8555d23393d5556287cc10e5b4c4",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ConstrainedInterfaceChecks.cs": "2db9cb2645f1ea8237d4268e6442ae30b06823af76d6db4e93cb4580c4cd77b1"
+  }
+}

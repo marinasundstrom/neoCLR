@@ -844,3 +844,8 @@ Host metadata Byte signature and `OpCode.Conv_U1` coverage is maintained in the
 [manual host reference](experimental-metadata.md#byte-signatures-and-il-generation-development-2026-10-03)
 and matching XML comments. The existing reference/snapshot regeneration blocker remains;
 this host-only API is not represented as a regenerated runtime reference assembly.
+
+Value-type interface relationships and the host-only IILGenerator constrained-call/typed
+Emit overload are documented in the [manual host reference](experimental-metadata.md#value-interfaces-and-constrained-calls-development-2026-10-03)
+and XML. These C# host APIs remain excluded from RavenDoc's runtime reference assembly;
+the previously recorded reference regeneration blocker is unchanged.

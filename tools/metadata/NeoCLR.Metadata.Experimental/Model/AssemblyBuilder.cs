@@ -115,7 +115,7 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
-                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed"))
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstructedTarget is { } target)
                     {
@@ -509,6 +509,7 @@ public sealed partial class AssemblyBuilder
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
                     "constant64" => 9,
+                    "call.constrained" => 11,
                     "fail" => 11,
                     "function.bind" => 12,
                     "function.invoke" => 5,
@@ -585,6 +586,9 @@ public sealed partial class AssemblyBuilder
                     case "shift.left": code.WriteByte(0x62); break;
                     case "shift.right": code.WriteByte(0x63); break;
                     case "new.constructed": case "call.constructed": case "call.virtual.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : instruction.Op == "call.virtual.constructed" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
+                    case "call.constrained":
+                        code.WriteByte(0xfe); code.WriteByte(0x16); code.WriteInt32(ElementToken(instruction.Type!));
+                        code.WriteByte(0x6f); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "function.bind":

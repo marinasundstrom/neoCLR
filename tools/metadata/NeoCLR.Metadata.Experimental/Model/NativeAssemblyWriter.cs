@@ -105,6 +105,7 @@ public sealed partial class AssemblyBuilder
                     parameters = instruction.GenericTarget.Signature.ParameterTypes.Select(SignatureValue).ToArray()
                 }
             },
+            "call.constrained" => new { op = "callself", arg = new { borrowed = true, self_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = true, parameters = Parameters(instruction.Target!) } } },
             "call.virtual" or "call" or "new.object" => new { op = instruction.Op == "call.virtual" ? "callvirt" : instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.import.load" or "field.import.store" => new { op = instruction.Op == "field.import.load" ? "ldfld" : "stfld", arg = (object)(instruction.ImportedField!.NativeIndex ?? throw new InvalidDataException("native field emission requires a native layout ordinal")) },

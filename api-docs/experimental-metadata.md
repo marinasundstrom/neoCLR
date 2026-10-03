@@ -5637,3 +5637,45 @@ costs another supported primitive category but avoids widening union tags in met
 C# coverage checks CLI/native round trips, field/method imports, local/array/field storage,
 conversion boundaries, CLR execution and incompatible by-reference rejection. The native
 artifact executes using the runtime's existing Byte storage and conversion implementation.
+
+## Value interfaces and constrained calls (development, 2026-10-03)
+
+`TypeBuilder.AddInterfaceImplementation(TypeBuilder|GenericTypeInstance|ImportedTypeReference)`
+and `TypeDefinition.Interfaces.Add` now admit value-type owners as well as root classes.
+Owned, constructed and registered external relationships retain their existing ownership,
+completeness, signature and duplicate validation. The native reader retains these edges;
+CLI emission writes ordinary InterfaceImpl rows and implementation method flags.
+Declaring a relationship does not introduce implicit boxing in the body API.
+
+New `IILGenerator` members:
+
+```csharp
+void CallConstrained(TypeBuilder receiverType, MethodBuilder target);
+void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);
+```
+
+The initial call profile requires an owned nongeneric concrete value type implementing
+an owned nongeneric interface, and an abstract instance method on that interface. The
+raw overload accepts only `OpCode.Callvirt`. Null operands throw ArgumentNullException;
+foreign, generic, nonvalue, nonconforming or invalid targets/opcodes throw ArgumentException
+before appending. The existing instruction bound applies. Writing validates complete
+implementations, parameters and the exact managed receiver address; invalid bodies throw
+InvalidDataException. Arguments follow the receiver on the stack.
+
+```csharp
+var il = method.GetILGenerator();
+il.LoadLocalAddress(counter);
+il.CallConstrained(counterType, nextInterfaceMethod);
+// Equivalent atomic typed emission:
+// il.Emit(OpCode.Callvirt, counterType, nextInterfaceMethod);
+```
+
+CLI encoding is `constrained.` plus `callvirt`; native encoding uses the existing borrowed
+`callself` instruction. Both dispatch to the implementation using the addressed storage,
+so mutations affect that instance and leave prior copies independent. This implements
+the value-implementation branch of [.NET constrained dispatch](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.constrained?view=net-10.0).
+Reference receivers, external/constructed call targets, open generic receivers, and boxing
+fallbacks remain outside this initial authoring profile. The bounded API costs a separate
+validated operand form but prevents an incomplete prefix from being left in a body.
+No native format version or runtime code change is required. This operation is exposed
+on the metadata IL generator, not added to method builders or Raven's shared IL interface.

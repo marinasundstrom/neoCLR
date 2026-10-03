@@ -100,6 +100,9 @@ public sealed partial class MethodBuilder
                     Assembly.HasNativeInterfaceConversion(importedActual, importedTarget);
                 var localExternalConformance = stack.Count > 0 && stack[^1].Class is { } localClass && type.ImportedType is { } externalTarget &&
                     localClass.InheritedContracts().Any(c => Equals(c.ImportedType, externalTarget));
+                if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
+                    (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
+                    throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
                 if (stack.Count == 0 || stack[^1] != type && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
                 stack.RemoveAt(stack.Count - 1);
             }
@@ -278,6 +281,7 @@ public sealed partial class MethodBuilder
                     Pop(instruction.Type);
                     if (!function.NoResult) stack.Add(function.ReturnType);
                     break;
+                case "call.constrained":
                 case "call.virtual.constructed":
                 case "call.virtual":
                 case "call":
@@ -298,7 +302,7 @@ public sealed partial class MethodBuilder
                     if (!instruction.Target.IsStatic)
                     {
                         var receiver = instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
-                        Pop(instruction.Target.DeclaringType!.IsValueType ? SignatureType.ByReference(receiver) : receiver);
+                        Pop(instruction.Op == "call.constrained" || instruction.Target.DeclaringType!.IsValueType ? SignatureType.ByReference(receiver) : receiver);
                     }
                     // Receiver and ref input preconditions precede all output assignments.
                     foreach (var slot in outputs) assigned[slot] = true;

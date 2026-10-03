@@ -66,7 +66,7 @@ public sealed partial class TypeBuilder
     }
 
     private readonly List<TypeBuilder> implementedInterfaces = [];
-    /// <summary>Gets the directly implemented nongeneric interfaces of a root class.</summary>
+    /// <summary>Gets the directly implemented nongeneric interfaces of a root class or value type.</summary>
     public IReadOnlyList<TypeBuilder> ImplementedInterfaces => implementedInterfaces.AsReadOnly();
     private readonly List<GenericTypeInstance> constructedInterfaces = [];
     private readonly List<ImportedTypeReference> externalInterfaces = [];
@@ -81,13 +81,13 @@ public sealed partial class TypeBuilder
         AddExternalInterface(contract);
     }
 
-    /// <summary>Adds an external interface implementation to a root class.</summary>
+    /// <summary>Adds an external interface implementation to a root class or value type.</summary>
     /// <remarks>All required public instance methods are checked against the completed external contracts when writing.</remarks>
     /// <exception cref="ArgumentException">The reference is foreign, unregistered, duplicate or has invalid generic scope.</exception>
-    /// <exception cref="InvalidOperationException">The owner is not a root class.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not a root class or value type.</exception>
     public void AddInterfaceImplementation(ImportedTypeReference contract)
     {
-        if (IsInterface || IsStatic || IsValueType) throw new InvalidOperationException("interface implementations require a root class");
+        if (IsInterface || IsStatic) throw new InvalidOperationException("interface implementations require a root class or value type");
         AddExternalInterface(contract);
     }
 
@@ -101,7 +101,7 @@ public sealed partial class TypeBuilder
 
     internal void AttachExternalInterface(ImportedTypeReference contract)
     {
-        if (!IsInterface && (IsStatic || IsValueType)) throw new InvalidOperationException("interface relationship requires an interface or root class");
+        if (!IsInterface && IsStatic) throw new InvalidOperationException("interface relationship requires an interface or root class or value type");
         SignatureType signature = contract;
         signature.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
         if (externalInterfaces.Contains(contract) || externalInterfaces.Count >= 256) throw new ArgumentException("duplicate or excessive interface relationship");
@@ -135,20 +135,20 @@ public sealed partial class TypeBuilder
         contract.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
         (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name,
             contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)));
-    /// <summary>Declares an owned generic interface implementation on a root class, including owner-parameter arguments.</summary>
+    /// <summary>Declares an owned generic interface implementation on a root class or value type, including owner-parameter arguments.</summary>
     /// <exception cref="ArgumentNullException">Contract is null.</exception>
     /// <exception cref="ArgumentException">Foreign, out-of-scope, duplicate, cyclic or noninterface contract.</exception>
-    /// <exception cref="InvalidOperationException">Owner is not a root class.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not a root class or value type.</exception>
     public void AddInterfaceImplementation(GenericTypeInstance contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
-        if (IsInterface || IsStatic || IsValueType)
-            throw new InvalidOperationException("interface implementations require a root class");
+        if (IsInterface || IsStatic)
+            throw new InvalidOperationException("interface implementations require a root class or value type");
         Definition.Interfaces.Add(new InterfaceImplementation(contract.Definition.Definition.ToReference(), contract.TypeArguments));
     }
     internal void AttachConstructedInterface(GenericTypeInstance contract)
     {
-        if (!IsInterface && (IsStatic || IsValueType)) throw new InvalidOperationException("constructed interfaces require an interface or root class");
+        if (!IsInterface && IsStatic) throw new InvalidOperationException("constructed interfaces require an interface or root class or value type");
         if (!contract.Definition.IsInterface || !ReferenceEquals(contract.Definition.Assembly, Assembly) ||
             contract.Definition.Reaches(this) || constructedInterfaces.Count >= 256 || constructedInterfaces.Contains(contract))
             throw new ArgumentException("unsupported or duplicate constructed interface");
@@ -166,19 +166,19 @@ public sealed partial class TypeBuilder
     /// <param name="contract">An interface from this assembly, including its inherited contracts.</param>
     /// <exception cref="ArgumentNullException">Contract is null.</exception>
     /// <exception cref="ArgumentException">Foreign, generic, duplicate or noninterface contract, or limit exceeded.</exception>
-    /// <exception cref="InvalidOperationException">Owner is not a root class.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not a root class or value type.</exception>
     /// <remarks>Writing requires an exact public instance implementation for every inherited method.</remarks>
     public void AddInterfaceImplementation(TypeBuilder contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
-        if (IsInterface || IsStatic || IsValueType)
-            throw new InvalidOperationException("interface implementations require a root class");
+        if (IsInterface || IsStatic)
+            throw new InvalidOperationException("interface implementations require a root class or value type");
         Definition.Interfaces.Add(new InterfaceImplementation(contract.Definition.ToReference()));
     }
     internal void AttachInterfaceImplementation(TypeBuilder contract)
     {
-        if (IsInterface || IsStatic || IsValueType)
-            throw new InvalidOperationException("interface implementations require a root class");
+        if (IsInterface || IsStatic)
+            throw new InvalidOperationException("interface implementations require a root class or value type");
         if (!contract.IsInterface || contract.GenericParameterNames.Count != 0 || !ReferenceEquals(contract.Assembly, Assembly) ||
             implementedInterfaces.Contains(contract) || implementedInterfaces.Count >= 256)
             throw new ArgumentException("invalid or duplicate interface implementation", nameof(contract));

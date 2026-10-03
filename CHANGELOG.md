@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Admit value-type interface relationships through metadata definitions/builders and
+  native readers. Add bounded IILGenerator constrained interface calls and a typed raw
+  Callvirt overload, encoding CLI constrained./callvirt and native borrowed callself.
+  C# execution checks addressed mutation, independent copies and exact receiver types;
+  implicit unboxed interface conversions still reject. Raven opts into value-interface
+  declarations; Option now reaches its generated ToString blocker. No runtime/schema
+  changes or boxed/generic constrained-call support are claimed. API snapshot remains stale.
+
 - Record Raven's complete source-union declaration discovery and physical generic
   case ownership. Native preflight now identifies unsupported synthesized ToString
   overrides; unchanged Option also requires value-type interface implementation.

@@ -69,7 +69,10 @@ Byte discriminator storage, conversions and signatures now execute on both targe
 see [byte evidence](experiments/extended-cli-metadata/byte-discriminator-2026-10-03.json).
 Generated union declaration discovery now retains complete case/member contracts and
 physical generic case owners. Native preflight reaches synthesized ToString overrides;
-unchanged Option separately requires value-type interface implementation. Union/case
+unchanged Option now passes value-type interface admission and reaches the same override
+blocker. Metadata-generated constrained interface dispatch already executes with mutation
+and independent copies on both runtimes; compiler declarations/concrete calls also pass.
+See [value-interface evidence](experiments/extended-cli-metadata/value-interfaces-2026-10-03.json). Union/case
 metadata round trips, synthesized member emission and symbol-authored external value
 operands remain pending; this is not source Option completion. See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See

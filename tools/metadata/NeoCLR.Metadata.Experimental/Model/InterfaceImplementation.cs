@@ -24,7 +24,7 @@ public sealed class InterfaceImplementation
     public IReadOnlyList<SignatureType> TypeArguments { get; } = Array.Empty<SignatureType>();
     /// <summary>Gets the exact target reference supplied by the caller.</summary>
     public TypeReference InterfaceType { get; }
-    /// <summary>Gets the declaring class or interface, or null before attachment.</summary>
+    /// <summary>Gets the declaring class, value type or interface, or null before attachment.</summary>
     public TypeDefinition? DeclaringType { get; internal set; }
 }
 

@@ -128,3 +128,8 @@ The development native emitter also handles bounded nested source class/value de
 under nongeneric owners. Paired .NET/native execution checks constructor and copy behavior;
 Byte discriminator signatures, storage and conversions now execute on both targets;
 generated union declarations remain work in progress.
+
+The development metadata API supports value-type interface relationships and bounded
+constrained calls through its IL generator. Mutation/copy checks execute on CLR and
+neoCLR. Raven admits the declarations and concrete calls; broader constrained lowering,
+boxing and complete source-union emission remain in progress.

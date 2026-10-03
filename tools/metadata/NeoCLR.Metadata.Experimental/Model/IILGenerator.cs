@@ -199,6 +199,24 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void CallVirtual(MethodBuilder target);
+    /// <summary>Calls an owned nongeneric interface on an addressed owned nongeneric value type without boxing.</summary>
+    /// <param name="receiverType">The concrete implementing value type from this assembly.</param>
+    /// <param name="target">An owned nongeneric abstract interface method.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Foreign, generic, nonvalue or nonconforming receiver, or invalid target.</exception>
+    /// <remarks>Consumes an exact managed receiver address followed by arguments. Writing verifies implementations and stack types.
+    /// CLI encoding uses constrained. plus callvirt; native encoding uses borrowed callself. Reference receivers, boxing fallbacks,
+    /// open generics, external and constructed interface targets are outside this initial profile.</remarks>
+    void CallConstrained(TypeBuilder receiverType, MethodBuilder target);
+    /// <summary>Emits an atomic constrained interface call with typed receiver and method operands.</summary>
+    /// <param name="opCode">Callvirt; other opcodes reject before mutation.</param>
+    /// <param name="receiverType">An owned nongeneric implementing value type.</param>
+    /// <param name="target">An owned nongeneric abstract interface method.</param>
+    /// <exception cref="ArgumentException">Unsupported opcode or operand contract.</exception>
+    /// <exception cref="ArgumentNullException">A required operand is null.</exception>
+    void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);
+
+
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
     /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, or Callvirt for a Function signature.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>

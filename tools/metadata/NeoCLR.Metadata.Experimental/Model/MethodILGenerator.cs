@@ -287,6 +287,24 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         Append(new(opCode == OpCode.Fail ? "fail" : "string", Text: operand));
     }
 
+    public void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target)
+    {
+        if (opCode != OpCode.Callvirt) throw OperandError(opCode);
+        CallConstrained(receiverType, target);
+    }
+
+    public void CallConstrained(TypeBuilder receiverType, MethodBuilder target)
+    {
+        ArgumentNullException.ThrowIfNull(receiverType);
+        ArgumentNullException.ThrowIfNull(target);
+        if (!ReferenceEquals(receiverType.Assembly, Assembly) || !receiverType.IsValueType ||
+            receiverType.GenericParameterNames.Count != 0 || !ReferenceEquals(target.Assembly, Assembly) ||
+            !target.IsAbstract || target.IsStatic || target.Signature.GenericParameterNames.Count != 0 ||
+            target.DeclaringType!.GenericParameterNames.Count != 0 || !receiverType.ConformsTo(target.DeclaringType))
+            throw new ArgumentException("constrained call requires an owned nongeneric value implementing an owned nongeneric interface");
+        Append(new("call.constrained", Target: target, Type: receiverType));
+    }
+
     public void Fail(string message) => Emit(OpCode.Fail, message);
 
     public void Emit(OpCode opCode, MethodBuilder operand)
