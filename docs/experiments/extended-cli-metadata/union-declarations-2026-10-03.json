@@ -1,0 +1,161 @@
+{
+  "scope": "Union declaration discovery baseline; native union execution remains blocked by synthesized override contracts.",
+  "driverSha256": "BA76D9D2BE440B3279BDAD8C6C1E75A6D4179397DB020FC641A700621EDCF481",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "evidence": [
+    {
+      "name": "Plain",
+      "sourceSha256": "E6947C1CA8CBB9368E6F0534E2A3DA3CA5C657EA2CD5798E408EF62780C1A90E",
+      "dotnetAssemblySha256": "6D137BEBE5BB8E6281E0002052575C79965C664CCCF9D6378B9337EA0FBAE303",
+      "dotnetExecuted": true,
+      "nativeExecuted": false,
+      "nativeOutputPublished": false
+    },
+    {
+      "name": "Generic",
+      "sourceSha256": "5AA0B46C1AEDFE1D1EA48A87821A09E226E8E83076C4C864DD237AAE1D3AF50F",
+      "dotnetAssemblySha256": "1E004BBED90AA62D61B57D81387360DB779BC6CC9EFEAD9CB1AB42E3D89C9D0A",
+      "dotnetExecuted": true,
+      "nativeExecuted": false,
+      "nativeOutputPublished": false
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/union-driver-verified-20261003/Plain.dll",
+        "/tmp/union-driver-verified-20261003/Plain.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-driver-verified-20261003/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 3,2s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-driver-verified-20261003/Plain.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/union-driver-verified-20261003/Plain.native.dll",
+        "/tmp/union-driver-verified-20261003/Plain.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union callable contract: virtual override func ToString() -> string.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/union-driver-verified-20261003/Generic.dll",
+        "/tmp/union-driver-verified-20261003/Generic.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-driver-verified-20261003/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,9s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-driver-verified-20261003/Generic.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/union-driver-verified-20261003/Generic.native.dll",
+        "/tmp/union-driver-verified-20261003/Generic.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union callable contract: virtual override func ToString() -> string.\n"
+    }
+  ],
+  "date": "2026-10-03",
+  "ravenRevision": "948da8bcc1de3ba2d86de42160a202092d99dbe9",
+  "neoClrBaseRevision": "b5ec64dd434740ca77830ba2d3d2c3362b495a59",
+  "focusedTests": {
+    "passed": 7,
+    "filter": "FullyQualifiedName~SourceUnionDeclarationPlanTests|FullyQualifiedName~EmissionBackendTests"
+  },
+  "option": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/NeoCLR.StorageCore-20261003.dll",
+      "--bootstrap-intrinsics",
+      "--library",
+      "--bootstrap-ownership",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+      "-o",
+      "/tmp/union-option-20261003/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support union type contract: union struct Option<T>.\n",
+    "outputPublished": false,
+    "sourceHashes": {
+      "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+      "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+      "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+      "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+      "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+      "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+      "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+      "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+    }
+  },
+  "next": [
+    "Value-type interface implementation/dispatch for Option : Propagatable",
+    "Synthesized override/display contracts",
+    "Union/case metadata authoring, reading and semantic imports"
+  ],
+  "runtime": "Unchanged; no native union assembly was emitted or executed in this slice."
+}

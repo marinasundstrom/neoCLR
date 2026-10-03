@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven's complete source-union declaration discovery and physical generic
+  case ownership. Native preflight now identifies unsupported synthesized ToString
+  overrides; unchanged Option also requires value-type interface implementation.
+  .NET union controls execute, but native union publication remains explicitly blocked
+  pending complete contracts. Metadata format and runtime are unchanged.
+
 - Support Byte signatures/storage and `IILGenerator.Emit(OpCode.Conv_U1)` in the
   experimental metadata API, preserving Int32 stack values and exact by-reference
   identity. CLI/native readers and introspection retain Byte; CLR/native execution

@@ -67,8 +67,12 @@ targets, with scoped payload identity and copy checks; see
 [nested source evidence](experiments/extended-cli-metadata/source-nested-2026-10-03.json).
 Byte discriminator storage, conversions and signatures now execute on both targets;
 see [byte evidence](experiments/extended-cli-metadata/byte-discriminator-2026-10-03.json).
-Generated union declaration collection, synthesized union
-members and symbol-authored external value operands remain pending; this is not source Option completion. See
+Generated union declaration discovery now retains complete case/member contracts and
+physical generic case owners. Native preflight reaches synthesized ToString overrides;
+unchanged Option separately requires value-type interface implementation. Union/case
+metadata round trips, synthesized member emission and symbol-authored external value
+operands remain pending; this is not source Option completion. See
+[union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires
 Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
