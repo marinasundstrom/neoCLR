@@ -1,0 +1,146 @@
+{
+  "date": "2026-10-03",
+  "ravenCommit": "fd4239bed6b820ee5d4f0769fdcfdbd9da218ed6",
+  "metadataTests": {
+    "passed": 109,
+    "total": 109
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "75BACCC3F1D71020B5DDE1BB60135097C0F0D76E83D458A3D9CB660D170B4386",
+        "dependencySha256": "B61B3F41D76A3AA275461827303C85C4C29236F0B63FFAF2E12A184C382FF14B",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "53F2506AD29B210A11A5A2C2DE9194240532700498008C0B6FABBF24214E6EFD",
+        "dependencySha256": "C934D1958D7522597E0D198A10C15CB43FF0BD65F2B1A15A019F690BFA213BB7",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "3098A1CF1789C16EB5BA8913DF41BEC17563DDA55A882EE3171430FECEA57539",
+        "dependencySha256": "CC707BD6DFE80046860FE2CE5A237724CAAB09F11B371A7505B9560FCA62F926",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "859FBB791F485E2645DAF49BCDCE472F4A6A53ED060B779584C8FB6E3F96C06F",
+        "dependencySha256": "CC707BD6DFE80046860FE2CE5A237724CAAB09F11B371A7505B9560FCA62F926",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "D5E5E5C400CEF23326A1BAC3EACC7B2BB36513241A6B8D79BE18B46EC2296E28",
+        "dependencySha256": "09604BFA6E5273A8E3EE6302722AADE3ACDEF966BF404219E7D50D9D32BDD2A2",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "CB3F4203AB105477BC2DB53EB3158BAA08A9C4FCC072923D69D3F4C2C3DA9446"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "2BDB6F7777BD587366EBD171E4D01572D8773CC2522FF2BE79F80A56AF6BC230",
+        "dependencySha256": "D824E892669D1E18733C38BE4424C45A8B235EE4C4749162C9CE81E0E283A2C4",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "6F52280B632725763EA8072E8E2B6B2C79BE88ED484AE5DEE5471B278199E291"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "4D928D681C2C2B1B4FF3F336919CFBC8CDE29DA096E8C69BE594EAB81647C43C",
+        "dependencySha256": "A321A225E3CEC3CEAB18956A4906E8C4BA7145326ACD62DBB9BA8E502FD3C6D2",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "1B279D806BDE05B57D510D09D32F9E00B91580BC891C4D54CEA83DD5F202F808"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "dualDriver": {
+    "passed": true,
+    "driverSha256": "791EA38E55676CE51B0C8814D83D3A08807E4669AE95A952BE790E9A30A5D1F4",
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "runtimeConfigSha256": "F9BC8E9F0C46247078ED47309F19A7576B4B94E4300E9DE0003917D6BD2D667A",
+    "sourceSha256": {
+      "hello": "F95F29308310D57401051FDFEE0477B10C39675CB4ABFC74677F94D10CF727FD",
+      "library": "F33719C88B797E1FB3345E539DD0018698566134EB3B66DA814C4ACA2DA66814",
+      "consumer": "C98453E37A131CFB113055366CC1465FAC025AAC9EC92ECA90334B039C34D932"
+    },
+    "bootstrap": "Explicit .NET host core / NeoCLR.CoreProbe bootstrap; no System seed or reference-only control counts as execution",
+    "cases": [
+      {
+        "target": "dotnet",
+        "scenario": "hello",
+        "passed": true,
+        "error": null,
+        "appSha256": "C801F4F395BD68C5CDA97E694949BC34587192CEFD90B72E0F228D503164012A",
+        "dependencySha256": null
+      },
+      {
+        "target": "dotnet",
+        "scenario": "library",
+        "passed": true,
+        "error": null,
+        "appSha256": "D0B0F15E972BF2CC0FFDB8579CEE60A810A667AA60F91BB1E0BF97A092C9EF7F",
+        "dependencySha256": "95FEC55B95B22CA9FF4FE1BE5B4135B9E06EEB43B5239E577137522ECE7E7AA7"
+      },
+      {
+        "target": "neoclr",
+        "scenario": "hello",
+        "passed": true,
+        "error": null,
+        "appSha256": "BBB73EDFAF0455A9F27BAD1672B1BA0D7A4BCBD16DC60326A8B5F96578B0F16E",
+        "dependencySha256": null
+      },
+      {
+        "target": "neoclr",
+        "scenario": "library",
+        "passed": true,
+        "error": null,
+        "appSha256": "C8092D8CA8F115A76F53F4BB0206982F39BB5A5DAF6C4126647E28AEF2FF8655",
+        "dependencySha256": "67D82A9D6F6BA670DF5289EA07E6D5607E768A3DE92C62BB1AFD2C611206A0BB"
+      },
+      {
+        "target": "neoclr",
+        "scenario": "native-reference-rejections",
+        "passed": true
+      }
+    ]
+  },
+  "scope": "Declaration classification only. Byref/out and broader reader profiles remain rejected."
+}

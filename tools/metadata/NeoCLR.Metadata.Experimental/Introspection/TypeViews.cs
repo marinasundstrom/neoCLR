@@ -77,6 +77,8 @@ public sealed class ConstructedTypeInfo : TypeInfo
     public IReadOnlyList<TypeInfo> GetInterfaces() => allInterfaces.Value;
     /// <summary>Gets declared non-constructor methods through this constructed owner.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => Context.GetMethods(Definition.Definition, this);
+    /// <summary>Gets constructor declarations with this owner's arguments substituted.</summary>
+    public IReadOnlyList<MethodInfo> GetConstructors() => Context.GetConstructors(Definition.Definition, this);
     internal override int Depth => 1 + TypeArguments.Max(t => t.Depth);
     /// <inheritdoc/>
     public override string DisplayName => Definition.DisplayName + "<" + string.Join(", ", TypeArguments.Select(t => t.DisplayName)) + ">";
@@ -88,7 +90,7 @@ public sealed class ConstructedTypeInfo : TypeInfo
 public sealed class FieldInfo
 {
     internal FieldInfo(FieldDefinition definition, TypeInfo declaringType, TypeInfo fieldType)
-    { Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType; IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0; }
+    { Accessibility = MetadataAccess.Member(definition.Attributes); Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType; IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0; }
     /// <summary>Gets the metadata name.</summary>
     public string Name { get; }
     /// <summary>Gets the original declaration's module-local field token.</summary>
@@ -99,6 +101,8 @@ public sealed class FieldInfo
     public TypeInfo FieldType { get; }
     /// <summary>Gets the metadata static flag.</summary>
     public bool IsStatic { get; }
+    /// <summary>Gets declared metadata accessibility.</summary>
+    public MetadataAccessibility Accessibility { get; }
     /// <summary>Gets the metadata init-only flag; this facade cannot write values.</summary>
     public bool IsReadOnly { get; }
 }

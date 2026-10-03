@@ -63,3 +63,8 @@ execute (42); the consumer has no library source. Duplicate identities, missing 
 dependencies, ordinary CLI references, malformed input and unsupported source reject without
 publishing output. Host .NET runtime execution uses an explicitly hashed runtimeconfig.
 The wider source-library/collections gate remains open; runtime encoding is unchanged.
+
+Declaration-fact slice complete for the current by-value signature profile: metadata
+accessibility/flags and constructors are facade-owned and consumed by Raven. Existing
+accessor associations remain canonical. Byref/out still fail reader materialization.
+Next: external interface declarations across separately compiled native assemblies.

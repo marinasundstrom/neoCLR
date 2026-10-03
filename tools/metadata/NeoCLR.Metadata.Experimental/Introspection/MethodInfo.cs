@@ -19,6 +19,7 @@ public sealed class MethodInfo
         Context = context; Definition = definition; this.genericDefinition = genericDefinition;
         Name = definition.Name; Namespace = definition.Namespace ?? ""; MetadataToken = definition.MetadataToken;
         DeclaringType = owner; Module = context.RequireSnapshot(definition.Module.Assembly).GetModules()[0];
+        Accessibility = MetadataAccess.Member(definition.Attributes);
         IsStatic = definition.IsStatic; IsAbstract = (definition.Attributes & 0x400) != 0; IsVirtual = (definition.Attributes & 0x40) != 0;
         GenericParameterNames = Array.AsReadOnly(signature!.GenericParameterNames.ToArray());
         genericArguments = Array.AsReadOnly(arguments ?? GenericParameterNames.Select((_, i) => (TypeInfo)new MethodGenericParameterTypeInfo(context, this, i)).ToArray());
@@ -56,6 +57,12 @@ public sealed class MethodInfo
     /// <exception cref="ArgumentNullException">The argument array is null.</exception>
     /// <exception cref="ArgumentException">Wrong arity, null/foreign/Void/bare-generic arguments or excessive nesting.</exception>
     public MethodInfo MakeGenericMethod(params TypeInfo[] arguments) => Context.ConstructMethod(this, arguments);
+    /// <summary>Gets declared metadata accessibility, without applying language access rules.</summary>
+    public MetadataAccessibility Accessibility { get; }
+    /// <summary>Gets whether this is an instance constructor declaration.</summary>
+    public bool IsConstructor => Name == ".ctor" && !IsStatic;
+    /// <summary>Gets whether this is a type initializer declaration.</summary>
+    public bool IsStaticConstructor => Name == ".cctor" && IsStatic;
     /// <summary>Gets the metadata static flag.</summary>
     public bool IsStatic { get; }
     /// <summary>Gets the metadata abstract flag.</summary>
@@ -137,6 +144,8 @@ public sealed partial class MetadataLoadContext
             return view;
         }
     }
+    internal IReadOnlyList<MethodInfo> GetConstructors(TypeDefinition definition, TypeInfo owner)
+        => Array.AsReadOnly(definition.Methods.Where(m => m.Name is ".ctor" or ".cctor").Select(m => GetMethod(m, owner)).ToArray());
     internal IReadOnlyList<MethodInfo> GetMethods(TypeDefinition definition, TypeInfo owner)
         => Array.AsReadOnly(definition.Methods.Where(m => m.Name is not (".ctor" or ".cctor")).Select(m => GetMethod(m, owner)).ToArray());
 }

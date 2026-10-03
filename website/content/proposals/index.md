@@ -711,3 +711,7 @@ duplicates collapse. No guest/runtime API change.
 Development checkpoint (2026-10-03): generic method/function signature inspection now
 supports canonical constructed views with independent owner/method scopes. These host
 views do not invoke code; Raven retains inference and compiler symbol construction.
+
+Development checkpoint (2026-10-03): native metadata views now expose constructor and
+accessibility facts consumed by Raven. Paired driver execution works for Hello World and
+a separate generic library on both targets; the broad source-library gate is still open.

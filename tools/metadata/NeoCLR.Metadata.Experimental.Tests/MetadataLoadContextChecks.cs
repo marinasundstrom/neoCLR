@@ -57,6 +57,8 @@ internal static class MetadataLoadContextChecks
         var stored = box.AddField("Value", SignatureType.TypeParameter(0));
         box.AddField("Items", SignatureType.ArrayOf(SignatureType.TypeParameter(0)));
         box.AddField("Next", box.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        var constructor = box.AddConstructor(new MethodSignature(PrimitiveType.Void, [SignatureType.TypeParameter(0)]));
+        constructor.LoadArgument(0); constructor.LoadArgument(1); constructor.StoreField(stored); constructor.Return();
         var get = box.AddInstanceMethod("Get", new MethodSignature(SignatureType.TypeParameter(0), []));
         get.LoadArgument(0); get.LoadField(stored); get.Return();
         var mixed = box.AddMethod("Mixed", new MethodSignature(SignatureType.TypeParameter(0),
@@ -85,9 +87,18 @@ internal static class MetadataLoadContextChecks
             [SignatureType.ArrayOf(SignatureType.MethodParameter(0))], ["T"]));
         identity.LoadArgument(0); identity.Return();
         genericBuilder.AddGenericClass("Example", "Other", ["T"]);
+        var hidden = genericBuilder.AddClass("Example", "Hidden", TypeVisibility.Internal);
+        hidden.AddField("Internal", PrimitiveType.Int32, FieldVisibility.Internal, isReadOnly: true);
+        var helper = hidden.AddMethod("Helper", new MethodSignature(PrimitiveType.Int32, []), MethodVisibility.Internal);
+        helper.LoadConstant(42); helper.Return();
         var genericSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(genericBuilder.WriteNativeAssembly(), core));
         var genericContext = new MetadataLoadContext([genericSnapshot]);
         var genericTypes = genericContext.Resolve(genericSnapshot.Identity).GetTypes();
+        var hiddenView = genericTypes.Single(t => t.Name == "Hidden");
+        Check(hiddenView.Accessibility == MetadataAccessibility.Assembly &&
+            hiddenView.GetFields().Single().Accessibility == MetadataAccessibility.Assembly && hiddenView.GetFields().Single().IsReadOnly &&
+            hiddenView.GetMethods().Single().Accessibility == MetadataAccessibility.Assembly && hiddenView.GetMethods().Single().IsStatic,
+            "internal visibility and readonly/static declaration facts");
         var boxView = genericTypes.Single(t => t.Name == "Box`1");
         var otherView = genericTypes.Single(t => t.Name == "Other`1");
         var intView = genericContext.ResolveSignature(PrimitiveType.Int32);
@@ -109,6 +120,11 @@ internal static class MetadataLoadContextChecks
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.TypeParameter(0)));
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(0)));
         Reject<NotSupportedException>(() => ((IList<TypeInfo>)closed.TypeArguments).Clear());
+        var ctorView = closed.GetConstructors().Single();
+        Check(ctorView.IsConstructor && !ctorView.IsStaticConstructor && ReferenceEquals(ctorView.GetParameters()[0].ParameterType, intView), "constructed constructor classification and scope");
+        Check(ReferenceEquals(ctorView, closed.GetConstructors().Single()) && !closed.GetMethods().Any(m => m.IsConstructor), "canonical constructor enumeration separate from methods");
+        Check(boxView.Accessibility == MetadataAccessibility.Public && !boxView.IsStatic && !boxView.IsAbstract && !boxView.IsSealed, "nominal declaration flags");
+        Check(ctorView.Accessibility == MetadataAccessibility.Public && boxView.GetFields()[0].Accessibility == MetadataAccessibility.Private, "callable and field access metadata");
         var getView = closed.GetMethods().Single(m => m.Name == "Get");
         Check(ReferenceEquals(getView.ReturnType, intView) && getView.GetParameters().Count == 0, "constructed owner method result");
         Check(ReferenceEquals(getView, closed.GetMethods().Single(m => m.Name == "Get")), "canonical method view");

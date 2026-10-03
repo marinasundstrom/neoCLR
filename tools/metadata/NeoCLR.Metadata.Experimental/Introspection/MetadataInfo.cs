@@ -107,6 +107,16 @@ public sealed class NominalTypeInfo : TypeInfo
     public IReadOnlyList<TypeInfo> GetInterfaces() => allInterfaces.Value;
     /// <summary>Gets declared non-constructor methods without inherited lookup or visibility filtering.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => context.GetMethods(definition, this);
+    /// <summary>Gets declared instance constructors and type initializers, including non-public declarations.</summary>
+    public IReadOnlyList<MethodInfo> GetConstructors() => context.GetConstructors(definition, this);
+    /// <summary>Gets declared metadata accessibility.</summary>
+    public MetadataAccessibility Accessibility => MetadataAccess.Type(definition.Attributes);
+    /// <summary>Gets the metadata abstract flag.</summary>
+    public bool IsAbstract => (definition.Attributes & 0x80) != 0;
+    /// <summary>Gets the metadata sealed flag.</summary>
+    public bool IsSealed => (definition.Attributes & 0x100) != 0;
+    /// <summary>Gets whether the declaration is an abstract sealed static container.</summary>
+    public bool IsStatic => IsAbstract && IsSealed;
     /// <summary>Gets the metadata name, including generic arity suffix.</summary>
     public string Name => definition.Name;
     /// <summary>Gets the declared namespace.</summary>

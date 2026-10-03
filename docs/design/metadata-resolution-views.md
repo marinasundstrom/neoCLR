@@ -285,3 +285,21 @@ decoding, full parameter metadata and constraint views remain explicit gaps.
 
 Validation: 109/109 C# groups including a CLR signature comparison, API snapshot checks,
 and all seven native runtime consumers (42) pass. See [evidence](../experiments/extended-cli-metadata/introspection-method-construction-2026-10-03.json).
+
+
+Declaration-fact checkpoint (2026-10-03): metadata views now expose declared accessibility,
+nominal abstract/sealed/static flags, instance/type-initializer classification, and
+constructor enumeration on open/constructed owners. Constructor views share the callable
+cache and substitute owner arguments. Raven maps supported metadata visibility to its own
+accessibility and no longer decodes those type/method/field attribute bits itself.
+
+This follows the existing CLI attribute contract rather than defining new access rules.
+GetConstructors includes non-public instance constructors and type initializers explicitly;
+GetMethods continues to exclude constructors. No invocation or implicit visibility filtering.
+Existing canonical property accessor associations are retained. Supported native parameter
+signatures remain by-value; byref/out, wider constrained/nested/value profiles still reject
+at the reader boundary instead of losing their modes. This slice does not broaden encoding,
+Runtime Contracts, the bootstrap, or runtime behavior.
+
+Validation: 109 C# groups, API snapshot check, seven native consumers and paired driver
+acceptance pass. See [evidence](../experiments/extended-cli-metadata/introspection-declarations-2026-10-03.json).

@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Declaration facts](#declaration-facts-development-2026-10-03): constructors, flags and accessibility.
+
 - [Generic method construction](#generic-method-construction-development-2026-10-03): metadata signature inspection.
 
 - [Inherited interface views](#inherited-interface-views-development-2026-10-03): bounded metadata closure.
@@ -5396,3 +5398,25 @@ or argument nesting of 16 or more. Result signature projection may later throw
 InvalidDataException for unsupported/unavailable metadata or nesting bounds, as on open
 methods. Collections remain read-only. This supports the reader's unconstrained generic
 signature profile, not general constraint validation, runtime invocation or code emission.
+
+
+## Declaration facts (development 2026-10-03)
+
+Host namespace: `NeoCLR.Metadata.Experimental.Introspection`.
+
+| API | Contract |
+| --- | --- |
+| `MetadataAccessibility` | CLI-shaped values: CompilerControlled (PrivateScope), Private, FamilyAndAssembly, Assembly, Family, FamilyOrAssembly, Public. Consumers apply language access rules. |
+| `NominalTypeInfo.Accessibility` | Declared type access, including distinct nested visibility categories on supported CLI definitions. |
+| `NominalTypeInfo.IsAbstract`, `IsSealed`, `IsStatic` | Metadata flags; static denotes abstract plus sealed. |
+| `MethodInfo.Accessibility`, `FieldInfo.Accessibility` | Declared member access; not filtered by caller. |
+| `MethodInfo.IsConstructor` | Instance `.ctor` classification. |
+| `MethodInfo.IsStaticConstructor` | Static `.cctor` classification. |
+| `NominalTypeInfo.GetConstructors()`, `ConstructedTypeInfo.GetConstructors()` | Read-only `IReadOnlyList<MethodInfo>` of declared constructors/type initializers in metadata order. Same canonical method elements as direct resolution; constructed owners substitute signatures. |
+
+GetMethods still excludes constructors. Unsupported callable signatures/dependencies throw
+InvalidDataException, including CLI instance signatures outside the current decoder.
+Enumeration does not execute initializers or load runtime types. The C# fixture checks
+public constructors/private fields, internal declarations, readonly/static facts and
+closed-owner constructor parameters. Raven supports public/internal/private native access;
+other categories fail explicitly rather than being treated as private.

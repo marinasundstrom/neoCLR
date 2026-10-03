@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add metadata accessibility, declaration flags and constructor views with generic owner
+  substitution. Raven consumes these facts; native byref/out profiles still reject explicitly.
+
 - Integrate direct native metadata imports into rvnc with an explicit primitive-core
   argument. Both targets pass paired driver execution; native invalid-reference/output
   safety checks pass. Broad collections/source-library gate remains open.
