@@ -298,3 +298,7 @@ unsupported; this does not add runtime invocation to introspection.
 Development metadata work now retains top-level native value declarations and generic
 inline payload signatures in the C# host facade. Raven source-union emission remains
 in progress; see the [development API reference](/docs/experimental-metadata/).
+
+The development host reader also preserves nested native case ownership and scoped
+external references below nongeneric owners. Same-named cases remain distinct in the
+metadata facade and Raven symbols; this does not yet complete source-union emission.

@@ -93,8 +93,8 @@ public sealed partial class AssemblyBuilder
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);
-        if (definition.GenericArity != 0 || definition.DeclaringType is not null)
-            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class, value or interface");
+        if (definition.GenericArity != 0)
+            throw new InvalidDataException("native nominal signature requires a nongeneric class, value or interface");
         return ImportReference(definition, core);
     }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
@@ -121,7 +121,7 @@ public sealed partial class AssemblyBuilder
     {
         if (type is null) return null;
         if (depth >= 16 || type.GenericArity != 0 || (type.Attributes & 7) != (type.DeclaringType is null ? 1u : 2u) ||
-            type.IsValueType && !Equals(type.ValueTypeCore, core)) throw new InvalidDataException("unsupported enclosing imported type");
+            type.IsValueType && !type.Module.Assembly.IsNative && !Equals(type.ValueTypeCore, core)) throw new InvalidDataException("unsupported enclosing imported type");
         return ImportTypeIdentity(type.Module.Assembly.Identity, type.Namespace, type.Name, 0, type.IsValueType, ImportDeclaringScope(type.DeclaringType, core, depth + 1));
     }
     internal ImportedTypeReference ImportTypeIdentity(AssemblyIdentity identity, string ns, string name, int arity, bool isValueType = false, ImportedTypeReference? declaringType = null)

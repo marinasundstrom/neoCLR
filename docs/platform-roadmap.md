@@ -59,7 +59,10 @@ now admits inline generic value payloads and direct native value snapshots; tag/
 copy execution and imported constructors return 42 on CLR and neoCLR. Raven imports
 these as structs. Ordinary top-level source structs now compile and execute on both targets with generic
 inline payloads, default constructors and independent copies. Native emission selects an
-explicit value declaration capability. Nested union cases, byte tags, synthesized union
+explicit value declaration capability. Native nested class/value snapshots and Raven symbol ownership now also preserve
+same-named case scopes; direct nested constructor imports execute on both runtimes.
+See [nested case evidence](experiments/extended-cli-metadata/nested-cases-2026-10-03.json).
+Source nested union case emission, byte tags, synthesized union
 members and symbol-authored external value operands remain pending; this is not source Option completion. See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires

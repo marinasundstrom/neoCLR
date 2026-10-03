@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--native-nested-value-runtime")
+{
+    await ValueConstructorChecks.RunRuntime(args[1], args[2], nested: true, native: true); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-value-runtime")
 {
     await ValueConstructorChecks.RunRuntime(args[1], args[2], native: true); return 0;
@@ -295,6 +299,7 @@ var tests = new (string Name, Action Body)[]
     ("Value receivers and imported generic output calls", ValueReceiverChecks.Run),
     ("Terminal failure flow and diagnostics", TerminalFailureChecks.Run),
     ("Tagged generic value payload layouts", TaggedValueLayoutChecks.Run),
+    ("Direct native nested value constructor import", () => ValueConstructorChecks.Run(nested: true, native: true)),
     ("Direct native value constructor import", () => ValueConstructorChecks.Run(native: true)),
     ("Imported value constructor initialization", () => ValueConstructorChecks.Run()),
     ("Nested definition ownership and execution", NestedTypeChecks.Run),

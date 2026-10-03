@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Native nested case metadata](#native-nested-case-metadata-development-2026-10-03): scoped local/external native case identities.
+
 - [Union payload foundation](#union-payload-foundation-development-2026-10-03): inline storage and direct native value declarations.
 
 - [Parameter passing modes](#parameter-passing-modes-development-2026-10-03): native and supported CLI ref/out metadata.
@@ -5587,3 +5589,29 @@ metadata in emission. Source value declarations, nested union cases, the Byte ta
 synthesized members and symbol-authored external value operands remain the next
 compiler work. Runtime-library union sources are unchanged. No format version change,
 CLI projection fallback, runtime implementation change or performance claim is needed.
+
+## Native nested case metadata (development, 2026-10-03)
+
+`AssemblyDefinition.ReadNativeAssembly` now retains supported nested class/value
+ownership beneath nongeneric declaring types, including generic nested value cases.
+Local signature lookup keys include the declaring token; external TypeRef rows use
+nested TypeRef scopes. Same-named cases beneath different companions remain distinct.
+Nested public/internal accessibility, canonical declaring views and constructor/member
+signatures survive direct native reading without a CLI projection. ImportReference
+accepts these scoped native definitions with the existing explicit matching core policy.
+
+Raven publishes nested symbols as members of their declaring type, preserving their
+namespace and containing-type identities; namespace member and simple-name lookup do
+not flatten them. Generic nested field substitution stays in introspection. Emission
+continues to reject native nested operands outside its symbol-authored capability profile.
+
+This follows CLI NestedClass/TypeRef identity semantics using existing native relationship
+encoding; no schema change or implicit dependency loading is required. C# checks cover
+same-named local/external payloads, multiple nesting levels, internal visibility, missing
+dependencies and cyclic owners. Direct native nested generic/nongeneric constructor
+imports execute on CLR and NeoCLR (42). Native semantic probes retain owner/field identity.
+
+This is a reader/importer prerequisite for union cases, not source union completion.
+Nested types that capture generic enclosing parameters remain unsupported. Source union
+declaration collection, nested definition emission, Byte discriminators and complete
+synthesized union contracts remain pending. Existing immutable snapshot behavior is unchanged.

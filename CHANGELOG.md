@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Preserve scoped nested class/value identities in direct native metadata snapshots and
+  imports, including generic value cases below nongeneric owners. Same-named cases,
+  external TypeRef scopes and visibility remain distinct; nested imported constructors
+  execute on CLR and neoCLR (42). Raven retains enclosing symbol ownership. Source union
+  emission and generic enclosing-type capture remain pending; native encoding is unchanged.
+
 - Advance Raven's source-union prerequisites with native ordinary struct declarations:
   generic inline payloads, constructors, accessors, value copies and addressed mutation.
   Paired compiler-driver execution checks CLR-compatible copy/default behavior. Source

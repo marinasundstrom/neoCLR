@@ -834,3 +834,8 @@ are covered in the [host-only manual](experimental-metadata.md#union-payload-fou
 and XML summaries, under the existing C# host RavenDoc exclusion. Snapshot check remains
 stale at the previously recorded SourceUnionReferences.Project / None regeneration
 blocker. Existing verified guest reference artifacts are retained; hashes were not advanced.
+
+2026-10-03 native nested case reading/imports extend the existing host-only API profile;
+see [manual reference](experimental-metadata.md#native-nested-case-metadata-development-2026-10-03).
+The C# host API remains excluded from guest RavenDoc. The previously documented stale
+reference regeneration blocker is unchanged; no reference hashes are advanced.

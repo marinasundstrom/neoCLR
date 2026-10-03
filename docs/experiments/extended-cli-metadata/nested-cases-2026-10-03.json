@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-03",
+  "scope": "Native nested declaration/introspection/import foundation for union case metadata. Not Raven source-union emission.",
+  "neoClrBaseRevision": "86c86de688d893dfac70e32783d341e0e7d1343a",
+  "ravenRevision": "bf8237d74a8337f3cc2459a2944aafec9b0fcc03",
+  "metadataTests": {
+    "passed": 115,
+    "total": 115,
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0"
+  },
+  "nativeConstructorImports": {
+    "command": "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --native-nested-value-runtime target/release/neoclr /tmp/native-nested-final-20261003",
+    "stdout": "Imported value/generic constructors execute on CLR and neoCLR: 42\n",
+    "runtimeCommand": [
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "run",
+      "/tmp/native-nested-final-20261003/App.dll",
+      "--module",
+      "/tmp/native-nested-final-20261003/Library.dll"
+    ],
+    "exitCode": 42,
+    "stdoutRuntime": "",
+    "stderrRuntime": "",
+    "runtimeSha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+    "artifacts": {
+      "Library.dll": "85c93a9585e51c23443a109a7b55b72f645a633ef410b8bd7c16e872bbca3b40",
+      "App.dll": "93f778f7b3fe3429fae6501dbb728258d467314397c39338c570a548d9bcfb53"
+    }
+  },
+  "nativeSymbols": {
+    "command": "dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-symbols /Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll /tmp/native-nested-symbols-final-20261003",
+    "stdout": "PASS native class identity, constructors, instance/static calls, access and emission\nPASS external native nominal signatures and exact dependency diagnostics\nPASS direct native interface symbols and dispatch emission\nPASS direct native generic symbols, inference, substitution and emission\nPASS direct native semantic imports\n",
+    "coreSha256": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad"
+  },
+  "sourceHashes": {
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NestedTypeChecks.cs": "8b2c116cc43d385c09398d4a49e43b4f8998ebecb1f107911b9e5a2214ad744e",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ValueConstructorChecks.cs": "1df29ab7787e03c4e1416fd7114a9a074fa77cfe162b2d1fdc9e300353f17334",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeDefinitionReader.cs": "92464cb53a8226fb19a94cd48f6aba3b72220e680525e0d0f97911326248f982"
+  },
+  "limitations": [
+    "No generic enclosing-type parameter capture",
+    "Source union declaration emission and Byte tags pending",
+    "Native nested emission still requires future symbol-authored contracts",
+    "API snapshot check retains previously documented stale regeneration blocker"
+  ]
+}
