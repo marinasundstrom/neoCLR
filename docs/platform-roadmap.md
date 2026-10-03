@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Compiler simplification implementation (2026-10-03): Raven `c2a66d82a` removes the
+second production .NET body emitter while retaining the native planner and metadata
+library. All 94 selected checks pass before/after, and the native broad application
+executes against its separate library. Constraint expectation reconciliation is committed
+separately; closure lifetime/shared array lowering remains the next unresolved compiler
+audit. Further importer and legacy-bridge cleanup is still pending, not completed.
+[Evidence](experiments/extended-cli-metadata/dotnet-emitter-simplification-2026-10-03.json).
+
 Target-boundary audit (2026-10-03): retain the NeoCLR metadata library and native
 symbol/backend boundaries. Raven audit commit `10f5f0089` records 71 further passing
 .NET checks on both lines and one shared constraint round-trip failure. Reconcile that

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Simplify Raven .NET body emission in `c2a66d82a` to its established generator while
+  retaining NeoCLR metadata/planning. All 94 selected .NET checks pass before/after and
+  unchanged native application-order-collections executes against its separately built
+  library. Reconcile the stale constraint test separately (`9bbcbb2b0`, isolated
+  `e46c0a9c9`); retain the reproduced loop-capture bug as unresolved.
+
 - Record the paired compiler/target-boundary assessment in Raven `10f5f0089`: retain
   NeoCLR metadata/introspection/builders and review duplicated .NET body emission.
   Additional execution checks pass on both branches; a shared constraint-import test

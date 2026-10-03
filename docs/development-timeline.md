@@ -10464,3 +10464,24 @@ each candidate; these are assistant recommendations under the authorized reasses
 
 Detailed findings, reproduction filters and bounded next steps are recorded in Raven
 `docs/compiler/architecture/neoclr-refactor-parity.md`, commit `10f5f0089`.
+
+
+### 2026-10-03 — First stabilization and simplification slices implemented
+
+Following the author's “Implement” instruction, the assistant reconciled the shared
+constraint test without changing compiler behavior (`9bbcbb2b0`, independently isolated
+as `e46c0a9c9`): source struct flags describe the written constraint while imported CLI
+flags include the implied constructor. Four integration and seven isolated checks pass.
+
+The next implemented slice, Raven `c2a66d82a`, removes automatic release-only portable
+.NET body generation and its adapter; MethodGenerator always uses the established
+MethodBodyGenerator. The native planner, metadata library and GetILGenerator adapter
+remain. All 94 selected .NET tests pass before and after; the rebuilt compiler still
+compiles and executes the unchanged native broad application against its separate library.
+
+The loop-capture reproducer remains wrong: class-method callbacks yield 0 on main and
+333 on the pre-removal integration branch instead of 123. This is not fixed by selecting
+the established body emitter and is not a passing acceptance case. Shared lowering and
+closure lifetime need independent work; the rest of the planned cleanup remains pending.
+No new CLR array adapter, metadata format change or backend rewrite was introduced.
+[Execution evidence](experiments/extended-cli-metadata/dotnet-emitter-simplification-2026-10-03.json).

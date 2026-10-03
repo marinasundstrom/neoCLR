@@ -4874,3 +4874,20 @@ ArraysImplementIterable metadata cannot make CLR vectors implement a custom inte
 The next step is explicit .NET array adaptation at conversion emission, retaining source
 library definitions and shared element identities, plus rejection when an adapter is
 unavailable. The full .NET broad gate is still failing; partial output is not completion.
+
+
+### .NET emitter simplification (2026-10-03)
+
+Raven `c2a66d82a` selects its established MethodBodyGenerator for all ordinary .NET
+method bodies, removing the additional release-only portable adapter. Native emission
+still uses compiler symbol operands, NeoCLR builders and GetILGenerator. Runtime Contract
+configuration, primitive bootstrap, native reference identities and metadata encoding are
+unchanged. The separate .NET unit/source-library compatibility experiment remains opt-in;
+no CLR array adapter is added. Native module functions and nominal Array<T> backing retain
+their existing runtime behavior; no further CLI projection is introduced.
+
+Validation: 94 selected .NET checks pass before/after, and unchanged native
+application-order-collections executes with its separately built source library. Shared
+array lowering and the known per-iteration capture bug remain unresolved. See
+[recorded evidence](experiments/extended-cli-metadata/dotnet-emitter-simplification-2026-10-03.json)
+and Raven's `docs/compiler/architecture/neoclr-refactor-parity.md` for remaining work.
