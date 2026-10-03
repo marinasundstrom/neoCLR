@@ -36,6 +36,11 @@ public sealed class GenericParameterTypeInfo : TypeInfo
     public NominalTypeInfo DeclaringType { get; }
     /// <summary>Gets the zero-based declaration ordinal.</summary>
     public int Position { get; }
+    /// <summary>Gets the declared generic parameter name from supported native metadata.</summary>
+    /// <exception cref="NotSupportedException">The reader has not materialized parameter names for this snapshot format.</exception>
+    /// <remarks>The name is descriptive; identity remains the declaring type and ordinal.</remarks>
+    public string Name => DeclaringType.Definition.GenericParameterNames is { } names
+        ? names[Position] : throw new NotSupportedException("generic parameter names are not materialized for this snapshot");
     /// <inheritdoc/>
     public override string DisplayName => "!" + Position;
     /// <inheritdoc/>

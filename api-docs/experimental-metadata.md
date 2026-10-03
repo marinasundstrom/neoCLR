@@ -5231,7 +5231,7 @@ In `NeoCLR.Metadata.Experimental.Introspection`:
 | NominalTypeInfo | `GetGenericArguments(): IReadOnlyList<TypeInfo>`, `MakeGenericType(params TypeInfo[] arguments): ConstructedTypeInfo`, `GetFields(): IReadOnlyList<FieldInfo>` |
 | PrimitiveTypeInfo | `PrimitiveType Kind`, DisplayName, IsNominalType=false |
 | ArrayTypeInfo | `TypeInfo ElementType`, DisplayName, IsNominalType=false |
-| GenericParameterTypeInfo | `NominalTypeInfo DeclaringType`, `int Position`, DisplayName, IsNominalType=false |
+| GenericParameterTypeInfo | `NominalTypeInfo DeclaringType`, `int Position`, `string Name`, DisplayName, IsNominalType=false |
 | ConstructedTypeInfo | `NominalTypeInfo Definition`, `IReadOnlyList<TypeInfo> TypeArguments`, `GetFields(): IReadOnlyList<FieldInfo>`, DisplayName, IsNominalType=true |
 | FieldInfo | `string Name`, `uint MetadataToken`, `TypeInfo DeclaringType`, `TypeInfo FieldType`, `bool IsStatic`, `bool IsReadOnly` |
 
@@ -6080,3 +6080,21 @@ selected by the explicit .NET bootstrap manifest; default initialization is its 
 It is not CLR System.Void and adds no metadata reader/writer or guest runtime API. The host
 compiler contract and ordinary CLI signatures carry this mapping without a native format
 extension. See the integration documentation for the remaining array-adapter limitation.
+
+
+### Declared generic type-parameter names (development, 2026-10-03)
+
+`GenericParameterTypeInfo.Name: string` returns the declared name from a supported native
+snapshot, for example `TItem`. It has no parameters and does not resolve dependencies or
+load runtime types. Identity remains the owning declaration plus Position; DisplayName
+remains `!ordinal`. Equal names on different owners do not merge parameters. CLI snapshots
+currently do not materialize these names: accessing Name throws NotSupportedException,
+rather than inventing a name. No generic constraints or variance facts are added here.
+
+```csharp
+var parameter = (GenericParameterTypeInfo)nativeType.GetGenericArguments()[0];
+string declaredName = parameter.Name;
+```
+
+This host-only member is outside the guest RavenDoc selection and is documented here.
+C# contracts cover native name/ordinal/canonical identity and explicit CLI rejection.

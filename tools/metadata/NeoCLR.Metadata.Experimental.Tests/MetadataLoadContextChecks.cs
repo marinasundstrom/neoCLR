@@ -215,11 +215,17 @@ internal static class MetadataLoadContextChecks
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(1), null, [intView]));
         Reject<ArgumentException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(0), null, [nominal]));
         Reject<NotSupportedException>(() => ((IList<NeoCLR.Metadata.Experimental.Introspection.ParameterInfo>)mixedParameters).Clear());
+        var namedParameter = (GenericParameterTypeInfo)genericContext.Resolve(genericSnapshot.Identity)
+            .GetTypes().Single(t => t.Name == "Box`1").GetGenericArguments().Single();
+        Check(namedParameter.Name == "T" && namedParameter.Position == 0 && namedParameter.DisplayName == "!0" &&
+            ReferenceEquals(namedParameter, namedParameter.DeclaringType.GetGenericArguments().Single()),
+            "native parameter name preserves owner/ordinal identity");
         var cli = new AssemblyBuilder(Id("Cli"), core);
         cli.AddGenericClass("Example", "Box", ["T"]);
         var cliSnapshot = AssemblyDefinition.ReadAssembly(cli.Write(), expectedExtended: false);
         var cliContext = new MetadataLoadContext([cliSnapshot]);
         var cliType = cliContext.Resolve(cliSnapshot.Identity).GetTypes().Single();
+        Reject<NotSupportedException>(() => _ = ((GenericParameterTypeInfo)cliType.GetGenericArguments().Single()).Name);
         Check(cliType.Name == "Box`1" && cliType.GenericArity == 1 && cliType.DeclaringType is null, "CLI definition facade excludes module pseudo-type");
         Check(ReferenceEquals(cliContext.Resolve(cliSnapshot.MainModule.Types.Single(t => t.Name == "Box`1").ToReference()), cliType), "CLI local resolution");
         Reject<NotSupportedException>(() => cliType.GetDeclaredInterfaces());

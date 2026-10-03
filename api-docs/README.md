@@ -905,3 +905,10 @@ reference assembly remains intact.
 experimental metadata manual and XML. No guest type selection changes are needed.
 The snapshot check still reports the recorded stale guest artifacts; this slice does
 not replace the verified guest snapshot with unverified output.
+
+
+2026-10-03: host-only GenericParameterTypeInfo.Name is documented in
+experimental-metadata.md, including native declaration identity and the CLI
+NotSupportedException limitation. It is not a guest runtime API and does not require a
+RavenDoc guest type selection. `build-api-docs.py --check` still reports the previously
+recorded stale guest snapshot; verified guest artifacts were not overwritten.

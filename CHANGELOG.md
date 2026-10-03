@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Expose native generic type-parameter names through introspection Name, preserving
+  owner/ordinal identity and rejecting unmaterialized CLI names explicitly. Raven
+  `003b9a38d` uses the retained type view for declaration facts. All 127 metadata groups
+  and seven native consumers pass; the existing guest API snapshot remains stale.
+
 - Route Raven native methods, constructors and module functions through introspection
   views (`015e6f66d`), removing the definition-based callable-symbol wrapper. Canonical
   constructor/accessor identity and all seven native consumers pass. Metadata encoding,

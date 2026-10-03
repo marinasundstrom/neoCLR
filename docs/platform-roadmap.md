@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+Native type facts (2026-10-03): Raven `003b9a38d` consumes declaration and generic
+parameter facts through the retained type view. The host facade now supplies declared
+parameter Name with explicit CLI limitations. All 127 metadata groups and seven native
+consumers pass; ordinary .NET is unchanged. Remaining definition use is concentrated in
+root declaration materialization and union transport, requiring separate review.
+[Evidence](experiments/extended-cli-metadata/native-type-facade-2026-10-03.json).
+
 Native callable cleanup (2026-10-03): Raven `015e6f66d` constructs method, constructor
 and module-function symbols from introspection views, preserving declaration order and
 canonical member identity. All seven native consumers pass. Remaining definition use

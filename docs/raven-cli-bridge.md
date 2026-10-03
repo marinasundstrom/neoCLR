@@ -4933,3 +4933,16 @@ All seven native consumers execute with expected exit 42; C# checks cover constr
 identity across enumeration/member lookup, generic scopes, accessor identity and dependency
 errors. Ordinary .NET loader and emitter paths are unchanged.
 [Evidence](experiments/extended-cli-metadata/native-callable-facade-2026-10-03.json).
+
+
+### Native type declaration views (2026-10-03)
+
+Raven `003b9a38d` consumes its retained nominal view for names, arity, accessibility,
+generic parameter names/positions and interface traversal. The matching host metadata
+library adds GenericParameterTypeInfo.Name with explicit NotSupportedException for CLI
+snapshots whose parameter names are not materialized. Native supported snapshots retain
+declared names and owner-scoped identity. There is no new Runtime Contract, CLI projection
+or format change; .NET loading and emission remain unchanged. Type/union transport still
+uses definitions elsewhere. All 127 metadata C# contract groups and seven native consumers
+pass. The manual host API reference is updated; the guest snapshot check remains stale.
+[Evidence](experiments/extended-cli-metadata/native-type-facade-2026-10-03.json).
