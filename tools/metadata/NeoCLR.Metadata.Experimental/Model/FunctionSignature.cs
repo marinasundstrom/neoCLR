@@ -41,39 +41,39 @@ public sealed partial record SignatureType
     }
 }
 
-/// <summary>A checked static method binding operand. The target is instance data, not part of Function type identity.</summary>
+/// <summary>A checked method binding operand. The target is instance data, not part of Function type identity.</summary>
 public sealed class FunctionBinding
 {
-    /// <summary>Creates an operand binding a nongeneric static method to an exact structural shape.</summary>
+    /// <summary>Creates an operand binding a nongeneric static or nonvirtual reference-instance method to an exact structural shape.</summary>
     /// <param name="functionType">A structural Function signature.</param>
-    /// <param name="target">A nongeneric static target with the exact parameter/result signature.</param>
+    /// <param name="target">A nongeneric static or nonvirtual reference-instance target with the exact parameter/result signature.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">Shape, target kind or signatures do not match.</exception>
     public FunctionBinding(SignatureType functionType, MethodBuilder target)
     {
         ArgumentNullException.ThrowIfNull(functionType); ArgumentNullException.ThrowIfNull(target);
-        if (functionType.FunctionSignature is not { } shape || !target.IsStatic || target.IsAbstract || target.IsConstructor ||
+        if (functionType.FunctionSignature is not { } shape || (!target.IsStatic && (target.DeclaringType is not { IsValueType: false, IsInterface: false } || (target.Definition.Attributes & 0x40) != 0)) || target.IsAbstract || target.IsConstructor ||
             target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType?.GenericParameterNames.Count > 0 || !shape.Signature.Matches(target.Signature))
-            throw new ArgumentException("function binding requires an exact nongeneric static target");
+            throw new ArgumentException("function binding requires an exact nongeneric static or nonvirtual reference-instance target");
         FunctionType = functionType; Target = target;
     }
     /// <summary>Gets the structural type of the bound value.</summary>
     public SignatureType FunctionType { get; }
-    /// <summary>Gets the static method selected for invocation.</summary>
+    /// <summary>Gets the method selected for invocation.</summary>
     public MethodBuilder Target { get; }
 }
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Pushes a Function value bound to an owned static method.</summary>
+    /// <summary>Pushes a Function value bound to an owned method; consumes its object receiver for an instance target.</summary>
     /// <param name="functionType">The exact structural shape.</param>
-    /// <param name="target">Owned nongeneric static target.</param>
+    /// <param name="target">Owned nongeneric static or nonvirtual reference-instance target.</param>
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     public void BindFunction(SignatureType functionType, MethodBuilder target) => GetILGenerator().BindFunction(functionType, target);
-    /// <summary>Emits a checked Function binding; consumes no receiver and pushes the callable value.</summary>
+    /// <summary>Emits a checked Function binding; consumes an instance receiver when required and pushes the callable value.</summary>
     /// <param name="opCode">BindFunction.</param>
-    /// <param name="operand">The exact static binding owned by this assembly.</param>
+    /// <param name="operand">The exact binding owned by this assembly.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign target or invalid generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>

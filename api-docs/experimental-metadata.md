@@ -4076,29 +4076,36 @@ shapes and are substituted recursively. Nesting is limited to sixteen levels.
 Null signatures throw ArgumentNullException; unsupported contracts throw ArgumentException.
 
 `FunctionBinding(SignatureType functionType, MethodBuilder target)` checks a nongeneric
-static target against the exact shape. Its FunctionType and Target properties are read-only.
+static or nonvirtual reference-instance target against the exact shape. Generic owners,
+constructors, abstract/virtual targets and value receivers are rejected. Its FunctionType
+and Target properties are read-only.
 `MethodBuilder.BindFunction(functionType, target)` and
 `Emit(OpCode.BindFunction, FunctionBinding)` push a callable value; the target must belong
-to the output assembly. `InvokeFunction(functionType)` and
+to the output assembly. Instance binding consumes the object receiver already on the
+stack; static binding consumes no receiver. `InvokeFunction(functionType)` and
 `Emit(OpCode.Callvirt, SignatureType)` consume the Function receiver and ordered arguments,
 then push the result unless NoResult. Invalid operands, target kinds, ownership or scope
 throw ArgumentException, null operands ArgumentNullException. Instruction limits and
 invalid evaluation stacks fail with InvalidDataException (stack validation on write).
-Bound receivers/captures and external binding targets remain future overloads; ordinary
-imported methods can accept/return Function values now.
+Bound instance receivers retain shared object identity. Compiler-generated capture frames
+and external binding targets remain future work; ordinary imported methods can accept/return
+Function values.
 
 Native output uses the runtime's structural Function shape, function.bind and ordinary
 instance Invoke. CLI output uses core-scoped Func/Action carriers with ldftn/newobj and
 callvirt, including generic signature variables on Invoke MemberRefs. This is a bridge
 representation; native Function identity is independent of a nominal delegate declaration.
 The imported-signature reader recognizes those carriers only in the explicit core scope.
-Ordinary CLI delegates retain their .NET behavior; native static binding follows the
+Ordinary CLI delegates retain their .NET behavior; native static/instance binding follows the
 existing Function runtime contract. This API does not expose native method pointers.
 
 C# validation executes static bindings across an assembly boundary on CLR and native
 binary PE, including generic higher-order calls and a no-result callback (42). Exact
 shape equality, wrong results, wrong receivers and reference projection are checked.
-The separate Raven backend still needs shared Function body lowering to consume this API.
+Raven consumes this transport for owned static and concrete instance method groups.
+Captured lambdas still require compiler-generated closure frames. Instance-binding C#
+tests execute two bindings against the same mutable receiver on CLR and NeoCLR and
+reject missing/wrong stack receivers before writing.
 
 ### Concrete imported value overrides (development, 2026-10-02)
 

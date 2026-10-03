@@ -111,15 +111,15 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Foreign owner, wrong opcode or invalid caller scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack checked on write.</exception>
     void Emit(OpCode opCode, ConstructedMethodReference operand);
-    /// <summary>Pushes a Function value bound to an owned static method.</summary>
+    /// <summary>Pushes a Function value bound to an owned method; consumes its object receiver for an instance target.</summary>
     /// <param name="functionType">The exact structural shape.</param>
-    /// <param name="target">Owned nongeneric static target.</param>
+    /// <param name="target">Owned nongeneric static or nonvirtual reference-instance target.</param>
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void BindFunction(SignatureType functionType, MethodBuilder target);
-    /// <summary>Emits a checked Function binding; consumes no receiver and pushes the callable value.</summary>
+    /// <summary>Emits a checked Function binding; consumes an instance receiver when required and pushes the callable value.</summary>
     /// <param name="opCode">BindFunction.</param>
-    /// <param name="operand">The exact static binding owned by this assembly.</param>
+    /// <param name="operand">The exact binding owned by this assembly.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign target or invalid generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>

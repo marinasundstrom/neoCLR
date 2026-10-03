@@ -285,6 +285,7 @@ public sealed partial class MethodBuilder
                         : instruction.Op == "reference.test" && !IsReferenceSignature(instruction.Type!) ? (SignatureType)Assembly.CoreObjectType : instruction.Type!);
                     break;
                 case "function.bind":
+                    if (!instruction.Target!.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));
                     stack.Add(instruction.Type!); MaxStack = Math.Max(MaxStack, stack.Count + 1); break;
                 case "function.invoke":
                     var function = instruction.Type!.FunctionSignature!;

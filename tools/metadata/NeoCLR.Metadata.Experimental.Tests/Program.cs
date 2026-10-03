@@ -331,6 +331,7 @@ var tests = new (string Name, Action Body)[]
     ("Nested definition ownership and execution", NestedTypeChecks.Run),
     ("Imported nested constructors", () => ValueConstructorChecks.Run(nested: true)),
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
+    ("Instance callback receiver identity", InstanceFunctionBindingChecks.Run),
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
     ("Reference nullness and runtime type tests", ReferenceOperationChecks.Run),
     ("Mutable owned field addresses", FieldAddressChecks.Run),

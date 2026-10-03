@@ -65,6 +65,19 @@ internal static class FunctionSignatureChecks
             await process.WaitForExitAsync(); var text = await stdout + await stderr;
             if (process.ExitCode != (command == "verify" ? 0 : 42)) throw new Exception(command + ": " + text);
         }
-        Console.WriteLine("Structural Function metadata executes across assemblies on CLR and neoCLR: 42");
+        var instanceApp = InstanceFunctionBindingChecks.Create();
+        var instancePath = Path.Combine(directory, "InstanceCallbacks.dll");
+        File.WriteAllBytes(instancePath, RuntimeAssemblyContainer.WriteBinary(instanceApp));
+        foreach (var command in new[] { "verify", "run" })
+        {
+            var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
+            foreach (var arg in new[] { command, instancePath }) start.ArgumentList.Add(arg);
+            using var process = Process.Start(start)!;
+            var stdout = process.StandardOutput.ReadToEndAsync(); var stderr = process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+            var text = await stdout + await stderr;
+            if (process.ExitCode != (command == "verify" ? 0 : 42)) throw new Exception(command + ": " + text);
+        }
+        Console.WriteLine("Static and instance callback metadata executes on CLR and neoCLR: 42");
     }
 }

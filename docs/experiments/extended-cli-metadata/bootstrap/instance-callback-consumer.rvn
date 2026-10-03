@@ -1,0 +1,28 @@
+class Matcher {
+    var Target: int
+    private var calls: int = 0
+
+    init(target: int) {
+        Target = target
+    }
+
+    val Calls: int => calls
+
+    func Matches(value: int) -> bool {
+        calls = calls + 1
+        return value == Target
+    }
+}
+
+func Main() -> int {
+    let values = System.Collections.ArrayList<int>()
+    values.Add(7)
+    values.Add(42)
+    let matcher = Matcher(7)
+    let predicate: (int) -> bool = matcher.Matches
+    matcher.Target = 42
+    return match values.Find(predicate) {
+        .Some(let found) => found + matcher.Calls - 2
+        .None => 1
+    }
+}

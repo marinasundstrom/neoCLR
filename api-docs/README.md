@@ -917,3 +917,7 @@ recorded stale guest snapshot; verified guest artifacts were not overwritten.
 16-level signature bound; manual reference and C# contracts updated. No guest API
 added. The guest snapshot check still reports the previously stale snapshot; no
 reference artifacts were overwritten for this host-only API adjustment.
+
+2026-10-03: FunctionBinding/BindFunction now admit owned nongeneric nonvirtual
+reference-instance targets, consuming a receiver. Host manual/XML contracts and C#
+execution tests updated; no guest API added. The existing guest snapshot is still stale.

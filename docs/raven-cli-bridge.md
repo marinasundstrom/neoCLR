@@ -5020,3 +5020,24 @@ nominal definition and exact element arguments, preserving the same storage. No 
 version change, new opcode or CLI fallback is involved. Older readers may reject the newly
 admitted nested vectors. Ordinary .NET loading/emission remains the established backend.
 The known stale guest API snapshot remains open; host C# manual documentation is updated.
+
+### Receiver-bound callback transport
+
+Receiver-bound callbacks (2026-10-03): Raven `a53b6412a` and the metadata writer now
+support owned nongeneric nonvirtual reference-instance callback targets. The runtime's
+existing instance binding preserves shared mutable receiver identity, confirmed by CLR
+and NeoCLR execution and a source method-group consumer of separately built ArrayList.Find.
+All 128 metadata groups, 31 focused .NET tests, seven native consumers and the expanded
+broad source-library gate pass. This is a captured-lambda prerequisite, not completion:
+next work remains closure-frame lowering for unchanged library-list-filters, including
+shared mutable captures and correct lexical lifetimes. No runtime/format-version change.
+[Evidence](experiments/extended-cli-metadata/instance-callbacks-2026-10-03.json).
+
+FunctionBinding and IILGenerator.BindFunction consume the object receiver for instance
+targets. CLI emission uses that receiver with ldftn/newobj; native emission sets the
+existing instance-target bit. Static calls remain unchanged. Targets must belong to the
+output; generic, virtual/abstract, constructor and value-instance bindings remain rejected.
+Raven consumes symbol operands through its separate emitter contract. Runtime Contract
+configuration and bootstrap ownership are unchanged, and no importer objects enter emission.
+No structural Function branch is integrated. The host API manual/XML is updated; the
+known stale guest API snapshot remains open.

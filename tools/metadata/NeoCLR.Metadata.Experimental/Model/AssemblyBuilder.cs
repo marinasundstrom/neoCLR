@@ -523,7 +523,7 @@ public sealed partial class AssemblyBuilder
                     "constant64" => 9,
                     "call.constrained" => 11,
                     "fail" => 11,
-                    "function.bind" => 12,
+                    "function.bind" => method.Instructions[i].Target!.IsStatic ? 12 : 11,
                     "function.invoke" => 5,
                     "label" => 0,
                     "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
@@ -610,7 +610,8 @@ public sealed partial class AssemblyBuilder
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "function.bind":
-                        code.WriteByte(0x14); code.WriteByte(0xfe); code.WriteByte(0x06); code.WriteInt32(ImportMethod(instruction.Target!));
+                        if (instruction.Target!.IsStatic) code.WriteByte(0x14);
+                        code.WriteByte(0xfe); code.WriteByte(0x06); code.WriteInt32(ImportMethod(instruction.Target!));
                         code.WriteByte(0x73); code.WriteInt32(FunctionMember(instruction.Type!, true)); break;
                     case "function.invoke":
                         code.WriteByte(0x6f); code.WriteInt32(FunctionMember(instruction.Type!, false)); break;

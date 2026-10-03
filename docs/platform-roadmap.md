@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Receiver-bound callbacks (2026-10-03): Raven `a53b6412a` and the metadata writer now
+support owned nongeneric nonvirtual reference-instance callback targets. The runtime's
+existing instance binding preserves shared mutable receiver identity, confirmed by CLR
+and NeoCLR execution and a source method-group consumer of separately built ArrayList.Find.
+All 128 metadata groups, 31 focused .NET tests, seven native consumers and the expanded
+broad source-library gate pass. This is a captured-lambda prerequisite, not completion:
+next work remains closure-frame lowering for unchanged library-list-filters, including
+shared mutable captures and correct lexical lifetimes. No runtime/format-version change.
+[Evidence](experiments/extended-cli-metadata/instance-callbacks-2026-10-03.json).
+
 Native array callbacks (2026-10-03): Raven `35464aabf` preserves imported no-result
 callback contracts separately from inhabited source unit and emits receivers through the
 configured nominal array backing. The metadata library admits nested vector signatures

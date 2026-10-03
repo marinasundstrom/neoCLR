@@ -240,3 +240,12 @@ backing cast preserves storage identity with exact element arguments. The additi
 returns 42 through the original aliases. This replaces the previously recorded callback
 blocker; captured function emission in list-filters remains open. No structural Function
 branch integration, rectangular arrays or array covariance is implied.
+
+## Instance callback prerequisite (2026-10-03)
+
+The array/application gate also compiles `instance-callback-consumer.rvn` against the
+separate library and executes it with exit 42. Binding a Matcher method, then changing
+its target and passing the callback to ArrayList.Find verifies receiver identity and
+shared mutation. It exercises an explicit source method group, not generated closure
+lowering. Unchanged library-list-filters remains blocked on captured lambdas; do not
+count this consumer as that sample passing.

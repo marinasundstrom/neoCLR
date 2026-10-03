@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Admit owned nongeneric nonvirtual reference-instance callback bindings in the
+  metadata builders/IL generator. Consume the receiver and preserve shared mutation
+  through CLI/native execution; invalid stack receivers reject on write. Raven
+  `a53b6412a` uses this for source method groups against the separate class library.
+  All 128 metadata groups, 31 focused .NET tests and native gates pass. Captured
+  lambda lowering remains open; no runtime or format-version change.
+
 - Support bounded nested vectors in metadata authoring/native materialization, using
   existing CLI SZARRAY and native ArrayRef encoding. Preserve exact nominal Array<T>
   backing casts and storage identity at runtime. With Raven `35464aabf`, unchanged
