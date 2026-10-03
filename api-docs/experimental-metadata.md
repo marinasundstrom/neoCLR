@@ -5679,3 +5679,44 @@ fallbacks remain outside this initial authoring profile. The bounded API costs a
 validated operand form but prevents an incomplete prefix from being left in a body.
 No native format version or runtime code change is required. This operation is exposed
 on the metadata IL generator, not added to method builders or Raven's shared IL interface.
+
+
+## Value override authoring (development, 2026-10-03)
+
+```csharp
+MethodBuilder TypeBuilder.AddOverride(string name, MethodSignature signature);
+```
+
+The initial profile accepts public instance `ToString() -> String` on a value type,
+including a generic value owner. The method itself cannot be generic. The result is
+an attached definition with a managed receiver; use `GetILGenerator()` for its body.
+Null signatures throw ArgumentNullException. Unsupported names/signatures, duplicate
+methods and method limits throw ArgumentException. Class, interface and static owners
+throw InvalidOperationException before attachment.
+
+Manual authoring uses the same path: construct `MethodDefinition` with CLI
+Public | Virtual (0x46), append it to `TypeDefinition.Methods`, then obtain its builder
+with `MethodBuilder.ForDefinition`. HideBySig is added by the writer. Do not specify
+Abstract or NewSlot. Interface implementation inference preserves this override rather
+than changing it into a new virtual slot. Existing nonvirtual AddInstanceMethod behavior
+is unchanged.
+
+```csharp
+var display = valueType.AddOverride("ToString", new(PrimitiveType.String, []));
+var il = display.GetILGenerator();
+il.Emit(OpCode.Ldstr, "Example value");
+il.Return();
+var cliImage = assembly.Write();
+```
+
+This follows [.NET CLI Virtual/ReuseSlot semantics](https://source.dot.net/system.private.corelib/src/runtime/src/libraries/System.Private.CoreLib/src/System/Reflection/MethodAttributes.cs.html).
+C# execution verifies boxed Object.ToString dispatch, generic value construction,
+interface dispatch to the same implementation, definition/builder parity and PE flags.
+The restricted profile avoids inventing general inheritance resolution; its cost is
+that other Object slots and class overrides remain unsupported.
+
+**Native limitation:** WriteNativeAssembly throws InvalidDataException for these
+methods. It must not silently turn an override into an ordinary method. The runtime
+already supports value Object overrides, but authoring still needs an explicit retained
+System.Object dependency, validated slot identity and native name mapping. Native reader
+round trips and Raven admission remain pending. This API does not complete union emission.

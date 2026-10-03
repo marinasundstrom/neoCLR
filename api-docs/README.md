@@ -849,3 +849,8 @@ Value-type interface relationships and the host-only IILGenerator constrained-ca
 Emit overload are documented in the [manual host reference](experimental-metadata.md#value-interfaces-and-constrained-calls-development-2026-10-03)
 and XML. These C# host APIs remain excluded from RavenDoc's runtime reference assembly;
 the previously recorded reference regeneration blocker is unchanged.
+
+Host-only TypeBuilder.AddOverride and the detached MethodDefinition override profile
+are covered by XML and the [manual reference](experimental-metadata.md#value-override-authoring-development-2026-10-03).
+These C# APIs remain outside guest RavenDoc type selection. The snapshot check was rerun
+and still reports the existing stale runtime reference; no snapshot hashes were changed.

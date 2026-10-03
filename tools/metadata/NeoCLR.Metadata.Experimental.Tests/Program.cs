@@ -308,6 +308,7 @@ var tests = new (string Name, Action Body)[]
     ("Imported nested constructors", () => ValueConstructorChecks.Run(nested: true)),
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
+    ("Value override definition and builder authoring", ValueOverrideAuthoringChecks.Run),
     ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),
     ("Constructed interface inheritance", ConstructedInheritanceChecks.Run),
     ("Generic class interface implementation", GenericImplementationChecks.Run),

@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-03",
+  "scope": "Bounded CLI value ToString override authoring; native union gate remains open",
+  "neoclrParentRevision": "ba43cacbe65a9e54c6412521e8be3248f6372b58",
+  "ravenDocumentationRevision": "03511943c25636cd8fb974e783c7538d9df05cee",
+  "runtimeCodeChanged": false,
+  "compilerCodeChanged": false,
+  "sourceSha256": {
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredMethods.cs": "63da1e8b4b4dcb8bc3b8b22cd2d73d4bc728a7672be5bf30455835f09b66a4f7",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyWriter.cs": "f974013a2a463b8b3ce717e187c7f7850cd2a907b82bd4023dda425a7c321d38",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ValueOverrideAuthoringChecks.cs": "310de81f2f236d8dabec1789640c22620061af1a07ea70fa01d726573636fcd8"
+  },
+  "validation": {
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+    "result": "118/118 C# metadata contract tests passed",
+    "execution": [
+      "boxed Object.ToString dispatch on manually authored and builder-authored values",
+      "boxed Object.ToString dispatch on constructed generic value",
+      "interface ToString dispatch through the same override",
+      "Object base slot identity"
+    ],
+    "roundTrip": "CLI attributes retain Virtual and clear NewSlot/Abstract/Static",
+    "negative": [
+      "nonpublic/static/new-slot/abstract partial override flags",
+      "wrong name/result/parameters/generic method",
+      "duplicate declaration",
+      "class/interface/static owners with no partial attachment",
+      "native writer rejects instead of losing override semantics"
+    ],
+    "apiSnapshotCommand": "python3 scripts/build-api-docs.py --check",
+    "apiSnapshotResult": "pre-existing stale runtime API snapshot; no hashes advanced"
+  },
+  "nativeExecuted": false,
+  "remaining": [
+    "explicit native System.Object dependency and slot binding",
+    "native override flags and names in writer and reader",
+    "Raven override admission from symbol contracts",
+    "generated formatting operations",
+    "native union/case contract preservation"
+  ]
+}

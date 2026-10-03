@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add bounded value-type ToString override authoring through definitions and
+  TypeBuilder.AddOverride. CLI output preserves the Object virtual slot, including
+  when the method also implements an interface; ordinary and generic value dispatch
+  execute in C# tests. Native writing explicitly rejects these overrides until runtime
+  Object-slot binding is implemented. Raven union admission is unchanged. Host API
+  XML/manual coverage is updated; the existing runtime API snapshot remains stale.
+
 - Record Raven's generated union constructor/accessor planning fix: retained case and
   parameter syntax now reaches existing synthesized bodies with exact union-anchor
   validation. Shared core-body lowering and .NET union regressions pass; native union

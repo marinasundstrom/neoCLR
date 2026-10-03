@@ -74,6 +74,9 @@ blocker. Metadata-generated constrained interface dispatch already executes with
 and independent copies on both runtimes; compiler declarations/concrete calls also pass.
 See [value-interface evidence](experiments/extended-cli-metadata/value-interfaces-2026-10-03.json). Generated case constructors and payload getters now also pass shared body planning,
 including generic payloads; see [core-body evidence](experiments/extended-cli-metadata/union-core-bodies-2026-10-03.json).
+Bounded value ToString override declarations now preserve and execute the Object slot on CLR;
+native writing explicitly rejects them pending runtime-slot binding. See
+[override declaration evidence](experiments/extended-cli-metadata/value-override-authoring-2026-10-03.json).
 Union/case metadata round trips, synthesized override/display emission and symbol-authored external value
 operands remain pending; this is not source Option completion. See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See

@@ -15,6 +15,8 @@ public sealed partial class AssemblyBuilder
     public byte[] WriteNativeAssembly()
     {
         var methods = ValidateGraph();
+        if (methods.Any(method => method.IsOverride))
+            throw new InvalidDataException("native Object overrides require explicit runtime slot binding, which is not yet supported");
         static void CheckText(string text)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Any(char.IsControl)) throw new InvalidDataException("invalid native descriptive name");

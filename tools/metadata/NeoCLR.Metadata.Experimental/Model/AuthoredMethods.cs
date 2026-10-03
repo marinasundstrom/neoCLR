@@ -39,20 +39,24 @@ public sealed partial class MethodDefinition
         declarationAttributes = (ushort)((visibility == MethodVisibility.Public ? 6 : 3) | 0x10);
         this.signature = [];
     }
-    /// <summary>Creates a detached type method, root-class constructor or abstract interface contract with CLI attributes.</summary>
+    /// <summary>Creates a detached type method, constructor, bounded value override or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; public instance interface contracts require Abstract, Virtual and NewSlot together.</param>
+    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; public instance interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
-    /// <remarks>Append to an attached authored TypeDefinition.Methods collection. Instance methods require a reference class. Constructors require a nongeneric Void signature.</remarks>
+    /// <remarks>Append to an attached authored TypeDefinition.Methods collection. Instance methods require a class or value owner. Overrides currently require a value owner and the nongeneric parameterless String-returning ToString contract. Constructors require a nongeneric Void signature.</remarks>
     public MethodDefinition(string name, ushort attributes, MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" ||
             (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 6))
             throw new ArgumentException("invalid type-method declaration");
-        bool contract = (attributes & 0x540) != 0;
+        bool valueOverride = (attributes & 0x540) == 0x40;
+        bool contract = !valueOverride && (attributes & 0x540) != 0;
+        if (valueOverride && ((attributes & 0x17) != 6 || name != "ToString" ||
+            signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
+            throw new ArgumentException("only public parameterless String-returning ToString overrides are supported");
         if (contract && ((attributes & 0x540) != 0x540 || (attributes & 0x17) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
             throw new ArgumentException("invalid interface method flags or signature");
         bool constructor = name == ".ctor";
@@ -85,12 +89,13 @@ public sealed partial class MethodBuilder
     internal MethodBuilder(AssemblyBuilder assembly, MethodDefinition definition, TypeBuilder? owner = null)
     { Assembly = assembly; DeclaringType = owner; Definition = definition; definition.Producer = this; definition.Module = assembly.Definition.MainModule; }
     // Keep access flags and context-derived CLI flags in one place for inspection and writing.
+    internal bool IsOverride => (Definition.DeclarationAttributes & 0x140) == 0x40;
     internal ushort GetAttributes(bool? accessor = null)
     {
         bool special = accessor ?? DeclaringType?.Properties.Any(p => ReferenceEquals(p.GetMethod, this) || ReferenceEquals(p.SetMethod, this)) == true;
         var flags = (MethodAttributes)Definition.DeclarationAttributes | MethodAttributes.HideBySig;
         if (IsAbstract) flags |= MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot;
-        else if (DeclaringType?.Implements(this) == true) flags |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
+        else if (!IsOverride && DeclaringType?.Implements(this) == true) flags |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
         if (IsConstructor) flags |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
         else if (special) flags |= MethodAttributes.SpecialName;
         return (ushort)flags;
@@ -113,11 +118,28 @@ public sealed partial class AssemblyBuilder
 
 public sealed partial class TypeBuilder
 {
+    /// <summary>Adds a public instance override using the same validation as a detached method definition.</summary>
+    /// <param name="name">Currently ToString only.</param>
+    /// <param name="signature">Nongeneric parameterless signature returning String.</param>
+    /// <returns>An owned method with a managed value receiver and a body generator.</returns>
+    /// <exception cref="ArgumentNullException">Signature is null.</exception>
+    /// <exception cref="ArgumentException">Unsupported override contract, duplicate signature or method limit.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not a value type.</exception>
+    /// <remarks>CLI emission reuses the inherited Object.ToString slot. Native encoding rejects overrides until explicit runtime Object-slot binding is implemented. Generic value owners are supported; generic override methods are not.</remarks>
+    public MethodBuilder AddOverride(string name, MethodSignature signature)
+    {
+        var definition = new MethodDefinition(name, (ushort)(MethodAttributes.Public | MethodAttributes.Virtual), signature);
+        Definition.Methods.Add(definition);
+        return MethodBuilder.ForDefinition(definition);
+    }
+
     internal void AttachMethod(MethodDefinition definition)
     {
         if (!definition.IsTypeDeclaration || definition.AuthoredSignature is not { } signature ||
             definition.Producer is { } producer && !ReferenceEquals(producer.DeclaringType, this))
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
+        if ((definition.DeclarationAttributes & 0x540) == 0x40 && !IsValueType)
+            throw new InvalidOperationException("Object overrides currently require a value owner");
         if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))
             throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");

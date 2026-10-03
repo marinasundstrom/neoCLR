@@ -133,3 +133,8 @@ The development metadata API supports value-type interface relationships and bou
 constrained calls through its IL generator. Mutation/copy checks execute on CLR and
 neoCLR. Raven admits the declarations and concrete calls; broader constrained lowering,
 boxing and complete source-union emission remain in progress.
+
+The development metadata API can now author value-type `ToString` overrides for CLI
+output, with boxed and interface dispatch verified in C#. Native Object-slot binding
+and source-union display emission remain in progress; native writing rejects the new
+override profile until it can preserve that contract.

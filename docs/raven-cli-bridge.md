@@ -4374,9 +4374,28 @@ library APIs are unchanged. No native union execution is claimed from plan admis
 
 Investigation of the next blocker confirms that synthesized ToString must retain a real
 Object virtual-slot contract. It cannot be emitted as an ordinary nonvirtual method.
-The current metadata declaration API cannot author that override; native runtime slot
+The metadata declaration API now authors that override for CLI output; native runtime slot
 validation also needs the explicit retained System.Object dependency and correct target
 identity/name. The generated formatting helper additionally uses object/string/character
 operations. Next add the bounded override/reference contract and formatting dependencies,
 then preserve union/case metadata for native imports. The production union publication
 gate stays closed throughout; supported core bodies are not a complete union contract.
+
+
+## Union override declaration foundation (2026-10-03)
+
+The separate metadata library now exposes TypeBuilder.AddOverride and matching detached
+MethodDefinition flags for a value-type ToString override. Definitions remain authoritative;
+builders are convenience and bodies use GetILGenerator. CLI flags reuse the Object slot,
+even when the method also implements a ToString interface contract. C# execution covers
+ordinary/generic values and interface dispatch; 118 metadata groups pass.
+
+This is a declaration foundation, not native override emission. WriteNativeAssembly rejects
+these methods before returning bytes. Native encoding still needs the explicit retained
+System.Object slot and dependency identity; the runtime slot validator already requires the
+actual System module and matching virtual signature. The current writer's hex-encoded
+ordinary method name cannot identify that slot. Native reader materialization must preserve
+the same override meaning when that encoding is added. No Runtime Contract or compiler
+capability is enabled, and source Option still stops at synthesized ToString admission.
+Formatting operations and native union/case contracts remain subsequent gates.
+See [evidence](experiments/extended-cli-metadata/value-override-authoring-2026-10-03.json).
