@@ -33,6 +33,7 @@ public sealed partial class MethodBuilder
     internal bool IsCoreObjectToString { get; set; }
     internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
+    internal PrimitiveType? NativeImportPrimitiveOwner { get; set; }
     internal bool NativeImportIsNamespaceFunction { get; set; }
     internal bool DiscardNativeImportResult { get; set; }
 }
@@ -78,7 +79,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
             throw new InvalidDataException("incompatible native Object.ToString slot");
     }
 
-    internal void ValidateType(TypeDefinition type)
+    internal void ValidateType(TypeDefinition type, bool intrinsicStringStaticOwner = false)
     {
         if (type.Module.Assembly.ImportSnapshotIdentity != reference.ImportSnapshotIdentity) throw new InvalidDataException("native binding snapshot mismatch");
         var name = TypeName(type);
@@ -89,7 +90,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         if (!NativeLibraryDefinition.IsPublic(native)) throw new InvalidDataException("native type is not public: " + name);
         var contract = (type.Attributes & 0x20) != 0;
         var nativeInterface = native.TryGetProperty("representation", out var kind) && kind.GetString() == "Interface";
-        if (contract != nativeInterface || !contract && (type.Attributes & 0x180) != 0x180 && type.IsValueType == Flag(native, "is_reference_type"))
+        if (contract != nativeInterface || !contract && !intrinsicStringStaticOwner && (type.Attributes & 0x180) != 0x180 && type.IsValueType == Flag(native, "is_reference_type"))
             throw new InvalidDataException("native type category mismatch: " + name);
     }
     internal void ValidateMethod(MethodDefinition definition, MethodBuilder target)
@@ -104,12 +105,17 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         }
         if (namespaceContainer && (!definition.IsStatic || (definition.Attributes & 7) != 6 || (definition.Attributes & 0x440) != 0))
             throw new InvalidDataException("namespace function must be public static and concrete");
-        if (!namespaceContainer) ValidateType(owner);
+        // String is a CLI reference type but intrinsic native storage. A static member
+        // needs the exact owner identity and signature, not a nominal instance layout.
+        // This exception does not admit String as an ordinary imported class/receiver.
+        var intrinsicStringStaticOwner = definition.IsStatic && reference.Identity.Equals(core) &&
+            Library.ModuleName == "System" && owner is { Namespace: "System", Name: "String", GenericArity: 0, DeclaringType: null, IsValueType: false };
+        if (!namespaceContainer) ValidateType(owner, intrinsicStringStaticOwner);
         var name = (namespaceContainer ? owner.Namespace : TypeName(owner));
         name = (name.Length == 0 ? "" : name + ".") + definition.Name;
         var parameters = target.Signature.ParameterTypes.Select(TypeKey).ToArray();
         var ownerName = TypeName(owner);
-        var ownerKey = owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
+        var ownerKey = intrinsicStringStaticOwner ? "String" : owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
         var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
             f.GetProperty("name").GetString() == name && f.TryGetProperty("owner", out var nativeOwner) && (namespaceContainer ? nativeOwner.ValueKind == JsonValueKind.Null : TypeKey(nativeOwner) == ownerKey) && Flag(f, "instance") == !definition.IsStatic &&
             Count(f, "generic_parameters") == definition.GenericArity &&
@@ -125,12 +131,16 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var actualOutputs = Indices(function, "out_parameters").Concat(Indices(function, "out_when_true")).Distinct().Order();
         if (!actualOutputs.SequenceEqual(target.Signature.OutParameters.Order())) throw new InvalidDataException("native output contract mismatch: " + name);
         target.NativeImportName = name;
+        target.NativeImportPrimitiveOwner = intrinsicStringStaticOwner ? PrimitiveType.String : null;
         target.NativeImportIsNamespaceFunction = namespaceContainer;
         target.DiscardNativeImportResult = target.Signature.ReturnType.Primitive == PrimitiveType.Void && !Flag(function, "no_result");
     }
     internal static bool IsInhabitedVoid(ImportedTypeReference type) =>
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity) is not null &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Void" && type.IsValueType && type.GenericArity == 0;
+    internal static bool IsIntrinsicChar(ImportedTypeReference type) =>
+        type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
+        type.DeclaringType is null && type.Namespace == "System" && type.Name == "Char" && type.IsValueType && type.GenericArity == 0;
     private string TypeKey(SignatureType type)
     {
         if (type.Primitive is { } primitive) return primitive.ToString();
@@ -142,6 +152,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         if (type.ImportedType is { } imported)
         {
             if (IsInhabitedVoid(imported)) return "Void";
+            if (IsIntrinsicChar(imported)) return "Char";
             var binding = imported.Owner.NativeBindingFor(imported.AssemblyIdentity) ?? throw new InvalidDataException("native signature requires an explicit dependency binding");
             var name = binding.TypeName(imported);
             return imported.TypeArguments.Count == 0 ? "Named(" + name + ")" : "Constructed(" + name + ";" + string.Join(",", imported.TypeArguments.Select(TypeKey)) + ")";

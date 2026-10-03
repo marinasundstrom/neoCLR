@@ -378,3 +378,21 @@ trips, then verifies/runs a two-assembly NeoCLR consumer (42). Its attribute con
 fails if invoked, proving metadata loading does not execute it. Missing native dependencies
 reject. No Runtime Contract selection or Raven emitter behavior changes in this slice;
 Raven union emission and imported semantic reconstruction remain pending.
+
+
+## Owned union execution (2026-10-03)
+
+Raven now emits plain/generic union declaration graphs and their marker/case/companion
+attributes. Both targets execute construction, Some/None matching, independent carrier
+copies and generated display, producing `Choice.Some(42)` and `Choice.None`, then exit 42.
+The compiler uses complete shared bound-body initialization for inactive payload fields
+and failed TryGetValue outputs; unreachable portable-plan instructions are removed after
+lowering. Native verification retains its initialization requirements.
+
+Runtime Contract configuration still uses the explicit CLI core snapshot plus retained
+System seed. Static String owners and core Char tests map to the runtime's canonical
+primitive encoding. Embedded native union marker constructors are metadata-only nominal
+records; unlike CLI attributes they currently lack System.Attribute inheritance. This
+bounded representation remains documented and does not introduce union-specific wire data.
+Separate-library native union symbol reconstruction and external value references remain
+pending; local execution is not the full union or source Option acceptance gate.

@@ -136,7 +136,14 @@ public sealed partial class AssemblyBuilder
                 {
                     if (method.Instructions.Count != 0 || method.Locals.Count != 0) throw new InvalidDataException("abstract interface methods must have no body or locals");
                 }
-                else if (validateBodies) method.Validate();
+                else if (validateBodies)
+                {
+                    try { method.Validate(); }
+                    catch (InvalidDataException error)
+                    {
+                        throw new InvalidDataException($"{method.DeclaringType?.Name ?? method.Namespace}.{method.Name}: {error.Message}", error);
+                    }
+                }
             }
         }
         catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract", error); }

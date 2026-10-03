@@ -10268,3 +10268,16 @@ not Self dispatch evidence. Raven integration and implementation substitution re
 - **Open:** union metadata preservation, native semantic reconstruction and executable
   separate-library consumers. This entry records scope; no format migration or new
   runtime acceptance result was completed by this documentation change.
+
+
+## 2026-10-03 — Shared format structure and NeoCLR categories
+
+- **Author:** noted that a future fork of the format remains possible, while the current
+  structure can encode NeoCLR semantics. Module functions and function types remain
+  NeoCLR concepts distinct from ordinary CLI categories; the message ended open-ended.
+- **Assistant:** retained CLI-derived structure and explicit extensions, without inferring
+  a decision to fork now. Continued unions using ordinary nominal declarations and the
+  existing Raven attribute contract. Structural Function integration remains on its
+  feature branches; no additional instruction was inferred from the unfinished thought.
+- **Outcome:** plain/generic local union cases now compile/run on both targets with
+  case metadata and generated display. Native imported union semantics remain open.

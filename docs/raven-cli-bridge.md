@@ -4544,3 +4544,14 @@ Raven's .NET UnionAttribute, case-name/ordinal and generic companion contracts t
 the existing runtime custom_attributes representation. No union-only wire format or
 unmarked-struct fallback is planned. Encoding and native union execution remain unproved.
 [Case/unit evidence](experiments/extended-cli-metadata/union-case-unit-2026-10-03.json).
+
+
+Union execution bootstrap continuation (2026-10-03): the host metadata adapter now maps
+explicitly bound core String static owners and core Char type-test operands to canonical
+native primitive encodings. CLI call/type tokens remain ordinary CLI encodings. This is a
+representation difference of the retained seed, not a language-level String/Char change.
+Exact core identity, System module and method contract validation remain required; nominal
+String instance import remains unsupported. The temporary CLI bootstrap owner is the host
+binding layer; native semantic primitive import replaces it as class-library ownership
+expands. Native PE/#Neo remains transitional. See the executable
+[union evidence](experiments/extended-cli-metadata/union-local-execution-2026-10-03.json).

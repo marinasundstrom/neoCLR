@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Map explicitly bound core String static call owners and core Char type operands to
+  canonical native primitive encodings. Keep ordinary nominal String import rejected;
+  validate core/module identity and selected method signatures. C# runtime checks and
+  122 metadata groups pass. Body validation errors now identify the declaring method.
+
 - Add bounded type custom-attribute definitions/builders and metadata-only introspection.
   CLI rows/blobs and existing native attribute records preserve String/Int32/Boolean
   fixed arguments and explicit constructor owners. C# tests verify CLR decoding and

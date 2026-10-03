@@ -5891,3 +5891,20 @@ wire category. Native constructor-bearing records currently do not enforce CLI
 System.Attribute inheritance; the .NET execution control uses System.ObsoleteAttribute.
 C# tests cover actual CLR decoding, native round trips, explicit dependency resolution,
 malformed records and runtime verification/execution without invoking an attribute ctor.
+
+
+### Intrinsic bootstrap mappings (development, 2026-10-03)
+
+`AssemblyBuilder.BindNativeLibrary` now permits static methods on the exact explicitly
+bound core System.String owner when the native module is System. Selected methods still
+require matching public signatures, results and owner identity. Native calls encode their
+owner as primitive String, while CLI output retains its TypeRef/MemberRef identity.
+This does not admit String as an ordinary nominal imported class or add instance members.
+An imported value System.Char from that same core binding encodes native type operands as
+Char, including generated formatting type tests; it is not a new public Char primitive
+signature API. Missing/wrong bindings fail before returning an image.
+
+These are existing runtime primitive representations, not new union semantics or wire
+categories. An executable C# fixture checks concatenation, a nonmatching boxed Int32/Char
+test, rejected owner/result/module changes and continued rejection of nominal String import.
+Method-body validation failures now include the declaring method for actionable diagnostics.
