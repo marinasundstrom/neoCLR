@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add canonical metadata-only generic method constructions, with copied arguments,
+  owner-preserving definition navigation and simultaneous type/method substitution.
+  C# contracts pass 109/109 and all seven native consumers execute (42). No invocation,
+  emission or broader generic constraint support is implied.
+
 - Add bounded inherited-interface metadata queries and consume them in Raven, preserving
   generic substitutions and diamond identity. Native encoding and .NET defaults are unchanged.
 

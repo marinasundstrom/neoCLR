@@ -152,12 +152,49 @@ internal static class MetadataLoadContextChecks
             ReferenceEquals(mixedParameters[1].ParameterType, intView) && ReferenceEquals(mixedView.ReturnType, intView), "separate owner and method scopes");
         Check(mixedView.GetGenericArguments()[0] is MethodGenericParameterTypeInfo methodParameter &&
             ReferenceEquals(methodParameter.DeclaringMethod, mixedView) && methodParameter.Position == 0, "method scope provenance");
+        var boolView = genericContext.ResolveSignature(PrimitiveType.Boolean);
+        var methodArgs = new[] { boolView };
+        var mixedClosed = mixedView.MakeGenericMethod(methodArgs);
+        methodArgs[0] = intView;
+        Check(mixedView.IsGenericMethodDefinition && !mixedClosed.IsGenericMethodDefinition &&
+            ReferenceEquals(mixedClosed.GetGenericMethodDefinition(), mixedView) &&
+            ReferenceEquals(mixedView.GetGenericMethodDefinition(), mixedView), "generic method definition provenance");
+        Check(ReferenceEquals(mixedClosed.ReturnType, intView) &&
+            ReferenceEquals(mixedClosed.GetParameters()[0].ParameterType, boolView) &&
+            ReferenceEquals(mixedClosed.GetParameters()[1].ParameterType, intView) &&
+            ReferenceEquals(mixedClosed.GetParameters()[0].DeclaringMethod, mixedClosed), "simultaneous owner and method construction");
+        Check(ReferenceEquals(mixedClosed, mixedView.MakeGenericMethod(boolView)), "canonical method construction and copied arguments");
+        Check(!ReferenceEquals(mixedClosed, boxView.GetMethods().Single(m => m.Name == "Mixed").MakeGenericMethod(boolView)), "constructed method owner identity");
+        Check(ReferenceEquals(mixedView.MakeGenericMethod(otherView.GetGenericArguments()[0]).GetParameters()[0].ParameterType,
+            otherView.GetGenericArguments()[0]), "caller type parameter survives method construction");
+        Check(ReferenceEquals(mixedView.MakeGenericMethod(mixedView.GetGenericArguments()[0]).GetParameters()[0].ParameterType,
+            mixedView.GetGenericArguments()[0]), "simultaneous method scope does not rebind supplied parameters");
+        Parallel.For(0, 32, _ => Check(ReferenceEquals(mixedClosed, mixedView.MakeGenericMethod(boolView)), "concurrent method construction identity"));
+        var oracle = typeof(GenericMethodOracle<int>).GetMethod("Mixed")!.MakeGenericMethod(typeof(bool));
+        Check(oracle.ReturnType == typeof(int) && oracle.GetParameters()[0].ParameterType == typeof(bool) &&
+            oracle.GetParameters()[1].ParameterType == typeof(int), "CLR comparison for independent owner/method construction");
+        TypeInfo deepArgument = intView;
+        for (var i = 0; i < 16; i++) deepArgument = boxView.MakeGenericType(deepArgument);
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod(deepArgument));
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod());
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod(nominal));
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod(otherView));
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod(genericContext.ResolveSignature(PrimitiveType.Void)));
+        Reject<ArgumentException>(() => mixedView.MakeGenericMethod(new TypeInfo[] { null! }));
+        Reject<ArgumentNullException>(() => mixedView.MakeGenericMethod(null!));
+        Reject<InvalidOperationException>(() => mixedClosed.MakeGenericMethod(intView));
+        Reject<InvalidOperationException>(() => getView.MakeGenericMethod(intView));
+        Reject<InvalidOperationException>(() => getView.GetGenericMethodDefinition());
+        Reject<NotSupportedException>(() => ((IList<TypeInfo>)mixedClosed.GetGenericArguments()).Clear());
         var moduleView = genericContext.Resolve(genericSnapshot.Identity).GetModules().Single();
         var functionView = moduleView.GetFunctions().Single();
         Check(functionView.DeclaringType is null && functionView.ReturnType is ArrayTypeInfo functionArray &&
             ReferenceEquals(functionArray.ElementType, functionView.GetGenericArguments()[0]) &&
             ReferenceEquals(functionView.ReturnType, functionView.GetParameters()[0].ParameterType), "namespace generic vector signature");
         Check(ReferenceEquals(functionView, genericContext.Resolve(genericSnapshot.MainModule.Functions.Single())), "function resolution identity");
+        var closedFunction = functionView.MakeGenericMethod(intView);
+        Check(closedFunction.DeclaringType is null && closedFunction.ReturnType is ArrayTypeInfo closedVector &&
+            ReferenceEquals(closedVector.ElementType, intView) && ReferenceEquals(closedFunction.ReturnType, closedFunction.GetParameters()[0].ParameterType), "constructed namespace function vector signature");
         Check(ReferenceEquals(genericContext.ResolveSignature(SignatureType.MethodParameter(0), boxView.GetGenericArguments(), [intView]), intView), "explicit method scope substitution");
         Reject<InvalidDataException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(1), null, [intView]));
         Reject<ArgumentException>(() => genericContext.ResolveSignature(SignatureType.MethodParameter(0), null, [nominal]));
@@ -172,6 +209,10 @@ internal static class MetadataLoadContextChecks
         Reject<NotSupportedException>(() => cliType.GetDeclaredInterfaces());
         Reject<NotSupportedException>(() => cliType.GetInterfaces());
         Reject<ArgumentException>(() => new MetadataLoadContext([cli.Definition]));
+    }
+    private sealed class GenericMethodOracle<T>
+    {
+        public T Mixed<U>(U first, T second) => second;
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }
     private static void Reject<T>(Action action) where T : Exception

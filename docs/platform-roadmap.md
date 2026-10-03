@@ -36,8 +36,8 @@ Raven uses them instead of its private dependency resolver. 109 metadata test gr
 Constructed type and field views now project signatures for Raven; canonical view-to-symbol
 mapping preserves array identity. Method/parameter views now also project open method scopes; Raven no longer performs
 recursive generic-signature projection. Declared property/direct interface views now also
-substitute owner arguments for Raven (2026-10-03); [109 C# groups and seven runtime consumers pass](experiments/extended-cli-metadata/introspection-properties-interfaces-2026-10-03.json). Bounded transitive interface traversal now also lives in the facade. Next extend generic
-method inspection and assess remaining importer-owned metadata transformations; see [metadata resolution views](design/metadata-resolution-views.md).
+substitute owner arguments for Raven (2026-10-03); [109 C# groups and seven runtime consumers pass](experiments/extended-cli-metadata/introspection-properties-interfaces-2026-10-03.json). Bounded transitive interface traversal now also lives in the facade. Generic method inspection now also supports canonical constructions on open/closed owners.
+Next address constructor/member classification and accessibility metadata in the facade; see [metadata resolution views](design/metadata-resolution-views.md).
 External interface implementation/inheritance declarations remain subsequent work.
 Previously identified next capability: external interface implementation/inheritance declarations for separately
 compiled class-library consumers; the current reader admits relationships within one

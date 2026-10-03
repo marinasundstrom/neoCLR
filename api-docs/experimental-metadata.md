@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Generic method construction](#generic-method-construction-development-2026-10-03): metadata signature inspection.
+
 - [Inherited interface views](#inherited-interface-views-development-2026-10-03): bounded metadata closure.
 
 - [Property and direct interface views](#property-and-direct-interface-views-development-2026-10-03): scoped property signatures, accessors and relationships.
@@ -5358,3 +5360,39 @@ reader relationship materialization (currently CLI snapshots) throws NotSupporte
 There is no partial success result, recursive member expansion or runtime loading.
 This covers the native root-class/interface profile; general class inheritance and
 parameter-constraint queries are not claimed. The result is cached per owner.
+
+
+## Generic method construction (development 2026-10-03)
+
+Host `Introspection.MethodInfo` adds these members:
+
+| Member | Contract |
+| --- | --- |
+| `bool IsGenericMethodDefinition` | True for a generic declaration without supplied method arguments, even on a constructed owner. |
+| `MethodInfo GetGenericMethodDefinition()` | Returns this definition or the construction's definition on the same declaring owner. Throws InvalidOperationException for nongeneric methods. |
+| `MethodInfo MakeGenericMethod(params TypeInfo[] arguments)` | Copies same-context arguments and returns a canonical constructed view. Only callable on a generic definition. |
+
+`GetGenericArguments()` returns scoped parameters on a definition and copied supplied
+arguments on a construction. GenericParameterNames remains declaration metadata.
+ReturnType and GetParameters apply owner and method arguments simultaneously; each
+ParameterInfo.DeclaringMethod is the constructed method that exposes it. DeclaringType,
+Module and MetadataToken retain original provenance. No declaration mutation occurs.
+
+```csharp
+var mixed = closed.GetMethods().Single(m => m.Name == "Mixed");
+var call = mixed.MakeGenericMethod(context.ResolveSignature(PrimitiveType.Boolean));
+// For Box<Int32>.Mixed<U>(U, T) -> T: parameters are Boolean/Int32, result Int32.
+```
+
+This pattern is tested by the C# fixture against equivalent CLR metadata inspection.
+Namespace functions support construction too. Supplied caller type/method parameters
+remain caller-scoped and are not recursively rebound. Repeated equal requests return
+the same view within one context; differing owners or contexts remain distinct.
+
+MakeGenericMethod throws ArgumentNullException for a null argument array;
+InvalidOperationException for a nongeneric or already constructed method; ArgumentException
+for wrong arity, null elements, foreign-context types, Void, bare generic definitions,
+or argument nesting of 16 or more. Result signature projection may later throw
+InvalidDataException for unsupported/unavailable metadata or nesting bounds, as on open
+methods. Collections remain read-only. This supports the reader's unconstrained generic
+signature profile, not general constraint validation, runtime invocation or code emission.

@@ -3976,3 +3976,34 @@ No Runtime Contract, emitter, bootstrap, guest API or encoding changes.
 
 Validation: 109 C# groups, API snapshot checks and all seven native runtime consumers (42)
 pass. See [recorded evidence](experiments/extended-cli-metadata/introspection-interface-closure-2026-10-03.json).
+
+
+Generic method inspection checkpoint (2026-10-03): MethodInfo.MakeGenericMethod now
+returns a canonical metadata view whose owner and method argument scopes are applied
+simultaneously. GetGenericMethodDefinition retains the same open/constructed declaring
+owner. Inputs are copied; caller-scoped parameters keep their original identity.
+Namespace functions and vectors use the same projection. These views cannot invoke or
+emit code; Raven continues its own inference and compiler-symbol construction.
+
+The comparison baseline is .NET 10 MethodInfo.MakeGenericMethod (Microsoft Learn,
+retrieved 2026-10-03):
+https://learn.microsoft.com/en-us/dotnet/api/system.reflection.methodinfo.makegenericmethod?view=net-10.0
+We follow definition/construction separation and allow supplied arguments that themselves
+contain parameters. This is a bounded signature-inspection API, not .NET execution or
+constraint validation: constrained CLI signatures already reject at the reader boundary;
+wider constraint projection remains pending. A C# CLR comparison checks the same mixed
+owner/method primitive substitution. Central projection avoids consumers reimplementing
+that substitution, at the cost of retaining context-owned constructed-method views.
+No Runtime Contract, emitter, bootstrap, guest API or encoding changes are introduced.
+
+Importer assessment: native signature decoding, generic scope projection and interface
+closure now live in the facade. Raven still reads declaration attributes, generic parameter
+declarations, storage ordinals and accessor associations from reader definitions to create
+language symbols. Those are adaptation sites, not emitter dependencies. The next bounded
+facade work is constructor/member classification and accessibility metadata; do not move
+Raven overload resolution, inference or language-specific visibility rules into this
+library. General class inheritance, external native interface declarations, CLI relationship
+decoding, full parameter metadata and constraint views remain explicit gaps.
+
+Validation: 109/109 C# groups including a CLR signature comparison, API snapshot checks,
+and all seven native runtime consumers (42) pass. See [evidence](experiments/extended-cli-metadata/introspection-method-construction-2026-10-03.json).

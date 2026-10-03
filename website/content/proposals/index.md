@@ -707,3 +707,7 @@ the compiler; no guest Introspection API or runtime encoding changes in this sli
 Development checkpoint (2026-10-03): bounded inherited-interface queries now live in the
 C# facade; Raven consumes the closure. Constructed arguments remain distinct and diamond
 duplicates collapse. No guest/runtime API change.
+
+Development checkpoint (2026-10-03): generic method/function signature inspection now
+supports canonical constructed views with independent owner/method scopes. These host
+views do not invoke code; Raven retains inference and compiler symbol construction.

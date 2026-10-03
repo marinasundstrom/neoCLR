@@ -790,3 +790,7 @@ reference and documentation snapshot remain unchanged.
 Host GetInterfaces APIs on nominal/constructed views are covered in the
 [manual reference](experimental-metadata.md#inherited-interface-views-development-2026-10-03);
 these C# APIs remain excluded from guest RavenDoc.
+
+Host MethodInfo generic construction/definition APIs and updated GetGenericArguments
+semantics are covered in the [manual reference](experimental-metadata.md#generic-method-construction-development-2026-10-03).
+They remain outside guest RavenDoc inputs because they are C# host APIs.
