@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Extend the native source-library acceptance driver to unchanged comparers and HashMap.
+  Separate import and execution verify collisions, growth, replacement, missing keys,
+  callback dispatch, key snapshots and shared object mutation (exit 42). Record revisions
+  and artifact hashes; the broad application and dual-target class-library gate remain open.
+
 - Read native callback signatures and expose canonical FunctionTypeInfo metadata views,
   including owner/method substitution, external identity and explicit no-result facts.
   Symbol-authored method references accept bounded callbacks. Separately compiled unchanged

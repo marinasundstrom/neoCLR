@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Source-library gate update (2026-10-03): unchanged HashMap and comparer sources now
+compile into a separately imported native library and execute collisions, growth,
+replacement, callback dispatch and shared object mutation. No backend change was needed.
+[Evidence](experiments/extended-cli-metadata/hashmap-import-2026-10-03.json).
+Query composition, the broad application and executable .NET class-library adapters remain open.
+
 Author priority clarification (2026-10-03): finish Raven targeting neoCLR and executable
 end-to-end compilation. CLI tables, signatures and instructions remain the baseline;
 new semantics and broader format redesign are subsequent experiments, not prerequisites

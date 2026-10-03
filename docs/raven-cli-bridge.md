@@ -4669,3 +4669,16 @@ The assessment driver now requires native import success; the previous failure r
 remains historical. Metadata contracts pass 125 groups, all seven existing native consumers
 pass, and the separate source-union gate still passes. The .NET class-library adapter,
 HashMap/comparers, queries and broad application gate remain open.
+
+### Native source HashMap gate (2026-10-03)
+
+The cumulative source-owned library now includes comparer policies and HashMap, with
+unchanged runtime sources and separate native consumer import. Explicit collection
+primitive bootstrap and retained seed configuration remain unchanged. No CLI projection
+is used for the rebuilt library. Collision/growth, replacement, missing keys, key snapshots,
+callback interface dispatch and shared value mutation execute with exit 42 and no stdout.
+The existing capacity-failure and dependency ownership guards pass too. No compiler,
+metadata or runtime behavior changed; .NET executable library adapters and query/broad
+application acceptance remain pending. See
+[reproducible workflow](experiments/extended-cli-metadata/bootstrap/README.md#separately-compiled-hashmap-and-comparers)
+and [evidence](experiments/extended-cli-metadata/hashmap-import-2026-10-03.json).

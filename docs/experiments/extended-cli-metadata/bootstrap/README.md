@@ -73,3 +73,25 @@ predicate shape to its existing callable symbols, and emission authors the callb
 from those symbols. Explicit no-result callbacks remain an unsupported Raven import category;
 metadata views preserve their distinction from inhabited-unit callbacks. Wider function
 semantics, .NET class-library adapters and the full collection application remain separate work.
+
+### Separately compiled HashMap and comparers
+
+Use the same collection primitive core and compiler/runtime paths as the ArrayList
+workflow, replacing `--collections` with `--hashmap` and choosing a fresh output directory.
+`hashmap-ownership.json` extends source ownership to Comparer, FunctionComparer,
+EqualityComparer, FunctionEqualityComparer, Map, MutableMap and HashMap. Their sources
+are unchanged. The consumer receives only the emitted native library reference.
+
+The consumer forces every key into one bucket, grows beyond initial capacity, rejects
+an existing key, replaces and inserts through Set, checks missing Option payloads,
+checks Keys snapshot independence, and mutates a shared ArrayList through a retrieved
+value. Both equality/hash callbacks and ordering callbacks execute through imported
+contracts. Expected stdout is empty and exit status is 42. Existing capacity-failure,
+missing-reference and duplicate-ownership guards also run. HashMap does not currently
+expose removal. This is native execution evidence, not the full .NET library gate.
+
+See [recorded commands, revisions and hashes](../hashmap-import-2026-10-03.json).
+No metadata, compiler or runtime changes were necessary for this extension. The source
+contract mirrors the supported CLR generic interfaces and callable operations; no new
+NeoCLR semantics or format version is introduced. Query composition and the broad
+application remain the next acceptance boundary.

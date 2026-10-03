@@ -20,7 +20,9 @@ def main():
     parser.add_argument('--core', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--collections', action='store_true', help='Verify separately compiled ArrayList including callback import')
+    parser.add_argument('--hashmap', action='store_true', help='Verify cumulative HashMap and comparer source library')
     args = parser.parse_args()
+    args.collections = args.collections or args.hashmap
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     compiler, runtime, core = (str(p.resolve()) for p in (args.compiler, args.runtime, args.core))
@@ -33,8 +35,8 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / ('arraylist-ownership.json' if args.collections else 'union-ownership.json')
-    consumer_source = HERE / ('arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
+    manifest = HERE / ('hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    consumer_source = HERE / ('hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
     seed_source = HERE / ('collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
     seed = output / 'System.neox'
@@ -71,12 +73,16 @@ def main():
     failure = run(bad_args + ['--library', '-o', str(rejected)] + sources, 1)
     if rejected.exists() or 'duplicates a source-owned declaration' not in failure.stderr:
         raise RuntimeError('Duplicate seed ownership was not rejected before output')
-    paths = [Path(compiler), Path(runtime), Path(core), seed, library, manifest,
+    paths = [Path(__file__).resolve(), Path(compiler), Path(runtime), Path(core), seed, library, manifest,
              HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources]
-    evidence = dict(scope=('ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    revisions = {}
+    for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
+        revisions[name] = subprocess.check_output(
+            ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
+    evidence = dict(revisions=revisions, scope=('HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,57 @@
+import System.Collections.*
+
+func Main() -> int {
+    let policy = FunctionEqualityComparer<int>((left, right) => left == right, value => 1)
+    let map = HashMap<int, ArrayList<int>>(policy)
+    let shared = ArrayList<int>()
+    shared.Add(20)
+    var key = 0
+    while key < 12 {
+        if !map.TryAdd(key, shared) {
+            return 1
+        }
+        key = key + 1
+    }
+    if map.TryAdd(0, ArrayList<int>()) || map.Count != 12 {
+        return 2
+    }
+    let replacement = ArrayList<int>()
+    replacement.Add(22)
+    map.Set(0, replacement)
+    map.Set(12, shared)
+    if map.Count != 13 || !map.ContainsKey(11) || map.ContainsKey(99) {
+        return 3
+    }
+    let contract: Map<int, ArrayList<int>> = map
+    let first = match contract.Find(0) {
+        .Some(let value) => value[0]
+        .None => -100
+    }
+    let second = match contract.Find(11) {
+        .Some(let value) => {
+            value[0] = 21
+            value[0]
+        }
+        .None => -100
+    }
+    if shared[0] != 21 || second != 21 {
+        return 4
+    }
+    let missing = match contract.Find(99) {
+        .Some(let value) => false
+        .None => true
+    }
+    if !missing {
+        return 5
+    }
+    let keys = contract.Keys
+    map.Set(13, shared)
+    if keys.Count != 13 || map.Count != 14 {
+        return 6
+    }
+    let order: Comparer<int> = FunctionComparer<int>((left, right) => left - right)
+    if order.Compare(20, 22) >= 0 {
+        return 7
+    }
+    return first + shared[0] - 1
+}
