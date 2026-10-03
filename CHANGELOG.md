@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add a minimal checked-storage bootstrap and ordinary-driver acceptance for separately
+  compiled generic reservation helpers. With explicit Raven bootstrap opt-in, native
+  consumers preserve array alias mutation (42) and reject uninitialized reads. Source-owned
+  iteration still executes on both targets. The next unchanged-source inventory identifies
+  native propagation out-parameter contracts, Fail bindings and callback bootstrap gaps;
+  ArrayList and the broad application remain incomplete.
+
 - Preserve native Self signatures in the experimental metadata definitions/builders,
   PE/#Neo readers/writers and scoped introspection member views. Self remains distinct
   from generic parameter ordinals; invalid storage and free-function contexts reject.

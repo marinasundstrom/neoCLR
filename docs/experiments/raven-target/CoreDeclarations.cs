@@ -7,9 +7,10 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false)
     {
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
+        if (checkedStorage) declarations += CheckedStorageBindings.Declarations;
         if (unionProbe)
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")

@@ -819,3 +819,7 @@ in the [host API manual](experimental-metadata.md#native-self-signatures-develop
 These .NET host APIs are excluded from guest RavenDoc selection because that generator
 loads Raven guest declarations. The existing expanded-reference fingerprint blocker above
 still causes `build-api-docs.py --check` to fail; no snapshot hashes have been relabelled.
+
+The 2026-10-03 storage-bootstrap generator mode also changes tracked generator inputs.
+It adds no public guest or host metadata API; the existing expanded-reference refresh
+blocker remains open. The old reference snapshot is intentionally preserved.

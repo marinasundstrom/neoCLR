@@ -4073,3 +4073,41 @@ Executable CLI emission rejects this native-only signature. This preserves contr
 information without promising CLR execution of Self. Next adapt Raven symbols from
 facade facts, then author native implementing-type substitution and typed calls from
 symbols; keep importer objects out of emission. See the host API reference for the bounds.
+
+
+### Checked-storage driver step (2026-10-03)
+
+`rvnc neoclr --bootstrap-intrinsics --core-reference <core>` now passes the exact
+registered primitive bootstrap to the existing target intrinsic contract. The flag is
+opt-in, requires an explicit core and may be specified only once. It does not authorize
+unrelated native dependencies or add an importer/emitter backchannel. `CheckedStorage`
+must have the already validated public static `Reserve<T>(int) -> T[]` signature; it
+emits the existing native array.reserve operation. Ordinary .NET defaults are unchanged.
+Unlike CLR newarr, native reservation tracks uninitialized elements and faults on reads
+before writes; the reference-only bootstrap body is never executable code.
+
+The new `--reference-storage-core` generator mode adds only this declaration to the
+primitive core, without competing source collection/union declarations. It is still a
+bootstrap reference, not a retained System implementation or an executable .NET adapter.
+No native format/runtime changes are needed. The C# API's existing BootstrapReference
+validation and checked-storage tests remain the owning contracts.
+
+`scripts/check-source-storage.py` first runs the existing dual-target source-iteration
+acceptance. It then compiles a native generic helper library through rvnc, deletes its
+source, imports its artifact into separate consumers without intrinsic opt-in, and verifies
+execution. Mutation through an array alias returns 42; an unread reserved slot faults.
+Disabled intrinsics, missing explicit core and repeated flags diagnose without publishing.
+[Executable evidence](experiments/extended-cli-metadata/source-storage-2026-10-03.json).
+
+Reproduce with the normal bridge build, selecting `--reference-storage-core /tmp/storage.dll`,
+then `python3 scripts/check-source-storage.py --raven-root <Raven> --core /tmp/storage.dll
+--output <fresh-directory>`.
+
+The [unchanged-source inventory](experiments/extended-cli-metadata/arraylist-inventory-2026-10-03.json)
+compiles Option and Propagatable alongside the seven collection contracts on .NET. Native
+emission rejects the propagation interface's out-parameter signatures. Including ArrayList
+also exposes missing System.Fail binding and minimal-bootstrap callback accessibility on
+native; .NET lacks the runtime storage/Fail service adapters. These are separate dependency
+and target-contract gaps. There is no ArrayList consumer or broad application success yet.
+Next admit and preserve supported ref/out interface parameter modes through the native
+metadata facade and compiler, then rerun the unchanged sources before widening emission.

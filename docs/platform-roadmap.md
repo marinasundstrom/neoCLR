@@ -49,7 +49,11 @@ including diamond traversal and dispatch on both targets. See [driver evidence](
 A checked-in ownership manifest and primitive-only bootstrap now support separately
 compiled iteration/collection contracts on both targets. Next extend ownership to the
 retained seed and ArrayList dependencies; also implement the author-requested native Self
-signature path through the metadata APIs. Its first contract-only slice now preserves Self
+signature path through the metadata APIs. Ordinary native driver opt-in now enables the
+existing checked-storage intrinsic, with separately compiled generic helper consumers
+executing 42 and rejecting uninitialized reads. The unchanged Option/Propagatable native
+emission blocker is interface out-parameter support; ArrayList also requires Fail/callback
+bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
 remain pending. The broad source-library/application gate remains open.
 See [closed generic field evidence](experiments/extended-cli-metadata/closed-generic-fields-2026-10-02.json).

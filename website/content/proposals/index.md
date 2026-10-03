@@ -310,7 +310,10 @@ Development metadata producer work also supports generic reference classes with 
 fields, constructors and instance calls. API-produced CLI/native binaries and Raven consumers execute the
 same storage case, including nested generic class values. Generic property/indexer metadata also preserves owner scope and accessor associations,
 with Raven consumers verified on both runtimes.
-Constraints and full class-library compilation remain future work; see the [experimental metadata API](/docs/experimental-metadata/).
+The ordinary native compiler driver now explicitly enables checked-storage reservation
+from the selected bootstrap. Separately compiled helper consumers exercise alias mutation
+and uninitialized-read faults. The full source-built class library remains incomplete;
+see the [experimental metadata API](/docs/experimental-metadata/).
 
 Development producer metadata also supports constructed generic field references with
 exact receiver/value checks; external assembly fields remain outside the current API.

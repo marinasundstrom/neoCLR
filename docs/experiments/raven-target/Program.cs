@@ -234,6 +234,12 @@ if (args.Length == 2 && args[0] == "--reference-primitive-core")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-storage-core")
+{
+    CoreDeclarations.Write(args[1], checkedStorage: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-library-core")
 {
     CoreDeclarations.Write(args[1], unionProbe: true, collectionProbe: true, libraryBootstrap: true);

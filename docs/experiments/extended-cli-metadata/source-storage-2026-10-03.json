@@ -1,0 +1,242 @@
+{
+  "scope": "driver bootstrap storage; not ArrayList or broad application completion",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "67be354a3f3b7bc8b7bd7ccc4df42cf0a11bf218",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven": "43341365c245b47b03dd53b47299c668719c37fd"
+  },
+  "artifacts": {
+    "/private/tmp/NeoCLR.StorageCore-20261003.dll": "66c581bd62be7936e524e1765d69422ad77264a42d86af824290616c9eaae31b",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "7cdae195afa954ac29dc7e93f7d6b8956e43375c93df1bf0e0d10cecbc4df452",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4"
+  },
+  "sourceHashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/check-source-storage.py": "4d8c66c8c85dc7ad9313f746ac6fd8b985095dffd54d99e315416b59c65b9e49",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/CoreDeclarations.cs": "2610e5b1cc8043913e77268ccba28b6d8975bc20a802dd9050c6fe37b06090d0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/Program.cs": "45596ad92b5174679f1273f4b3223f1a5801411b28a0483eed27d9c52befc884",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/NeoClrCommand.cs": "a5879a40ef0a09eb9a7cc41aaaf01caa69ca468b0d970991921167b1e0b56e1e"
+  },
+  "ownershipManifestSha256": "9578fb5f2f530537c36c513e12473ccec3c84b83aecfd24a911ad157da50cb88",
+  "commands": [
+    {
+      "arguments": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/python3",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/check-source-iteration.py",
+        "--raven-root",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven",
+        "--core",
+        "/private/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--runtime",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "--output",
+        "/private/tmp/source-storage-final-20261003/iteration"
+      ],
+      "exitCode": 0,
+      "stdout": "PASS source-owned iteration: .NET and NeoCLR 42; ownership failures publish no output\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/Disabled.dll",
+        "/private/tmp/source-storage-final-20261003/Storage.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support unregistered dependency: NeoCLR.CoreProbe.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--bootstrap-intrinsics",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/Invalid.dll",
+        "/private/tmp/source-storage-final-20261003/Storage.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: --bootstrap-intrinsics requires an explicit --core-reference.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--bootstrap-intrinsics",
+        "--bootstrap-intrinsics",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/Invalid.dll",
+        "/private/tmp/source-storage-final-20261003/Storage.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Specify --bootstrap-intrinsics once.\n"
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll",
+        "/private/tmp/source-storage-final-20261003/Storage.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/Written.dll",
+        "/private/tmp/source-storage-final-20261003/Written.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/source-storage-final-20261003/Written.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_06BCBF5AFEC6748BEECCD8EC375E75FF6DD9AACB2C868216F06CB3942022198A: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/source-storage-final-20261003/Written.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/NeoCLR.StorageCore-20261003.dll",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll",
+        "-o",
+        "/private/tmp/source-storage-final-20261003/Unread.dll",
+        "/private/tmp/source-storage-final-20261003/Unread.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/source-storage-final-20261003/Unread.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C0BF26D8BC42EFF294CE5E437DB9A2C59FA0D4632092D0E59866EAAF5FEB7326: typed-stack/control-flow verification passed (643 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/source-storage-final-20261003/Unread.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/iteration/neoclr/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/source-storage-final-20261003/StorageHelpers.dll"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: read of uninitialized array element [code=RuntimeError] at NeoMetadata_C0BF26D8BC42EFF294CE5E437DB9A2C59FA0D4632092D0E59866EAAF5FEB7326.F_4D61696E:14\n  at NeoMetadata_C0BF26D8BC42EFF294CE5E437DB9A2C59FA0D4632092D0E59866EAAF5FEB7326.F_4D61696E() [NeoMetadata_C0BF26D8BC42EFF294CE5E437DB9A2C59FA0D4632092D0E59866EAAF5FEB7326#1.0.0.0:0] IL instruction 14\n"
+    }
+  ],
+  "passed": true,
+  "librarySourceSha256": "f02a5b078a0156cbe88ac796ceca30f1c285581dba851e937dc4c101c4292fd9",
+  "librarySha256": "802cd7a02d9505c6d023d7329ed3c90dfcb54bbd9589b2dc11d31cf4de973d5a",
+  "Written": {
+    "sourceSha256": "d05251e8e2aed83a22507d44ea5207da72fa409fe8009883835030fcaed0c5b3",
+    "artifactSha256": "8f0d00b764bd3d531fa0c646206fc47c2d68131fe4e7ff2987953421175dc2f9"
+  },
+  "Unread": {
+    "sourceSha256": "2e9a3ba56e0acbf70c248f0adfe07d0cf049070b9f92156cfd51cff39d056f95",
+    "artifactSha256": "e333bb180fb40cbbb8ef11013b3f08d708380ac433606e8b12f2106977e3c29a"
+  },
+  "pairedIteration": {
+    "passed": true,
+    "dotnet": {
+      "librarySha256": "ce1937fbc4c51231b4a7ee90d66d6d932fcf7052b4ce08b4b9ebc39738de6a52",
+      "applicationSha256": "3e990e4a909b907d16691c72f6cf014a4bc467fc81838b3d4035c5cb44267374",
+      "exitCode": 42
+    },
+    "neoclr": {
+      "librarySha256": "369ae8c7a0514c22ab6db54f557f2974d7ff0b793f0d4219db2f6facbe533439",
+      "applicationSha256": "e1c2a6a525a6baef4f1a9601d171917dc9bd12883b8e7a1854d419c3bb1680ed",
+      "exitCode": 42
+    },
+    "sources": {
+      "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+      "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+      "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+      "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+      "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+      "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+    },
+    "manifestSha256": "9578fb5f2f530537c36c513e12473ccec3c84b83aecfd24a911ad157da50cb88",
+    "consumerSha256": "4f16bee56af36fa185e96318f320fe1af6352ac3922b568312da68ec5d24591b"
+  },
+  "apiSnapshot": "Previously recorded stale expanded reference; build-api-docs.py --check still fails. No snapshot relabelled."
+}
