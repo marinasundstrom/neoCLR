@@ -697,3 +697,9 @@ method/parameter projection and the guest implementation remain future work.
 Development checkpoint (2026-10-02): the C# facade now exposes metadata-only method and
 parameter views, preserving separate generic scopes. Raven delegates signature projection
 to those views. No runtime invocation or guest Introspection API change is introduced.
+
+
+Development checkpoint (2026-10-03): C# metadata views now project declared properties,
+indexed signatures, canonical accessors and directly declared generic interface edges.
+Raven consumes those views. Inherited-interface traversal and language policy remain in
+the compiler; no guest Introspection API or runtime encoding changes in this slice.

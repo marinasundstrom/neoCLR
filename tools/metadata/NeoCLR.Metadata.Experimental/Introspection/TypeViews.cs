@@ -46,10 +46,14 @@ public sealed class GenericParameterTypeInfo : TypeInfo
 public sealed class ConstructedTypeInfo : TypeInfo
 {
     private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
+    private readonly Lazy<IReadOnlyList<PropertyInfo>> properties;
+    private readonly Lazy<IReadOnlyList<TypeInfo>> interfaces;
     internal ConstructedTypeInfo(MetadataLoadContext context, NominalTypeInfo definition, TypeInfo[] arguments) : base(context)
     {
         Definition = definition; TypeArguments = Array.AsReadOnly(arguments);
         fields = new(() => context.ProjectFields(definition.Definition, this, TypeArguments));
+        properties = new(() => context.ProjectProperties(Definition.Definition, this, TypeArguments));
+        interfaces = new(() => context.ProjectInterfaces(Definition.Definition, TypeArguments));
     }
     /// <summary>Gets the canonical open declaration.</summary>
     public NominalTypeInfo Definition { get; }
@@ -58,6 +62,13 @@ public sealed class ConstructedTypeInfo : TypeInfo
     /// <summary>Gets declared field views with simultaneous owner-argument substitution.</summary>
     /// <exception cref="InvalidDataException">A field signature or dependency is unsupported/unavailable.</exception>
     public IReadOnlyList<FieldInfo> GetFields() => fields.Value;
+    /// <summary>Gets declared properties in metadata order, including non-public and indexed properties.</summary>
+    /// <exception cref="InvalidDataException">A signature or dependency is unsupported or missing.</exception>
+    public IReadOnlyList<PropertyInfo> GetProperties() => properties.Value;
+    /// <summary>Gets directly declared interface relationships with owner arguments substituted; no transitive traversal.</summary>
+    /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships for this format.</exception>
+    /// <exception cref="InvalidDataException">A relationship or dependency cannot be resolved.</exception>
+    public IReadOnlyList<TypeInfo> GetDeclaredInterfaces() => interfaces.Value;
     /// <summary>Gets declared non-constructor methods through this constructed owner.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => Context.GetMethods(Definition.Definition, this);
     internal override int Depth => 1 + TypeArguments.Max(t => t.Depth);

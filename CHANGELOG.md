@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-03
+
+- Add metadata-only property and direct interface views with owner-scope substitution,
+  canonical accessors and setter-only index signatures. Raven consumes these projections;
+  inherited-interface traversal stays in the compiler. All 109 C# groups and seven native
+  consumers pass (42). No runtime/encoding change.
+
 ### 2026-10-02
 
 - Add metadata method/parameter views with distinct owner and method scopes.

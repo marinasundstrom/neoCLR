@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-03",
+  "ravenCommit": "07785be2c",
+  "metadataTests": {
+    "passed": 109,
+    "total": 109
+  },
+  "checks": [
+    "Open, constructed and caller-scoped property types",
+    "Canonical accessor and concurrent property identity",
+    "Setter-only generic index excludes value parameter",
+    "Static generic property",
+    "External property dependency identity and missing dependency rejection",
+    "Direct interface edges compose generic/vector substitutions",
+    "Immutable result collections",
+    "CLI interface materialization rejects explicitly"
+  ],
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "systemSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "38B640C6313CF3B20BC80B51709442A8EEAB54B7CBD964EE6C51CD67EB55A4BF",
+        "dependencySha256": "31D4403C5EB827837622663AA0523C784F8A5DD149180303274538EE294DB4D3",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "3362DF73B2A16068B407A1493BCBA47688FFB1A5FA52920E09D8EDFF2C26CDD0",
+        "dependencySha256": "C0D9FA38C160A752462DAC79636B9739E2634ED5528C4036EF148F50D2EF4EE6",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "2723570E9C1E8267FE3F08E19784045817EAE4B71B0595A96F8CD6D7B23D1A1F",
+        "dependencySha256": "EE7C6B34663A7D832E8DAFCC126788DAE5BF4CA66429587FBD064438A312A860",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "F816310B96742A5C52601A78562FAEA02B8231AFFB7249B98981E319AD96BA6A",
+        "dependencySha256": "EE7C6B34663A7D832E8DAFCC126788DAE5BF4CA66429587FBD064438A312A860",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "4DA929AB3138A2705A23CF9AA1AF7C1D173B04B0634085CE9E1ABA16B3FE52A3",
+        "dependencySha256": "14FBA0A2C3FABF4F9EC8BC6C9811C502F9BB67A1E48B3257712A0308E7D85B9A",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "A51E81CDEF8B9164830AECB14D1860E9F3ECBF35C0E3135994167EBA7E57E52C"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "F39DDD7A7473F0EA608365BC5FF10F0DDE1E1B172E095DB43112E9103FF87FBB",
+        "dependencySha256": "524BAE977F56AB106B5DE6F93088ADAC4FC7F9BE9A6444CF2B57075FA874A36D",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "5062CEF3DDE3FE6855BBDD8133C66C2B5B29907D546EBE185E5FB33E7BE45EC6"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "1C741CE6713DC6C4D89DD099462B11E8C5C35BA63A9AC965491E2E34ADD4ABD4",
+        "dependencySha256": "1692142B6AE8813015F51993626F2D2FC51E5E85EF20CB45C1C8C4D9A77BED2D",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "C4D01A8222F5FA14C38F2CDD063A51B0AC4ED4D19A6BD3136699923D4C51A98B"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "semantic": {
+    "passed": true,
+    "nativeSha256": "31D4403C5EB827837622663AA0523C784F8A5DD149180303274538EE294DB4D3",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "scope": "Metadata-only host C# facade. No runtime, serialized-format, Runtime Contract or emitter changes. Direct interfaces only; compiler retains transitive traversal. CLI interface materialization and external native interface declarations remain unsupported."
+}

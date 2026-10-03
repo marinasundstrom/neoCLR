@@ -770,13 +770,19 @@ The development C# `NeoCLR.Metadata.Experimental.Introspection` namespace now ex
 MetadataLoadContext, AssemblyInfo, ModuleInfo, TypeInfo and NominalTypeInfo. All public
 members are covered in the [host manual](experimental-metadata.md#metadata-only-introspection-facade-development-2026-10-02).
 These host-only types are not guest Raven APIs and do not belong in the RavenDoc input
-assembly. Constructed/member facade coverage remains pending rather than silently omitted.
+assembly. Subsequent constructed/member facade coverage is recorded below.
 
 Host facade coverage now also includes PrimitiveTypeInfo, ArrayTypeInfo,
 GenericParameterTypeInfo, ConstructedTypeInfo and FieldInfo, with every current member
 in [constructed and field views](experimental-metadata.md#constructed-and-field-views-development-2026-10-02).
-Method/property facade coverage remains explicitly pending.
+Subsequent method/property facade coverage is recorded below.
 
 MethodInfo, ParameterInfo and MethodGenericParameterTypeInfo are now included in the
 [manual host facade reference](experimental-metadata.md#method-and-parameter-views-development-2026-10-02),
 including scope projection and module/type enumeration. Guest snapshot selection is unchanged.
+
+
+PropertyInfo and NominalTypeInfo/ConstructedTypeInfo.GetProperties/GetDeclaredInterfaces
+are covered member by member in the [host manual](experimental-metadata.md#property-and-direct-interface-views-development-2026-10-03).
+These are host C# APIs, excluded from the guest RavenDoc input for that reason; guest
+reference and documentation snapshot remain unchanged.

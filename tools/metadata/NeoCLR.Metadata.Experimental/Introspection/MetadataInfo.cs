@@ -75,9 +75,13 @@ public sealed class NominalTypeInfo : TypeInfo
         this.context = context; this.definition = definition;
         parameters = Array.AsReadOnly(Enumerable.Range(0, definition.GenericArity).Select(i => (TypeInfo)new GenericParameterTypeInfo(context, this, i)).ToArray());
         fields = new(() => context.ProjectFields(definition, this, parameters));
+        properties = new(() => context.ProjectProperties(definition, this, parameters));
+        interfaces = new(() => context.ProjectInterfaces(definition, parameters));
     }
     private readonly IReadOnlyList<TypeInfo> parameters;
     private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
+    private readonly Lazy<IReadOnlyList<PropertyInfo>> properties;
+    private readonly Lazy<IReadOnlyList<TypeInfo>> interfaces;
     internal TypeDefinition Definition => definition;
     /// <summary>Gets stable owner-scoped generic parameter views in declaration order.</summary>
     public IReadOnlyList<TypeInfo> GetGenericArguments() => parameters;
@@ -88,6 +92,13 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <summary>Gets all declared fields in metadata order, without inherited-member or visibility filtering.</summary>
     /// <exception cref="InvalidDataException">A field signature is unsupported or its dependency is missing.</exception>
     public IReadOnlyList<FieldInfo> GetFields() => fields.Value;
+    /// <summary>Gets declared properties in metadata order, including non-public and indexed properties.</summary>
+    /// <exception cref="InvalidDataException">A signature or dependency is unsupported or missing.</exception>
+    public IReadOnlyList<PropertyInfo> GetProperties() => properties.Value;
+    /// <summary>Gets directly declared interface relationships with owner arguments substituted; no transitive traversal.</summary>
+    /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships for this format.</exception>
+    /// <exception cref="InvalidDataException">A relationship or dependency cannot be resolved.</exception>
+    public IReadOnlyList<TypeInfo> GetDeclaredInterfaces() => interfaces.Value;
     /// <summary>Gets declared non-constructor methods without inherited lookup or visibility filtering.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => context.GetMethods(definition, this);
     /// <summary>Gets the metadata name, including generic arity suffix.</summary>

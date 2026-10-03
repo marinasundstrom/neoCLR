@@ -13,7 +13,13 @@ internal static class MetadataLoadContextChecks
             var builder = new AssemblyBuilder(Id(name), core);
             var type = builder.AddClass("Example", "Item");
             foreach (var dependency in dependencies)
-                type.AddField(dependency, builder.CreateTypeReference(Id(dependency), core, new string('a', 64), "Example", "Item"));
+            {
+                var reference = builder.CreateTypeReference(Id(dependency), core, new string('a', 64), "Example", "Item");
+                var field = type.AddField(dependency, reference);
+                var getter = type.AddInstanceMethod("get_" + dependency, new MethodSignature(reference, []));
+                getter.LoadArgument(0); getter.LoadField(field); getter.Return();
+                type.AddProperty(dependency, reference, getter);
+            }
             return AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(builder.WriteNativeAssembly(), core));
         }
         var a = Snapshot("A", "B", "C");
@@ -36,7 +42,9 @@ internal static class MetadataLoadContextChecks
         Reject<InvalidDataException>(() => context.Resolve(Id("A", 2)));
         Reject<InvalidDataException>(() => context.Resolve(Snapshot("B", "D").MainModule.TypeReferences.Single()));
         Reject<NotSupportedException>(() => ((IList<NominalTypeInfo>)view.GetTypes()).Clear());
+        Check(ReferenceEquals(context.Resolve(b.Identity).GetTypes().Single().GetProperties().Single().PropertyType, nominal), "external property dependency canonical identity");
         var missing = new MetadataLoadContext([a]);
+        Reject<InvalidDataException>(() => missing.Resolve(a.Identity).GetTypes().Single().GetProperties());
         Reject<InvalidDataException>(() => _ = missing.Resolve(a.Identity).ReferencedAssemblies);
         Check(new MetadataLoadContext([a, b, c, d]).Resolve(a.Identity).ReferencedAssemblies.Count == 2, "failed context does not poison next context");
         var revisionBuilder = new AssemblyBuilder(Id("A", 2), core);
@@ -54,6 +62,19 @@ internal static class MetadataLoadContextChecks
         var mixed = box.AddMethod("Mixed", new MethodSignature(SignatureType.TypeParameter(0),
             [SignatureType.MethodParameter(0), SignatureType.TypeParameter(0)], ["U"]));
         mixed.LoadArgument(1); mixed.Return();
+        box.AddProperty("Current", SignatureType.TypeParameter(0), get);
+        var empty = box.AddMethod("get_Empty", new MethodSignature(SignatureType.TypeParameter(0), []));
+        empty.LoadDefault(SignatureType.TypeParameter(0)); empty.Return();
+        box.AddProperty("Empty", SignatureType.TypeParameter(0), empty);
+        var setIndex = box.AddInstanceMethod("set_Item", new MethodSignature(PrimitiveType.Void,
+            [SignatureType.TypeParameter(0), SignatureType.TypeParameter(0)]));
+        setIndex.LoadArgument(0); setIndex.LoadArgument(2); setIndex.StoreField(stored); setIndex.Return();
+        box.AddProperty("Item", SignatureType.TypeParameter(0), null, setIndex);
+        var root = genericBuilder.AddGenericInterface("Example", "Root", ["T"]);
+        var middle = genericBuilder.AddGenericInterface("Example", "Middle", ["T"]);
+        middle.AddBaseInterface(root.MakeGenericInstance(SignatureType.ArrayOf(SignatureType.TypeParameter(0))));
+        box.AddInterfaceImplementation(middle.MakeGenericInstance(SignatureType.TypeParameter(0)));
+
         var identity = genericBuilder.AddFunction("Identity", new MethodSignature(SignatureType.ArrayOf(SignatureType.MethodParameter(0)),
             [SignatureType.ArrayOf(SignatureType.MethodParameter(0))], ["T"]));
         identity.LoadArgument(0); identity.Return();
@@ -85,6 +106,29 @@ internal static class MetadataLoadContextChecks
         var getView = closed.GetMethods().Single(m => m.Name == "Get");
         Check(ReferenceEquals(getView.ReturnType, intView) && getView.GetParameters().Count == 0, "constructed owner method result");
         Check(ReferenceEquals(getView, closed.GetMethods().Single(m => m.Name == "Get")), "canonical method view");
+        var current = closed.GetProperties().Single(p => p.Name == "Current");
+        Check(ReferenceEquals(current.PropertyType, intView) && ReferenceEquals(current.DeclaringType, closed) &&
+            ReferenceEquals(current.GetMethod, getView) && current.SetMethod is null && !current.IsStatic, "closed property and canonical accessor");
+        Check(ReferenceEquals(current, closed.GetProperties().Single(p => p.Name == "Current")), "stable property view");
+        var emptyView = closed.GetProperties().Single(p => p.Name == "Empty");
+        Check(emptyView.IsStatic && emptyView.GetMethod!.IsStatic && ReferenceEquals(emptyView.PropertyType, intView), "static generic property");
+        Parallel.For(0, 32, _ => Check(ReferenceEquals(current, closed.GetProperties().Single(p => p.Name == "Current")), "concurrent property identity"));
+        var indexed = closed.GetProperties().Single(p => p.Name == "Item");
+        Check(indexed.GetMethod is null && indexed.SetMethod is not null && indexed.IndexParameterTypes.Count == 1 &&
+            ReferenceEquals(indexed.IndexParameterTypes[0], intView) && ReferenceEquals(indexed.PropertyType, intView), "setter-only generic index excludes value");
+        Check(ReferenceEquals(indexed.SetMethod, closed.GetMethods().Single(m => m.Name == "set_Item")), "canonical setter");
+        Check(ReferenceEquals(forwarded.GetProperties()[0].PropertyType, otherView.GetGenericArguments()[0]), "caller-scoped property");
+        Check(ReferenceEquals(boxView.GetProperties()[0].PropertyType, boxView.GetGenericArguments()[0]), "open property scope");
+        var middleView = (ConstructedTypeInfo)closed.GetDeclaredInterfaces().Single();
+        Check(ReferenceEquals(middleView.TypeArguments[0], intView), "closed direct interface substitution");
+        var rootView = (ConstructedTypeInfo)middleView.GetDeclaredInterfaces().Single();
+        Check(rootView.TypeArguments[0] is ArrayTypeInfo interfaceArray && ReferenceEquals(interfaceArray.ElementType, intView), "interface edge composes vector substitution");
+        Check(ReferenceEquals(middleView, genericTypes.Single(t => t.Name == "Middle`1").MakeGenericType(intView)), "canonical interface construction");
+        Check(ReferenceEquals(((ConstructedTypeInfo)boxView.GetDeclaredInterfaces().Single()).TypeArguments[0], boxView.GetGenericArguments()[0]), "open interface owner scope");
+        Check(ReferenceEquals(((ConstructedTypeInfo)forwarded.GetDeclaredInterfaces().Single()).TypeArguments[0], otherView.GetGenericArguments()[0]), "caller-scoped interface argument");
+        Reject<NotSupportedException>(() => ((IList<TypeInfo>)indexed.IndexParameterTypes).Clear());
+        Reject<NotSupportedException>(() => ((IList<TypeInfo>)closed.GetDeclaredInterfaces()).Clear());
+        Reject<NotSupportedException>(() => ((IList<NeoCLR.Metadata.Experimental.Introspection.PropertyInfo>)closed.GetProperties()).Clear());
         var mixedView = closed.GetMethods().Single(m => m.Name == "Mixed");
         var mixedParameters = mixedView.GetParameters();
         Check(ReferenceEquals(mixedParameters[0].ParameterType, mixedView.GetGenericArguments()[0]) &&
@@ -108,6 +152,7 @@ internal static class MetadataLoadContextChecks
         var cliType = cliContext.Resolve(cliSnapshot.Identity).GetTypes().Single();
         Check(cliType.Name == "Box`1" && cliType.GenericArity == 1 && cliType.DeclaringType is null, "CLI definition facade excludes module pseudo-type");
         Check(ReferenceEquals(cliContext.Resolve(cliSnapshot.MainModule.Types.Single(t => t.Name == "Box`1").ToReference()), cliType), "CLI local resolution");
+        Reject<NotSupportedException>(() => cliType.GetDeclaredInterfaces());
         Reject<ArgumentException>(() => new MetadataLoadContext([cli.Definition]));
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

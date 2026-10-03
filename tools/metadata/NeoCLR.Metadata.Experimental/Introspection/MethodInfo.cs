@@ -87,7 +87,7 @@ public sealed partial class MetadataLoadContext
         RequireSnapshot(definition.Module.Assembly);
         return GetMethod(definition, definition.DeclaringType is { } owner ? GetType(owner) : null);
     }
-    private MethodInfo GetMethod(MethodDefinition definition, TypeInfo? owner)
+    internal MethodInfo GetMethod(MethodDefinition definition, TypeInfo? owner)
     {
         lock (gate)
         {

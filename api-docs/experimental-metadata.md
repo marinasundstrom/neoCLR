@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Property and direct interface views](#property-and-direct-interface-views-development-2026-10-03): scoped property signatures, accessors and relationships.
+
 - [Method and parameter views](#method-and-parameter-views-development-2026-10-02): callable signatures and separate generic scopes.
 
 - [Constructed and field views](#constructed-and-field-views-development-2026-10-02): signature projection and declared field metadata.
@@ -5286,3 +5288,55 @@ view, full parameter metadata, custom attributes, property views and broad CLI d
 remain pending. There is no Invoke API. Current MethodInfo/ParameterInfo names follow
 System.Introspection; this host prototype does not change guest APIs or commit a future
 identical implementation. All public host members are documented here outside RavenDoc.
+
+
+## Property and direct interface views (development 2026-10-03)
+
+Namespace: `NeoCLR.Metadata.Experimental.Introspection`. Host C# development APIs;
+not guest APIs or runtime Reflection. Existing context/snapshot lifetime rules apply.
+
+Both `NominalTypeInfo` and `ConstructedTypeInfo` expose:
+
+| Member | Contract |
+| --- | --- |
+| `IReadOnlyList<PropertyInfo> GetProperties()` | Stable read-only list of declared properties in metadata order, including non-public/static/indexed properties. No inherited lookup or visibility filter. |
+| `IReadOnlyList<TypeInfo> GetDeclaredInterfaces()` | Stable read-only direct interface edges in metadata order; arguments substitute in this owner's scope. Does not include transitive ancestors. |
+
+`PropertyInfo` is obtained from a type view; it has no public constructor:
+
+| Member | Contract |
+| --- | --- |
+| `string Name` | Metadata declaration name. |
+| `uint MetadataToken` | Original property token, local to the declaring module. |
+| `TypeInfo DeclaringType` | Open or constructed owner through which it was selected. |
+| `TypeInfo PropertyType` | Resolved property result/storage type after owner substitution. |
+| `IReadOnlyList<TypeInfo> IndexParameterTypes` | Read-only ordered index types; empty for non-indexed properties. Setter value is excluded, including setter-only properties. No parameter names/defaults/attributes are invented. |
+| `MethodInfo? GetMethod` | Canonical getter on the same owner, including non-public accessors; null if absent. |
+| `MethodInfo? SetMethod` | Canonical setter on the same owner, including non-public accessors; null if absent. |
+| `bool IsStatic` | Staticness recorded by the metadata accessors. |
+
+```csharp
+var box = context.Resolve(identity).GetTypes().Single(t => t.Name == "Box`1");
+var closed = box.MakeGenericType(context.ResolveSignature(PrimitiveType.Int32));
+var current = closed.GetProperties().Single(p => p.Name == "Current");
+// current.PropertyType is the canonical Int32 view; its getter is also in closed.GetMethods().
+var directContracts = closed.GetDeclaredInterfaces();
+```
+
+The C# contract fixture validates this inspection pattern. Open definitions preserve
+their scoped parameters; caller-provided parameters retain caller identity. Constructed
+relationships can be inspected edge by edge to compose substitutions, without eagerly
+expanding a graph. Properties and lists are cached per owner; accessor/type identity is
+canonical in the context. There is no invocation, property value access or runtime loading.
+
+`GetProperties()` throws `InvalidDataException` for unsupported signatures or missing
+catalog dependencies. Signature scope/construction bounds from `ResolveSignature` still
+apply. `GetDeclaredInterfaces()` throws `InvalidDataException` for invalid relationships
+or missing dependencies and `NotSupportedException` when reader relationship materialization
+is unavailable (currently CLI snapshots). The native reader currently supports
+same-assembly interface declarations; this facade does not broaden that encoding.
+
+Unlike .NET Reflection property access, this reports metadata only. Index types are
+exposed directly instead of manufacturing method-owned ParameterInfo objects for a
+property. Other-method semantics, full parameter metadata, transitive interface queries,
+constructor-specific views and generic method construction are not added here.
