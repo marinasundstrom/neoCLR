@@ -7,7 +7,7 @@ using AssemblyBuilder = NeoCLR.Metadata.Experimental.Model.AssemblyBuilder;
 
 internal static class ValueConstructorChecks
 {
-    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create(bool nested = false)
+    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create(bool nested = false, bool native = false)
     {
         var core = new AssemblyIdentity("System.Private.CoreLib", typeof(object).Assembly.GetName().Version!, "", "7cec85d7bea7798e");
         var library = new AssemblyBuilder(new("ValueConstructorLibrary", new Version(1, 0, 0, 0)), core);
@@ -30,7 +30,8 @@ internal static class ValueConstructorChecks
         referenceConstructor.LoadArgument(0); referenceConstructor.LoadArgument(1); referenceConstructor.StoreField(referenceField); referenceConstructor.Return();
         var referenceRead = referenceType.AddInstanceMethod("Read", new MethodSignature(PrimitiveType.Int32, []));
         referenceRead.LoadArgument(0); referenceRead.LoadField(referenceField); referenceRead.Return();
-        var projection = RuntimeAssemblyContainer.ReadCliProjection(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core));
+        var image = RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core);
+        var projection = native ? AssemblyDefinition.ReadNativeAssembly(image) : RuntimeAssemblyContainer.ReadCliProjection(image);
         var app = new AssemblyBuilder(new("ValueConstructorApp", new Version(1, 0, 0, 0)), core);
         var numberType = projection.MainModule.Types.Single(t => t.Name == "Number");
         var numberCtor = app.ImportReference(numberType.Methods.Single(m => m.Name == ".ctor"), core);
@@ -50,9 +51,9 @@ internal static class ValueConstructorChecks
         try { main.Call(numberCtor); throw new Exception("ordinary constructor call admitted"); } catch (ArgumentException) { }
         return (library, app, constructor, value);
     }
-    internal static void Run(bool nested = false)
+    internal static void Run(bool nested = false, bool native = false)
     {
-        var (library, app, constructor, field) = Create(nested);
+        var (library, app, constructor, field) = Create(nested, native);
         var context = new AssemblyLoadContext("value-constructors", true);
         try
         {
@@ -73,9 +74,9 @@ internal static class ValueConstructorChecks
         try { assembly.Write(); throw new Exception("invalid constructor accepted"); } catch (InvalidDataException) { }
         try { assembly.WriteNativeAssembly(); throw new Exception("invalid native constructor accepted"); } catch (InvalidDataException) { }
     }
-    internal static async Task RunRuntime(string runtime, string directory, bool nested = false)
+    internal static async Task RunRuntime(string runtime, string directory, bool nested = false, bool native = false)
     {
-        Run(nested); Directory.CreateDirectory(directory); var (library, app, _, _) = Create(nested);
+        Run(nested, native); Directory.CreateDirectory(directory); var (library, app, _, _) = Create(nested, native);
         var libraryPath = Path.Combine(directory, "Library.dll"); var appPath = Path.Combine(directory, "App.dll");
         File.WriteAllBytes(libraryPath, RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), library.CoreLibrary));
         File.WriteAllBytes(appPath, RuntimeAssemblyContainer.WriteBinary(app.WriteNativeAssembly(), app.CoreLibrary));

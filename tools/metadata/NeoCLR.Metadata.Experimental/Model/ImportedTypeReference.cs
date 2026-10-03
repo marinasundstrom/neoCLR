@@ -93,8 +93,8 @@ public sealed partial class AssemblyBuilder
     internal ImportedTypeReference ImportNativeSignatureReference(TypeReference reference, AssemblyIdentity core, IAssemblyResolver? resolver)
     {
         var definition = reference.Resolve(resolver);
-        if (definition.GenericArity != 0 || definition.DeclaringType is not null || definition.IsValueType)
-            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class or interface");
+        if (definition.GenericArity != 0 || definition.DeclaringType is not null)
+            throw new InvalidDataException("native nominal signature requires a nongeneric top-level class, value or interface");
         return ImportReference(definition, core);
     }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
@@ -106,7 +106,7 @@ public sealed partial class AssemblyBuilder
     public ImportedTypeReference ImportReference(TypeDefinition definition, AssemblyIdentity dependencyCoreLibrary)
     {
         ArgumentNullException.ThrowIfNull(definition); ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
-        if (!CoreLibrary.Equals(dependencyCoreLibrary) || !definition.CanImportReference || definition.IsValueType && !Equals(definition.ValueTypeCore, dependencyCoreLibrary) || (definition.Attributes & 7) != (definition.DeclaringType is null ? 1u : 2u))
+        if (!CoreLibrary.Equals(dependencyCoreLibrary) || !definition.CanImportReference || definition.IsValueType && !definition.Module.Assembly.IsNative && !Equals(definition.ValueTypeCore, dependencyCoreLibrary) || (definition.Attributes & 7) != (definition.DeclaringType is null ? 1u : 2u))
             throw new InvalidDataException("unsupported imported type or core contract: " + definition.Namespace + "." + definition.Name + " (value core " + definition.ValueTypeCore?.Name + ", expected " + dependencyCoreLibrary.Name + ")");
         var identity = definition.Module.Assembly.Identity;
         NativeBindingFor(identity)?.ValidateType(definition);

@@ -54,7 +54,12 @@ existing checked-storage intrinsic, with separately compiled generic helper cons
 executing 42 and rejecting uninitialized reads. The unchanged Option/Propagatable native
 interface out-parameter blocker is now resolved: metadata views preserve modes and
 three-assembly ref/out dispatch executes on both targets. Unchanged Propagatable emits;
-Option now reaches source-union/declaration emission rejection. ArrayList also requires
+Option now reaches source-union/declaration emission rejection. The metadata foundation
+now admits inline generic value payloads and direct native value snapshots; tag/payload
+copy execution and imported constructors return 42 on CLR and neoCLR. Raven imports
+these as structs. Source declarations, nested cases, byte tags and synthesized union
+members remain pending; this is not source Option completion. See
+[union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json). ArrayList also requires
 Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
 remain pending. The broad source-library/application gate remains open.

@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Union payload foundation](#union-payload-foundation-development-2026-10-03): inline storage and direct native value declarations.
+
 - [Parameter passing modes](#parameter-passing-modes-development-2026-10-03): native and supported CLI ref/out metadata.
 
 - [Native Self signatures](#native-self-signatures-development-2026-10-03): implementing-type contracts and scoped views.
@@ -3222,7 +3224,7 @@ unconstrained parameters and appends the normal metadata arity suffix to the nam
 Names/visibility/duplicate and resource checks match AddClass/AddGenericClass; invalid
 inputs throw ArgumentException and null generic parameter collections throw
 ArgumentNullException. Neither method creates an instance constructor. The definition
-supports static methods, primitive or declaring-parameter instance fields, defaults, parameters/results,
+supports static methods, supported inline instance fields (see the union payload foundation update), defaults, parameters/results,
 locals, vectors and generic construction/arguments. Public/internal visibility is
 preserved in both output formats.
 
@@ -5554,3 +5556,34 @@ Validation: C# `ParameterModeChecks` covers manual/builder declarations, both na
 containers, open/constructed scopes, CLI mode parity, readonly rejection and conflicting
 contracts. The Raven three-assembly driver case executes inherited generic ref/out dispatch
 on both targets with library sources removed; incompatible implementations publish nothing.
+
+## Union payload foundation (development, 2026-10-03)
+
+The metadata producer now accepts direct nominal and constructed fields in owned
+value types, including a `Payload<T>` embedded in a `Carrier<T>`. Builder calls and
+manually attached field definitions share validation. Writing rejects recursive inline
+storage and limits owned layout traversal to depth 64 and 4096 visited constructions;
+references and vectors terminate inline traversal. Native input validates the same
+owned layouts. External dependency layouts still require explicit dependency resolution
+and runtime linking; this check does not load dependencies implicitly.
+
+`AssemblyDefinition.ReadNativeAssembly` now materializes unconstrained top-level
+value declarations, signatures, fields and supported constructors/methods. `IsValueType`
+reflects the native category; sealed/sequential flags are preserved without inventing
+a CLI `System.ValueType` dependency. ImportReference overloads retain the explicit
+matching output core requirement. Nested declarations, constrained owners and generic
+instance methods remain outside this native snapshot profile. Native snapshots remain
+immutable and preserve their original bytes on Write.
+
+This matches CLR inline value storage and copy semantics: an executable tag/payload
+fixture returns 42 on both runtimes after mutating an independent copy. Direct native
+imports of nongeneric/generic value constructors and methods also execute on both.
+The fixture uses an Int32 tag and is a metadata contract test, not a replacement for
+Raven union lowering or proof that source Option compiles.
+
+Raven maps the introspection value category to Struct and its semantic ValueType base;
+generic field substitution remains in introspection. It does not reopen imported
+metadata in emission. Source value declarations, nested union cases, the Byte tag,
+synthesized members and symbol-authored external value operands remain the next
+compiler work. Runtime-library union sources are unchanged. No format version change,
+CLI projection fallback, runtime implementation change or performance claim is needed.

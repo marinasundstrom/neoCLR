@@ -110,8 +110,8 @@ internal static class NativeDefinitionChecks
         instances.AddClass("Example", "UnsupportedStorage").AddField("Other", SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [])));
         var unsupportedStorageImage = RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core);
         Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(unsupportedStorageImage));
-        library.AddValueType("Example", "Unsupported");
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)));
+        library.AddValueType("Example", "Value");
+        Check(AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)).MainModule.Types.Single(t => t.Name == "Value").IsValueType, "native value classification");
         var generic = new AssemblyBuilder(new("Generic", new Version(1, 0, 0, 0)), core);
         generic.AddGenericInterface("Example", "Supported", ["T"]);
         var genericSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(generic.WriteNativeAssembly(), core));

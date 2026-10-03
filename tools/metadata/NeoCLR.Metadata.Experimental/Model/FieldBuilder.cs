@@ -45,7 +45,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Type is null.</exception>
     /// <exception cref="ArgumentException">Invalid name/type/access, unsupported value-type storage, duplicate name or exceeded field limit.</exception>
     /// <exception cref="InvalidOperationException">This is a static class.</exception>
-    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet. Value-type fields currently require primitive or declaring-type parameter signatures.</remarks>
+    /// <remarks>At most 256 fields per type and 4096 per assembly. No static/literal fields yet. Value-type fields support nominal and constructed payloads. Direct self storage rejects on attachment; indirect inline cycles and bounded layout expansion reject when writing.</remarks>
     public FieldBuilder AddField(string name, SignatureType type, FieldVisibility visibility = FieldVisibility.Private, bool isReadOnly = false)
     {
         var definition = new FieldDefinition(name, (ushort)((visibility switch { FieldVisibility.Public => 6, FieldVisibility.Internal => 3, FieldVisibility.Private => 1, _ => throw new ArgumentOutOfRangeException(nameof(visibility)) }) | (isReadOnly ? 0x20 : 0)), type);
@@ -58,7 +58,7 @@ public sealed partial class TypeBuilder
         var visibility = (definition.Attributes & 7) switch { 6 => FieldVisibility.Public, 3 => FieldVisibility.Internal, _ => FieldVisibility.Private };
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
-        if (IsValueType && type.Primitive is null && type.TypeParameterIndex is null) throw new ArgumentException("value-type fields currently require primitive or declaring-parameter storage", nameof(type));
+        if (IsValueType && ReferenceEquals(type.ClassType ?? type.GenericInstance?.Definition, this)) throw new ArgumentException("recursive value-type storage", nameof(type));
         if (IsStatic || IsInterface) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||

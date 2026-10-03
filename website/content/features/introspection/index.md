@@ -294,3 +294,7 @@ for supported signatures and remaining limits.
 The development host facade preserves writable `ref`/`out` parameter modes separately
 from their element types, including constructed generic owners. Readonly modes remain
 unsupported; this does not add runtime invocation to introspection.
+
+Development metadata work now retains top-level native value declarations and generic
+inline payload signatures in the C# host facade. Raven source-union emission remains
+in progress; see the [development API reference](/docs/experimental-metadata/).

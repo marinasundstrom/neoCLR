@@ -828,3 +828,9 @@ blocker remains open. The old reference snapshot is intentionally preserved.
 [the host metadata manual](experimental-metadata.md#parameter-passing-modes-development-2026-10-03).
 These C# host APIs remain excluded from guest RavenDoc because it consumes Raven guest
 declarations. The separately recorded expanded-reference refresh blocker remains open.
+
+2026-10-03 union payload update: inline value fields and direct native value snapshots
+are covered in the [host-only manual](experimental-metadata.md#union-payload-foundation-development-2026-10-03)
+and XML summaries, under the existing C# host RavenDoc exclusion. Snapshot check remains
+stale at the previously recorded SourceUnionReferences.Project / None regeneration
+blocker. Existing verified guest reference artifacts are retained; hashes were not advanced.

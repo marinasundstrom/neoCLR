@@ -1,0 +1,62 @@
+{
+  "date": "2026-10-03",
+  "scope": "Metadata foundation for source unions; not Raven source-union execution",
+  "neoClrBaseRevision": "c3c685857c58da1c1119fc99bfdaa9532bcf7447",
+  "ravenBaseRevision": "19f02bf2cd87e91baaa125a560faf88b3c677566",
+  "changes": "working tree accompanying this evidence",
+  "metadataTests": {
+    "passed": 114,
+    "total": 114,
+    "command": "NEOCLR_TAGGED_ARTIFACT=/tmp/tagged-payload-20261003.neox dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0"
+  },
+  "taggedPayload": {
+    "command": [
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "run",
+      "/tmp/tagged-payload-20261003.neox",
+      "--show-result"
+    ],
+    "artifactSha256": "fc60e466cc2f0239b7790965b1aef64437d3374c15642ca6d1ff98d669cd870b",
+    "runtimeSha256": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+    "exitCode": 42,
+    "stdout": "",
+    "stderr": "=> Int32(42)\n",
+    "assertions": [
+      "zero default tag and nested payload",
+      "copy retains tag",
+      "independent payload copies sum to 42",
+      "CLR executes same definition graph",
+      "native immutable snapshot roundtrip",
+      "generic introspection field substitution",
+      "reject direct, indirect and expanding inline layouts",
+      "accept finite nested constructions and manual field definitions"
+    ]
+  },
+  "nativeConstructorImport": {
+    "command": "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --native-value-runtime target/release/neoclr /tmp/native-value-union-20261003",
+    "result": "Imported value/generic constructors execute on CLR and neoCLR: 42",
+    "artifacts": {
+      "Library.dll": "98d6d4d65f4483dcb2ad43b0abbc4d0a7a6fcf7fc08c046738119067aa4657ab",
+      "App.dll": "4f0b3459c97c1ccebbaf69ff3080c206d617d4604ae1c2c63778121ba30350f8"
+    }
+  },
+  "sources": {
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/TaggedValueLayoutChecks.cs": "102f7a9b4bdc90041a78deaf21ba00bc955ef5c255fe8462085f7bd943d277d7",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ValueConstructorChecks.cs": "1df29ab7787e03c4e1416fd7114a9a074fa77cfe162b2d1fdc9e300353f17334",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ValueTypeLayout.cs": "2573ffd393bab7f407b8e356ef48ba322d31a26090018c5be33b946f2d2cc1d6"
+  },
+  "limitations": [
+    "Source Option union does not yet emit",
+    "Nested native declarations, Byte discriminator mapping, synthesized union members and symbol-authored value emission pending",
+    "No seed/source ownership changes",
+    "API snapshot check retains known stale reference regeneration blocker"
+  ],
+  "ravenRevision": "1804324e3705c6097f24dee21affaf244d1ad5a4",
+  "ravenNativeSymbols": {
+    "command": "dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-symbols /Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll /tmp/union-native-symbols-final-20261003",
+    "passed": true,
+    "stdout": "PASS native class identity, constructors, instance/static calls, access and emission\nPASS external native nominal signatures and exact dependency diagnostics\nPASS direct native interface symbols and dispatch emission\nPASS direct native generic symbols, inference, substitution and emission\nPASS direct native semantic imports\n",
+    "coreSha256": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad",
+    "scope": "Struct identity, semantic ValueType base and generic field substitution; existing semantic/emission probe cases. Not execution of Raven-emitted unions."
+  }
+}

@@ -397,7 +397,7 @@ public sealed partial class TypeDefinition
         MetadataToken = row.Token; Namespace = row.Namespace;
         Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
-    /// <summary>Gets whether the declaration directly extends System.ValueType or System.Enum in the input metadata.</summary>
+    /// <summary>Gets the intrinsic native value category, or whether a CLI declaration directly extends System.ValueType or System.Enum.</summary>
     /// <remarks>This is a metadata classification, not runtime type loading or base-identity validation.</remarks>
     public bool IsValueType { get; }
     internal bool CanImportReference { get; }

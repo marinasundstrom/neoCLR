@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Extend union metadata prerequisites with nominal/constructed inline value fields,
+  bounded recursive-layout rejection and direct native value declaration/import support.
+  Tag/payload copies and native-imported value constructors execute on CLR and neoCLR
+  (42); 114 C# contract groups pass. Raven preserves Struct identity from introspection.
+  Source union emission, nested native case snapshots and byte-tag emission remain pending.
+
 - Preserve writable ref/out parameter modes through native definitions, introspection
   and symbol-authored external method contracts, including generic interface substitution.
   Existing encodings are unchanged; readonly parameter metadata rejects explicitly.

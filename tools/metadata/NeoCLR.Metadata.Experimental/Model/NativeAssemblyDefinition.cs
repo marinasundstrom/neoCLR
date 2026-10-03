@@ -350,17 +350,19 @@ public sealed partial class NativeAssemblyDefinition
                 return index >= 0 ? (SignatureType)signatureOwners[index]
                     : ImportExternalType(signatureGraph, Text(element, "Named"), 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
             }
-            foreach (var type in types)
+            for (int typeIndex = 0; typeIndex < types.Count; typeIndex++)
             {
+                var type = types[typeIndex];
                 typeArity = type.GenericNames.Length;
                 for (int fieldIndex = 0; fieldIndex < type.Fields.Length; fieldIndex++)
                 {
                     var field = type.Fields[fieldIndex];
                     var storage = ReadType(field.Type, false);
                     type.Fields[fieldIndex] = field with { Signature = storage };
-                    Require(!type.IsValueType || storage.Primitive is not null || storage.TypeParameterIndex is not null, "value-type fields currently require primitive or declaring-parameter storage");
+                    signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);
                 }
             }
+            signatureGraph.ValidateValueLayouts();
             typeArity = 0;
             string TypeKey(SignatureType type) => type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;

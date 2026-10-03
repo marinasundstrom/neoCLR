@@ -10219,3 +10219,16 @@ views. C# tests cover definition/builder parity, generic-scope separation, acces
 round trips and invalid contexts. NeoCLR loads/verifies a generated assembly containing
 these declarations and executes its ordinary entry point (42); this is loading evidence,
 not Self dispatch evidence. Raven integration and implementation substitution remain open.
+
+## 2026-10-03 — Builder and IL generator boundary reaffirmed
+
+- Author, during union support: “separating the neoclr methodBuilers from IL emission”
+  and “methodBuilder.GetILGenerator”.
+- Assistant inspected the feature branch: MethodBuilder.GetILGenerator already returns
+  the metadata library's IILGenerator; direct builder emission methods forward to it.
+  Raven's target adapter already consumes that generator behind its own boundary.
+- Action: use GetILGenerator explicitly in the new tag/payload contract test. Preserve
+  existing forwarding compatibility for now. A wider cleanup/removal of convenience
+  forwards remains open, not implemented or inferred as an immediate breaking change.
+- Evidence: tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBodyGenerator.cs,
+  MethodILGenerator.cs and TaggedValueLayoutChecks.cs; Raven Int32Emitter adapter.

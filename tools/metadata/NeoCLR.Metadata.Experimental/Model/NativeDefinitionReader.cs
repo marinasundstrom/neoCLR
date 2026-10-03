@@ -2,11 +2,11 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyDefinition
 {
-    /// <summary>Reads authoritative native namespace-function and bounded class/interface declarations directly from PE/#Neo.</summary>
+    /// <summary>Reads authoritative native namespace-function and bounded class/value/interface declarations directly from PE/#Neo.</summary>
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
-    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value, constrained, nested and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference, local or external generic construction or vector signatures, interface-scoped Self member signatures, and unconstrained top-level classes and interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
+    /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained, nested and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal value/reference, local or external generic construction or vector signatures, interface-scoped Self member signatures, and unconstrained top-level classes, values and interfaces with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
@@ -29,15 +29,15 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.IsSelf || type.GenericInstance is { } instance && !instance.Definition.IsValueType && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
-            type.ClassType is { IsStatic: false, IsValueType: false } ||
-            type.ImportedType is { IsValueType: false, DeclaringType: null } imported &&
+        static bool SupportedScalar(SignatureType type) => type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+            type.ClassType is { IsStatic: false } ||
+            type.ImportedType is { DeclaringType: null } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
         static bool SupportedMethod(SignatureType type) => type.MethodParameterIndex is not null ||
             type.ArrayElement is { } element && element.MethodParameterIndex is not null || Supported(type);
         static bool Supported(SignatureType type) => SupportedScalar(type) || type.ArrayElement is { } element && SupportedScalar(element);
         // Fail closed rather than returning a partial assembly with silently missing types.
-        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.IsValueType || t.DeclaringType >= 0 ||
+        if (properties.Any(p => p.Parameters.Any(parameter => !Supported(parameter)) || !Supported(p.Type)) || types.Any(t => t.DeclaringType >= 0 ||
             (t.GenericNames.Length != 0 && t.IsStatic) || t.Fields.Any(f => !Supported(f.Signature!)) || t.InterfaceSignatures.Any(i => !Supported(i)) || t.Constraints.Length != 0 || t.SpecialConstraints.Count != 0) ||
             methods.Any(m => (m.Owner < 0 && m.Visibility is not (MethodVisibility.Public or MethodVisibility.Internal)) ||
             (m.Name == ".ctor" && m.Signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)) ||
@@ -72,7 +72,7 @@ public sealed partial class NativeAssemblyDefinition
         }
         var typeRows = types.Select((type, index) => new AssemblyDefinition.TypeRow(
             0x02000002u + (uint)index, type.Namespace, type.Name, type.GenericNames.Length, 0,
-            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : 0) | (type.Visibility == TypeVisibility.Public ? 1 : 0)), !type.IsStatic, false, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames)).ToArray();
+            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.IsValueType ? 0x108 : 0) | (type.Visibility == TypeVisibility.Public ? 1 : 0)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames)).ToArray();
         var fieldRows = new List<AssemblyDefinition.FieldRow>();
         for (int owner = 0; owner < types.Length; owner++)
             foreach (var field in types[owner].Fields)
