@@ -1,5 +1,17 @@
 # neoCLR platform roadmap
 
+Native query acceptance (2026-10-04): unchanged library-query-basics and
+library-query-names compile and run with checked-in expected output against the
+separately compiled native source library. An instrumented iterator consumer confirms
+lazy construction, early/exhaustion disposal, repeated enumeration and idempotent
+explicit disposal through imported Filter/Map/Take implementations. The expanded broad
+application gate passes without compiler/runtime changes. A seven-sample assessment
+records remaining library-surface gaps: numeric/comparer APIs and guest introspection
+are absent from this selected library. Next bounded expansion is numeric/comparer source
+ownership and primitive contracts; guest introspection remains a separate, larger step.
+These are binding diagnostics, not evidence of new .NET regressions or full-library
+completion. [Evidence](experiments/extended-cli-metadata/query-acceptance-2026-10-04.json).
+
 Native reference captures (2026-10-03): Raven `623cbc1d8` lowers lambdas capturing
 immutable reference locals into fresh private frames using existing instance callback
 bindings. Unchanged library-list-filters now compiles, verifies and executes with exact

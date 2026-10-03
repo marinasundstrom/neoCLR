@@ -6,6 +6,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-04
+
+- Expand native source-library acceptance with unchanged query-basics/query-names
+  and observable lazy iteration/disposal checks through imported Filter/Map/Take.
+  The broad application gate passes. Record missing numeric/comparer/introspection
+  surfaces in a seven-sample assessment; no compiler, metadata or runtime change.
+
 ### 2026-10-03
 
 - Record Raven `623cbc1d8` immutable reference capture lowering and expand native

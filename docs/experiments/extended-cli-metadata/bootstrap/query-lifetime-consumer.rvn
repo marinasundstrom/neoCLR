@@ -1,0 +1,57 @@
+import System.Collections.*
+import System.Linq.*
+
+class Source : Iterable<int> {
+    var Moves: int = 0
+    var Disposals: int = 0
+
+    func GetIterator() -> Iterator<int> => Cursor(self)
+}
+
+class Cursor : Iterator<int> {
+    private val source: Source
+    private var position = 0
+    private var disposed = false
+
+    init(source: Source) {
+        self.source = source
+    }
+
+    func MoveNext() -> bool {
+        if disposed {
+            return false
+        }
+        source.Moves += 1
+        position += 1
+        return position <= 3
+    }
+
+    val Current: int => position
+
+    func Dispose() {
+        if !disposed {
+            disposed = true
+            source.Disposals += 1
+        }
+    }
+}
+
+func Main() -> int {
+    let source = Source()
+    let query = source.Filter(value => value > 1).Map(value => value * 10)
+    if source.Moves != 0 { return 1 }
+    let first = query.Take(1).ToList()
+    if first.Count != 1 || first[0] != 20 { return 2 }
+    if source.Moves != 2 || source.Disposals != 1 { return 3 }
+    let all = query.ToList()
+    if all.Count != 2 || all[0] != 20 || all[1] != 30 { return 4 }
+    if source.Moves != 6 || source.Disposals != 2 { return 5 }
+    let iterator = query.GetIterator()
+    if !iterator.MoveNext() || iterator.Current != 20 { return 6 }
+    iterator.Dispose()
+    iterator.Dispose()
+    if source.Disposals != 3 { return 7 }
+    if iterator.MoveNext() { return 8 }
+    if source.Moves != 8 { return 9 }
+    return 42
+}

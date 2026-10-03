@@ -88,6 +88,7 @@ def main():
             (HERE / 'nested-array-callback-consumer.rvn', 42, ''),
             (HERE / 'instance-callback-consumer.rvn', 42, ''),
             (HERE / 'captured-reference-consumer.rvn', 42, ''),
+            (HERE / 'query-lifetime-consumer.rvn', 42, ''),
             (ROOT / 'docs/experiments/raven-target/samples/library-list-filters.rvn', 0,
              '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-array-callbacks.rvn', 0, '7\n42\nFirst\nSecond\n'),
@@ -96,6 +97,11 @@ def main():
             (ROOT / 'docs/experiments/raven-target/samples/library-collection-capabilities.rvn', 0,
              '2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n'),
         ]
+        for name in ['library-query-basics', 'library-query-names']:
+            source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
+            expected = source.with_suffix('.expected.txt')
+            samples.append((source, 0, expected.read_text()))
+            sample_paths.append(expected)
         for source, exit_code, expected_stdout in samples:
             app = output / (source.stem + '.dll')
             run(common + ['--reference', str(library), '-o', str(app), str(source)])

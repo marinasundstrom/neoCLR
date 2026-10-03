@@ -1,0 +1,1449 @@
+{
+  "compilerRevision": "623cbc1d8",
+  "runtimeMetadataRevision": "c8ab1967",
+  "gate": {
+    "revisions": {
+      "runtime": "c8ab1967c028332ecb53fbb236ad8e2641ac30ae",
+      "compiler": "623cbc1d8db2c20ac82cf1027a8322f3c4278b6e"
+    },
+    "scope": "Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.",
+    "commands": [
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/collection-seed.neoil",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/query-lifetime-gate-1004/System.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "warning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/Consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/Consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (179 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/Consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/invalid/NegativeCapacity.dll",
+          "/private/tmp/query-lifetime-gate-1004/NegativeCapacity.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/invalid/NegativeCapacity.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: ArrayList capacity must be non-negative [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:10] IL instruction 1\n  at NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031..ctor(Int32) owner=Constructed { definition: \"NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031\", arguments: [Int32] } [NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9#1.0.0.0:41] IL instruction 5\n  at NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F.F_4D61696E() [NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F#1.0.0.0:0] IL instruction 1\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/Override.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/Override.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_35E5ED7F554FCEFC06617BE4251EB897036CDEC3ADBA542613DC3B7D4280215A: typed-stack/control-flow verification passed (178 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/Override.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Multiple\n42\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/Application.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/Application.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_5F1E7980BF83E18282A3DF9BFBB13E29DA3B1C681F11A81E23680CA795A01645: typed-stack/control-flow verification passed (194 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/Application.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/array-interface-count-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-interface-count-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/array-interface-count-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_3CA17E2FE31E07C1E7A27AFE03C42FDD25E0B177FA5912ABDF190319A3EE203E: typed-stack/control-flow verification passed (178 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/array-interface-count-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/nested-array-callback-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/nested-array-callback-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/nested-array-callback-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_1312FED3A9A714F6BC9239B3764876447FA882B0A4021CD986D6162489E51FB3: typed-stack/control-flow verification passed (179 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/nested-array-callback-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/instance-callback-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/instance-callback-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/instance-callback-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_68BC6703E395E40F85D1DAD2DE7551BEDA41074C4D9A619834B516747C393E36: typed-stack/control-flow verification passed (183 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/instance-callback-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/captured-reference-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/captured-reference-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/captured-reference-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_0234E703CFC1FCF8083C4AC99C4A55DC660163612F989D1EB98AFA2EEC69D995: typed-stack/control-flow verification passed (188 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/captured-reference-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/query-lifetime-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/query-lifetime-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/query-lifetime-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_30F7EED037A308FA90FFBD828B76BA2308A1E05117816516C481DD20C6FF1970: typed-stack/control-flow verification passed (190 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/query-lifetime-consumer.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-list-filters.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-list-filters.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-list-filters.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_EAA8D6D74F8F7D4F56CD607881723B7AF7E98D1B0BC5DADF31A1C26968A3968E: typed-stack/control-flow verification passed (187 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-list-filters.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-array-callbacks.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-array-callbacks.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-array-callbacks.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_C2E0696563A2835CD4B05CD82B3A475BD3C5730B455CE399E33E58E9221C7ED6: typed-stack/control-flow verification passed (180 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-array-callbacks.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "7\n42\nFirst\nSecond\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-option.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-option.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_C8A744CC9D0353AD5BA066AB7E38918F63D2D2D7BEFD69A39540DE2E139EEF4F: typed-stack/control-flow verification passed (180 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-option.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "42\nProduct not found\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-option-propagation.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option-propagation.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-option-propagation.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_F1392B1E2E0FE88EBFEB4E3F545877599848D2F10D9C30F9C915154989B683D6: typed-stack/control-flow verification passed (181 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-option-propagation.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Value found\n42\nAbsent\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-collection-capabilities.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-collection-capabilities.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-collection-capabilities.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_271ECA4231BB5FED1BB0AC1D160C3A1B8D00D997F62F46183A5C54BFFACEE342: typed-stack/control-flow verification passed (181 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-collection-capabilities.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-query-basics.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-query-basics.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_85E6A037A6896AC0029088733358FDC15DD91F7DA23A487E388B3122AA779B33: typed-stack/control-flow verification passed (184 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-query-basics.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "2\n3\nTrue\nTrue\n2\n10\n2\n20\n3\n30\n5\n50\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/library-query-names.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/query-lifetime-gate-1004/library-query-names.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_4F171849ABCAA9BF7D28CCDD43854B9D0CA11780B9F1D28BD2BDC3552573D4EF: typed-stack/control-flow verification passed (180 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/library-query-names.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "10\n30\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/MutableCapture.dll",
+          "/private/tmp/query-lifetime-gate-1004/MutableCapture.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA001: Native emission does not support closure capture requires an immutable reference local.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/BadCast.dll",
+          "/private/tmp/query-lifetime-gate-1004/BadCast.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/query-lifetime-gate-1004/BadCast.dll",
+          "--module",
+          "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/query-lifetime-gate-1004/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: unbox.any requires the exact boxed value type [code=InvalidCast] at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374:1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374(Named(\"System.Object\")) [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_4D61696E() [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:1] IL instruction 4\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/MissingLibrary.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'NeoCLR.Collections'; found none.\n"
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/private/tmp/query-lifetime-gate-1004/DuplicateSeed.neoil",
+          "/private/tmp/query-lifetime-gate-1004/DuplicateSeed.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/query-lifetime-gate-1004/DuplicateSeed.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/query-lifetime-gate-1004/DuplicateSeed.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/query-lifetime-gate-1004/MissingLibrary.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Runtime seed duplicates a source-owned declaration: System.Option`1\n"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_source_unions.py",
+        "sha256": "4761c96924815e4099c2df11bc07c3a8bfa73840fd4f7725b046111c3294c1cd"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "sha256": "1872ed2e12efacc3ff648564d2e36a6a0ec5a49d0f9eff8c2b7fe168dc4ae201"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "sha256": "e5a3029e43fa4e900210ccc18c8d399de125788f63929ee14c4a7dee9d5a51c3"
+      },
+      {
+        "path": "/private/tmp/ArrayListCore.dll",
+        "sha256": "d299ac3b6c6c2a8f7522a0af79580a396d0c383653e66e343e0983118adb0e73"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/System.neox",
+        "sha256": "0f3a498c5737d629f5592fab697f18d68900b51264a3bc377f3b9e8635a54fe4"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/NeoCLR.Collections.dll",
+        "sha256": "918d39e27059d38521da162f6bf72d6dce8fe85fe4c26360f085ce87736479b7"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "sha256": "354091db7c6ac28d84718359e9c5bcc590b05ee870d60014afeb0b36e9a0cacf"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/union-seed.neoil",
+        "sha256": "38692aa6abfe5ef73427fa4202290c0f82dd0fe8cd47e1599a872a44c2afcfc6"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/collection-seed.neoil",
+        "sha256": "d898414b4fe814768cf964c1491baf5d6c17ac87f4701986d0a5da50b2e981ec"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn",
+        "sha256": "de237a93ab7f8380530c4ee85fb5ad0e39e85ad897d7e50fb434d1aaf1fc973e"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/Consumer.dll",
+        "sha256": "108fcd876edf03a2a5d11e7b2292828cea608cc5f90ca48d0fa8aa466a27e02f"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/NegativeCapacity.rvn",
+        "sha256": "d04d582629c5b092c55f83ac898e902d7856607567214d8484904e747353eb00"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/invalid/NegativeCapacity.dll",
+        "sha256": "1eebfdfc97795cca1f804b7cb5e57bda13512ab4a2dedd5edd1da782a017f69f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Disposable.rvn",
+        "sha256": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterator.rvn",
+        "sha256": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterable.rvn",
+        "sha256": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Collection.rvn",
+        "sha256": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Sequence.rvn",
+        "sha256": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "sha256": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/List.rvn",
+        "sha256": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Propagatable.rvn",
+        "sha256": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Option.rvn",
+        "sha256": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Result.rvn",
+        "sha256": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/ArrayList.rvn",
+        "sha256": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Comparer.rvn",
+        "sha256": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionComparer.rvn",
+        "sha256": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/EqualityComparer.rvn",
+        "sha256": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+        "sha256": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Map.rvn",
+        "sha256": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableMap.rvn",
+        "sha256": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/HashMap.rvn",
+        "sha256": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/SingleError.rvn",
+        "sha256": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/Operators.rvn",
+        "sha256": "615a01a8fa987959aba0a5b49a35fa479088b7aa15482a18b1c16e09470fb53b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Array.rvn",
+        "sha256": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/BadCast.rvn",
+        "sha256": "facd3b4918e846361ecadae4381c12ce6c0b3d8c94d4e0caa2e27fbd96e2869d"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/BadCast.dll",
+        "sha256": "75a58ce21d8e641b5aa6bc16c3edfee126dc6619e1bdbcf15579da672a52e927"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn",
+        "sha256": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.expected.txt",
+        "sha256": "a3ad3c2feba43048173845f14ad098cd7301b07a283e661a8f0d6a889c1a03bb"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/Application.dll",
+        "sha256": "3f487eec62beaa3e1694199fff00bf76347ec693f25cc9c4fdfe88cc6f46f690"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn",
+        "sha256": "fcac6722e46fda00afebf298cd7d956b6867d6e01776b6ed4d9221d334aa1ac8"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/Override.dll",
+        "sha256": "c756e8e63008e3830ed51904407065a357b7147478a0bb52696f3fc190f740b0"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.expected.txt",
+        "sha256": "dfcfcb802bc2ead4bf7fbc822036e6d2a26396af6d21c1c1c3b865ef1d5683a5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.expected.txt",
+        "sha256": "3402e03f3358b77b64747550cf175c77266234f6addf6c3d67c1e7b8c11590d8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-interface-count-consumer.rvn",
+        "sha256": "b9b4b2cad68abe8195bc5103a55bcffcb30206a3106dbd0cec4f34ed8f61896d"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/array-interface-count-consumer.dll",
+        "sha256": "2823b3cc3631aec9fabb64139c89ae1abc1b48dd29df77b5585859251e8fa930"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/nested-array-callback-consumer.rvn",
+        "sha256": "ee1560d2ff73a34e241dc709a9643556fdd20c3ed3df69d821211100c1da56a2"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/nested-array-callback-consumer.dll",
+        "sha256": "1b3f08f7e2e889c77a140d5337a51e08d14fc67ce343baa121e08e50a87a9ef7"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/instance-callback-consumer.rvn",
+        "sha256": "15b2666453ee618f0720551da510685bbffab39e5af0de8e39db8d00416dcec5"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/instance-callback-consumer.dll",
+        "sha256": "5b412f409a3f1df0d56da9eb00bd11fac18240ed3f22a7cc2aae6f556534e264"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/captured-reference-consumer.rvn",
+        "sha256": "ac940a6299e31cf052b778aa3a91a3a871d185842c15de72742b988533728aa3"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/captured-reference-consumer.dll",
+        "sha256": "d4afab075a4cc39f021c7e84b8813e12a801c95feabf45ab8de3336fb337fb68"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/query-lifetime-consumer.rvn",
+        "sha256": "4c2cff76419ab2324b70464ec544570545904ca8834ef852c8f0a21d19fc54e6"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/query-lifetime-consumer.dll",
+        "sha256": "3e938386a3cba6762c5ca46ecd6a5e9215af6206e163ddb54fcfa4ff0a4046cb"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-list-filters.rvn",
+        "sha256": "951981d63ec9665777421f835b756bac6784497b3ec23eb79d264b49d9e06f63"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-list-filters.dll",
+        "sha256": "fbd8403ac415275db0798817f9aa5159d5c89b688a46d752dd29d5272246b8a3"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-array-callbacks.rvn",
+        "sha256": "a3e49891cb9a66cd88dba725638b4ba92bde156fb2a05db8de7738bd910934da"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-array-callbacks.dll",
+        "sha256": "846159dbc8cb096a8d46bf23e8ead74c52d539244fe9542d60729c7d818c1360"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option.rvn",
+        "sha256": "66e5d193209cb652154f2d6fcd66f41f885e9844c1e6b4fbd65dfa529712f0a6"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-option.dll",
+        "sha256": "9947b72801d7a978c52ba1f25e2eeb44c8e36172c70dd95ef881b1d106c86d1f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option-propagation.rvn",
+        "sha256": "5200bb44b33e82081343133efd95e8632009afc59e9be1349aa25d49f19865df"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-option-propagation.dll",
+        "sha256": "779835cc5de7fcc7579c7dfe7d5cdab229b26391c8bad3475b9e508a351c57b5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-collection-capabilities.rvn",
+        "sha256": "e9d5546e8206197bfbf4fc98015db2635fbdb52d02ad2f6de77f5b614f838929"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-collection-capabilities.dll",
+        "sha256": "d2576ff62342cb0976ce023d0b040cd468706b0647e36bc4626043e9eb1a1ab2"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.rvn",
+        "sha256": "c54dcdc929845a6ce9dee3cbee4da1a8735ad8ffcdebc075a305c521afb28b21"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-query-basics.dll",
+        "sha256": "313aeb873f1e4590b330779194d0bfbb9d4912cfe4eeae8c5a5a65d9c4df12f9"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.rvn",
+        "sha256": "5498135b6a4e423d4fbf8b2ac9ba9f44ae8556aec2ad3af46ba040dd4e4098b4"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/library-query-names.dll",
+        "sha256": "46ca2807431e5ddbb5820f5b96d84c629969dc94b218dbc781ef4c2a029ebc32"
+      },
+      {
+        "path": "/private/tmp/query-lifetime-gate-1004/MutableCapture.rvn",
+        "sha256": "f8c5faabbcf36304674cccd6daa8e20e4decead5166f41a7d3d96f1af01958a5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll",
+        "sha256": "a12abbfcabfbdb178244cc2bf3d448b493fe07c9a029a38a255868cee806e8c7"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll",
+        "sha256": "39b9f530f4dcde3f425416700a46e3b18b7544ed975b4e446551db0d73aece01"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll",
+        "sha256": "b0eee8b1b71ca366d38f9d6a8cf0728e1f3f80326a23b068750c1ea4561015ce"
+      }
+    ]
+  },
+  "assessment": [
+    {
+      "sample": "library-maps",
+      "compileExit": 1,
+      "diagnostics": "error RAV2021: You can only import namespaces and types.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0305: The type 'Some' requires 1 type argument(s)\nerror RAV0103: 'found' is not in scope.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.\n",
+      "source": "docs/experiments/raven-target/samples/library-maps.rvn",
+      "sourceSha256": "81a41a763ae990b0bd466366e0f359400fb1bcd56951dc5737d43278f042e17d",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-maps.dll",
+        "docs/experiments/raven-target/samples/library-maps.rvn"
+      ]
+    },
+    {
+      "sample": "library-query-basics",
+      "compileExit": 0,
+      "diagnostics": "",
+      "runExit": 0,
+      "stdout": "2\n3\nTrue\nTrue\n2\n10\n2\n20\n3\n30\n5\n50\n",
+      "stderr": "",
+      "source": "docs/experiments/raven-target/samples/library-query-basics.rvn",
+      "sourceSha256": "c54dcdc929845a6ce9dee3cbee4da1a8735ad8ffcdebc075a305c521afb28b21",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-query-basics.dll",
+        "docs/experiments/raven-target/samples/library-query-basics.rvn"
+      ]
+    },
+    {
+      "sample": "library-query-names",
+      "compileExit": 0,
+      "diagnostics": "",
+      "runExit": 0,
+      "stdout": "10\n30\n",
+      "stderr": "",
+      "source": "docs/experiments/raven-target/samples/library-query-names.rvn",
+      "sourceSha256": "5498135b6a4e423d4fbf8b2ac9ba9f44ae8556aec2ad3af46ba040dd4e4098b4",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-query-names.dll",
+        "docs/experiments/raven-target/samples/library-query-names.rvn"
+      ]
+    },
+    {
+      "sample": "library-oftype",
+      "compileExit": 1,
+      "diagnostics": "error RAV2021: You can only import namespaces and types.\nerror RAV0103: 'MethodInfo' is not in scope.\nerror RAV0103: 'MemberInfo' is not in scope.\nerror RAV0117: 'Type' has no member 'GetMethods'.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.\nerror RAV0103: 'Module' is not in scope.\n",
+      "source": "docs/experiments/raven-target/samples/library-oftype.rvn",
+      "sourceSha256": "3b3a146d634aa34a9e9552d777fda93481ae546f2ab3cc46361c4c7712231fe7",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-oftype.dll",
+        "docs/experiments/raven-target/samples/library-oftype.rvn"
+      ]
+    },
+    {
+      "sample": "library-comparers",
+      "compileExit": 1,
+      "diagnostics": "error RAV0103: 'StringComparer' is not in scope.\nerror RAV0103: 'StringComparer' is not in scope.\nerror RAV2200: Cannot infer the type of parameter 'left'. Specify an explicit type or use the lambda in a delegate-typed context\nerror RAV2200: Cannot infer the type of parameter 'right'. Specify an explicit type or use the lambda in a delegate-typed context\nerror RAV0117: 'Int32' has no member 'CompareTo'.\n",
+      "source": "docs/experiments/raven-target/samples/library-comparers.rvn",
+      "sourceSha256": "aea9054ba153bab90efab6520172288f22954be734aca3735ac2e402b63648c3",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-comparers.dll",
+        "docs/experiments/raven-target/samples/library-comparers.rvn"
+      ]
+    },
+    {
+      "sample": "library-result",
+      "compileExit": 1,
+      "diagnostics": "error RAV0117: 'Math' has no member 'Abs'.\nerror RAV2104: Case pattern 'Ok' requires a union target\nerror RAV0103: 'ok' is not in scope.\nerror RAV2104: Case pattern 'Error' requires a union target\n",
+      "source": "docs/experiments/raven-target/samples/library-result.rvn",
+      "sourceSha256": "ec57186ac6c949cd14ebde8de263047798b29ab5b2daf064eed254036c2f164f",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-result.dll",
+        "docs/experiments/raven-target/samples/library-result.rvn"
+      ]
+    },
+    {
+      "sample": "library-reference-payloads",
+      "compileExit": 1,
+      "diagnostics": "error RAV0103: 'None' is not in scope.\nerror RAV2021: You can only import namespaces and types.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.\nerror RAV0103: 'ComparableTo' is not in scope.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'Error'.\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV2104: Case pattern 'Some' requires a union target\nerror RAV0103: 'some' is not in scope.\nerror RAV0103: 'OverflowError' is not in scope.\nerror RAV2104: Case pattern 'Ok' requires a union target\nerror RAV0103: 'ok' is not in scope.\nerror RAV2104: Case pattern 'Error' requires a union target\nerror RAV0103: 'TypeInfo' is not in scope.\nerror RAV2104: Case pattern 'Ok' requires a union target\nerror RAV0103: 'ok' is not in scope.\nerror RAV2104: Case pattern 'Error' requires a union target\n",
+      "source": "docs/experiments/raven-target/samples/library-reference-payloads.rvn",
+      "sourceSha256": "00fca15aaa0217e2327dd1089f88daf1fb98b0472c2be65358c77ad11dda3f4e",
+      "compileCommand": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/ArrayListCore.dll",
+        "--runtime-seed",
+        "/tmp/captured-reference-gate/System.neox",
+        "--bootstrap-ownership",
+        "docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "--bootstrap-intrinsics",
+        "--reference",
+        "/tmp/captured-reference-gate/NeoCLR.Collections.dll",
+        "-o",
+        "/tmp/native-sample-assessment-1004/library-reference-payloads.dll",
+        "docs/experiments/raven-target/samples/library-reference-payloads.rvn"
+      ]
+    }
+  ],
+  "reusedEvidence": "reference-captures-2026-10-03.json: unchanged compiler/runtime; 31 .NET tests and seven consumers not rerun",
+  "limitations": "Selected source library only; no guest introspection, full numeric/comparer surface or exception disposal guarantees."
+}
