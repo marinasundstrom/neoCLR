@@ -1,0 +1,214 @@
+{
+  "date": "2026-10-03",
+  "scope": "Bounded core Object.ToString dispatch; native unions remain blocked by synthesized null literal emission.",
+  "revisions": {
+    "neoclrBase": "8acd0be62d520d7c3c89fc8c2c3be47de835fd41",
+    "raven": "ec23ae9bc",
+    "sourceHashesIdentifyUncommittedSlice": true
+  },
+  "sourceSha256": {
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeValueOverrideChecks.cs": "06447f0e8be4e3457483596852e4be3760f2c616c278dde2364264f7a3a3076b",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedMethodReference.cs": "96944c603d80f1dceffb2c0f905922f5637bc65487d125e233b3696a8fb72ebe",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyWriter.cs": "f10b9f601129cd262b225c05d2e7c3e476d83923b87b8680bdf57efac942ad5c",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeImportBinding.cs": "814013e8a7925df7b59ef9789567236d681fc6ef880a5b57134f5272e9710213"
+  },
+  "metadataContracts": {
+    "passed": 121,
+    "log": "121/121 C# metadata contract tests passed"
+  },
+  "runtimeContract": {
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --native-value-override target/release/neoclr /tmp/override-System.neox api-docs/reference/NeoCLR.CoreProbe.dll /tmp/native-object-dispatch-final",
+    "result": "Native override roundtrips, imported direct call and boxed Object dispatch passed (42).\n"
+  },
+  "ravenFocusedTests": {
+    "passed": 9
+  },
+  "driver": {
+    "scope": "Dual-target core Object.ToString dispatch on generic boxed integer and string (42).",
+    "driverSha256": "A74B627CB3819A9DE98814D01E2516085EE18F87A6E8FA66BE78D1F75BD4C516",
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "sourceSha256": "077A64D4E4CCBDACB89EE3B11AAE32F262AB458C22BF03E6980482CDDE06F82F",
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-object-display-final/ObjectDisplay.clr.dll",
+          "/tmp/raven-object-display-final/ObjectDisplay.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "Build succeeded in 1,4s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-object-display-final/ObjectDisplay.clr.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "42\ntext\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-object-display-final/ObjectDisplay.native.dll",
+          "/tmp/raven-object-display-final/ObjectDisplay.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "verify",
+          "/tmp/raven-object-display-final/ObjectDisplay.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_4C5885CD0FA31F99820FD4C1158AF91730361E878DA18DCBB0E0623302BF16B0: typed-stack/control-flow verification passed (3838 IL functions; maximum stack 7; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "run",
+          "/tmp/raven-object-display-final/ObjectDisplay.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "42\ntext\n",
+        "stderr": ""
+      }
+    ]
+  },
+  "unionGate": {
+    "scope": "Union declaration discovery baseline; native union execution remains blocked by synthesized union null-literal emission.",
+    "driverSha256": "A74B627CB3819A9DE98814D01E2516085EE18F87A6E8FA66BE78D1F75BD4C516",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "evidence": [
+      {
+        "name": "Plain",
+        "sourceSha256": "E6947C1CA8CBB9368E6F0534E2A3DA3CA5C657EA2CD5798E408EF62780C1A90E",
+        "dotnetAssemblySha256": "5AD5C9704B0214D6CE69C688F7812E887E91722E1BBBD111464A7B1DA7681134",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      },
+      {
+        "name": "Generic",
+        "sourceSha256": "5AA0B46C1AEDFE1D1EA48A87821A09E226E8E83076C4C864DD237AAE1D3AF50F",
+        "dotnetAssemblySha256": "2C6262FFBB489009C4BBBA74C656F5508D86B202D84206215159E9D66463B43F",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      }
+    ],
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-object-gate/Plain.dll",
+          "/tmp/raven-union-object-gate/Plain.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-object-gate/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,4s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-object-gate/Plain.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-object-gate/Plain.native.dll",
+          "/tmp/raven-union-object-gate/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body get_Value: lowered expression BoundLiteralExpression.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-object-gate/Generic.dll",
+          "/tmp/raven-union-object-gate/Generic.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-object-gate/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,3s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-object-gate/Generic.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-object-gate/Generic.native.dll",
+          "/tmp/raven-union-object-gate/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body get_Value: lowered expression BoundLiteralExpression.\n"
+      }
+    ]
+  },
+  "apiSnapshot": "Known stale snapshot; check still fails. Existing refresh blocked by SourceUnionReferences.Project / None binding. Manual host API documentation updated."
+}

@@ -1303,3 +1303,7 @@ union/case metadata remain open.
 
 [Reference-test evidence](experiments/extended-cli-metadata/reference-tests-2026-10-03.json)
 records commands/hashes and Raven 5bb8f4dfc.
+
+Development update (2026-10-03): core Object.ToString dispatch now executes for boxed
+values through the metadata API and ordinary Raven commands. Union preflight next
+requires synthesized null literal emission; native union execution is still pending.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Support imported core Object.ToString virtual dispatch with exact CLI core and
+  native System slot validation. API boxed overrides and Raven generic integer/string
+  display execute correctly; other virtual class calls remain unsupported. Union
+  preflight advances to its synthesized null literal, without native publication.
+
 - Add IL-generator null identity/type tests and String checked casts using standard CLI
   instructions and existing native operations. Value/generic tests require explicit core
   binding. C# contracts (121 groups), API runtime tests and Raven ordinary-command null/

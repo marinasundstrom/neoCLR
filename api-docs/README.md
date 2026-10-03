@@ -873,3 +873,7 @@ RavenDoc selection; the known stale runtime snapshot remains unchanged.
 Host-only IILGenerator.IsNull/IsInstance, their raw opcodes, and String CastReference
 support have XML and [manual reference](experimental-metadata.md#reference-tests-development-2026-10-03)
 coverage. The known stale guest RavenDoc snapshot remains tracked; no snapshot mutation.
+
+2026-10-03: bounded core Object.ToString import/call behavior is covered in the host
+metadata manual and XML; no new guest API selection. Existing stale snapshot and
+SourceUnionReferences.Project refresh blocker remain unchanged.

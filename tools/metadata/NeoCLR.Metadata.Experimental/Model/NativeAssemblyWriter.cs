@@ -18,6 +18,9 @@ public sealed partial class AssemblyBuilder
         if (methods.Any(m => m.Instructions.Any(i => i.Op == "object.box" || i.Op == "reference.test" && !MethodBuilder.IsReferenceSignature(i.Type!))))
             (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native boxing/value type tests require an explicit System core binding")).ValidateBoxingCore();
 
+        foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>().Where(m => m.IsCoreObjectToString).Distinct())
+            (target.Assembly.NativeBinding ?? throw new InvalidDataException("native Object.ToString dispatch requires an explicit core slot binding")).ValidateObjectToStringSlot();
+
         static void CheckText(string text)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Any(char.IsControl)) throw new InvalidDataException("invalid native descriptive name");

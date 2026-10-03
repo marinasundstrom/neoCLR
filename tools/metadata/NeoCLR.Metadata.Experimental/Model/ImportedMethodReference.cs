@@ -52,7 +52,9 @@ public sealed partial class AssemblyBuilder
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
         => ImportReference(definition, dependencyCoreLibrary, null);
 
-    /// <summary>Imports a native contract with explicitly resolved cross-assembly nominal signature types.</summary>
+    /// <summary>Imports a contract with explicitly resolved cross-assembly nominal signature types.
+    /// The explicit CLI core Object.ToString slot supports virtual dispatch; native output requires
+    /// a matching validated System binding. Other nonfinal virtual reference-class methods remain unsupported.</summary>
     /// <param name="definition">Immutable method or field definition.</param>
     /// <param name="dependencyCoreLibrary">Matching explicit core contract for all resolved dependencies.</param>
     /// <param name="resolver">Exact identity resolver; null permits local signature types only.</param>
@@ -77,11 +79,15 @@ public sealed partial class AssemblyBuilder
         bool isVirtual = (definition.Attributes & 0x40) != 0;
         bool isAbstract = (definition.Attributes & 0x400) != 0;
         bool isFinal = (definition.Attributes & 0x20) != 0;
+        bool isObjectToString = !definition.Module.Assembly.IsNative && definition.AuthoredSignature is null && identity.Equals(CoreLibrary) && type is { Namespace: "System", Name: "Object", GenericArity: 0, IsValueType: false, DeclaringType: null } &&
+            (type.Attributes & 0x27) == 1 && definition.Name == "ToString" && !definition.IsStatic && definition.GenericArity == 0 &&
+            isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
+            definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x0e });
         if (type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
             definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
-            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType)))
+            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString)))
             throw new InvalidDataException("unsupported imported instance method contract");
         if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
             throw new InvalidDataException("invalid imported constructor contract");
@@ -119,6 +125,8 @@ public sealed partial class AssemblyBuilder
         }
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        reference.Target.IsCoreObjectToString = isObjectToString;
+        if (isObjectToString) NativeBindingFor(identity)?.ValidateObjectToStringSlot();
         reference.Target.NativeValueOverride = definition.Module.Assembly.IsNative && type?.IsValueType == true && (definition.Attributes & 0x140) == 0x40;
         NativeBindingFor(identity)?.ValidateMethod(definition, reference.Target);
         importedReferences.Add(key, reference);

@@ -5829,3 +5829,14 @@ and native-binding failures throw InvalidDataException before an image is return
 These operations add no metadata format or runtime behavior. C# tests exercise null and
 matching/nonmatching primitive/reference type tests, generic scopes and String identity
 on CLR; native binary tests verify/run 42 with the explicit retained-System bootstrap.
+
+Core display dispatch continuation (2026-10-03): imported public instance
+System.Object.ToString() -> String from the exact explicit CLI core snapshot now
+supports CallVirtual. Native output requires the validated System slot binding;
+missing, ambiguous, nongeneric/signature-mismatched or nonvirtual slots reject.
+This reuses CLI callvirt and native virtual dispatch without a format/runtime change.
+Raven opts into a bounded semantic Object display capability; other virtual class
+calls remain unsupported. Runtime Contract and importer/emitter boundaries are unchanged.
+API-authored boxed value overrides execute through Object; ordinary Raven commands
+print `42` and `text` on both targets. The union preflight now reaches a synthesized
+get_Value null literal. Full native union/case metadata and execution remain pending.

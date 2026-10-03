@@ -34,13 +34,22 @@ internal static class NativeValueOverrideChecks
         var projected = RuntimeAssemblyContainer.ReadCliProjection(binary);
         Check((projected.MainModule.Types.Single(t => t.Name == "Display").Methods.Single().Attributes & 0x540) == 0x40, "projection lost override slot");
         var app = new AssemblyBuilder(new("NativeOverrideConsumer", new Version(1, 0, 0, 0)), core);
+        app.BindNativeLibrary(reference, system, core);
+        var objectToString = app.ImportReference(reference.MainModule.Types.Single(t => t.Namespace == "System" && t.Name == "Object").Methods.Single(m => m.Name == "ToString"), core);
+        Check(objectToString.RequiresVirtualDispatch, "core Object slot must dispatch virtually");
+        var unbound = new AssemblyBuilder(new("UnboundObjectCall", new Version(1, 0, 0, 0)), core);
+        var unboundSlot = unbound.ImportReference(reference.MainModule.Types.Single(t => t.Namespace == "System" && t.Name == "Object").Methods.Single(m => m.Name == "ToString"), core);
+        var unboundBody = unbound.AddFunction("Display", new(PrimitiveType.String, [unbound.CoreObjectType])).GetILGenerator();
+        unboundBody.LoadArgument(0); unboundBody.CallVirtual(unboundSlot); unboundBody.Return();
+        Reject(() => unbound.WriteNativeAssembly());
         var imported = app.ImportReference(type, core);
         var method = app.ImportReference(type.Methods.Single(), core);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var il = main.GetILGenerator();
         var value = il.DeclareLocal(imported);
         il.LoadLocalAddress(value); il.InitializeObject(imported);
-        il.LoadLocalAddress(value); il.Call(method); il.WriteConsoleLine(); il.LoadConstant(42); il.Return();
+        il.LoadLocalAddress(value); il.Call(method); il.WriteConsoleLine();
+        il.LoadLocal(value); il.Box(imported); il.CallVirtual(objectToString); il.WriteConsoleLine(); il.LoadConstant(42); il.Return();
         var libraryPath = Path.Combine(directory, "Library.dll");
         var appPath = Path.Combine(directory, "Consumer.dll");
         File.WriteAllBytes(libraryPath, binary);
@@ -94,7 +103,14 @@ internal static class NativeValueOverrideChecks
             if (corruption == "virtual") slot["is_virtual"] = false;
             if (corruption == "receiver") slot["receiver_byref"] = true;
             if (corruption == "generic") slot["generic_parameters"] = new JsonArray("T");
-            Reject(() => Create(NativeLibraryDefinition.ReadAssembly(NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(changed.ToJsonString())))).WriteNativeAssembly());
+            var invalidSeed = NativeLibraryDefinition.ReadAssembly(NativeModuleContainer.WriteLibraryBinary(Encoding.UTF8.GetBytes(changed.ToJsonString())));
+            Reject(() => Create(invalidSeed).WriteNativeAssembly());
+            Reject(() =>
+            {
+                var invalidCall = new AssemblyBuilder(new("InvalidObjectCall", new Version(1, 0, 0, 0)), core);
+                invalidCall.BindNativeLibrary(reference, invalidSeed, core);
+                invalidCall.ImportReference(reference.MainModule.Types.Single(t => t.Namespace == "System" && t.Name == "Object").Methods.Single(m => m.Name == "ToString"), core);
+            });
         }
         foreach (var corruption in new[] { "virtual", "override", "name", "binding" })
         {
@@ -108,7 +124,7 @@ internal static class NativeValueOverrideChecks
         }
         Console.WriteLine("Native override roundtrips, imported direct call and boxed Object dispatch passed (42).");
 
-        async Task Execute(string command, string input, bool success, string dependency, bool includeSystem = true, string expectedOutput = "native override")
+        async Task Execute(string command, string input, bool success, string dependency, bool includeSystem = true, string expectedOutput = "native override\nnative override")
         {
             var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
             foreach (var argument in new[] { command, input, "--module", dependency }) start.ArgumentList.Add(argument);

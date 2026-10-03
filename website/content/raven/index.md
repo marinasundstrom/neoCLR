@@ -149,3 +149,7 @@ core virtual dispatch and union metadata preservation still block native source 
 Focused null/type tests now execute through both targets.
 Owned mutable field addresses now preserve nested value mutation and object aliases in
 focused .NET/NeoCLR executions. Imported and readonly field addresses remain outside this profile.
+
+Development update (2026-10-03): core Object.ToString dispatch now executes for boxed
+values through the metadata API and ordinary Raven commands. Union preflight next
+requires synthesized null literal emission; native union execution is still pending.
