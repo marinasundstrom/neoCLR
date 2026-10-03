@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven contextual reference-null lowering and dual-target execution. Plain/
+  generic union bodies now reach metadata preservation; unchanged Option reaches
+  its TryGetOutput case pattern. Native union output remains withheld.
+
 - Support imported core Object.ToString virtual dispatch with exact CLI core and
   native System slot validation. API boxed overrides and Raven generic integer/string
   display execute correctly; other virtual class calls remain unsupported. Union

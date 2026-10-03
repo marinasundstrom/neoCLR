@@ -1,0 +1,234 @@
+{
+  "date": "2026-10-03",
+  "revisions": {
+    "neoclr": "1a40881d",
+    "raven": "ad3d8a71f"
+  },
+  "focusedCompilerTestsPassed": 11,
+  "driver": {
+    "scope": "Dual-target typed null returns and initialized local (42).",
+    "driverSha256": "9569CF26934BA6DA76FC4F8F97D4F976BD09B221D2B8CCF819DD063C95E034E6",
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "sourceSha256": "0819C1799BB6F21D6A72A0E6FD1F46EB642674F8B981C52D9429E1D69EA4D61F",
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-null-literals-verified/NullLiterals.clr.dll",
+          "/tmp/raven-null-literals-verified/NullLiterals.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-null-literals-verified/NullLiterals.rvn(3,43): warning RAV9015: This comparison may call a custom equality operator. Use 'is null' or 'is not null' to test null identity.\n\n../../../../../../tmp/raven-null-literals-verified/NullLiterals.rvn(7,8): warning RAV9015: This comparison may call a custom equality operator. Use 'is null' or 'is not null' to test null identity.\n\n../../../../../../tmp/raven-null-literals-verified/NullLiterals.rvn(10,8): warning RAV9015: This comparison may call a custom equality operator. Use 'is null' or 'is not null' to test null identity.\n\n../../../../../../tmp/raven-null-literals-verified/NullLiterals.rvn(13,8): warning RAV9015: This comparison may call a custom equality operator. Use 'is null' or 'is not null' to test null identity.\n\nBuild succeeded with 4 warning(s) in 1,2s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-null-literals-verified/NullLiterals.clr.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-null-literals-verified/NullLiterals.native.dll",
+          "/tmp/raven-null-literals-verified/NullLiterals.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "verify",
+          "/tmp/raven-null-literals-verified/NullLiterals.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_E49E624154BEFB324C352144C77580EA94B51AC4B764CA809193588CC9B34F30: typed-stack/control-flow verification passed (3840 IL functions; maximum stack 7; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "run",
+          "/tmp/raven-null-literals-verified/NullLiterals.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  "unionGate": {
+    "scope": "Union declaration discovery baseline; native union execution remains blocked by preserving the native union/case metadata contract.",
+    "driverSha256": "9569CF26934BA6DA76FC4F8F97D4F976BD09B221D2B8CCF819DD063C95E034E6",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "evidence": [
+      {
+        "name": "Plain",
+        "sourceSha256": "E6947C1CA8CBB9368E6F0534E2A3DA3CA5C657EA2CD5798E408EF62780C1A90E",
+        "dotnetAssemblySha256": "42F71E1FE97BC9234D19CED6A72663EA2433DFD0CBF423E9EB9DBA6357BD993A",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      },
+      {
+        "name": "Generic",
+        "sourceSha256": "5AA0B46C1AEDFE1D1EA48A87821A09E226E8E83076C4C864DD237AAE1D3AF50F",
+        "dotnetAssemblySha256": "DFB43A350B21A3CA588CA1403FC0FEF3B0F404291880F32352F84C0078D22025",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      }
+    ],
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-null-gate/Plain.dll",
+          "/tmp/raven-union-null-gate/Plain.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-null-gate/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,5s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-null-gate/Plain.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-null-gate/Plain.native.dll",
+          "/tmp/raven-union-null-gate/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support native union/case metadata contract.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-null-gate/Generic.dll",
+          "/tmp/raven-union-null-gate/Generic.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-null-gate/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,3s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-null-gate/Generic.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-null-gate/Generic.native.dll",
+          "/tmp/raven-union-null-gate/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support native union/case metadata contract.\n"
+      }
+    ]
+  },
+  "unchangedOption": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/NeoCLR.StorageCore-20261003.dll",
+      "--bootstrap-intrinsics",
+      "--library",
+      "--bootstrap-ownership",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+      "-o",
+      "/tmp/raven-null-option/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn"
+    ],
+    "returncode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support union body TryGetOutput: lowered expression BoundIsPatternExpression.\n",
+    "outputPublished": false,
+    "sourceSha256": {
+      "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+      "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+      "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+      "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+      "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+      "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+      "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+      "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+    }
+  }
+}

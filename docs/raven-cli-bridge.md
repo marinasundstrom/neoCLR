@@ -4525,3 +4525,10 @@ get_Value null literal. Full native union/case metadata and execution remain pen
 
 [Core display evidence](experiments/extended-cli-metadata/object-display-2026-10-03.json)
 records Raven ec23ae9bc, artifact/source hashes, commands, and the remaining gate.
+
+Typed null continuation (2026-10-03): Raven ad3d8a71f emits contextual reference nulls
+through the existing metadata LoadDefault operation. Return/local/argument driver cases
+execute on both targets; 11 focused tests pass. Plain/generic unions reach the native
+union/case metadata gate. Unchanged Option next rejects its TryGetOutput case pattern.
+No metadata/runtime change or union execution is claimed. See
+[null evidence](experiments/extended-cli-metadata/typed-null-2026-10-03.json).

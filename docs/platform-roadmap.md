@@ -1307,3 +1307,10 @@ records commands/hashes and Raven 5bb8f4dfc.
 Development update (2026-10-03): core Object.ToString dispatch now executes for boxed
 values through the metadata API and ordinary Raven commands. Union preflight next
 requires synthesized null literal emission; native union execution is still pending.
+
+Typed null continuation (2026-10-03): Raven ad3d8a71f emits contextual reference nulls
+through the existing metadata LoadDefault operation. Return/local/argument driver cases
+execute on both targets; 11 focused tests pass. Plain/generic unions reach the native
+union/case metadata gate. Unchanged Option next rejects its TryGetOutput case pattern.
+No metadata/runtime change or union execution is claimed. See
+[null evidence](experiments/extended-cli-metadata/typed-null-2026-10-03.json).
