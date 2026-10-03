@@ -303,3 +303,20 @@ Runtime Contracts, the bootstrap, or runtime behavior.
 
 Validation: 109 C# groups, API snapshot check, seven native consumers and paired driver
 acceptance pass. See [evidence](../experiments/extended-cli-metadata/introspection-declarations-2026-10-03.json).
+
+
+## Native Self signature follow-up (2026-10-03)
+
+The author requested support for the Self signature and asked whether it behaves like an
+undeclared, always-available type parameter. The assistant's architectural interpretation
+is an implicit implementing-type parameter scoped to an interface contract, consistent
+with [the runtime Self contract](../self-types.md). It is not a positional VAR/MVAR and
+must not alter declared generic arity. It is not meaningful without a defining context.
+
+The forthcoming Cecil-like signature node and metadata-only view must preserve symbolic
+Self until a selected implementation supplies substitution, including nested signatures.
+Class Self remains the declaring constructed nominal type; it does not automatically
+vary with subclasses. Unsupported storage/free-function uses reject. Existing runtime
+SelfType and structural TypeExpression encoding do not mean the assembly reader/writer,
+introspection and native Raven symbol/emission integration are complete. This section
+records direction for that work, not a shipped API.

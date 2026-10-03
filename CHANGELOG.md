@@ -13,6 +13,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   and neoCLR. A checked-in ownership manifest selects the iteration contract; a
   minimal CLI core excludes competing collection declarations. Ownership failures
   reject before publication. The retained System seed and ArrayList remain later steps.
+  Expanded API snapshot regeneration currently fails on source-union `None` resolution;
+  preserve the last verified reference and record its stale source fingerprint explicitly.
 
 - Support external generic interface inheritance and implementation declarations, with
   explicit complete contracts, definition/builder parity and metadata-only resolution.

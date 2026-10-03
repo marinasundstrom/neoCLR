@@ -10199,3 +10199,16 @@ source units compile as a library and a separate consumer executes on both targe
 The explicit ownership manifest rejects competing CoreProbe declarations and configures
 only the runtime contracts supplied by the selected bootstrap. No full-System or broad
 application completion is claimed; see the dual-target tracker and matching evidence.
+
+
+The author then asked whether Self is a special type parameter available without an
+explicit generic declaration. The assistant explained it as an implicit implementing-type
+parameter scoped to an interface, distinct from declared generic parameter slots. Class
+Self denotes the declaring constructed type. The proposed metadata API should preserve
+a dedicated symbolic signature and contract-scoped view; implementation remains open.
+
+Expanded API-reference regeneration was attempted after the bootstrap command change;
+it failed in source-union projection with `None` not in scope. The last verified snapshot
+was preserved and the stale fingerprint recorded in API maintenance notes. This does not
+invalidate the independently executed source-ownership fixture, but it is an unresolved
+validation item rather than a successful API refresh.

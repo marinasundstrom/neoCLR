@@ -800,3 +800,16 @@ Host MetadataAccessibility and declaration/constructor view members are covered 
 These C# APIs do not belong in the guest RavenDoc input; guest signatures are unchanged.
 
 2026-10-03: external interface completion/relationship overloads and authored-graph binary PE emission are covered in the [host metadata manual](experimental-metadata.md#external-interface-declarations-development-2026-10-03); these C# host APIs remain outside guest RavenDoc selection.
+
+
+### Expanded reference refresh blocker (2026-10-03)
+
+Adding the primitive-only bootstrap command changes a tracked reference-generator input.
+The primitive mode and source-owned iteration/collection execution pass on both targets.
+Regenerating the expanded consumer reference with the freshly built bridge fails in
+`SourceUnionReferences.Project` with `RAV0103: 'None' is not in scope`. The previous
+verified `reference/NeoCLR.CoreProbe.dll` and its snapshot manifest are preserved; the
+source-fingerprint check currently reports stale. Do not bless the old binary with new
+input hashes. Reproduce with the normal `--reference-core` refresh command above, using
+Raven `f9841b0f6` and the current bridge, then repair and regenerate before claiming a
+current expanded API snapshot. No published API contract changed in the primitive-mode slice.
