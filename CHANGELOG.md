@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Route Raven native methods, constructors and module functions through introspection
+  views (`015e6f66d`), removing the definition-based callable-symbol wrapper. Canonical
+  constructor/accessor identity and all seven native consumers pass. Metadata encoding,
+  public library APIs and ordinary .NET loading/emission are unchanged.
+
 - Simplify Raven native field/property loading through existing introspection views
   (`12b545bc1`), removing duplicate definition/accessor lookup work. Native semantic
   contracts and seven executable consumers pass before/after. Record the explicit legacy

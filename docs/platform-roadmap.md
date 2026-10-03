@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Native callable cleanup (2026-10-03): Raven `015e6f66d` constructs method, constructor
+and module-function symbols from introspection views, preserving declaration order and
+canonical member identity. All seven native consumers pass. Remaining definition use
+is in type/union construction and explicit legacy bindings, not callable-symbol creation.
+[Evidence](experiments/extended-cli-metadata/native-callable-facade-2026-10-03.json).
+
 Native importer cleanup (2026-10-03): Raven `12b545bc1` consumes field/property
 introspection views directly and reuses canonical accessor symbols. Seven native consumers
 pass before/after. The remaining legacy references have explicit seed/probe callers;

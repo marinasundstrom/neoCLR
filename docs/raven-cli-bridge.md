@@ -4919,3 +4919,17 @@ The caller inventory in Raven `docs/compiler/metadata-backend-boundaries.md` ret
 explicit primitive/runtime seed binding, CLI comparison probes and opt-in partial System
 projection. Those are not fallback paths for native application/library references.
 [Validation](experiments/extended-cli-metadata/native-member-facade-2026-10-03.json).
+
+
+### Native callable facade adoption (2026-10-03)
+
+Raven `015e6f66d` consumes introspection MethodInfo views for declared methods,
+constructors and namespace/module functions. Type method/constructor lists are merged in
+metadata-token order; constructors/accessors reuse canonical module symbols. The previous
+definition-taking callable-symbol entry point is removed. This preserves module-function
+semantics and requires no Runtime Contract option, CLI projection, public metadata API or
+format change. Other type/union definition uses and explicit legacy bindings remain.
+All seven native consumers execute with expected exit 42; C# checks cover constructor
+identity across enumeration/member lookup, generic scopes, accessor identity and dependency
+errors. Ordinary .NET loader and emitter paths are unchanged.
+[Evidence](experiments/extended-cli-metadata/native-callable-facade-2026-10-03.json).
