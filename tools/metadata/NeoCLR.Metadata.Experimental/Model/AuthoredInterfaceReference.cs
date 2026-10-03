@@ -70,8 +70,8 @@ public sealed partial class AssemblyBuilder
         return reference;
     }
 
-    /// <summary>Records a direct interface inheritance or class implementation edge from resolved semantic facts.</summary>
-    /// <param name="source">Owned top-level reference class or interface definition.</param>
+    /// <summary>Records a direct interface inheritance or class/value implementation edge from resolved semantic facts.</summary>
+    /// <param name="source">Owned top-level class, value type or interface definition.</param>
     /// <param name="target">Owned interface identity or construction created from CreateInterfaceReference.</param>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Foreign/unsupported endpoint, noninterface target or cyclic edge.</exception>
@@ -83,7 +83,7 @@ public sealed partial class AssemblyBuilder
     {
         ArgumentNullException.ThrowIfNull(source); ArgumentNullException.ThrowIfNull(target);
         if (!ReferenceEquals(source.Owner, this) || !ReferenceEquals(target.Owner, this) || source.TypeArguments.Count != 0 ||
-            source.IsValueType || source.DeclaringType is not null || !IsAuthoredInterface(target) ||
+            source.DeclaringType is not null || !IsAuthoredInterface(target) ||
             InterfaceDefinition(source).Equals(InterfaceDefinition(target)) || HasAuthoredInterfaceConversion(target, source, definitionsOnly: true))
             throw new ArgumentException("invalid or cyclic interface conversion");
         ((SignatureType)target).ValidateOwner(this, typeArity: source.GenericArity);

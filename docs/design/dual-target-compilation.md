@@ -456,3 +456,28 @@ binding gap. The compiler fix is independently validated on the main-based fixes
 (fc32e3b9e), with 16 focused tests passing there and on the integration branch (ca7164aa2).
 Main is unchanged. See [execution evidence](../experiments/extended-cli-metadata/inhabited-unit-execution-2026-10-03.json).
 Unchanged Option still requires coherent bootstrap/source ownership before execution.
+
+
+### Unchanged source Option/Result execution (2026-10-03)
+
+The bounded [union bootstrap](../experiments/extended-cli-metadata/bootstrap/README.md)
+now supplies executable primitive services without duplicate collection/union definitions.
+The ownership manifest assigns iteration, Propagatable, Option and Result to the source
+library. A generated storage core supplies explicit primitive symbols only; native library
+references use the metadata importer. The seed's Object display adapter uses existing
+native type-handle queries rather than constructing the guest introspection facade.
+
+Compilation exposed two adapter gaps: authored value types could not retain interface
+relationships, and imported methods could not accept the configured inhabited unit as a
+value parameter. Metadata now accepts top-level value implementation edges while keeping
+boxing requirements; Raven authors direct calls to concrete nonoverride value methods,
+including CLI virtual interface implementations, with managed receivers. Unit parameter
+positions map to the selected nominal unit representation; return positions preserve the
+existing no-result mapping. Importer objects remain outside emission.
+
+The unchanged sources compile into NeoCLR.Collections.dll. A separate consumer using only
+that native reference executes with exact output `Option.Some(40)` and `Result.Error(7)`,
+exit 42, and checks copies, output initialization and residuals. Missing-library and duplicate
+seed ownership tests reject without output. This does not complete the executable .NET
+adapter, broader collections or application-order-collections gates. See the reproducible
+[evidence](../experiments/extended-cli-metadata/source-unions-2026-10-03.json).

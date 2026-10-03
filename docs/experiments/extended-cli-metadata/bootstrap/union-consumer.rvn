@@ -1,0 +1,40 @@
+import System.*
+
+func Main() -> int {
+    var some: Option<int> = .Some(40)
+    let copy = some
+    some = .None
+    var output = 99
+    if some.TryGetOutput(out output) {
+        return 1
+    }
+    if output != 0 {
+        return 2
+    }
+    var unit: System.Void = ()
+    if !some.TryGetResidual(out unit) {
+        return 3
+    }
+    let ok: Result<int, int> = .Ok(2)
+    let error: Result<int, int> = .Error(7)
+    var residual = 0
+    if !error.TryGetResidual(out residual) {
+        return 4
+    }
+    if residual != 7 {
+        return 5
+    }
+    let left = match copy {
+        .Some(let value) => value
+        .None => 0
+    }
+    let right = match ok {
+        .Ok(let value) => value
+        .Error(let failure) => 0
+    }
+    let displayedOption: object = copy
+    let displayedResult: object = error
+    System.Console.WriteLine(displayedOption.ToString())
+    System.Console.WriteLine(displayedResult.ToString())
+    return left + right
+}

@@ -98,9 +98,10 @@ conversion lowering; [driver evidence](experiments/extended-cli-metadata/raven-v
 records the existing CLR return-nullability mismatch separately.
 Union/case metadata, local synthesized display and separately compiled plain/generic
 union matching now execute on both targets. Native imports retain parameter names and
-physical case scopes; external value operands are authored from symbols. The unchanged
-Option ownership probe now reaches the System.Void residual unit-value dependency;
-this is not source Option completion. See
+physical case scopes; external value operands are authored from symbols. The unchanged Option/Result and iteration sources now build into a separate native
+library and execute in a reference-only consumer with the bounded executable seed.
+See [source union evidence](experiments/extended-cli-metadata/source-unions-2026-10-03.json).
+The .NET adapter and broader collection/application gates remain open. See
 [separate union evidence](experiments/extended-cli-metadata/union-separate-execution-2026-10-03.json). See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and

@@ -1,0 +1,54 @@
+; Bounded executable bootstrap for source-built unions.
+; Object display uses the existing type-handle query directly, without a guest
+; introspection object graph that would itself depend on Option and Result.
+.module System
+.references ()
+.type System.Void
+.sealed
+.end
+.type System.Char
+.sealed
+.end
+.type System.RuntimeTypeHandle
+.sealed
+.end
+.type class abstract System.Object
+.method instance .ctor() -> noresult
+ret
+.end
+.method instance virtual ToString() -> String
+ldarg 0
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ldc.i4 0
+call neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.end
+.type System.String
+.sealed
+.method static Concat(String left,String right) -> String
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringConcat(String,String)
+ret
+.end
+.end
+.function neoCLR.Runtime.ObjectTypeHandle(System.Object value) -> System.RuntimeTypeHandle
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle type,Int32 kind) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringConcat(String left,String right) -> String
+.methodimpl InternalCall
+.end
+.type System.Console
+.method static WriteLine(String value) -> Void
+ldarg 0
+call neoCLR.Runtime.WriteLine(String)
+ret
+.end
+.end
+.function neoCLR.Runtime.WriteLine(String value) -> Void
+.methodimpl InternalCall
+.end

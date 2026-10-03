@@ -4947,9 +4947,9 @@ mixing authored references and reader imports. The caller asserts truthful decla
 facts; the dependency is not loaded or inspected.
 
 `AssemblyBuilder.AddInterfaceConversion(ImportedTypeReference source,
-ImportedTypeReference target) -> void` registers direct interface inheritance or class
+ImportedTypeReference target) -> void` registers direct interface inheritance or class/value
 implementation. Both references belong to this output; the source is a top-level
-reference definition (possibly generic), and the target is an interface identity or
+nominal definition (possibly generic), and the target is an interface identity or
 construction from CreateInterfaceReference. Target arguments may refer to the source's
 type parameters; out-of-scope arguments reject. Traversal substitutes arguments
 simultaneously, preserving distinct constructions and rejecting declaration cycles.
@@ -5949,3 +5949,9 @@ C# contracts exercise CLI/native name round trips, constructed parameter views, 
 snapshots, invalid names/positions/array lengths, and symbol-authored nested generic value
 constructors executed by the CLR. The native Raven union consumer additionally executes
 these references on neoCLR. No metadata version change is required.
+
+Development validation, 2026-10-03: authored value-interface edges now retain the
+relationships needed by imported source Option/Result carriers. Unboxed value-to-interface
+assignment remains rejected; boxing or constrained dispatch is still required. C# tests
+cover idempotent value edges, wrong target kinds and foreign ownership. The unchanged
+source-library consumer executes separately on neoCLR with the bounded union bootstrap.

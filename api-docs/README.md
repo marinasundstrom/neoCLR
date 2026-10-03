@@ -890,3 +890,8 @@ covered in `experimental-metadata.md`, outside the guest RavenDoc type inventory
 The API snapshot check still reports stale guest artifacts; refreshing remains blocked
 by the recorded source-union bridge binding issue. The last verified core reference
 assembly has not been replaced by unverified output.
+
+2026-10-03 source-union slice: AddInterfaceConversion now accepts top-level value
+implementation sources; the host API manual records this and unchanged explicit-boxing
+requirements. The guest API snapshot check remains stale for the previously recorded
+bridge issue; no guest snapshot or reference assembly was overwritten.

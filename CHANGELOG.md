@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Compile unchanged Option/Result, Propagatable and iteration sources with an explicit
+  executable union seed and source ownership manifest. A separately compiled native
+  consumer verifies copies, residuals and boxed display (exit 42); missing-library and
+  duplicate-seed guards reject before publication. Authoring now retains top-level value
+  interface edges. The .NET class-library adapter and broader application gate remain open.
+
 - Validate inhabited unit through generic union construction, payload matching and an
   ordinary argument on neoCLR (42). Raven now respects the explicit unit contract in
   overload validation; the fix is isolated and tested on a main-based branch. No native

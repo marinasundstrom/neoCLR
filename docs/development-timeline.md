@@ -10318,3 +10318,21 @@ an unconditional special-void check in overload resolution. Raven now honors the
 selected unit contract; the negative ordinary-CLI control still rejects. Generic union
 payload execution returns 42 and all 16 focused tests pass on both the integration and
 isolated main-based fix branches. Source Option's bootstrap ownership gap remains open.
+
+
+### 2026-10-03 — Source-owned Option/Result pass the native execution gate
+
+Following the author's continuation request, the assistant split a bounded executable
+System seed from the translated full library. The seed contains real primitive services;
+Object display calls the existing type-handle query directly to avoid a dependency cycle
+through guest introspection and Option/Result. Unchanged iteration, Propagatable, Option
+and Result sources compile into a separate library, then a native-import consumer runs
+with exact output and exit 42. No source union declarations were rewritten or replaced.
+
+Two implementation gaps were fixed: metadata authoring now records value-interface edges,
+and Raven reconstructs imported concrete value calls and unit value parameters from symbols.
+Missing-library and duplicate-seed ownership reject before publication. The .NET class-library
+adapter and application-order-collections gate remain open. A newly written test also exposed
+an unrelated possible pattern-variable shadowing issue (reusing an outer `error` name inside
+an Error case makes the outer name unavailable afterward); it is recorded as an unisolated
+binder investigation, not fixed or claimed validated for main in this slice.

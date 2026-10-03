@@ -74,6 +74,11 @@ internal static class AuthoredFunctionReferenceChecks
         app.AddInterfaceConversion(derived, contract);
         app.AddInterfaceConversion(item, derived);
         app.AddInterfaceConversion(item, derived); // Idempotent.
+        var valueOwner = app.CreateValueTypeReference(dependency, core, hash, "Example", "ValueOwner");
+        app.AddInterfaceConversion(valueOwner, derived);
+        app.AddInterfaceConversion(valueOwner, derived); // Value implementation edges are also idempotent.
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, valueOwner));
+        Reject<ArgumentException>(() => app.AddInterfaceConversion(foreignType.ImportedType!, derived));
         Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, derived));
         Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, item));
         Reject<InvalidDataException>(() => app.CreateTypeReference(dependency, core, hash, "Example", "IValue"));
@@ -86,6 +91,11 @@ internal static class AuthoredFunctionReferenceChecks
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.LoadConstant(42); main.Call(reference); main.Return();
         _ = app.WriteNativeAssembly();
+        var unboxed = app.AddFunction("InvalidUnboxedConversion", new MethodSignature(contract, [valueOwner]));
+        unboxed.LoadArgument(0); unboxed.Return();
+        try { app.WriteNativeAssembly(); throw new Exception("unboxed value-to-interface accepted"); }
+        catch (InvalidDataException error) when (error.Message.Contains("value-to-interface conversion requires explicit boxing")) { }
+        unboxed.ClearBody(); unboxed.Fail("non-returning contract fixture");
         Reject<InvalidDataException>(() => app.CreateFunctionReference(dependency, core, new string('b', 64), "Example", "Identity", signature));
         Reject<InvalidDataException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "Identity", new MethodSignature(PrimitiveType.Boolean, [PrimitiveType.Int32])));
         Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, "bad", "Example", "Identity", signature));
