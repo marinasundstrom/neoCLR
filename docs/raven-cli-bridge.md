@@ -4428,3 +4428,38 @@ override contract through compiler symbols/capabilities and the target adapter, 
 generated formatting operations and union/case metadata preservation. Runtime Contract
 configuration and the .NET Reflection/Emit backend remain unchanged. This is not the
 full source Option or broad application gate, and does not establish compiler boxing.
+
+
+## Raven override emission and next union body gate (2026-10-03)
+
+Raven `29268815d` consumes metadata `b94bdf79` through a bounded ObjectToString
+callable capability. The contract comes from bound source symbols and their resolved
+System.Object slot; reference-nullability annotations are erased only for physical slot
+classification. General virtual/class methods remain gated. The target adapter chooses
+AddOverride, while body instructions use the independent Raven/metadata generator boundaries.
+Direct addressed calls work on local ordinary and constructed generic values.
+
+`rvnc neoclr --core-reference NeoCLR.CoreProbe.dll --runtime-seed System.neox ...`
+now registers an explicit retained seed binding. This imports no extra symbols and does
+not fall back for native application references. It requires an explicit core, module
+System, bounded input images, a distinct output and no legacy --system-symbols selection.
+Source ownership manifests are checked against seed type inventory (including generic
+arity normalization); duplicate declarations reject before publication. Supply the same
+seed to runtime --system. Intrinsic opt-in and semantic Runtime Contract selection remain
+separate. The full seed is not valid alongside source-owned iteration contracts until
+those copies are removed; this slice does not claim filtered-seed completion.
+
+The driver check compiles/runs ordinary and generic struct overrides (stdout
+`native override`, exit 42), verifies native override flags and rejects missing seed/core
+and duplicate source ownership without output. The unchanged source is attempted on .NET;
+Raven's existing exact return-nullability rule rejects it because host Object.ToString
+returns string? while the native bootstrap returns string. This is explicitly recorded
+as RAV0307, not a successful dual-target fixture. No binder behavior was changed; existing
+.NET union execution controls still pass. Twelve focused Raven tests pass.
+
+Union preflight now admits generated override declarations and validates shared lowered
+bodies. Ordinary/generic union controls and unchanged source Option now reach
+`union body ToString: lowered expression BoundConversionExpression`, with no output.
+The next slice is generated display conversion/formatting support, then union/case metadata
+preservation. Compiler boxing and separately imported override reference authoring remain
+unproven. See [driver and source evidence](experiments/extended-cli-metadata/raven-value-overrides-2026-10-03.json).

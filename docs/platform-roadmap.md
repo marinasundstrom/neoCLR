@@ -79,7 +79,11 @@ native writing now validates the explicit retained System slot, retains override
 and executes imported direct calls plus boxed ordinary/generic Object dispatch. See
 [native override evidence](experiments/extended-cli-metadata/native-value-overrides-2026-10-03.json). See
 [override declaration evidence](experiments/extended-cli-metadata/value-override-authoring-2026-10-03.json).
-Union/case metadata round trips, synthesized override/display emission and symbol-authored external value
+Raven now admits the bounded override and executes local ordinary/generic value calls through
+explicit --runtime-seed binding. Source unions and unchanged Option reach generated ToString
+conversion lowering; [driver evidence](experiments/extended-cli-metadata/raven-value-overrides-2026-10-03.json)
+records the existing CLR return-nullability mismatch separately.
+Union/case metadata round trips, synthesized display bodies and symbol-authored external value
 operands remain pending; this is not source Option completion. See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and

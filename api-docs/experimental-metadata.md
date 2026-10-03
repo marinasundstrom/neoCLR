@@ -5741,5 +5741,5 @@ emits a separate direct-call consumer and executes it. A neoIL harness boxes ord
 and generic values from that same API-produced library and calls Object.ToString; both
 return 42 using the real retained System bundle. Boxing is not yet an operation exposed
 by the metadata generator, so this harness does not claim Raven union execution.
-Raven override admission, generated formatting operations, and union/case metadata
-preservation remain pending.
+Raven now consumes the bounded override with explicit runtime-seed binding. Generated
+display conversions/formatting operations and union/case metadata preservation remain pending.

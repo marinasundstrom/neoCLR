@@ -138,4 +138,7 @@ The development metadata API can now author value-type `ToString` overrides for 
 output, with boxed and interface dispatch verified in C#. Native writing now validates
 an explicit retained System binding and preserves the override slot. A native API-produced
 library executes imported direct calls and boxed ordinary/generic Object dispatch.
-Raven source-union admission, display bodies and union metadata remain in progress.
+Raven now emits local ordinary/generic value overrides using an explicit runtime seed.
+Source-union declarations pass override admission; generated display conversions and union
+metadata remain in progress. The existing .NET/native bootstrap return-nullability
+difference is recorded separately from native execution evidence.

@@ -1,0 +1,371 @@
+{
+  "date": "2026-10-03",
+  "scope": "Raven source value Object.ToString emission and union display body preflight",
+  "ravenRevision": "29268815d71819d6f23c9db43d7c0c1cf4daac11",
+  "metadataRuntimeRevision": "b94bdf7990c8d40b6ed92698eff4c3183ecf14ef",
+  "driver": {
+    "scope": "Native driver value ToString overrides; CLR source rejected by existing return-nullability policy; source unions and boxed compiler calls remain pending",
+    "driverSha256": "0E3C92B14302F7F7B6703674CA16871F618F2338F2890F92781832F369264D39",
+    "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+    "evidence": [
+      {
+        "name": "Plain",
+        "sourceSha256": "7EAE24EA6C451CFF2F21761940ADDC72A316BA5EECA37F538052346FD4477080",
+        "nativeSha256": "2559A6C726D49C38D995F768EBC0A5CDA2276287F49D79E857D7548293197320",
+        "dotnetExecuted": false,
+        "dotnetDiagnostic": "RAV0307",
+        "nativeExecuted": true
+      },
+      {
+        "name": "Generic",
+        "sourceSha256": "920F5467CA37CDD09BE268AE0907B5E963CFBC6CE0A744B9771927BB6F7690AF",
+        "nativeSha256": "FAD4967D1CF74BF5A4D391A3596E76B630D607BB5CEFCC7BF78235E3DB4D296B",
+        "dotnetExecuted": false,
+        "dotnetDiagnostic": "RAV0307",
+        "nativeExecuted": true
+      }
+    ],
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Configuration.dll",
+          "/tmp/raven-value-override-driver-final/Configuration.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: --runtime-seed requires --core-reference, a distinct output and no legacy --system-symbols selection.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "--bootstrap-ownership",
+          "/tmp/raven-value-override-driver-final/ownership.json",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Configuration.dll",
+          "/tmp/raven-value-override-driver-final/Configuration.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Runtime seed duplicates a source-owned declaration: System.Collections.Iterable`1\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Plain.clr.dll",
+          "/tmp/raven-value-override-driver-final/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "../../../../../../tmp/raven-value-override-driver-final/Plain.rvn(2,19): error RAV0307: 'func ToString() -> string': no suitable method found to override\n\nBuild failed with 1 error(s)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Plain.native.dll",
+          "/tmp/raven-value-override-driver-final/Plain.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "verify",
+          "/tmp/raven-value-override-driver-final/Plain.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_AE48B2E8346C5650DDCC30933BA7637875F4C2FD033F31F46466754E6C365FE6: typed-stack/control-flow verification passed (3839 IL functions; maximum stack 7; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "run",
+          "/tmp/raven-value-override-driver-final/Plain.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "native override\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Plain.missing-seed.dll",
+          "/tmp/raven-value-override-driver-final/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA003: Native metadata encoding failed: native Object overrides require one explicit runtime slot binding for System.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Generic.clr.dll",
+          "/tmp/raven-value-override-driver-final/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "../../../../../../tmp/raven-value-override-driver-final/Generic.rvn(2,19): error RAV0307: 'func ToString() -> string': no suitable method found to override\n\nBuild failed with 1 error(s)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "--runtime-seed",
+          "/tmp/override-System.neox",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Generic.native.dll",
+          "/tmp/raven-value-override-driver-final/Generic.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "verify",
+          "/tmp/raven-value-override-driver-final/Generic.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_BF97E0CB727A85225F10CD36DBBD08BA6E767553F804518F1662C6C8614CC1AB: typed-stack/control-flow verification passed (3839 IL functions; maximum stack 7; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "arguments": [
+          "run",
+          "/tmp/raven-value-override-driver-final/Generic.native.dll",
+          "--system",
+          "/tmp/override-System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "native override\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-value-override-driver-final/Generic.missing-seed.dll",
+          "/tmp/raven-value-override-driver-final/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA003: Native metadata encoding failed: native Object overrides require one explicit runtime slot binding for System.\n"
+      }
+    ]
+  },
+  "unionDriver": {
+    "scope": "Union declaration discovery baseline; native union execution remains blocked by generated display conversion lowering.",
+    "driverSha256": "0E3C92B14302F7F7B6703674CA16871F618F2338F2890F92781832F369264D39",
+    "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+    "evidence": [
+      {
+        "name": "Plain",
+        "sourceSha256": "E6947C1CA8CBB9368E6F0534E2A3DA3CA5C657EA2CD5798E408EF62780C1A90E",
+        "dotnetAssemblySha256": "1581039DA32FE433F1B120B465A0A33725E4E0F79B5FDF976C4392647E2DB41F",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      },
+      {
+        "name": "Generic",
+        "sourceSha256": "5AA0B46C1AEDFE1D1EA48A87821A09E226E8E83076C4C864DD237AAE1D3AF50F",
+        "dotnetAssemblySha256": "BEA674589082D99752DCAEF4C16D5DFD9C9DC59B9CA41592AC1C7EE4CF43931D",
+        "dotnetExecuted": true,
+        "nativeExecuted": false,
+        "nativeOutputPublished": false
+      }
+    ],
+    "commands": [
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-body-gate/Plain.dll",
+          "/tmp/raven-union-body-gate/Plain.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-body-gate/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 3,9s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-body-gate/Plain.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-body-gate/Plain.native.dll",
+          "/tmp/raven-union-body-gate/Plain.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body ToString: lowered expression BoundConversionExpression.\n"
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "-o",
+          "/tmp/raven-union-body-gate/Generic.dll",
+          "/tmp/raven-union-body-gate/Generic.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "../../../../../../tmp/raven-union-body-gate/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 2,5s\n",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "exec",
+          "--runtimeconfig",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+          "/tmp/raven-union-body-gate/Generic.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "executable": "dotnet",
+        "arguments": [
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+          "-o",
+          "/tmp/raven-union-body-gate/Generic.native.dll",
+          "/tmp/raven-union-body-gate/Generic.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support union body ToString: lowered expression BoundConversionExpression.\n"
+      }
+    ]
+  },
+  "unchangedOption": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/NeoCLR.StorageCore-20261003.dll",
+      "--bootstrap-intrinsics",
+      "--library",
+      "--bootstrap-ownership",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+      "-o",
+      "/tmp/raven-override-option-final/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support union body ToString: lowered expression BoundConversionExpression.\n",
+    "outputPublished": false
+  },
+  "focusedTests": {
+    "baseline": "7/7 passed",
+    "final": "12/12 passed",
+    "command": "dotnet test test/Raven.CodeAnalysis.Tests --no-restore -p:BuildProjectReferences=false -p:WarningLevel=0 -p:UseRavenCoreReference=false --filter 'FullyQualifiedName~SourceUnionDeclarationPlanTests|FullyQualifiedName~EmissionBackendTests|FullyQualifiedName~UnionCaseConstructor_AssignsFields|FullyQualifiedName~GenericOptionCases_PreservePayloadAndEmptyState|FullyQualifiedName~OverrideWithDifferentReturnNullability_ProducesDiagnostic'"
+  },
+  "runtimeSeedProvenance": "native-value-overrides-2026-10-03.json: checked-in System sources through collection_library.py and native assembler; same seed hash recorded in driver evidence",
+  "remaining": [
+    "lower generated display conversions and formatting operations",
+    "metadata Object/boxing operations for compiler-generated bodies",
+    "native union/case contract encoding and import",
+    "symbol-authored external override references",
+    "full unchanged application/class-library gate"
+  ],
+  "bindingPolicy": "Existing Raven rule requires equal return nullability for overrides. Native bootstrap Object.ToString says string, host .NET says string?. CLR authored-override fixture failure is recorded, not relabeled as successful execution. No binder fix or .NET backend replacement.",
+  "optionInputSha256": {
+    "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+    "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+    "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+    "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+    "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+    "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+    "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+    "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+    "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+  }
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Integrate bounded value Object overrides into Raven callable contracts and the
+  NeoCLR adapter (`29268815d`), with explicit --runtime-seed host binding and seed/source
+  ownership rejection. Ordinary/generic native driver cases execute; the existing CLR
+  override return-nullability mismatch remains explicit. Unchanged Option now reaches
+  generated display conversion lowering rather than override declaration rejection.
+  Twelve focused Raven tests pass; full union metadata/emission remains pending.
+
 - Add bounded value-type ToString override authoring through definitions and
   TypeBuilder.AddOverride. CLI output preserves the Object virtual slot, including
   when the method also implements an interface; ordinary and generic value dispatch
@@ -15,7 +22,7 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Object.ToString binding and preserves the slot name/flags through native reading and
   imported calls. An API-produced native library executes both separate direct calls and
   boxed ordinary/generic dispatch against the real System bundle; incompatible/missing
-  bindings reject. No runtime or format-version change. Raven union admission is unchanged. Host API
+  bindings reject. No runtime or format-version change. Raven subsequently consumes the bounded override as recorded above. Host API
   XML/manual coverage is updated; the existing runtime API snapshot remains stale.
 
 - Record Raven's generated union constructor/accessor planning fix: retained case and
