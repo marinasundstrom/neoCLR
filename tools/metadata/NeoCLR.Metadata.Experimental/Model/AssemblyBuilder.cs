@@ -517,7 +517,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => 12,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -547,9 +547,10 @@ public sealed partial class AssemblyBuilder
                     case "field.import.store":
                         code.WriteByte(instruction.Op == "field.import.load" ? (byte)0x7b : (byte)0x7d);
                         code.WriteInt32(ImportedFieldToken(instruction.ImportedField!, instruction.ImportedConstructedField)); break;
+                    case "field.address":
                     case "field.load":
                     case "field.store":
-                        code.WriteByte(instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
+                        code.WriteByte(instruction.Op == "field.address" ? (byte)0x7c : instruction.Op == "field.load" ? (byte)0x7b : (byte)0x7d);
                         code.WriteInt32(instruction.ConstructedField is { } fieldReference ? ConstructedFieldToken(fieldReference) : MetadataTokens.GetToken(fieldHandles[instruction.Field!])); break;
                     case "negate": code.WriteByte(0x65); break;
                     case "complement": code.WriteByte(0x66); break;

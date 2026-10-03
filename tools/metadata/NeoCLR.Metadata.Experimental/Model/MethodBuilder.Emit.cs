@@ -103,7 +103,9 @@ public enum OpCode
     /// <summary>Truncates an integer to unsigned 8-bit, leaving an Int32 evaluation value.</summary>
     Conv_U1,
     /// <summary>Boxes a value or scoped generic parameter as the explicit core System.Object.</summary>
-    Box
+    Box,
+    /// <summary>Loads a managed address of an owned mutable instance field.</summary>
+    Ldflda
 }
 
 public sealed partial class MethodBuilder
@@ -179,7 +181,7 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode, bool operand) => GetILGenerator().Emit(opCode, operand);
 
     /// <summary>Appends a field load/store using an owned output-field handle.</summary>
-    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <param name="opCode">Ldfld, Stfld or Ldflda.</param>
     /// <param name="operand">An instance field declared in this output assembly.</param>
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign field or generic definition field outside its declaring type.</exception>

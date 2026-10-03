@@ -124,6 +124,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "field.import.load") stack.Add(instruction.ImportedConstructedField?.FieldType ?? importedField.FieldType);
                     break;
                 case "field.load":
+                case "field.address":
                 case "field.store":
                     if (instruction.Op == "field.store")
                     {
@@ -137,7 +138,7 @@ public sealed partial class MethodBuilder
                     {
                         if (!ReferenceEquals(instruction.Field!.DeclaringType, DeclaringType)) throw new InvalidDataException("constructor requires an owned field");
                         var fieldSlot = locals.Count + ParameterCount + instruction.Field.Index;
-                        if (instruction.Op == "field.load" && !assigned[fieldSlot]) throw new InvalidDataException("constructor field read before assignment");
+                        if (instruction.Op != "field.store" && !assigned[fieldSlot]) throw new InvalidDataException("constructor field read before assignment");
                         if (instruction.Op == "field.store") assigned[fieldSlot] = true;
                         stack.RemoveAt(stack.Count - 1);
                     }
@@ -155,11 +156,12 @@ public sealed partial class MethodBuilder
                     }
                     else
                     {
-                        if (instruction.Field.DeclaringType.IsValueType && instruction.Op == "field.store")
-                            throw new InvalidDataException("value-type field store requires an addressed local receiver");
+                        if (instruction.Field.DeclaringType.IsValueType && instruction.Op is "field.store" or "field.address")
+                            throw new InvalidDataException("value-type field write/address requires an initialized managed receiver");
                         Pop(fieldOwner);
                     }
                     if (instruction.Op == "field.load") stack.Add(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType);
+                    if (instruction.Op == "field.address") stack.Add(SignatureType.ByReference(instruction.ConstructedField?.FieldType ?? instruction.Field!.FieldType));
                     break;
                 case "array.new":
                 case "array.reserve":

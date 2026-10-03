@@ -76,6 +76,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         Instructions.Add(operation);
     }
 
+    public void LoadFieldAddress(ConstructedFieldReference field) => Emit(OpCode.Ldflda, field);
+
     public void LoadField(ConstructedFieldReference field) => Emit(OpCode.Ldfld, field);
 
     public void StoreField(ConstructedFieldReference field) => Emit(OpCode.Stfld, field);
@@ -84,7 +86,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     {
         ArgumentNullException.ThrowIfNull(operand);
         ((SignatureType)operand.DeclaringType).ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand.Definition, ConstructedField: operand));
+        if (opCode == OpCode.Ldflda && operand.Definition.IsReadOnly) throw new ArgumentException("readonly field addresses are unsupported", nameof(operand));
+        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", OpCode.Ldflda => "field.address", _ => throw OperandError(opCode) }, Field: operand.Definition, ConstructedField: operand));
     }
 
     public void NewObject(ConstructedMethodReference constructor) => Emit(OpCode.Newobj, constructor);
@@ -370,12 +373,15 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (!ReferenceEquals(operand.DeclaringType.Assembly, Assembly)) throw new ArgumentException("field belongs to another output", nameof(operand));
         if (operand.DeclaringType.GenericParameterNames.Count > 0 && !ReferenceEquals(DeclaringType, operand.DeclaringType))
             throw new ArgumentException("generic definition fields require the declaring type scope");
-        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", _ => throw OperandError(opCode) }, Field: operand));
+        if (opCode == OpCode.Ldflda && operand.IsReadOnly) throw new ArgumentException("readonly field addresses are unsupported", nameof(operand));
+        Append(new(opCode switch { OpCode.Ldfld => "field.load", OpCode.Stfld => "field.store", OpCode.Ldflda => "field.address", _ => throw OperandError(opCode) }, Field: operand));
     }
 
     public void Duplicate() => Emit(OpCode.Dup);
 
     public void NewObject(MethodBuilder constructor) => Emit(OpCode.Newobj, constructor);
+
+    public void LoadFieldAddress(FieldBuilder field) => Emit(OpCode.Ldflda, field);
 
     public void LoadField(FieldBuilder field) => Emit(OpCode.Ldfld, field);
 

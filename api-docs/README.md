@@ -864,3 +864,8 @@ Host-only CoreObjectType, IILGenerator.Box and OpCode.Box are documented in XML 
 [typed boxing](experimental-metadata.md#typed-boxing-development-2026-10-03).
 They remain outside the guest RavenDoc selection; the existing snapshot regeneration
 blocker is tracked above, not silently removed from API coverage.
+
+Host-only IILGenerator.LoadFieldAddress overloads and OpCode.Ldflda are covered by XML
+and [owned field addresses](experimental-metadata.md#owned-field-addresses-development-2026-10-03).
+The imported-field overloads still reject Ldflda. These C# APIs remain outside guest
+RavenDoc selection; the known stale runtime snapshot remains unchanged.

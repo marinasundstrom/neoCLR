@@ -5778,3 +5778,30 @@ il.LoadArgument(0);
 il.Box(t);
 il.Return();
 ```
+
+
+### Owned field addresses (development, 2026-10-03)
+
+`IILGenerator.LoadFieldAddress(FieldBuilder field)` and
+`LoadFieldAddress(ConstructedFieldReference field)` consume an initialized receiver and
+push a managed reference to its actual field storage. The equivalent raw operations are
+`Emit(OpCode.Ldflda, field)` on these two operand categories. Existing forwarding Emit
+methods on MethodBuilder retain parity; no new builder-body convenience API is added.
+
+The field must belong to this output, be an instance field and be mutable. Constructed
+references substitute the exact owner arguments; open definition operands require the
+matching owner scope. A reference-class receiver is consumed directly. A value receiver
+must already be addressed; a temporary value on the stack is rejected instead of silently
+mutating a copy. Uninitialized locals/out parameters/constructor fields reject on write.
+Readonly and imported field addresses remain explicitly unsupported in this profile.
+
+Null arguments throw ArgumentNullException; foreign/readonly/out-of-scope operands throw
+ArgumentException without appending instructions. Instruction limits and incorrect stack
+or initialization contracts throw InvalidDataException before producing output. Reads,
+stores and calls through the resulting managed reference reuse their existing exact-type
+checks. CLI uses standard ldflda (0x7c) with a FieldDef/MemberRef; native uses the existing
+ldflda layout ordinal. No format or runtime behavior change is required.
+
+C# tests execute nested field mutation through a constructed generic holder and verify
+that its object alias sees 42 on CLR and NeoCLR. They also reject readonly and foreign
+operands, temporary value receivers and uninitialized local receivers.

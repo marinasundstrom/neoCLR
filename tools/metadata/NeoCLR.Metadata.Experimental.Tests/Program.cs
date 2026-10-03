@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--field-address-runtime")
+{
+    await FieldAddressChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 5 && args[0] == "--native-value-override")
 {
     await NativeValueOverrideChecks.RunRuntime(args[1], args[2], args[3], args[4]); return 0;
@@ -312,6 +316,7 @@ var tests = new (string Name, Action Body)[]
     ("Imported nested constructors", () => ValueConstructorChecks.Run(nested: true)),
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
+    ("Mutable owned field addresses", FieldAddressChecks.Run),
     ("Typed boxing and core Object", BoxingChecks.Run),
     ("Value override definition and builder authoring", ValueOverrideAuthoringChecks.Run),
     ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),

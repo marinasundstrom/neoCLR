@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add owned mutable field-address operations to the IL generator, including constructed
+  generic fields, using standard CLI/native ldflda. Reject readonly, foreign, temporary
+  value and uninitialized receivers. API and Raven driver executions preserve nested
+  value mutation and object aliases on both targets (42); 120 metadata groups pass.
+  Unchanged Option now reaches its generated formatting comparison, with no native output.
+
 - Add typed IL-generator boxing and an explicit core Object reference. CLI uses standard
   box tokens; native output requires the validated System core binding and uses the
   existing instruction format. Generic value dispatch, primitive display and reference

@@ -75,10 +75,16 @@ public interface IILGenerator
     void ClearBody();
     /// <summary>Loads a field from an exactly matching constructed receiver.</summary>
     void LoadField(ConstructedFieldReference field);
+    /// <summary>Loads the managed address of an owned mutable field on a constructed receiver.</summary>
+    /// <param name="field">Owned constructed field reference, valid in the caller's generic scope.</param>
+    /// <exception cref="ArgumentException">Foreign, readonly or out-of-scope reference.</exception>
+    /// <exception cref="ArgumentNullException">Field is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; initialized exact receiver checked on write.</exception>
+    void LoadFieldAddress(ConstructedFieldReference field);
     /// <summary>Stores a field on an exactly matching constructed receiver.</summary>
     void StoreField(ConstructedFieldReference field);
-    /// <summary>Appends Ldfld or Stfld with a constructed field reference.</summary>
-    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <summary>Appends Ldfld, Stfld or Ldflda with a constructed field reference.</summary>
+    /// <param name="opCode">Ldfld, Stfld or Ldflda.</param>
     /// <param name="operand">Owned reference, valid in the caller's parameter scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign definition or out-of-scope argument.</exception>
@@ -174,7 +180,7 @@ public interface IILGenerator
     /// <summary>Stores a primitive, nominal or vector field on its exact external receiver type; readonly stores fail validation.</summary>
     void StoreField(ImportedFieldReference field);
     /// <summary>Appends Ldfld or Stfld with an imported field operand.</summary>
-    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <param name="opCode">Ldfld or Stfld; imported field addresses are unsupported.</param>
     /// <param name="operand">Reference owned by this output builder.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or foreign reference.</exception>
@@ -319,7 +325,7 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void Emit(OpCode opCode, bool operand);
     /// <summary>Appends a field load/store using an owned output-field handle.</summary>
-    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <param name="opCode">Ldfld, Stfld or Ldflda.</param>
     /// <param name="operand">An instance field declared in this output assembly.</param>
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign field or generic definition field outside its declaring type.</exception>
@@ -340,6 +346,13 @@ public interface IILGenerator
     /// <exception cref="ArgumentNullException">Field is null.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void LoadField(FieldBuilder field);
+    /// <summary>Consumes an initialized receiver and loads a managed address of an owned mutable field.</summary>
+    /// <param name="field">Owned instance field, in its declaring scope for an open generic definition.</param>
+    /// <remarks>Values require an addressed receiver; no temporary copy is introduced. Readonly and imported field addresses are outside this profile.</remarks>
+    /// <exception cref="ArgumentException">Foreign, readonly or out-of-scope field.</exception>
+    /// <exception cref="ArgumentNullException">Field is null.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; initialization and exact receiver type are checked on write.</exception>
+    void LoadFieldAddress(FieldBuilder field);
     /// <summary>Consumes a receiver followed by a value and stores the field.</summary>
     /// <param name="field">Owned instance field.</param>
     /// <exception cref="ArgumentException">Foreign field.</exception>

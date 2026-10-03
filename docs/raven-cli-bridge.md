@@ -4481,3 +4481,19 @@ pass both on the integration line (Raven 697a093d7) and the main-based fixes bra
 
 See [typed-boxing evidence](experiments/extended-cli-metadata/typed-boxing-2026-10-03.json)
 for commands, source/artifact hashes and cross-repository validation (Raven 558462967).
+
+Owned field-address continuation (2026-10-03): metadata IILGenerator now supports
+LoadFieldAddress/Emit(Ldflda) for owned mutable definitions and constructed field references.
+Raven admits a separate FieldAddress capability carrying only IFieldSymbol; its adapter
+resolves owned field handles. Getter/method receivers nested in value fields use the
+actual storage; no spill-copy workaround is introduced. Imported/readonly field addresses
+remain explicit limits. Ordinary .NET stays on its existing backend. API and ordinary
+compiler-command cases execute nested generic mutation through object aliases (42) on both
+targets; 120 C# metadata groups and ten focused Raven tests pass. No runtime/format or
+Runtime Contract configuration change. Unchanged Option and the source-union controls
+now reject at `<RavenFormatUnionValue>` BoundBinaryExpression (null comparison), with no
+native output. Null/reference operations, remaining formatting and union/case metadata
+preservation are next; full union execution is not claimed.
+
+[Field-address evidence](experiments/extended-cli-metadata/owned-field-addresses-2026-10-03.json)
+records commands, artifact/source hashes and Raven c951e33c0.

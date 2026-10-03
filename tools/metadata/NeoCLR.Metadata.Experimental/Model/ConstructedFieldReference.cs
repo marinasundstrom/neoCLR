@@ -36,8 +36,8 @@ public sealed partial class MethodBuilder
     public void LoadField(ConstructedFieldReference field) => GetILGenerator().LoadField(field);
     /// <summary>Stores a field on an exactly matching constructed receiver.</summary>
     public void StoreField(ConstructedFieldReference field) => GetILGenerator().StoreField(field);
-    /// <summary>Appends Ldfld or Stfld with a constructed field reference.</summary>
-    /// <param name="opCode">Ldfld or Stfld.</param>
+    /// <summary>Appends Ldfld, Stfld or Ldflda with a constructed field reference.</summary>
+    /// <param name="opCode">Ldfld, Stfld or Ldflda.</param>
     /// <param name="operand">Owned reference, valid in the caller's parameter scope.</param>
     /// <exception cref="ArgumentNullException">Null reference.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, foreign definition or out-of-scope argument.</exception>

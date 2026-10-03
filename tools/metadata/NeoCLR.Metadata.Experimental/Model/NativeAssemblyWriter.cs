@@ -119,7 +119,7 @@ public sealed partial class AssemblyBuilder
             "call.virtual" or "call" or "new.object" => new { op = instruction.Op == "call.virtual" ? "callvirt" : instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.import.load" or "field.import.store" => new { op = instruction.Op == "field.import.load" ? "ldfld" : "stfld", arg = (object)(instruction.ImportedField!.NativeIndex ?? throw new InvalidDataException("native field emission requires a native layout ordinal")) },
-            "field.load" or "field.store" => new { op = instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
+            "field.address" or "field.load" or "field.store" => new { op = instruction.Op == "field.address" ? "ldflda" : instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
             "object.box" => new { op = "box", arg = SignatureValue(instruction.Type!) },
             "reference.cast" => new { op = "castclass", arg = SignatureValue(instruction.Type!) },
