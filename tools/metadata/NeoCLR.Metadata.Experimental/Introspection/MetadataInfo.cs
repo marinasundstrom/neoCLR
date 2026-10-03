@@ -77,11 +77,13 @@ public sealed class NominalTypeInfo : TypeInfo
         fields = new(() => context.ProjectFields(definition, this, parameters));
         properties = new(() => context.ProjectProperties(definition, this, parameters));
         interfaces = new(() => context.ProjectInterfaces(definition, parameters));
+        allInterfaces = new(() => context.ProjectInterfaceClosure(this));
     }
     private readonly IReadOnlyList<TypeInfo> parameters;
     private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
     private readonly Lazy<IReadOnlyList<PropertyInfo>> properties;
     private readonly Lazy<IReadOnlyList<TypeInfo>> interfaces;
+    private readonly Lazy<IReadOnlyList<TypeInfo>> allInterfaces;
     internal TypeDefinition Definition => definition;
     /// <summary>Gets stable owner-scoped generic parameter views in declaration order.</summary>
     public IReadOnlyList<TypeInfo> GetGenericArguments() => parameters;
@@ -99,6 +101,10 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships for this format.</exception>
     /// <exception cref="InvalidDataException">A relationship or dependency cannot be resolved.</exception>
     public IReadOnlyList<TypeInfo> GetDeclaredInterfaces() => interfaces.Value;
+    /// <summary>Gets distinct direct and inherited interface views in depth-first metadata order, excluding this type.</summary>
+    /// <exception cref="InvalidDataException">An invalid/cyclic relationship, missing dependency or traversal bound is encountered.</exception>
+    /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships.</exception>
+    public IReadOnlyList<TypeInfo> GetInterfaces() => allInterfaces.Value;
     /// <summary>Gets declared non-constructor methods without inherited lookup or visibility filtering.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => context.GetMethods(definition, this);
     /// <summary>Gets the metadata name, including generic arity suffix.</summary>

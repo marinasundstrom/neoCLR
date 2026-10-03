@@ -3954,3 +3954,25 @@ remain follow-up work. No performance claim is made.
 Validation: 109/109 C# groups, all seven Raven consumers (42), and the API snapshot
 check pass. See [property/interface evidence](experiments/extended-cli-metadata/introspection-properties-interfaces-2026-10-03.json)
 for the tested Raven revision and artifact/runtime hashes.
+
+
+Interface closure checkpoint (2026-10-03): GetInterfaces on nominal/constructed metadata
+views now returns distinct direct and inherited interfaces, with composed owner argument
+substitution. Iterative depth-first traversal follows metadata order; identity includes
+constructed arguments. Cyclic declaration paths reject, even when arguments differ.
+Traversal is bounded to 4,096 distinct views and 65,536 visited edges, with cached
+read-only results per owner. This replaces Raven native AllInterfaces recursion;
+Raven retains language symbol substitution and binding policy.
+
+The .NET 10 baseline is Type.GetInterfaces (Microsoft Learn, retrieved 2026-10-03):
+https://learn.microsoft.com/en-us/dotnet/api/system.type.getinterfaces?view=net-10.0
+It includes inherited interfaces and substitutes constructed arguments. We use those
+semantics for the supported native root-class/interface profile; our explicit DFS order
+and traversal bounds are metadata-library policy, not claims of exact CLR ordering.
+Compared with leaving recursion in each consumer, this centralizes metadata traversal
+and bounds at the cost of retaining per-owner closure results. General base classes,
+CLI relationship decoding and constrained parameter queries remain unsupported.
+No Runtime Contract, emitter, bootstrap, guest API or encoding changes.
+
+Validation: 109 C# groups, API snapshot checks and all seven native runtime consumers (42)
+pass. See [recorded evidence](experiments/extended-cli-metadata/introspection-interface-closure-2026-10-03.json).

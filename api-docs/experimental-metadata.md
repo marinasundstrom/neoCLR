@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Inherited interface views](#inherited-interface-views-development-2026-10-03): bounded metadata closure.
+
 - [Property and direct interface views](#property-and-direct-interface-views-development-2026-10-03): scoped property signatures, accessors and relationships.
 
 - [Method and parameter views](#method-and-parameter-views-development-2026-10-02): callable signatures and separate generic scopes.
@@ -5340,3 +5342,19 @@ Unlike .NET Reflection property access, this reports metadata only. Index types 
 exposed directly instead of manufacturing method-owned ParameterInfo objects for a
 property. Other-method semantics, full parameter metadata, transitive interface queries,
 constructor-specific views and generic method construction are not added here.
+
+
+## Inherited interface views (development 2026-10-03)
+
+`NominalTypeInfo.GetInterfaces()` and `ConstructedTypeInfo.GetInterfaces()` return
+`IReadOnlyList<TypeInfo>` containing direct and inherited interfaces, excluding the owner.
+Owner arguments are substituted at each edge; diamond duplicates collapse by canonical
+constructed identity, so different arguments remain distinct. Results are stable,
+read-only and in depth-first metadata order. GetDeclaredInterfaces remains direct-only.
+
+Invalid relationships, missing dependencies, cyclic declaration paths, more than 4,096
+distinct interface views or 65,536 visited edges throw InvalidDataException. Unsupported
+reader relationship materialization (currently CLI snapshots) throws NotSupportedException.
+There is no partial success result, recursive member expansion or runtime loading.
+This covers the native root-class/interface profile; general class inheritance and
+parameter-constraint queries are not claimed. The result is cached per owner.

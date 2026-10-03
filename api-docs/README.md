@@ -786,3 +786,7 @@ PropertyInfo and NominalTypeInfo/ConstructedTypeInfo.GetProperties/GetDeclaredIn
 are covered member by member in the [host manual](experimental-metadata.md#property-and-direct-interface-views-development-2026-10-03).
 These are host C# APIs, excluded from the guest RavenDoc input for that reason; guest
 reference and documentation snapshot remain unchanged.
+
+Host GetInterfaces APIs on nominal/constructed views are covered in the
+[manual reference](experimental-metadata.md#inherited-interface-views-development-2026-10-03);
+these C# APIs remain excluded from guest RavenDoc.

@@ -703,3 +703,7 @@ Development checkpoint (2026-10-03): C# metadata views now project declared prop
 indexed signatures, canonical accessors and directly declared generic interface edges.
 Raven consumes those views. Inherited-interface traversal and language policy remain in
 the compiler; no guest Introspection API or runtime encoding changes in this slice.
+
+Development checkpoint (2026-10-03): bounded inherited-interface queries now live in the
+C# facade; Raven consumes the closure. Constructed arguments remain distinct and diamond
+duplicates collapse. No guest/runtime API change.

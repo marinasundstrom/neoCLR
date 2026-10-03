@@ -74,6 +74,12 @@ internal static class MetadataLoadContextChecks
         var middle = genericBuilder.AddGenericInterface("Example", "Middle", ["T"]);
         middle.AddBaseInterface(root.MakeGenericInstance(SignatureType.ArrayOf(SignatureType.TypeParameter(0))));
         box.AddInterfaceImplementation(middle.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        var sibling = genericBuilder.AddGenericInterface("Example", "Sibling", ["T"]);
+        sibling.AddBaseInterface(root.MakeGenericInstance(SignatureType.ArrayOf(SignatureType.TypeParameter(0))));
+        var diamond = genericBuilder.AddGenericInterface("Example", "Diamond", ["T"]);
+        diamond.AddBaseInterface(middle.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        diamond.AddBaseInterface(sibling.MakeGenericInstance(SignatureType.TypeParameter(0)));
+        diamond.AddBaseInterface(root.MakeGenericInstance(PrimitiveType.Boolean));
 
         var identity = genericBuilder.AddFunction("Identity", new MethodSignature(SignatureType.ArrayOf(SignatureType.MethodParameter(0)),
             [SignatureType.ArrayOf(SignatureType.MethodParameter(0))], ["T"]));
@@ -126,6 +132,17 @@ internal static class MetadataLoadContextChecks
         Check(ReferenceEquals(middleView, genericTypes.Single(t => t.Name == "Middle`1").MakeGenericType(intView)), "canonical interface construction");
         Check(ReferenceEquals(((ConstructedTypeInfo)boxView.GetDeclaredInterfaces().Single()).TypeArguments[0], boxView.GetGenericArguments()[0]), "open interface owner scope");
         Check(ReferenceEquals(((ConstructedTypeInfo)forwarded.GetDeclaredInterfaces().Single()).TypeArguments[0], otherView.GetGenericArguments()[0]), "caller-scoped interface argument");
+        var closure = closed.GetInterfaces();
+        Check(closure.Count == 2 && ReferenceEquals(closure[0], middleView) && ReferenceEquals(closure[1], rootView), "transitive interface order and identity");
+        var diamondView = genericTypes.Single(t => t.Name == "Diamond`1").MakeGenericType(intView);
+        var diamondClosure = diamondView.GetInterfaces();
+        Check(diamondClosure.Count == 4 && ReferenceEquals(diamondClosure[0], middleView) &&
+            ReferenceEquals(diamondClosure[1], rootView) && ((ConstructedTypeInfo)diamondClosure[2]).Definition.Name == "Sibling`1" &&
+            ((ConstructedTypeInfo)diamondClosure[3]).TypeArguments[0] is PrimitiveTypeInfo { Kind: PrimitiveType.Boolean }, "diamond dedup retains different constructions");
+        Check(otherView.GetInterfaces().Count == 0, "empty interface closure");
+        Check(boxView.GetInterfaces().Count == 2 && forwarded.GetInterfaces().Count == 2, "open and caller-scoped closure");
+        Parallel.For(0, 32, _ => Check(ReferenceEquals(diamondView.GetInterfaces(), diamondClosure), "stable concurrent interface closure"));
+        Reject<NotSupportedException>(() => ((IList<TypeInfo>)diamondClosure).Clear());
         Reject<NotSupportedException>(() => ((IList<TypeInfo>)indexed.IndexParameterTypes).Clear());
         Reject<NotSupportedException>(() => ((IList<TypeInfo>)closed.GetDeclaredInterfaces()).Clear());
         Reject<NotSupportedException>(() => ((IList<NeoCLR.Metadata.Experimental.Introspection.PropertyInfo>)closed.GetProperties()).Clear());
@@ -153,6 +170,7 @@ internal static class MetadataLoadContextChecks
         Check(cliType.Name == "Box`1" && cliType.GenericArity == 1 && cliType.DeclaringType is null, "CLI definition facade excludes module pseudo-type");
         Check(ReferenceEquals(cliContext.Resolve(cliSnapshot.MainModule.Types.Single(t => t.Name == "Box`1").ToReference()), cliType), "CLI local resolution");
         Reject<NotSupportedException>(() => cliType.GetDeclaredInterfaces());
+        Reject<NotSupportedException>(() => cliType.GetInterfaces());
         Reject<ArgumentException>(() => new MetadataLoadContext([cli.Definition]));
     }
     private static void Check(bool value, string message) { if (!value) throw new Exception(message); }

@@ -48,12 +48,14 @@ public sealed class ConstructedTypeInfo : TypeInfo
     private readonly Lazy<IReadOnlyList<FieldInfo>> fields;
     private readonly Lazy<IReadOnlyList<PropertyInfo>> properties;
     private readonly Lazy<IReadOnlyList<TypeInfo>> interfaces;
+    private readonly Lazy<IReadOnlyList<TypeInfo>> allInterfaces;
     internal ConstructedTypeInfo(MetadataLoadContext context, NominalTypeInfo definition, TypeInfo[] arguments) : base(context)
     {
         Definition = definition; TypeArguments = Array.AsReadOnly(arguments);
         fields = new(() => context.ProjectFields(definition.Definition, this, TypeArguments));
         properties = new(() => context.ProjectProperties(Definition.Definition, this, TypeArguments));
         interfaces = new(() => context.ProjectInterfaces(Definition.Definition, TypeArguments));
+        allInterfaces = new(() => context.ProjectInterfaceClosure(this));
     }
     /// <summary>Gets the canonical open declaration.</summary>
     public NominalTypeInfo Definition { get; }
@@ -69,6 +71,10 @@ public sealed class ConstructedTypeInfo : TypeInfo
     /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships for this format.</exception>
     /// <exception cref="InvalidDataException">A relationship or dependency cannot be resolved.</exception>
     public IReadOnlyList<TypeInfo> GetDeclaredInterfaces() => interfaces.Value;
+    /// <summary>Gets distinct direct and inherited interface views in depth-first metadata order, excluding this type.</summary>
+    /// <exception cref="InvalidDataException">An invalid/cyclic relationship, missing dependency or traversal bound is encountered.</exception>
+    /// <exception cref="NotSupportedException">The reader cannot materialize interface relationships.</exception>
+    public IReadOnlyList<TypeInfo> GetInterfaces() => allInterfaces.Value;
     /// <summary>Gets declared non-constructor methods through this constructed owner.</summary>
     public IReadOnlyList<MethodInfo> GetMethods() => Context.GetMethods(Definition.Definition, this);
     internal override int Depth => 1 + TypeArguments.Max(t => t.Depth);

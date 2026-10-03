@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add bounded inherited-interface metadata queries and consume them in Raven, preserving
+  generic substitutions and diamond identity. Native encoding and .NET defaults are unchanged.
+
 - Add metadata-only property and direct interface views with owner-scope substitution,
   canonical accessors and setter-only index signatures. Raven consumes these projections;
   inherited-interface traversal stays in the compiler. All 109 C# groups and seven native
