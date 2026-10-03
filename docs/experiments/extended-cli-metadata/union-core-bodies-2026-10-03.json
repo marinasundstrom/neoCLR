@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "ravenRevision": "fa48d0a453104adb2acf828c0e426d049a95b224",
+  "neoClrBaseRevision": "750925dc4b21fd41a2f6aa8645e34eb9b8338716",
+  "scope": "Shared callable planning and lowered core bodies; not native union emission or runtime execution.",
+  "baseline": "Case constructors with CaseDeclarationSyntax and payload getters with ParameterSyntax were rejected as declarations for both generic and nongeneric unions.",
+  "checks": [
+    {
+      "filter": "FullyQualifiedName~SourceUnionDeclarationPlanTests|FullyQualifiedName~EmissionBackendTests",
+      "passed": 7
+    },
+    {
+      "filter": "FullyQualifiedName~UnionCaseConstructor_AssignsFields|FullyQualifiedName~GenericOptionCases_PreservePayloadAndEmptyState",
+      "passed": 2
+    }
+  ],
+  "sourceHashes": {
+    "src/Raven.CodeAnalysis/CodeGen/Portable/SourceCallablePlan.cs": "46a6a1c95ab2ee0a8482ac26807c852998e98f1824b4495295eefdf779692dc7",
+    "test/Raven.CodeAnalysis.Tests/CodeGen/SourceUnionDeclarationPlanTests.cs": "112eb4d64d338b487c24804c607686ae9badbd3c6576b8799e89919bd064529a"
+  },
+  "unchanged": [
+    "metadata API and encoding",
+    "native runtime",
+    "Runtime Contract and bootstrap selection",
+    "ordinary .NET Reflection/Emit backend"
+  ],
+  "remaining": [
+    "Object override contract and explicit System dependency/slot mapping",
+    "generated formatting helper operations",
+    "union/case metadata preservation and native symbol imports"
+  ]
+}

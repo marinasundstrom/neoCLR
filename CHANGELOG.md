@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven's generated union constructor/accessor planning fix: retained case and
+  parameter syntax now reaches existing synthesized bodies with exact union-anchor
+  validation. Shared core-body lowering and .NET union regressions pass; native union
+  publication still requires override/display and union metadata contracts. No runtime
+  or metadata API changes are included.
+
 - Admit value-type interface relationships through metadata definitions/builders and
   native readers. Add bounded IILGenerator constrained interface calls and a typed raw
   Callvirt overload, encoding CLI constrained./callvirt and native borrowed callself.
