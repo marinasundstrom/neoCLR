@@ -22,8 +22,9 @@ def main():
     parser.add_argument('--collections', action='store_true', help='Verify separately compiled ArrayList including callback import')
     parser.add_argument('--hashmap', action='store_true', help='Verify cumulative HashMap and comparer source library')
     parser.add_argument('--extensions', action='store_true', help='Also verify a separate generic extension library and consumer')
+    parser.add_argument('--queries', action='store_true', help='Compile unchanged full query sources and execute an independent consumer')
     args = parser.parse_args()
-    args.hashmap = args.hashmap or args.extensions
+    args.hashmap = args.hashmap or args.extensions or args.queries
     args.collections = args.collections or args.hashmap
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -37,8 +38,8 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / ('hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
-    consumer_source = HERE / ('hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
+    manifest = HERE / ('query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    consumer_source = HERE / ('query-consumer.rvn' if args.queries else 'hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
     seed_source = HERE / ('collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
     seed = output / 'System.neox'
@@ -62,6 +63,16 @@ def main():
         failure = run([runtime, 'run', str(invalid), '--module', str(library), '--system', str(seed)], 1)
         if 'ArrayList capacity must be non-negative' not in failure.stderr:
             raise RuntimeError('Terminal failure adapter did not preserve the capacity error')
+    query_paths = []
+    if args.queries:
+        bad_cast_source = output / 'BadCast.rvn'
+        bad_cast_source.write_text('func Extract<T>(value: object) -> T => (T)value\nfunc Main() -> int {\n    let boxed: object = "wrong"\n    return Extract<int>(boxed)\n}\n')
+        bad_cast = output / 'BadCast.dll'
+        run(common + ['--reference', str(library), '-o', str(bad_cast), str(bad_cast_source)])
+        failure = run([runtime, 'run', str(bad_cast), '--module', str(library), '--system', str(seed)], 1)
+        if 'unbox.any requires the exact boxed value type' not in failure.stderr:
+            raise RuntimeError('Incorrect unboxing did not preserve exact-type failure')
+        query_paths = [bad_cast_source, bad_cast]
     extension_paths = []
     if args.extensions:
         extension_source = HERE / 'extension-library.rvn'
@@ -97,15 +108,15 @@ def main():
     compiler_payloads = [Path(compiler).parent / name for name in
                          ['Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll']]
     paths = [Path(__file__).resolve(), Path(compiler), Path(runtime), Path(core), seed, library, manifest,
-             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + compiler_payloads
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + query_paths + compiler_payloads
     revisions = {}
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

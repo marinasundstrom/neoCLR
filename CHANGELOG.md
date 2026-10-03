@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add IL-generator/raw UnboxAny authoring with CLI/native encoding and typed stack checks.
+  Exact value boxes and reference identity follow existing runtime semantics. Unchanged
+  query sources now separately compile, import and execute (42); 126 metadata C# groups
+  pass. The broad application next requires configured array extension receiver support.
+
 - Add a separate native generic extension-library acceptance case alongside HashMap.
   Receiver-generic predicates and method-generic selectors execute (42) through Raven
   extension metadata discovery. Assess unchanged query sources: OfType object-to-generic

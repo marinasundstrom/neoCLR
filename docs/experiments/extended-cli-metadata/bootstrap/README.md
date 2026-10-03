@@ -119,3 +119,19 @@ support. See [extension evidence](../extension-import-2026-10-03.json) and
 [full source assessment](../query-source-assessment-2026-10-03.json). Next add the supported
 CLI-equivalent unboxing/generic-cast operation through shared emission, metadata and
 runtime validation, then resume the unchanged broad application.
+
+### Unchanged full query library executes
+
+Use `--queries` with the same compiler/runtime/core paths and a fresh output directory.
+This selects `query-ownership.json`, compiles the complete unchanged SingleError and
+Operators sources cumulatively with unions and collections, and then compiles only
+`query-consumer.rvn` against the emitted native artifact. OfType, Filter, Map, ToList and
+Single execute with empty stdout and exit 42. Heterogeneous boxed integers/string values
+check filtering and unboxing; a retrieved ArrayList checks retained object identity.
+The capacity-failure, missing-library and duplicate-ownership guards also run.
+
+The earlier OfType assessment is historical: UnboxAny authoring and shared lowering now
+close it using the existing CLI/native instruction. The unchanged broad application
+still rejects `Order[].Filter` during binding. The next task is canonical array iteration
+contract participation in extension receiver inference/conversion, followed by native
+emission and runtime verification. No sample rewrite is used to bypass that failure.

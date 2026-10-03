@@ -900,3 +900,8 @@ bridge issue; no guest snapshot or reference assembly was overwritten.
 its members, resolution errors and limits. It is not a guest RavenDoc type. The API snapshot
 check still reports the previously recorded stale guest snapshot; the last verified guest
 reference assembly remains intact.
+
+2026-10-03: host-only IILGenerator.UnboxAny and OpCode.UnboxAny are documented in the
+experimental metadata manual and XML. No guest type selection changes are needed.
+The snapshot check still reports the recorded stale guest artifacts; this slice does
+not replace the verified guest snapshot with unverified output.

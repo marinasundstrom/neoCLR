@@ -526,7 +526,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => 12,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" => 2,
@@ -586,6 +586,7 @@ public sealed partial class AssemblyBuilder
                     case "object.box": code.WriteByte(0x8c); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "reference.isnull": code.WriteByte(0x14); code.WriteByte(0xfe); code.WriteByte(0x01); break;
                     case "reference.test": code.WriteByte(0x75); code.WriteInt32(ElementToken(instruction.Type!)); break;
+                    case "object.unbox": code.WriteByte(0xa5); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "reference.cast": code.WriteByte(0x74); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.load": code.WriteByte(0x71); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "object.store": code.WriteByte(0x81); code.WriteInt32(ElementToken(instruction.Type!)); break;

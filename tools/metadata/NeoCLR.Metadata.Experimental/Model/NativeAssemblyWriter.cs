@@ -137,6 +137,7 @@ public sealed partial class AssemblyBuilder
             "object.box" => new { op = "box", arg = SignatureValue(instruction.Type!) },
             "reference.isnull" => new { op = "ref.isnull" },
             "reference.test" => new { op = "isinst", arg = SignatureValue(instruction.Type!) },
+            "object.unbox" => new { op = "unbox.any", arg = SignatureValue(instruction.Type!) },
             "reference.cast" => new { op = "castclass", arg = SignatureValue(instruction.Type!) },
             "object.load" or "object.store" => new { op = instruction.Op == "object.load" ? "ldobj" : "stobj", arg = SignatureValue(instruction.Type!) },
             "local.initialize" => new { op = "initobj", arg = SignatureValue(instruction.Type!) },

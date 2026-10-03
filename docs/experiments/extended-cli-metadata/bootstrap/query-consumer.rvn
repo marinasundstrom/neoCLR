@@ -1,0 +1,29 @@
+import System.Collections.*
+import System.Linq.*
+func Main() -> int {
+    let items = ArrayList<object>()
+    items.Add(20)
+    items.Add("skip")
+    items.Add(22)
+    let shared = ArrayList<int>()
+    shared.Add(1)
+    items.Add(shared)
+    let references = items.OfType<ArrayList<int>>().ToList()
+    if references.Count != 1 {
+        return 2
+    }
+    references[0][0] = 42
+    if shared[0] != 42 {
+        return 3
+    }
+    let numbers = items.OfType<int>().Filter(value => value > 0).Map(value => value).ToList()
+    if numbers.Count != 2 {
+        return 1
+    }
+    let only = numbers.Single(value => value == 22)
+    let result = match only {
+        .Ok(let value) => value
+        .Error(let error) => 0
+    }
+    return numbers[0] + result
+}

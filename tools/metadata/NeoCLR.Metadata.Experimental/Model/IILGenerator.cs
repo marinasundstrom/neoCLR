@@ -237,6 +237,13 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded; input stack validation occurs on write.</exception>
     /// <remarks>CLI uses castclass; native uses castclass and its verifier/runtime conversion contract. This does not box values.</remarks>
     void CastReference(SignatureType target);
+
+    /// <summary>Extracts an exact boxed value, or performs a checked reference conversion for a reference target.</summary>
+    /// <param name="target">Non-Void storage type or caller-scoped generic parameter.</param>
+    /// <exception cref="ArgumentException">Invalid target or foreign/unbound scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded or invalid input stack on write.</exception>
+    /// <remarks>Emits CLI/native unbox.any. Null and mismatched value boxes fault at execution; reference identity is preserved.</remarks>
+    void UnboxAny(SignatureType target);
     /// <summary>Tests a reference and pushes a compatible reference or null.</summary>
     /// <param name="target">Supported reference/value type or in-scope generic parameter; Void, Self, managed references and Function reject.</param>
     /// <remarks>Reference targets retain their signature, including String. Value/generic targets produce CoreObjectType (a box or null). No unboxing occurs.</remarks>

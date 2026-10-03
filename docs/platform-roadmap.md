@@ -1,5 +1,11 @@
 # neoCLR platform roadmap
 
+Query gate update (2026-10-03): unchanged complete query sources now compile and import
+into an executing native consumer (OfType/Filter/Map/ToList/Single, boxed values and shared
+reference identity). [Evidence](experiments/extended-cli-metadata/query-import-2026-10-03.json).
+The unchanged broad application next fails at array extension lookup (Order[].Filter);
+configured iteration identity/conversion is the next bounded task. The full dual-target gate remains open.
+
 Query integration update (2026-10-03): native extension declaration/import now executes
 a separate generic extension library and consumer. The unchanged full query library
 advances to OfType object-to-generic conversion, which still rejects before publication.

@@ -109,7 +109,10 @@ public enum OpCode
     /// <summary>Pushes a compatible reference or null for a typed runtime test.</summary>
     Isinst,
     /// <summary>Consumes a reference and pushes whether it is null (CLI ldnull/ceq).</summary>
-    ReferenceIsNull
+    ReferenceIsNull,
+    /// <summary>Extracts an exact boxed value or converts a reference using a storage type or generic parameter operand.</summary>
+    UnboxAny
+
 }
 
 public sealed partial class MethodBuilder

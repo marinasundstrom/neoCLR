@@ -336,6 +336,7 @@ var tests = new (string Name, Action Body)[]
     ("Native callback signatures project canonical generic views", FunctionViewChecks.Run),
     ("Symbol-authored nested value constructors execute on CLR", () => ValueConstructorChecks.Run(nested: true, native: true, authored: true)),
     ("Value override definition and builder authoring", ValueOverrideAuthoringChecks.Run),
+    ("UnboxAny preserves exact values and reference identity", UnboxChecks.Run),
     ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),
     ("Constructed interface inheritance", ConstructedInheritanceChecks.Run),
     ("Generic class interface implementation", GenericImplementationChecks.Run),

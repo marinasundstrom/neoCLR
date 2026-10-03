@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class MethodBuilder
 {
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
-    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, Isinst, or Callvirt for a Function signature.</param>
+    /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, UnboxAny, Isinst, or Callvirt for a Function signature.</param>
     /// <param name="elementType">Supported non-Void signature type; vector operations require scalar elements.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode, unsupported element or foreign owner.</exception>

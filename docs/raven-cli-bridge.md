@@ -4705,3 +4705,23 @@ No format version change is required. See the
 Validation: Raven `0cca93a00`; 23 focused shared capability and .NET codegen tests pass.
 The native extension/HashMap driver gate and unsupported-property publication guard pass.
 Source and compiler payload hashes are recorded with the executable evidence.
+
+### Unchanged native query library execution (2026-10-03)
+
+Raven `e3556fabe` lowers built-in reference-to-generic/value casts through an explicit
+UnboxAny capability. The metadata IL generator and raw opcode authoring emit ordinary
+CLI unbox.any or the existing native instruction. The runtime implementation is unchanged;
+no native metadata version or new semantic category is introduced. Generic signatures
+remain compiler-owned operands; native import/emission boundaries remain independent.
+
+The cumulative unchanged Operators/SingleError and collection/union sources now compile,
+import separately and execute OfType, Filter, Map, ToList and Single. The consumer checks
+exact boxed integer extraction and shared reference identity (42, empty stdout); an
+incorrect box faults with InvalidCast. 126 metadata C# groups and 15 focused Raven tests
+pass. Runtime Contract selection uses the same explicit collection primitive core and
+retained seed. Full .NET source-library adapters are still pending.
+
+The unchanged broad sample now rejects Order[].Filter during binding and publishes no
+output. Array participation in the configured iteration contract for extension receiver
+inference/conversion is next. See [query evidence](experiments/extended-cli-metadata/query-import-2026-10-03.json)
+and [broad assessment](experiments/extended-cli-metadata/query-broad-assessment-2026-10-03.json).

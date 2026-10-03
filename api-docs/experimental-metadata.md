@@ -5992,3 +5992,33 @@ Raven currently imports value-returning callbacks through its existing callable 
 and explicit primitive bootstrap. Explicit no-result callback import still rejects rather
 than being silently changed to an inhabited-unit result. This completes ArrayList's Boolean
 predicate case; it does not integrate the separate structural Function language experiments.
+
+### Exact unboxing and generic conversions (development)
+
+`IILGenerator.UnboxAny(SignatureType target)` and
+`IILGenerator.Emit(OpCode.UnboxAny, SignatureType target)` consume an object reference
+and push the requested storage type. MethodBuilder's existing raw `Emit` forwarding
+overload accepts the same opcode; the convenience operation lives on the IL generator.
+The target may be a primitive value, nominal value/reference, vector, or caller-scoped
+method/type parameter. Void, managed references, Self and function signatures reject
+with ArgumentException, as do foreign owners and unbound generic parameters. Stack
+validation on write rejects non-reference input with InvalidDataException.
+
+CLI output uses `unbox.any` (0xA5); native output uses the existing `unbox.any` operation.
+Value targets require an exact boxed type and reject null or a different box at execution.
+Reference targets preserve object identity and admit null under the runtime's existing
+checked-reference rules. This is not a numeric conversion and creates no new native
+format or semantic category. Unlike `CastReference`, a generic target may instantiate
+as either a value or reference type.
+
+```csharp
+var il = method.GetILGenerator();
+il.LoadArgument(0); // object parameter
+il.UnboxAny(SignatureType.MethodParameter(0));
+il.Return();
+```
+
+Validation includes CLR execution for primitive/method/owner generic scopes, reference
+identity/null, incorrect boxes and invalid authoring/stack inputs. The unchanged native
+query library separately imports and executes OfType over heterogeneous boxed values
+and reference payloads; see the bootstrap query acceptance workflow.

@@ -206,6 +206,13 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             _ = Assembly.CoreObjectType;
             Append(new("object.box", Type: elementType)); return;
         }
+        if (opCode == OpCode.UnboxAny)
+        {
+            if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
+                throw new ArgumentException("UnboxAny requires a storage type or scoped generic parameter", nameof(elementType));
+            elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+            Append(new("object.unbox", Type: elementType)); return;
+        }
         if (opCode == OpCode.Castclass)
         {
             if (!IsReferenceSignature(elementType)) throw new ArgumentException("Castclass requires a reference target", nameof(elementType));
@@ -240,6 +247,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public void IsInstance(SignatureType target) => Emit(OpCode.Isinst, target);
 
     public void IsNull() => Emit(OpCode.ReferenceIsNull);
+
+    public void UnboxAny(SignatureType target) => Emit(OpCode.UnboxAny, target);
 
     public void Box(SignatureType type) => Emit(OpCode.Box, type);
 
