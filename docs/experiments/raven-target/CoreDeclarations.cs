@@ -7,10 +7,11 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false)
     {
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
-        if (checkedStorage) declarations += CheckedStorageBindings.Declarations;
+        if (checkedStorage || collectionStorage) declarations += CheckedStorageBindings.Declarations;
+        if (collectionStorage) declarations += FunctionBindings.Declarations + "public static class FailFunctions { public static void Fail(string message) { } }";
         if (unionProbe)
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
@@ -110,6 +111,12 @@ static class CoreDeclarations
                     throw new InvalidDataException("Core projection introduced an external type scope.");
                 module.AssemblyReferences.Remove(reference);
             }
+            image.Write(path);
+        }
+        else if (collectionStorage)
+        {
+            using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
+            NamespaceFunctions.ProjectFault(image.MainModule);
             image.Write(path);
         }
         else File.WriteAllBytes(path, stream.ToArray());

@@ -1,0 +1,27 @@
+import System.Collections.*
+func Main() -> int {
+    let values = ArrayList<int>()
+    values.Add(20)
+    values.Add(22)
+    let alias = values
+    alias[0] = 19
+    let copy = values.Copy()
+    copy[0] = 1
+    if values[0] != 19 {
+        return 1
+    }
+    values[0] = 20
+    var total = 0
+    for value in values {
+        total = total + value
+    }
+    let found = values.Find(value => value == 22)
+    let item = match found {
+        .Some(let value) => value
+        .None => 0
+    }
+    if item != 22 {
+        return 3
+    }
+    return total
+}

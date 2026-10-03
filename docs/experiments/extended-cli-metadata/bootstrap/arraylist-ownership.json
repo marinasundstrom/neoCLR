@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "libraries": [
+    {
+      "assemblyName": "NeoCLR.Collections",
+      "sources": [
+        "runtime/raven/src/System/Disposable.rvn",
+        "runtime/raven/src/System/Collections/Iterator.rvn",
+        "runtime/raven/src/System/Collections/Iterable.rvn",
+        "runtime/raven/src/System/Collections/Collection.rvn",
+        "runtime/raven/src/System/Collections/Sequence.rvn",
+        "runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "runtime/raven/src/System/Collections/List.rvn",
+        "runtime/raven/src/System/Propagatable.rvn",
+        "runtime/raven/src/System/Option.rvn",
+        "runtime/raven/src/System/Result.rvn",
+        "runtime/raven/src/System/Collections/ArrayList.rvn"
+      ],
+      "types": [
+        "System.Disposable",
+        "System.Collections.Iterator`1",
+        "System.Collections.Iterable`1",
+        "System.Collections.Collection`1",
+        "System.Collections.Sequence`1",
+        "System.Collections.MutableSequence`1",
+        "System.Collections.List`1",
+        "System.Propagatable`3",
+        "System.Option`1",
+        "System.Result`2",
+        "System.Collections.ArrayList`1",
+        "System.Collections.ArrayListIterator`1"
+      ]
+    }
+  ],
+  "iteration": {
+    "assemblyName": "NeoCLR.Collections",
+    "iterableTypeName": "System.Collections.Iterable`1",
+    "iteratorTypeName": "System.Collections.Iterator`1"
+  },
+  "typeOf": null,
+  "propagation": null
+}

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Add a bounded collection bootstrap with explicit callback declarations and executable
+  terminal failure. Unchanged ArrayList emits and runs with sources included, checking
+  alias mutation, copying, iteration and Find; negative capacity faults correctly. Separate
+  native import is explicitly blocked by callback signature materialization and is not
+  counted as a completed library-consumer gate. The separate source-union gate still passes.
+
 - Compile unchanged Option/Result, Propagatable and iteration sources with an explicit
   executable union seed and source ownership manifest. A separately compiled native
   consumer verifies copies, residuals and boxed display (exit 42); missing-library and

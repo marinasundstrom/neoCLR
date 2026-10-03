@@ -105,8 +105,10 @@ The .NET adapter and broader collection/application gates remain open. See
 [separate union evidence](experiments/extended-cli-metadata/union-separate-execution-2026-10-03.json). See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
-[source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires
-Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
+[source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList now has explicit Fail/callback bootstrap bindings and passes source-included
+execution with alias mutation, independent copies, iteration and Find. Separate library
+import remains blocked by function-signature materialization; see
+[arraylist assessment](experiments/extended-cli-metadata/arraylist-source-assessment-2026-10-03.json). See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
 remain pending. Configured unit generic union payloads now bind and execute (42); ordinary CLI void
 remains rejected without the unit contract. The broad source-library/application gate remains open.

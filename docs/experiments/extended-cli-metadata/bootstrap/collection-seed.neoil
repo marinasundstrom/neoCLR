@@ -1,0 +1,10 @@
+; Extends the executable primitive union seed with terminal failure.
+.include "union-seed.neoil"
+.function System.Fail(String message) -> Void
+ldarg 0
+call neoCLR.Runtime.Fault(String)
+ret
+.end
+.function neoCLR.Runtime.Fault(String message) -> Void
+.methodimpl InternalCall
+.end

@@ -43,3 +43,30 @@ library input and duplicate source ownership in a seed must reject before public
 
 The seven older native consumers use their own full CoreProbe/seed baseline; the small
 core here intentionally does not supply their configured typeof facade.
+
+## ArrayList assessment
+
+Generate the next primitive profile with `--reference-collection-storage-core` in
+place of `--reference-storage-core`, then pass that image and `--collections` to the
+same Python driver. This adds public CLI Func/Action declarations for Raven's existing
+callback binding and the marked namespace declaration for System.Fail. These are explicit
+compiler bootstrap symbols; no source collection or union declaration is copied into core.
+The callback declarations remain the existing temporary CLI transport, not a new structural
+Function semantic design or a claim that the separate Function experiments are integrated.
+
+`arraylist-ownership.json` adds unchanged ArrayList and its internal iterator to the
+source library. `collection-seed.neoil` includes the union seed and supplies System.Fail
+through the existing terminal runtime intrinsic. The negative-capacity execution test
+checks the real diagnostic and failure exit, so its reference-only core body is never
+mistaken for executable behavior.
+
+Current result: the library emits. Source-included execution returns 42 after alias
+mutation, independent copy, iteration and Find callback checks. Separate native import
+rejects the library's callback signature category before publishing output. The assessment
+expects this rejection and explicitly reports BLOCKED; it does not count as the library /
+consumer gate. The prior separate Option/Result gate remains required and passes.
+
+Next bounded work is native function-signature materialization and metadata-only facade
+views with generic substitution, followed by mapping those facts into Raven's existing
+callable symbols. Then re-run the unchanged consumer using only the emitted library.
+No source-method removal or callback stub should be used to bypass that import boundary.

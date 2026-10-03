@@ -19,6 +19,7 @@ def main():
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--core', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--collections', action='store_true', help='Assess ArrayList including its currently unsupported separate native import')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -32,21 +33,42 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / 'union-ownership.json'
+    manifest = HERE / ('arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    consumer_source = HERE / ('arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
+    seed_source = HERE / ('collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
     seed = output / 'System.neox'
     library = output / 'NeoCLR.Collections.dll'
     consumer = output / 'Consumer.dll'
-    run([runtime, 'assemble', str(HERE / 'union-seed.neoil'), str(seed), '--format', 'neox'])
+    run([runtime, 'assemble', str(seed_source), str(seed), '--format', 'neox'])
     common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', str(seed),
               '--bootstrap-ownership', str(manifest), '--bootstrap-intrinsics']
     run(common + ['--library', '-o', str(library)] + sources)
-    run(common + ['--reference', str(library), '-o', str(consumer), str(HERE / 'union-consumer.rvn')])
-    run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
-    run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
-        'Option.Some(40)\nResult.Error(7)\n')
+    consumer_command = common + ['--reference', str(library), '-o', str(consumer), str(consumer_source)]
+    if args.collections:
+        rejection = run(consumer_command, 1)
+        if consumer.exists() or 'native definition materialization requires' not in rejection.stderr:
+            raise RuntimeError('Expected explicit callback metadata import rejection before publication')
+        owned = output / 'owned' / 'NeoCLR.Collections.dll'
+        owned.parent.mkdir()
+        run(common + ['-o', str(owned)] + sources + [str(consumer_source)])
+        run([runtime, 'verify', str(owned), '--system', str(seed)])
+        run([runtime, 'run', str(owned), '--system', str(seed)], 42, '')
+        invalid_source = output / 'NegativeCapacity.rvn'
+        invalid_source.write_text('func Main() -> int {\n    let values = System.Collections.ArrayList<int>(-1)\n    return 42\n}\n')
+        invalid = output / 'invalid' / 'NeoCLR.Collections.dll'
+        invalid.parent.mkdir()
+        run(common + ['-o', str(invalid)] + sources + [str(invalid_source)])
+        failure = run([runtime, 'run', str(invalid), '--system', str(seed)], 1)
+        if 'ArrayList capacity must be non-negative' not in failure.stderr:
+            raise RuntimeError('Terminal failure adapter did not preserve the capacity error')
+    else:
+        run(consumer_command)
+        run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
+        run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
+            'Option.Some(40)\nResult.Error(7)\n')
     rejected = output / 'MissingLibrary.dll'
-    run(common + ['-o', str(rejected), str(HERE / 'union-consumer.rvn')], 1)
+    run(common + ['-o', str(rejected), str(consumer_source)], 1)
     if rejected.exists():
         raise RuntimeError('Missing source-library dependency published output')
     bad_source = output / 'DuplicateSeed.neoil'
@@ -58,12 +80,12 @@ def main():
     failure = run(bad_args + ['--library', '-o', str(rejected)] + sources, 1)
     if rejected.exists() or 'duplicates a source-owned declaration' not in failure.stderr:
         raise RuntimeError('Duplicate seed ownership was not rejected before output')
-    paths = [Path(compiler), Path(runtime), Path(core), seed, library, consumer, manifest,
-             HERE / 'union-seed.neoil', HERE / 'union-consumer.rvn'] + [ROOT / p for p in sources]
-    evidence = dict(scope='Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.',
+    paths = [Path(compiler), Path(runtime), Path(core), seed, library, manifest,
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + ([owned] if args.collections else [consumer]) + [ROOT / p for p in sources]
+    evidence = dict(scope=('ArrayList source-included execution passes; separate native import rejects callback signatures. NOT a completed separate-library gate.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS source-included ArrayList execution; separate native import BLOCKED' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':
