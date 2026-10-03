@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the paired compiler/target-boundary assessment in Raven `10f5f0089`: retain
+  NeoCLR metadata/introspection/builders and review duplicated .NET body emission.
+  Additional execution checks pass on both branches; a shared constraint-import test
+  discrepancy remains unresolved. No compiler/runtime behavior is changed by the audit.
+
 - Record the author-directed compiler direction reassessment and suspend the proposed
   .NET array adapter slice. Current Raven main and integration pass the same 36 focused
   array/iteration tests and ordinary .NET mutation/LINQ execution. Distinguish the invalid

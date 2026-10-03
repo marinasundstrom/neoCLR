@@ -1,5 +1,12 @@
 # neoCLR platform roadmap
 
+Target-boundary audit (2026-10-03): retain the NeoCLR metadata library and native
+symbol/backend boundaries. Raven audit commit `10f5f0089` records 71 further passing
+.NET checks on both lines and one shared constraint round-trip failure. Reconcile that
+baseline discrepancy and evaluate simplifying the second production .NET body path
+before expanding adapters. These are bounded review recommendations; no backend has
+been removed or replaced. See the [conversation record](development-timeline.md).
+
 Direction reassessment (2026-10-03, author-directed): pause new adapter/compiler work
 and re-establish ordinary Raven/.NET behavior against main before selecting another
 implementation slice. The proposed CLR array adapter below is suspended. Current main

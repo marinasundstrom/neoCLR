@@ -10434,3 +10434,33 @@ more compiler changes. The author has not yet approved a replacement completion 
 No compiler/runtime code changed; no adapters were implemented or prior commits reverted.
 The earlier paired gate remains incomplete. This bounded audit does not prove the entire
 compiler regression-free. [Evidence](experiments/extended-cli-metadata/dotnet-main-audit-2026-10-03.json).
+
+
+### 2026-10-03 — Retain metadata library, reassess shared compiler paths
+
+The author clarified that Raven runs on .NET while .NET and NeoCLR are distinct targets,
+questioned whether the symbol-loader/codegen refactoring had gone too far, and asked to
+preserve working .NET behavior while retaining the NeoCLR metadata library and finding
+better shared paths. The assistant proposed an architectural audit rather than further
+adapter work, then performed additional paired checks on main `46491585e` and integration
+`97d07b901`.
+
+Assistant-verified results: 71 invocation/receiver/constructor/field/loop/collection tests
+pass on both. Metadata/import/propagation checks pass 44 on main and 45 on integration,
+with the same single struct-constraint round-trip failure on both. The test expects
+ValueType, while the imported symbol reports ValueType | Constructor after a previously
+integrated implied-constructor flag change. That discrepancy needs separate reconciliation;
+it is not evidence of a new integration-only regression. Earlier 36-test array evidence
+remains applicable, but full compiler parity and captured-loop behavior remain unproven.
+
+The audit recommends keeping native metadata/introspection/builders, the narrow semantic
+reference provider, explicit emission backend and symbol-authored native references.
+Its first simplification candidate is the additional release-only .NET portable body path:
+it coexists with the established emitter and creates a parity obligation. Other candidates
+are shared array lowering and legacy bridge branches, each requiring independent evidence
+before changes. No production path was removed and no compiler/runtime implementation
+changed. The CLR array adapter remains suspended. The author has not separately approved
+each candidate; these are assistant recommendations under the authorized reassessment.
+
+Detailed findings, reproduction filters and bounded next steps are recorded in Raven
+`docs/compiler/architecture/neoclr-refactor-parity.md`, commit `10f5f0089`.
