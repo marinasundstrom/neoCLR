@@ -1,0 +1,6 @@
+func Main() -> int {
+    let values: System.Array<int> = [40, 0]
+    let view: System.Collections.MutableSequence<int> = values
+    view[1] = values.Count
+    return values[0] + values[1]
+}

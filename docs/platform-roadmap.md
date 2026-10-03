@@ -1,5 +1,17 @@
 # neoCLR platform roadmap
 
+Native end-to-end sample expansion (2026-10-03): Raven `3367f3200` fixes vector
+receivers for projected inherited interface accessors, exposed by Array<int>.Count in
+unchanged collection-capabilities. Existing reference conversion uses semantic symbols
+and target capability checks; nominal Array<T>, metadata and runtime remain unchanged.
+The source-library driver gate now includes a Count/mutation regression and three
+unchanged samples (Option, propagation, collection capabilities), all verified/executed
+with exact output/status alongside the broad order-collections application. Seven native
+consumers and 13 focused .NET tests pass. Next bounded native task: no-result callback
+import/emission for unchanged library-array-callbacks. Captured functions and missing
+numeric/date source coverage remain separate gaps; full-library completion is not claimed.
+[Evidence](experiments/extended-cli-metadata/native-array-receiver-2026-10-03.json).
+
 Native catalog validation (2026-10-03): Raven `42503ec23` converts conflicts between
 native snapshots and the explicit primitive bootstrap into RAVT003, including failures
 while constructing the introspection catalog. A C# regression reproduces the previous

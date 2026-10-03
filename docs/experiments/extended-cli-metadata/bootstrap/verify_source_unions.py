@@ -81,6 +81,22 @@ def main():
         run([runtime, 'verify', str(application), '--module', str(library), '--system', str(seed)])
         run([runtime, 'run', str(application), '--module', str(library), '--system', str(seed)], 0, expected.read_text())
         application_paths = [application_source, expected, application, override_source, override_app]
+    sample_paths = []
+    if args.arrays:
+        samples = [
+            (HERE / 'array-interface-count-consumer.rvn', 42, ''),
+            (ROOT / 'docs/experiments/raven-target/samples/library-option.rvn', 0, '42\nProduct not found\n'),
+            (ROOT / 'docs/experiments/raven-target/samples/library-option-propagation.rvn', 0, 'Value found\n42\nAbsent\n'),
+            (ROOT / 'docs/experiments/raven-target/samples/library-collection-capabilities.rvn', 0,
+             '2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n'),
+        ]
+        for source, exit_code, expected_stdout in samples:
+            app = output / (source.stem + '.dll')
+            run(common + ['--reference', str(library), '-o', str(app), str(source)])
+            run([runtime, 'verify', str(app), '--module', str(library), '--system', str(seed)])
+            run([runtime, 'run', str(app), '--module', str(library), '--system', str(seed)],
+                exit_code, expected_stdout)
+            sample_paths.extend([source, app])
     query_paths = []
     if args.queries:
         bad_cast_source = output / 'BadCast.rvn'
@@ -126,7 +142,7 @@ def main():
     compiler_payloads = [Path(compiler).parent / name for name in
                          ['Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll']]
     paths = [Path(__file__).resolve(), Path(compiler), Path(runtime), Path(core), seed, library, manifest,
-             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + query_paths + application_paths + compiler_payloads
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + query_paths + application_paths + sample_paths + compiler_payloads
     revisions = {}
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(

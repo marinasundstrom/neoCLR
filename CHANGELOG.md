@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Expand native source-library acceptance with an array Count/mutation regression
+  and unchanged Option, propagation and collection-capabilities samples. Raven
+  `3367f3200` fixes projected array interface receivers; the broad native application,
+  seven native consumers and 13 focused .NET tests pass. Record remaining callback,
+  capture and library-coverage gaps without changing metadata/runtime semantics.
+
 - Record Raven `42503ec23` diagnostic handling for native/bootstrap catalog identity
   conflicts, replacing an uncaught exception. C# rejection/unchanged-output coverage
   and seven native execution consumers pass; runtime and format remain unchanged.

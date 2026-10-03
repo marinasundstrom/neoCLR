@@ -203,3 +203,28 @@ array-query section terminates abnormally because CLR arrays have no implementat
 the selected custom iteration interface. An explicit .NET adapter conversion is next.
 The driver still returns nonzero and records the partial output, rather than counting
 successful compilation or a prefix as broad application success.
+
+## Native sample expansion (2026-10-03)
+
+The `verify_source_unions.py --arrays` and `--application` gates additionally compile,
+verify and execute these consumers against the separately built native source library:
+
+- `array-interface-count-consumer.rvn`: inherited Count access plus shared array mutation,
+  exit 42.
+- Unchanged `library-option.rvn` and `library-option-propagation.rvn`: imported union
+  construction, matching and propagation, exact output and exit 0.
+- Unchanged `library-collection-capabilities.rvn`: source Array<T>/ArrayList interface
+  views, mutations, query materialization and list growth, exact output and exit 0.
+
+The Count regression previously failed metadata stack validation because the projected
+interface accessor received a vector without the required receiver reference conversion.
+Portable codegen now emits that conversion when admitted by the target and Raven's
+existing implicit-reference rules. No metadata/runtime change or nominal-array redesign.
+The consumer commands include only the library artifact, never its Raven source files.
+
+Broader unchanged samples still reject: `library-array-callbacks` needs native no-result
+callback import; `library-list-filters` needs captured function emission;
+`library-generic-collections` needs Int64.CompareTo and source/seed Date support. These
+are distinct layers and are not evidence for resuming CLR source-library adapter work.
+Next bounded native step: no-result callback import/emission with array callback execution,
+keeping CLI void separate from inhabited unit and structural Function experiments separate.

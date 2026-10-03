@@ -4976,3 +4976,25 @@ The metadata context owns exact identity checks; the native compiler adapter tra
 invalid/unsupported catalog failures before semantic setup and publication. Native inputs
 never fall back to a CLI projection. This target-specific correction requires no general
 binder fix or new host metadata API. Full dual-target completion remains open.
+
+### Native array interface receiver execution
+
+Native end-to-end sample expansion (2026-10-03): Raven `3367f3200` fixes vector
+receivers for projected inherited interface accessors, exposed by Array<int>.Count in
+unchanged collection-capabilities. Existing reference conversion uses semantic symbols
+and target capability checks; nominal Array<T>, metadata and runtime remain unchanged.
+The source-library driver gate now includes a Count/mutation regression and three
+unchanged samples (Option, propagation, collection capabilities), all verified/executed
+with exact output/status alongside the broad order-collections application. Seven native
+consumers and 13 focused .NET tests pass. Next bounded native task: no-result callback
+import/emission for unchanged library-array-callbacks. Captured functions and missing
+numeric/date source coverage remain separate gaps; full-library completion is not claimed.
+[Evidence](experiments/extended-cli-metadata/native-array-receiver-2026-10-03.json).
+
+Unlike CLR vectors implementing CLR collection contracts, native vectors dispatch through
+the configured source Array<T> backing. Portable planning now emits the existing reference
+conversion for an implicit array-to-interface receiver; the native adapter maps the semantic
+operand without reopening importer objects. Bootstrap ownership and Runtime Contract
+options do not change. No CLI bridge expansion, metadata API addition or format fork is
+required. The ordinary .NET emitter remains in use; this portable-planner adjustment is a
+deferred general candidate until an independent main-line caller is established.
