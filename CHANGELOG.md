@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the author-approved dual-target execution plan and ordinary-driver baseline:
+  .NET Hello/library and native Hello pass; native library field import remains a driver gap.
+
 - Add canonical metadata-only generic method constructions, with copied arguments,
   owner-preserving definition navigation and simultaneous type/method substitution.
   C# contracts pass 109/109 and all seven native consumers execute (42). No invocation,

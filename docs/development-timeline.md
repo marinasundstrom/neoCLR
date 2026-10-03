@@ -10159,3 +10159,14 @@ A compilation-owned weak-key adapter supplies lifetime without exposing caches p
 Constructed/member views and further loader simplification remain next; the runtime
 model and guest implementation are unchanged. 109 C# groups pass; native integration
 execution evidence is recorded with this slice. No future identical port/API is promised.
+
+
+## 2026-10-03 — Dual-target execution gate
+
+The author requested a plan for end-to-end .NET and NeoCLR compilation. The assistant
+proposed a broad existing application plus a separately source-built library subset as
+the first gate. Asked to choose, the author selected that gate over the entire runtime
+library and accepted the bounded primitive CLI bootstrap/runtime seed. The author then
+explicitly requested implementation of the seven-slice plan. Work begins with paired
+ordinary driver commands and direct native import, retaining the .NET backend. The broad
+sample/full-library outcomes are still open; see the [implementation plan](design/dual-target-compilation.md).

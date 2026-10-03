@@ -1,5 +1,9 @@
 # neoCLR platform roadmap
 
+Author-approved implementation gate (2026-10-03): [dual-target driver and source-library plan](design/dual-target-compilation.md).
+Prove ordinary .NET/NeoCLR library-to-application compilation first, then the broad
+collections sample, retaining only the explicit primitive bootstrap/runtime seed.
+
 Author clarification (2026-10-02): importer and emitter must communicate through Raven
 symbols, without emission reusing loader objects. Raven compiler contracts and the
 metadata library body-generator API are independent boundaries. The first bounded
