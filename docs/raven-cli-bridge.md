@@ -4776,3 +4776,38 @@ slice (implementation and artifact hashes recorded in
 The unchanged broad application now fails before publication on the explicit retained
 seed's missing Console.WriteLine(Int32) contract. That service overload is the next
 bounded task. No application sources were rewritten.
+
+### Unchanged broad native application gate (2026-10-03)
+
+`bootstrap/verify_source_unions.py --application` separately compiles the cumulative
+source library selected by array-ownership.json, then compiles unchanged
+application-order-collections using only emitted native references. Exact checked-in
+stdout and exit 0 pass, covering union propagation, maps/lists, callbacks, query composition,
+vector iteration and mutation through shared object identities. The retained seed now
+implements WriteLine(Int32) via existing Int32ToString and WriteLine(String) runtime
+services, matching the current source Console implementation. Primitive CLI core and
+retained seed remain explicit bootstrap dependencies; library/application imports are native.
+
+The last linking gap was imported SingleError.ToString: native overrides use the existing
+inherited-slot name, while authored references previously used ordinary method names.
+Introspection now exposes the CLI NewSlot flag. Raven stores the inherited-slot fact as
+IsOverride in its native method symbol; emission passes that semantic fact to the metadata
+reference API without reopening the importer. The bounded public value ToString override
+contract preserves managed receiver behavior. Ordinary .NET Reflection/Emit is unchanged;
+no native format change or new runtime instruction was required.
+
+A minimal separately imported union display consumer prints Multiple and 42; the broad
+consumer checks all expected lines. Metadata tests reject conflicting and unsupported
+reference contracts; the native value-override C# runtime fixture also tests metadata slot
+facts and directly authored references. These are target-specific changes, not a shared
+binding fix needing main-based extraction. Full paired .NET execution against rebuilt
+source libraries remains the next gate, not a completed claim.
+
+Validation: 127 metadata groups and 15 focused Raven external-signature tests pass.
+The guest API snapshot check remains the previously recorded stale-snapshot failure;
+the host API manual reference is updated. No website build or publication is claimed.
+
+Cross-repository validation: Raven `80f57d2f9`, runtime `97cd6e90`, metadata changes
+committed with [broad-native-execution-2026-10-03.json](experiments/extended-cli-metadata/broad-native-execution-2026-10-03.json).
+The evidence records compiler payloads, source ownership, artifact hashes and exact
+commands/output. The optional host API parameter requires rebuilding binary consumers.

@@ -20,7 +20,7 @@ public sealed class MethodInfo
         Name = definition.Name; Namespace = definition.Namespace ?? ""; MetadataToken = definition.MetadataToken;
         DeclaringType = owner; Module = context.RequireSnapshot(definition.Module.Assembly).GetModules()[0];
         Accessibility = MetadataAccess.Member(definition.Attributes);
-        IsStatic = definition.IsStatic; IsAbstract = (definition.Attributes & 0x400) != 0; IsVirtual = (definition.Attributes & 0x40) != 0;
+        IsStatic = definition.IsStatic; IsAbstract = (definition.Attributes & 0x400) != 0; IsVirtual = (definition.Attributes & 0x40) != 0; IsNewSlot = (definition.Attributes & 0x100) != 0;
         GenericParameterNames = Array.AsReadOnly(signature!.GenericParameterNames.ToArray());
         genericArguments = Array.AsReadOnly(arguments ?? GenericParameterNames.Select((_, i) => (TypeInfo)new MethodGenericParameterTypeInfo(context, this, i)).ToArray());
         var typeArguments = owner switch { NominalTypeInfo nominal => nominal.GetGenericArguments(), ConstructedTypeInfo constructed => constructed.TypeArguments, _ => Array.Empty<TypeInfo>() };
@@ -71,6 +71,8 @@ public sealed class MethodInfo
     public bool IsAbstract { get; }
     /// <summary>Gets the metadata virtual flag.</summary>
     public bool IsVirtual { get; }
+    /// <summary>Gets the CLI NewSlot flag; a virtual method without it reuses an inherited slot.</summary>
+    public bool IsNewSlot { get; }
 }
 
 /// <summary>The supported metadata parameter passing conventions.</summary>

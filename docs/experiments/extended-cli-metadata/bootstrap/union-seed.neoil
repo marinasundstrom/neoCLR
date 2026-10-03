@@ -43,6 +43,12 @@ ret
 .methodimpl InternalCall
 .end
 .type System.Console
+.method static WriteLine(Int32 value) -> Void
+ldarg 0
+call neoCLR.Runtime.Int32ToString(Int32)
+call neoCLR.Runtime.WriteLine(String)
+ret
+.end
 .method static WriteLine(String value) -> Void
 ldarg 0
 call neoCLR.Runtime.WriteLine(String)
@@ -50,5 +56,9 @@ ret
 .end
 .end
 .function neoCLR.Runtime.WriteLine(String value) -> Void
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.Int32ToString(Int32 value) -> String
 .methodimpl InternalCall
 .end

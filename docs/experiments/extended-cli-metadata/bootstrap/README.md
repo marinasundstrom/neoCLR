@@ -158,3 +158,19 @@ with the same seed. Exact commands and artifact hashes are recorded in
 Next connect vector storage to the output-owned nominal Array<T> descriptor and its
 source-authored iterator through explicit identity-aware compiler/runtime contracts.
 Do not rely on the old translated System.ArrayEnumerable adapter's hard-coded names.
+
+### Broad native application gate (2026-10-03)
+
+Run `verify_source_unions.py --application` with the same required `--compiler`,
+`--runtime`, `--core` and fresh `--output` arguments. This implies `--arrays` and builds
+all sources selected by array-ownership.json as one native library. It then compiles a
+minimal imported SingleError display regression and unchanged
+`application-order-collections.rvn` with only the emitted library reference. The broad
+application must match its checked-in expected text exactly and exit 0.
+
+The retained seed's `WriteLine(Int32)` delegates to existing native Int32ToString and
+WriteLine(String) services. It is an executable bootstrap adapter, not a consumer stub.
+The library's source methods, unions and arrays are imported natively. Evidence includes
+source/artifact hashes, ownership, compiler payloads and executed commands. This passes
+the native broad gate; .NET source-library service adapters and paired execution remain
+open. Earlier assessments above describe the failure state before this gate.

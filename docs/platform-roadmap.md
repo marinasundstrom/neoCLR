@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Broad native gate update (2026-10-03): unchanged application-order-collections compiles
+against the separately emitted source library and executes with exact checked-in output
+and exit 0, including collection mutation, callback/query composition, union propagation,
+array iteration and shared object identity. Reproduce with the bootstrap acceptance script
+`--application`; [evidence](experiments/extended-cli-metadata/broad-native-execution-2026-10-03.json).
+Next bounded gate: executable .NET source-library adapters and the paired unchanged sample;
+full-runtime compilation and broader native categories remain subsequent work.
+
 Nominal-array execution update (2026-10-03): the separate native consumer now mutates
 vector storage through MutableSequence<int>, observes the same storage through its array
 reference, and executes Filter/ToList through source Array<T>/ArrayIterator<T> (42).

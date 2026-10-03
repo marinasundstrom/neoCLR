@@ -10369,3 +10369,14 @@ observes shared storage through the original array, and runs source iterator/que
 The unchanged broad sample next exposes the retained seed's missing WriteLine(Int32).
 See [execution evidence](experiments/extended-cli-metadata/nominal-array-execution-2026-10-03.json)
 and the [integration record](raven-cli-bridge.md).
+
+### 2026-10-03 — Unchanged broad native application executes
+
+Under the author's continuing end-to-end directive, the assistant closed the explicit
+seed's integer console overload and corrected imported value override identity through
+metadata slot facts and Raven symbols. The unchanged application-order-collections now
+compiles against the independently emitted native source-library subset, with library
+sources absent from consumer compilation, and executes with exact expected stdout/exit 0.
+This is assistant-verified native evidence, not completion of the paired .NET gate or the
+entire runtime library. Next is the .NET source-library execution adapter gate.
+[Evidence](experiments/extended-cli-metadata/broad-native-execution-2026-10-03.json).

@@ -1,0 +1,7 @@
+import System.Linq.*
+
+func Main() {
+    let error: SingleError = .Multiple
+    System.Console.WriteLine(error.ToString())
+    System.Console.WriteLine(42)
+}

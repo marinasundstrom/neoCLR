@@ -24,7 +24,9 @@ def main():
     parser.add_argument('--extensions', action='store_true', help='Also verify a separate generic extension library and consumer')
     parser.add_argument('--queries', action='store_true', help='Compile unchanged full query sources and execute an independent consumer')
     parser.add_argument('--arrays', action='store_true', help='Execute source Array<T> backing and query iteration over native vectors')
+    parser.add_argument('--application', action='store_true', help='Run unchanged application-order-collections against the separately built native library')
     args = parser.parse_args()
+    args.arrays = args.arrays or args.application
     args.queries = args.queries or args.arrays
     args.hashmap = args.hashmap or args.extensions or args.queries
     args.collections = args.collections or args.hashmap
@@ -65,6 +67,20 @@ def main():
         failure = run([runtime, 'run', str(invalid), '--module', str(library), '--system', str(seed)], 1)
         if 'ArrayList capacity must be non-negative' not in failure.stderr:
             raise RuntimeError('Terminal failure adapter did not preserve the capacity error')
+    application_paths = []
+    if args.application:
+        override_source = HERE / 'override-consumer.rvn'
+        override_app = output / 'Override.dll'
+        run(common + ['--reference', str(library), '-o', str(override_app), str(override_source)])
+        run([runtime, 'verify', str(override_app), '--module', str(library), '--system', str(seed)])
+        run([runtime, 'run', str(override_app), '--module', str(library), '--system', str(seed)], 0, 'Multiple\n42\n')
+        application_source = ROOT / 'docs/experiments/raven-target/samples/application-order-collections.rvn'
+        expected = application_source.with_suffix('.expected.txt')
+        application = output / 'Application.dll'
+        run(common + ['--reference', str(library), '-o', str(application), str(application_source)])
+        run([runtime, 'verify', str(application), '--module', str(library), '--system', str(seed)])
+        run([runtime, 'run', str(application), '--module', str(library), '--system', str(seed)], 0, expected.read_text())
+        application_paths = [application_source, expected, application, override_source, override_app]
     query_paths = []
     if args.queries:
         bad_cast_source = output / 'BadCast.rvn'
@@ -110,15 +126,15 @@ def main():
     compiler_payloads = [Path(compiler).parent / name for name in
                          ['Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll']]
     paths = [Path(__file__).resolve(), Path(compiler), Path(runtime), Path(core), seed, library, manifest,
-             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + query_paths + compiler_payloads
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources] + extension_paths + query_paths + application_paths + compiler_payloads
     revisions = {}
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.' if args.application else 'Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS unchanged application-order-collections with a separately compiled native library' if args.application else 'PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

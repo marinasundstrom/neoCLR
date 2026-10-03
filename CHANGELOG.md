@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Execute unchanged application-order-collections against a separately compiled native
+  source-library subset with exact stdout and exit 0. Add the retained seed's Int32 console
+  overload using existing runtime services. Preserve inherited-slot facts through metadata
+  introspection and symbol-only value-override references, fixing imported SingleError.ToString
+  linking. The .NET source-library adapter gate remains open.
+
 - Connect native vectors to an explicitly selected nominal Array<T> descriptor. Source
   array interfaces, mutation and query iteration execute against a separately compiled
   library. Add checked SetArrayBacking authoring and reader/runtime validation; legacy

@@ -75,6 +75,17 @@ internal static class AuthoredFunctionReferenceChecks
         app.AddInterfaceConversion(item, derived);
         app.AddInterfaceConversion(item, derived); // Idempotent.
         var valueOwner = app.CreateValueTypeReference(dependency, core, hash, "Example", "ValueOwner");
+        var displaySignature = new MethodSignature(PrimitiveType.String, []);
+        var display = app.CreateMethodReference(valueOwner, "ToString", displaySignature, isOverride: true);
+        if (!display.RequiresManagedReceiver || display.RequiresVirtualDispatch ||
+            !ReferenceEquals(display, app.CreateMethodReference(valueOwner, "ToString", displaySignature, isOverride: true)))
+            throw new Exception("authored value override contract");
+        Reject<InvalidDataException>(() => app.CreateMethodReference(valueOwner, "ToString", displaySignature));
+        Reject<ArgumentException>(() => app.CreateMethodReference(item, "ToString", displaySignature, isOverride: true));
+        Reject<ArgumentException>(() => app.CreateMethodReference(valueOwner, "ToString", displaySignature, isStatic: true, isOverride: true));
+        Reject<ArgumentException>(() => app.CreateMethodReference(valueOwner, "Other", displaySignature, isOverride: true));
+        var show = app.AddFunction("Show", new MethodSignature(PrimitiveType.String, [SignatureType.ByReference(valueOwner)]));
+        var showIl = show.GetILGenerator(); showIl.LoadArgument(0); showIl.Call(display); showIl.Return();
         app.AddInterfaceConversion(valueOwner, derived);
         app.AddInterfaceConversion(valueOwner, derived); // Value implementation edges are also idempotent.
         Reject<ArgumentException>(() => app.AddInterfaceConversion(contract, valueOwner));

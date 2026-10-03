@@ -4864,7 +4864,7 @@ native containers. This does not imply that member references are reader-indepen
 ## Authored method references (development, 2026-10-02)
 
 `AssemblyBuilder.CreateMethodReference(ImportedTypeReference declaringType, string name,
-MethodSignature signature, bool isStatic = false) -> ImportedMethodReference` authors a
+MethodSignature signature, bool isStatic = false, bool isOverride = false) -> ImportedMethodReference` authors a
 public concrete nonvirtual root-class member contract without a reader definition.
 The declaring type must be an output-owned, top-level reference-class definition whose
 dependency/core/artifact contract has already been registered. Pass the generic definition,
@@ -4873,7 +4873,7 @@ arguments. Static generic methods are supported; instance generic methods are no
 
 Signatures admit primitive values, a Void result, scoped owner/method parameters,
 output-owned external reference-class constructions and vectors. `.ctor` requires an
-instance nongeneric Void signature. Byrefs/out parameters, nested/value owners, class virtual contracts are unsupported. Authored interface dispatch is supported as
+instance nongeneric Void signature. Later extensions documented below admit ref/out parameters, nested/value owners and bounded value overrides. General class virtual contracts remain unsupported. Authored interface dispatch is supported as
 described below. No members or access rules are resolved
 from the dependency: the caller asserts the semantic contract. This API does not imply
 that an arbitrary interface reference can be treated as a reference-class owner.
@@ -6040,3 +6040,22 @@ the descriptor as a nominal object are unsupported. Older readers reject this op
 format-5 field. NativeAssemblyDefinition.ReadAssembly validates its identity and storage
 shape and retains it in the immutable native snapshot. See the integration documentation
 for source Array<T>, iteration configuration and executable validation.
+
+### Imported value overrides and slot facts
+
+`Introspection.MethodInfo.IsNewSlot` exposes the CLI NewSlot declaration bit, including
+on constructed views. A virtual method with this bit clear reuses an inherited slot;
+this is metadata information, not a language-level override-resolution service.
+
+`AssemblyBuilder.CreateMethodReference(ImportedTypeReference declaringType, string name,
+MethodSignature signature, bool isStatic = false, bool isOverride = false)` additionally
+accepts the bounded value override contract: an instance, nongeneric `ToString(): String`
+on a value owner (including a generic value definition). Other override shapes throw
+ArgumentException. Conflicting reuse-slot/ordinary references throw InvalidDataException.
+Repeated equivalent references intern normally. The reference retains a managed receiver
+and native override identity; it does not request class/interface virtual dispatch.
+No dependency metadata is reopened by this authoring API. CLI MemberRef signatures remain
+unchanged. Wider overrides remain unsupported.
+
+The optional isOverride parameter preserves source calls but changes the experimental host
+method signature; rebuild binary consumers with the matching metadata library.

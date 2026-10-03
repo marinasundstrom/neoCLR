@@ -43,7 +43,9 @@ internal static class NativeValueOverrideChecks
         unboundBody.LoadArgument(0); unboundBody.CallVirtual(unboundSlot); unboundBody.Return();
         Reject(() => unbound.WriteNativeAssembly());
         var imported = app.ImportReference(type, core);
-        var method = app.ImportReference(type.Methods.Single(), core);
+        var view = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([snapshot]).Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "Display").GetMethods().Single();
+        Check(view.IsVirtual && !view.IsNewSlot, "introspection lost inherited override slot");
+        var method = app.CreateMethodReference(imported, view.Name, new MethodSignature(PrimitiveType.String, []), isOverride: view.IsVirtual && !view.IsNewSlot);
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         var il = main.GetILGenerator();
         var value = il.DeclareLocal(imported);

@@ -2,11 +2,12 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyBuilder
 {
-    /// <summary>Authors a public nonvirtual class/value member or abstract interface method reference without a reader definition.</summary>
+    /// <summary>Authors a public nonvirtual member, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
     /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
+    /// <param name="isOverride">Reuse the inherited slot; currently only instance value-type ToString(): String is supported.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
@@ -16,7 +17,7 @@ public sealed partial class AssemblyBuilder
     /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic = false)
+        MethodSignature signature, bool isStatic = false, bool isOverride = false)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -24,6 +25,9 @@ public sealed partial class AssemblyBuilder
         if (!ReferenceEquals(declaringType.Owner, this) ||
             declaringType.TypeArguments.Count != 0 || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph))
             throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
+        if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||
+            signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
+            throw new ArgumentException("override reference requires instance value ToString(): String");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
         if (isInterface && (isStatic || constructor || signature.GenericParameterNames.Count != 0))
@@ -40,7 +44,7 @@ public sealed partial class AssemblyBuilder
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -57,6 +61,7 @@ public sealed partial class AssemblyBuilder
         var owner = MaterializeOwner(declaringType);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface };
+        reference.Target.NativeValueOverride = isOverride;
         authoredCallableReferences.Add(reference);
         return reference;
 
