@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Array-lowering boundary (2026-10-03): Raven `19a3e84c0` confines vector expansion to
+portable body planning; ordinary .NET retains its established loop emitter. The 86
+focused checks, native broad application and native labeled-loop case pass. Loop capture
+now matches main's known failure rather than acquiring a different integration result;
+correct lexical closure lifetimes remain independent work. Next target cleanup: inventory
+native-versus-legacy reference consumers before removing any bridge branch.
+[Evidence](experiments/extended-cli-metadata/portable-array-boundary-2026-10-03.json).
+
 Compiler simplification implementation (2026-10-03): Raven `c2a66d82a` removes the
 second production .NET body emitter while retaining the native planner and metadata
 library. All 94 selected checks pass before/after, and the native broad application

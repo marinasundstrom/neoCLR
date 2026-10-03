@@ -10485,3 +10485,23 @@ the established body emitter and is not a passing acceptance case. Shared loweri
 closure lifetime need independent work; the rest of the planned cleanup remains pending.
 No new CLR array adapter, metadata format change or backend rewrite was introduced.
 [Execution evidence](experiments/extended-cli-metadata/dotnet-emitter-simplification-2026-10-03.json).
+
+
+### 2026-10-03 — Keep array expansion out of ordinary .NET lowering
+
+Continuing the authorized simplification, the assistant investigated capture storage:
+the established compiler allocates one method-wide shared closure, but for-loop iteration
+values are written to locals while callbacks read hoisted fields. Integration's global
+array expansion instead writes the shared field, so all callbacks observe its last value.
+Correctness requires lexical closure lifetimes; copying every capture would lose outer
+variable sharing and was not implemented.
+
+The assistant scoped array expansion to explicit portable planning in Raven `19a3e84c0`,
+retaining the established .NET loop route. All 86 focused checks pass. The unchanged
+native broad application executes against its separate library; the existing labeled/
+nested-loop C# fixture's Raven program also verifies and executes natively with exit 9.
+The capture repro now prints main's 0 rather than 333; expected 123 remains unresolved.
+This is a target-boundary cleanup, not a capture fix. Native introspection, builders,
+ILGenerator and nominal Array<T> remain intact. The next cleanup is an inventory of
+remaining native/legacy reference consumers; no speculative adapter was introduced.
+[Evidence](experiments/extended-cli-metadata/portable-array-boundary-2026-10-03.json).

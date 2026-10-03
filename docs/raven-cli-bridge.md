@@ -4891,3 +4891,15 @@ application-order-collections executes with its separately built source library.
 array lowering and the known per-iteration capture bug remain unresolved. See
 [recorded evidence](experiments/extended-cli-metadata/dotnet-emitter-simplification-2026-10-03.json)
 and Raven's `docs/compiler/architecture/neoclr-refactor-parity.md` for remaining work.
+
+
+### Portable array-loop boundary (2026-10-03)
+
+Raven `19a3e84c0` requests vector-for expansion from the portable planner rather than
+ordinary shared lowering. .NET keeps its established loop emitter. Native vectors still
+use nominal Array<T> backing, native import and builder/ILGenerator emission; no new
+Runtime Contract option, CLI projection or metadata encoding is introduced. All 86
+focused .NET tests pass; unchanged native application-order-collections and a labeled/
+nested array-loop program execute successfully. The lexical closure-lifetime bug on main
+remains unresolved, explicitly outside passing results.
+[Evidence](experiments/extended-cli-metadata/portable-array-boundary-2026-10-03.json).

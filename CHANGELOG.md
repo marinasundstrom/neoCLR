@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Scope Raven vector-loop expansion to portable planning (`19a3e84c0`), preserving
+  ordinary .NET loop emission and native nominal-array behavior. All 86 focused checks,
+  native broad execution and native labeled/nested-loop execution pass. Restore main's
+  behavior for the known capture repro without claiming its lexical-lifetime bug fixed.
+
 - Simplify Raven .NET body emission in `c2a66d82a` to its established generator while
   retaining NeoCLR metadata/planning. All 94 selected .NET checks pass before/after and
   unchanged native application-order-collections executes against its separately built
