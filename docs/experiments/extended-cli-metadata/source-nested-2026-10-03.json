@@ -1,0 +1,138 @@
+{
+  "passed": true,
+  "scope": "Ordinary source nested class/value declarations through both drivers. Not generated Raven union emission or separate native case-library consumption.",
+  "driverSha256": "9974EAFBDAED0CB49F4E0033D177A56E54E3BF8627301B6A4FF9DA236E8D4496",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "results": [
+    {
+      "target": "dotnet",
+      "passed": true,
+      "assemblySha256": "7A1A700A3C57FE2E602693FF910C8B3E3A7A1677AC4C30AAD2BB122755AB3EAD",
+      "sourceSha256": "A61B77CDA962C1DF4E1A058D2578367E9BE99DF154E6ABA7CE03D652C09A4088"
+    },
+    {
+      "target": "neoclr",
+      "passed": true,
+      "assemblySha256": "014830D6B9AF8A0C4058CBD5C404C213E651BC018B008879C2FAF0D03E80971F",
+      "sourceSha256": "A61B77CDA962C1DF4E1A058D2578367E9BE99DF154E6ABA7CE03D652C09A4088"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/source-nested-final-20261003/dotnet.dll",
+        "/tmp/source-nested-final-20261003/dotnet.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/source-nested-final-20261003/dotnet.rvn(22,21): warning RAV9006: 'number' needs an initial value. Set it in an initializer or on every normal constructor path.\n\nBuild succeeded with 1 warning(s) in 1,5s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/source-nested-final-20261003/dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/source-nested-final-20261003/neoclr.dll",
+        "/tmp/source-nested-final-20261003/neoclr.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/source-nested-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AFAA8F4253B1CB34FF6CBD4B453F9C3A4DCFB31A288EB8B03A77C6898F60F130: typed-stack/control-flow verification passed (652 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/source-nested-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/source-nested-final-20261003/Rejected.dll",
+        "/tmp/source-nested-final-20261003/Rejected.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support supported public/internal static classes, root classes or unconstrained value types.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/source-nested-final-20261003/Rejected.dll",
+        "/tmp/source-nested-final-20261003/Rejected.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support supported public/internal static classes, root classes or unconstrained value types.\n"
+    }
+  ],
+  "date": "2026-10-03",
+  "ravenRevision": "aa6f5fb59fa6bf48fc96801a1493338dd9cf83d3",
+  "neoClrRevision": "1ce81b3f39258caf2ea9545784ce0f04da285ed2",
+  "focusedDotNetRegressions": {
+    "passed": 14,
+    "failed": 0,
+    "command": "dotnet test test/Raven.CodeAnalysis.Tests -p:WarningLevel=0 -p:UseRavenCoreReference=false --filter 'FullyQualifiedName~EmissionBackendTests|FullyQualifiedName~NominalLocalEmissionTests|FullyQualifiedName~GenericReferenceEmissionTests'",
+    "framework": "net11.0"
+  },
+  "sourceHashes": {
+    "tools/NeoClrMetadataProbe/SourceValueDriverChecks.cs": "daf224b1960ba52f72cca0dc72b603a9dae321722ca55e0383ea053d5a0f3491",
+    "src/Raven.CodeAnalysis.NeoClr/Int32Emitter.cs": "15bfbce05d36e8197baa2a1daa2aacff44b0232fdd9e3ff42fc02777ab4c7f55",
+    "src/Raven.CodeAnalysis/CodeGen/Portable/SourceTypePlan.cs": "355c7f60cc7051458ec69f18df88c9937622e276bb9088e6c9c0f38c00d888b8"
+  },
+  "runtimeConfigSha256": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+  "bootstrap": "Explicit CLI CoreProbe primitive/runtime contract reference; no native application/library projection fallback. No runtime service calls or ownership-manifest changes in this fixture.",
+  "remaining": [
+    "Generated union declaration collection",
+    "Byte discriminators",
+    "Complete synthesized union contracts",
+    "Symbol-authored external value/case operands",
+    "Source-library and broad application gate"
+  ]
+}

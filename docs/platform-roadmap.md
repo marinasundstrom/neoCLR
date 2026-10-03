@@ -62,7 +62,10 @@ inline payloads, default constructors and independent copies. Native emission se
 explicit value declaration capability. Native nested class/value snapshots and Raven symbol ownership now also preserve
 same-named case scopes; direct nested constructor imports execute on both runtimes.
 See [nested case evidence](experiments/extended-cli-metadata/nested-cases-2026-10-03.json).
-Source nested union case emission, byte tags, synthesized union
+Ordinary nested source class/value declaration emission now also executes on both
+targets, with scoped payload identity and copy checks; see
+[nested source evidence](experiments/extended-cli-metadata/source-nested-2026-10-03.json).
+Generated union declaration collection, byte tags, synthesized union
 members and symbol-authored external value operands remain pending; this is not source Option completion. See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires

@@ -123,3 +123,7 @@ for that status.
 Development native emission now includes bounded top-level source structs with generic
 inline payloads, constructors, accessors and value-copy behavior checked against .NET.
 Source-union emission and separate native value-library consumption remain in progress.
+
+The development native emitter also handles bounded nested source class/value declarations
+under nongeneric owners. Paired .NET/native execution checks constructor and copy behavior;
+generated union declarations and byte discriminators remain work in progress.

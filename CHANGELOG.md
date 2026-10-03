@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Advance source-union prerequisites with Raven native nested declaration emission:
+  same-named payloads retain distinct owners; generic nested values, nongeneric classes
+  and value copies execute on both targets. Generic enclosing capture remains unsupported.
+  Metadata encoding/runtime are unchanged; generated union collection and byte tags
+  are still pending.
+
 - Preserve scoped nested class/value identities in direct native metadata snapshots and
   imports, including generic value cases below nongeneric owners. Same-named cases,
   external TypeRef scopes and visibility remain distinct; nested imported constructors
