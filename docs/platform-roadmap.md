@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+Direction reassessment (2026-10-03, author-directed): pause new adapter/compiler work
+and re-establish ordinary Raven/.NET behavior against main before selecting another
+implementation slice. The proposed CLR array adapter below is suspended. Current main
+and integration both pass 36 focused array/iteration checks and an ordinary .NET
+array/IList mutation/LINQ executable. The failing bootstrap configuration asserts custom
+NeoCLR interfaces for CLR vectors; it is not evidence that ordinary .NET arrays regressed.
+Keep native acceptance, ordinary .NET regression checks and cross-runtime source-library
+compatibility evidence distinct. This reassessment does not claim the earlier paired
+source-library gate complete or permanently remove it from scope.
+[Audit](experiments/extended-cli-metadata/dotnet-main-audit-2026-10-03.json).
+
 Paired .NET unit milestone (2026-10-03): explicit source-void/unit mapping removes invalid
 CLR generic storage. Separate union, ArrayList, HashMap and query consumers run successfully
 on .NET; 22 unit-contract tests pass on both Raven branches. Native broad execution remains

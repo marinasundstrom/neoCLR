@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the author-directed compiler direction reassessment and suspend the proposed
+  .NET array adapter slice. Current Raven main and integration pass the same 36 focused
+  array/iteration tests and ordinary .NET mutation/LINQ execution. Distinguish the invalid
+  custom-interface bootstrap assumption from ordinary .NET behavior; no compiler or
+  runtime implementation changes are part of this audit.
+
 - Configure an explicit .NET inhabited-unit value without replacing the CLR core.
   Unchanged source unions/collections now separately compile, import and execute in four
   focused .NET consumers. Native broad execution is preserved. The .NET broad sample

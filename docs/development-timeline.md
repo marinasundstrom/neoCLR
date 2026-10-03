@@ -10409,3 +10409,28 @@ execute successfully; native broad execution remains passing. The .NET broad app
 compiles and prints the expected prefix, then terminates at custom array-interface use.
 The minimal array consumer reproduces signal 10. This is recorded as failure, with explicit
 .NET array conversion/adaptation as the next bounded task. [Evidence](experiments/extended-cli-metadata/dotnet-unit-execution-2026-10-03.json).
+
+
+### 2026-10-03 — Reassess direction against working .NET compilation
+
+The author asked to inspect Raven main before further work, noting that the .NET target
+worked before refactoring, then clarified: “I don’t want you to create new problems. So we
+need to re-assess our direction”. The assistant stopped the proposed array-adapter work
+and compared main `46491585e` with integration `97d07b901`.
+
+Assistant-verified findings: array-interface projection, RuntimeIterationContract and the
+expression generator are identical on those revisions. Both pass 36 focused array and
+iteration tests. A normal compiler invocation using CLR IList<int>, shared array mutation
+and LINQ compiles and executes with expected exit 42 on both. The custom-contract tests
+include binding/emission assertions and do not establish execution of custom NeoCLR
+interfaces on CLR vectors. The failing paired bootstrap manifest explicitly enables those
+custom interfaces; that experiment is not the ordinary .NET baseline.
+
+The assistant acknowledged that proposing an adapter as the immediate next step was
+premature. Proposed direction: preserve the normal .NET dependency/runtime path, verify
+shared-code changes against it, and assess native NeoCLR with its own library/runtime.
+Cross-runtime source-library execution should be evaluated separately before it drives
+more compiler changes. The author has not yet approved a replacement completion gate.
+No compiler/runtime code changed; no adapters were implemented or prior commits reverted.
+The earlier paired gate remains incomplete. This bounded audit does not prove the entire
+compiler regression-free. [Evidence](experiments/extended-cli-metadata/dotnet-main-audit-2026-10-03.json).

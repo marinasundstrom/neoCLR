@@ -1,0 +1,39 @@
+{
+  "date": "2026-10-03",
+  "mainRevision": "46491585e",
+  "integrationRevision": "97d07b901",
+  "filter": "FullyQualifiedName~ImportedArrayInterfaceTests|FullyQualifiedName~RuntimeIterationContractTests|FullyQualifiedName~ArrayTypeSemanticTests|FullyQualifiedName~GenericArrayElementTests|FullyQualifiedName~UnsignedArrayElementTests",
+  "testCommand": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj --no-restore -p:WarningLevel=0 --filter <filter>",
+  "tests": {
+    "main": {
+      "passed": 36,
+      "failed": 0
+    },
+    "integration": {
+      "passed": 36,
+      "failed": 0
+    }
+  },
+  "source": "import System.Collections.Generic.*\nimport System.Linq.*\npublic class Check {\n    public static func Run() -> int {\n        let values: int[] = [1, 22]\n        let view: IList<int> = values\n        view[0] = 20\n        if values[0] != 20 { return 1 }\n        let selected = values.Where(value => value > 0).ToArray()\n        return selected[0] + selected[1]\n    }\n}\nfunc Main() -> int { return Check.Run() }\n",
+  "driverResults": [
+    {
+      "branch": "main",
+      "compileExit": 0,
+      "stdout": "../../../../tmp/raven-direction-audit/ordinary.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../../tmp/raven-direction-audit/ordinary.rvn(6,13): warning RAV9027: Value 'view' is never used.\n\nBuild succeeded with 2 warning(s) in 2,1s\n",
+      "stderr": "",
+      "runExit": 42,
+      "runStdout": "",
+      "runStderr": ""
+    },
+    {
+      "branch": "integration",
+      "compileExit": 0,
+      "stdout": "../../../../tmp/raven-direction-audit/ordinary.rvn(4,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\n../../../../tmp/raven-direction-audit/ordinary.rvn(6,13): warning RAV9027: Value 'view' is never used.\n\nBuild succeeded with 2 warning(s) in 1,8s\n",
+      "stderr": "",
+      "runExit": 42,
+      "runStdout": "",
+      "runStderr": ""
+    }
+  ],
+  "scope": "Ordinary .NET default configuration. No bootstrap ownership or NeoCLR iteration contract. Does not establish full compiler parity or completion of the source-library-on-CLR gate."
+}
