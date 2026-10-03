@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Extend explicit bootstrap method imports for intrinsic String/Int32 receivers and
+  the exact Object.GetHashCode virtual slot, with receiver/identity/signature rejection
+  tests. Compile unchanged StringComparer into the native source library using a
+  dedicated comparer ownership/core/seed profile. With Raven `7b3928239`, focused
+  equality, Unicode ordering, folded hashes, map replacement and extreme Int32
+  comparisons execute. The full comparer sample remains blocked on integer-range
+  loops. No runtime or format-version change; guest API snapshot remains stale.
+
 - Record Raven `1b15715bf` native primitive captures and promoted integer operand
   emission. Captured comparer policies, escaped/per-iteration values and mixed-width
   arithmetic execute; mutable captures reject before output. Broad native gate,

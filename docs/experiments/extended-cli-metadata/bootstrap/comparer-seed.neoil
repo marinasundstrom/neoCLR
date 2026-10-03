@@ -1,0 +1,31 @@
+.include "collection-seed.neoil"
+.type System.Int32
+.sealed
+.method instance readonly byref CompareTo(Int32 other) -> Int32
+ldarg 0
+ldobj Int32
+ldarg 1
+clt
+brtrue less
+ldarg 0
+ldobj Int32
+ldarg 1
+cgt
+brtrue greater
+ldc.i4 0
+ret
+less:
+ldc.i4 -1
+ret
+greater:
+ldc.i4 1
+ret
+.end
+.end
+.type System.Runtime.CompilerServices.RuntimeServices
+.method static StringHashOrdinalIgnoreCase(String value) -> Int32
+ldarg 0
+call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
+ret
+.end
+.end

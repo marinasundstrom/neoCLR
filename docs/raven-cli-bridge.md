@@ -5083,3 +5083,45 @@ Both mutable reference and mutable scalar captures reject without publishing out
 The full unchanged comparer sample remains blocked by missing StringComparer service
 bindings and primitive CompareTo contracts; this focused case is not a replacement for
 that sample. The promotion fix is recorded in Raven as a deferred general candidate.
+
+## Source-built comparer and explicit primitive bootstrap (2026-10-04)
+
+`comparer-ownership.json` extends the source library with unchanged
+`System/StringComparer.rvn`; applications import the emitted artifact, not that source.
+The new `--reference-comparer-storage-core` exporter mode supplies declaration-only
+Int32.CompareTo, String.CompareOrdinalIgnoreCase and RuntimeServices.StringHashOrdinalIgnoreCase
+on the primitive storage core. The executable `comparer-seed.neoil` supplies overflow-free
+integer comparison and the case-folded hash adapter. Shared union seed adapters now
+expose String equality/comparison operators and Object hashing/reference identity through
+existing runtime services. No placeholder CLI body is executed. Full primitive source
+compilation remains open, so these members remain bootstrap-owned and explicitly scoped.
+
+Generate the core with the existing Probe build against the matching Raven compiler:
+
+```sh
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --reference-comparer-storage-core /tmp/ComparerCore.dll
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_source_unions.py \
+  --comparers --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --core /tmp/ComparerCore.dll --output /tmp/fresh-comparer-gate
+```
+
+Raven `7b3928239` emits the bound static operator call and explicitly admitted Object
+hash slot. Metadata import maps only selected explicit core String/Int32 members to
+intrinsic receiver storage; it does not import String as a nominal layout. String uses
+its reference value and Int32 a managed address. Missing/nonvirtual Object hash slots,
+wrong results, virtual primitive members and incorrect receiver modes reject. Native
+and CLI encodings remain unchanged. The emitter still uses compiler symbols and host
+artifact contracts; native library references have no fallback to CLI projection.
+
+The focused string-comparer-consumer verifies UTF-8 scalar order (intentionally different
+from .NET UTF-16 ordinal order), Unicode simple-folded equality/hashes, matching Object
+hashes, map replacement and extreme signed comparisons. It passes along with the broad
+application and seven native consumers. 128 metadata groups, dedicated native/static
+String binding checks and 34 focused C#/.NET tests pass. Guest API snapshot validation
+still reports the known stale snapshot; the host API manual reference is updated.
+
+The unchanged full library-comparers sample now reaches an unsupported integer-range
+BoundForStatement. It was not edited or replaced as an acceptance claim. Range lowering
+is the next bounded task; general primitive source ownership and the larger guest
+introspection library are separate subsequent work.

@@ -31,6 +31,9 @@ public sealed partial class AssemblyBuilder
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>().Where(m => m.IsCoreObjectToString).Distinct())
             (target.Assembly.NativeBinding ?? throw new InvalidDataException("native Object.ToString dispatch requires an explicit core slot binding")).ValidateObjectToStringSlot();
 
+        foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>().Where(m => m.IsCoreObjectHash).Distinct())
+            (target.Assembly.NativeBinding ?? throw new InvalidDataException("native Object.GetHashCode dispatch requires an explicit core slot binding")).ValidateObjectHashSlot();
+
         static void CheckText(string text)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Any(char.IsControl)) throw new InvalidDataException("invalid native descriptive name");

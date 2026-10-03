@@ -46,14 +46,15 @@ public sealed partial class AssemblyBuilder
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
-    /// <remarks>No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
+    /// <remarks>With an explicit native System binding, core String and Int32 methods use validated intrinsic receiver signatures. Core Object.GetHashCode requires its exact virtual Int32 slot.
+    /// No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
     /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; native cross-dependency signatures require the explicit-resolver overload; CLI cross-dependency decoding remains unsupported.
     /// Native primitive/nominal-reference/vector namespace functions, unconstrained static generic calls with method parameters, and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary)
         => ImportReference(definition, dependencyCoreLibrary, null);
 
     /// <summary>Imports a contract with explicitly resolved cross-assembly nominal signature types.
-    /// The explicit CLI core Object.ToString slot supports virtual dispatch; native output requires
+    /// The explicit CLI core Object.ToString and Object.GetHashCode slots support virtual dispatch; native output requires
     /// a matching validated System binding. Other nonfinal virtual reference-class methods remain unsupported.</summary>
     /// <param name="definition">Immutable method or field definition.</param>
     /// <param name="dependencyCoreLibrary">Matching explicit core contract for all resolved dependencies.</param>
@@ -83,15 +84,22 @@ public sealed partial class AssemblyBuilder
             (type.Attributes & 0x27) == 1 && definition.Name == "ToString" && !definition.IsStatic && definition.GenericArity == 0 &&
             isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
             definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x0e });
+        bool isObjectHash = !definition.Module.Assembly.IsNative && definition.AuthoredSignature is null && identity.Equals(CoreLibrary) && type is { Namespace: "System", Name: "Object", GenericArity: 0, IsValueType: false, DeclaringType: null } &&
+            (type.Attributes & 0x27) == 1 && definition.Name == "GetHashCode" && !definition.IsStatic && definition.GenericArity == 0 &&
+            isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
+            definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x08 });
+        bool intrinsicPrimitiveOwner = NativeBindingFor(identity) is not null && identity.Equals(CoreLibrary) &&
+            type is { Namespace: "System", Name: "String" or "Int32", GenericArity: 0, DeclaringType: null } &&
+            type.IsValueType == (type.Name == "Int32");
         if (type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
             definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
-            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString)))
+            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString && !isObjectHash)))
             throw new InvalidDataException("unsupported imported instance method contract");
         if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
             throw new InvalidDataException("invalid imported constructor contract");
-        var declaringReference = type is not null && (!definition.IsStatic || type.GenericArity > 0)
+        var declaringReference = !intrinsicPrimitiveOwner && type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
         var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver);
         if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
@@ -126,6 +134,8 @@ public sealed partial class AssemblyBuilder
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         reference.Target.IsCoreObjectToString = isObjectToString;
+        reference.Target.IsCoreObjectHash = isObjectHash;
+        if (isObjectHash) NativeBindingFor(identity)?.ValidateObjectHashSlot();
         if (isObjectToString) NativeBindingFor(identity)?.ValidateObjectToStringSlot();
         reference.Target.NativeValueOverride = definition.Module.Assembly.IsNative && type?.IsValueType == true && (definition.Attributes & 0x140) == 0x40;
         NativeBindingFor(identity)?.ValidateMethod(definition, reference.Target);

@@ -6106,3 +6106,30 @@ string declaredName = parameter.Name;
 
 This host-only member is outside the guest RavenDoc selection and is documented here.
 C# contracts cover native name/ordinal/canonical identity and explicit CLI rejection.
+
+### Primitive comparer bootstrap imports (development, 2026-10-04)
+
+`AssemblyBuilder.ImportReference(MethodDefinition, AssemblyIdentity)` additionally
+supports explicit CLI core String/Int32 members bound to an executable native System
+seed. It validates snapshot/core identity, primitive owner, public concrete nonvirtual
+method, parameters/results and receiver passing mode. String instance calls consume a
+String value; Int32 instance calls consume a managed address to Int32. Generic owner or
+nominal layout inference is not introduced. String still cannot be imported as an
+ordinary nominal class through this bootstrap mapping. `ImportedMethodReference` keeps
+its original CLI owner identity and reports `RequiresManagedReceiver` for Int32.
+`IILGenerator.Call`/`Emit` validate the actual primitive receiver and preserve the ordinary
+CLI member reference encoding; native output uses the existing primitive owner encoding.
+
+The exact public virtual core `System.Object.GetHashCode() -> Int32` slot is now admitted
+by `ImportReference` and `IILGenerator.CallVirtual`/`Emit(Callvirt, ...)`. Native output
+requires an explicit System binding with matching virtual/result/receiver flags. Missing,
+wrong or nonvirtual slots throw `InvalidDataException` before an image is returned.
+This does not enable arbitrary class virtual imports. No public signature, metadata
+version or runtime instruction changes are required.
+
+C# native comparer binding checks execute String.Equals, Int32.CompareTo and Object
+hash calls and reject wrong receiver modes, virtual primitive methods, wrong hash result
+and unbound native hash dispatch. The source-built StringComparer consumer tests existing
+UTF-8 scalar ordering and Unicode simple folding; .NET ordinal UTF-16 ordering is not
+substituted. This host API is documented manually; the separate guest RavenDoc snapshot
+check remains stale and was not regenerated for this host-only change.

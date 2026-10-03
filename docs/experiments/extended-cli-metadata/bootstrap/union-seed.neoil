@@ -16,6 +16,17 @@
 .method instance .ctor() -> noresult
 ret
 .end
+.method instance virtual GetHashCode() -> Int32
+ldarg 0
+call neoCLR.Runtime.ObjectIdentityHash(System.Object)
+ret
+.end
+.method static ReferenceEquals(System.Object left,System.Object right) -> Boolean
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.ObjectReferenceEquals(System.Object,System.Object)
+ret
+.end
 .method instance virtual ToString() -> String
 ldarg 0
 call neoCLR.Runtime.ObjectTypeHandle(System.Object)
@@ -26,6 +37,44 @@ ret
 .end
 .type System.String
 .sealed
+.method instance Equals(String other) -> Boolean
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
+ldc.i4 0
+ceq
+ret
+.end
+.method static op_Equality(String left,String right) -> Boolean
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
+ldc.i4 0
+ceq
+ret
+.end
+.method static op_Inequality(String left,String right) -> Boolean
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
+ldc.i4 0
+ceq
+ldc.bool false
+ceq
+ret
+.end
+.method static CompareOrdinal(String left,String right) -> Int32
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
+ret
+.end
+.method static CompareOrdinalIgnoreCase(String left,String right) -> Int32
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String,String)
+ret
+.end
 .method static Concat(String left,String right) -> String
 ldarg 0
 ldarg 1
@@ -60,5 +109,21 @@ ret
 .end
 
 .function neoCLR.Runtime.Int32ToString(Int32 value) -> String
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.ObjectIdentityHash(System.Object value) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ObjectReferenceEquals(System.Object left,System.Object right) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringCompareOrdinal(String left,String right) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String left,String right) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringHashOrdinalIgnoreCase(String value) -> Int32
 .methodimpl InternalCall
 .end

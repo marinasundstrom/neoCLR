@@ -7,8 +7,9 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false, bool comparerStorage = false)
     {
+        collectionStorage |= comparerStorage;
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
         if (checkedStorage || collectionStorage) declarations += CheckedStorageBindings.Declarations;
         if (collectionStorage) declarations += FunctionBindings.Declarations + "public static class FailFunctions { public static void Fail(string message) { } }";
@@ -21,6 +22,11 @@ static class CoreDeclarations
         var source = Source.Replace("public struct Double { }", unionProbe ? DoubleBindings.Declarations : "public struct Double { }").Replace("public struct Int32 { }", unionProbe ? Int32Bindings.Declarations : "public struct Int32 { }").Replace("public sealed class String { }", StringBindings.Declarations(unionProbe, collectionProbe))
             .Replace("public static class Console { public static void WriteLine(string value) { } }", declarations)
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
+        if (comparerStorage)
+            source = source.Replace("public struct Int32 { }", "public struct Int32 { public int CompareTo(int other) => 0; }")
+                .Replace("public sealed class String {", "public sealed class String { public static int CompareOrdinalIgnoreCase(string left, string right) => 0;");
+        if (comparerStorage)
+            source += "namespace System.Runtime.CompilerServices { public static class RuntimeServices { public static int StringHashOrdinalIgnoreCase(string value) => 0; } }";
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration);
         if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "").Replace("public abstract class Enum : ValueType { }", EnumHelpersBindings.Declaration)
             .Replace("public abstract class Object {", "public abstract class Object { public System.Introspection.TypeInfo GetType() => default;"));

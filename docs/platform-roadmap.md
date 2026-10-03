@@ -1,5 +1,17 @@
 # neoCLR platform roadmap
 
+Native source comparer milestone (2026-10-04): unchanged StringComparer.rvn now
+compiles into the independently consumed native class library. The explicit comparer
+bootstrap supplies primitive String/Int32 members and runtime services; metadata imports
+validate primitive receiver modes and the Object.GetHashCode virtual slot. Raven
+`7b3928239` admits that bounded slot and bound static binary operators. The focused
+consumer verifies ordinal/folded equality and hashing, Unicode scalar ordering, map
+replacement and extreme Int32.CompareTo. Expanded broad native gate, seven consumers,
+128 metadata groups, dedicated native binding checks and 34 C#/.NET tests pass.
+Next bounded blocker: integer-range loop lowering in unchanged library-comparers.
+No runtime/format change or full comparer-sample completion is claimed.
+[Evidence](experiments/extended-cli-metadata/source-comparers-2026-10-04.json).
+
 Native primitive capture prerequisite (2026-10-04): Raven `1b15715bf` admits immutable
 Int32/Int64/Boolean/Byte local captures through the existing closure frames. A separately
 compiled FunctionEqualityComparer/HashMap consumer executes with a captured divisor,

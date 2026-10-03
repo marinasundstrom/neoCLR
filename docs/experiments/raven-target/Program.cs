@@ -234,6 +234,12 @@ if (args.Length == 2 && args[0] == "--reference-primitive-core")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-comparer-storage-core")
+{
+    CoreDeclarations.Write(args[1], comparerStorage: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-collection-storage-core")
 {
     CoreDeclarations.Write(args[1], collectionStorage: true);

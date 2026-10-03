@@ -163,3 +163,8 @@ primitive local captures (Int32, Int64, Boolean and Byte). Separate-library exec
 checks shared object mutation and distinct captured loop values. Mutable local captures
 and general closure support remain outside this bounded native profile; ordinary Raven
 .NET closure support follows its existing compiler path.
+
+Development source-library coverage now includes separately compiled StringComparer
+with explicit primitive/runtime bootstrap bindings. Native consumers exercise ordinal
+and case-folded equality, hashing and ordering. The full comparer sample still awaits
+integer-range loop support; this is bounded integration evidence, not full-library support.

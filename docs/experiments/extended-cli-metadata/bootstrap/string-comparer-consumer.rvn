@@ -1,0 +1,38 @@
+import System.*
+import System.Collections.*
+
+func Check(condition: bool, message: string) {
+    if !condition {
+        System.Fail(message)
+    }
+}
+
+func Main() -> int {
+    let ordinal = StringComparer.Ordinal
+    let folded = StringComparer.OrdinalIgnoreCase
+    let reconstructed = String.Concat("ca", "fé")
+    Check(reconstructed == "café" && reconstructed != "CAFÉ", "bound string operators")
+    Check(ordinal.Equals("café", reconstructed), "content equality")
+    Check(ordinal.GetHashCode("café") == ordinal.GetHashCode(reconstructed), "equal hashes")
+    let boxed: object = reconstructed
+    Check(boxed.GetHashCode() == ordinal.GetHashCode(reconstructed), "object hash agreement")
+    Check(!ordinal.Equals("A", "a"), "case sensitive")
+    Check(!ordinal.Equals("é", "é"), "no normalization")
+    Check(ordinal.Compare("𐀀", "") > 0, "Unicode scalar order")
+    Check(folded.Equals("CAFÉ", reconstructed), "folded equality")
+    Check(folded.GetHashCode("CAFÉ") == folded.GetHashCode(reconstructed), "folded hashes")
+    Check(folded.Compare("CAFÉ", reconstructed) == 0, "folded ordering")
+    let files = HashMap<string, int>(folded)
+    Check(files.TryAdd("café", 40), "add")
+    Check(!files.TryAdd("CAFÉ", 99), "duplicate")
+    files.Set("CAFÉ", 42)
+    Check(files.Count == 1, "replacement")
+    let low = -2147483648
+    let high = 2147483647
+    Check(low.CompareTo(high) < 0 && high.CompareTo(low) > 0, "overflow-free ordering")
+    Check(high.CompareTo(high) == 0, "equal ordering")
+    return match files.Find(reconstructed) {
+        .Some(let found) => found
+        .None => 1
+    }
+}

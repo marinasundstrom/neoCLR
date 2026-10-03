@@ -25,7 +25,9 @@ def main():
     parser.add_argument('--queries', action='store_true', help='Compile unchanged full query sources and execute an independent consumer')
     parser.add_argument('--arrays', action='store_true', help='Execute source Array<T> backing and query iteration over native vectors')
     parser.add_argument('--application', action='store_true', help='Run unchanged application-order-collections against the separately built native library')
+    parser.add_argument('--comparers', action='store_true', help='Build unchanged StringComparer and run comparer plus broad application acceptance; requires comparer-storage core')
     args = parser.parse_args()
+    args.application = args.application or args.comparers
     args.arrays = args.arrays or args.application
     args.queries = args.queries or args.arrays
     args.hashmap = args.hashmap or args.extensions or args.queries
@@ -42,9 +44,9 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / ('array-ownership.json' if args.arrays else 'query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    manifest = HERE / ('comparer-ownership.json' if args.comparers else 'array-ownership.json' if args.arrays else 'query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
     consumer_source = HERE / ('array-consumer.rvn' if args.arrays else 'query-consumer.rvn' if args.queries else 'hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
-    seed_source = HERE / ('collection-seed.neoil' if args.collections else 'union-seed.neoil')
+    seed_source = HERE / ('comparer-seed.neoil' if args.comparers else 'collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
     seed = output / 'System.neox'
     library = output / 'NeoCLR.Collections.dll'
@@ -98,6 +100,8 @@ def main():
             (ROOT / 'docs/experiments/raven-target/samples/library-collection-capabilities.rvn', 0,
              '2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n'),
         ]
+        if args.comparers:
+            samples.append((HERE / 'string-comparer-consumer.rvn', 42, ''))
         for name in ['library-query-basics', 'library-query-names']:
             source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
             expected = source.with_suffix('.expected.txt')
