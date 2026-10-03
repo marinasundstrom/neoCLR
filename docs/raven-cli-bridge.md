@@ -4532,3 +4532,15 @@ execute on both targets; 11 focused tests pass. Plain/generic unions reach the n
 union/case metadata gate. Unchanged Option next rejects its TryGetOutput case pattern.
 No metadata/runtime change or union execution is claimed. See
 [null evidence](experiments/extended-cli-metadata/typed-null-2026-10-03.json).
+
+Option body continuation (2026-10-03): Raven a99cd3c3e reuses existing case-pattern
+lowering in conditional branches and Boolean values, and emits RuntimeUnitContract's
+inhabited value as a nominal default. Native configured unit out/value arguments
+execute (42); .NET configured ValueTuple storage also executes. Existing CLI/native
+instructions and runtime mappings are unchanged. Unchanged Option and its dependencies
+now pass source-body preflight and reach the union/case metadata publication guard.
+Next implement general custom-attribute authoring/reading and introspection, retaining
+Raven's .NET UnionAttribute, case-name/ordinal and generic companion contracts through
+the existing runtime custom_attributes representation. No union-only wire format or
+unmarked-struct fallback is planned. Encoding and native union execution remain unproved.
+[Case/unit evidence](experiments/extended-cli-metadata/union-case-unit-2026-10-03.json).

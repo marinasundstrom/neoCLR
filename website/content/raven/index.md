@@ -153,3 +153,7 @@ focused .NET/NeoCLR executions. Imported and readonly field addresses remain out
 Development update (2026-10-03): core Object.ToString dispatch now executes for boxed
 values through the metadata API and ordinary Raven commands. Union preflight next
 requires synthesized null literal emission; native union execution is still pending.
+
+Development continuation (2026-10-03): unchanged Option now passes native source-body
+preflight. Preserving union/case attributes through metadata and native semantic import
+remains required before native union output or execution can be claimed.

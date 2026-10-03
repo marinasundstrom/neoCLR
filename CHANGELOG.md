@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven case-branch/Boolean pattern lowering and configured unit storage.
+  Native unit out/value argument execution returns 42. Unchanged Option passes
+  source-body preflight; union/case attribute round trips remain the publication gate.
+
 - Record Raven contextual reference-null lowering and dual-target execution. Plain/
   generic union bodies now reach metadata preservation; unchanged Option reaches
   its TryGetOutput case pattern. Native union output remains withheld.

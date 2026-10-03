@@ -10232,3 +10232,22 @@ not Self dispatch evidence. Raven integration and implementation substitution re
   forwards remains open, not implemented or inferred as an immediate breaking change.
 - Evidence: tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodBodyGenerator.cs,
   MethodILGenerator.cs and TaggedValueLayoutChecks.cs; Raven Int32Emitter adapter.
+
+## 2026-10-03 — Share CLR instruction and metadata information
+
+- **Author:** emphasized that targeting NeoCLR should not require complicated new
+  machinery when the writer can consume the same information: “same instructions,
+  same instruction set as the .NET platform, the CLR.” Mapping differences are the
+  exception that requires target handling.
+- **Assistant:** agreed to carry existing lowered operations and metadata facts through
+  the target adapter, and identified missing preservation of union attributes, case
+  identities and generic companion relationships as the next writer/reader work.
+  Proposed reusing Raven's attribute-based contract rather than a separate union encoding.
+- **Actions/evidence:** Object display, contextual nulls, case tests and configured unit
+  storage now reuse existing CLI/native operations. Core display and null drivers execute
+  on both targets; the configured native unit driver executes with its explicit seed.
+  Unchanged Option now reaches metadata preservation after its bodies pass preflight.
+  See [case/unit evidence](experiments/extended-cli-metadata/union-case-unit-2026-10-03.json).
+- **Open:** custom-attribute authoring/reader/introspection coverage, native union/case
+  semantic reconstruction, then separately compiled union consumer execution. This is
+  a work direction and partial implementation report, not completed union support.
