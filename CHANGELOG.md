@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Preserve native Self signatures in the experimental metadata definitions/builders,
+  PE/#Neo readers/writers and scoped introspection member views. Self remains distinct
+  from generic parameter ordinals; invalid storage and free-function contexts reject.
+  Executable CLI emission rejects Self; reference-only projection retains the explicit
+  core marker. Contract loading is verified; Raven integration and typed dispatch
+  authoring remain pending.
+
 - Establish a source-owned iteration/collection contract bootstrap: seven unchanged
   Raven source units compile into a separate library consumed and executed on .NET
   and neoCLR. A checked-in ownership manifest selects the iteration contract; a

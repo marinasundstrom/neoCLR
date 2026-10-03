@@ -31,7 +31,7 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
         ArgumentNullException.ThrowIfNull(arguments);
         if (GenericArity == 0 || TypeArguments.Count != 0 || arguments.Length != GenericArity ||
             arguments.Any(t => t is null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16)) throw new ArgumentException("invalid imported type construction", nameof(arguments));
-        foreach (var argument in arguments) argument.ValidateOwner(Owner, 32, 32);
+        foreach (var argument in arguments) argument.ValidateOwner(Owner, 32, 32, allowSelf: true);
         return new(Owner, AssemblyIdentity, Namespace, Name, GenericArity, (SignatureType[])arguments.Clone(), IsValueType, DeclaringType);
     }
     internal ImportedTypeReference Substitute(Func<SignatureType, SignatureType> substitute) => TypeArguments.Count == 0 ? this

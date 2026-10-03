@@ -293,12 +293,17 @@ public sealed partial class NativeAssemblyDefinition
                 }
             for (int i = 0; i < types.Count; i++)
                 foreach (var (parameter, flags) in types[i].SpecialConstraints) signatureOwners[i].SetSpecialConstraints(parameter, flags);
-            SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false)
+            SignatureType ReadType(JsonElement element, bool allowVoid, bool allowArray = true, bool allowByReference = false, bool allowSelf = false)
             {
                 if (element.ValueKind == JsonValueKind.String)
                 {
                     if (!allowVoid && element.GetString() == "Void" && nativeTypeAliases.TryGetValue(("System.Void", 0), out var unit) && unit.ValueType && unit.Namespace == "System" && unit.Name == "Void")
                         return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                    if (element.GetString() == "SelfType")
+                    {
+                        Require(allowSelf, "Self requires an interface contract signature");
+                        return SignatureType.Self;
+                    }
                     return ReadPrimitive(element.GetString(), allowVoid);
                 }
                 if (element.TryGetProperty("Function", out var function))
@@ -313,7 +318,7 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Require(allowByReference, "byref only supported in method parameters");
                     Shape(element, "ByRef");
-                    return SignatureType.ByReference(ReadType(target, false));
+                    return SignatureType.ByReference(ReadType(target, false, allowSelf: allowSelf));
                 }
                 if (element.TryGetProperty("TypeParameter", out var typeParameter))
                 {
@@ -330,13 +335,13 @@ public sealed partial class NativeAssemblyDefinition
                 if (element.TryGetProperty("ArrayRef", out var arrayElement))
                 {
                     Require(allowArray, "nested arrays unsupported"); Shape(element, "ArrayRef");
-                    return SignatureType.ArrayOf(ReadType(arrayElement, false, false));
+                    return SignatureType.ArrayOf(ReadType(arrayElement, false, false, allowSelf: allowSelf));
                 }
                 if (element.TryGetProperty("Constructed", out var construction))
                 {
                     Shape(element, "Constructed"); Shape(construction, "definition", "arguments");
                     var definition = types.FindIndex(t => t.NativeName == Text(construction, "definition") && !t.IsStatic && t.GenericNames.Length > 0);
-                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false)).ToArray();
+                    var arguments = Array(construction, "arguments", 32).Select(a => ReadType(a, false, allowSelf: allowSelf)).ToArray();
                     return definition >= 0 ? signatureOwners[definition].MakeGenericInstance(arguments)
                         : ImportExternalType(signatureGraph, Text(construction, "definition"), arguments.Length, referenceIdentities, valueTypeReferences, nativeTypeAliases).MakeGenericInstance(arguments);
                 }
@@ -357,7 +362,7 @@ public sealed partial class NativeAssemblyDefinition
                 }
             }
             typeArity = 0;
-            string TypeKey(SignatureType type) => type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
+            string TypeKey(SignatureType type) => type.IsSelf ? "self" : type.FunctionSignature is { } function ? "function:" + TypeKey(function.ReturnType) + "(" + string.Join(",", function.ParameterTypes.Select(TypeKey)) + ")" : type.ByReferenceElement is { } target ? "byref:" + TypeKey(target) : type.ImportedType is { } imported ? "external:" + JsonSerializer.Serialize(new { imported.AssemblyIdentity, imported.Namespace, imported.Name, Arguments = imported.TypeArguments.Select(TypeKey).ToArray() }) : type.GenericInstance is { } instance ? "constructed:" + System.Array.IndexOf(signatureOwners, instance.Definition) + "<" + string.Join(",", instance.TypeArguments.Select(TypeKey)) + ">" : type.TypeParameterIndex is { } ordinal ? "type:" + ordinal : type.MethodParameterIndex is { } index ? "method:" + index : type.ArrayElement is { } element ? "array:" + TypeKey(element)
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
@@ -423,9 +428,9 @@ public sealed partial class NativeAssemblyDefinition
                 if (method.TryGetProperty("locals", out _))
                     foreach (var local in Array(method, "locals", 256)) _ = ReadType(local, false);
                 var parameters = Array(method, "parameters", 256);
-                var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true)).ToArray();
+                var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface)).ToArray();
                 var noResult = method.GetProperty("no_result").GetBoolean();
-                var resultType = ReadType(method.GetProperty("returns"), noResult);
+                var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
                 Require(ownerIndex < 0 || ns.Length == 0, "type method cannot declare a function namespace");
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
@@ -459,9 +464,9 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Shape(property, "name", "instance", "parameters", "ty", "getter", "setter");
                     var name = Text(property, "name"); CheckName(name);
-                    var indices = Array(property, "parameters", 256).Select(p => ReadType(p, false)).ToArray();
+                    var indices = Array(property, "parameters", 256).Select(p => ReadType(p, false, allowSelf: types[owner].IsInterface)).ToArray();
                     Require(name.Length <= 1024 && names.Add(name + "(" + string.Join(",", indices.Select(TypeKey)) + ")"), "invalid or duplicate property");
-                    var valueType = ReadType(property.GetProperty("ty"), false);
+                    var valueType = ReadType(property.GetProperty("ty"), false, allowSelf: types[owner].IsInterface);
                     var instance = property.GetProperty("instance").GetBoolean();
                     int Accessor(string key, bool setter)
                     {
@@ -485,7 +490,7 @@ public sealed partial class NativeAssemblyDefinition
                         }
                         var ownerName = constructed ? Text(construction, "definition") : Text(referenceOwner, "Named");
                         Require(ownerName == types[owner].NativeName && reference.GetProperty("instance").GetBoolean() == instance, "property accessor owner/instance mismatch");
-                        var parameters = Array(reference, "parameters", 256).Select(p => ReadType(p, false, allowByReference: true)).ToArray();
+                        var parameters = Array(reference, "parameters", 256).Select(p => ReadType(p, false, allowByReference: true, allowSelf: types[owner].IsInterface)).ToArray();
                         Require(parameters.SequenceEqual(setter ? indices.Append(valueType) : indices), "property accessor parameters mismatch");
                         var candidates = methods.Select((m, i) => (m, i)).Where(p => p.m.Owner == owner && methodNames[p.i] == Text(reference, "name") && p.m.Signature.ParameterTypes.SequenceEqual(parameters)).ToArray();
                         Require(candidates.Length == 1, "missing or ambiguous property accessor");

@@ -284,3 +284,9 @@ constructs ordinary union values through checked Reflection extensions.
 
 See [Function types and objects](../functions/) for signature identity, value bindings
 and the transitional bound-target Function property.
+
+The development .NET host metadata facade also preserves interface-scoped native Self
+signatures in declared member views. This is separate from guest introspection and does
+not yet provide Raven native Self dispatch. See the
+[experimental metadata API](/docs/experimental-metadata/#native-self-signatures-development-2026-10-03)
+for supported signatures and remaining limits.

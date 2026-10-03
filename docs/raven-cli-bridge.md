@@ -4060,3 +4060,16 @@ round-trip, and runtime dependency/dispatch verification. Current writer/reader 
 attachment requires owned definitions. Do not simply remove admission checks or duplicate
 contracts into the implementation assembly. No compiler/runtime behavior changes in this
 baseline test slice.
+
+### Native Self metadata contract slice (2026-10-03)
+
+The host metadata API now retains `SignatureType.Self` and scoped `SelfTypeInfo` for
+bodyless instance-interface declarations and associated properties. Runtime Contract
+configuration is unchanged: Raven still needs its explicitly configured primitive core
+and Self transport marker for the existing CLI bridge. No native Raven symbol or emitter
+mapping is added by this slice. Native readers consume SelfType directly; reference-only
+PE projection scopes the fieldless value-type marker to the supplied core identity.
+Executable CLI emission rejects this native-only signature. This preserves contract
+information without promising CLR execution of Self. Next adapt Raven symbols from
+facade facts, then author native implementing-type substitution and typed calls from
+symbols; keep importer objects out of emission. See the host API reference for the bounds.

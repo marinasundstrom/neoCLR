@@ -13,8 +13,8 @@ public sealed class PropertyInfo
         MetadataToken = definition.MetadataToken;
         DeclaringType = owner;
         IsStatic = isStatic;
-        PropertyType = context.ResolveSignature(type!, arguments);
-        IndexParameterTypes = Array.AsReadOnly(indices.Select(t => context.ResolveSignature(t, arguments)).ToArray());
+        PropertyType = context.ResolveMemberSignature(type!, arguments, [], owner);
+        IndexParameterTypes = Array.AsReadOnly(indices.Select(t => context.ResolveMemberSignature(t, arguments, [], owner)).ToArray());
         GetMethod = definition.GetMethod is { } getter ? context.GetMethod(getter, owner) : null;
         SetMethod = definition.SetMethod is { } setter ? context.GetMethod(setter, owner) : null;
     }

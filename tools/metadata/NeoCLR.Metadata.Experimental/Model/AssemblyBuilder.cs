@@ -110,7 +110,7 @@ public sealed partial class AssemblyBuilder
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
-                method.Signature.ValidateOwner(this, arity, complete: true);
+                method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
@@ -295,8 +295,16 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
+        TypeReferenceHandle selfMarker = default;
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.IsSelf)
+            {
+                if (!referenceOnly) throw new InvalidDataException("Self requires native emission; CLI projection is reference-only");
+                if (selfMarker.IsNil) selfMarker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("Self"));
+                encoder.Type(selfMarker, isValueType: true);
+                return;
+            }
             if (type.FunctionSignature is { } function)
             {
                 var arguments = function.NoResult ? function.ParameterTypes.ToArray() : function.ParameterTypes.Append(function.ReturnType).ToArray();
@@ -774,7 +782,7 @@ public sealed partial class TypeBuilder
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
         if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
-        signature.ValidateOwner(Assembly, GenericParameterNames.Count);
+        signature.ValidateOwner(Assembly, GenericParameterNames.Count, allowSelf: IsInterface);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
             methods.Any(m => m.Name == name && m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("invalid or duplicate method");

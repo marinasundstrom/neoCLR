@@ -6,7 +6,7 @@ public sealed partial class AssemblyDefinition
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including value, constrained, nested and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference, local or external generic construction or vector signatures, and unconstrained top-level classes and interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal reference, local or external generic construction or vector signatures, interface-scoped Self member signatures, and unconstrained top-level classes and interfaces with primitive, nominal reference or vector fields/properties and exact dependency identities.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
@@ -28,7 +28,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.GenericInstance is { } instance && !instance.Definition.IsValueType && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.IsSelf || type.GenericInstance is { } instance && !instance.Definition.IsValueType && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false, IsValueType: false } ||
             type.ImportedType is { IsValueType: false, DeclaringType: null } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
@@ -49,6 +49,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.IsSelf) return new(null, 0, IsSelf: true);
             if (type.GenericInstance is { } instance) return new(null, nominalTokens[(instance.Definition.Namespace, instance.Definition.Name)], Arguments: instance.TypeArguments.Select(Copy).ToArray());
             if (type.TypeParameterIndex is { } typeParameter) return new(null, 0, TypeParameter: typeParameter);
             if (type.MethodParameterIndex is { } parameter) return new(null, 0, MethodParameter: parameter);

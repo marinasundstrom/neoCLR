@@ -42,6 +42,18 @@ public sealed class GenericParameterTypeInfo : TypeInfo
     public override bool IsNominalType => false;
 }
 
+/// <summary>The implementing type of a particular interface view, retained without a runtime type or generic ordinal.</summary>
+public sealed class SelfTypeInfo : TypeInfo
+{
+    internal SelfTypeInfo(MetadataLoadContext context, TypeInfo contract) : base(context) { DeclaringType = contract; }
+    /// <summary>Gets the canonical open or constructed interface view defining this Self scope.</summary>
+    public TypeInfo DeclaringType { get; }
+    /// <inheritdoc/>
+    public override string DisplayName => DeclaringType.DisplayName + ".Self";
+    /// <inheritdoc/>
+    public override bool IsNominalType => false;
+}
+
 /// <summary>A nominal construction retaining its original definition and substituted declared fields.</summary>
 public sealed class ConstructedTypeInfo : TypeInfo
 {
@@ -109,6 +121,7 @@ public sealed class FieldInfo
 
 public sealed partial class MetadataLoadContext
 {
+    private readonly Dictionary<TypeInfo, SelfTypeInfo> selfTypes = [];
     private readonly Dictionary<PrimitiveType, PrimitiveTypeInfo> primitives = [];
     private readonly Dictionary<TypeInfo, ArrayTypeInfo> arrays = [];
     private readonly Dictionary<ConstructionKey, ConstructedTypeInfo> constructions = [];
@@ -139,8 +152,20 @@ public sealed partial class MetadataLoadContext
         lock (gate) return Project(signature, arguments, methods);
     }
 
-    private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods)
+    internal TypeInfo ResolveMemberSignature(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods, TypeInfo? owner)
     {
+        lock (gate) return Project(signature, arguments, methods, owner);
+    }
+
+    private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods, TypeInfo? selfOwner = null)
+    {
+        if (signature.IsSelf)
+        {
+            if (selfOwner is not NominalTypeInfo { IsInterface: true } && selfOwner is not ConstructedTypeInfo { Definition.IsInterface: true })
+                throw new InvalidDataException("Self requires an interface view scope");
+            if (!selfTypes.TryGetValue(selfOwner, out var view)) selfTypes.Add(selfOwner, view = new SelfTypeInfo(this, selfOwner));
+            return view;
+        }
         if (signature.MethodParameterIndex is { } methodPosition)
             return methodPosition < methods.Count ? methods[methodPosition] : throw new InvalidDataException("metadata method parameter outside supplied scope");
         if (signature.TypeParameterIndex is { } position)
@@ -152,13 +177,13 @@ public sealed partial class MetadataLoadContext
         }
         if (signature.ArrayElement is { } element)
         {
-            var type = Project(element, arguments, methods);
+            var type = Project(element, arguments, methods, selfOwner);
             if (type.Depth >= 16) throw new InvalidDataException("metadata type nesting exceeds limit");
             if (!arrays.TryGetValue(type, out var view)) arrays.Add(type, view = new ArrayTypeInfo(this, type));
             return view;
         }
         if (signature.ReferencedGenericInstance is { } constructed)
-            return Construct(Resolve(constructed.Definition), constructed.TypeArguments.Select(t => Project(t, arguments, methods)).ToArray());
+            return Construct(Resolve(constructed.Definition), constructed.TypeArguments.Select(t => Project(t, arguments, methods, selfOwner)).ToArray());
         if (signature.ReferencedType is { } reference) return Resolve(reference);
         throw new InvalidDataException("unsupported metadata facade signature");
     }

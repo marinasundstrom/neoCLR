@@ -1,9 +1,14 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector or managed-reference parameter signature type.</summary>
+/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector, interface Self or managed-reference parameter signature type.</summary>
 public sealed partial record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null) { ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false) { IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    /// <summary>Gets the interface-scoped implementing-type signature. It does not consume a generic parameter ordinal.</summary>
+    /// <remarks>Valid in bodyless interface member contracts. Native encoding uses SelfType; executable CLI emission rejects it.</remarks>
+    public static SignatureType Self { get; } = new(null, null, isSelf: true);
+    /// <summary>Gets whether this is the unresolved implementing type of an interface contract.</summary>
+    public bool IsSelf { get; }
     /// <summary>Gets the target of a writable managed-reference parameter, or null.</summary>
     public SignatureType? ByReferenceElement { get; }
     /// <summary>Creates a writable managed-reference parameter type. Ref arguments must be initialized before calls.</summary>
@@ -72,28 +77,29 @@ public sealed partial record SignatureType
     internal static SignatureType FromConstruction(TypeReference definition, IEnumerable<SignatureType> arguments) => new(null, null, referencedGenericType: new(definition, arguments));
     internal static SignatureType FromReference(TypeReference reference) => new(null, null, referencedType: reference);
     internal int NestingDepth => ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
-    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false)
+    internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false, bool allowSelf = false)
     {
+        if (IsSelf && !allowSelf) throw new ArgumentException("Self requires an interface contract signature");
         if (ReferencedType is not null || ReferencedGenericInstance is not null) throw new ArgumentException("loaded nominal signatures must be imported before emission");
         if (FunctionSignature is { } function) foreach (var type in function.ParameterTypes.Append(function.ReturnType)) type.ValidateOwner(assembly, genericArity, typeArity, complete);
         if (ByReferenceElement is { } target)
         {
             if (!allowByReference) throw new ArgumentException("managed references are supported only as method parameters");
-            target.ValidateOwner(assembly, genericArity, typeArity, complete);
+            target.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if (ImportedType is { } imported)
         {
             if (!ReferenceEquals(imported.Owner, assembly)) throw new ArgumentException("imported type belongs to another output");
-            foreach (var argument in imported.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete);
+            foreach (var argument in imported.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if (MethodParameterIndex is { } index && index >= genericArity) throw new ArgumentException("method type parameter outside declared scope");
         if (TypeParameterIndex is { } ordinal && ordinal >= typeArity) throw new ArgumentException("type parameter outside declared scope");
-        ArrayElement?.ValidateOwner(assembly, genericArity, typeArity, complete);
+        ArrayElement?.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         if (GenericInstance is { } instance)
         {
             if (!ReferenceEquals(instance.Definition.Assembly, assembly)) throw new ArgumentException("foreign constructed class");
             instance.Definition.ValidateTypeArguments(instance.TypeArguments, complete);
-            foreach (var argument in instance.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete);
+            foreach (var argument in instance.TypeArguments) argument.ValidateOwner(assembly, genericArity, typeArity, complete, allowSelf: allowSelf);
         }
         if ((ArrayElement?.ClassType ?? ClassType) is { } owner && !ReferenceEquals(owner.Assembly, assembly))
             throw new ArgumentException("signature requires a class owned by the output assembly");
@@ -109,7 +115,7 @@ public sealed partial record SignatureType
         return new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>
@@ -154,10 +160,10 @@ public class MethodSignature
     public IReadOnlyList<int> OutParameters { get; }
     /// <summary>Gets declared parameters, excluding the receiver.</summary>
     public IReadOnlyList<SignatureType> ParameterTypes { get; }
-    internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false)
+    internal void ValidateOwner(AssemblyBuilder assembly, int typeArity = 0, bool complete = false, bool allowSelf = false)
     {
-        ReturnType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete);
-        foreach (var type in ParameterTypes) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowByReference: true);
+        ReturnType.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowSelf: allowSelf);
+        foreach (var type in ParameterTypes) type.ValidateOwner(assembly, GenericParameterNames.Count, typeArity, complete, allowByReference: true, allowSelf: allowSelf);
     }
     internal bool Matches(MethodSignature other) => GenericParameterNames.Count == other.GenericParameterNames.Count && ReturnType == other.ReturnType && ParameterTypes.SequenceEqual(other.ParameterTypes) && OutParameters.SequenceEqual(other.OutParameters);
 }

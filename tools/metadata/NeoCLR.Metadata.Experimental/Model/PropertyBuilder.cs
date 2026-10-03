@@ -50,7 +50,7 @@ public sealed partial class TypeBuilder
         if (definition.GetMethod is { Producer: null } || definition.SetMethod is { Producer: null })
             throw new ArgumentException("attach property accessors before the property");
         var name = definition.Name; var getter = definition.GetMethod?.Producer; var setter = definition.SetMethod?.Producer;
-        type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count, allowSelf: IsInterface);
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||
             type.Primitive == PrimitiveType.Void ||
             properties.Count >= 256 || getter is null && setter is null)

@@ -10212,3 +10212,10 @@ it failed in source-union projection with `None` not in scope. The last verified
 was preserved and the stale fingerprint recorded in API maintenance notes. This does not
 invalidate the independently executed source-ownership fixture, but it is an unresolved
 validation item rather than a successful API refresh.
+
+The subsequent authorized continuation implements the first bounded contract slice:
+Self signature nodes, native encoding/decoding and canonical interface-scoped introspection
+views. C# tests cover definition/builder parity, generic-scope separation, accessors,
+round trips and invalid contexts. NeoCLR loads/verifies a generated assembly containing
+these declarations and executes its ordinary entry point (42); this is loading evidence,
+not Self dispatch evidence. Raven integration and implementation substitution remain open.

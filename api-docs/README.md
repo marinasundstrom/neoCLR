@@ -813,3 +813,9 @@ source-fingerprint check currently reports stale. Do not bless the old binary wi
 input hashes. Reproduce with the normal `--reference-core` refresh command above, using
 Raven `f9841b0f6` and the current bridge, then repair and regenerate before claiming a
 current expanded API snapshot. No published API contract changed in the primitive-mode slice.
+
+2026-10-03: `SignatureType.Self`/`IsSelf` and `Introspection.SelfTypeInfo` are documented
+in the [host API manual](experimental-metadata.md#native-self-signatures-development-2026-10-03).
+These .NET host APIs are excluded from guest RavenDoc selection because that generator
+loads Raven guest declarations. The existing expanded-reference fingerprint blocker above
+still causes `build-api-docs.py --check` to fail; no snapshot hashes have been relabelled.

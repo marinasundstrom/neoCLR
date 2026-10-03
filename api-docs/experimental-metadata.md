@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Native Self signatures](#native-self-signatures-development-2026-10-03): implementing-type contracts and scoped views.
+
 - [Declaration facts](#declaration-facts-development-2026-10-03): constructors, flags and accessibility.
 
 - [Generic method construction](#generic-method-construction-development-2026-10-03): metadata signature inspection.
@@ -5478,3 +5480,45 @@ var image = RuntimeAssemblyContainer.WriteBinary(output);
 PE/native round trips, external generic diamond resolution and native linked dispatch.
 No format version change is required. The C# development API remains documented here
 rather than through guest RavenDoc.
+
+
+## Native Self signatures (development, 2026-10-03)
+
+`Model.SignatureType.Self` is an immutable singleton signature node; `bool IsSelf`
+identifies it. It is neither a primitive nor a positional type/method parameter.
+`ToString()` returns `Self`. It consumes no generic arity. Attaching it to a bodyless
+instance interface method (directly or through `AddInterfaceMethod`) or its associated
+property supplies its scope. Vectors and unconstrained nominal constructions can contain
+Self. Class signatures must use the actual nominal declaring type instead.
+
+Native writing preserves the existing `SelfType` encoding; the binary payload and format
+versions do not change. Native readers reject unresolved Self in fields, locals, free
+functions and class method signatures with `InvalidDataException`. Builder attachment
+rejects those declarations with `ArgumentException`. Standalone constructions may retain
+Self, like an open parameter, but their eventual use must provide the interface scope.
+
+`Introspection.SelfTypeInfo : TypeInfo` exposes:
+
+- `TypeInfo DeclaringType`: canonical open or constructed interface view supplying scope.
+- `string DisplayName`: the interface display label followed by `.Self`, not an identity.
+- `bool IsNominalType`: always false.
+
+Method results/parameters and property types project to the same context-canonical Self
+view for the same owner. Constructing `I<T>` substitutes T while retaining a distinct Self
+scope for `I<int>`. No generic ordinal or runtime handle is exposed. Calling public
+`MetadataLoadContext.ResolveSignature(SignatureType.Self)` without a member scope rejects
+with `InvalidDataException`; use the declared member views. Contexts do not share identity.
+
+Executable CLI `AssemblyBuilder.Write()` rejects Self with `InvalidDataException`.
+The reference-only CLI projection in PE/#Neo uses the existing value-type marker
+`System.Runtime.CompilerServices.Self`, scoped to the explicitly supplied core identity.
+It is only a transport representation; it has no CLR implementing-type semantics.
+Native materialization reads the authoritative payload, never the marker. Both container
+variants and immutable snapshot writing preserve the native signature.
+
+This slice supports contract declarations and inspection. Implementation substitution,
+typed `callself` authoring, static Self interface methods, Self-containing inheritance,
+Raven native symbol projection/emission and general byref/function introspection remain
+subsequent work. Existing runtime Self execution does not imply these host APIs are ready.
+Tests: `SelfSignatureChecks` (C#), with a generated PE/#Neo loaded and verified by NeoCLR;
+its entry point returns 42 independently of Self dispatch.

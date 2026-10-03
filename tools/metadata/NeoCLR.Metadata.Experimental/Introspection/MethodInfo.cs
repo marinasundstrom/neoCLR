@@ -24,9 +24,9 @@ public sealed class MethodInfo
         GenericParameterNames = Array.AsReadOnly(signature!.GenericParameterNames.ToArray());
         genericArguments = Array.AsReadOnly(arguments ?? GenericParameterNames.Select((_, i) => (TypeInfo)new MethodGenericParameterTypeInfo(context, this, i)).ToArray());
         var typeArguments = owner switch { NominalTypeInfo nominal => nominal.GetGenericArguments(), ConstructedTypeInfo constructed => constructed.TypeArguments, _ => Array.Empty<TypeInfo>() };
-        returns = new(() => context.ResolveSignature(signature.ReturnType, typeArguments, genericArguments));
+        returns = new(() => context.ResolveMemberSignature(signature.ReturnType, typeArguments, genericArguments, owner));
         parameters = new(() => Array.AsReadOnly(signature.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
-            context.ResolveSignature(type, typeArguments, genericArguments))).ToArray()));
+            context.ResolveMemberSignature(type, typeArguments, genericArguments, owner))).ToArray()));
     }
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }

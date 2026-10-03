@@ -320,3 +320,14 @@ vary with subclasses. Unsupported storage/free-function uses reject. Existing ru
 SelfType and structural TypeExpression encoding do not mean the assembly reader/writer,
 introspection and native Raven symbol/emission integration are complete. This section
 records direction for that work, not a shipped API.
+
+The first implementation now preserves Self in bodyless instance-interface declarations,
+including vectors, constructed signatures and property/accessor associations. The facade
+provides a canonical `SelfTypeInfo` scoped to an open/constructed interface, independent
+of positional generic scopes. Native readers enforce scope before materialization.
+Both PE/#Neo containers round-trip it; executable CLI emission rejects while reference-only
+projection uses the documented core marker. Implementation substitution, typed dispatch,
+Self inheritance and Raven semantic/emission integration remain open. See the
+[API contract](../../api-docs/experimental-metadata.md#native-self-signatures-development-2026-10-03).
+
+[Executable evidence](../experiments/extended-cli-metadata/self-contracts-2026-10-03.json) records source/artifact hashes and the remaining gates.

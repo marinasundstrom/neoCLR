@@ -190,7 +190,7 @@ public sealed partial class TypeBuilder
 
     /// <summary>Adds a public abstract instance method to an interface.</summary>
     /// <param name="name">Nonempty simple method name; constructors are forbidden.</param>
-    /// <param name="signature">Supported value parameters/result; declaring-type parameters are allowed, method parameters are not.</param>
+    /// <param name="signature">Supported value parameters/result; declaring-type parameters and native Self are allowed, method parameters are not.</param>
     /// <returns>A bodyless declaration; adding instructions or locals makes writing fail.</returns>
     /// <exception cref="ArgumentNullException">Null signature.</exception>
     /// <exception cref="ArgumentException">Invalid/duplicate signature, generic method or exceeded limit.</exception>

@@ -122,7 +122,7 @@ public sealed partial class TypeBuilder
             throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");
         if (!definition.IsStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic owner");
-        signature.ValidateOwner(Assembly, GenericParameterNames.Count);
+        signature.ValidateOwner(Assembly, GenericParameterNames.Count, allowSelf: IsInterface);
         if (methods.Count >= 256 || methods.Any(m => m.Name == definition.Name &&
             m.Signature.GenericParameterNames.Count == signature.GenericParameterNames.Count && m.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)))
             throw new ArgumentException("duplicate method or exceeded limit");
