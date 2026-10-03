@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Read native callback signatures and expose canonical FunctionTypeInfo metadata views,
+  including owner/method substitution, external identity and explicit no-result facts.
+  Symbol-authored method references accept bounded callbacks. Separately compiled unchanged
+  ArrayList now imports and executes; 125 metadata groups and seven native consumers pass.
+  Raven's explicit no-result callback import remains unsupported; no format version changed.
+
 - Add a bounded collection bootstrap with explicit callback declarations and executable
   terminal failure. Unchanged ArrayList emits and runs with sources included, checking
   alias mutation, copying, iteration and Find; negative capacity faults correctly. Separate

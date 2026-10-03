@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Function signature views](#function-signature-views-development-2026-10-03): native callback signatures and substitution.
+
 - [Parameter names and authored value references](#parameter-names-and-authored-value-references-development-2026-10-03).
 
 - [Native nested case metadata](#native-nested-case-metadata-development-2026-10-03): scoped local/external native case identities.
@@ -5955,3 +5957,38 @@ relationships needed by imported source Option/Result carriers. Unboxed value-to
 assignment remains rejected; boxing or constrained dispatch is still required. C# tests
 cover idempotent value edges, wrong target kinds and foreign ownership. The unchanged
 source-library consumer executes separately on neoCLR with the bounded union bootstrap.
+
+
+## Function signature views (development, 2026-10-03)
+
+`Introspection.FunctionTypeInfo : TypeInfo` is a context-owned metadata facade for an
+existing native callback shape. It exposes no callable instance, invocation or reflection.
+
+| Member | Contract |
+| --- | --- |
+| `TypeInfo ReturnType` | Canonical result view; primitive Void for an explicit no-result signature. |
+| `IReadOnlyList<TypeInfo> ParameterTypes` | Immutable ordered value parameter views. Names and callable targets are not signature identity. |
+| `bool NoResult` | True only when invocation leaves no result; an inhabited unit type is distinct. |
+| `bool IsNominalType` | Always false. |
+| `string DisplayName` | Diagnostic signature text, not a serialized identity or resolver key. |
+
+`MetadataLoadContext.ResolveSignature` and member views now project function shapes,
+recursively substituting owner and method parameters and resolving nominal dependencies.
+Equivalent shapes share a view in one context; contexts never share identity. Missing
+catalog dependencies and unscoped parameters throw InvalidDataException. Existing foreign
+argument and nesting limits remain enforced. There are at most sixteen value parameters;
+byref callback parameters and generic callback declarations remain unsupported. Outer
+method/type parameters can appear inside a callback.
+
+`AssemblyDefinition.ReadNativeAssembly` preserves these shapes in supported method,
+field and property signatures, using the existing function encoding without a format
+version change. `AssemblyBuilder.CreateMethodReference` also accepts bounded callback
+operands authored from semantic facts; dependency resolution is not added to emission.
+The earlier test rejecting all callback fields now checks their retained signature.
+
+C# tests cover open and constructed owner/method substitution, canonical views, external
+identity, missing dependencies, explicit no-result signatures and context isolation.
+Raven currently imports value-returning callbacks through its existing callable symbols
+and explicit primitive bootstrap. Explicit no-result callback import still rejects rather
+than being silently changed to an inhabited-unit result. This completes ArrayList's Boolean
+predicate case; it does not integrate the separate structural Function language experiments.

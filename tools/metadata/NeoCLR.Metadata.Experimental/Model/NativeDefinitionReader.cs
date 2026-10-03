@@ -6,7 +6,7 @@ public sealed partial class AssemblyDefinition
     /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
-    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal value/reference, local or external generic construction or vector signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
+    /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
     /// Public value-type ToString overrides retain their inherited CLI slot flags and native call name.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
@@ -30,7 +30,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
@@ -52,6 +52,7 @@ public sealed partial class NativeAssemblyDefinition
         var externalTokens = new Dictionary<(AssemblyIdentity, string, string, uint), uint>();
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
+            if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
             if (type.ByReferenceElement is { } target) return new(null, 0, Copy(target), IsByReference: true);
             if (type.IsSelf) return new(null, 0, IsSelf: true);
             if (type.GenericInstance is { } instance) return new(null, LocalToken(instance.Definition), Arguments: instance.TypeArguments.Select(Copy).ToArray());

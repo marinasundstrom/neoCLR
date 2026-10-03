@@ -107,9 +107,10 @@ internal static class NativeDefinitionChecks
         Check(ctorImport.IsConstructor && !valueImport.IsStatic && valueImport.DeclaringTypeName == "Calculator", "instance import contract");
         var instanceCall = consumer.AddFunction("InstanceCall"); instanceCall.NewObject(ctorImport); instanceCall.Call(valueImport); instanceCall.Return();
         _ = consumer.WriteNativeAssembly();
-        instances.AddClass("Example", "UnsupportedStorage").AddField("Other", SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [])));
-        var unsupportedStorageImage = RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core);
-        Reject<InvalidDataException>(() => AssemblyDefinition.ReadNativeAssembly(unsupportedStorageImage));
+        instances.AddClass("Example", "CallbackStorage").AddField("Other", SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [])));
+        var callbackStorageImage = RuntimeAssemblyContainer.WriteBinary(instances.WriteNativeAssembly(), core);
+        var callbackStorage = AssemblyDefinition.ReadNativeAssembly(callbackStorageImage).MainModule.Types.Single(t => t.Name == "CallbackStorage");
+        Check(callbackStorage.Fields.Single().TryGetSignature(out var callbackField) && callbackField!.FunctionSignature?.ReturnType.Primitive == PrimitiveType.Int32, "native callback field shape");
         library.AddValueType("Example", "Value");
         Check(AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(library.WriteNativeAssembly(), core)).MainModule.Types.Single(t => t.Name == "Value").IsValueType, "native value classification");
         var generic = new AssemblyBuilder(new("Generic", new Version(1, 0, 0, 0)), core);

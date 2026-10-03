@@ -895,3 +895,8 @@ assembly has not been replaced by unverified output.
 implementation sources; the host API manual records this and unchanged explicit-boxing
 requirements. The guest API snapshot check remains stale for the previously recorded
 bridge issue; no guest snapshot or reference assembly was overwritten.
+
+2026-10-03: host-only FunctionTypeInfo is documented in experimental-metadata.md with
+its members, resolution errors and limits. It is not a guest RavenDoc type. The API snapshot
+check still reports the previously recorded stale guest snapshot; the last verified guest
+reference assembly remains intact.

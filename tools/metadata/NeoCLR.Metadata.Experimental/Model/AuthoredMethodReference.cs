@@ -5,7 +5,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Authors a public nonvirtual class/value member or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
-    /// <param name="signature">Primitive, scoped parameter, external nominal construction or vector signature.</param>
+    /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -61,6 +61,7 @@ public sealed partial class AssemblyBuilder
         return reference;
 
         static bool Supported(SignatureType type, bool result) =>
+            type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
             type.ImportedType is { } nominal ? nominal.TypeArguments.All(t => Supported(t, false)) :
             type.MethodParameterIndex is not null || type.TypeParameterIndex is not null ||

@@ -60,13 +60,16 @@ through the existing terminal runtime intrinsic. The negative-capacity execution
 checks the real diagnostic and failure exit, so its reference-only core body is never
 mistaken for executable behavior.
 
-Current result: the library emits. Source-included execution returns 42 after alias
-mutation, independent copy, iteration and Find callback checks. Separate native import
-rejects the library's callback signature category before publishing output. The assessment
-expects this rejection and explicitly reports BLOCKED; it does not count as the library /
-consumer gate. The prior separate Option/Result gate remains required and passes.
+Current result: the library and a separate native-import consumer compile and execute
+successfully. The consumer has no library source inputs. Alias mutation, independent copy,
+iteration and Find callback checks return 42. The negative-capacity consumer also compiles
+against the library alone and terminates through System.Fail. Missing-library and duplicate
+seed ownership guards remain required. The previous blocked assessment is retained as
+historical evidence; the current driver expects successful separate execution.
 
-Next bounded work is native function-signature materialization and metadata-only facade
-views with generic substitution, followed by mapping those facts into Raven's existing
-callable symbols. Then re-run the unchanged consumer using only the emitted library.
-No source-method removal or callback stub should be used to bypass that import boundary.
+Native reader function signatures now project through metadata-only FunctionTypeInfo views,
+with generic substitution and explicit dependency resolution. Raven maps the Boolean
+predicate shape to its existing callable symbols, and emission authors the callback operand
+from those symbols. Explicit no-result callbacks remain an unsupported Raven import category;
+metadata views preserve their distinction from inhabited-unit callbacks. Wider function
+semantics, .NET class-library adapters and the full collection application remain separate work.

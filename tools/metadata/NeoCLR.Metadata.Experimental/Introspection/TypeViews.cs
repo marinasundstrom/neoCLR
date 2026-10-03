@@ -121,12 +121,13 @@ public sealed class FieldInfo
 
 public sealed partial class MetadataLoadContext
 {
+    private readonly Dictionary<FunctionKey, FunctionTypeInfo> functions = [];
     private readonly Dictionary<TypeInfo, SelfTypeInfo> selfTypes = [];
     private readonly Dictionary<PrimitiveType, PrimitiveTypeInfo> primitives = [];
     private readonly Dictionary<TypeInfo, ArrayTypeInfo> arrays = [];
     private readonly Dictionary<ConstructionKey, ConstructedTypeInfo> constructions = [];
 
-    /// <summary>Projects a loaded primitive/nominal/vector/construction signature using explicit owner arguments.</summary>
+    /// <summary>Projects a loaded primitive/nominal/vector/construction/function signature using explicit owner arguments.</summary>
     /// <param name="signature">Reader signature; output-builder operands are not accepted.</param>
     /// <param name="typeArguments">Owner arguments or scoped parameter views; copied before traversal.</param>
     /// <returns>A canonical context-owned type view.</returns>
@@ -159,6 +160,15 @@ public sealed partial class MetadataLoadContext
 
     private TypeInfo Project(SignatureType signature, IReadOnlyList<TypeInfo> arguments, IReadOnlyList<TypeInfo> methods, TypeInfo? selfOwner = null)
     {
+        if (signature.FunctionSignature is { } function)
+        {
+            var result = Project(function.ReturnType, arguments, methods, selfOwner);
+            var parameters = function.ParameterTypes.Select(t => Project(t, arguments, methods, selfOwner)).ToArray();
+            if (parameters.Append(result).Any(t => t.Depth >= 16)) throw new InvalidDataException("metadata type nesting exceeds limit");
+            var key = new FunctionKey(result, parameters, function.NoResult);
+            if (!functions.TryGetValue(key, out var view)) functions.Add(key, view = new FunctionTypeInfo(this, result, parameters, function.NoResult));
+            return view;
+        }
         if (signature.IsSelf)
         {
             if (selfOwner is not NominalTypeInfo { IsInterface: true } && selfOwner is not ConstructedTypeInfo { Definition.IsInterface: true })
@@ -208,6 +218,12 @@ public sealed partial class MetadataLoadContext
             if (!field.TryGetSignature(out var signature)) throw new InvalidDataException("unsupported field metadata signature: " + field.Name);
             return new FieldInfo(field, owner, ResolveSignature(signature!, arguments));
         }).ToArray());
+
+    private sealed record FunctionKey(TypeInfo Result, TypeInfo[] Parameters, bool NoResult)
+    {
+        public bool Equals(FunctionKey? other) => other is not null && ReferenceEquals(Result, other.Result) && NoResult == other.NoResult && Parameters.SequenceEqual(other.Parameters);
+        public override int GetHashCode() { var hash = new HashCode(); hash.Add(Result); hash.Add(NoResult); foreach (var p in Parameters) hash.Add(p); return hash.ToHashCode(); }
+    }
 
     private sealed class ConstructionKey(NominalTypeInfo definition, TypeInfo[] arguments) : IEquatable<ConstructionKey>
     {

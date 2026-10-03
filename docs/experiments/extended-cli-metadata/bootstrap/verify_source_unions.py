@@ -19,7 +19,7 @@ def main():
     parser.add_argument('--runtime', type=Path, required=True)
     parser.add_argument('--core', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--collections', action='store_true', help='Assess ArrayList including its currently unsupported separate native import')
+    parser.add_argument('--collections', action='store_true', help='Verify separately compiled ArrayList including callback import')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -45,28 +45,19 @@ def main():
               '--bootstrap-ownership', str(manifest), '--bootstrap-intrinsics']
     run(common + ['--library', '-o', str(library)] + sources)
     consumer_command = common + ['--reference', str(library), '-o', str(consumer), str(consumer_source)]
+    run(consumer_command)
+    run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
+    run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
+        '' if args.collections else 'Option.Some(40)\nResult.Error(7)\n')
     if args.collections:
-        rejection = run(consumer_command, 1)
-        if consumer.exists() or 'native definition materialization requires' not in rejection.stderr:
-            raise RuntimeError('Expected explicit callback metadata import rejection before publication')
-        owned = output / 'owned' / 'NeoCLR.Collections.dll'
-        owned.parent.mkdir()
-        run(common + ['-o', str(owned)] + sources + [str(consumer_source)])
-        run([runtime, 'verify', str(owned), '--system', str(seed)])
-        run([runtime, 'run', str(owned), '--system', str(seed)], 42, '')
         invalid_source = output / 'NegativeCapacity.rvn'
         invalid_source.write_text('func Main() -> int {\n    let values = System.Collections.ArrayList<int>(-1)\n    return 42\n}\n')
-        invalid = output / 'invalid' / 'NeoCLR.Collections.dll'
+        invalid = output / 'invalid' / 'NegativeCapacity.dll'
         invalid.parent.mkdir()
-        run(common + ['-o', str(invalid)] + sources + [str(invalid_source)])
-        failure = run([runtime, 'run', str(invalid), '--system', str(seed)], 1)
+        run(common + ['--reference', str(library), '-o', str(invalid), str(invalid_source)])
+        failure = run([runtime, 'run', str(invalid), '--module', str(library), '--system', str(seed)], 1)
         if 'ArrayList capacity must be non-negative' not in failure.stderr:
             raise RuntimeError('Terminal failure adapter did not preserve the capacity error')
-    else:
-        run(consumer_command)
-        run([runtime, 'verify', str(consumer), '--module', str(library), '--system', str(seed)])
-        run([runtime, 'run', str(consumer), '--module', str(library), '--system', str(seed)], 42,
-            'Option.Some(40)\nResult.Error(7)\n')
     rejected = output / 'MissingLibrary.dll'
     run(common + ['-o', str(rejected), str(consumer_source)], 1)
     if rejected.exists():
@@ -81,11 +72,11 @@ def main():
     if rejected.exists() or 'duplicates a source-owned declaration' not in failure.stderr:
         raise RuntimeError('Duplicate seed ownership was not rejected before output')
     paths = [Path(compiler), Path(runtime), Path(core), seed, library, manifest,
-             HERE / 'union-seed.neoil', seed_source, consumer_source] + ([owned] if args.collections else [consumer]) + [ROOT / p for p in sources]
-    evidence = dict(scope=('ArrayList source-included execution passes; separate native import rejects callback signatures. NOT a completed separate-library gate.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+             HERE / 'union-seed.neoil', seed_source, consumer_source] + [consumer] + ([invalid_source, invalid] if args.collections else []) + [ROOT / p for p in sources]
+    evidence = dict(scope=('ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS source-included ArrayList execution; separate native import BLOCKED' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

@@ -333,6 +333,7 @@ var tests = new (string Name, Action Body)[]
     ("Typed boxing and core Object", BoxingChecks.Run),
     ("Type custom attributes and explicit metadata introspection", CustomAttributeChecks.Run),
     ("Parameter names survive native and CLI metadata", ParameterNameChecks.Run),
+    ("Native callback signatures project canonical generic views", FunctionViewChecks.Run),
     ("Symbol-authored nested value constructors execute on CLR", () => ValueConstructorChecks.Run(nested: true, native: true, authored: true)),
     ("Value override definition and builder authoring", ValueOverrideAuthoringChecks.Run),
     ("Reference casts preserve object identity and dispatch", ReferenceCastChecks.Run),
