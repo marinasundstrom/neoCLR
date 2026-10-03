@@ -1,7 +1,8 @@
 # neoCLR platform roadmap
 
 Author-approved implementation gate (2026-10-03): [dual-target driver and source-library plan](design/dual-target-compilation.md).
-Prove ordinary .NET/NeoCLR library-to-application compilation first, then the broad
+Paired ordinary-driver Hello and separate generic library/consumer cases now execute on
+both targets; native references load directly with explicit --core-reference. Next the broad
 collections sample, retaining only the explicit primitive bootstrap/runtime seed.
 
 Author clarification (2026-10-02): importer and emitter must communicate through Raven

@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Integrate direct native metadata imports into rvnc with an explicit primitive-core
+  argument. Both targets pass paired driver execution; native invalid-reference/output
+  safety checks pass. Broad collections/source-library gate remains open.
+
 - Record the author-approved dual-target execution plan and ordinary-driver baseline:
   .NET Hello/library and native Hello pass; native library field import remains a driver gap.
 
