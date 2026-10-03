@@ -6022,3 +6022,21 @@ Validation includes CLR execution for primitive/method/owner generic scopes, ref
 identity/null, incorrect boxes and invalid authoring/stack inputs. The unchanged native
 query library separately imports and executes OfType over heterogeneous boxed values
 and reference payloads; see the bootstrap query acceptance workflow.
+
+### AssemblyBuilder.SetArrayBacking(TypeBuilder type)
+
+Development API: selects the output-owned nominal class backing native vectors. `type`
+must be a nonabstract, nonstatic, nonnested generic class with one unconstrained parameter
+and exactly one private field of type `T[]`. Repeating the same selection is idempotent;
+a different selection throws InvalidOperationException. Null throws ArgumentNullException;
+foreign/incompatible descriptors throw ArgumentException. Native writing revalidates the
+selection after subsequent definition edits.
+
+This host execution policy is encoded beside ordinary definitions in the native assembly
+manifest; it does not alter CLI array signatures or make CLI arrays implement custom
+interfaces. The runtime requires exactly one selected descriptor across linked assemblies.
+Its storage field aliases vector identity; replacing/addressing that field and allocating
+the descriptor as a nominal object are unsupported. Older readers reject this optional
+format-5 field. NativeAssemblyDefinition.ReadAssembly validates its identity and storage
+shape and retains it in the immutable native snapshot. See the integration documentation
+for source Array<T>, iteration configuration and executable validation.

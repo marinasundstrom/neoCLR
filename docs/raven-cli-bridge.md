@@ -4736,3 +4736,43 @@ array descriptor/storage/iterator linking using canonical dependency identities.
 The configured shape and source propagation selections are in `array-ownership.json`;
 existing successful query acceptance configuration is unchanged. See
 [nominal array evidence](experiments/extended-cli-metadata/nominal-array-assessment-2026-10-03.json).
+
+### Explicit native nominal array backing (2026-10-03)
+
+The array ownership manifest now drives the native emitter's SetArrayBacking selection:
+only an output-owned declaration in the configured RuntimeIterationContract assembly is
+eligible. The adapter uses symbol identity and builder ownership; it does not reopen
+importer objects. Ordinary .NET emission and CLI vector signatures are unchanged.
+
+The native assembly manifest optionally carries array_backing (module, revision, TypeDef
+index). The linked runtime requires a unique concrete, unconstrained generic root record
+with a single private T[] field. Vector interface closure and dispatch use that descriptor;
+reading its storage field aliases the original vector, so source-authored indexers and
+ArrayIterator<T> share mutation/identity. Nominal object allocation for the descriptor is
+rejected; vector allocation remains the storage operation. Replacing/addressing the
+backing field is unsupported. No name-based source-array inference or structural type
+conversion was added. Without the selection, existing legacy array behavior remains.
+
+This is optional format-5 native execution metadata, not a change to ECMA CLI vector
+signatures. Older runtimes/readers reject the new field; deployments must pair compiler
+and runtime revisions. Native immutable reads preserve the selection; general native
+rewriting remains outside this bounded slice.
+
+Reproduce using bootstrap/verify_source_unions.py --arrays with the documented compiler,
+primitive storage core and runtime arguments. The separate consumer mutates through
+MutableSequence<int>, observes the change through the original vector, then evaluates
+Filter/ToList and returns 42 with empty stdout. Negative capacity, wrong unboxing, missing
+library and duplicate seed checks also pass. C# authoring/reader tests and runtime checks
+cover malformed identity, incompatible storage and duplicate backing selection; seven
+legacy array tests pass. No broad application or .NET source-library completion is claimed.
+
+Validation note: the guest RavenDoc snapshot check remains stale (the previously recorded
+snapshot mismatch). This host-only API is covered by api-docs/experimental-metadata.md;
+no guest API snapshot or website build is claimed by this slice.
+
+Cross-repository evidence: Raven `85f2b2be6`; runtime based on `ced73e9d` plus this
+slice (implementation and artifact hashes recorded in
+[nominal-array-execution-2026-10-03.json](experiments/extended-cli-metadata/nominal-array-execution-2026-10-03.json)).
+The unchanged broad application now fails before publication on the explicit retained
+seed's missing Console.WriteLine(Int32) contract. That service overload is the next
+bounded task. No application sources were rewritten.

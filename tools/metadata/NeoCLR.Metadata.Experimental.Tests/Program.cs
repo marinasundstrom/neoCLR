@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--array-backing-runtime")
+{
+    await ArrayBackingChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 5 && args[0] == "--native-string-binding")
 {
     await NativeStringBindingChecks.Run(args[1], args[2], args[3], args[4]); return 0;
@@ -341,6 +345,7 @@ var tests = new (string Name, Action Body)[]
     ("Constructed interface inheritance", ConstructedInheritanceChecks.Run),
     ("Generic class interface implementation", GenericImplementationChecks.Run),
     ("Checked reserved arrays", ReservedArrayChecks.Run),
+    ("Explicit nominal array backing", ArrayBackingChecks.Run),
     ("Core-marked namespace function binding", NamespaceBindingChecks.Run),
     ("Direct native definition materialization", NativeDefinitionChecks.Run),
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),

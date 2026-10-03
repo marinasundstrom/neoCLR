@@ -72,6 +72,9 @@ fn arguments(ty: &Type) -> &[Type] {
 
 /// Transitive, substituted interface identities, with diamonds deduplicated.
 pub(crate) fn closure(module: &Module, ty: &Type) -> Result<Vec<Type>, Fault> {
+    if let Some(nominal) = module.array_nominal(ty) {
+        return closure(module, &nominal);
+    }
     fn visit(
         module: &Module,
         ty: &Type,
@@ -356,6 +359,8 @@ pub(crate) fn ensure_implementation(
     concrete: &Type,
     interface: &Type,
 ) -> Result<(), Fault> {
+    let nominal = module.array_nominal(concrete);
+    let concrete = nominal.as_ref().unwrap_or(concrete);
     declared(module, concrete, interface)?;
     if interface_definition(module, concrete).is_ok() {
         return Ok(());
@@ -400,6 +405,8 @@ pub(crate) fn implementation(
     interface: &Type,
     contract: &Function,
 ) -> Result<Function, Fault> {
+    let nominal = module.array_nominal(concrete);
+    let concrete = nominal.as_ref().unwrap_or(concrete);
     declared(module, concrete, interface)?;
     if !is_contract(module, contract)
         || contract.owner.as_ref() != Some(interface)

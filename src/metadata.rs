@@ -918,7 +918,8 @@ impl Module {
     /// Implicit ordinary-reference upcast; byrefs and array covariance are excluded.
     pub(crate) fn reference_assignable(&self, source: &Type, target: &Type) -> bool {
         self.is_object_reference_type(source)
-            && ((*target == Type::from_name("System.Object") && self.is_reference_type(target))
+            && ((self.array_nominal(source).as_ref() == Some(target))
+                || (*target == Type::from_name("System.Object") && self.is_reference_type(target))
                 || (self.is_reference_type(source)
                     && self.is_reference_type(target)
                     && crate::inheritance::require_base(self, source, target).is_ok())
@@ -928,7 +929,32 @@ impl Module {
                     && crate::interfaces::ensure_implementation(self, source, target).is_ok()))
     }
 
+    pub(crate) fn array_backing(&self) -> Option<&TypeDef> {
+        let id = self
+            .assemblies
+            .iter()
+            .find_map(|a| a.array_backing.as_ref())?;
+        self.types
+            .iter()
+            .find(|t| t.definition.as_ref() == Some(id))
+    }
+
+    pub(crate) fn array_nominal(&self, ty: &Type) -> Option<Type> {
+        let Type::ArrayRef(element) = ty else {
+            return None;
+        };
+        Some(Type::Constructed {
+            definition: self.array_backing()?.name.clone(),
+            arguments: vec![(**element).clone()],
+        })
+    }
+
     pub fn type_definition(&self, ty: &Type) -> Option<&TypeDef> {
+        if matches!(ty, Type::ArrayRef(_)) {
+            if let Some(backing) = self.array_backing() {
+                return Some(backing);
+            }
+        }
         let name = ty.definition_name()?;
         let arity = match ty {
             Type::Constructed { arguments, .. } => arguments.len(),
@@ -1315,6 +1341,7 @@ impl Module {
                     value_type_references: vec![],
                     native_module_bindings: vec![],
                     native_type_bindings: vec![],
+                    array_backing: None,
                     name: identity.to_owned(),
                     full_name: identity.to_owned(),
                     modules: vec![self.name.clone()],

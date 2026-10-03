@@ -78,6 +78,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(alias.Arity is >= 0 and <= 32 && alias.Namespace is not null && nativeTypeAliases.TryAdd((alias.NativeName, alias.Arity), alias), "invalid native type binding");
                 }
             }
+            if (manifest.TryGetProperty("array_backing", out _)) manifestFields.Add("array_backing");
             Shape(manifest, manifestFields.ToArray());
             var identityText = Text(manifest, "full_name");
             var identity = ReadIdentity(identityText);
@@ -103,6 +104,24 @@ public sealed partial class NativeAssemblyDefinition
             }
             Require(nativeModuleAliases.Keys.All(seenReferences.Contains) && nativeTypeAliases.Values.All(a => nativeModuleAliases.ContainsKey(a.Assembly)), "unscoped native binding");
             var typeElements = Array(root, "types", 256);
+            if (manifest.TryGetProperty("array_backing", out var arrayBacking))
+            {
+                Shape(arrayBacking, "module", "revision", "index");
+                Require(Text(arrayBacking, "module") == moduleName && Text(arrayBacking, "revision") == identity.Version.ToString() &&
+                    arrayBacking.GetProperty("index").GetInt32() is var backingIndex && backingIndex >= 0 && backingIndex < typeElements.Length,
+                    "invalid native array backing identity");
+                var backing = typeElements[arrayBacking.GetProperty("index").GetInt32()];
+                var backingFields = Array(backing, "fields", 256);
+                Require(backing.TryGetProperty("is_reference_type", out var referenceBacking) && referenceBacking.GetBoolean() &&
+                    (!backing.TryGetProperty("is_abstract", out var abstractBacking) || !abstractBacking.GetBoolean()) &&
+                    !backing.TryGetProperty("base", out _) && !backing.TryGetProperty("declaring_type", out _) &&
+                    Array(backing, "generic_parameters", 32).Length == 1 &&
+                    (!backing.TryGetProperty("generic_constraints", out var bounds) || bounds.GetArrayLength() == 0) &&
+                    backingFields.Length == 1 && Text(backingFields[0], "visibility") == "private" &&
+                    backingFields[0].GetProperty("ty").TryGetProperty("ArrayRef", out var vector) &&
+                    vector.ValueKind == JsonValueKind.Object && vector.TryGetProperty("TypeParameter", out var element) && element.GetInt32() == 0,
+                    "invalid native array backing storage contract");
+            }
             var types = new List<TypeRow>();
             int nextPropertyToken = 0x17000001;
             int nextFieldToken = 0x04000001;

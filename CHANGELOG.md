@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Connect native vectors to an explicitly selected nominal Array<T> descriptor. Source
+  array interfaces, mutation and query iteration execute against a separately compiled
+  library. Add checked SetArrayBacking authoring and reader/runtime validation; legacy
+  array execution is preserved. This optional native execution metadata requires a
+  matching runtime and does not change CLI array encoding or .NET semantics.
+
 - Record the author-directed nominal Array<T> backing policy; structural array changes
   remain deferred. Unchanged source Array and an independent consumer compile, but runtime
   vector/interface backing fails. Add reproducible assessment evidence without claiming

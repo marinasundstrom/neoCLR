@@ -23,7 +23,9 @@ def main():
     parser.add_argument('--hashmap', action='store_true', help='Verify cumulative HashMap and comparer source library')
     parser.add_argument('--extensions', action='store_true', help='Also verify a separate generic extension library and consumer')
     parser.add_argument('--queries', action='store_true', help='Compile unchanged full query sources and execute an independent consumer')
+    parser.add_argument('--arrays', action='store_true', help='Execute source Array<T> backing and query iteration over native vectors')
     args = parser.parse_args()
+    args.queries = args.queries or args.arrays
     args.hashmap = args.hashmap or args.extensions or args.queries
     args.collections = args.collections or args.hashmap
     output = args.output.resolve()
@@ -38,8 +40,8 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / ('query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
-    consumer_source = HERE / ('query-consumer.rvn' if args.queries else 'hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
+    manifest = HERE / ('array-ownership.json' if args.arrays else 'query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    consumer_source = HERE / ('array-consumer.rvn' if args.arrays else 'query-consumer.rvn' if args.queries else 'hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
     seed_source = HERE / ('collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
     seed = output / 'System.neox'
@@ -113,10 +115,10 @@ def main():
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

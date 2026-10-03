@@ -246,6 +246,11 @@ public sealed partial class AssemblyBuilder
             return result.Count == 0 ? null : result.ToArray();
         }
         var manifest = new Dictionary<string, object> { ["name"] = Identity.Name, ["full_name"] = IdentityText(Identity), ["modules"] = new[] { Identity.Name + ".dll" }, ["references"] = dependencies.Keys.Select(IdentityText).ToArray() };
+        if (arrayBacking is not null)
+        {
+            ValidateArrayBacking(arrayBacking);
+            manifest["array_backing"] = new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(arrayBacking) };
+        }
         var moduleBindings = dependencies.Values.Where(d => d.NativeBinding is not null).Select(d => new
         {
             assembly = IdentityText(d.Identity),

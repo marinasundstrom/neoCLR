@@ -215,6 +215,8 @@ pub(crate) fn record_fields(
     arity: impl Into<SignatureContext>,
 ) -> Result<Vec<crate::metadata::Field>, Fault> {
     let arity = arity.into();
+    let nominal = module.array_nominal(ty);
+    let ty = nominal.as_ref().unwrap_or(ty);
     check_type_context(ty, module, arity, 0)?;
     let (name, arguments): (&str, &[Type]) = match ty {
         Type::Named(name) => (name, &[]),
@@ -1069,6 +1071,15 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     }
                 }
                 Op::New(ty) => {
+                    if module
+                        .array_backing()
+                        .zip(module.type_definition(ty))
+                        .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                    {
+                        return Err(Fault::new(
+                            "nominal array backing requires vector allocation",
+                        ));
+                    }
                     record_fields(module, ty, context)?;
                     crate::access::check_construction(module, function, ty)?;
                 }
@@ -3996,6 +4007,15 @@ fn interpret_instructions_with_dispatch(
                     }
                 }
                 Op::New(ty) => {
+                    if module
+                        .array_backing()
+                        .zip(module.type_definition(ty))
+                        .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                    {
+                        return Err(Fault::new(
+                            "nominal array backing requires vector allocation",
+                        ));
+                    }
                     crate::access::check_construction(module, &function, ty)?;
                     let definitions = module.instantiated_fields(ty)?;
                     let types: Vec<_> = definitions.iter().map(|f| f.ty.clone()).collect();
@@ -4032,7 +4052,26 @@ fn interpret_instructions_with_dispatch(
                     }
                     if let Some(Value::ObjectReference(object)) = frame.stack.last() {
                         crate::access::check_field(module, &function, object.target(), *i)?;
-                        let value = object.reference.read_field(*i)?.on_stack();
+                        let value = if *i == 0
+                            && module
+                                .array_backing()
+                                .zip(module.type_definition(object.target()))
+                                .is_some_and(|(a, b)| std::ptr::eq(a, b))
+                        {
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: object.reference.clone(),
+                                view: Some(Type::ArrayRef(Box::new(
+                                    module
+                                        .array_nominal(object.target())
+                                        .as_ref()
+                                        .unwrap_or(object.target())
+                                        .generic_arguments()[0]
+                                        .clone(),
+                                ))),
+                            })
+                        } else {
+                            object.reference.read_field(*i)?.on_stack()
+                        };
                         frame.pop()?;
                         frame.stack.push(value);
                         return Ok(None);

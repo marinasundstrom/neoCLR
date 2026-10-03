@@ -19,6 +19,9 @@ pub struct AssemblyMetadata {
     /// Physical CLI type scopes retained for reference projection; execution uses native_name.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub native_type_bindings: Vec<NativeTypeBinding>,
+    /// Explicit nominal descriptor backing managed vector storage.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub array_backing: Option<crate::metadata::TypeDefId>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -89,6 +92,42 @@ fn text(value: &str) -> bool {
 }
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
+    let bindings: Vec<_> = module
+        .assemblies
+        .iter()
+        .filter_map(|a| a.array_backing.as_ref().map(|id| (a, id)))
+        .collect();
+    if bindings.len() > 1 {
+        return Err(Fault::new("multiple nominal array backing selections"));
+    }
+    if let Some((assembly, id)) = bindings.first() {
+        let shape = module
+            .types
+            .iter()
+            .find(|t| t.definition.as_ref() == Some(*id))
+            .ok_or_else(|| Fault::new("nominal array backing definition is missing"))?;
+        if !shape.is_reference_type
+            || shape.is_abstract
+            || shape.base.is_some()
+            || shape.declaring_type.is_some()
+            || !matches!(
+                shape.representation,
+                crate::metadata::Representation::Record
+            )
+            || shape.generic_parameters.len() != 1
+            || !shape.generic_constraints.is_empty()
+            || shape.fields.len() != 1
+            || shape.fields[0].ty
+                != crate::metadata::Type::ArrayRef(Box::new(crate::metadata::Type::TypeParameter(
+                    0,
+                )))
+            || !shape.origin.as_ref().is_some_and(|o| {
+                o.assembly == assembly.full_name && o.field_access == vec![SourceAccess::Private]
+            })
+        {
+            return Err(Fault::new("invalid nominal array backing storage contract"));
+        }
+    }
     let mut assemblies = HashSet::new();
     for assembly in &module.assemblies {
         if !text(&assembly.name)

@@ -10358,3 +10358,14 @@ binder investigation, not fixed or claimed validated for main in this slice.
   separate array-query consumer compiles. Execution fails to match the vector's
   source-owned interface implementation. Nominal descriptor/storage linking and
   iterator dispatch remain open. See [recorded evidence](experiments/extended-cli-metadata/nominal-array-assessment-2026-10-03.json).
+
+### 2026-10-03 — Nominal array direction reaches executable evidence
+
+Following the author's instruction to keep arrays backed by Array<T> and defer structural
+array decisions, the assistant implemented an explicit native descriptor selection and
+vector/interface dispatch. The separate consumer mutates through MutableSequence<int>,
+observes shared storage through the original array, and runs source iterator/query code
+(return 42). This is an assistant-verified outcome, not full broad-application completion.
+The unchanged broad sample next exposes the retained seed's missing WriteLine(Int32).
+See [execution evidence](experiments/extended-cli-metadata/nominal-array-execution-2026-10-03.json)
+and the [integration record](raven-cli-bridge.md).

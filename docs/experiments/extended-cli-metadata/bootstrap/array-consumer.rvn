@@ -1,6 +1,11 @@
 import System.Linq.*
 func Main() -> int {
-    let values: int[] = [20, 22]
+    let values: int[] = [1, 22]
+    let sequence: System.Collections.MutableSequence<int> = values
+    sequence[0] = 20
+    if values[0] != 20 {
+        return 1
+    }
     let selected = values.Filter(value => value > 0).ToList()
     return selected[0] + selected[1]
 }

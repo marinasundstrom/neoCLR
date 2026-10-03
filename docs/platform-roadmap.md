@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Nominal-array execution update (2026-10-03): the separate native consumer now mutates
+vector storage through MutableSequence<int>, observes the same storage through its array
+reference, and executes Filter/ToList through source Array<T>/ArrayIterator<T> (42).
+[Evidence](experiments/extended-cli-metadata/nominal-array-execution-2026-10-03.json).
+Next: resume unchanged application-order-collections with this ownership manifest and
+close its runtime-service binding gaps. Full dual-target library/application execution
+remains open.
+
 Author clarification (2026-10-03): retain nominal Array<T> backing and defer structural
 array decisions. Source Array/iterator and separate consumer compilation succeed; the
 next bounded task is identity-aware vector-to-nominal interface backing/runtime dispatch.
