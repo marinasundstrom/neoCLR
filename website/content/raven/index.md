@@ -135,6 +135,7 @@ neoCLR. Raven admits the declarations and concrete calls; broader constrained lo
 boxing and complete source-union emission remain in progress.
 
 The development metadata API can now author value-type `ToString` overrides for CLI
-output, with boxed and interface dispatch verified in C#. Native Object-slot binding
-and source-union display emission remain in progress; native writing rejects the new
-override profile until it can preserve that contract.
+output, with boxed and interface dispatch verified in C#. Native writing now validates
+an explicit retained System binding and preserves the override slot. A native API-produced
+library executes imported direct calls and boxed ordinary/generic Object dispatch.
+Raven source-union admission, display bodies and union metadata remain in progress.

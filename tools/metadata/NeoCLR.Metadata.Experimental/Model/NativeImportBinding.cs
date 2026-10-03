@@ -15,7 +15,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
     /// <exception cref="InvalidDataException">Core mismatch, conflicting identity, prior imports or reference limit.</exception>
     /// <remarks>Imports validate selected declarations lazily. Native names follow the translated CLI convention (nested names use dots, generic arity is separate).
-    /// This bridge does not replace metadata resolution or infer implementation identity from the host. CLI output retains the original reference identity.</remarks>
+    /// This bridge does not replace metadata resolution or infer implementation identity from the host. CLI output retains the original reference identity. Native value ToString overrides require exactly one System binding; writing validates its CLI and native Object.ToString declarations and records the dependency even without a body call.</remarks>
     public void BindNativeLibrary(AssemblyDefinition reference, NativeLibraryDefinition implementation, AssemblyIdentity coreLibrary)
     {
         ArgumentNullException.ThrowIfNull(reference); ArgumentNullException.ThrowIfNull(implementation); ArgumentNullException.ThrowIfNull(coreLibrary);
@@ -30,6 +30,7 @@ public sealed partial class AssemblyBuilder
 
 public sealed partial class MethodBuilder
 {
+    internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
     internal bool NativeImportIsNamespaceFunction { get; set; }
     internal bool DiscardNativeImportResult { get; set; }
@@ -45,6 +46,30 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         (type.Namespace.Length == 0 ? "" : type.Namespace + ".") + SimpleName(type.Name);
     internal string TypeName(ImportedTypeReference type) => type.DeclaringType is { } parent ? TypeName(parent) + "." + SimpleName(type.Name) :
         (type.Namespace.Length == 0 ? "" : type.Namespace + ".") + SimpleName(type.Name);
+    internal void ValidateObjectToStringSlot()
+    {
+        if (reference.IsNative) throw new InvalidDataException("Object bootstrap binding requires an explicit CLI declaration snapshot");
+        var owners = reference.MainModule.Types.Where(t => t.Namespace == "System" && t.Name == "Object" && t.DeclaringType is null).Take(2).ToArray();
+        var owner = owners.Length == 1 ? owners[0] : null;
+        // The bounded slot has the canonical CLI instance () -> String signature.
+        var slots = owner?.Methods.Where(m => m.Name == "ToString" && !m.IsStatic && m.GenericArity == 0 && m.AuthoredSignature is null &&
+            m.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x0e })).Take(2).ToArray() ?? [];
+        var slot = slots.Length == 1 ? slots[0] : null;
+        if (Library.ModuleName != "System" || owner is null || owner.IsValueType || slot is null || (slot.Attributes & 0x447) != 0x46)
+            throw new InvalidDataException("native Object override requires a public virtual System.Object.ToString declaration");
+        ValidateType(owner);
+        var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
+            f.GetProperty("name").GetString() == "System.Object.ToString" &&
+            f.TryGetProperty("owner", out var target) && TypeKey(target) == "Named(System.Object)" &&
+            Flag(f, "instance") && Count(f, "parameters") == 0).ToArray();
+        if (matches.Length != 1) throw new InvalidDataException("missing or ambiguous native Object.ToString slot");
+        var method = matches[0];
+        if (!NativeLibraryDefinition.IsPublic(method) || !Flag(method, "is_virtual") || Flag(method, "is_abstract") ||
+            Flag(method, "receiver_byref") || Flag(method, "no_result") || Count(method, "generic_parameters") != 0 ||
+            TypeKey(method.GetProperty("returns")) != "String" || Indices(method, "out_parameters").Any() || Indices(method, "out_when_true").Any() || Indices(method, "readonly_parameters").Any())
+            throw new InvalidDataException("incompatible native Object.ToString slot");
+    }
+
     internal void ValidateType(TypeDefinition type)
     {
         if (type.Module.Assembly.ImportSnapshotIdentity != reference.ImportSnapshotIdentity) throw new InvalidDataException("native binding snapshot mismatch");

@@ -15,8 +15,7 @@ public sealed partial class AssemblyBuilder
     public byte[] WriteNativeAssembly()
     {
         var methods = ValidateGraph();
-        if (methods.Any(method => method.IsOverride))
-            throw new InvalidDataException("native Object overrides require explicit runtime slot binding, which is not yet supported");
+
         static void CheckText(string text)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Any(char.IsControl)) throw new InvalidDataException("invalid native descriptive name");
@@ -25,6 +24,13 @@ public sealed partial class AssemblyBuilder
         }
         CheckText(Identity.Name);
         var dependencies = new Dictionary<AssemblyIdentity, AssemblyBuilder>();
+        if (methods.Any(method => method.IsOverride))
+        {
+            var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
+            if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
+            bindings[0].Value.ValidateObjectToStringSlot();
+            dependencies.Add(bindings[0].Key, importedGraphs[bindings[0].Key].Graph);
+        }
         foreach (var method in methods)
         {
             CheckText(method.Name);
@@ -51,7 +57,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => type.Assembly.NativeBinding is { } binding ? binding.TypeName(type.Definition) : type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName));
+        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? ((method.IsOverride || method.NativeValueOverride) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName));
         static object? Owner(MethodBuilder method) => method.NativeImportIsNamespaceFunction ? null : method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
         static string ExternalName(ImportedTypeReference type) => type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
@@ -248,7 +254,7 @@ public sealed partial class AssemblyBuilder
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
                 SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
-                Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsAbstract ? true : null,
+                Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsAbstract || method.IsOverride ? true : null, method.IsOverride ? true : null,
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null)).ToArray()
@@ -263,6 +269,8 @@ public sealed partial class AssemblyBuilder
         bool? is_abstract,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         bool? is_virtual,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        bool? is_override,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? visibility,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

@@ -854,3 +854,8 @@ Host-only TypeBuilder.AddOverride and the detached MethodDefinition override pro
 are covered by XML and the [manual reference](experimental-metadata.md#value-override-authoring-development-2026-10-03).
 These C# APIs remain outside guest RavenDoc type selection. The snapshot check was rerun
 and still reports the existing stale runtime reference; no snapshot hashes were changed.
+
+The value override profile now includes explicit retained-System native binding, native
+round trips and call-name preservation; the same manual entry and XML document the
+bounded contract. C# native execution uses the checked-in CoreProbe bootstrap and a
+freshly assembled System bundle. The existing runtime snapshot check remains stale.

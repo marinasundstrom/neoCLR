@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 5 && args[0] == "--native-value-override")
+{
+    await NativeValueOverrideChecks.RunRuntime(args[1], args[2], args[3], args[4]); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-nested-value-runtime")
 {
     await ValueConstructorChecks.RunRuntime(args[1], args[2], nested: true, native: true); return 0;

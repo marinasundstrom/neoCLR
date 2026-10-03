@@ -11,7 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; }
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance);
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override);
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -402,6 +402,8 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 bool isAbstract = method.TryGetProperty("is_abstract", out var abstractFlag);
                 bool isVirtual = method.TryGetProperty("is_virtual", out var virtualFlag);
+                bool isOverride = method.TryGetProperty("is_override", out var overrideFlag);
+                if (isOverride) { fields.Add("is_override"); Require(overrideFlag.GetBoolean(), "override flag must be true"); }
                 if (isAbstract) { fields.Add("is_abstract"); Require(abstractFlag.GetBoolean(), "abstract flag must be true"); }
                 if (isVirtual) { fields.Add("is_virtual"); Require(virtualFlag.GetBoolean(), "virtual flag must be true"); }
                 Shape(method, fields.ToArray());
@@ -438,12 +440,16 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
                 Require(receiverByRef == (instance && types[ownerIndex].IsValueType), "value instance receiver must be byref");
                 var interfaceOwner = ownerIndex >= 0 && types[ownerIndex].IsInterface;
-                Require(isAbstract == interfaceOwner && isVirtual == interfaceOwner, "interface method flags mismatch");
+                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner || isOverride), "interface method flags mismatch");
                 Require(!interfaceOwner || instance && visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract interface method");
+                Require(!isOverride || !interfaceOwner && instance && types[ownerIndex].IsValueType &&
+                    visibility == MethodVisibility.Public && name == "ToString" && resultType == PrimitiveType.String &&
+                    parameterTypes.Length == 0 && genericArity == 0 && nativeModuleAliases.Values.Count(m => m.Module == "System") == 1,
+                    "unsupported or unbound native Object override");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
-                var expectedName = constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
+                var expectedName = isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
@@ -453,7 +459,7 @@ public sealed partial class NativeAssemblyDefinition
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance)); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride)); methodNames.Add(expectedName);
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -586,6 +592,7 @@ public sealed partial class NativeAssemblyDefinition
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
                 : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
+                : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.

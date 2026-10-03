@@ -4399,3 +4399,32 @@ the same override meaning when that encoding is added. No Runtime Contract or co
 capability is enabled, and source Option still stops at synthesized ToString admission.
 Formatting operations and native union/case contracts remain subsequent gates.
 See [evidence](experiments/extended-cli-metadata/value-override-authoring-2026-10-03.json).
+
+
+## Native value Object override binding (2026-10-03)
+
+The metadata writer now emits the bounded value ToString override after validating one
+explicit BindNativeLibrary mapping to the retained System module. It verifies the CLI
+bootstrap slot and the actual native public virtual String-returning instance contract.
+That registration contributes an assembly/module dependency even without an IL call.
+Missing, ambiguous and incompatible slots fail before encoding returns bytes. This is
+an explicit bootstrap bridge only; application/native library references do not fall back
+to a CLI projection. The System source bundle and checked-in CoreProbe revision/hashes
+are recorded in [execution evidence](experiments/extended-cli-metadata/native-value-overrides-2026-10-03.json).
+
+Native method rows use the runtime slot name and existing is_virtual/is_override fields.
+The reader retains Virtual/ReuseSlot and rejects invalid flags, names or missing System
+scope. Imported native value calls preserve that name without using runtime reflection.
+A separate metadata-generated consumer runs against the generated library (stdout
+`native override`, exit 42). An independent neoIL harness boxes nongeneric/generic values
+from that library and dispatches through the real System.Object.ToString (exit 42).
+The harness supplies boxing instructions, not replacement declarations or method bodies.
+No runtime source or format version changes were needed; this follows supported CLR
+slot semantics with explicit native linking. Native instructions/bodies remain runtime
+validated, not interpreted by the metadata reader.
+
+Raven source-union preflight is still closed at ToString admission. Next expose the bounded
+override contract through compiler symbols/capabilities and the target adapter, then close
+generated formatting operations and union/case metadata preservation. Runtime Contract
+configuration and the .NET Reflection/Emit backend remain unchanged. This is not the
+full source Option or broad application gate, and does not establish compiler boxing.

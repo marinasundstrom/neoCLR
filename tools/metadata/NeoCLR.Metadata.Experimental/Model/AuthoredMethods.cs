@@ -125,7 +125,7 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported override contract, duplicate signature or method limit.</exception>
     /// <exception cref="InvalidOperationException">Owner is not a value type.</exception>
-    /// <remarks>CLI emission reuses the inherited Object.ToString slot. Native encoding rejects overrides until explicit runtime Object-slot binding is implemented. Generic value owners are supported; generic override methods are not.</remarks>
+    /// <remarks>CLI emission reuses the inherited Object.ToString slot. Native encoding requires one explicit BindNativeLibrary System binding with a matching Object.ToString slot. Generic value owners are supported; generic override methods are not.</remarks>
     public MethodBuilder AddOverride(string name, MethodSignature signature)
     {
         var definition = new MethodDefinition(name, (ushort)(MethodAttributes.Public | MethodAttributes.Virtual), signature);

@@ -11,8 +11,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add bounded value-type ToString override authoring through definitions and
   TypeBuilder.AddOverride. CLI output preserves the Object virtual slot, including
   when the method also implements an interface; ordinary and generic value dispatch
-  execute in C# tests. Native writing explicitly rejects these overrides until runtime
-  Object-slot binding is implemented. Raven union admission is unchanged. Host API
+  execute in C# tests. Native writing now validates one explicit retained-System
+  Object.ToString binding and preserves the slot name/flags through native reading and
+  imported calls. An API-produced native library executes both separate direct calls and
+  boxed ordinary/generic dispatch against the real System bundle; incompatible/missing
+  bindings reject. No runtime or format-version change. Raven union admission is unchanged. Host API
   XML/manual coverage is updated; the existing runtime API snapshot remains stale.
 
 - Record Raven's generated union constructor/accessor planning fix: retained case and

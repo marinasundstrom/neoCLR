@@ -5715,8 +5715,31 @@ interface dispatch to the same implementation, definition/builder parity and PE 
 The restricted profile avoids inventing general inheritance resolution; its cost is
 that other Object slots and class overrides remain unsupported.
 
-**Native limitation:** WriteNativeAssembly throws InvalidDataException for these
-methods. It must not silently turn an override into an ordinary method. The runtime
-already supports value Object overrides, but authoring still needs an explicit retained
-System.Object dependency, validated slot identity and native name mapping. Native reader
-round trips and Raven admission remain pending. This API does not complete union emission.
+**Native binding:** before native writing, register exactly one explicit System library
+with `BindNativeLibrary(referenceSnapshot, nativeLibrary, coreIdentity)`. The existing
+retained CLI bootstrap snapshot must declare public virtual Object.ToString() -> String;
+the native library must be module System and provide the matching public virtual instance
+slot, with no generic parameters, byref receiver, output modes or no-result semantics.
+Missing, ambiguous or incompatible bindings throw InvalidDataException. No library is
+loaded implicitly. This remains an explicit bootstrap bridge, not an application-reference
+fallback or a general Object/Reflection API.
+
+Native writing includes the registered assembly identity and native module/revision binding
+even without a call to the dependency in the body. Override names use the runtime's
+owner.ToString slot convention, with is_virtual/is_override and receiver_byref. Ordinary
+method naming and interface encodings are unchanged. These are existing format-5/runtime
+fields; no format bump or runtime change is required.
+
+Native readers retain the CLI Virtual/ReuseSlot flags, validate the bounded shape and System
+binding, and native imports preserve the call name. Both native semantic snapshots and
+reference-only CLI projections retain the declaration meaning. Execution additionally
+checks the linked dependency's actual definitions. Reader validation is not proof that
+runtime bodies or external artifacts have been verified.
+
+The C# `--native-value-override` integration mode writes a native library, rereads it,
+emits a separate direct-call consumer and executes it. A neoIL harness boxes ordinary
+and generic values from that same API-produced library and calls Object.ToString; both
+return 42 using the real retained System bundle. Boxing is not yet an operation exposed
+by the metadata generator, so this harness does not claim Raven union execution.
+Raven override admission, generated formatting operations, and union/case metadata
+preservation remain pending.

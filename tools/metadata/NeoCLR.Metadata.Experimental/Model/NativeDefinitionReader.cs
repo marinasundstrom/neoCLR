@@ -7,6 +7,7 @@ public sealed partial class AssemblyDefinition
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
     /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal value/reference, local or external generic construction or vector signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
+    /// Public value-type ToString overrides retain their inherited CLI slot flags and native call name.
     /// Writable ref/out parameters retain their element signature and output indices; readonly modes and byref constructors remain unsupported.
     /// Bodies remain opaque. Write copies the original image; editing remains pending. Supported method definitions can be imported for native calls.
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
@@ -85,7 +86,7 @@ public sealed partial class NativeAssemblyDefinition
         var accessors = properties.SelectMany(p => new[] { p.Getter, p.Setter }).Where(index => index >= 0).ToHashSet();
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
-            (ushort)((method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, method.Signature.GenericParameterNames.Count, [], false, [],
+            (ushort)((method.Override ? 0xc0 : 0) | (method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, method.Signature.GenericParameterNames.Count, [], false, [],
             new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace)).ToArray();
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],

@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-03",
+  "scope": "Native value Object.ToString slot binding, reading and runtime execution; Raven union admission remains pending",
+  "neoclrParentRevision": "757ee6821238c2e722c802635c54d1c26e6f7143",
+  "ravenRevision": "03511943c25636cd8fb974e783c7538d9df05cee",
+  "compilerCodeChanged": false,
+  "runtimeCodeChanged": false,
+  "runtimeBuiltFromRevision": "757ee6821238c2e722c802635c54d1c26e6f7143",
+  "sourceSha256": {
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeImportBinding.cs": "556e45f523a4e4b5fe91f5f149a04ff280bf80dd5c304e646fc3a61988662f8d",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyWriter.cs": "cdd088ef29e59f5514e3a763931525d0fd37344b8ee7a5e0e9677cd1716b5553",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyDefinition.cs": "a58581740a1bdede6be25719362a5a77721ce6f88a042c862089abdd6149f190",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeDefinitionReader.cs": "19b5de4d8fead35d6d7985e0b72636d4722369babd6fef16b1a0d21019b34443",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/ImportedMethodReference.cs": "c382c4836447e4ae0478c26da3de5dd794058722ec85e0a6f7a3ebd706474b0f",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeValueOverrideChecks.cs": "138a42820c82e2a535a60aaa768548ea65cc172c01b4ed16399b9a2a5e6b46bf"
+  },
+  "commands": [
+    "cargo build --release --bin neoclr",
+    "python3 docs/experiments/raven-target/collection_library.py /tmp/override-System.neoil",
+    "target/release/neoclr assemble /tmp/override-System.neoil /tmp/override-System.neox --format neox",
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+    "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0 -- --native-value-override target/release/neoclr /tmp/override-System.neox api-docs/reference/NeoCLR.CoreProbe.dll /tmp/native-override-final"
+  ],
+  "artifactSha256": {
+    "target/release/neoclr": "d3cff2ab0c9f6b671120b3cab72837ad2403fc87695aabcaef11f88001845ee4",
+    "api-docs/reference/NeoCLR.CoreProbe.dll": "f85826c88fd3617fc357e6261a73b2bc745550e635d8130166ae09b61a72d1ad",
+    "docs/experiments/raven-target/collection_library.py": "337adcde547610bf8b40596cbf0673ed959752060e20114d6608d3c254edddc3",
+    "/tmp/override-System.neoil": "37568183d4a1405818e92fa8e8371e877cab4ecbc7f4dc68c68c1d14634e3e35",
+    "/tmp/override-System.neox": "7ea8985d7cb804ebd3d4094d0531658c9ff53353cac1aa4fc7ee32bf06ad2e90",
+    "/tmp/native-override-final/Library.dll": "8d1596d058e109751644566d863be4cf24deb4023bc2d89d6c9453f0d862cf16",
+    "/tmp/native-override-final/Consumer.dll": "f1c436e3a13bc7acc18670bd8e0641afe45cc0689294c71ead856d90c08d49bb",
+    "/tmp/native-override-final/Boxed.neoil": "c2c6d79fc215853ae1584df4f07cb2fdcab671b1ee100d5ff9fef8a7ff36a3d3"
+  },
+  "ownership": "Retained System generated from checked-in runtime sources; explicit existing CoreProbe CLI bootstrap snapshot. No application/library sources or replacement System stubs in consumer.",
+  "results": {
+    "metadataContracts": "118/118 passed",
+    "nativeRoundTrip": "Virtual/ReuseSlot flags preserved for ordinary and generic value owners",
+    "cliProjection": "override flags preserved; projection not used by native consumer import",
+    "nativeConsumer": {
+      "stdout": "native override\n",
+      "exitCode": 42
+    },
+    "boxedHarness": {
+      "stdout": "",
+      "exitCode": 42,
+      "assertions": [
+        "ordinary boxed value dispatches through actual System.Object.ToString",
+        "constructed generic boxed value dispatches through the same actual slot",
+        "both results equal native override"
+      ]
+    },
+    "negative": [
+      "missing System runtime dependency rejected",
+      "ambiguous System registration rejected",
+      "CLI bootstrap without Object slot rejected",
+      "missing/duplicate native slot rejected",
+      "wrong result, nonvirtual, byref or generic slot rejected",
+      "bad native override/virtual flags, name and dependency scope rejected"
+    ],
+    "apiSnapshot": "pre-existing stale snapshot check; no hash refresh"
+  },
+  "limitations": [
+    "boxing instructions supplied by neoIL runtime harness, not yet metadata IL generator",
+    "Raven adapter and source-union callable admission unchanged",
+    "source-generated formatting operations and union/case metadata remain incomplete",
+    "explicit retained bootstrap bridge; no implicit dependency loading or native application CLI fallback"
+  ]
+}
