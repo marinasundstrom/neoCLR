@@ -87,6 +87,9 @@ def main():
             (HERE / 'array-interface-count-consumer.rvn', 42, ''),
             (HERE / 'nested-array-callback-consumer.rvn', 42, ''),
             (HERE / 'instance-callback-consumer.rvn', 42, ''),
+            (HERE / 'captured-reference-consumer.rvn', 42, ''),
+            (ROOT / 'docs/experiments/raven-target/samples/library-list-filters.rvn', 0,
+             '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-array-callbacks.rvn', 0, '7\n42\nFirst\nSecond\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-option.rvn', 0, '42\nProduct not found\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-option-propagation.rvn', 0, 'Value found\n42\nAbsent\n'),
@@ -100,6 +103,13 @@ def main():
             run([runtime, 'run', str(app), '--module', str(library), '--system', str(seed)],
                 exit_code, expected_stdout)
             sample_paths.extend([source, app])
+        mutable_source = output / 'MutableCapture.rvn'
+        mutable_source.write_text('class Cell {}\nfunc Main() -> int {\n    var cell = Cell()\n    let callback: () -> object = () => cell\n    cell = Cell()\n    return 42\n}\n')
+        mutable_output = output / 'MutableCapture.dll'
+        failure = run(common + ['--reference', str(library), '-o', str(mutable_output), str(mutable_source)], 1)
+        if mutable_output.exists() or 'closure capture requires an immutable reference local' not in failure.stderr:
+            raise RuntimeError('Mutable capture did not reject before publication')
+        sample_paths.append(mutable_source)
     query_paths = []
     if args.queries:
         bad_cast_source = output / 'BadCast.rvn'

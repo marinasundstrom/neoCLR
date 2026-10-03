@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Native reference captures (2026-10-03): Raven `623cbc1d8` lowers lambdas capturing
+immutable reference locals into fresh private frames using existing instance callback
+bindings. Unchanged library-list-filters now compiles, verifies and executes with exact
+output against the separately built native class library. Escaped callbacks, independent
+factory instances and shared object mutation pass; mutable bindings reject before output.
+The broad application, seven native consumers and 31 focused .NET tests pass. No runtime,
+metadata format or bootstrap configuration change. Mutable/value/parameter/receiver
+captures remain unsupported; general lexical shared storage and full-library coverage
+remain open. [Evidence](experiments/extended-cli-metadata/reference-captures-2026-10-03.json).
+
 Receiver-bound callbacks (2026-10-03): Raven `a53b6412a` and the metadata writer now
 support owned nongeneric nonvirtual reference-instance callback targets. The runtime's
 existing instance binding preserves shared mutable receiver identity, confirmed by CLR

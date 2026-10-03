@@ -1,0 +1,31 @@
+class Cell {
+    var Value: int
+    init(value: int) {
+        Value = value
+    }
+}
+
+func Create(value: int) -> () -> int {
+    let cell = Cell(value)
+    return () => {
+        cell.Value = cell.Value + 1
+        return cell.Value
+    }
+}
+
+func Main() -> int {
+    let first = Create(10)
+    let second = Create(20)
+    if first() != 11 { return 1 }
+    if second() != 21 { return 2 }
+    if first() != 12 { return 3 }
+    let shared = Cell(40)
+    let write: () -> int = () => {
+        shared.Value = shared.Value + 1
+        return shared.Value
+    }
+    let read: () -> int = () => shared.Value
+    if write() != 41 { return 4 }
+    if read() != 41 { return 5 }
+    return write()
+}

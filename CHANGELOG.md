@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven `623cbc1d8` immutable reference capture lowering and expand native
+  acceptance with unchanged list-filters plus escaped/shared-reference callbacks.
+  Exact output, identity/mutation, separate invocation state and rejection without
+  output pass alongside the broad application, seven consumers and 31 .NET tests.
+  Metadata/runtime remain unchanged; general mutable/value captures remain open.
+
 - Admit owned nongeneric nonvirtual reference-instance callback bindings in the
   metadata builders/IL generator. Consume the receiver and preserve shared mutation
   through CLI/native execution; invalid stack receivers reject on write. Raven
