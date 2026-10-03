@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Preserve declared parameter names through CLI/native encoding and constructed
+  introspection views. Author external value and nested type/method references from
+  explicit identity/digest contracts, without reopening reader objects. C# metadata
+  contracts pass 124 groups; separately compiled plain/generic union consumers run
+  on CLR and neoCLR. Unchanged Option still requires a residual unit-value contract.
+
 - Map explicitly bound core String static call owners and core Char type operands to
   canonical native primitive encodings. Keep ordinary nominal String import rejected;
   validate core/module identity and selected method signatures. C# runtime checks and

@@ -884,3 +884,9 @@ Host-only type custom-attribute model and introspection APIs are covered by XML 
 These C# APIs are not guest Raven types and are excluded from RavenDoc's guest type selection.
 The existing stale guest snapshot/source-union refresh blocker remains separate; this
 change does not overwrite the last verified reference assembly or claim regeneration.
+
+2026-10-03: host-only parameter-name and authored value/nested reference APIs are
+covered in `experimental-metadata.md`, outside the guest RavenDoc type inventory.
+The API snapshot check still reports stale guest artifacts; refreshing remains blocked
+by the recorded source-union bridge binding issue. The last verified core reference
+assembly has not been replaced by unverified output.

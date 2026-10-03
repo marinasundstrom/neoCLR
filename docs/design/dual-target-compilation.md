@@ -396,3 +396,39 @@ records; unlike CLI attributes they currently lack System.Attribute inheritance.
 bounded representation remains documented and does not introduce union-specific wire data.
 Separate-library native union symbol reconstruction and external value references remain
 pending; local execution is not the full union or source Option acceptance gate.
+
+
+## Native union imports (development, 2026-10-03)
+
+The normal driver now imports separately emitted plain/generic union libraries through
+native metadata. The facade resolves attributes and parameter names; Raven reconstructs
+carrier, logical case and physical companion relationships. Case ordinals and ownership
+must be consistent, and cases require one instance constructor. Corrupt relationships
+diagnose before publishing output. Constructor parameter names are retained because
+Raven's case payload-property association depends on them.
+
+`NeoClrPrimitiveBootstrap.ReadAssembly(ReadOnlySpan<byte>)` captures an explicit CLI core
+snapshot and exposes its matching `PortableExecutableReference Reference`. Hosts must
+include that exact reference and select its assembly as the target core. The new
+`NeoClrMetadataReference.ReadAssembly(image, bootstrap)` overload admits only that exact
+core identity during native metadata resolution; application and rebuilt-library
+references remain native. Conflicting bootstrap snapshots and missing dependencies reject.
+The existing overload remains available for catalogs without that explicit bridge.
+
+Emission uses compiler symbol facts and host identity/digest contracts to author external
+value and physical nested owners. It does not reopen native importer objects. The current
+Reflection/Emit backend remains unchanged. A small common union-companion symbol contract
+replaces concrete PE checks in binding; language decisions still belong to Raven.
+
+Validation: local and separate-library plain/generic cases compile through ordinary driver
+commands and run on both runtimes (42). Local cases also print the expected Some/None
+strings. Separate consumers use only emitted references, preserve an independent carrier
+copy after replacing the original, and match the payload. Malformed duplicate ordinals
+reject with no output. 21 focused .NET regressions and 124 metadata contract groups pass.
+
+Limitations: native embedded marker types retain the documented bounded attribute profile;
+CLI IUnion projection, imported ToString overrides and unchanged Option/Result completion
+are not claimed. The source Option ownership probe now reaches an unregistered System.Void
+residual type argument. This requires a coherent unit-value/bootstrap contract, not removal
+of source declarations or a fallback to CLI library imports. The API documentation guest
+snapshot remains stale for the previously recorded bridge issue.

@@ -7,7 +7,7 @@ using AssemblyBuilder = NeoCLR.Metadata.Experimental.Model.AssemblyBuilder;
 
 internal static class ValueConstructorChecks
 {
-    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create(bool nested = false, bool native = false)
+    static (AssemblyBuilder Library, AssemblyBuilder App, MethodBuilder Constructor, FieldBuilder Field) Create(bool nested = false, bool native = false, bool authored = false)
     {
         var core = new AssemblyIdentity("System.Private.CoreLib", typeof(object).Assembly.GetName().Version!, "", "7cec85d7bea7798e");
         var library = new AssemblyBuilder(new("ValueConstructorLibrary", new Version(1, 0, 0, 0)), core);
@@ -34,26 +34,45 @@ internal static class ValueConstructorChecks
         var projection = native ? AssemblyDefinition.ReadNativeAssembly(image) : RuntimeAssemblyContainer.ReadCliProjection(image);
         var app = new AssemblyBuilder(new("ValueConstructorApp", new Version(1, 0, 0, 0)), core);
         var numberType = projection.MainModule.Types.Single(t => t.Name == "Number");
-        var numberCtor = app.ImportReference(numberType.Methods.Single(m => m.Name == ".ctor"), core);
-        var numberRead = app.ImportReference(numberType.Methods.Single(m => m.Name == "Read"), core);
+        var digest = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(image));
+        ImportedTypeReference Describe(TypeDefinition type)
+        {
+            if (type.DeclaringType is { } parent)
+                return app.CreateNestedTypeReference(Describe(parent), type.Name, type.GenericArity, type.IsValueType);
+            return type.IsValueType
+                ? app.CreateValueTypeReference(library.Identity, core, digest, type.Namespace, type.Name, type.GenericArity)
+                : app.CreateTypeReference(library.Identity, core, digest, type.Namespace, type.Name, type.GenericArity);
+        }
+        ImportedMethodReference Reference(TypeDefinition type, string name, MethodSignature signature) => authored
+            ? app.CreateMethodReference(Describe(type), name, signature)
+            : app.ImportReference(type.Methods.Single(m => m.Name == name), core);
+        if (authored)
+        {
+            var root = app.CreateTypeReference(library.Identity, core, digest, "Example", "Container");
+            var foreign = new AssemblyBuilder(new("OtherOutput", new Version(1, 0, 0, 0)), core);
+            try { foreign.CreateNestedTypeReference(root, "Child"); throw new Exception("foreign parent admitted"); } catch (ArgumentException) { }
+            try { app.CreateValueTypeReference(library.Identity, core, new string('0', 64), "Example", "Other"); throw new Exception("conflicting snapshot admitted"); } catch (InvalidDataException) { }
+        }
+        var numberCtor = Reference(numberType, ".ctor", new(PrimitiveType.Void, [PrimitiveType.Int32]));
+        var numberRead = Reference(numberType, "Read", new(PrimitiveType.Int32, []));
         var boxType = projection.MainModule.Types.Single(t => t.Name == "Box`1");
-        var boxCtor = app.ImportReference(boxType.Methods.Single(m => m.Name == ".ctor"), core).MakeConstructedReference([PrimitiveType.Int32]);
-        var boxRead = app.ImportReference(boxType.Methods.Single(m => m.Name == "Get"), core).MakeConstructedReference([PrimitiveType.Int32]);
+        var boxCtor = Reference(boxType, ".ctor", new(PrimitiveType.Void, [t])).MakeConstructedReference([PrimitiveType.Int32]);
+        var boxRead = Reference(boxType, "Get", new(t, [])).MakeConstructedReference([PrimitiveType.Int32]);
         if (!numberCtor.IsConstructor || !boxCtor.Definition.IsConstructor) throw new Exception("constructor identity lost");
         var referenceDefinition = projection.MainModule.Types.Single(t => t.Name == "ReferenceBox");
-        var importedReferenceConstructor = app.ImportReference(referenceDefinition.Methods.Single(m => m.Name == ".ctor"), core);
-        var importedReferenceRead = app.ImportReference(referenceDefinition.Methods.Single(m => m.Name == "Read"), core);
+        var importedReferenceConstructor = Reference(referenceDefinition, ".ctor", new(PrimitiveType.Void, [PrimitiveType.Int32]));
+        var importedReferenceRead = Reference(referenceDefinition, "Read", new(PrimitiveType.Int32, []));
         var main = app.AddFunction("Main"); app.EntryPoint = main;
-        var local = main.DeclareLocal(app.ImportReference(numberType, core)); var boxed = main.DeclareLocal(boxCtor.DeclaringType);
+        var local = main.DeclareLocal(authored ? Describe(numberType) : app.ImportReference(numberType, core)); var boxed = main.DeclareLocal(boxCtor.DeclaringType);
         main.LoadConstant(42); main.NewObject(numberCtor); main.StoreLocal(local);
         main.LoadLocalAddress(local); main.Call(numberRead); main.NewObject(boxCtor); main.StoreLocal(boxed);
         main.LoadLocalAddress(boxed); main.Call(boxRead); main.Emit(OpCode.Newobj, importedReferenceConstructor); main.Call(importedReferenceRead); main.Return();
         try { main.Call(numberCtor); throw new Exception("ordinary constructor call admitted"); } catch (ArgumentException) { }
         return (library, app, constructor, value);
     }
-    internal static void Run(bool nested = false, bool native = false)
+    internal static void Run(bool nested = false, bool native = false, bool authored = false)
     {
-        var (library, app, constructor, field) = Create(nested, native);
+        var (library, app, constructor, field) = Create(nested, native, authored);
         var context = new AssemblyLoadContext("value-constructors", true);
         try
         {

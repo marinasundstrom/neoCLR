@@ -96,8 +96,12 @@ Raven now admits the bounded override and executes local ordinary/generic value 
 explicit --runtime-seed binding. Source unions and unchanged Option reach generated ToString
 conversion lowering; [driver evidence](experiments/extended-cli-metadata/raven-value-overrides-2026-10-03.json)
 records the existing CLR return-nullability mismatch separately.
-Union/case metadata round trips, synthesized display bodies and symbol-authored external value
-operands remain pending; this is not source Option completion. See
+Union/case metadata, local synthesized display and separately compiled plain/generic
+union matching now execute on both targets. Native imports retain parameter names and
+physical case scopes; external value operands are authored from symbols. The unchanged
+Option ownership probe now reaches the System.Void residual unit-value dependency;
+this is not source Option completion. See
+[separate union evidence](experiments/extended-cli-metadata/union-separate-execution-2026-10-03.json). See
 [union declaration evidence](experiments/extended-cli-metadata/union-declarations-2026-10-03.json). See
 [union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
 [source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires

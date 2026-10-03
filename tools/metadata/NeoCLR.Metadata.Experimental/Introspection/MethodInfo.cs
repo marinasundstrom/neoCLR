@@ -27,7 +27,8 @@ public sealed class MethodInfo
         returns = new(() => context.ResolveMemberSignature(signature.ReturnType, typeArguments, genericArguments, owner));
         parameters = new(() => Array.AsReadOnly(signature.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
             context.ResolveMemberSignature(type.ByReferenceElement ?? type, typeArguments, genericArguments, owner),
-            type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref)).ToArray()));
+            type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref,
+            definition.ParameterNames.GetValueOrDefault(i))).ToArray()));
     }
     /// <summary>Gets the declaration name.</summary>
     public string Name { get; }
@@ -86,7 +87,9 @@ public enum ParameterPassingMode
 /// <summary>A metadata parameter with position and type; absent native parameter names are not invented.</summary>
 public sealed class ParameterInfo
 {
-    internal ParameterInfo(MethodInfo method, int position, TypeInfo type, ParameterPassingMode passingMode) { DeclaringMethod = method; Position = position; ParameterType = type; PassingMode = passingMode; }
+    internal ParameterInfo(MethodInfo method, int position, TypeInfo type, ParameterPassingMode passingMode, string? name) { DeclaringMethod = method; Position = position; ParameterType = type; PassingMode = passingMode; Name = name; }
+    /// <summary>Gets the declared parameter name, or null when metadata omits it.</summary>
+    public string? Name { get; }
     /// <summary>Gets the canonical owning method view.</summary>
     public MethodInfo DeclaringMethod { get; }
     /// <summary>Gets the zero-based parameter index.</summary>

@@ -23,6 +23,7 @@ public sealed partial class MethodDefinition
         declaringToken = row.DeclaringToken;
         signature = row.Signature;
         outParameters = row.OutParameters;
+        LoadParameterNames(row.ParameterNames);
         nativeSignature = row.NativeSignature?.Materialize(module);
         nativeNamespace = row.NativeNamespace;
     }

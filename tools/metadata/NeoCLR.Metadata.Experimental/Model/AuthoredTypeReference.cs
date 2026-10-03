@@ -20,8 +20,44 @@ public sealed partial class AssemblyBuilder
         string artifactSha256, string @namespace, string name, int genericArity = 0)
         => CreateNominalReference(dependency, dependencyCoreLibrary, artifactSha256, @namespace, name, genericArity, false);
 
+    /// <summary>Authors a public unconstrained value-type identity from explicit dependency facts.</summary>
+    /// <param name="dependency">Exact unsigned external assembly identity.</param>
+    /// <param name="dependencyCoreLibrary">Core identity, equal to the output core.</param>
+    /// <param name="artifactSha256">64 hexadecimal SHA-256 digits for the selected native image.</param>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Metadata name including any generic arity suffix.</param>
+    /// <param name="genericArity">Number of invariant unconstrained parameters, zero to 32.</param>
+    /// <returns>An interned output-owned value definition reference.</returns>
+    /// <exception cref="ArgumentException">The digest is malformed.</exception>
+    /// <exception cref="InvalidDataException">Unsupported identity, core, name, arity, conflicting snapshot or resource limit.</exception>
+    /// <remarks>Core, digest, ownership and limits match CreateTypeReference. No dependency is loaded.</remarks>
+    public ImportedTypeReference CreateValueTypeReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
+        string artifactSha256, string @namespace, string name, int genericArity = 0)
+        => CreateNominalReference(dependency, dependencyCoreLibrary, artifactSha256, @namespace, name, genericArity, false, true);
+
+    /// <summary>Authors a public nested reference/value identity beneath an output-owned nongeneric scope.</summary>
+    /// <param name="declaringType">An output-owned, unconstructed nongeneric native scope.</param>
+    /// <param name="name">Simple nested metadata name including any arity suffix.</param>
+    /// <param name="genericArity">The nested type's own generic arity.</param>
+    /// <param name="isValueType">Whether the identity denotes a value type.</param>
+    /// <returns>An interned scoped reference.</returns>
+    /// <exception cref="ArgumentException">The scope is not owned by this output or lacks a native artifact contract.</exception>
+    /// <exception cref="InvalidDataException">Unsupported identity, nesting or resource limit.</exception>
+    /// <remarks>The declaring scope must carry a native artifact contract. Namespace is empty; generic arity belongs to the nested type alone.</remarks>
+    public ImportedTypeReference CreateNestedTypeReference(ImportedTypeReference declaringType, string name,
+        int genericArity = 0, bool isValueType = false)
+    {
+        ArgumentNullException.ThrowIfNull(declaringType);
+        if (!ReferenceEquals(declaringType.Owner, this) || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph) ||
+            !graph.Snapshot.StartsWith("native:", StringComparison.Ordinal))
+            throw new ArgumentException("nested identity requires an output-owned native scope", nameof(declaringType));
+        var reference = ImportTypeIdentity(declaringType.AssemblyIdentity, "", name, genericArity, isValueType, declaringType);
+        RegisterNominalKind(reference, false);
+        return reference;
+    }
+
     private ImportedTypeReference CreateNominalReference(AssemblyIdentity dependency, AssemblyIdentity dependencyCoreLibrary,
-        string artifactSha256, string @namespace, string name, int genericArity, bool isInterface)
+        string artifactSha256, string @namespace, string name, int genericArity, bool isInterface, bool isValueType = false)
     {
         ArgumentNullException.ThrowIfNull(dependency);
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
@@ -34,7 +70,7 @@ public sealed partial class AssemblyBuilder
         var snapshot = "native:" + artifactSha256.ToUpperInvariant();
         if (importedGraphs.TryGetValue(dependency, out var prior) && prior.Snapshot != snapshot)
             throw new InvalidDataException("conflicting dependency module snapshots");
-        var reference = ImportTypeIdentity(dependency, @namespace, name, genericArity);
+        var reference = ImportTypeIdentity(dependency, @namespace, name, genericArity, isValueType);
         RegisterNominalKind(reference, isInterface);
         if (!importedGraphs.ContainsKey(dependency))
             importedGraphs.Add(dependency, (snapshot, new AssemblyBuilder(dependency, dependencyCoreLibrary)));

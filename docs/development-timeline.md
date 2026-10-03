@@ -10281,3 +10281,16 @@ not Self dispatch evidence. Raven integration and implementation substitution re
   feature branches; no additional instruction was inferred from the unfinished thought.
 - **Outcome:** plain/generic local union cases now compile/run on both targets with
   case metadata and generated display. Native imported union semantics remain open.
+
+
+### 2026-10-03 — Unions as a class-library prerequisite
+
+The author emphasized that making Option and Result work unlocks compiling the class
+library that depends on them. The assistant agreed with the dependency order while
+separating union support from unrelated remaining library/runtime gaps. Implementation
+now executes separately compiled plain/generic union consumers on .NET and neoCLR,
+using native metadata import and symbol-authored emission. The unchanged source Option
+probe passes union declaration admission but rejects an unregistered System.Void residual
+type dependency. Option/Result and the broad library/application gate remain open.
+See the separate-union evidence and dual-target integration tracker. This continues the
+existing Raven integration priority; it does not authorize a format fork or new semantics.

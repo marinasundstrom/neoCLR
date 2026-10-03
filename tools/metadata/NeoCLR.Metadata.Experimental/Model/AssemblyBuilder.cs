@@ -501,10 +501,10 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
-            if (method.Signature.OutParameters.Count > 0)
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0)
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
-                    metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, default, i + 1);
+                    metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
                     nextParameter++;
                 }
             if (method.IsAbstract)

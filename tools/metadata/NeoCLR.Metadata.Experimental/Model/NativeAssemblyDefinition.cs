@@ -12,7 +12,7 @@ public sealed partial class NativeAssemblyDefinition
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override);
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, string> ParameterNames { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -403,6 +403,7 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
+                if (method.TryGetProperty("parameter_names", out _)) fields.Add("parameter_names");
                 if (method.TryGetProperty("out_parameters", out _)) fields.Add("out_parameters");
                 var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
                 genericArity = genericNames.Length;
@@ -489,7 +490,20 @@ public sealed partial class NativeAssemblyDefinition
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride)); methodNames.Add(expectedName);
+                var parameterNames = new Dictionary<int, string>();
+                if (method.TryGetProperty("parameter_names", out _))
+                {
+                    var names = Array(method, "parameter_names", 256);
+                    Require(names.Length == parameterTypes.Length, "parameter names must align with signature");
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        if (names[i].ValueKind == JsonValueKind.Null) continue;
+                        var parameterName = names[i].GetString();
+                        Require(parameterName is { Length: > 0 and <= 1024 } && !parameterName.Any(char.IsControl), "invalid parameter name");
+                        parameterNames.Add(i, parameterName!);
+                    }
+                }
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames }); methodNames.Add(expectedName);
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -625,6 +639,7 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
+            foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
             projectedMethods.Add(output);
         }

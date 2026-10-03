@@ -2,10 +2,10 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyBuilder
 {
-    /// <summary>Authors a public nonvirtual root-class member or abstract interface method reference without a reader definition.</summary>
-    /// <param name="declaringType">Output-owned top-level class/interface definition, not a construction.</param>
+    /// <summary>Authors a public nonvirtual class/value member or abstract interface method reference without a reader definition.</summary>
+    /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
-    /// <param name="signature">Primitive, scoped parameter, external reference-class construction or vector signature.</param>
+    /// <param name="signature">Primitive, scoped parameter, external nominal construction or vector signature.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -13,7 +13,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
     /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
-    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Writable ref/out parameters are supported; byref constructors, instance generic methods and value/nested owners are unsupported.
+    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false)
@@ -21,9 +21,9 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
         ArgumentNullException.ThrowIfNull(signature);
-        if (!ReferenceEquals(declaringType.Owner, this) || declaringType.DeclaringType is not null || declaringType.IsValueType ||
+        if (!ReferenceEquals(declaringType.Owner, this) ||
             declaringType.TypeArguments.Count != 0 || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph))
-            throw new ArgumentException("method requires an owned reference-class definition", nameof(declaringType));
+            throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
         if (isInterface && (isStatic || constructor || signature.GenericParameterNames.Count != 0))
@@ -46,8 +46,15 @@ public sealed partial class AssemblyBuilder
         }
         if (completedInterfaceContracts.ContainsKey(declaringType)) throw new InvalidOperationException("interface contract is complete");
         if (authoredCallableReferences.Count + importedReferences.Count >= 4096) throw new InvalidDataException("too many imported methods");
-        var owner = new TypeBuilder(graph.Graph, declaringType.Namespace, declaringType.Name, isStatic: false,
-            genericNames: Enumerable.Range(0, declaringType.GenericArity).Select(i => "T" + i).ToArray(), isInterface: isInterface);
+        TypeBuilder MaterializeOwner(ImportedTypeReference type)
+        {
+            var result = new TypeBuilder(graph.Graph, type.Namespace, type.Name, isStatic: false,
+                genericNames: Enumerable.Range(0, type.GenericArity).Select(i => "T" + i).ToArray(),
+                isInterface: authoredInterfaces.Contains(type), isValueType: type.IsValueType);
+            result.Definition.AuthoredDeclaringType = type.DeclaringType is { } parent ? MaterializeOwner(parent).Definition : null;
+            return result;
+        }
+        var owner = MaterializeOwner(declaringType);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface };
         authoredCallableReferences.Add(reference);
@@ -55,7 +62,7 @@ public sealed partial class AssemblyBuilder
 
         static bool Supported(SignatureType type, bool result) =>
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
-            type.ImportedType is { IsValueType: false, DeclaringType: null } nominal ? nominal.TypeArguments.All(t => Supported(t, false)) :
+            type.ImportedType is { } nominal ? nominal.TypeArguments.All(t => Supported(t, false)) :
             type.MethodParameterIndex is not null || type.TypeParameterIndex is not null ||
             type.ArrayElement is { ArrayElement: null } element && Supported(element, false);
     }

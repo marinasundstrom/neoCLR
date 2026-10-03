@@ -286,7 +286,8 @@ public sealed partial class AssemblyBuilder
                 Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsAbstract || method.IsOverride ? true : null, method.IsOverride ? true : null,
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
-                method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null)).ToArray()
+                method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
+                method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray())).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -311,7 +312,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         int[]? out_parameters,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        bool? receiver_byref);
+        bool? receiver_byref,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        string?[]? parameter_names);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

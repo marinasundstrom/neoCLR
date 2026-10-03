@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Parameter names and authored value references](#parameter-names-and-authored-value-references-development-2026-10-03).
+
 - [Native nested case metadata](#native-nested-case-metadata-development-2026-10-03): scoped local/external native case identities.
 
 - [Union payload foundation](#union-payload-foundation-development-2026-10-03): inline storage and direct native value declarations.
@@ -5908,3 +5910,42 @@ These are existing runtime primitive representations, not new union semantics or
 categories. An executable C# fixture checks concatenation, a nonmatching boxed Int32/Char
 test, rejected owner/result/module changes and continued rejection of nominal String import.
 Method-body validation failures now include the declaring method for actionable diagnostics.
+
+
+## Parameter names and authored value references (development, 2026-10-03)
+
+`MethodDefinition.ParameterNames : IReadOnlyDictionary<int, string>` exposes sparse,
+zero-based declared names. `MethodDefinition.SetParameterName(int position, string? name)`
+and the forwarding `MethodBuilder.SetParameterName` set a name or clear it with null.
+The position must be inside the signature; names must contain 1–1024 characters and
+no control characters. Loaded snapshots reject mutation. Names are descriptive and
+do not change method identity or parameter modes.
+
+CLI output uses ordinary Param names; native output uses the existing aligned
+`parameter_names` array. Readers reject names outside the signature and malformed
+native array lengths. `Introspection.ParameterInfo.Name : string?` returns null for
+an unnamed parameter and retains names through constructed generic views.
+
+`AssemblyBuilder.CreateValueTypeReference(AssemblyIdentity dependency,
+AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
+string name, int genericArity = 0)` authors a public unconstrained value identity.
+It has the exact identity, core, digest and resource validation of `CreateTypeReference`.
+It neither loads the dependency nor proves its storage layout.
+
+`AssemblyBuilder.CreateNestedTypeReference(ImportedTypeReference declaringType,
+string name, int genericArity = 0, bool isValueType = false)` authors a public nested
+identity. The declaring reference must belong to this output and carry a native
+artifact contract; generic/constructed declaring scopes are unsupported. The nested
+namespace is empty and its arity is its own. Foreign scopes throw `ArgumentException`;
+unsupported identities or scope categories reject through normal import validation.
+
+`CreateMethodReference` now also accepts these value and nested owners and their
+supported nominal signature operands. Instance value calls retain managed receivers;
+physical nesting survives encoding. The caller supplies semantic facts and an explicit
+artifact digest. This does not introduce dependency loading, virtual override authoring,
+byref constructors or generic instance methods.
+
+C# contracts exercise CLI/native name round trips, constructed parameter views, readonly
+snapshots, invalid names/positions/array lengths, and symbol-authored nested generic value
+constructors executed by the CLR. The native Raven union consumer additionally executes
+these references on neoCLR. No metadata version change is required.

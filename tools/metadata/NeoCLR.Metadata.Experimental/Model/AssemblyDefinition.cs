@@ -192,12 +192,29 @@ public sealed partial class AssemblyDefinition
                 if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
                     throw new InvalidDataException("missing or excessive method signature data");
                 signatureBytes += length;
+                var names = new Dictionary<int, string>();
+                foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
+                {
+                    if (parameter.SequenceNumber == 0 || parameter.Name.IsNil) continue;
+                    var parameterName = ReadName(parameter.Name);
+                    if (parameter.SequenceNumber > 256 || parameterName.Length == 0 || !names.TryAdd(parameter.SequenceNumber - 1, parameterName))
+                        throw new InvalidDataException("invalid parameter name row");
+                }
+                if (names.Count != 0)
+                {
+                    var signatureReader = reader.GetBlobReader(method.Signature);
+                    var header = signatureReader.ReadSignatureHeader();
+                    if (header.IsGeneric) _ = signatureReader.ReadCompressedInteger();
+                    int parameterCount = signatureReader.ReadCompressedInteger();
+                    if (parameterCount < 0 || names.Keys.Any(index => index >= parameterCount))
+                        throw new InvalidDataException("parameter name outside method signature");
+                }
                 methods.Add(new((uint)MetadataTokens.GetToken(handle), global ? 0 : declaring, ReadName(method.Name),
                     (ushort)method.Attributes, (ushort)method.ImplAttributes, method.GetGenericParameters().Count,
                     reader.GetBlobBytes(method.Signature),
                     method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0 || p.GetConstraints().Count != 0).Any(),
                     method.GetParameters().Select(reader.GetParameter).Where(p => p.SequenceNumber > 0 && (p.Attributes & System.Reflection.ParameterAttributes.Out) != 0).Select(p => p.SequenceNumber - 1).ToArray(),
-                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0)));
+                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names));
             }
             var properties = new List<PropertyRow>();
             var methodRows = methods.ToDictionary(m => m.Token);
@@ -287,7 +304,7 @@ public sealed partial class AssemblyDefinition
     {
         internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)), GenericNames, OutParameters);
     }
-    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false);
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null);
