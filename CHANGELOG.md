@@ -8,6 +8,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record the three-assembly interface acceptance baseline: .NET runs successfully;
+  native external declaration admission and metadata relationship support remain open.
+
 - Add metadata accessibility, declaration flags and constructor views with generic owner
   substitution. Raven consumes these facts; native byref/out profiles still reject explicitly.
 

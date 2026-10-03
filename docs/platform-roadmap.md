@@ -43,7 +43,8 @@ mapping preserves array identity. Method/parameter views now also project open m
 recursive generic-signature projection. Declared property/direct interface views now also
 substitute owner arguments for Raven (2026-10-03); [109 C# groups and seven runtime consumers pass](experiments/extended-cli-metadata/introspection-properties-interfaces-2026-10-03.json). Bounded transitive interface traversal now also lives in the facade. Generic method inspection now also supports canonical constructions on open/closed owners.
 Constructor/member classification and accessibility metadata now live in the facade;
-paired driver execution passes. Next extend external interface declarations; see [metadata resolution views](design/metadata-resolution-views.md).
+paired driver execution passes. The three-assembly generic interface driver case passes on .NET and currently fails native
+external implementation admission. Next extend external interface declarations; see [metadata resolution views](design/metadata-resolution-views.md).
 External interface implementation/inheritance declarations remain subsequent work.
 Previously identified next capability: external interface implementation/inheritance declarations for separately
 compiled class-library consumers; the current reader admits relationships within one

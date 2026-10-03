@@ -1,0 +1,48 @@
+{
+  "passed": false,
+  "driverSha256": "791EA38E55676CE51B0C8814D83D3A08807E4669AE95A952BE790E9A30A5D1F4",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "runtimeConfigSha256": "F9BC8E9F0C46247078ED47309F19A7576B4B94E4300E9DE0003917D6BD2D667A",
+  "sourceSha256": {
+    "hello": "F95F29308310D57401051FDFEE0477B10C39675CB4ABFC74677F94D10CF727FD",
+    "library": "F33719C88B797E1FB3345E539DD0018698566134EB3B66DA814C4ACA2DA66814",
+    "consumer": "C98453E37A131CFB113055366CC1465FAC025AAC9EC92ECA90334B039C34D932",
+    "externalContracts": "430297F8A7A9295FD8710C08F10D329D09621BFC64E8457F5C18851B36CBD291",
+    "externalImplementation": "3C50017B078A90769A91F1F51952176F48A398455D9C2424A165642E6DD7F384"
+  },
+  "bootstrap": "Explicit .NET host core / NeoCLR.CoreProbe bootstrap; no System seed or reference-only control counts as execution",
+  "cases": [
+    {
+      "target": "dotnet",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "C9087992B8C047F289245DAB4E72FAF052737A56C72B4BEB0B5E02CBFC6D64E8",
+      "dependencySha256": null
+    },
+    {
+      "target": "dotnet",
+      "scenario": "library",
+      "passed": true,
+      "error": null,
+      "appSha256": "368B5D1A7EBE2366A105221775DC0F36AFD44E01131ACC296AA309C1F779744D",
+      "dependencySha256": "E1B4BFD74F26E82448E8C6CAA6B01D41E63A37639D664941B489E8BED1F34A66"
+    },
+    {
+      "target": "neoclr",
+      "scenario": "hello",
+      "passed": true,
+      "error": null,
+      "appSha256": "A2F16D77616B606F0EAEED9E2F7FD9A09609120502590E3ED5540B83EC124083",
+      "dependencySha256": null
+    },
+    {
+      "target": "neoclr",
+      "scenario": "library",
+      "passed": false,
+      "error": "dotnet exit 1, expected 0: warning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nerror NEOMETA001: Native emission does not support only public or internal unconstrained static or root classes.\n"
+    }
+  ],
+  "ravenCommit": "1d4235dc1250dcb6b59c62ee49633de689555182",
+  "status": "Expected incomplete acceptance: .NET contracts/implementation/consumer executes; native implementation emission rejects external interface identity."
+}
