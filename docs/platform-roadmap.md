@@ -57,9 +57,12 @@ three-assembly ref/out dispatch executes on both targets. Unchanged Propagatable
 Option now reaches source-union/declaration emission rejection. The metadata foundation
 now admits inline generic value payloads and direct native value snapshots; tag/payload
 copy execution and imported constructors return 42 on CLR and neoCLR. Raven imports
-these as structs. Source declarations, nested cases, byte tags and synthesized union
-members remain pending; this is not source Option completion. See
-[union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json). ArrayList also requires
+these as structs. Ordinary top-level source structs now compile and execute on both targets with generic
+inline payloads, default constructors and independent copies. Native emission selects an
+explicit value declaration capability. Nested union cases, byte tags, synthesized union
+members and symbol-authored external value operands remain pending; this is not source Option completion. See
+[union payload evidence](experiments/extended-cli-metadata/union-payloads-2026-10-03.json) and
+[source value driver evidence](experiments/extended-cli-metadata/source-values-2026-10-03.json). ArrayList also requires
 Fail/callback bootstrap bindings. See the dual-target tracker for evidence. The first Self contract-only slice now preserves Self
 through native readers/writers and scoped introspection; Raven and typed dispatch authoring
 remain pending. The broad source-library/application gate remains open.

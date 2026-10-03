@@ -1,0 +1,145 @@
+{
+  "passed": true,
+  "scope": "Ordinary-driver source value declarations, inline payloads, constructors, accessors, mutation and self copies. Not separate library import or source union emission.",
+  "driverSha256": "B1D4B805B9BCED0EA302B084A43FB1EBC5212B05B8F681CA80A82F455531051A",
+  "runtimeSha256": "D3CFF2AB0C9F6B671120B3CAB72837AD2403FC87695AABCAEF11F88001845EE4",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "results": [
+    {
+      "target": "dotnet",
+      "passed": true,
+      "assemblySha256": "55B69CFAA5724C7ECD7D6CFEA21E47201338183CE2EADF594F7ADF5D36CFD33F",
+      "sourceSha256": "160AF2254512271404418FB94EE126AD679DB2195125C8597854FEE04D4A6D03"
+    },
+    {
+      "target": "neoclr",
+      "passed": true,
+      "assemblySha256": "02BE61AE232B0E50B67EF45CAAB440B8C966E5AA480599298294712BE3B8D537",
+      "sourceSha256": "160AF2254512271404418FB94EE126AD679DB2195125C8597854FEE04D4A6D03"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/source-value-driver-final-20261003/dotnet.dll",
+        "/tmp/source-value-driver-final-20261003/dotnet.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/source-value-driver-final-20261003/dotnet.rvn(16,17): warning RAV9006: 'number' needs an initial value. Set it in an initializer or on every normal constructor path.\n\n../../../../../../tmp/source-value-driver-final-20261003/dotnet.rvn(20,5): warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n\nBuild succeeded with 2 warning(s) in 1,5s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/source-value-driver-final-20261003/dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/source-value-driver-final-20261003/neoclr.dll",
+        "/tmp/source-value-driver-final-20261003/neoclr.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0908: Modifier 'public' is redundant because type members are public by default.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/source-value-driver-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AFAA8F4253B1CB34FF6CBD4B453F9C3A4DCFB31A288EB8B03A77C6898F60F130: typed-stack/control-flow verification passed (652 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/source-value-driver-final-20261003/neoclr.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/source-value-driver-final-20261003/Rejected.dll",
+        "/tmp/source-value-driver-final-20261003/Rejected.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support supported public/internal static classes, root classes or unconstrained value types.\n"
+    }
+  ],
+  "date": "2026-10-03",
+  "neoClrRevision": "c8529b7fbb94c2bf376203d0518822dc25ba246f",
+  "ravenBaseRevision": "1804324e3705c6097f24dee21affaf244d1ad5a4",
+  "workingChanges": "Raven source value emission slice accompanying this evidence",
+  "unchangedOptionInventory": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/NeoCLR.StorageCore-20261003.dll",
+      "--bootstrap-intrinsics",
+      "--library",
+      "--bootstrap-ownership",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/iteration-ownership.json",
+      "-o",
+      "/tmp/source-value-option-inventory-20261003/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support only top-level functions and supported source type declarations.\n"
+  },
+  "bootstrap": "Explicit verified NeoCLR.CoreProbe CLI primitive/runtime contract reference; no native library fallback or retained-seed ownership change. Acceptance fixture uses no runtime service calls.",
+  "runtimeConfigSha256": "f9bc8e9f0c46247078ed47309f19a7576b4b94e4300e9de0003917d6bd2d667a",
+  "sourceHashes": {
+    "tools/NeoClrMetadataProbe/SourceValueDriverChecks.cs": "2b1447a043352db6e257168af92156961214b9520bde8ef97dd7ebee87516a61",
+    "src/Raven.CodeAnalysis/CodeGen/Portable/SourceTypePlan.cs": "f70c2152760719d2440fbb93fd4a66d42dd606084beb2b6af1eba149a11fdf5a",
+    "src/Raven.CodeAnalysis/CodeGen/Portable/LinearMethodBody.cs": "230c7691aea4293c8f12c145210de36507f5c53af8492d1aa01c71062baaa692"
+  },
+  "ravenRevision": "78a8eb3152e5b304484313598c3f662d343a586d",
+  "focusedDotNetRegressions": {
+    "passed": 13,
+    "failed": 0,
+    "command": "dotnet test test/Raven.CodeAnalysis.Tests -p:WarningLevel=0 -p:UseRavenCoreReference=false --filter 'FullyQualifiedName~EmissionBackendTests|FullyQualifiedName~NominalLocalEmissionTests|FullyQualifiedName~GenericReferenceEmissionTests'",
+    "framework": "net11.0"
+  }
+}

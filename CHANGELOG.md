@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Advance Raven's source-union prerequisites with native ordinary struct declarations:
+  generic inline payloads, constructors, accessors, value copies and addressed mutation.
+  Paired compiler-driver execution checks CLR-compatible copy/default behavior. Source
+  union emission and separate native value consumption remain pending; metadata encoding
+  and runtime behavior are unchanged.
+
 - Extend union metadata prerequisites with nominal/constructed inline value fields,
   bounded recursive-layout rejection and direct native value declaration/import support.
   Tag/payload copies and native-imported value constructors execute on CLR and neoCLR

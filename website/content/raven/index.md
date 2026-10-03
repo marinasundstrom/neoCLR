@@ -119,3 +119,7 @@ queues remain caller-driven. Ordinary `Task.GetResult()` stays nonblocking.
 `neoclr run` also uses integer entry values as process status for Neo and neoIL.
 Existing scripts that previously ignored a nonzero integer result should account
 for that status.
+
+Development native emission now includes bounded top-level source structs with generic
+inline payloads, constructors, accessors and value-copy behavior checked against .NET.
+Source-union emission and separate native value-library consumption remain in progress.
