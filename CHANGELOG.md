@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-03
 
+- Record Raven `777499170` native type/union construction through introspection,
+  removing obsolete reader-signature helpers. Source-union library and broad native
+  application execution plus seven native consumers pass; no format/runtime changes.
+
 - Expose native generic type-parameter names through introspection Name, preserving
   owner/ordinal identity and rejecting unmaterialized CLI names explicitly. Raven
   `003b9a38d` uses the retained type view for declaration facts. All 127 metadata groups

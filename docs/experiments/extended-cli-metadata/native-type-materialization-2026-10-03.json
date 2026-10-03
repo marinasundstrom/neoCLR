@@ -1,0 +1,660 @@
+{
+  "compilerRevision": "777499170",
+  "note": "Execution used the matching uncommitted source tree before this commit; driver report records its parent HEAD. No metadata or runtime implementation changes.",
+  "sourceUnionGate": {
+    "revisions": {
+      "runtime": "999919f7848afd8ecde6147588dd4486042932ac",
+      "compiler": "003b9a38d3f36fa1272d2ae32ee0e51bfc827074"
+    },
+    "scope": "Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.",
+    "commands": [
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/collection-seed.neoil",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/native-type-materialization/System.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "warning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/native-type-materialization/Consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/native-type-materialization/Consumer.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (179 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/native-type-materialization/Consumer.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/native-type-materialization/invalid/NegativeCapacity.dll",
+          "/private/tmp/native-type-materialization/NegativeCapacity.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/native-type-materialization/invalid/NegativeCapacity.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: ArrayList capacity must be non-negative [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:10] IL instruction 1\n  at NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031..ctor(Int32) owner=Constructed { definition: \"NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031\", arguments: [Int32] } [NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9#1.0.0.0:41] IL instruction 5\n  at NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F.F_4D61696E() [NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F#1.0.0.0:0] IL instruction 1\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/native-type-materialization/Override.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/native-type-materialization/Override.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_35E5ED7F554FCEFC06617BE4251EB897036CDEC3ADBA542613DC3B7D4280215A: typed-stack/control-flow verification passed (178 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/native-type-materialization/Override.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Multiple\n42\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/native-type-materialization/Application.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/native-type-materialization/Application.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_5F1E7980BF83E18282A3DF9BFBB13E29DA3B1C681F11A81E23680CA795A01645: typed-stack/control-flow verification passed (194 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/native-type-materialization/Application.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/native-type-materialization/BadCast.dll",
+          "/private/tmp/native-type-materialization/BadCast.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/native-type-materialization/BadCast.dll",
+          "--module",
+          "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/native-type-materialization/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: unbox.any requires the exact boxed value type [code=InvalidCast] at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374:1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374(Named(\"System.Object\")) [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_4D61696E() [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:1] IL instruction 4\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "-o",
+          "/private/tmp/native-type-materialization/MissingLibrary.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'NeoCLR.Collections'; found none.\n"
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/private/tmp/native-type-materialization/DuplicateSeed.neoil",
+          "/private/tmp/native-type-materialization/DuplicateSeed.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/native-type-materialization/DuplicateSeed.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/ArrayListCore.dll",
+          "--runtime-seed",
+          "/private/tmp/native-type-materialization/DuplicateSeed.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/native-type-materialization/MissingLibrary.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Runtime seed duplicates a source-owned declaration: System.Option`1\n"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_source_unions.py",
+        "sha256": "0bcb280dec7d569b90546c75fd31d41a04d2594a8be73da0bef9b95c83cf1580"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "sha256": "aaebb6a25bfd2de458004de0a9d7ae2808476c3b132ebac3f16d072f643c206e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "sha256": "b3b50bb65a3c418d20a39f90639b0cc93e7f364df637423ea6af1871303892d1"
+      },
+      {
+        "path": "/private/tmp/ArrayListCore.dll",
+        "sha256": "d299ac3b6c6c2a8f7522a0af79580a396d0c383653e66e343e0983118adb0e73"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/System.neox",
+        "sha256": "0f3a498c5737d629f5592fab697f18d68900b51264a3bc377f3b9e8635a54fe4"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/NeoCLR.Collections.dll",
+        "sha256": "563f9339b57b44e9517ee8e296ae7ea240b5179f0371a8da55184c42369ed12b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-ownership.json",
+        "sha256": "354091db7c6ac28d84718359e9c5bcc590b05ee870d60014afeb0b36e9a0cacf"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/union-seed.neoil",
+        "sha256": "38692aa6abfe5ef73427fa4202290c0f82dd0fe8cd47e1599a872a44c2afcfc6"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/collection-seed.neoil",
+        "sha256": "d898414b4fe814768cf964c1491baf5d6c17ac87f4701986d0a5da50b2e981ec"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn",
+        "sha256": "de237a93ab7f8380530c4ee85fb5ad0e39e85ad897d7e50fb434d1aaf1fc973e"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/Consumer.dll",
+        "sha256": "ba1dd254980019da25b7bfba0adca1f04b8baf9b27cef6966df2ce62d43e4ffe"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/NegativeCapacity.rvn",
+        "sha256": "d04d582629c5b092c55f83ac898e902d7856607567214d8484904e747353eb00"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/invalid/NegativeCapacity.dll",
+        "sha256": "418fe19b16bc10e95ed8e4aaee13e95511435a40ba49239792b71ffa2534249e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Disposable.rvn",
+        "sha256": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterator.rvn",
+        "sha256": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterable.rvn",
+        "sha256": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Collection.rvn",
+        "sha256": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Sequence.rvn",
+        "sha256": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "sha256": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/List.rvn",
+        "sha256": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Propagatable.rvn",
+        "sha256": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Option.rvn",
+        "sha256": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Result.rvn",
+        "sha256": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/ArrayList.rvn",
+        "sha256": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Comparer.rvn",
+        "sha256": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionComparer.rvn",
+        "sha256": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/EqualityComparer.rvn",
+        "sha256": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+        "sha256": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Map.rvn",
+        "sha256": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableMap.rvn",
+        "sha256": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/HashMap.rvn",
+        "sha256": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/SingleError.rvn",
+        "sha256": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/Operators.rvn",
+        "sha256": "615a01a8fa987959aba0a5b49a35fa479088b7aa15482a18b1c16e09470fb53b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Array.rvn",
+        "sha256": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/BadCast.rvn",
+        "sha256": "facd3b4918e846361ecadae4381c12ce6c0b3d8c94d4e0caa2e27fbd96e2869d"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/BadCast.dll",
+        "sha256": "2f17c64816828f32e7ecef45e2a83a74310e0b7417c086570dd0e34fc087982e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn",
+        "sha256": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.expected.txt",
+        "sha256": "a3ad3c2feba43048173845f14ad098cd7301b07a283e661a8f0d6a889c1a03bb"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/Application.dll",
+        "sha256": "2a50b087c38ef405b16e2011b94bcf6ca09d694c494699b4aa47fac2dcb759c5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn",
+        "sha256": "fcac6722e46fda00afebf298cd7d956b6867d6e01776b6ed4d9221d334aa1ac8"
+      },
+      {
+        "path": "/private/tmp/native-type-materialization/Override.dll",
+        "sha256": "c3963da9e1f08099deb0060267b77848a4ca9cde9c4bea3771fe5c32a8feb831"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll",
+        "sha256": "204d2bd6680403f098b1755a15a25dca2ef24e4e1ba2ad49f69d3dc576ee9ed4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll",
+        "sha256": "99ce3faacea352406f61cdec4a69dc76db64c1303de6addf88f0f50eb9a72c77"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll",
+        "sha256": "a9c5ad17f1d62cbfe287d06ebfa05af578e402b9b866e45bdb068d5e730a166c"
+      }
+    ]
+  },
+  "semantic": {
+    "passed": true,
+    "nativeSha256": "879B3B82A6FD8D27B4067DBBE4D69CD64BBE456F597EA6055BA05099CF500BD6",
+    "coreSha256": "B7F2B143BE11B25FBB91441ADC988EB0F2B8DD0A4B9E49F9F8760BAE22297EAB",
+    "cases": [
+      "native generic static/namespace calls, inference, forwarding, overloads and method-scoped vectors",
+      "external nominal method/constructor/field signatures",
+      "primitive and external-class array signatures and aliasing",
+      "native property identity, instance/static calls and setter accessibility",
+      "native namespace overloads",
+      "both reference orders",
+      "semantic type and symbol identity",
+      "compilation isolation",
+      "accessibility",
+      "invalid argument",
+      "CLI emission leaves output empty",
+      "native call emission",
+      "Raven-produced native library read and consumed",
+      "native snapshot mismatch leaves output empty",
+      "duplicate identity",
+      "wrong target",
+      "missing dependency",
+      "registered dependency",
+      "exact version identity",
+      "native class/field symbols, nominal function/method/constructor signatures, overloads, stateful instance calls and primitive/nominal field load/store"
+    ],
+    "scope": "direct native dependency symbols with explicit CLI primitive core; native call emitted; runtime execution validated separately"
+  },
+  "runtime": {
+    "passed": true,
+    "runtimeSha256": "B3B50BB65A3C418D20A39F90639B0CC93E7F364DF637423EA6AF1871303892D1",
+    "systemSha256": "0F3A498C5737D629F5592FAB697F18D68900B51264A3BC377F3B9E8635A54FE4",
+    "coreSha256": "B7F2B143BE11B25FBB91441ADC988EB0F2B8DD0A4B9E49F9F8760BAE22297EAB",
+    "results": [
+      {
+        "app": "NativeConsumer",
+        "dependency": "NativeSymbols",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "39480D550653F2DFACC9111883B0D5B018D13BB45F51DFBC6F3A1F47D1282DB4",
+        "dependencySha256": "879B3B82A6FD8D27B4067DBBE4D69CD64BBE456F597EA6055BA05099CF500BD6",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "RavenNativeConsumer",
+        "dependency": "RavenNativeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "E44E67EFD7C185DE06C6F27EA44B9C265261D8CC54D0D0019EEF1D5C1C6CD525",
+        "dependencySha256": "CC97BF7BAD58181DFB20BCDCCB7D5BB35D6DF176FA2AF1EF203594BE4839D078",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeTypeConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "DE615A0DC7E732101225A1EBC98D77C3367685110C6E1267A47593D3FAA99888",
+        "dependencySha256": "908417B6C44EDDAA32420741A15FE8EA47D55EEEB3F87990221DEE95659A1A94",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "NativeFieldConsumer",
+        "dependency": "NativeTypeLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "514EEEA1AFE20FCA31D9ECD9DEB6E28C2787944803D83AC49C051B705B8D26B4",
+        "dependencySha256": "908417B6C44EDDAA32420741A15FE8EA47D55EEEB3F87990221DEE95659A1A94",
+        "additionalDependency": null,
+        "additionalDependencySha256": null
+      },
+      {
+        "app": "ExternalNativeConsumer",
+        "dependency": "NativeHolderLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "B1DA8878FF6AE9FD04357CA03A8183A214AB6B36C22802128A1DFDF54E556685",
+        "dependencySha256": "92A10099652A14939666B41427348DEB9D47224DBD3F3432AEC374B0926215BC",
+        "additionalDependency": "NativePayloadLibrary",
+        "additionalDependencySha256": "535DD5E5D8D58583F1D21753D088B7FFC05CD5C3C2FF08816890619A9C072E5E"
+      },
+      {
+        "app": "NativeInterfaceConsumer",
+        "dependency": "NativeInterfaceLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "E8AC5A12C1984261F62E4FC7F39F3CDBE71A65153C1554895E3C21D4CD5D00DB",
+        "dependencySha256": "33759411334E2D191456369F9EC49D4F128B08E9CCF378DD1BFA6A8CDC70932C",
+        "additionalDependency": "NativeInterfaceStorageLibrary",
+        "additionalDependencySha256": "120D39D05CC1B3D262488C25030510555E73D6BDD9D9D9E6D67CCBD2E50C8AF0"
+      },
+      {
+        "app": "NativeGenericConsumer",
+        "dependency": "NativeGenericLibrary",
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": "=> Int32(42)\n",
+        "appSha256": "CD167C21BB4B8ECA6391A4F597DF237E10DB6E23DE36EEB46EE92F5369F807E4",
+        "dependencySha256": "E361E285125C3709B0C1EEC1D898378ADC9BE85720B35346D56CA9575E26FEE5",
+        "additionalDependency": "NativeGenericBridge",
+        "additionalDependencySha256": "17756F5BA02E72A70CB5C92A1C93169485B4716CB77FEB7BA1C0A17000975B9B"
+      }
+    ],
+    "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+  },
+  "compilerArtifacts": {
+    "Raven.CodeAnalysis.Console.dll": "587363f42a062f9f16148db052edf0b3f091aa06dbf1af7c03f15228caf024ad",
+    "Raven.CodeAnalysis.NeoClr.dll": "99ce3faacea352406f61cdec4a69dc76db64c1303de6addf88f0f50eb9a72c77",
+    "Raven.CodeAnalysis.dll": "204d2bd6680403f098b1755a15a25dca2ef24e4e1ba2ad49f69d3dc576ee9ed4"
+  }
+}

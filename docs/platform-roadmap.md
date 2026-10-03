@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Native type materialization cleanup (2026-10-03): Raven `777499170` constructs ordinary
+type and union/case/companion symbols from canonical introspection views and removes
+obsolete raw-signature mapping helpers. The separately compiled source-union library
+and unchanged application-order-collections pass, as do all seven native consumers.
+Runtime Contract/bootstrap configuration, metadata format and ordinary .NET paths are
+unchanged. The native gate is evidence for this cleanup, not full dual-target completion.
+[Evidence](experiments/extended-cli-metadata/native-type-materialization-2026-10-03.json).
+
 Native type facts (2026-10-03): Raven `003b9a38d` consumes declaration and generic
 parameter facts through the retained type view. The host facade now supplies declared
 parameter Name with explicit CLI limitations. All 127 metadata groups and seven native

@@ -4946,3 +4946,18 @@ or format change; .NET loading and emission remain unchanged. Type/union transpo
 uses definitions elsewhere. All 127 metadata C# contract groups and seven native consumers
 pass. The manual host API reference is updated; the guest snapshot check remains stale.
 [Evidence](experiments/extended-cli-metadata/native-type-facade-2026-10-03.json).
+
+### Native type and union materialization cleanup
+
+Native type materialization cleanup (2026-10-03): Raven `777499170` constructs ordinary
+type and union/case/companion symbols from canonical introspection views and removes
+obsolete raw-signature mapping helpers. The separately compiled source-union library
+and unchanged application-order-collections pass, as do all seven native consumers.
+Runtime Contract/bootstrap configuration, metadata format and ordinary .NET paths are
+unchanged. The native gate is evidence for this cleanup, not full dual-target completion.
+[Evidence](experiments/extended-cli-metadata/native-type-materialization-2026-10-03.json).
+
+Physical metadata nesting remains distinct from Raven union membership. The importer
+uses facade ownership to preserve both; emission still receives symbol facts and host
+artifact identities. No new bridge encoding, fallback or public metadata API is added.
+The known stale guest API snapshot and full dual-target gate remain open.
