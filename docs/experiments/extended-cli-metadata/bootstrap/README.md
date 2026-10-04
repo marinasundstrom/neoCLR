@@ -922,3 +922,27 @@ Negative cases cover an incompatible implementation and missing/wrong marker sel
 including absence of output files. This is not a claim of constrained generic Self
 calls or static Number dispatch. [Hashes and commands](../self-native-2026-10-04.json)
 identify the matching experimental compiler/runtime bundle. No native format change.
+
+
+## Source Boolean parsing and numeric service family (2026-10-04)
+
+`verify_parsing.py` takes the same compiler/runtime/core/seed/base-library/ownership/output
+arguments as `verify_self.py`. Generate the current checked catalog, rebuild the
+`--reference-comparer-storage-core` image and assemble `comparer-seed.neoil` before use.
+The current seed/catalog has 37 checked declaration/binding contracts, including all
+11 existing Boolean/integer/floating parsers with String -> Value signatures.
+
+The gate compiles actual Boolean.rvn and BooleanParseError.rvn as a separate library.
+Its artifact-only consumer checks true/false, malformed/whitespace input, byte overflow,
+Int32/Int64 boundaries, and invalid-format results from SByte, Int16, UInt16, UInt32,
+UInt64, Single and Double parsers. It verifies and runs with exit 42. Wider primitive
+success payloads remain outside compiler emission support; admitting an erased-result
+service does not admit those payload categories implicitly.
+
+Explicit System.Boolean names can reach this library's nominal declaration/static API;
+primitive bool symbols remain owned by the selected bootstrap core. This is a bounded
+source-method integration, not complete replacement of core primitive declarations or
+routing every bool instance member through the source library. The compiler honors the
+configured metadata core when names overlap. This fix was independently reproduced and
+validated for .NET on main (`f749c1a75`). [Evidence](../parsing-native-2026-10-04.json)
+records source, dependency and executable hashes plus the reduced numeric-family audit.

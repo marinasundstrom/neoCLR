@@ -6,7 +6,8 @@ using System.Text.Json;
 static partial class RuntimeServiceBindings
 {
     static readonly string[] NativeSelection = [
-        "StringHashOrdinalIgnoreCase", "SystemCultureName", "UnixTimeTicks", "UnixTimeToLocal", "ParseInt64",
+        "StringHashOrdinalIgnoreCase", "SystemCultureName", "UnixTimeTicks", "UnixTimeToLocal",
+        "ParseBoolean", "ParseSByte", "ParseByte", "ParseInt16", "ParseUInt16", "ParseInt32", "ParseUInt32", "ParseInt64", "ParseUInt64", "ParseSingle", "ParseDouble",
         "Utf8Encode", "Utf8Decode", "FileOpenRead", "FileCreateNew", "FilePosition", "FileSeek",
         "FileReadInto", "FileWriteChunk", "FileFlush", "FileClose", "StartWorker", "QueueWorker",
         "JoinWorker", "RequestWorkerCancellation", "JoinWorkerResult", "ScheduleTask", "DrainEntryTasks"

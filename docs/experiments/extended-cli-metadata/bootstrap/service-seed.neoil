@@ -72,9 +72,59 @@ blt Copy
 ldloc destination
 ret
 .end
+.method static ParseBoolean(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseBoolean(String)
+ret
+.end
+.method static ParseSByte(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseSByte(String)
+ret
+.end
+.method static ParseByte(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseByte(String)
+ret
+.end
+.method static ParseInt16(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseInt16(String)
+ret
+.end
+.method static ParseUInt16(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseUInt16(String)
+ret
+.end
+.method static ParseInt32(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseInt32(String)
+ret
+.end
+.method static ParseUInt32(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseUInt32(String)
+ret
+.end
 .method static ParseInt64(String arg0) -> Value
 ldarg arg0
 call neoCLR.Runtime.ParseInt64(String)
+ret
+.end
+.method static ParseUInt64(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseUInt64(String)
+ret
+.end
+.method static ParseSingle(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseSingle(String)
+ret
+.end
+.method static ParseDouble(String arg0) -> Value
+ldarg arg0
+call neoCLR.Runtime.ParseDouble(String)
 ret
 .end
 .method static Utf8Encode(String arg0) -> arrayref<Byte>
@@ -212,7 +262,37 @@ ret
 .function neoCLR.Runtime.UnixTimeToLocal(Int64 arg0) -> Int32[]
 .methodimpl InternalCall
 .end
+.function neoCLR.Runtime.ParseBoolean(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseSByte(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseByte(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseInt16(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseUInt16(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseInt32(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseUInt32(String arg0) -> Value
+.methodimpl InternalCall
+.end
 .function neoCLR.Runtime.ParseInt64(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseUInt64(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseSingle(String arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseDouble(String arg0) -> Value
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.Utf8Encode(String arg0) -> Byte[]

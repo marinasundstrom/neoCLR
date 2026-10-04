@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Select all eleven existing numeric/Boolean parsing services in the checked native
+  bootstrap catalog. Actual Boolean and BooleanParseError sources compile separately
+  and execute through an artifact-only consumer; boundary/error cases also exercise
+  the numeric service family. Raven's explicit primitive-core selection fix is validated
+  independently and integrated into local main as f749c1a75. Wider payload emission,
+  static Number contracts and complete primitive-source ownership remain open.
+
 - Admit Self in authored external interface method contracts and substitute the concrete
   implementing owner when validating required methods, including generic owners. Preserve
   symbolic Self in native metadata without a format change. The actual Clonable source,

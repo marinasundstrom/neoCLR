@@ -305,3 +305,23 @@ errors. These are not all independent defects. Next connect a coherent numeric p
 service family, then re-assess primitive ownership and static Number emission from the
 remaining first failures. Do not treat this concrete-call gate as constrained generic
 Self dispatch support. [Evidence](self-native-2026-10-04.json).
+
+
+### Parsing service family and primitive selection (2026-10-04)
+
+[The parsing gate](parsing-native-2026-10-04.json) connects all eleven existing parsers
+through the checked catalog and executes the actual Boolean source library. This exposed
+an unconditional System.Runtime primitive preference in Raven's shared CLI contract;
+explicit metadata-core selection now takes precedence. The fix independently fails/passes
+on .NET main with competing core references and is integrated as f749c1a75 (20 focused
+tests). The seven native consumers remain passing.
+
+The numeric-family audit drops from 43 to 33 missing-service diagnostics, 13 to 3
+out-of-scope diagnostics, and 21 to 2 unsupported-operator diagnostics after this batch.
+These counts describe cascading diagnostics, not independent defects or completion
+percentages. Remaining first failures include character/string adapters, integer display,
+IntPtr operations and other RuntimeServices members. Follow with the common primitive
+signature/storage capabilities and static Number/Self contracts needed by the selected
+numeric sources, using coherent service families rather than isolated API wrappers.
+The core bool identity and native source System.Boolean declaration are still distinct;
+full primitive-source ownership and instance dispatch remain explicit work.

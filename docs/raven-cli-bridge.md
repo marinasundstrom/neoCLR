@@ -5515,3 +5515,19 @@ and [evidence](experiments/extended-cli-metadata/self-native-2026-10-04.json).
 
 Compiler slice: Raven `0014a1241`; matching metadata/bootstrap changes and evidence are
 committed on neoCLR `codex/extended-cli-metadata`.
+
+
+### Checked numeric parser family (2026-10-04)
+
+All eleven existing parser RuntimeServices signatures are selected in the native catalog
+as String -> Value; exact binding tests cover 37 total declarations. Native runtime grammar,
+payload/status conventions and metadata formats are unchanged. The separately compiled
+actual Boolean/BooleanParseError source library executes true/false/error cases alongside
+byte/Int32/Int64 boundaries and the other parsers' invalid-format results. Wider primitive
+success payloads, static Number/Self emission and complete source-owned primitives remain
+open. The source nominal Boolean API and canonical bootstrap bool stay distinct.
+
+Raven's shared primitive preference now honors MetadataImportOptions.CoreAssemblyName.
+The bug was independently reproduced on .NET main; fix f749c1a75 and 20 focused tests
+are integrated there without the experimental target. [Evidence and reproduction](experiments/extended-cli-metadata/bootstrap/README.md#source-boolean-parsing-and-numeric-service-family-2026-10-04)
+identify the matching bundle. Ordinary .NET defaults remain System.Runtime.

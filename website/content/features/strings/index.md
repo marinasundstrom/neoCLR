@@ -261,3 +261,9 @@ culture dependency. Number provides a separate arithmetic contract; parsing is n
 part of it. See [numeric API contracts](/docs/text-numbers.html) for exact rules and the
 current generic-import limits. A shared numeric parsing interface remains a possible
 future direction.
+
+
+The development native compiler gate now builds Boolean and BooleanParseError from Raven
+source into a separate library and executes an artifact-only consumer. The checked service
+catalog includes all existing numeric parsers; this does not yet provide every primitive
+payload category or the complete numeric source library in the native compiler.

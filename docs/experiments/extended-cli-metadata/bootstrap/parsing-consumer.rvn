@@ -1,0 +1,53 @@
+import System.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+
+func ReadBoolean(text: string) -> int {
+    return Boolean.Parse(text) match {
+        Ok(let value) => if value { 1 } else { 0 }
+        Error(_) => -1
+    }
+}
+
+func Invalid(payload: Value) -> bool {
+    return RuntimeServices.IsValue<int>(payload) && RuntimeServices.UnpackValue<int>(payload) == 1
+}
+
+func Main() -> int {
+    if ReadBoolean("true") != 1 || ReadBoolean("FALSE") != 0 {
+        return 1
+    }
+    if ReadBoolean(" true") != -1 || ReadBoolean("") != -1 {
+        return 2
+    }
+    let small = RuntimeServices.ParseByte("255")
+    if !RuntimeServices.IsValue<byte>(small) || RuntimeServices.UnpackValue<byte>(small) != (byte)255 {
+        return 3
+    }
+    let overflow = RuntimeServices.ParseByte("256")
+    if !RuntimeServices.IsValue<int>(overflow) || RuntimeServices.UnpackValue<int>(overflow) != 2 {
+        return 4
+    }
+    let number = RuntimeServices.ParseInt32("2147483647")
+    if !RuntimeServices.IsValue<int>(number) || RuntimeServices.UnpackValue<int>(number) != 2147483647 {
+        return 5
+    }
+    let wide = RuntimeServices.ParseInt64("9223372036854775807")
+    if !RuntimeServices.IsValue<long>(wide) || RuntimeServices.UnpackValue<long>(wide) != 9223372036854775807L {
+        return 6
+    }
+    let intOverflow = RuntimeServices.ParseInt32("2147483648")
+    if !RuntimeServices.IsValue<byte>(intOverflow) || RuntimeServices.UnpackValue<byte>(intOverflow) != (byte)2 {
+        return 7
+    }
+    if !Invalid(RuntimeServices.ParseSByte("bad")) || !Invalid(RuntimeServices.ParseInt16("bad")) {
+        return 8
+    }
+    if !Invalid(RuntimeServices.ParseUInt16("bad")) || !Invalid(RuntimeServices.ParseUInt32("bad")) {
+        return 9
+    }
+    if !Invalid(RuntimeServices.ParseUInt64("bad")) || !Invalid(RuntimeServices.ParseSingle("bad")) || !Invalid(RuntimeServices.ParseDouble("bad")) {
+        return 10
+    }
+    return 42
+}

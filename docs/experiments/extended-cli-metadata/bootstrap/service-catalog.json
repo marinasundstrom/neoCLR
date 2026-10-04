@@ -1277,7 +1277,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1290,7 +1290,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1303,7 +1303,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1316,7 +1316,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1329,7 +1329,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1342,7 +1342,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1355,7 +1355,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1368,7 +1368,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1381,7 +1381,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1394,7 +1394,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
