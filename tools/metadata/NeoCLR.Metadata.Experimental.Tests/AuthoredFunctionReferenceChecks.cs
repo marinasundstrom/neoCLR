@@ -81,7 +81,7 @@ internal static class AuthoredFunctionReferenceChecks
             !ReferenceEquals(display, app.CreateMethodReference(valueOwner, "ToString", displaySignature, isOverride: true)))
             throw new Exception("authored value override contract");
         Reject<InvalidDataException>(() => app.CreateMethodReference(valueOwner, "ToString", displaySignature));
-        Reject<ArgumentException>(() => app.CreateMethodReference(item, "ToString", displaySignature, isOverride: true));
+        if (!app.CreateMethodReference(item, "ToString", displaySignature, isOverride: true).RequiresVirtualDispatch) throw new Exception("class override must dispatch virtually");
         Reject<ArgumentException>(() => app.CreateMethodReference(valueOwner, "ToString", displaySignature, isStatic: true, isOverride: true));
         Reject<ArgumentException>(() => app.CreateMethodReference(valueOwner, "Other", displaySignature, isOverride: true));
         var show = app.AddFunction("Show", new MethodSignature(PrimitiveType.String, [SignatureType.ByReference(valueOwner)]));

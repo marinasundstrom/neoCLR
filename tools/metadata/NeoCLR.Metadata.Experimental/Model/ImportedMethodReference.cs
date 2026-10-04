@@ -89,6 +89,11 @@ public sealed partial class AssemblyBuilder
             (type.Attributes & 0x27) == 1 && definition.Name == "GetHashCode" && !definition.IsStatic && definition.GenericArity == 0 &&
             isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
             definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x08 });
+        bool isObjectEquals = !definition.Module.Assembly.IsNative && definition.AuthoredSignature is null && identity.Equals(CoreLibrary) && type is { Namespace: "System", Name: "Object", GenericArity: 0, IsValueType: false, DeclaringType: null } &&
+            (type.Attributes & 0x27) == 1 && definition.Name == "Equals" && !definition.IsStatic && definition.GenericArity == 0 &&
+            isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
+            definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 1, 0x02, 0x1c });
+        bool nativeOverride = definition.Module.Assembly.IsNative && isVirtual && !isAbstract && (definition.Attributes & 0x100) == 0;
         bool intrinsicPrimitiveOwner = type?.NativePrimitive is not null || NativeBindingFor(identity) is not null && identity.Equals(CoreLibrary) &&
             type is { Namespace: "System", Name: "String" or "Int32" or "Int64", GenericArity: 0, DeclaringType: null } &&
             type.IsValueType == (type.Name is "Int32" or "Int64");
@@ -96,13 +101,14 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
             definition.Name == ".cctor" || (definition.Attributes & 7) != 6 ||
-            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString && !isObjectHash)))
+            (isInterface ? !isAbstract || !isVirtual : isAbstract || isVirtual && !isFinal && !type.IsValueType && !isObjectToString && !isObjectHash && !isObjectEquals && !nativeOverride)))
             throw new InvalidDataException("unsupported imported instance method contract");
         if (definition.Name == ".ctor" && (definition.IsStatic || isInterface || isVirtual || isAbstract || (definition.Attributes & 0x1800) != 0x1800))
             throw new InvalidDataException("invalid imported constructor contract");
         var declaringReference = !intrinsicPrimitiveOwner && type is not null && (!definition.IsStatic || type.GenericArity > 0)
             ? ImportReference(type, dependencyCoreLibrary) : null;
         var signature = definition.DecodeImportedSignature(this, dependencyCoreLibrary, resolver);
+        if (nativeOverride && (!type!.IsValueType && type.GenericArity != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, CoreLibrary))) throw new InvalidDataException("unsupported native Object override");
         if (definition.Name == ".ctor" && (signature!.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Any(p => p.ByReferenceElement is not null)))
             throw new InvalidDataException("constructor requires a nongeneric void signature without byref parameters");
         if (!importedGraphs.TryGetValue(identity, out var imported))
@@ -145,9 +151,11 @@ public sealed partial class AssemblyBuilder
         reference.Target.NativeImportCharOwner = type?.NativeGrapheme == true;
         reference.Target.IsCoreObjectToString = isObjectToString;
         reference.Target.IsCoreObjectHash = isObjectHash;
+        reference.Target.IsCoreObjectEquals = isObjectEquals;
+        if (isObjectEquals) NativeBindingFor(identity)?.ValidateObjectOverride("Equals");
         if (isObjectHash) NativeBindingFor(identity)?.ValidateObjectHashSlot();
         if (isObjectToString) NativeBindingFor(identity)?.ValidateObjectToStringSlot();
-        reference.Target.NativeValueOverride = definition.Module.Assembly.IsNative && type?.IsValueType == true && (definition.Attributes & 0x140) == 0x40;
+        reference.Target.NativeValueOverride = nativeOverride;
         NativeBindingFor(identity)?.ValidateMethod(definition, reference.Target);
         importedReferences.Add(key, reference);
         return reference;

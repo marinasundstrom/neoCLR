@@ -50,13 +50,26 @@ public sealed partial class MethodDefinition
         declarationAttributes = (ushort)((visibility == MethodVisibility.Public ? 6 : 3) | 0x10);
         this.signature = [];
     }
-    /// <summary>Creates a detached type method, constructor, bounded value override or abstract interface contract with CLI attributes.</summary>
+    internal static bool IsObjectOverride(string name, MethodSignature signature, AssemblyIdentity? core = null)
+    {
+        if (signature.GenericParameterNames.Count != 0) return false;
+        return name switch
+        {
+            "ToString" => signature.ReturnType == PrimitiveType.String && signature.ParameterTypes.Count == 0,
+            "GetHashCode" => signature.ReturnType == PrimitiveType.Int32 && signature.ParameterTypes.Count == 0,
+            "Equals" => signature.ReturnType == PrimitiveType.Boolean && signature.ParameterTypes.Count == 1 &&
+                signature.ParameterTypes[0].ImportedType is { Namespace: "System", Name: "Object", GenericArity: 0, DeclaringType: null, IsValueType: false } owner &&
+                (core is null || owner.AssemblyIdentity.Equals(core)),
+            _ => false
+        };
+    }
+    /// <summary>Creates a detached type method, constructor, bounded Object override or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
+    /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. Public Object overrides use Virtual without Abstract or NewSlot.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
-    /// <remarks>Append to an attached authored TypeDefinition.Methods collection. Instance methods require a class or value owner. Overrides currently require a value owner and the nongeneric parameterless String-returning ToString contract. Constructors require a nongeneric Void signature.</remarks>
+    /// <remarks>Append to an attached authored TypeDefinition.Methods collection. Instance methods require a class or value owner. Overrides require class/value owners and exact nongeneric Object.ToString, GetHashCode or Equals contracts. Constructors require a nongeneric Void signature.</remarks>
     public MethodDefinition(string name, ushort attributes, MethodSignature signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
@@ -65,9 +78,8 @@ public sealed partial class MethodDefinition
             throw new ArgumentException("invalid type-method declaration");
         bool valueOverride = (attributes & 0x540) == 0x40;
         bool contract = !valueOverride && (attributes & 0x540) != 0;
-        if (valueOverride && ((attributes & 0x17) != 6 || name != "ToString" ||
-            signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
-            throw new ArgumentException("only public parameterless String-returning ToString overrides are supported");
+        if (valueOverride && ((attributes & 0x17) != 6 || !IsObjectOverride(name, signature)))
+            throw new ArgumentException("unsupported Object override signature");
         if (contract && ((attributes & 0x540) != 0x540 || (attributes & 7) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
             throw new ArgumentException("invalid interface method flags or signature");
         bool constructor = name == ".ctor";
@@ -135,13 +147,13 @@ public sealed partial class AssemblyBuilder
 public sealed partial class TypeBuilder
 {
     /// <summary>Adds a public instance override using the same validation as a detached method definition.</summary>
-    /// <param name="name">Currently ToString only.</param>
-    /// <param name="signature">Nongeneric parameterless signature returning String.</param>
-    /// <returns>An owned method with a managed value receiver and a body generator.</returns>
+    /// <param name="name">ToString, GetHashCode or Equals.</param>
+    /// <param name="signature">Nongeneric String ToString(), Int32 GetHashCode(), or Boolean Equals(CoreObjectType).</param>
+    /// <returns>An owned method with a class receiver or managed value receiver and a body generator.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported override contract, duplicate signature or method limit.</exception>
-    /// <exception cref="InvalidOperationException">Owner is not a value type.</exception>
-    /// <remarks>CLI emission reuses the inherited Object.ToString slot. Native encoding requires one explicit BindNativeLibrary System binding with a matching Object.ToString slot. Generic value owners are supported; generic override methods are not.</remarks>
+    /// <exception cref="InvalidOperationException">Owner is static, an interface, or the Equals argument has the wrong core identity.</exception>
+    /// <remarks>CLI emission reuses the corresponding inherited Object slot. Native encoding requires one explicit BindNativeLibrary System binding with a matching Object slot. Generic value owners are supported; generic override methods are not.</remarks>
     public MethodBuilder AddOverride(string name, MethodSignature signature)
     {
         var definition = new MethodDefinition(name, (ushort)(MethodAttributes.Public | MethodAttributes.Virtual), signature);
@@ -154,8 +166,8 @@ public sealed partial class TypeBuilder
         if (!definition.IsTypeDeclaration || definition.AuthoredSignature is not { } signature ||
             definition.Producer is { } producer && !ReferenceEquals(producer.DeclaringType, this))
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
-        if ((definition.DeclarationAttributes & 0x540) == 0x40 && !IsValueType)
-            throw new InvalidOperationException("Object overrides currently require a value owner");
+        if ((definition.DeclarationAttributes & 0x540) == 0x40 && (IsInterface || IsStatic || !IsValueType && GenericParameterNames.Count != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary)))
+            throw new InvalidOperationException("Object overrides require a class/value owner and the exact core slot signature");
         if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))
             throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");
         if (definition.Name == ".ctor" && definition.AuthoredSignature!.ParameterTypes.Any(p => p.ByReferenceElement is not null)) throw new InvalidOperationException("byref constructor parameters unsupported");

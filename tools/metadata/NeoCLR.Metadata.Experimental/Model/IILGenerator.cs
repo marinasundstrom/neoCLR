@@ -235,10 +235,10 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Wrong opcode, consuming owner or caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void Emit(OpCode opCode, ImportedGenericMethodReference operand);
-    /// <summary>Appends virtual dispatch to an owned nongeneric interface method.</summary>
-    /// <param name="target">A public abstract interface instance method.</param>
+    /// <summary>Appends virtual dispatch to an owned nongeneric interface method or reference-class Object override.</summary>
+    /// <param name="target">A public abstract interface instance method or supported reference-class Object override.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
-    /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
+    /// <exception cref="ArgumentException">Foreign, generic or unsupported virtual target.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void CallVirtual(MethodBuilder target);
     /// <summary>Calls an owned nongeneric interface using a concrete owned implementing type.</summary>
@@ -386,7 +386,7 @@ public interface IILGenerator
     /// <remarks>Native execution produces UserFault without guest exception handling. CLI execution throws InvalidOperationException, which CLR callers can catch.</remarks>
     void Fail(string message);
     /// <summary>Appends a call or allocation using a local or external builder method.</summary>
-    /// <param name="opCode">Call, Callvirt or Newobj; Callvirt currently requires an owned interface method.</param>
+    /// <param name="opCode">Call, Callvirt or Newobj; Callvirt requires an owned interface method or reference-class Object override.</param>
     /// <param name="operand">Method with a supported signature; external identity/core contracts are checked when writing.</param>
     /// <exception cref="ArgumentNullException">Operand is null.</exception>
     /// <exception cref="ArgumentException">Wrong opcode or constructor usage.</exception>

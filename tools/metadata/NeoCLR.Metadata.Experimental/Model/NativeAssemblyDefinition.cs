@@ -595,9 +595,8 @@ public sealed partial class NativeAssemblyDefinition
                 Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner && instance || isOverride), "interface method flags mismatch");
                 Require(!interfaceOwner || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract interface method");
-                Require(!isOverride || !interfaceOwner && instance && types[ownerIndex].IsValueType &&
-                    visibility == MethodVisibility.Public && name == "ToString" && resultType == PrimitiveType.String &&
-                    parameterTypes.Length == 0 && genericArity == 0 && nativeModuleAliases.Values.Count(m => m.Module == "System") == 1,
+                Require(!isOverride || !interfaceOwner && instance && (types[ownerIndex].IsValueType || types[ownerIndex].GenericNames.Length == 0) &&
+                    visibility == MethodVisibility.Public && MethodDefinition.IsObjectOverride(name, new(resultType, parameterTypes, genericNames)) && nativeModuleAliases.Values.Count(m => m.Module == "System") == 1,
                     "unsupported or unbound native Object override");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");

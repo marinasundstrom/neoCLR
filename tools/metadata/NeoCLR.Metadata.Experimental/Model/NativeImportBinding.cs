@@ -32,6 +32,7 @@ public sealed partial class MethodBuilder
 {
     internal bool IsCoreObjectToString { get; set; }
     internal bool IsCoreObjectHash { get; set; }
+    internal bool IsCoreObjectEquals { get; set; }
     internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
     internal bool NativeImportCharOwner { get; set; }
@@ -59,14 +60,21 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     }
     internal void ValidateObjectToStringSlot() => ValidateObjectSlot("ToString", "String", 0x0e);
     internal void ValidateObjectHashSlot() => ValidateObjectSlot("GetHashCode", "Int32", 0x08);
-    private void ValidateObjectSlot(string name, string result, byte signatureResult)
+    internal void ValidateObjectOverride(string name)
+    {
+        if (name == "ToString") ValidateObjectToStringSlot();
+        else if (name == "GetHashCode") ValidateObjectHashSlot();
+        else if (name == "Equals") ValidateObjectSlot("Equals", "Boolean", 0x02, true);
+        else throw new InvalidDataException("unsupported Object override slot");
+    }
+    private void ValidateObjectSlot(string name, string result, byte signatureResult, bool objectParameter = false)
     {
         if (reference.IsNative) throw new InvalidDataException("Object bootstrap binding requires an explicit CLI declaration snapshot");
         var owners = reference.MainModule.Types.Where(t => t.Namespace == "System" && t.Name == "Object" && t.DeclaringType is null).Take(2).ToArray();
         var owner = owners.Length == 1 ? owners[0] : null;
         // Each bounded slot has its exact canonical CLI instance result signature.
         var slots = owner?.Methods.Where(m => m.Name == name && !m.IsStatic && m.GenericArity == 0 && m.AuthoredSignature is null &&
-            m.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, signatureResult })).Take(2).ToArray() ?? [];
+            m.GetSignature().AsSpan().SequenceEqual(objectParameter ? new byte[] { 0x20, 1, signatureResult, 0x1c } : new byte[] { 0x20, 0, signatureResult })).Take(2).ToArray() ?? [];
         var slot = slots.Length == 1 ? slots[0] : null;
         if (Library.ModuleName != "System" || owner is null || owner.IsValueType || slot is null || (slot.Attributes & 0x447) != 0x46)
             throw new InvalidDataException("native Object override requires a public virtual System.Object." + name + " declaration");
@@ -74,7 +82,8 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
             f.GetProperty("name").GetString() == "System.Object." + name &&
             f.TryGetProperty("owner", out var target) && TypeKey(target) == "Named(System.Object)" &&
-            Flag(f, "instance") && Count(f, "parameters") == 0).ToArray();
+            Flag(f, "instance") && Count(f, "parameters") == (objectParameter ? 1 : 0) &&
+            (!objectParameter || TypeKey(f.GetProperty("parameters")[0]) == "Named(System.Object)")).ToArray();
         if (matches.Length != 1) throw new InvalidDataException("missing or ambiguous native Object." + name + " slot");
         var method = matches[0];
         if (!NativeLibraryDefinition.IsPublic(method) || !Flag(method, "is_virtual") || Flag(method, "is_abstract") ||

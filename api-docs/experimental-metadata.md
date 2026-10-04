@@ -7119,3 +7119,26 @@ implementations and derived interfaces, excluding indirect descendants. Runtime 
 rejects direct children outside the defining module/revision. Open local branches remain
 extensible. Generic closed interfaces are not yet authored. Existing local relationship
 encoding and closed-family flag are reused without a format revision.
+
+## Reference Object overrides (development, 2026-10-05)
+
+`TypeBuilder.AddOverride(name, signature)` and manual `MethodDefinition(name, 0x46, signature)`
+admit nongeneric reference owners alongside value owners. Supported exact slots:
+`String ToString()`, `Int32 GetHashCode()`, `Boolean Equals(assembly.CoreObjectType)`.
+The flags are Public/Virtual without NewSlot or Abstract. Generic reference owners and
+generic override methods remain unsupported. Static/interface owners, wrong core Object
+identity, or incompatible signatures reject on attachment; duplicate members reject.
+
+`IILGenerator.CallVirtual(MethodBuilder)` and `Emit(OpCode.Callvirt, MethodBuilder)` also
+admit these owned reference overrides. Imported references retain RequiresVirtualDispatch.
+`CreateMethodReference(..., isOverride: true)` supports the same slots and exact core
+identity. Value overrides retain managed receivers and direct calls.
+
+Native writes require an explicit System binding with the actual matching public virtual
+Object slot, and native readers preserve flags. Runtime linking validates the contract;
+reference dispatch traverses the actual class lineage, including an implicit Object view
+for rootless native classes. No Object storage fields are introduced. The CLI writer
+uses ELEMENT_TYPE_OBJECT for the configured core Object signature, including nested
+arrays/parameters, rather than a nominal CLASS encoding that fails CLR override matching.
+C# tests execute both manual and builder definitions on CLR; native compiler consumers
+exercise separate-assembly class, Object-view and inherited dispatch.

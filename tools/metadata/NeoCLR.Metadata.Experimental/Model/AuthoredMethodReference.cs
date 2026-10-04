@@ -23,7 +23,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
     /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
-    /// <param name="isOverride">Reuse the inherited slot; currently only instance value-type ToString(): String is supported.</param>
+    /// <param name="isOverride">Reuse the inherited slot; bounded instance Object.ToString/GetHashCode/Equals contracts are supported.</param>
     /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
@@ -46,9 +46,8 @@ public sealed partial class AssemblyBuilder
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
-        if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||
-            signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
-            throw new ArgumentException("override reference requires instance value ToString(): String");
+        if (isOverride && (isStatic || !declaringType.IsValueType && declaringType.GenericArity != 0 || !MethodDefinition.IsObjectOverride(name, signature, CoreLibrary)))
+            throw new ArgumentException("override reference requires an exact instance Object slot signature");
         if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
             throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");
         bool constructor = name == ".ctor";
@@ -88,7 +87,7 @@ public sealed partial class AssemblyBuilder
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
-        { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface && !isStatic };
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = (isInterface || isOverride && !declaringType.IsValueType) && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
         reference.Target.NativeImportCharOwner = IsNativeGrapheme(declaringType);

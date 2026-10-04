@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Author and execute the bounded Object Equals/GetHashCode/ToString overrides on
+  nongeneric reference classes, preserving CLI slot flags, native identity and inherited
+  dispatch across separately compiled assemblies. Encode core Object signatures with
+  the CLI Object element code so Equals actually overrides on .NET. The retained
+  executable seed now supplies Object.Equals using reference identity.
+
 - Preserve nongeneric closed interface families through definition/builder authoring,
   native readers and metadata introspection. Validate direct implementation ownership
   at runtime linking while leaving open branches extensible. Native Raven gates also

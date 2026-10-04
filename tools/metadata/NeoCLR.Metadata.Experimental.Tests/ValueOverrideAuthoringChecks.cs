@@ -59,7 +59,7 @@ internal static class ValueOverrideAuthoringChecks
         Reject<ArgumentException>(() => owner.AddOverride("ToString", new(PrimitiveType.String, [PrimitiveType.Int32])));
         Reject<ArgumentException>(() => owner.AddOverride("ToString", new(PrimitiveType.String, [], ["T"])));
         Reject<ArgumentException>(() => owner.AddOverride("ToString", signature));
-        foreach (var invalidOwner in new[] { graph.AddClass("Example", "Reference"), graph.AddInterface("Example", "Contract"), graph.AddType("Example", "Static") })
+        foreach (var invalidOwner in new[] { graph.AddInterface("Example", "Contract"), graph.AddType("Example", "Static") })
         {
             Reject<InvalidOperationException>(() => invalidOwner.AddOverride("ToString", signature));
             Check(invalidOwner.Methods.Count == 0, "rejected builder attachment leaves owner unchanged");

@@ -44,6 +44,9 @@ public sealed partial class AssemblyBuilder
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>().Where(m => m.IsCoreObjectHash).Distinct())
             (target.Assembly.NativeBinding ?? throw new InvalidDataException("native Object.GetHashCode dispatch requires an explicit core slot binding")).ValidateObjectHashSlot();
 
+        foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>().Where(m => m.IsCoreObjectEquals).Distinct())
+            (target.Assembly.NativeBinding ?? throw new InvalidDataException("native Object.Equals dispatch requires an explicit core slot binding")).ValidateObjectOverride("Equals");
+
         static void CheckText(string text)
         {
             if (string.IsNullOrWhiteSpace(text) || text.Any(char.IsControl)) throw new InvalidDataException("invalid native descriptive name");
@@ -56,7 +59,7 @@ public sealed partial class AssemblyBuilder
         {
             var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
             if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
-            bindings[0].Value.ValidateObjectToStringSlot();
+            foreach (var name in methods.Where(m => m.IsOverride).Select(m => m.Name).Distinct()) bindings[0].Value.ValidateObjectOverride(name);
             dependencies.Add(bindings[0].Key, importedGraphs[bindings[0].Key].Graph);
         }
         foreach (var method in methods)

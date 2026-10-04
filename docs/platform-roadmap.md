@@ -2,6 +2,8 @@
 
 Native descriptor prerequisites now include closed interface authoring/linking and
 source static extensions with generic type tokens; see [focused evidence](experiments/extended-cli-metadata/introspection-prerequisites-2026-10-05.md).
+Source descriptor Object overrides also execute across separate native assemblies;
+see [slot authoring and dispatch evidence](experiments/extended-cli-metadata/reference-object-overrides-2026-10-05.md).
 The production JSON mapping gate remains open.
 
 ## Active priority: full-System capability batches (2026-10-04)

@@ -1,0 +1,23 @@
+func Main() -> int {
+    let descriptor = Descriptor()
+    let other = Descriptor()
+    let value: object = descriptor
+    if !value.Equals(other) || value.Equals("different") {
+        return 1
+    }
+    if value.ToString() != "descriptor" || descriptor.ToString() != "descriptor" {
+        return 2
+    }
+    if descriptor.GetHashCode() != 42 {
+        return 3
+    }
+    let specialized: Descriptor = SpecializedDescriptor()
+    if specialized.GetHashCode() != 43 {
+        return 4
+    }
+    let inherited: object = InheritedDescriptor()
+    if inherited.GetHashCode() != 42 {
+        return 5
+    }
+    return value.GetHashCode()
+}

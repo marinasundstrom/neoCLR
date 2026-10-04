@@ -18,6 +18,12 @@ ldarg 0
 call neoCLR.Runtime.ObjectIdentityHash(System.Object)
 ret
 .end
+.method instance virtual Equals(System.Object other) -> Boolean
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.ObjectReferenceEquals(System.Object,System.Object)
+ret
+.end
 .method static ReferenceEquals(System.Object left,System.Object right) -> Boolean
 ldarg 0
 ldarg 1

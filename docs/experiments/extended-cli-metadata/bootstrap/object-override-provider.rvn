@@ -1,0 +1,10 @@
+public open class Descriptor {
+    override func ToString() -> string => "descriptor"
+    override func GetHashCode() -> int => 42
+    override func Equals(other: object?) -> bool => other is Descriptor
+}
+public class SpecializedDescriptor : Descriptor {
+    override func GetHashCode() -> int => 43
+}
+public class InheritedDescriptor : Descriptor {
+}
