@@ -88,7 +88,7 @@ public sealed partial class AssemblyBuilder
             (type.Attributes & 0x27) == 1 && definition.Name == "GetHashCode" && !definition.IsStatic && definition.GenericArity == 0 &&
             isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
             definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x08 });
-        bool intrinsicPrimitiveOwner = NativeBindingFor(identity) is not null && identity.Equals(CoreLibrary) &&
+        bool intrinsicPrimitiveOwner = type?.NativePrimitive is not null || NativeBindingFor(identity) is not null && identity.Equals(CoreLibrary) &&
             type is { Namespace: "System", Name: "String" or "Int32" or "Int64", GenericArity: 0, DeclaringType: null } &&
             type.IsValueType == (type.Name is "Int32" or "Int64");
         if (type is { GenericArity: > 0, CanImportReference: false })
@@ -129,10 +129,12 @@ public sealed partial class AssemblyBuilder
                 genericNames: Enumerable.Range(0, declaration.GenericArity).Select(i => "T" + i).ToArray(),
                 isInterface: (declaration.Attributes & 0x20) != 0, isValueType: declaration.IsValueType);
             result.Definition.AuthoredDeclaringType = MakeOwner(declaration.DeclaringType)?.Definition;
+            if (declaration.NativePrimitive is { } primitive) result.SetNativePrimitive(primitive);
             return result;
         }
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        reference.Target.NativeImportPrimitiveOwner = type?.NativePrimitive;
         reference.Target.IsCoreObjectToString = isObjectToString;
         reference.Target.IsCoreObjectHash = isObjectHash;
         if (isObjectHash) NativeBindingFor(identity)?.ValidateObjectHashSlot();

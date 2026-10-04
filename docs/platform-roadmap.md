@@ -37,7 +37,9 @@ import and direct implementation calls now execute; intrinsic primitive ownershi
 generic Self dispatch remain open. All fixed-width integer signatures and unsigned
 instruction selection now execute through a separate library/consumer on both targets;
 [integer evidence](experiments/extended-cli-metadata/integer-dual-2026-10-04.json).
-See the strategy's Number integration checkpoint.
+The metadata API also authors and imports explicit native numeric scalar declarations;
+its separate API library/consumer executes managed-receiver mutation. Raven primitive
+ownership and generic dispatch remain open. See the strategy's Number integration checkpoint.
 Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service

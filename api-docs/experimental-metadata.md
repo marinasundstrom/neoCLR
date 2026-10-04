@@ -6473,3 +6473,56 @@ including high-bit arithmetic, conversion and signature round trips. The separat
 compiled Raven integer gate covers native import, fields/properties, arrays and generic
 calls. This does not yet make source-owned primitive Number implementations or generic
 Number-constrained dispatch complete.
+
+
+## Native numeric declaration representation (development, 2026-10-04)
+
+`TypeDefinition.NativePrimitive`, `TypeBuilder.NativePrimitive` and introspection
+`NominalTypeInfo.NativePrimitive` return `PrimitiveType?`. Non-null means that the
+native declaration implements that canonical runtime scalar. Null means ordinary
+metadata; a CLI System name alone never establishes native ownership.
+
+`TypeDefinition.SetNativePrimitive(PrimitiveType primitive)` works on authored
+(including detached) definitions. `TypeBuilder.SetNativePrimitive` forwards to the
+same validation. The declaration must be the matching `System.<primitive>` sealed,
+sequential, nongeneric, top-level value type with no record fields or constructors.
+Only the ten fixed-width integer/floating primitives are admitted. Other categories,
+wrong names, conflicting designations or incompatible storage throw ArgumentException;
+loaded snapshots throw InvalidOperationException. The writer revalidates after edits,
+so adding fields or constructors later cannot bypass the contract.
+
+```csharp
+var scalar = assembly.AddValueType("System", "Double");
+scalar.SetNativePrimitive(PrimitiveType.Double);
+var read = scalar.AddInstanceMethod("Identity", new(PrimitiveType.Double, []));
+var il = read.GetILGenerator();
+il.LoadArgument(0); // managed address of Double, not an ordinary record
+il.LoadObject(PrimitiveType.Double);
+il.Return();
+```
+
+An owned scalar's signature and implementing Self are the primitive signature. Native
+output uses existing canonical System names, scalar owners, Runtime representation
+and managed receiver instructions. No new native instruction or metadata version is
+introduced. The snapshot and introspection preserve this fact; importing a native
+method preserves its exact assembly dependency and scalar receiver. No runtime code
+or reflection API is loaded during import.
+
+Executable CLI output rejects native primitive declarations and calls to their
+imported members with InvalidDataException: these are not ordinary structs hosted in
+another .NET assembly. Reference-only CLI projections remain available for diagnostics;
+only authoritative native snapshots retain NativePrimitive. This follows the CLR's
+separation of intrinsic scalar storage from ordinary value layouts without claiming
+that an arbitrary .NET library can replace core numeric types.
+
+The designation does not supply runtime storage fields, resolve dependency ownership,
+or rewrite a source `m_value` field. A compiler must select ownership explicitly and
+translate its checked intrinsic-storage contract into receiver operations. Duplicate
+canonical primitive owners remain invalid at runtime linking. Raven source primitive
+integration and generic Number constraints are not established by this API alone.
+
+`PrimitiveRepresentationChecks` covers detached/builder authoring, strict malformed
+input, immutable snapshots, introspection, late invalid edits and independent native
+method import. With `NEOCLR_PRIMITIVE_ARTIFACT` and `NEOCLR_PRIMITIVE_CONSUMER` set,
+the C# suite saves a primitive library and consumer; running the consumer with that
+module and the explicit seed returns 42 after mutation through its primitive receiver.

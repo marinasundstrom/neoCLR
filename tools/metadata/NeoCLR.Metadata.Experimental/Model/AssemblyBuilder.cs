@@ -96,7 +96,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {
-            foreach (var type in types) type.ValidateEnum();
+            foreach (var type in types) { type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); }
             ValidateValueLayouts();
             foreach (var type in types)
                 foreach (var attribute in type.Definition.CustomAttributes) attribute.ValidateContract(type.Definition);
@@ -221,6 +221,9 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (!referenceOnly && (types.Any(t => t.NativePrimitive is not null) ||
+            methods.SelectMany(m => m.Instructions).Any(i => i.Target?.DeclaringType?.NativePrimitive is not null)))
+            throw new InvalidDataException("native primitive implementations require native emission");
         if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "array.reserve")))
             throw new InvalidDataException("checked uninitialized array reservation requires native emission; executable CLI has no equivalent operation");
         var metadata = new MetadataBuilder();

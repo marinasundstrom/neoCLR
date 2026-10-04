@@ -399,3 +399,29 @@ Validation: 137 metadata C# groups, the paired integer and floating driver gates
 31 focused .NET controls, and all seven existing native consumers pass. API manual
 updated; `build-api-docs.py --check` still reports the known stale guest snapshot.
 No guest public API changed, and no snapshot was regenerated against a mismatched bridge.
+
+
+### Number prerequisite: explicit scalar declarations (2026-10-04)
+
+The C# metadata API now admits an explicit NativePrimitive designation for canonical
+numeric definitions. Builder and manual-definition paths share validation; native
+reading, introspection and imported methods preserve the scalar receiver. An independent
+library/consumer executes receiver mutation and returns 42. Runtime representation and
+instructions already existed; no runtime or format extension was necessary. Ordinary
+System-named definitions do not implicitly acquire scalar ownership. Executable CLI
+output rejects this native ownership, while reference-only projection remains possible.
+
+Raven still needs an explicit primitive ownership catalog shared by special-type
+resolution and emission. Its existing bootstrap ownership validator intentionally
+rejects duplicate declarations: simply adding Single to the source list while retaining
+a canonical CLI primitive declaration is not a solution. A checked source `m_value`
+intrinsic mapping must emit receiver loads/stores, not record fields. The metadata API
+does not silently discard fields. Generic Number-constrained method bounds and callself
+emission remain subsequent work. These distinctions preserve the importer/emitter
+boundary and avoid teaching ordinary .NET emission about native primitive ownership.
+
+Validation for scalar declarations: 138 metadata groups pass. The saved independent
+consumer verifies and runs with exit 42 and no stdout/stderr; see
+[commands and hashes](primitive-declarations-2026-10-04.json). The existing stale API
+snapshot check remains unchanged; the C# development API manual is updated. Integer
+compiler support is Raven 17d7c50f5 with neoCLR fe2c263c.

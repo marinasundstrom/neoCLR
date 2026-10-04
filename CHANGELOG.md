@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add explicit native numeric primitive designation to metadata definitions/builders
+  and expose it through introspection. Preserve existing runtime scalar representation,
+  Self substitution and imported managed receivers. Reject ordinary record fields and
+  executable CLI emission for these declarations. A separate API-authored primitive
+  library/consumer loads and executes; Raven source ownership remains unfinished.
+
 - Complete fixed-width integer metadata signatures and expose standard unsigned
   arithmetic, comparisons, shifts and conversions through the IL generator. Preserve
   storage signedness while using CLI evaluation widths. Raven imports and emits the

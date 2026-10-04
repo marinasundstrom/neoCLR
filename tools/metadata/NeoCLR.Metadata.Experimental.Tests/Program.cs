@@ -386,6 +386,7 @@ var tests = new (string Name, Action Body)[]
     ("Static interface contracts and inherited Self", StaticInterfaceChecks.Run),
     ("Floating point signatures and execution", FloatingPointChecks.Run),
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
+    ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),

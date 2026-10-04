@@ -729,3 +729,8 @@ all eight fixed-width integer signatures with standard CLI signedness rules. Sep
 integer libraries and consumers run on .NET and NeoCLR, including high-bit unsigned
 arithmetic, shifts and conversions. Canonical source primitive ownership and generic
 Number dispatch remain unfinished; this is not full class-library numeric support.
+
+The development metadata API also supports explicit numeric runtime declarations,
+including scalar managed receivers and metadata-only inspection. It rejects record
+storage on those declarations. This is infrastructure for source numeric ownership;
+Raven's full Number/class-library gate remains unfinished.

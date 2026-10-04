@@ -10605,3 +10605,23 @@ regression reproduced three invalid variants accepted before the fix; all 27 foc
 interface/Self tests pass afterwards. The isolated fix b88a8d19d was fast-forwarded
 into local main and integrated separately as 90c02af96. Missing/instance/wrong-result
 identity properties now fail with RAV0330, independently of writer validation.
+
+
+### 2026-10-04 — Numeric declaration storage and ownership
+
+- **Author direction:** continue until the entire feature around numeric structs/classes
+  and Number is solved, rather than stopping at floating arithmetic.
+- **Assistant work:** completed integer-width/unsigned metadata and Raven emission,
+  verified separately compiled consumers on both targets, then added explicit numeric
+  scalar designation to the metadata definitions/builders and introspection. The native
+  runtime already provides Runtime representation and scalar managed receivers; an
+  API-authored primitive library and separate consumer now execute those operations.
+- **Boundary decision implemented:** a System name alone does not claim intrinsic
+  storage. Explicitly designated numeric declarations reject record fields/constructors
+  and executable CLI output. Native snapshots and imported callable references retain
+  the designation. No automatic source-field removal or bootstrap fallback was added.
+- **Open:** Raven's canonical primitive-provider ownership, checked intrinsic `m_value`
+  emission, and generic Number bounds/callself. This is not a claim of completing the
+  author's requested full numeric family. See the
+  [strategy checkpoint](experiments/extended-cli-metadata/system-compilation-strategy.md)
+  and [API contract](../api-docs/experimental-metadata.md).

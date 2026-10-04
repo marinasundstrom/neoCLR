@@ -1,0 +1,43 @@
+{
+  "scope": "API-authored canonical Double and Single declarations, separate direct native consumer, scalar managed receiver mutation. Does not establish Raven primitive ownership or Number constrained generic calls.",
+  "repositoryBaseRevision": "fe2c263cc2b141296e31e4841b7972469a0fca68",
+  "metadataTests": "138/138",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/primitive-consumer1004.neox",
+        "--module",
+        "/tmp/primitive-representation1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_0A5D86BDBF337E1A6622614A1CD62649237E3A2D233833EEBCAD7CD85022BBD1: typed-stack/control-flow verification passed (62 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/primitive-consumer1004.neox",
+        "--module",
+        "/tmp/primitive-representation1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/tmp/primitive-consumer1004.neox": "b2da90fa16f260726a3ddd73547166254b8606ade9487ac28512d0679990c077",
+    "/tmp/primitive-representation1004.neox": "c12000212b85c9ad80c0003d11ec9113606b8a26814ab9f532390c14b5da9480",
+    "/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/PrimitiveRepresentationChecks.cs": "4aaba6d5976cd6016e65e8c30d2f71e85ffdfe8f496031ef46ee1ed8eaf9234f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/PrimitiveRepresentation.cs": "a5f2fb5d484bedab24b63cd83829ca201f00244b4237655bfef8af5e42c2507f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c"
+  }
+}
