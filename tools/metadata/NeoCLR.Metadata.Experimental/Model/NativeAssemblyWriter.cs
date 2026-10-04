@@ -324,7 +324,7 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(c.InterfaceType.Producer!) } }).ToArray())).ToArray()
+                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray())).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");

@@ -1,0 +1,49 @@
+{
+  "scope": "External nongeneric method interface bounds, CLI/native execution and direct Raven import. Open constrained call emission remains unsupported.",
+  "metadataBaseRevision": "43c1a96b4cb4c3582a7f50ae4c3bd39a591e5089",
+  "ravenBaseRevision": "b2a99bccd6a041059662a0832c69c400a4834b4c",
+  "metadataTests": "139/139 groups including definition/builder parity and separate-contract CLI execution",
+  "nativeRavenProbe": "External bound canonical identity, valid/invalid binding and missing dependencies; seven existing native consumers execute",
+  "metadataCommand": "NEOCLR_EXTERNAL_BOUND_ARTIFACT=/tmp/external-method-bounds.neox dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+  "ravenCommand": "dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-symbols-runtime /tmp/neoclr-fail-reference-20261002/NeoCLR.CoreProbe.dll <neoclr>/target/debug/neoclr /tmp/ParseSystem1004.neox /tmp/FRESH",
+  "apiSnapshot": "Known stale guest snapshot: check fails; C# manual updated.",
+  "commands": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/external-method-bounds.neox",
+        "--module",
+        "/tmp/external-method-bounds.neox.contracts.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_257548DCDBF44977F3A477F5375EFDD5D52094A6F9B9E0E171F8B14630202850: typed-stack/control-flow verification passed (59 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/external-method-bounds.neox",
+        "--module",
+        "/tmp/external-method-bounds.neox.contracts.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/private/tmp/external-method-bounds.neox": "906f0c849751bf2d1c4e86ec881efe87e1de620479103ad3e819a300342d8fc1",
+    "/private/tmp/external-method-bounds.neox.contracts.neox": "d9cd04c15063cd14bba8bf9041c2b745512dc6ba48eaa74e6183a3c745932464",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "7a36146da256897652ad7d31da961f566fd47914449e95464c0cb19206fd1a43",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/GenericMethodConstraintChecks.cs": "b19d040f355744f47bf9a54224a35e152f9b0548850643fc0ca0e075f436be06",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericMethodConstraint.cs": "40dfe2c0a13d3f35c87275dfe2e9b08b2f65695772e737521058227175ce6260",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/NativeGenericSymbolChecks.cs": "f21be18217f6dee002f2d6125f2a286158d60e231329a60c5932ce24ffcee9a0"
+  }
+}

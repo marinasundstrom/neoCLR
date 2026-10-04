@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Extend method interface bounds to explicit external nongeneric interfaces, using
+  CLI TypeRefs and existing native TypeBound identities. Introspection checks the
+  resolved dependency category; .NET and NeoCLR execute a separate-contract fixture.
+  The experimental constraint record now exposes TypeReference instead of TypeDefinition.
+  Legacy CLI projection rejects external bounds explicitly; direct native Raven import
+  preserves them. Open constrained-call emission remains unfinished.
+
 - Preserve owned nongeneric interface bounds on method type parameters through
   definitions/builders, standard CLI constraints, native metadata and introspection.
   Validate concrete local generic arguments and recheck after graph edits. Raven

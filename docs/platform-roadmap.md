@@ -1229,7 +1229,8 @@ Single/Double Number implementations through explicit scalar ownership; see the
 The subsequent cumulative source-library rebuild executes all ten numeric types with
 seed ownership removed. The metadata generator now executes concrete static constrained interface calls on
 both targets. Owned nongeneric method interface bounds now round-trip and import into
-Raven symbols; external bounds, open constrained calls and generic Number lowering remain
+Raven symbols; external nongeneric method bounds now also retain scoped identity and
+execute in a separate-contract metadata fixture. Open constrained calls and generic Number lowering remain
 unfinished. See the method-bound checkpoint in the system compilation strategy.
 The next bounded interface slice adds application defaults and public/private static
 helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).

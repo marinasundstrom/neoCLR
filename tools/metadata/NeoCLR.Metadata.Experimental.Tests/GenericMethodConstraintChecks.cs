@@ -9,6 +9,7 @@ internal static class GenericMethodConstraintChecks
 {
     internal static void Run()
     {
+        ExternalBounds();
         foreach (var detached in new[] { false, true })
         {
             var graph = new AssemblyBuilder(new("MethodBounds" + detached, new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
@@ -50,7 +51,7 @@ internal static class GenericMethodConstraintChecks
                 var context = new MetadataLoadContext([snapshot]);
                 var view = context.Resolve(definition);
                 var parameter = (MethodGenericParameterTypeInfo)view.GetGenericArguments().Single();
-                if (!ReferenceEquals(parameter.GetInterfaceConstraints().Single(), context.GetType(definition.InterfaceConstraints.Single().InterfaceType))) throw new Exception("method bound facade");
+                if (!ReferenceEquals(parameter.GetInterfaceConstraints().Single(), context.Resolve(definition.InterfaceConstraints.Single().InterfaceType))) throw new Exception("method bound facade");
                 Reject<InvalidOperationException>(() => definition.AddInterfaceConstraint(0, definition.InterfaceConstraints[0].InterfaceType));
                 var consumer = new AssemblyBuilder(new("Consumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
                 Reject<NotSupportedException>(() => consumer.ImportReference(definition, graph.CoreLibrary));
@@ -71,6 +72,64 @@ internal static class GenericMethodConstraintChecks
             var extraBound = graph.AddInterface("Example", "Other");
             method.AddInterfaceConstraint(0, extraBound);
             Reject<InvalidDataException>(() => graph.Write());
+        }
+    }
+    private static void ExternalBounds()
+    {
+        foreach (var manual in new[] { false, true })
+        {
+            var core = new AssemblyIdentity("System.Runtime", new Version(10, 0, 0, 0));
+            var contracts = new AssemblyBuilder(new("BoundContracts" + manual, new Version(1, 0, 0, 0)), core);
+            contracts.AddInterface("Example", "Number");
+            var contractImage = RuntimeAssemblyContainer.WriteBinary(contracts);
+            var graph = new AssemblyBuilder(new("ExternalBounds" + manual, new Version(1, 0, 0, 0)), core);
+            var bound = graph.CreateInterfaceReference(contracts.Identity, core, Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(contractImage)), "Example", "Number");
+            var method = graph.AddFunction("Answer", new(PrimitiveType.Int32, [], ["T"]));
+            if (manual) method.Definition.AddInterfaceConstraint(0, graph.Definition.MainModule.ImportReference(contracts.Identity, "Example", "Number"));
+            else method.AddInterfaceConstraint(0, bound);
+            method.GetILGenerator().LoadConstant(42); method.GetILGenerator().Return();
+            Reject<ArgumentException>(() => method.AddInterfaceConstraint(0, bound));
+            Reject<InvalidDataException>(() => graph.Write());
+            graph.CompleteInterfaceReference(bound);
+            var implementation = graph.AddValueType("Example", "Count");
+            implementation.AddInterfaceImplementation(bound);
+            var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
+            main.GetILGenerator().Call(method.MakeGenericInstance(implementation)); main.GetILGenerator().Return();
+            graph.EntryPoint = main;
+            var cli = graph.Write();
+            var context = new System.Runtime.Loader.AssemblyLoadContext("bounds", true);
+            try
+            {
+                var dependency = context.LoadFromStream(new MemoryStream(contracts.Write()));
+                context.Resolving += (_, name) => name.Name == dependency.GetName().Name ? dependency : null;
+                var assembly = context.LoadFromStream(new MemoryStream(cli));
+                if ((int)assembly.EntryPoint!.Invoke(null, null)! != 42) throw new Exception("external CLI method bound execution");
+            }
+            finally { context.Unload(); }
+            var native = RuntimeAssemblyContainer.WriteBinary(graph);
+            foreach (var snapshot in new[] { AssemblyDefinition.ReadAssembly(cli, expectedExtended: false), AssemblyDefinition.ReadNativeAssembly(native) })
+            {
+                var definition = snapshot.MainModule.Functions.Single(m => m.Name == "Answer");
+                var dependency = AssemblyDefinition.ReadNativeAssembly(contractImage);
+                var load = new MetadataLoadContext([snapshot, dependency]);
+                var parameter = (MethodGenericParameterTypeInfo)load.Resolve(definition).GetGenericArguments().Single();
+                if (!ReferenceEquals(parameter.GetInterfaceConstraints().Single(), load.Resolve(dependency.MainModule.Types.Single(t => t.Name == "Number").ToReference())))
+                    throw new Exception("external bound canonical resolution");
+                var missing = new MetadataLoadContext([snapshot]);
+                Reject<InvalidDataException>(() => ((MethodGenericParameterTypeInfo)missing.Resolve(definition).GetGenericArguments().Single()).GetInterfaceConstraints());
+                foreach (var wrongVersion in new[] { false, true })
+                {
+                    var wrong = new AssemblyBuilder(wrongVersion ? new AssemblyIdentity(contracts.Identity.Name, new Version(2, 0, 0, 0)) : contracts.Identity, core);
+                    wrong.AddClass("Example", "Number");
+                    var wrongLoad = new MetadataLoadContext([snapshot, AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(wrong))]);
+                    Reject<InvalidDataException>(() => ((MethodGenericParameterTypeInfo)wrongLoad.Resolve(definition).GetGenericArguments().Single()).GetInterfaceConstraints());
+                }
+            }
+            if (Environment.GetEnvironmentVariable("NEOCLR_EXTERNAL_BOUND_ARTIFACT") is { } path)
+            {
+                File.WriteAllBytes(path, native);
+                File.WriteAllBytes(path + ".contracts.neox", contractImage);
+            }
         }
     }
     private static void Reject<T>(Action action) where T : Exception

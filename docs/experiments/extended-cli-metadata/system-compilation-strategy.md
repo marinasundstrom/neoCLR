@@ -540,3 +540,20 @@ consumers still execute. See method-interface-bounds-2026-10-04.json. The next b
 work is external interface bound identity, then open constrained-call operands and
 semantic authoring in Raven's emitter. Keep its constrained callable rejection until
 these contracts are complete; this checkpoint does not claim generic Number execution.
+
+
+### External method bounds checkpoint (2026-10-04)
+
+Method constraints now retain external nongeneric interface identities through standard
+CLI TypeRefs, existing native TypeBound records and reader snapshots. Introspection
+resolves only through its explicit catalog and rejects missing/wrong dependencies and
+noninterface definitions. The experimental constraint record now carries TypeReference;
+local definition authoring remains supported. No runtime schema change was necessary.
+
+Both targets execute the API-authored separate-contract bounded-method fixture with
+exit 42. Raven's direct importer preserves canonical external bounds and its existing
+binder rejects incompatible arguments. Seven native consumers remain passing. See
+external-method-bounds-2026-10-04.json. The legacy reference-only projection explicitly
+rejects external bounds; it is not a fallback. Primitive bootstrap and runtime seed
+configuration are unchanged. Open constrained calls, imported bounded-method authoring
+and Raven's constrained emission admission remain the next implementation work.

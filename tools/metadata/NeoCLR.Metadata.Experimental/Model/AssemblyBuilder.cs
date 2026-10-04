@@ -119,8 +119,10 @@ public sealed partial class AssemblyBuilder
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var bound in method.InterfaceConstraints)
-                    if (!ReferenceEquals(bound.InterfaceType.Module, Definition.MainModule) || bound.InterfaceType.Producer is not { IsInterface: true, GenericParameterNames.Count: 0 })
-                        throw new InvalidDataException("invalid method interface bound owner");
+                {
+                    var signature = method.Definition.ConstraintSignature(bound.InterfaceType);
+                    if (signature.ImportedType is { } external) _ = ExternalInterfaceMethods(external).ToArray();
+                }
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
@@ -757,7 +759,7 @@ public sealed partial class AssemblyBuilder
                 }
                 else
                     foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].InterfaceConstraints.Where(c => c.ParameterIndex == i))
-                        metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.InterfaceType.Producer!]);
+                        metadata.AddGenericParameterConstraint(parameter, MetadataTokens.EntityHandle(ElementToken(methods[MetadataTokens.GetRowNumber(row.Owner) - 1].Definition.ConstraintSignature(constraint.InterfaceType))));
             }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),

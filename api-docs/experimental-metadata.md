@@ -6596,14 +6596,16 @@ instruction change is introduced.
 
 ### Method interface bounds (development, 2026-10-04)
 
-`Model.GenericMethodInterfaceConstraint(int ParameterIndex, TypeDefinition InterfaceType)`
-records a zero-based method type parameter ordinal and its owned nongeneric interface.
+`Model.GenericMethodInterfaceConstraint(int ParameterIndex, TypeReference InterfaceType)`
+records a zero-based method type parameter ordinal and a local or external nongeneric interface reference.
 `MethodDefinition.InterfaceConstraints` and `MethodBuilder.InterfaceConstraints` expose
 read-only lists of these records. Define bounds using:
 
 ```csharp
 void MethodDefinition.AddInterfaceConstraint(int parameterIndex, TypeDefinition interfaceType);
+void MethodDefinition.AddInterfaceConstraint(int parameterIndex, TypeReference interfaceType);
 void MethodBuilder.AddInterfaceConstraint(int parameterIndex, TypeBuilder interfaceType);
+void MethodBuilder.AddInterfaceConstraint(int parameterIndex, ImportedTypeReference interfaceType);
 ```
 
 The builder delegates to the canonical definition. Detached definitions may be attached
@@ -6615,6 +6617,8 @@ InterfaceConstraints to throw InvalidDataException rather than return a partial 
 
 `Introspection.MethodGenericParameterTypeInfo.GetInterfaceConstraints()` returns
 `IReadOnlyList<NominalTypeInfo>` using canonical views in the same metadata load context.
+External bounds resolve through the explicit dependency catalog and must resolve to nongeneric
+interfaces. Missing/wrong dependencies or noninterface bounds throw InvalidDataException.
 No implicit dependency loading occurs. Method construction in introspection substitutes
 signatures; language admission and constraint satisfaction remain compiler responsibilities.
 
@@ -6625,11 +6629,27 @@ Open, imported and constructed argument satisfaction is not supported in this fi
 NotSupportedException until its contract can preserve their bounds. Unconstrained imports
 retain their previous behavior.
 
-CLI output uses GenericParamConstraint rows referencing local interface TypeDefs. Native
+CLI output uses GenericParamConstraint rows referencing interface TypeDefs or scoped TypeRefs. Native
 output uses existing function generic_constraints / TypeBound records. Native snapshots
-and the explicitly legacy reference-only CLI projection retain these bounds. No runtime
+retain both bound kinds. The legacy reference-only CLI projection preserves local bounds
+and rejects external bounds with NotSupportedException; use direct native import. No runtime
 schema change is required; older experimental readers may reject the added function field.
 C# tests cover builder/definition parity, executable CLI output, native/projection round
 trips, canonical views, invalid ordinals/duplicates and late graph mutation. A native
 API-authored bounded method executes with exit 42. This does not yet enable Raven's
 Number-constrained generic bodies or calls.
+
+
+External method bounds require a reference registered through CreateInterfaceReference,
+with an explicit dependency identity/core/digest and CompleteInterfaceReference before
+writing. Both definition and builder overloads use this output-owned contract; they do
+not reopen importer objects. Definition-level external bounds require an attached method.
+Foreign/unregistered references, duplicates and generic bounds reject. Concrete local
+arguments may satisfy external bounds through their declared interface relationships;
+open argument forwarding and imported bounded-method emission remain unsupported.
+
+Migration (development only, 2026-10-04): GenericMethodInterfaceConstraint.InterfaceType
+is now TypeReference. Use MetadataLoadContext.Resolve for canonical views or an explicit
+resolver for TypeReference.Resolve. The TypeDefinition authoring overload is retained.
+Separate contract fixtures execute on .NET and NeoCLR; the direct Raven importer checks
+valid/invalid arguments and canonical external symbol identity without a CLI projection.

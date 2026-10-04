@@ -110,7 +110,7 @@ public sealed partial class MethodDefinition
 
     /// <summary>Recognizes unconstrained static generic primitive/vector signatures with scoped method parameters.</summary>
     /// <param name="decoded">Immutable signature with preserved native or positional CLI parameter names on success; null otherwise.</param>
-    /// <returns>False for nongeneric, constrained, malformed or unsupported declarations.</returns>
+    /// <returns>False for nongeneric, malformed or unsupported declarations, including unsupported constraint categories.</returns>
     /// <remarks>At most 32 method parameters. No nominal types, declaring-type parameters or nested vectors.</remarks>
     public bool TryGetStaticGenericValueSignature(out MethodSignature? decoded)
     {
