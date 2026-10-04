@@ -1,0 +1,50 @@
+import System.Runtime.CompilerServices.RuntimeServices
+
+func Main() -> int {
+    // A combining sequence and an emoji ZWJ sequence are two graphemes.
+    let text = "é👩‍👩‍👧‍👦"
+    if text.Length != 2 {
+        return 10
+    }
+    let empty = ""
+    if empty.Length != 0 {
+        return 11
+    }
+    let culture = RuntimeServices.SystemCultureName()
+    // Empty is a valid host fallback; do not depend on a particular machine locale.
+    if System.String.CompareOrdinal(culture, culture) != 0 {
+        return 1
+    }
+    let first = RuntimeServices.UnixTimeToLocal(1234567L)
+    let second = RuntimeServices.UnixTimeToLocal(7654321L)
+    let beforeEpoch = RuntimeServices.UnixTimeToLocal(-1L)
+    if first.Length != 8 || second.Length != 8 || beforeEpoch.Length != 8 {
+        return 2
+    }
+    if first[6] != 1234567 || second[6] != 7654321 || beforeEpoch[6] != 9999999 {
+        return 3
+    }
+    for index in 0..<6 {
+        if first[index] != second[index] {
+            return 4
+        }
+    }
+    if first[0] < 1 || first[0] > 9999 || first[1] < 1 || first[1] > 12 {
+        return 5
+    }
+    if first[2] < 1 || first[2] > 31 || first[3] < 0 || first[3] > 23 {
+        return 6
+    }
+    if first[4] < 0 || first[4] > 59 || first[5] < 0 || first[5] > 59 {
+        return 7
+    }
+    if first[7] != second[7] || first[7] < -86400 || first[7] > 86400 {
+        return 8
+    }
+    let year = second[0]
+    first[0] = 0
+    if second[0] != year {
+        return 9
+    }
+    return 42
+}

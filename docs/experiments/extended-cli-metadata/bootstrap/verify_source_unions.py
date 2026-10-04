@@ -112,6 +112,7 @@ def main():
         if args.calendar_foundation:
             samples.append((HERE / 'duration-consumer.rvn', 42, ''))
             samples.append((HERE / 'duration-contract-consumer.rvn', 42, ''))
+            samples.append((HERE / 'calendar-services-consumer.rvn', 42, ''))
         for name in ['library-query-basics', 'library-query-names']:
             source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
             expected = source.with_suffix('.expected.txt')
@@ -125,6 +126,14 @@ def main():
                 exit_code, expected_stdout)
             sample_paths.extend([source, app])
         if args.calendar_foundation:
+            range_source = HERE / 'calendar-services-out-of-range.rvn'
+            range_app = output / 'CalendarOutOfRange.dll'
+            run(common + ['--reference', str(library), '-o', str(range_app), str(range_source)])
+            run([runtime, 'verify', str(range_app), '--module', str(library), '--system', str(seed)])
+            fault = run([runtime, 'run', str(range_app), '--module', str(library), '--system', str(seed)], 1, '')
+            if 'system local time is outside the supported Date/Time range' not in fault.stderr:
+                raise RuntimeError('Calendar service did not preserve the runtime range fault')
+            sample_paths.extend([range_source, range_app])
             # Ordinary .NET control for the same unchanged source foundation. The
             # broader native collection gate does not imply full .NET library parity.
             dotnet_output = output / 'dotnet-duration'

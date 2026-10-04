@@ -37,6 +37,11 @@ ret
 .end
 .type System.String
 .sealed
+.method instance get_Length() -> Int32
+ldarg 0
+call neoCLR.Runtime.StringGraphemeCount(String)
+ret
+.end
 .method instance Equals(String other) -> Boolean
 ldarg 0
 ldarg 1
@@ -125,5 +130,9 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.StringHashOrdinalIgnoreCase(String value) -> Int32
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.StringGraphemeCount(String value) -> Int32
 .methodimpl InternalCall
 .end

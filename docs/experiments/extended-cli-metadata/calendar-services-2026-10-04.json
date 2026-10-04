@@ -1,0 +1,2112 @@
+{
+  "compilerRevision": "9d06edf80",
+  "compilerDocumentationRevision": "1fae5ff28",
+  "metadataRuntimeBase": "56f0d8f0",
+  "note": "Matching bootstrap changes tested before commit; compiler/metadata/runtime implementation unchanged. Prior unaffected metadata tests reused. Existing guest API implementations/signatures unchanged; no API snapshot refresh or website build. Website text behavior reviewed against docs/design/text-abstraction.md.",
+  "gate": {
+    "revisions": {
+      "runtime": "56f0d8f0df3f3a949e800a0fdd5da788dece2785",
+      "compiler": "7a5f5e74665a3a8cdb0eaeb2efd20a32cfc036be"
+    },
+    "scope": "Unchanged Duration and comparison contracts compile into separately consumed libraries on both targets; the same value-contract consumer exits 42 on each. Native ArrayList<Duration> and the broad application also execute. Date and the full dual-target library gate remain open.",
+    "commands": [
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/comparer-seed.neoil",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/calendar-services-final-1004/System.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn",
+          "runtime/raven/src/System/StringComparer.rvn",
+          "runtime/raven/src/System/ComparableTo.rvn",
+          "runtime/raven/src/System/EquatableTo.rvn",
+          "runtime/raven/src/System/Duration.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "warning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/Consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/Consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (205 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/Consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/invalid/NegativeCapacity.dll",
+          "/private/tmp/calendar-services-final-1004/NegativeCapacity.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/invalid/NegativeCapacity.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: ArrayList capacity must be non-negative [code=UserFault] at System.Fail:1\n  at System.Fail(String) [System:24] IL instruction 1\n  at NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031..ctor(Int32) owner=Constructed { definition: \"NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9.T_53797374656D2E436F6C6C656374696F6E73_41727261794C6973746031\", arguments: [Int32] } [NeoMetadata_2F30BD02AFBA05BD600752FFA8ADE3921F7A299295D206B0C9F8C027082AC0D9#1.0.0.0:41] IL instruction 5\n  at NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F.F_4D61696E() [NeoMetadata_4067E4B52BDAEADB05C4BCF35EF31E448D9CC2461AD8EF883769AD04B9DB1F9F#1.0.0.0:0] IL instruction 1\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/Override.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/Override.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_35E5ED7F554FCEFC06617BE4251EB897036CDEC3ADBA542613DC3B7D4280215A: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/Override.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Multiple\n42\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/Application.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/Application.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_5F1E7980BF83E18282A3DF9BFBB13E29DA3B1C681F11A81E23680CA795A01645: typed-stack/control-flow verification passed (220 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/Application.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/array-interface-count-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-interface-count-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/array-interface-count-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_3CA17E2FE31E07C1E7A27AFE03C42FDD25E0B177FA5912ABDF190319A3EE203E: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/array-interface-count-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/nested-array-callback-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/nested-array-callback-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/nested-array-callback-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_1312FED3A9A714F6BC9239B3764876447FA882B0A4021CD986D6162489E51FB3: typed-stack/control-flow verification passed (205 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/nested-array-callback-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/instance-callback-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/instance-callback-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/instance-callback-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_68BC6703E395E40F85D1DAD2DE7551BEDA41074C4D9A619834B516747C393E36: typed-stack/control-flow verification passed (209 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/instance-callback-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/captured-reference-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/captured-reference-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/captured-reference-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_0234E703CFC1FCF8083C4AC99C4A55DC660163612F989D1EB98AFA2EEC69D995: typed-stack/control-flow verification passed (214 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/captured-reference-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/primitive-capture-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/primitive-capture-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/primitive-capture-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_B4B117A467E6AFF3282CBF7223113D21519C48420F8E63FAA428DBCA0B6D68F7: typed-stack/control-flow verification passed (214 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/primitive-capture-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/query-lifetime-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/query-lifetime-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/query-lifetime-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_30F7EED037A308FA90FFBD828B76BA2308A1E05117816516C481DD20C6FF1970: typed-stack/control-flow verification passed (216 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/query-lifetime-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/range-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/range-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/range-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_7F4E0083682470F0D03C1204F6B230CEAA289C2CE2C1AFB76B74892390BBE5C3: typed-stack/control-flow verification passed (211 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/range-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-list-filters.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-list-filters.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-list-filters.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_EAA8D6D74F8F7D4F56CD607881723B7AF7E98D1B0BC5DADF31A1C26968A3968E: typed-stack/control-flow verification passed (213 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-list-filters.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-array-callbacks.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-array-callbacks.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-array-callbacks.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_C2E0696563A2835CD4B05CD82B3A475BD3C5730B455CE399E33E58E9221C7ED6: typed-stack/control-flow verification passed (206 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-array-callbacks.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "7\n42\nFirst\nSecond\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-option.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-option.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_C8A744CC9D0353AD5BA066AB7E38918F63D2D2D7BEFD69A39540DE2E139EEF4F: typed-stack/control-flow verification passed (206 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-option.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "42\nProduct not found\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-option-propagation.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option-propagation.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-option-propagation.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_F1392B1E2E0FE88EBFEB4E3F545877599848D2F10D9C30F9C915154989B683D6: typed-stack/control-flow verification passed (207 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-option-propagation.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Value found\n42\nAbsent\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-collection-capabilities.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-collection-capabilities.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-collection-capabilities.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_271ECA4231BB5FED1BB0AC1D160C3A1B8D00D997F62F46183A5C54BFFACEE342: typed-stack/control-flow verification passed (207 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-collection-capabilities.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "2\n42\n2\n2\n7\n2\n9\n2\n3\n11\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/string-comparer-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/string-comparer-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/string-comparer-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_75FFFF84276DE4CFF78217359FB802323DCA3C8809AB78C117A8BC464528B67E: typed-stack/control-flow verification passed (205 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/string-comparer-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/value-result-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/value-result-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/value-result-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_FC42416D56CDA2F04B26936C98B818B06310DADE1E5566E81D45C8DE761E98D6: typed-stack/control-flow verification passed (218 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/value-result-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-comparers.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-comparers.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-comparers.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_37D03D2AC935508A9BCF3A391708276D67C8AAC3B67469F3403CDCD2340AC09E: typed-stack/control-flow verification passed (217 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-comparers.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Comparer contract passed\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-integers.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-integers.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-integers.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_DA16AC530B1A1659C1815584CEC532D09529390AE9C1AC7B476D8B44F06E66D7: typed-stack/control-flow verification passed (205 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-integers.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/duration-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/duration-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_9AE86DA47AFD3077FFF20427111A5942BD8280021A1A791CD56918BFD0E6F99B: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/duration-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/duration-contract-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-contract-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/duration-contract-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_00F9B9EC49E6972EB62F9A77E6691A8501D4AB71F4A20CA493D9B97906A7B0B0: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/duration-contract-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/calendar-services-consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-services-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/calendar-services-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_36547F57FA348A16B36DAE713312CA6AD434F47D8DD48968096231E39383B1AF: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/calendar-services-consumer.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-query-basics.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-query-basics.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_85E6A037A6896AC0029088733358FDC15DD91F7DA23A487E388B3122AA779B33: typed-stack/control-flow verification passed (210 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-query-basics.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "2\n3\nTrue\nTrue\n2\n10\n2\n20\n3\n30\n5\n50\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/library-query-names.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/library-query-names.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_4F171849ABCAA9BF7D28CCDD43854B9D0CA11780B9F1D28BD2BDC3552573D4EF: typed-stack/control-flow verification passed (206 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/library-query-names.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "10\n30\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/CalendarOutOfRange.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-services-out-of-range.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "verify",
+          "/private/tmp/calendar-services-final-1004/CalendarOutOfRange.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 0,
+        "stdout": "NeoMetadata_F4D7E48A324589F196803EFFF215918E160950B8507340F6FB3D0584B590E6CF: typed-stack/control-flow verification passed (204 IL functions; maximum stack 6; runtime value checks remain)\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/CalendarOutOfRange.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: system local time is outside the supported Date/Time range [code=RuntimeError] at System.Runtime.CompilerServices.RuntimeServices.UnixTimeToLocal:1\n  at System.Runtime.CompilerServices.RuntimeServices.UnixTimeToLocal(Int64) owner=Named(\"System.Runtime.CompilerServices.RuntimeServices\") [System:30] IL instruction 1\n  at NeoMetadata_F4D7E48A324589F196803EFFF215918E160950B8507340F6FB3D0584B590E6CF.F_4D61696E() [NeoMetadata_F4D7E48A324589F196803EFFF215918E160950B8507340F6FB3D0584B590E6CF#1.0.0.0:0] IL instruction 1\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "--output-type",
+          "classlib",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/dotnet-duration/NeoCLR.Duration.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/ComparableTo.rvn",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/EquatableTo.rvn",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Duration.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "Build succeeded in 1,3s\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "--framework",
+          "net10.0",
+          "--emit-core-types-only",
+          "--refs",
+          "/private/tmp/calendar-services-final-1004/dotnet-duration/NeoCLR.Duration.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/dotnet-duration/Consumer.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-contract-consumer.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "Build succeeded in 1,2s\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/calendar-services-final-1004/dotnet-duration/Consumer.dll"
+        ],
+        "exitCode": 42,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/MutableCapture.dll",
+          "/private/tmp/calendar-services-final-1004/MutableCapture.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA001: Native emission does not support closure capture requires an immutable reference or supported primitive local.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/MutableScalarCapture.dll",
+          "/private/tmp/calendar-services-final-1004/MutableScalarCapture.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "error NEOMETA001: Native emission does not support closure capture requires an immutable reference or supported primitive local.\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--reference",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/BadCast.dll",
+          "/private/tmp/calendar-services-final-1004/BadCast.rvn"
+        ],
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "run",
+          "/private/tmp/calendar-services-final-1004/BadCast.dll",
+          "--module",
+          "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+          "--system",
+          "/private/tmp/calendar-services-final-1004/System.neox"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "Fault: unbox.any requires the exact boxed value type [code=InvalidCast] at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374:1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_45787472616374(Named(\"System.Object\")) [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767.F_4D61696E() [NeoMetadata_0EED5677655AB3A8BD0A5269A9F3BB5973746D7DBBDFEC76B82EF297B8BB6767#1.0.0.0:1] IL instruction 4\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/System.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/MissingLibrary.dll",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Bootstrap ownership for 'System.Disposable' requires exactly one declaration in 'NeoCLR.Collections'; found none.\n"
+      },
+      {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+          "assemble",
+          "/private/tmp/calendar-services-final-1004/DuplicateSeed.neoil",
+          "/private/tmp/calendar-services-final-1004/DuplicateSeed.neox",
+          "--format",
+          "neox"
+        ],
+        "exitCode": 0,
+        "stdout": "Assembled System -> /private/tmp/calendar-services-final-1004/DuplicateSeed.neox\n",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "dotnet",
+          "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+          "neoclr",
+          "--core-reference",
+          "/private/tmp/CalendarServiceCore-1004.dll",
+          "--runtime-seed",
+          "/private/tmp/calendar-services-final-1004/DuplicateSeed.neox",
+          "--bootstrap-ownership",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+          "--bootstrap-intrinsics",
+          "--library",
+          "-o",
+          "/private/tmp/calendar-services-final-1004/MissingLibrary.dll",
+          "runtime/raven/src/System/Disposable.rvn",
+          "runtime/raven/src/System/Collections/Iterator.rvn",
+          "runtime/raven/src/System/Collections/Iterable.rvn",
+          "runtime/raven/src/System/Collections/Collection.rvn",
+          "runtime/raven/src/System/Collections/Sequence.rvn",
+          "runtime/raven/src/System/Collections/MutableSequence.rvn",
+          "runtime/raven/src/System/Collections/List.rvn",
+          "runtime/raven/src/System/Propagatable.rvn",
+          "runtime/raven/src/System/Option.rvn",
+          "runtime/raven/src/System/Result.rvn",
+          "runtime/raven/src/System/Collections/ArrayList.rvn",
+          "runtime/raven/src/System/Collections/Comparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+          "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+          "runtime/raven/src/System/Collections/Map.rvn",
+          "runtime/raven/src/System/Collections/MutableMap.rvn",
+          "runtime/raven/src/System/Collections/HashMap.rvn",
+          "runtime/raven/src/System/Linq/SingleError.rvn",
+          "runtime/raven/src/System/Linq/Operators.rvn",
+          "runtime/raven/src/System/Array.rvn",
+          "runtime/raven/src/System/StringComparer.rvn",
+          "runtime/raven/src/System/ComparableTo.rvn",
+          "runtime/raven/src/System/EquatableTo.rvn",
+          "runtime/raven/src/System/Duration.rvn"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR: Runtime seed duplicates a source-owned declaration: System.Option`1\n"
+      }
+    ],
+    "artifacts": [
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_source_unions.py",
+        "sha256": "2fa20fb5869d64b15bc87828f8de8ba06cffb5168602c936ba9a08df536e2c8f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "sha256": "7de067fedd5df4ebb58a2932d5165558efdb4675f9825468e5ab0f512d4ed6ca"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "sha256": "e5a3029e43fa4e900210ccc18c8d399de125788f63929ee14c4a7dee9d5a51c3"
+      },
+      {
+        "path": "/private/tmp/CalendarServiceCore-1004.dll",
+        "sha256": "0300aabe1db839389a2ed95a530a19a503b9896dd0f078a70a6bb5222b401dc2"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/System.neox",
+        "sha256": "56c0010a515bbf7c9b25683de19306fd54770d8bc4da2b5801d24d2e5d8d69cc"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/NeoCLR.Collections.dll",
+        "sha256": "8253ea317879bb9cc33d46805087831ab1d4703e5793ac90906d280da0907678"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+        "sha256": "ae3679d1c4218b51f6275d1f0f3083a35523711ec147ba3dbb03265a4a5ab694"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/union-seed.neoil",
+        "sha256": "53676e709e3280a657d28df96ffd8a53b8e2d70a16bfea5ec9d26295aa2cf863"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/comparer-seed.neoil",
+        "sha256": "9c7e6e89f2da657dc82211b01adf19485af5eea44abe8437cb7a790eac9e5998"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-consumer.rvn",
+        "sha256": "de237a93ab7f8380530c4ee85fb5ad0e39e85ad897d7e50fb434d1aaf1fc973e"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/Consumer.dll",
+        "sha256": "75af2b909c3fd4368fff1e448e36f2c4740145c873cafcc00869af9996db2b25"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/NegativeCapacity.rvn",
+        "sha256": "d04d582629c5b092c55f83ac898e902d7856607567214d8484904e747353eb00"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/invalid/NegativeCapacity.dll",
+        "sha256": "9bc9cbfd7aa233e0448342d3bfa6466510b448c1e6658b19ba45a090037d0b32"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Disposable.rvn",
+        "sha256": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterator.rvn",
+        "sha256": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Iterable.rvn",
+        "sha256": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Collection.rvn",
+        "sha256": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Sequence.rvn",
+        "sha256": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableSequence.rvn",
+        "sha256": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/List.rvn",
+        "sha256": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Propagatable.rvn",
+        "sha256": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Option.rvn",
+        "sha256": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Result.rvn",
+        "sha256": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/ArrayList.rvn",
+        "sha256": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Comparer.rvn",
+        "sha256": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionComparer.rvn",
+        "sha256": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/EqualityComparer.rvn",
+        "sha256": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+        "sha256": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/Map.rvn",
+        "sha256": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/MutableMap.rvn",
+        "sha256": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Collections/HashMap.rvn",
+        "sha256": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/SingleError.rvn",
+        "sha256": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Linq/Operators.rvn",
+        "sha256": "615a01a8fa987959aba0a5b49a35fa479088b7aa15482a18b1c16e09470fb53b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Array.rvn",
+        "sha256": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/StringComparer.rvn",
+        "sha256": "b436f00a4b16f9d3121e367860daa7808a458b849c6c2f516aca5c5f4dc7cf97"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/ComparableTo.rvn",
+        "sha256": "6143925de5041ac427fdadbe31aab03c391e48b520ab8ea706801d425e2552f1"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/EquatableTo.rvn",
+        "sha256": "0abe8cc42a1a0430c85a80fedf1a450e909370276dde862846dd9dbd0ba4fbd9"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Duration.rvn",
+        "sha256": "c721be8cd945e3ca1dd94020d624880b3bd3240ee4844187db487577bf67d0bf"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/BadCast.rvn",
+        "sha256": "facd3b4918e846361ecadae4381c12ce6c0b3d8c94d4e0caa2e27fbd96e2869d"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/BadCast.dll",
+        "sha256": "fa9788175d2cc5ad098f3206d530eec5e7db366b509224b3d6e5a18aa5c5744d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn",
+        "sha256": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.expected.txt",
+        "sha256": "a3ad3c2feba43048173845f14ad098cd7301b07a283e661a8f0d6a889c1a03bb"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/Application.dll",
+        "sha256": "a7376b8e6ea8972ddf5e89988a72fb2ec89d1a104f2df02b91474fba4a3a6bd0"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/override-consumer.rvn",
+        "sha256": "fcac6722e46fda00afebf298cd7d956b6867d6e01776b6ed4d9221d334aa1ac8"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/Override.dll",
+        "sha256": "e53610fbe1072ae0bd8fa97c1165540d8cfc015867742a490c37e056fbf8641b"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.expected.txt",
+        "sha256": "dfcfcb802bc2ead4bf7fbc822036e6d2a26396af6d21c1c1c3b865ef1d5683a5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.expected.txt",
+        "sha256": "3402e03f3358b77b64747550cf175c77266234f6addf6c3d67c1e7b8c11590d8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/array-interface-count-consumer.rvn",
+        "sha256": "b9b4b2cad68abe8195bc5103a55bcffcb30206a3106dbd0cec4f34ed8f61896d"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/array-interface-count-consumer.dll",
+        "sha256": "b08582ff7b903ad34e195beca681d5525bbe5526a0964c7c113f8e2667540b2d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/nested-array-callback-consumer.rvn",
+        "sha256": "ee1560d2ff73a34e241dc709a9643556fdd20c3ed3df69d821211100c1da56a2"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/nested-array-callback-consumer.dll",
+        "sha256": "a5d56c6bd36f13ac6b11d828b2773f3310228112e0ac87e6e599334b11b4eb7f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/instance-callback-consumer.rvn",
+        "sha256": "15b2666453ee618f0720551da510685bbffab39e5af0de8e39db8d00416dcec5"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/instance-callback-consumer.dll",
+        "sha256": "9944e7f2a48ab229cc108adc3b7526f152590b31d9f2972d2b55df8c7d6be7e9"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/captured-reference-consumer.rvn",
+        "sha256": "ac940a6299e31cf052b778aa3a91a3a871d185842c15de72742b988533728aa3"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/captured-reference-consumer.dll",
+        "sha256": "cbb5742156ebc758086f36e989cab1036c0fe03a35bc70f1a7feec1d878711de"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/primitive-capture-consumer.rvn",
+        "sha256": "9d6eb6270c9b37b1d2883580ee4a6e8814ab86e9f8bad5a45e7ac919c58af849"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/primitive-capture-consumer.dll",
+        "sha256": "fc15a48c84b0ab6ee31d7517a4da0ad9b2ba98fe207f5fa1b4825ecd8030fd43"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/query-lifetime-consumer.rvn",
+        "sha256": "4c2cff76419ab2324b70464ec544570545904ca8834ef852c8f0a21d19fc54e6"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/query-lifetime-consumer.dll",
+        "sha256": "2a034593994cfe0508e360de3da5a0b31a8e4cc435211e677fa8b626c28a6795"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/range-consumer.rvn",
+        "sha256": "320a303019875b9afe3d034a88260749977515a9dbf4c1613a4a29c3d27bbd57"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/range-consumer.dll",
+        "sha256": "41396aae01b3620278da917a17f4c878b2359786fb02c031cd74ca6178e7eb3f"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-list-filters.rvn",
+        "sha256": "951981d63ec9665777421f835b756bac6784497b3ec23eb79d264b49d9e06f63"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-list-filters.dll",
+        "sha256": "02509fc6313eded5b789e4b4426c165a8b1f8fc18d8852e6b48f183e88e81f1c"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-array-callbacks.rvn",
+        "sha256": "a3e49891cb9a66cd88dba725638b4ba92bde156fb2a05db8de7738bd910934da"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-array-callbacks.dll",
+        "sha256": "8dd69527fe26813ece27bf4785eaa638183df22954774c482dbc1211ad794312"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option.rvn",
+        "sha256": "66e5d193209cb652154f2d6fcd66f41f885e9844c1e6b4fbd65dfa529712f0a6"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-option.dll",
+        "sha256": "f25146ca521a7353330c698cdb1cdf2c8bfa00ba35d4c0265d5b77e3896e84bd"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-option-propagation.rvn",
+        "sha256": "5200bb44b33e82081343133efd95e8632009afc59e9be1349aa25d49f19865df"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-option-propagation.dll",
+        "sha256": "5bbe62ffcb1af070424d16148dfef48bc1f1acbb5032e7c833501c6c27130d4d"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-collection-capabilities.rvn",
+        "sha256": "e9d5546e8206197bfbf4fc98015db2635fbdb52d02ad2f6de77f5b614f838929"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-collection-capabilities.dll",
+        "sha256": "c8958ffd19036e12e232a742ebb68a923c82641ee9d7e558f94e8fcb0bae7b1a"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/string-comparer-consumer.rvn",
+        "sha256": "85aa137a15dcb7e398b317df3af8533edb53f5297a4dfc7eec4ac275e3af773a"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/string-comparer-consumer.dll",
+        "sha256": "15618bcceb069af47de58a39d5703039a15b6e3ebf17cdfee6706f1e7307aadb"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/value-result-consumer.rvn",
+        "sha256": "5156bf41ca63a2461cc11b49c7b36c64e4aa20121b56efdb28b698be6785d5ea"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/value-result-consumer.dll",
+        "sha256": "458baa6547f8f7c03316ec172c97b02833a79ccb1b5f4aaa8cbccf3978ff1093"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-comparers.rvn",
+        "sha256": "aea9054ba153bab90efab6520172288f22954be734aca3735ac2e402b63648c3"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-comparers.dll",
+        "sha256": "2aa70ec27cc7eceec5bfd7f8ef1c7d2882366f3a9368fe74e3b9bbac1df5ab17"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-integers.rvn",
+        "sha256": "d42ccd726f6f3cebf8c0e5106853dbfe8a15fa3761313e1ee8dcd6246734566e"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-integers.dll",
+        "sha256": "b48aec5fe6c5993de4df7ecb7707d45874e2f2f80f9aac41e887ba03ed90dfd8"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-consumer.rvn",
+        "sha256": "62f8ef9a6f8034a752240337a651a640e8c12737e1df5675e83d190292894733"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/duration-consumer.dll",
+        "sha256": "258b1e05eb75cc5d4df155eceab179d97b2651cb3e4735924b26a0789245dec1"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-contract-consumer.rvn",
+        "sha256": "08a61577807ea604874e53cdc9a78921ee8fa7d2c9a0b0878aa5f8d4b1315ff6"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/duration-contract-consumer.dll",
+        "sha256": "af92929e66717f2e5b98e4dda4e592fc8929352ad2d78898ac9b631d77869bdc"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-services-consumer.rvn",
+        "sha256": "50e958e961cd427a650504eb92d9c5c665ce2af8be1e43adba2030a994e4a2a4"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/calendar-services-consumer.dll",
+        "sha256": "7ccaf5dfaed5fb23a050821d6988df12affc3ec36ac9c1ad8ed306d3f1840571"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-basics.rvn",
+        "sha256": "c54dcdc929845a6ce9dee3cbee4da1a8735ad8ffcdebc075a305c521afb28b21"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-query-basics.dll",
+        "sha256": "4c5b0d25014085efb9cb081ffd598af9e272f9aa9f2253a5149ba462646da1f5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-query-names.rvn",
+        "sha256": "5498135b6a4e423d4fbf8b2ac9ba9f44ae8556aec2ad3af46ba040dd4e4098b4"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/library-query-names.dll",
+        "sha256": "3abdfd43d56f93f43879fe758e72217d18880415c8c3873630ec5ecbdeb5f073"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/calendar-services-out-of-range.rvn",
+        "sha256": "5ba8d1d7160f304c678542f42438a1d1a6b5fc24cd440e35a5d831559f505cae"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/CalendarOutOfRange.dll",
+        "sha256": "03181c7c0c7d43cba1bd3e3325a0e69d76dd1c070d78071f3bfe5318220f28bf"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/ComparableTo.rvn",
+        "sha256": "6143925de5041ac427fdadbe31aab03c391e48b520ab8ea706801d425e2552f1"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/EquatableTo.rvn",
+        "sha256": "0abe8cc42a1a0430c85a80fedf1a450e909370276dde862846dd9dbd0ba4fbd9"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Duration.rvn",
+        "sha256": "c721be8cd945e3ca1dd94020d624880b3bd3240ee4844187db487577bf67d0bf"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/duration-contract-consumer.rvn",
+        "sha256": "08a61577807ea604874e53cdc9a78921ee8fa7d2c9a0b0878aa5f8d4b1315ff6"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/dotnet-duration/NeoCLR.Duration.dll",
+        "sha256": "656f480096a24eedeb6d0165522b74c1d1090eb9c42a81e5ac4def92e961aedd"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/dotnet-duration/Consumer.dll",
+        "sha256": "fabcdcd90e6b1f4513c6d24f64b54405b3601b4751de32610df42c35a44701cb"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/dotnet-duration/Consumer.runtimeconfig.json",
+        "sha256": "4b2e426ae6f5c1ae59f40b18b19ff6bde3d09f6c0a0f3dc1267ce87746ffafc3"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/MutableCapture.rvn",
+        "sha256": "f8c5faabbcf36304674cccd6daa8e20e4decead5166f41a7d3d96f1af01958a5"
+      },
+      {
+        "path": "/private/tmp/calendar-services-final-1004/MutableScalarCapture.rvn",
+        "sha256": "5fc50e91f653a8a2dc1eeb2f9f0477e77920f9758106c2939421a371f9be4aca"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll",
+        "sha256": "46bf1a5f1a9bcd45e71e0f96048f7af5dd365486e7feaca7556ae03e0f4b7247"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll",
+        "sha256": "8f1d7b7fe184349d1b21c77287f88c4fd81048fd6b6726f4035b693af5fdb4d5"
+      },
+      {
+        "path": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll",
+        "sha256": "d429c0dfd6c10b0f57ba3cee6dba2c99487b86ee6506453f6bea9ad58a0237c9"
+      }
+    ]
+  },
+  "dateInventory": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/CalendarServiceCore-1004.dll",
+      "--runtime-seed",
+      "/tmp/calendar-services-gate2-1004/System.neox",
+      "--bootstrap-ownership",
+      "docs/experiments/extended-cli-metadata/bootstrap/comparer-ownership.json",
+      "--bootstrap-intrinsics",
+      "--library",
+      "-o",
+      "/tmp/date-services-inventory-1004/NeoCLR.Collections.dll",
+      "runtime/raven/src/System/Disposable.rvn",
+      "runtime/raven/src/System/Collections/Iterator.rvn",
+      "runtime/raven/src/System/Collections/Iterable.rvn",
+      "runtime/raven/src/System/Collections/Collection.rvn",
+      "runtime/raven/src/System/Collections/Sequence.rvn",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn",
+      "runtime/raven/src/System/Collections/List.rvn",
+      "runtime/raven/src/System/Propagatable.rvn",
+      "runtime/raven/src/System/Option.rvn",
+      "runtime/raven/src/System/Result.rvn",
+      "runtime/raven/src/System/Collections/ArrayList.rvn",
+      "runtime/raven/src/System/Collections/Comparer.rvn",
+      "runtime/raven/src/System/Collections/FunctionComparer.rvn",
+      "runtime/raven/src/System/Collections/EqualityComparer.rvn",
+      "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn",
+      "runtime/raven/src/System/Collections/Map.rvn",
+      "runtime/raven/src/System/Collections/MutableMap.rvn",
+      "runtime/raven/src/System/Collections/HashMap.rvn",
+      "runtime/raven/src/System/Linq/SingleError.rvn",
+      "runtime/raven/src/System/Linq/Operators.rvn",
+      "runtime/raven/src/System/Array.rvn",
+      "runtime/raven/src/System/StringComparer.rvn",
+      "runtime/raven/src/System/ComparableTo.rvn",
+      "runtime/raven/src/System/EquatableTo.rvn",
+      "runtime/raven/src/System/InvalidDateError.rvn",
+      "runtime/raven/src/System/InvalidTimeError.rvn",
+      "runtime/raven/src/System/Date.rvn",
+      "runtime/raven/src/System/Time.rvn",
+      "runtime/raven/src/System/LocalDateTime.rvn",
+      "runtime/raven/src/System/Duration.rvn",
+      "runtime/raven/src/System/Calendar.rvn",
+      "runtime/raven/src/System/GregorianCalendar.rvn",
+      "runtime/raven/src/System/HebrewCalendar.rvn",
+      "runtime/raven/src/System/Globalization/Culture.rvn",
+      "runtime/raven/src/System/Globalization/CultureProvider.rvn",
+      "runtime/raven/src/System/Globalization/DateTimeFormat.rvn",
+      "runtime/raven/src/System/Globalization/DateTimeFormatDigits.rvn",
+      "runtime/raven/src/System/Globalization/FixedCultureProvider.rvn",
+      "runtime/raven/src/System/Globalization/HebrewDateTimeFormat.rvn",
+      "runtime/raven/src/System/Globalization/InvariantDateTimeFormat.rvn",
+      "runtime/raven/src/System/Globalization/Language.rvn",
+      "runtime/raven/src/System/Globalization/SwedishDateTimeFormat.rvn",
+      "runtime/raven/src/System/Globalization/SystemCultureProvider.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "info RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'long' is unnecessary because an implicit conversion exists.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'string'.\nerror RAV0021: Cannot apply indexing with [] to an expression of type 'string'.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'InvalidDateError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0908: Modifier 'public' is redundant because type members are public by default.\nwarning RAV0331: Member 'InvalidTimeError.ToString' hides inherited member 'object.ToString'. Add the 'new' modifier if hiding was intended.\nwarning RAV0403: The '!' operator treats the operand as non-null\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n",
+    "outputPublished": false,
+    "sourceHashes": {
+      "runtime/raven/src/System/Disposable.rvn": "5899f28a3f77a1e2b463689c2e25e19ce39200ea519f49ffba9a77cf0d35769d",
+      "runtime/raven/src/System/Collections/Iterator.rvn": "6fc46377ace7c8f7af8be7c9a90b574dfd878d37333982ef04cfc144c7196a14",
+      "runtime/raven/src/System/Collections/Iterable.rvn": "5c6ae049841d4ea32993a92d283f68dd9a36806958c683aa5866cb377d0f8f06",
+      "runtime/raven/src/System/Collections/Collection.rvn": "31656dc5518001c9f925fc2427cb55ceb8b4d329d156c9c473889bfd5f5251db",
+      "runtime/raven/src/System/Collections/Sequence.rvn": "11493ebbb8f28cb614d5e09ab5d9604c43dd5ee8596d16d6dda826bae0894c8a",
+      "runtime/raven/src/System/Collections/MutableSequence.rvn": "2864330e194dc665a65a4a3a31cae18c6ffb5473cb0086b14d02df05d6dc69d8",
+      "runtime/raven/src/System/Collections/List.rvn": "101d76f2f4d2b950bc59abd89938cb2e9ebea1d6e43087e80309b0de963a22d2",
+      "runtime/raven/src/System/Propagatable.rvn": "0f8af6a1fe29ca4be08f496e5b485c762ecdf6ae8d9197700697e6203e9ba98e",
+      "runtime/raven/src/System/Option.rvn": "d691d1e10b36c5484cd9d7e410cb12b11397e6b6bcffd5cc273a147c67399b96",
+      "runtime/raven/src/System/Result.rvn": "e251512b797a3eb0d536e3df32aed723e10541952cd9f6949f1b58c19b132835",
+      "runtime/raven/src/System/Collections/ArrayList.rvn": "74262ea7362de107ebc583e6887578f3fa69ecef905da52a8c0a9d718b535dd4",
+      "runtime/raven/src/System/Collections/Comparer.rvn": "bea7287fddab87ad0716aab38e82eb9837a03c121d6dd4fde96ab2f87c793592",
+      "runtime/raven/src/System/Collections/FunctionComparer.rvn": "94baeb9bb46d745819df394c2a8e73a7cb82361fa2d81e4709eab51aac7f96d0",
+      "runtime/raven/src/System/Collections/EqualityComparer.rvn": "820c9ab4936879f8f60a4882c3ea0bd266c3de4f562c8f61c49b8aac9801258b",
+      "runtime/raven/src/System/Collections/FunctionEqualityComparer.rvn": "3f98957438834dcbac9d23eaea41927ff52d74f358edfc4fcb33490d0f3a15ff",
+      "runtime/raven/src/System/Collections/Map.rvn": "2e62350aec516e1f74eed496ec08375fe367af09655bd42397680b275636640d",
+      "runtime/raven/src/System/Collections/MutableMap.rvn": "109b64c49882b813d5c532e6cf7ccc06cb907d38cb5eb6e3ffdfaf2ca72af627",
+      "runtime/raven/src/System/Collections/HashMap.rvn": "6018bde81a80d1e742bed28442ed499f843a3aaf177ae5103c0dfdc3a3b2486c",
+      "runtime/raven/src/System/Linq/SingleError.rvn": "bb496ec19e71b91857388b0499efd86c7a60612e1d533662c280165284b217d4",
+      "runtime/raven/src/System/Linq/Operators.rvn": "615a01a8fa987959aba0a5b49a35fa479088b7aa15482a18b1c16e09470fb53b",
+      "runtime/raven/src/System/Array.rvn": "6e421b09a2909d31ca48781106f8b9a82d9af59d9d0c9e6a30855c7284590c3f",
+      "runtime/raven/src/System/StringComparer.rvn": "b436f00a4b16f9d3121e367860daa7808a458b849c6c2f516aca5c5f4dc7cf97",
+      "runtime/raven/src/System/ComparableTo.rvn": "6143925de5041ac427fdadbe31aab03c391e48b520ab8ea706801d425e2552f1",
+      "runtime/raven/src/System/EquatableTo.rvn": "0abe8cc42a1a0430c85a80fedf1a450e909370276dde862846dd9dbd0ba4fbd9",
+      "runtime/raven/src/System/InvalidDateError.rvn": "9b47a6f1f4b41b6e64988a61239c7ac80f6667af7325b68d6d60fcd5d91f68f8",
+      "runtime/raven/src/System/InvalidTimeError.rvn": "f845856f6f260641c2c2823deaa4565feb0ecb003932904f1bf8bd22c37f0410",
+      "runtime/raven/src/System/Date.rvn": "92fc6097d206710c0a8e219e341d79a1cbdc40b54777da33785da042104c2f64",
+      "runtime/raven/src/System/Time.rvn": "fab4422e41fc4c1cd5f656734fc108e3aae049f25f04365913df9da418931e78",
+      "runtime/raven/src/System/LocalDateTime.rvn": "e78f3213dfc1b574b38171cdedf71e761db669873a40960718a12eaa2775f885",
+      "runtime/raven/src/System/Duration.rvn": "c721be8cd945e3ca1dd94020d624880b3bd3240ee4844187db487577bf67d0bf",
+      "runtime/raven/src/System/Calendar.rvn": "eca97a91ad9d567a5a5edcb014e58236b81defb4a0ee3466c15ab40a96ed595f",
+      "runtime/raven/src/System/GregorianCalendar.rvn": "991c7cda20edf39efb1a97e9cad37d03379cfc82eb0a1b36830eb7249a9208a4",
+      "runtime/raven/src/System/HebrewCalendar.rvn": "a899aa592f325777819034df6521e0e1d58353e5bba4bc1d1cd51d7edf1ff2e0",
+      "runtime/raven/src/System/Globalization/Culture.rvn": "aa59eb4b5d3d65e2ef7e9ffdaa3c946c20877b674019749144db3e81d5d04741",
+      "runtime/raven/src/System/Globalization/CultureProvider.rvn": "acfd6f76927c0058be1ecb895280bf1b2823e97cf5e808f2a86b69da25dc41af",
+      "runtime/raven/src/System/Globalization/DateTimeFormat.rvn": "6cf8550b80074817fba34e70d6f3e1630561b43c1a8308990585e3e60515d0cb",
+      "runtime/raven/src/System/Globalization/DateTimeFormatDigits.rvn": "430cdead1746c75c5a6ec951c127e5a0ae8236a784d0b4eea4d1cfc588161e4b",
+      "runtime/raven/src/System/Globalization/FixedCultureProvider.rvn": "4e98c0a7e46e21dae3077935329a7e8c12311175373940bdf921ec3272c1a452",
+      "runtime/raven/src/System/Globalization/HebrewDateTimeFormat.rvn": "fc810d52b949a4e7acac550ed073d526605580d553302fb65b272139eb04a8e3",
+      "runtime/raven/src/System/Globalization/InvariantDateTimeFormat.rvn": "fca49c1822e9f2e2ef7992827091e1d9c8706e324b5280717bbff015ce2c1498",
+      "runtime/raven/src/System/Globalization/Language.rvn": "ebb435acc91081f574f1515bb22870833ff5c3a935dc44ba3562fceacc022760",
+      "runtime/raven/src/System/Globalization/SwedishDateTimeFormat.rvn": "dc9cf0d525317dbdf44497ca8f761d4671b0cc0d07eabcfab0c4f5ada29a33bd",
+      "runtime/raven/src/System/Globalization/SystemCultureProvider.rvn": "c26c8cc06c13202ab38d69713b834663b9b6b4168ff924977e3c9c4d2961eb2c"
+    }
+  },
+  "oldSeedRejection": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/CalendarServiceCore-1004.dll",
+      "--runtime-seed",
+      "/tmp/long-gate-verified-1004/System.neox",
+      "--bootstrap-ownership",
+      "docs/experiments/extended-cli-metadata/bootstrap/calendar-foundation-ownership.json",
+      "--bootstrap-intrinsics",
+      "--reference",
+      "/tmp/calendar-services-gate2-1004/NeoCLR.Collections.dll",
+      "-o",
+      "/tmp/calendar-missing-service-1004.dll",
+      "docs/experiments/extended-cli-metadata/bootstrap/calendar-services-consumer.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "error NEOMETA001: Native emission does not support dependency method contract unavailable or ambiguous: get_Length() -> int (native method missing or ambiguous: System.String.get_Length).\n",
+    "outputPublished": false
+  },
+  "bootstrapSources": {
+    "docs/experiments/raven-target/CoreDeclarations.cs": "8f262faa6ce04e725a1466848def9c5de279206d28806ed7c396a7f68ca8c893",
+    "runtime/raven/generated/LocalDateTime.helpers.neoil": "165ffe4e95962e5eadfcd53a1dbb971489b72d3bd497f9b46a4bc1f54dea2447"
+  }
+}

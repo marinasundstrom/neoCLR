@@ -1,0 +1,6 @@
+import System.Runtime.CompilerServices.RuntimeServices
+
+func Main() -> int {
+    let fields = RuntimeServices.UnixTimeToLocal(9223372036854775807L)
+    return fields.Length
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Connect the explicit calendar bootstrap to existing host culture/local-time services
+  and grapheme-count String.Length. Convert service value arrays into fresh nominal
+  reference arrays with the established adapter. Native service/Unicode/fault checks,
+  broad application acceptance and paired Duration consumers pass. Date inventory now
+  reports only string-indexing binding errors. No compiler/runtime implementation change;
+  correct earlier integration wording from scalar indexing to the shipped grapheme model.
+
 - Add calendar-foundation acceptance with unchanged source-built Duration,
   ComparableTo and EquatableTo. The same reference-only consumer executes on .NET
   and NeoCLR; native ArrayList<Duration> storage/copy/iteration and the broad application

@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Calendar bootstrap services (2026-10-04): explicit core/seed bindings now execute host
+culture lookup, local-time conversion and grapheme-count String.Length. The existing
+value-array-to-reference-array adapter preserves nominal array ownership; Unicode,
+component/fraction/storage and range-fault checks pass alongside native broad application
+and paired Duration acceptance. No compiler/runtime implementation change. The unchanged
+Date dependency inventory now reports only string-indexing binding errors. Next bounded
+work remains the grapheme Char signature/indexer contract across import, emission and
+runtime linking; the earlier scalar-indexing wording was incorrect, not a new direction.
+[Evidence](experiments/extended-cli-metadata/calendar-services-2026-10-04.json).
+
 Duration foundation (2026-10-04): unchanged Duration, ComparableTo and EquatableTo
 compile into separately consumed libraries on both targets. The same value-contract
 consumer returns 42 on .NET and NeoCLR; native ArrayList<Duration> and broad application

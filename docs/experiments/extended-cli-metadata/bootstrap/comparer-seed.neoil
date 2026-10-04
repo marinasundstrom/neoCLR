@@ -36,6 +36,46 @@ ret
 .end
 .end
 .type System.Runtime.CompilerServices.RuntimeServices
+.method static SystemCultureName() -> String
+call neoCLR.Runtime.SystemCultureName()
+ret
+.end
+.method static UnixTimeToLocal(Int64 ticks) -> arrayref<Int32>
+; Convert the existing service value-array result to nominal reference storage.
+.local Int32[] source
+.local arrayref<Int32> destination
+.local Int32 index
+ldarg ticks
+call neoCLR.Runtime.UnixTimeToLocal(Int64)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Int32
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Int32
+stelem Int32
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
 .method static StringHashOrdinalIgnoreCase(String value) -> Int32
 ldarg 0
 call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
@@ -65,4 +105,11 @@ greater:
 ldc.i4 1
 ret
 .end
+.end
+
+.function neoCLR.Runtime.SystemCultureName() -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> Int32[]
+.methodimpl InternalCall
 .end
