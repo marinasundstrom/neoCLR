@@ -10625,3 +10625,18 @@ identity properties now fail with RAV0330, independently of writer validation.
   author's requested full numeric family. See the
   [strategy checkpoint](experiments/extended-cli-metadata/system-compilation-strategy.md)
   and [API contract](../api-docs/experimental-metadata.md).
+
+### 2026-10-04 — Future function-kind generic constraint
+
+- **Author:** asked to define a future constraint admitting a function type, suggesting
+  Raven's `func` keyword as the constraint syntax.
+- **Assistant response:** proposed recording `where T: func` as a future function-kind
+  constraint without nominal delegate identity, separate from current Number interface
+  bounds. Any-function versus signature-specific constraints still need specification.
+- **Existing context:** the structural-types proposal already sketches `where F : func`
+  for Callable<F>. This exchange reinforces that direction; it does not implement the
+  syntax, establish a metadata encoding, or promote structural Function experiments
+  from their feature branches. See [Callable<F>](proposals/structural-types.md#19-callablef).
+- **Action:** recorded the direction while continuing the owned-interface method-bound
+  metadata slice. Open decisions include signature compatibility, generic inference,
+  metadata representation and how the ordinary .NET target would reject or map it.

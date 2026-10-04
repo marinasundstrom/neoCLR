@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Record a future function-type constraint using Raven’s proposed `where F: func`
+  spelling. Signature requirements, metadata encoding and .NET target behavior
+  remain design questions; this does not add compiler or runtime support.
+
 - Extend the metadata IL generator's constrained call operation to static interface
   contracts, using standard CLI constrained./call and native nonborrowed callself.
   Substitute Self in stack signatures and retain exact implementation/operand checks.

@@ -703,6 +703,12 @@ interface Callable<F> : Callable
 
 where `F` must be a function type.
 
+Author follow-up (2026-10-04): define this constraint later, with Raven's `func`
+keyword as the proposed spelling. This remains a proposal, separate from nominal
+interface bounds under active metadata development. Any-function versus a required
+signature, variance/compatibility, inference, metadata encoding and .NET target
+mapping or rejection remain to be specified; no shipped support is implied.
+
 For example:
 
 ```text
