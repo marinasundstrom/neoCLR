@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Extend the checked native bootstrap catalog with 20 existing text services, including
+  graphemes, scalar vectors and UTF-8 slice outcomes. Separate native library/consumer
+  tests execute UnicodeScalar and text operations, including character-array mutation;
+  missing declarations reject without output. Canonical source String/Char ownership
+  remains open; no runtime implementation or metadata-format change is implied.
+
 - Verify the shared Raven conversion-cache fix (459856a71; independently validated
   main backport f0c3b75a0): empty-first and reverse-order numeric source builds pass.
   Native numeric, generic Number, broad application and combined Tasks consumers execute;

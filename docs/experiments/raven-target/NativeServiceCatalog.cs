@@ -7,6 +7,11 @@ static partial class RuntimeServiceBindings
 {
     static readonly string[] NativeSelection = [
         "Int32ToString", "Int64ToString",
+        "StringEquals", "StringFromChars", "StringGraphemeAt", "StringIntern", "StringConcat",
+        "StringCompareOrdinal", "StringCompareOrdinalIgnoreCase", "StringContainsOrdinal",
+        "StringStartsWithOrdinal", "StringEndsWithOrdinal", "StringGraphemeCount",
+        "CharFromString", "CharText", "CharCategory", "StringGraphemes", "StringScalars",
+        "StringByteCount", "StringSliceUtf8", "StringToUpperInvariant", "StringToLowerInvariant",
         "StringHashOrdinalIgnoreCase", "SystemCultureName", "UnixTimeTicks", "UnixTimeToLocal",
         "ParseBoolean", "ParseSByte", "ParseByte", "ParseInt16", "ParseUInt16", "ParseInt32", "ParseUInt32", "ParseInt64", "ParseUInt64", "ParseSingle", "ParseDouble",
         "Utf8Encode", "Utf8Decode", "FileOpenRead", "FileCreateNew", "FilePosition", "FileSeek",
@@ -26,7 +31,7 @@ static partial class RuntimeServiceBindings
     };
 
     static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "noresult"
-        or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
+        or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
 
     static (string Name, string[] Args, string Result)[] NativeMembers(string[]? selection = null)
     {
@@ -80,7 +85,8 @@ static partial class RuntimeServiceBindings
             if (vector)
                 text.AppendLine($".local {element}[] source\n.local {member.Result} destination\n.local Int32 index");
             for (int i = 0; i < member.Args.Length; i++) text.AppendLine("ldarg arg" + i);
-            text.AppendLine($"call neoCLR.Runtime.{member.Name}({string.Join(',', member.Args)})");
+            // Equality is the existing value comparison instruction, not a host service.
+            text.AppendLine(member.Name == "StringEquals" ? "ceq" : $"call neoCLR.Runtime.{member.Name}({string.Join(',', member.Args)})");
             if (member.Result == "noresult") text.AppendLine("pop");
             if (vector)
                 text.AppendLine($"stloc source\nldloc source\nldlen\nconv.i4\nnewarr {element}\nstloc destination\nldc.i4 0\nstloc index\nbr Test\nCopy:\nldloc destination\nldloc index\nldloc source\nldloc index\nldelem {element}\nstelem {element}\nldloc index\nldc.i4 1\nadd\nstloc index\nTest:\nldloc index\nldloc source\nldlen\nconv.i4\nblt Copy\nldloc destination");
@@ -90,7 +96,9 @@ static partial class RuntimeServiceBindings
         foreach (var member in NativeMembers())
         {
             // These services are already required by the primitive string/console seed.
-            if (member.Name is "StringHashOrdinalIgnoreCase" or "Int32ToString") continue;
+            if (member.Name is "StringEquals" or "StringHashOrdinalIgnoreCase" or "Int32ToString"
+                or "StringConcat" or "StringCompareOrdinal" or "StringCompareOrdinalIgnoreCase"
+                or "StringGraphemeCount" or "StringGraphemeAt" or "CharText") continue;
             var nativeResult = member.Result == "noresult" ? "Void" : member.Result.StartsWith("arrayref<", StringComparison.Ordinal) ? member.Result[9..^1] + "[]" : member.Result;
             text.AppendLine($".function neoCLR.Runtime.{member.Name}({string.Join(',', member.Args.Select((t, i) => t + " arg" + i))}) -> {nativeResult}\n.methodimpl InternalCall\n.end");
         }

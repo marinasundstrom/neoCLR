@@ -1,0 +1,54 @@
+import System.Runtime.CompilerServices.*
+
+public static class TextChecks {
+    static func Run() -> int {
+        let text = RuntimeServices.StringConcat("a", "é")
+        if !RuntimeServices.StringEquals(text, "aé") || RuntimeServices.StringEquals(text, "a") {
+            return 1
+        }
+        if RuntimeServices.StringByteCount(text) != 3 || RuntimeServices.StringGraphemeCount(text) != 2 {
+            return 2
+        }
+        if RuntimeServices.StringCompareOrdinal("a", "b") >= 0 || RuntimeServices.StringCompareOrdinalIgnoreCase("Å", "å") != 0 {
+            return 3
+        }
+        if !RuntimeServices.StringContainsOrdinal(text, "é") || !RuntimeServices.StringStartsWithOrdinal(text, "a") || !RuntimeServices.StringEndsWithOrdinal(text, "é") {
+            return 4
+        }
+        if RuntimeServices.StringToUpperInvariant("straße") != "STRASSE" || RuntimeServices.StringToLowerInvariant("ABC") != "abc" {
+            return 5
+        }
+        if RuntimeServices.StringIntern(text) != text {
+            return 6
+        }
+        let grapheme = RuntimeServices.CharFromString("é")
+        if RuntimeServices.CharText(grapheme) != "é" || RuntimeServices.CharText(RuntimeServices.StringGraphemeAt(text, 1)) != "é" {
+            return 7
+        }
+        let characters = RuntimeServices.StringGraphemes("aé")
+        if characters.Length != 2 || RuntimeServices.StringFromChars(characters) != "aé" {
+            return 8
+        }
+        characters[0] = RuntimeServices.CharFromString("b")
+        if RuntimeServices.StringFromChars(characters) != "bé" {
+            return 9
+        }
+        let scalars = RuntimeServices.StringScalars("A😀")
+        if scalars.Length != 2 || scalars[0] != (uint)65 || scalars[1] != (uint)128512 {
+            return 10
+        }
+        let slice = RuntimeServices.StringSliceUtf8(text, 1, 2)
+        if !RuntimeServices.IsValue<string>(slice) || RuntimeServices.UnpackValue<string>(slice) != "é" {
+            return 11
+        }
+        let boundary = RuntimeServices.StringSliceUtf8(text, 2, 1)
+        if !RuntimeServices.IsValue<byte>(boundary) || RuntimeServices.UnpackValue<byte>(boundary) != (byte)2 {
+            return 12
+        }
+        let outside = RuntimeServices.StringSliceUtf8(text, -1, 1)
+        if !RuntimeServices.IsValue<byte>(outside) || RuntimeServices.UnpackValue<byte>(outside) != (byte)1 {
+            return 13
+        }
+        return 42
+    }
+}

@@ -34,6 +34,176 @@ ldarg arg0
 call neoCLR.Runtime.Int64ToString(Int64)
 ret
 .end
+.method static StringEquals(String arg0,String arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+ceq
+ret
+.end
+.method static StringFromChars(arrayref<Char> arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.StringFromChars(arrayref<Char>)
+ret
+.end
+.method static StringGraphemeAt(String arg0,Int32 arg1) -> Char
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringGraphemeAt(String,Int32)
+ret
+.end
+.method static StringIntern(String arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.StringIntern(String)
+ret
+.end
+.method static StringConcat(String arg0,String arg1) -> String
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringConcat(String,String)
+ret
+.end
+.method static StringCompareOrdinal(String arg0,String arg1) -> Int32
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringCompareOrdinal(String,String)
+ret
+.end
+.method static StringCompareOrdinalIgnoreCase(String arg0,String arg1) -> Int32
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringCompareOrdinalIgnoreCase(String,String)
+ret
+.end
+.method static StringContainsOrdinal(String arg0,String arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringContainsOrdinal(String,String)
+ret
+.end
+.method static StringStartsWithOrdinal(String arg0,String arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringStartsWithOrdinal(String,String)
+ret
+.end
+.method static StringEndsWithOrdinal(String arg0,String arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.StringEndsWithOrdinal(String,String)
+ret
+.end
+.method static StringGraphemeCount(String arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.StringGraphemeCount(String)
+ret
+.end
+.method static CharFromString(String arg0) -> Char
+ldarg arg0
+call neoCLR.Runtime.CharFromString(String)
+ret
+.end
+.method static CharText(Char arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.CharText(Char)
+ret
+.end
+.method static CharCategory(UInt32 arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.CharCategory(UInt32)
+ret
+.end
+.method static StringGraphemes(String arg0) -> arrayref<Char>
+.local Char[] source
+.local arrayref<Char> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.StringGraphemes(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr Char
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem Char
+stelem Char
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.method static StringScalars(String arg0) -> arrayref<UInt32>
+.local UInt32[] source
+.local arrayref<UInt32> destination
+.local Int32 index
+ldarg arg0
+call neoCLR.Runtime.StringScalars(String)
+stloc source
+ldloc source
+ldlen
+conv.i4
+newarr UInt32
+stloc destination
+ldc.i4 0
+stloc index
+br Test
+Copy:
+ldloc destination
+ldloc index
+ldloc source
+ldloc index
+ldelem UInt32
+stelem UInt32
+ldloc index
+ldc.i4 1
+add
+stloc index
+Test:
+ldloc index
+ldloc source
+ldlen
+conv.i4
+blt Copy
+ldloc destination
+ret
+.end
+.method static StringByteCount(String arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.StringByteCount(String)
+ret
+.end
+.method static StringSliceUtf8(String arg0,Int32 arg1,Int32 arg2) -> Value
+ldarg arg0
+ldarg arg1
+ldarg arg2
+call neoCLR.Runtime.StringSliceUtf8(String,Int32,Int32)
+ret
+.end
+.method static StringToUpperInvariant(String arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.StringToUpperInvariant(String)
+ret
+.end
+.method static StringToLowerInvariant(String arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.StringToLowerInvariant(String)
+ret
+.end
 .method static StringHashOrdinalIgnoreCase(String arg0) -> Int32
 ldarg arg0
 call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
@@ -264,6 +434,45 @@ ret
 .end
 .end
 .function neoCLR.Runtime.Int64ToString(Int64 arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringFromChars(arrayref<Char> arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringIntern(String arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringContainsOrdinal(String arg0,String arg1) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringStartsWithOrdinal(String arg0,String arg1) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringEndsWithOrdinal(String arg0,String arg1) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharFromString(String arg0) -> Char
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharCategory(UInt32 arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringGraphemes(String arg0) -> Char[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringScalars(String arg0) -> UInt32[]
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringByteCount(String arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringSliceUtf8(String arg0,Int32 arg1,Int32 arg2) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringToUpperInvariant(String arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.StringToLowerInvariant(String arg0) -> String
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SystemCultureName() -> String

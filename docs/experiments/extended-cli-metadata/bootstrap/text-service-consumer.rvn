@@ -1,0 +1,11 @@
+import System.Text.*
+
+func Main() -> int {
+    if !UnicodeScalar.IsDigit((uint)48) || !UnicodeScalar.IsLetter((uint)197) || !UnicodeScalar.IsSymbol((uint)128512) {
+        return 20
+    }
+    if !UnicodeScalar.IsWhiteSpace((uint)32) || UnicodeScalar.IsLetter((uint)48) {
+        return 21
+    }
+    return TextChecks.Run()
+}

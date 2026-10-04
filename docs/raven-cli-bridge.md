@@ -5708,3 +5708,23 @@ regression is independently fixed and validated on main at f0c3b75a0, with 139 t
 passing on each line. [Evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
 Next capability batch remains source-owned String/Char and common text-service binding;
 full System and complete rebuilt-library dual-target execution remain open.
+
+
+### Checked text-service family (2026-10-04)
+
+The explicit native service catalog now wires 20 existing text operations from the
+same signature inventory used by legacy translation. Char and UInt32 scalars/vectors
+are admitted by the catalog; vector results are copied into native managed arrays.
+String equality uses native value comparison; existing seed host functions are reused.
+Native intent is Unicode graphemes and UTF-8 strings, not CLR char/String internals.
+The CLI primitive core only supplies signature transport; executable native seed
+bindings call the existing runtime services. No compiler, native format or runtime
+implementation changes are needed by this prerequisite. No .NET text parity is claimed.
+
+Separate native library/consumer execution includes the unchanged UnicodeScalar source,
+character-array mutation and UTF-8 success/error payloads. The expanded-seed numeric
+gate also passes. An incomplete old core rejects with RAV0117 and publishes no output.
+Canonical source-owned String/Char storage remains open; actual String reaches its
+explicit interface Count-property rejection. The eventual replacement is native source
+primitive ownership and accessor emission, not additional CLI application projections.
+[Evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).

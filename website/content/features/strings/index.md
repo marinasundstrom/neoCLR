@@ -274,3 +274,10 @@ also compiles into a separate algorithms library. A consumer using only emitted 
 references executes arithmetic, Zero/One, inherited ordering and generic forwarding for
 all ten numeric types. This is a development integration gate; full class-library
 compilation and broader generic constraints remain ongoing.
+
+
+Development integration: the Raven-to-NeoCLR native bootstrap now executes the existing
+text-service family through separately compiled libraries, including grapheme vectors,
+Unicode scalar classification and UTF-8 slice errors. The compiler's source-owned
+String/Char implementation is still in progress; this gate uses explicit bootstrap
+ownership and does not establish .NET text parity.

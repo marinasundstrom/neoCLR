@@ -22,6 +22,17 @@ cache guards; it passes 139 focused .NET tests independently and is fast-forward
 main. The integration branch passes the same 139 tests. See [evidence](source-order-conversions-2026-10-04.json).
 Priority 1 below is now the next feature batch. No runtime/metadata representation changed.
 
+Priority 1 prerequisite now executes: the catalog selects 20 existing text services,
+including Char/UInt32 and vector transports. Separate native library/consumer execution
+covers unchanged UnicodeScalar and a text-service contract fixture; missing declarations
+reject without output. The full numeric gate passes against the expanded seed.
+[Text evidence](text-services-native-2026-10-04.json). Actual String source advances to
+an explicit-interface-property emission rejection (Collection<char>.Count). Char source
+emits, but canonical source ownership and execution are not established. Next bounded
+work is explicit interface accessor emission, followed by source-owned String/Char
+storage and identity; do not infer canonical primitive support from emission alone.
+
+
 **Original reproduction: source-order-dependent generic interface binding.** Prepending
 an empty file (`// No declarations.`) to the accepted source set produces two RAV1504
 errors assigning ArrayList<byte> to List<byte> in MemoryStream. The same baseline

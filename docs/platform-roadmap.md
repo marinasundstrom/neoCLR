@@ -20,6 +20,12 @@ numeric, generic Number, broad application and task consumers execute. Raven 459
 and independently validated main f0c3b75a0 each pass 139 focused .NET tests.
 [Execution and regression evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
 
+The common text-service prerequisite now executes through native libraries: Unicode
+scalar classification, grapheme/vector operations, Unicode casing and UTF-8 slicing.
+The expanded seed preserves the numeric gate. Actual String source reaches an explicit
+interface Count-property emission rejection; Char source emission alone does not prove
+canonical ownership. [Text evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).
+
 Next prioritize source-owned String/Char and coherent text-service bindings (shared
 by text, stream, storage and JSON sources), ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and

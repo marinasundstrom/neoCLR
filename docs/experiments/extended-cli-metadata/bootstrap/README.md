@@ -1008,3 +1008,39 @@ an artifact-only consumer. It expects exit 99 and empty stdout. The retained see
 no competing Int32/Int64 copies. Old consumers of seed-owned numeric members require
 rebuilding; undeclared dependency errors are not bypassed. Generic constrained Number
 calls remain separate work. See ../numeric-source-family-2026-10-04.json.
+
+
+### Native text-service boundary (2026-10-04)
+
+The native catalog now selects the existing string operations, grapheme operations,
+Unicode scalar categories and UTF-8 byte/slice services as one coherent family.
+It admits Char/UInt32 and their vector transports. StringEquals uses the existing
+native value-comparison instruction; it is not a new host call. Host declarations
+already provided by union-seed are reused, avoiding duplicate native definitions.
+
+Rebuild Probe with the matching RavenRoot, run `--native-service-catalog-checks`, then
+regenerate the catalog and primitive core and assemble numeric-seed as in the numeric
+gate above. Rebuild Numbers against those exact dependencies. Run:
+
+```sh
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_text_services.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --core /path/to/TextCore.dll --seed /path/to/TextSystem.neox \
+  --base-library /path/to/numeric-gate/Numbers.dll \
+  --ownership /path/to/numeric-gate/ownership.json --output /tmp/fresh-text-gate
+```
+
+Optionally pass `--incomplete-core` pointing to the previous numeric core to verify
+missing text services produce RAV0117 and no output. The test compiles unchanged
+UnicodeScalar plus a service-contract test library, then a source-free consumer.
+Verification and execution check equality, ordering, Unicode casing, grapheme count/
+construction/indexing, mutable grapheme vectors, scalar vectors and UTF-8 slicing
+(including invalid boundary and range outcomes). Expected exit: 42, empty stdout.
+[Evidence](../text-services-native-2026-10-04.json).
+
+This is the dependency boundary, not a replacement String implementation. String/Char
+remain bootstrap-owned. Adding actual String source now reaches emission and rejects
+its explicit interface Count property; source-owned storage and primitive identity
+must be implemented/validated together afterward. Native Char is a grapheme, unlike
+.NET's UTF-16 code unit; the CLI core is signature transport and not an executable
+implementation or proof of .NET parity. Existing runtime semantics are unchanged.

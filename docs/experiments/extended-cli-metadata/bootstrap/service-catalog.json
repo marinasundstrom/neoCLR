@@ -970,7 +970,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -983,7 +983,7 @@
         "scalar",
         "vector"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -996,7 +996,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1008,7 +1008,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1021,7 +1021,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1034,7 +1034,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1059,7 +1059,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1072,7 +1072,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1085,7 +1085,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1098,7 +1098,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1136,7 +1136,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1148,7 +1148,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1160,7 +1160,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1173,7 +1173,7 @@
         "scalar",
         "vector"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1186,7 +1186,7 @@
         "scalar",
         "vector"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1198,7 +1198,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1213,7 +1213,7 @@
         "erased-value",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1239,7 +1239,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1251,7 +1251,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1528,7 +1528,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
