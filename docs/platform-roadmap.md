@@ -41,8 +41,12 @@ The [post-text audit and encoding gate](experiments/extended-cli-metadata/source
 now prove seven unchanged encoding sources in a separate native library, incremental
 UTF-8/ASCII execution, and preserved native text/.NET emission controls. The 75-source
 baseline and 81-source task combination compile. Memory streams are already part of
-that baseline. Next fix the lowered required-result wrapper exposed by StreamReader/Writer
-and execute them over MemoryStream, then expand JSON document/value support.
+that baseline. The lowered required-result/early-return wrapper is now fixed: five unchanged text-stream
+sources compile as another native assembly and execute over source-built MemoryStream.
+[Stream gate and evidence](experiments/extended-cli-metadata/source-text-streams-2026-10-04.md).
+Next address nominal hierarchy/signature admission exposed by the focused JSON
+DocumentReader/JsonValue source group; add the standalone ReflectionError union to its
+explicit source dependencies, without pulling in runtime introspection services.
 
 Next expand the verified text-service foundation into stream, storage and JSON sources, ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and

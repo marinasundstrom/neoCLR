@@ -758,3 +758,13 @@ provider. Seven encoding sources execute after a portable field-receiver fix. Th
 high-leverage demonstrated failure is a required-result expression wrapper in text
 streams; address it before broadening services or beginning JSON object mapping.
 The cumulative source/bootstrap String binding limitation remains recorded.
+
+### Text streams and focused JSON frontier (2026-10-04)
+
+The [text-stream gate](source-text-streams-2026-10-04.md) executes five unchanged sources
+against native text/encoding dependencies, including error paths and resource ownership.
+The focused JsonDocument/JsonSyntax/JsonValue/JsonError plus ReflectionError source set
+passes binding and rejects callable admission for DocumentReader.Value's
+Result<JsonValue, JsonError> signature. Work next on nominal class hierarchy admission
+and representation; do not expand all introspection services based on the old broad
+JSON family's missing-service diagnostics. JSON execution and full System remain open.

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Execute five unchanged source-built text-stream types against native encoding and
+  text libraries. Verify Unicode line/whole-stream I/O, byte counts, EOF, shared cursor,
+  leave-open, limits and malformed-input errors. Raven now preserves match-initializer
+  early returns; unsafe nested exits still reject before output. The focused JSON
+  document frontier now reaches nominal hierarchy/signature admission.
+
 - Refresh the full-System audit after native Char/String ownership and establish a
   separate source-built encoding-library gate. UTF-8 incremental encode/decode, ASCII
   rejection, malformed input, and field evaluation/failure consumers execute through

@@ -186,3 +186,8 @@ Development encoding coverage now includes seven unchanged source-library files 
 as a separate native assembly. An artifact-only consumer incrementally encodes and
 decodes UTF-8, including split scalar boundaries, and checks ASCII and malformed-input
 errors. Text-stream integration and the broader JSON library gate remain in progress.
+
+The development text-stream layer also compiles separately against those native
+libraries. Executable checks cover Unicode line/whole-stream reads and writes, EOF,
+byte limits, malformed UTF-8 and leave-open behavior over source-built MemoryStream.
+The JSON document layer next exposes native class-hierarchy support still to complete.

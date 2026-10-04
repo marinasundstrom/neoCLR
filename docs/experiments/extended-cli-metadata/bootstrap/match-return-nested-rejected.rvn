@@ -1,0 +1,16 @@
+import System.*
+import System.Result.*
+
+func Add(left: int, right: int) -> int => left + right
+
+func Read(choice: Result<int, string>) -> int {
+    return Add(1, {
+        let value = match choice {
+            Ok(let item) => item
+            Error(_) => return 42
+        }
+        value
+    })
+}
+
+func Main() -> int => Read(Error("stop"))

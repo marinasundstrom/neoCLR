@@ -1,0 +1,20 @@
+import System.*
+import System.Result.*
+
+func Read(choice: Result<int, string>) -> int {
+    let value = match choice {
+        Ok(let item) => item
+        Error(_) => return 42
+    }
+    return value + 1
+}
+
+func Main() -> int {
+    if Read(Ok(16)) != 17 {
+        return 1
+    }
+    if Read(Error("stop")) != 42 {
+        return 2
+    }
+    return 42
+}
