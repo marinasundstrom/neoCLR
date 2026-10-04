@@ -712,3 +712,30 @@ regeneration failure and array-element receiver addresses remain open.
 
 Run the existing verification command with --offsets and the matching Clock core.
 [Offset execution and next-source inventory](../offset-source-2026-10-04.json).
+
+
+## Source streams and inhabited unit (2026-10-04)
+
+After producing the offset gate's NeoCLR.Collections.dll, run:
+
+```sh
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_source_streams.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --core /path/to/ClockCore.dll --seed /path/to/System.neox \
+  --base-library /path/to/NeoCLR.Collections.dll --output /tmp/new-stream-gate
+```
+
+The driver adds explicit NeoCLR.CoreProbe/System.Void unit ownership and builds five
+unchanged System.IO sources as Streams.dll. It validates source ownership when the
+consumer imports that artifact. No library source is passed to consumer compilation.
+The consumer checks byte write/read, shared cursor/interface identity, Result<unit,
+StreamError> success and closed errors. A second library checks generic unit return
+storage/discarding, unit arrays and no-result calls; both consumers verify and exit 42
+with empty stdout. validation.json records commands and input/artifact hashes.
+
+This uses existing native inhabited Void metadata; direct callable unit results remain
+no-result. The ordinary .NET control uses System.ValueTuple and the existing backend;
+38 focused C# tests passed. Evidence: /tmp/stream-gate-final-1004/validation.json (Raven 82f30272f). A single PE
+containing the previous 48 sources plus streams exceeds schema 2's 1 MiB envelope;
+separate native libraries work. The size limit remains a full-library blocker, not a
+reason to fall back to translated metadata. Website/public APIs are unchanged.

@@ -1,0 +1,5 @@
+func Main() -> int {
+    UnitContracts.Echo<unit>(())
+    UnitContracts.Notify()
+    return UnitContracts.Run()
+}

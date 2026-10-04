@@ -1,0 +1,11 @@
+public static class UnitContracts {
+    public static func Echo<T>(value: T) -> T => value
+    public static func Notify() { }
+    public static func Run() -> int {
+        Echo<unit>(())
+        Notify()
+        let copy = Echo<unit>(())
+        let values: unit[] = [copy, ()]
+        return values.Length + 40
+    }
+}

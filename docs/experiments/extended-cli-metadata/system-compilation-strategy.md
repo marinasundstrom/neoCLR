@@ -143,3 +143,19 @@ directory. Use the matching Clock comparer core/seed documented in bootstrap/REA
 The JSON records commands, source hashes, revisions, errors and output publication.
 Minimal probes are embedded in the tool and materialized in the audit directory.
 The checked-in evidence also records the additional explicit-unit-contract experiment.
+
+
+## Batch 1 implementation evidence, 2026-10-04
+
+Inhabited unit is now admitted through the portable signature/local planner using the
+explicit existing RuntimeUnitContract. Generic unit returns retain their physical
+value result; ordinary unit-returning calls remain no-result. Five unchanged stream
+sources compile separately and their imported consumer executes byte mutation, shared
+interface/cursor identity and Flush success/error. A separate generic-unit consumer
+covers values, arrays and discarded returns. See bootstrap/verify_source_streams.py
+and bootstrap/README.md. 38 focused C#/.NET controls pass.
+
+The cumulative 53-source single PE now reaches the schema-2 1 MiB encoding limit after
+binding/emission. It does not publish output. The supported separate-library workflow
+passes; whole-library container sizing remains an additional shared blocker. Erased
+Value and the common ABI catalog are still pending; the first batch is not complete.

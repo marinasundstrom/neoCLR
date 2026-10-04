@@ -1,0 +1,24 @@
+import System.*
+import System.IO.*
+import System.Result.*
+
+func Main() -> int {
+    let stream = MemoryStream()
+    let output: OutputStream = stream
+    let input: InputStream = stream
+    let seek: SeekableStream = stream
+    let bytes: byte[] = [(byte)40, (byte)2]
+    let Ok(written) = output.Write(bytes, 0, 2) else { return 1 }
+    if written != 2 { return 2 }
+    let Ok(_) = output.Flush() else { return 3 }
+    let Ok(_) = seek.Seek(0L) else { return 4 }
+    let buffer: byte[] = [(byte)0, (byte)0]
+    let Ok(read) = input.Read(buffer, 0, 2) else { return 5 }
+    if read != 2 || buffer[0] != (byte)40 || buffer[1] != (byte)2 { return 6 }
+    output.Close()
+    match output.Flush() {
+        .Ok(_) => { return 7 }
+        .Error(_) => {}
+    }
+    return 42
+}

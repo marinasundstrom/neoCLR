@@ -1698,3 +1698,13 @@ Raven's .NET UnionAttribute, case-name/ordinal and generic companion contracts t
 the existing runtime custom_attributes representation. No union-only wire format or
 unmarked-struct fallback is planned. Encoding and native union execution remain unproved.
 [Case/unit evidence](experiments/extended-cli-metadata/union-case-unit-2026-10-03.json).
+
+
+### 2026-10-04 capability-batch progress
+
+The [System strategy](experiments/extended-cli-metadata/system-compilation-strategy.md)
+unit subgate now executes unchanged MemoryStream from a separate native library,
+including Result<unit, E>, shared interface identity and byte mutation. Generic-unit
+storage/calls and 38 focused .NET controls pass. Erased Value/service ABI work remains
+next. A cumulative single PE also exposes the existing 1 MiB envelope bound; separate
+libraries remain supported. This is not full-System completion.

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Complete explicit inhabited-unit signature/local admission in Raven's portable
+  planner. Add separate native stream and generic-unit library/consumer execution:
+  unchanged MemoryStream, Flush outcomes, interface identity, unit arrays and generic
+  returns pass. Preserve no-result calls and ordinary .NET behavior (38 focused tests).
+  The cumulative single PE still exceeds schema 2's 1 MiB limit; this is recorded,
+  not relaxed implicitly. No metadata/runtime representation changes.
+
 - Reprioritize full-System compilation by shared capability blockers at the author's
   direction. Add a reproducible 166-source/family/probe audit and evidence-backed
   strategy: unit/erased values and common service ABI first, then reusable metadata,
