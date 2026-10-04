@@ -1,0 +1,28 @@
+{
+  "runtimeBaseRevision": "2d80dfd4a591d327a4b7fbb3be031150b04dbbdc",
+  "scope": "Reader-only local nongeneric base support plus independent three-binary-module runtime control; not Raven/writer inheritance completion.",
+  "sources": {
+    "tests/class_inheritance.rs": "8242111b7a30cf4d7bb4b4f9f3f6ff49d6d1206671f7cdc8040aaa9effa30c8a",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/ClassBaseReaderChecks.cs": "a392fa4fe38e1c070804965c9df54148ecd2cb4fb0893fccb31f5a8a47240b78",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeAssemblyDefinition.cs": "2f3a9c674f32a5c1e6b02eb8d5eb8392e10c8124bab41efdd957ee8240a897cc",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/NativeDefinitionReader.cs": "d145c7f237aff6342d87ad888d57ad4c5eed91ddca8603d1891db779629c0cb6",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AssemblyDefinition.cs": "952986f087ff2491f43f20538d5393a9cc94919ded4ec180599cc370220102ff",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Model/AuthoredDefinitions.cs": "35982f24f0321c8bb437ed755851d38251105c51e33891719463f97142c435a8",
+    "tools/metadata/NeoCLR.Metadata.Experimental/Introspection/MetadataInfo.cs": "fb3402899c94e61ee39245bbccb615bddba45aaef0bc721ae72c8a8102bdc8b8"
+  },
+  "checks": [
+    {
+      "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+      "result": "144/144 C# metadata contract tests passed"
+    },
+    {
+      "command": "cargo test --test class_inheritance",
+      "result": "8 passed; 0 failed",
+      "nativeBinaryControlResult": 42
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "result": "pre-existing stale guest API snapshot; host C# APIs documented in manual reference"
+    }
+  ]
+}

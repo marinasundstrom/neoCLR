@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Materialize local nongeneric native class bases in metadata definitions and the
+  introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,
+  missing and unsupported bases; reject reference projection rather than dropping
+  inheritance. A three-binary-assembly runtime regression verifies constructor chaining,
+  inherited mutation, virtual dispatch and identity. Writer/Raven hierarchy emission
+  remains the next integration step.
+
 - Execute five unchanged source-built text-stream types against native encoding and
   text libraries. Verify Unicode line/whole-stream I/O, byte counts, EOF, shared cursor,
   leave-open, limits and malformed-input errors. Raven now preserves match-initializer

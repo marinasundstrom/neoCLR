@@ -337,7 +337,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -452,9 +452,11 @@ public sealed partial class ModuleDefinition
 public sealed partial class TypeDefinition
 {
     private readonly uint declaringToken;
+    private readonly uint loadedBaseTypeToken;
     internal TypeDefinition(ModuleDefinition module, AssemblyDefinition.TypeRow row)
     {
         Module = module;
+        loadedBaseTypeToken = row.BaseTypeToken;
         GenericParameterNames = row.NativeGenericNames is { } names ? Array.AsReadOnly((string[])names.Clone()) : null;
         nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(signature =>
         {

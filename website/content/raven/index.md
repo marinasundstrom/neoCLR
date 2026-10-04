@@ -191,3 +191,8 @@ The development text-stream layer also compiles separately against those native
 libraries. Executable checks cover Unicode line/whole-stream reads and writes, EOF,
 byte limits, malformed UTF-8 and leave-open behavior over source-built MemoryStream.
 The JSON document layer next exposes native class-hierarchy support still to complete.
+
+Development hierarchy work now preserves local nongeneric native bases in the metadata
+reader/introspection facade. A three-binary-assembly runtime control verifies base
+construction, inherited mutation, dispatch and identity. Raven and metadata-builder
+inheritance emission remain in progress; this is not yet JSON compilation support.

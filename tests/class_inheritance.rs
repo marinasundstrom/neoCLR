@@ -170,3 +170,120 @@ ret
         Value::String("kept".into())
     );
 }
+
+#[test]
+fn three_binary_assemblies_preserve_base_construction_dispatch_and_identity() {
+    let base = r#"
+.module Models
+.revision r1
+.type class Base
+.field Number Int32
+.method instance .ctor(Int32 number) -> noresult
+ldarg this
+ldarg number
+stfld Base::Number
+ret
+.end
+.method instance virtual Read() -> Int32
+ldarg this
+ldfld Base::Number
+ret
+.end
+.end
+"#;
+    let derived = r#"
+.module Implementation
+.revision r1
+.references (Models#r1)
+.type class Derived
+.extends Base
+.field Extra Int32
+.method instance .ctor(Int32 number,Int32 extra) -> noresult
+ldarg this
+ldarg number
+call instance Base::.ctor(Int32)
+ldarg this
+ldarg extra
+stfld Derived::Extra
+ret
+.end
+.method instance override Read() -> Int32
+ldarg this
+ldfld Base::Number
+ldarg this
+ldfld Derived::Extra
+add
+ret
+.end
+.end
+"#;
+    let app = r#"
+.module Consumer
+.references (Models#r1,Implementation#r1)
+.entry Main
+.function Main() -> Int32
+.local Derived original
+.local Base view
+.local Int32 first
+ldc.i4 40
+ldc.i4 2
+newobj instance Derived::.ctor(Int32,Int32)
+stloc original
+ldloc original
+stloc view
+ldloc view
+callvirt instance Base::Read()
+stloc first
+ldloc view
+ldc.i4 41
+stfld Base::Number
+ldloc original
+callvirt instance Base::Read()
+ldc.i4 43
+ceq
+brfalse Bad
+ldloc first
+ldc.i4 42
+ceq
+brfalse Bad
+ldloc view
+castclass Derived
+ldloc original
+ref.eq
+brfalse Bad
+ldc.i4 42
+ret
+Bad:
+ldc.i4 0
+ret
+.end
+"#;
+    let modules = neoclr::assembler::assemble_modules(&[app, base, derived]).unwrap();
+    let decoded: Vec<_> = modules
+        .iter()
+        .map(|module| {
+            let image = neoclr::metadata_container::write_module(module).unwrap();
+            assert_eq!(&image[..4], b"NEOX");
+            neoclr::metadata_container::decode_envelope(&image).unwrap()
+        })
+        .collect();
+    let program = neoclr::LoadedProgram::with_modules(
+        &decoded[0],
+        neoclr::library::system().unwrap(),
+        &decoded[1..],
+    )
+    .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+    assert!(
+        neoclr::LoadedProgram::with_modules(
+            &decoded[0],
+            neoclr::library::system().unwrap(),
+            &decoded[2..],
+        )
+        .is_err()
+    );
+}

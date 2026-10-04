@@ -10,6 +10,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
+        internal string? BaseName { get; init; }
+        internal int BaseIndex { get; set; } = -1;
         internal PrimitiveType? NativePrimitive { get; init; }
         internal bool NativeGrapheme { get; init; }
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
@@ -137,6 +139,7 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var type in typeElements)
             {
                 var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
+                if (type.TryGetProperty("base", out _)) typeFields.Add("base");
                 var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
                 if (type.TryGetProperty("generic_parameters", out _)) typeFields.Add("generic_parameters");
                 var constraints = new List<(int Parameter, string Bound)>();
@@ -296,7 +299,19 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+            }
+            for (int i = 0; i < types.Count; i++)
+            {
+                var type = types[i];
+                if (type.BaseName is null) continue;
+                type.BaseIndex = types.FindIndex(candidate => candidate.NativeName == type.BaseName);
+                Require(type.BaseIndex >= 0, "base class must be a local declaration");
+                var parent = types[type.BaseIndex];
+                Require(IsOrdinaryClass(type) && IsOrdinaryClass(parent), "unsupported base class category");
+                var seen = new HashSet<int>();
+                for (var current = i; current >= 0; current = types[current].BaseName is { } name ? types.FindIndex(candidate => candidate.NativeName == name) : -1)
+                    Require(seen.Add(current), "cyclic class inheritance");
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
@@ -700,6 +715,9 @@ public sealed partial class NativeAssemblyDefinition
     /// This is compiler reference metadata, never an executable replacement for the native artifact. Per-call MVIDs may differ.</remarks>
     public byte[] CreateReferenceAssembly(AssemblyIdentity coreLibrary)
     {
+        if (types.Any(type => type.BaseName is not null))
+            throw new NotSupportedException("class inheritance reference projection is not implemented");
+
         ArgumentNullException.ThrowIfNull(coreLibrary);
         if (nativeTypeAliases.TryGetValue(("System.Void", 0), out var unitAlias) && !unitAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("inhabited Void projection requires the explicit core scope");
@@ -921,6 +939,14 @@ public sealed partial class NativeAssemblyDefinition
         var canonical = JsonSerializer.Serialize(new[] { identity.Name, identity.Version.ToString(), identity.Culture, identity.PublicKeyToken, identity.Flags.ToString(CultureInfo.InvariantCulture) });
         Require(text == canonical, "noncanonical native identity"); return identity;
     }
+    private static bool IsOrdinaryClass(TypeRow type) => !type.IsStatic && !type.IsInterface && !type.IsValueType &&
+        type.NativePrimitive is null && !type.NativeGrapheme && type.GenericNames.Length == 0 && type.DeclaringType < 0;
+    private static string ReadBaseName(JsonElement node)
+    {
+        Shape(node, "Named");
+        return Text(node, "Named");
+    }
+
     private static string ModuleName(string identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(identity)));
     private static void Origin(JsonElement origin, string identityText, AssemblyIdentity identity, string name, int token)
     {

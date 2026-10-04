@@ -61,7 +61,7 @@ public sealed partial class TypeDefinition
     {
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 || (name + @namespace).Any(char.IsControl))
             throw new ArgumentException("invalid type name");
-        Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType; GenericParameterNames = Array.Empty<string>();
+        Namespace = @namespace; Name = name; Attributes = attributes; authoredBaseType = baseType; GenericParameterNames = Array.Empty<string>();
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
         IsEnum = baseType is { Namespace: "System", Name: "Enum" };
         authoredProperties = new DefinitionCollection<PropertyDefinition>([], property =>
@@ -102,8 +102,12 @@ public sealed partial class TypeDefinition
             field.AuthoredOwner = this; field.Module = Module;
         });
     }
-    /// <summary>Gets the explicit authored base reference; loaded base decoding remains pending.</summary>
-    public TypeReference? BaseType { get; }
+    private readonly TypeReference? authoredBaseType;
+    /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
+    /// <remarks>Native snapshots currently support local nongeneric class bases. Null means no recorded base.</remarks>
+    public TypeReference? BaseType => authoredBaseType ?? (loadedBaseTypeToken == 0 ? null :
+        Module!.GetTypeDefinition(loadedBaseTypeToken)?.ToReference()
+            ?? throw new InvalidDataException("missing base class definition"));
 }
 
 public sealed partial class FieldDefinition

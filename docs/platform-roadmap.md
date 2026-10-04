@@ -44,9 +44,15 @@ baseline and 81-source task combination compile. Memory streams are already part
 that baseline. The lowered required-result/early-return wrapper is now fixed: five unchanged text-stream
 sources compile as another native assembly and execute over source-built MemoryStream.
 [Stream gate and evidence](experiments/extended-cli-metadata/source-text-streams-2026-10-04.md).
-Next address nominal hierarchy/signature admission exposed by the focused JSON
-DocumentReader/JsonValue source group; add the standalone ReflectionError union to its
-explicit source dependencies, without pulling in runtime introspection services.
+The [class-hierarchy foundation](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md)
+now proves runtime inheritance across three binary assemblies and materializes bounded
+local native base relationships in reader/introspection views. Writer and Raven support
+remain incomplete. Next implement definition/builder base-signature authoring and
+constructor/flag preservation before enabling nominal hierarchy/signature admission for JSON.
+
+The focused JSON DocumentReader/JsonValue source group also requires the standalone
+ReflectionError union in its explicit source dependencies; it does not yet require
+runtime introspection services.
 
 Next expand the verified text-service foundation into stream, storage and JSON sources, ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and

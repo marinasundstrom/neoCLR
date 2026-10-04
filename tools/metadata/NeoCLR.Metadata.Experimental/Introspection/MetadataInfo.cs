@@ -87,6 +87,12 @@ public sealed class NominalTypeInfo : TypeInfo
     private readonly Lazy<IReadOnlyList<TypeInfo>> allInterfaces;
     private readonly Lazy<IReadOnlyList<CustomAttributeInfo>> attributes;
     internal TypeDefinition Definition => definition;
+    /// <summary>Gets the recorded nominal base through this explicit metadata context, or null when absent.</summary>
+    /// <remarks>Native local nongeneric class bases are supported. This does not perform inherited member lookup.</remarks>
+    /// <exception cref="NotSupportedException">Base relationships have not been materialized for a CLI snapshot.</exception>
+    public TypeInfo? BaseType => !definition.Module.Assembly.IsNative
+        ? throw new NotSupportedException("CLI base relationships are not materialized")
+        : definition.BaseType is { } parent ? context.Resolve(parent) : null;
     /// <summary>Gets declared metadata-only attribute records without loading dependencies or executing constructors.</summary>
     /// <remarks>Fixed-argument decoding is bounded; raw CLI blobs preserve other loaded categories.</remarks>
     public IReadOnlyList<CustomAttributeInfo> GetCustomAttributes() => attributes.Value;

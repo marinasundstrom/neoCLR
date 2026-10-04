@@ -2,8 +2,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyDefinition
 {
-    /// <summary>Reads authoritative native namespace-function and bounded class/value/interface declarations directly from PE/#Neo.</summary>
-    /// <param name="image">Complete API-produced schema-1/2/3 runtime container.</param>
+    /// <summary>Reads authoritative native namespace-function and bounded class/value/interface declarations directly from PE/#Neo or standalone NEOX.</summary>
+    /// <param name="image">Complete schema-1/2/3 PE runtime container or schema-2/3 standalone NEOX with an assembly manifest.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
     /// <remarks>This materialization profile admits nongeneric methods and static generic methods/functions with supported nongeneric interface bounds and scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
@@ -15,7 +15,8 @@ public sealed partial class AssemblyDefinition
     {
         if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
-        var native = NativeAssemblyDefinition.ReadLibraryAssembly(RuntimeAssemblyContainer.Read(owned));
+        var native = NativeAssemblyDefinition.ReadLibraryAssembly(owned.AsSpan().StartsWith("NEOX"u8)
+            ? NativeModuleContainer.Read(owned) : RuntimeAssemblyContainer.Read(owned));
         return native.MaterializeDeclarations(owned);
     }
 
@@ -77,7 +78,7 @@ public sealed partial class NativeAssemblyDefinition
         }
         var typeRows = types.Select((type, index) => new AssemblyDefinition.TypeRow(
             0x02000002u + (uint)index, type.Namespace, type.Name, type.GenericNames.Length, type.DeclaringType < 0 ? 0u : 0x02000002u + (uint)type.DeclaringType,
-            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.EnumMembers is not null ? 0x100 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames, IsEnum: type.EnumMembers is not null, NativePrimitive: type.NativePrimitive, NativeGrapheme: type.NativeGrapheme)).ToArray();
+            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.EnumMembers is not null ? 0x100 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames, IsEnum: type.EnumMembers is not null, NativePrimitive: type.NativePrimitive, NativeGrapheme: type.NativeGrapheme, BaseTypeToken: type.BaseIndex < 0 ? 0u : 0x02000002u + (uint)type.BaseIndex)).ToArray();
         var fieldRows = new List<AssemblyDefinition.FieldRow>();
         for (int owner = 0; owner < types.Length; owner++)
         {

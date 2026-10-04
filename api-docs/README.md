@@ -969,3 +969,12 @@ already documented String(Sequence<char>) constructor directly in Raven source. 
 guest signature is added to the bridge reference. `build-api-docs.py --check` still reports
 the previously stale full snapshot; do not replace it with the subset native Numbers.dll.
 Host metadata storage/constructor contracts are documented in experimental-metadata.md.
+
+### Native class-base reader checkpoint (2026-10-04)
+
+The .NET-host reader's local nongeneric base relationships and standalone assembly
+input are documented in [the manual metadata API reference](experimental-metadata.md#native-class-base-reader-views-development-2026-10-04),
+including NominalTypeInfo.BaseType, TypeDefinition.BaseType and rejection contracts.
+Host C# APIs remain outside the guest RavenDoc selection. The required snapshot check
+still reports the pre-existing stale guest snapshot; no mismatched bridge refresh or
+website build was performed.

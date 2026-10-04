@@ -437,6 +437,7 @@ var tests = new (string Name, Action Body)[]
     ("Runtime PE container and required execution schema", RuntimeContainerChecks.Run),
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
+    ("Native local class base snapshots and facade identity", ClassBaseReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("CLI and native Int32 enum definitions and builders", EnumChecks.Run),
     ("Bounded library PE profile and native declaration round trip", LibraryPeProfileChecks.Run),

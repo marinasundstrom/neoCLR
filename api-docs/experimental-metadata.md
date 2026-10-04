@@ -39,6 +39,8 @@ and guest Introspection assembly loading remain pending.
 
 - [Constructed and field views](#constructed-and-field-views-development-2026-10-02): signature projection and declared field metadata.
 
+- [Native class-base reader views](#native-class-base-reader-views-development-2026-10-04): bounded local bases and standalone snapshots.
+
 - [Introspection facade and MetadataLoadContext](#metadata-only-introspection-facade-development-2026-10-02): context-owned assembly, module and nominal-type views.
 
 - [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
@@ -6881,3 +6883,40 @@ resolve to the graph's designated local/external grapheme owner, including insid
 With no such binding, Char preserves its original CLI core scope even if the output
 also declares a native grapheme type. This is a bridge signature rule, not implicit
 loading or a new .NET Char representation.
+
+## Native class-base reader views (development, 2026-10-04)
+
+C# namespace `NeoCLR.Metadata.Experimental.Introspection`:
+
+- `NominalTypeInfo.BaseType: TypeInfo?` resolves a recorded native class base to the
+  canonical same-context view. Null means the native declaration has no explicit base.
+  The initial supported shape is a local, top-level, nongeneric reference class base
+  of a local, top-level, nongeneric reference class. This does not enumerate inherited
+  members, synthesize System.Object, load files or instantiate runtime objects.
+- Reading this property on CLI snapshots throws `NotSupportedException`: their base
+  relationships are not yet materialized. Do not interpret absent reader support as
+  proof of no inheritance. Constructed/external native bases remain unsupported and
+  reject when the snapshot is read.
+
+C# namespace `NeoCLR.Metadata.Experimental.Model`:
+
+- Existing `TypeDefinition.BaseType: TypeReference?` now retains those loaded native
+  bases as owned definition references. `Resolve()` returns the original parent
+  definition. Authored behavior is unchanged; loaded CLI base decoding remains pending.
+- `AssemblyDefinition.ReadNativeAssembly(ReadOnlySpan<byte>)` also accepts standalone
+  schema-2/3 NEOX images containing the supported assembly manifest, in addition to
+  PE/#Neo. General module inventories without that manifest remain unsupported.
+  `Write()` on an immutable snapshot copies the original container; it does not convert
+  NEOX to PE or reconstruct an editable graph. Existing bounds and validation apply.
+- Missing targets, cycles, static/value/interface/primitive bases and unsupported
+  generic/external relationships throw `InvalidDataException`. The native reader does
+  not validate opaque method bodies; runtime verification remains required.
+- `NativeAssemblyDefinition.CreateReferenceAssembly` throws `NotSupportedException`
+  for these inherited declarations until the writer can preserve them. Container
+  writers that require that projection also reject; none silently flatten the hierarchy.
+
+Validation: ClassBaseReaderChecks covers definition/facade identity, snapshot copying,
+missing/self/cyclic/unsupported bases and explicit rejection of lossy projection and
+unmaterialized CLI base views. These are .NET-host APIs documented manually here; no
+guest RavenDoc signature was added. Builder authoring, external/generic base projection,
+Raven symbols and emission remain subsequent work.
