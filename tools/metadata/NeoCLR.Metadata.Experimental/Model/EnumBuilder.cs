@@ -47,9 +47,50 @@ public sealed partial class TypeBuilder
     internal void ValidateEnum()
     {
         if (!IsEnum) return;
+        if (Definition.CustomAttributes.Count(Definition.IsFlagsAttribute) > 1) throw new InvalidDataException("duplicate core FlagsAttribute");
         if (GenericParameterNames.Count != 0 || Definition.DeclaringType is not null || InterfaceSignatures.Any() || Methods.Count != 0 ||
             fields.Count != 1 || fields[0].Name != "value__" || fields[0].FieldType.Primitive != PrimitiveType.Int32 || fields[0].Definition.Attributes != 0x606 ||
             literalFields.Any(f => !f.Name.All(c => char.IsAsciiLetterOrDigit(c) || c == '_') || char.IsDigit(f.Name[0]) || !ReferenceEquals(f.FieldType.ClassType, this) || f.Definition.Constant is not int))
             throw new InvalidDataException("enum requires Int32 value__ storage and owned Int32 literal members");
     }
+}
+
+public sealed partial class TypeDefinition
+{
+    private readonly bool nativeEnumFlags;
+    /// <summary>Gets whether this enum declares combinable flag values.</summary>
+    /// <remarks>Reads the native enum classification or the exact core CLI FlagsAttribute, without loading the core.</remarks>
+    public bool IsFlagsEnum => IsEnum && (Module?.Assembly.IsNative == true && Producer is null ? nativeEnumFlags : CustomAttributes.Any(IsFlagsAttribute));
+
+    /// <summary>Marks an attached authored enum as a flags enum through the ordinary core FlagsAttribute.</summary>
+    /// <exception cref="InvalidOperationException">The definition is detached, read-only, or not an enum.</exception>
+    public void SetEnumFlags()
+    {
+        if (Producer is null || !IsEnum) throw new InvalidOperationException("flags require an attached authored enum");
+        if (!IsFlagsEnum) CustomAttributes.Add(new CustomAttributeDefinition(Module!.ImportReference(Producer.Assembly.CoreLibrary, "System", "FlagsAttribute"), []));
+    }
+
+    internal bool IsFlagsAttribute(CustomAttributeDefinition attribute)
+    {
+        var reference = attribute.AttributeType;
+        if (!IsEnum || reference.Namespace != "System" || reference.Name != "FlagsAttribute") return false;
+        var core = Producer?.Assembly.CoreLibrary ?? ValueTypeCore;
+        var scope = reference.ExplicitScope ?? (reference.ResolutionScopeToken >> 24 == 0x23
+            ? reference.Module.AssemblyReferences.SingleOrDefault(a => a.MetadataToken == reference.ResolutionScopeToken)?.Identity
+            : reference.ResolutionScopeToken == 0 ? reference.Module.Assembly.Identity : null);
+        if (core is null || !Equals(core, scope)) return false;
+        if (!attribute.GetConstructorSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 1 }) ||
+            !attribute.GetValue().AsSpan().SequenceEqual(new byte[] { 1, 0, 0, 0 }))
+            throw new InvalidDataException("invalid core FlagsAttribute contract");
+        return true;
+    }
+}
+
+public sealed partial class TypeBuilder
+{
+    /// <summary>Gets the flags classification shared with the authored definition.</summary>
+    public bool IsFlagsEnum => Definition.IsFlagsEnum;
+    /// <summary>Marks this enum as flags using the definition's standard attribute authoring path.</summary>
+    /// <exception cref="InvalidOperationException">The owner is not an enum.</exception>
+    public void SetEnumFlags() => Definition.SetEnumFlags();
 }

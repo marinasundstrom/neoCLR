@@ -337,7 +337,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false, bool IsFlagsEnum = false);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -458,6 +458,7 @@ public sealed partial class TypeDefinition
         Module = module;
         loadedBaseTypeToken = row.BaseTypeToken;
         closedHierarchy = row.IsClosedHierarchy;
+        nativeEnumFlags = row.IsFlagsEnum;
         GenericParameterNames = row.NativeGenericNames is { } names ? Array.AsReadOnly((string[])names.Clone()) : null;
         nativeInterfaces = row.NativeInterfaces is null ? null : new(() => Array.AsReadOnly(row.NativeInterfaces.Select(signature =>
         {

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve flags-enum intent as the ordinary core FlagsAttribute in CLI projections
+  and the existing native enum-info flag. Definitions/builders and introspection expose
+  the classification; manual attributes share validation. The unchanged source
+  BindingFlags enum now compiles and executes through an artifact-only consumer.
+
 - Author and execute the bounded Object Equals/GetHashCode/ToString overrides on
   nongeneric reference classes, preserving CLI slot flags, native identity and inherited
   dispatch across separately compiled assemblies. Encode core Object signatures with

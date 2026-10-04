@@ -1,0 +1,102 @@
+{
+  "runtimeRevision": "fb3dc129d4413d966040926860e29818fd264842",
+  "compilerRevision": "11409a822f070414ad76010e90e569042212d808",
+  "scope": "Unchanged BindingFlags source, native reference-only consumer, flag combination returns 42. JSON mapping remains open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_flags.py": "dd70adebbe50c0df6547680e93c51224eb887d5a772e08c9d74813cfa7506297",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "29bf51543432d2a354c75311b6d702d7f7cf1a9b95d6f124d730584a956479fe",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "ac2e463c4fe0b616b73f704bfcdf9d7584b8d6cc071dc7c7eae909f1545ec48f",
+    "/private/tmp/IntrospectionCore1005.dll": "cf036147d29269d65729561c54a9e96cf6fe55220cdd3fe7133dc6022dd97a17",
+    "/private/tmp/introspection-seed1005.neox": "4e55b27aad6c57087163d075429afaf0c46f2218d61c4fd502b66591b3a881f3",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn": "d653a79edea57d664431ee9b6a1bd5e7980f873b6543308610a33286703f7d4e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/flags-consumer.rvn": "d9444c735e018c6853fdd655f86e249cbc5c3f543800116c0fcef9060f472d86",
+    "/private/tmp/flags-gate1005b/Flags.dll": "574e3c432b87b24a1196174bc4f621ba6591b882227e496d908a30ea278d0e29",
+    "/private/tmp/flags-gate1005b/Consumer.dll": "bb67d581f5f773381896b5ec8230e20b0d92d507d2501844ed749fc16e43dbf9",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "7e9895788cb9e164571aa4709f00f7f8781b3f5743dc958499af5f02272f0030",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "5044cb2592447295c91d9d3a80a8a060f9aa4d26f74e63180a7506c2049ce7f0",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "a13347a802637bf4ee6dd6eac4deed531498922d28607b5c73829c83c5fc57a5"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCore1005.dll",
+        "--runtime-seed",
+        "/private/tmp/introspection-seed1005.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/flags-gate1005b/Flags.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Introspection/BindingFlags.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCore1005.dll",
+        "--runtime-seed",
+        "/private/tmp/introspection-seed1005.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/flags-gate1005b/Flags.dll",
+        "-o",
+        "/private/tmp/flags-gate1005b/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/flags-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/flags-gate1005b/Consumer.dll",
+        "--module",
+        "/private/tmp/flags-gate1005b/Flags.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/introspection-seed1005.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (671 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/flags-gate1005b/Consumer.dll",
+        "--module",
+        "/private/tmp/flags-gate1005b/Flags.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/introspection-seed1005.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

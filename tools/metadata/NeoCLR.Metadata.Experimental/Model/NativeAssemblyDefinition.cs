@@ -11,6 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
+        internal bool IsFlagsEnum { get; init; }
         internal string? BaseName { get; init; }
         internal int BaseIndex { get; set; } = -1;
         internal PrimitiveType? NativePrimitive { get; init; }
@@ -200,10 +201,12 @@ public sealed partial class NativeAssemblyDefinition
                         "invalid or unsupported nested owner");
                 }
                 (string Name, int Value)[]? enumMembers = null;
+                bool enumFlags = false;
                 if (type.TryGetProperty("enum_info", out var enumInfo))
                 {
                     typeFields.Add("enum_info"); Shape(enumInfo, "underlying", "flags", "members");
-                    Require(enumInfo.GetProperty("underlying").GetString() == "Int32" && !enumInfo.GetProperty("flags").GetBoolean(), "only ordinary Int32 enums are supported");
+                    Require(enumInfo.GetProperty("underlying").GetString() == "Int32", "only Int32 enums are supported");
+                    enumFlags = enumInfo.GetProperty("flags").GetBoolean();
                     enumMembers = Array(enumInfo, "members", 256).Select(member =>
                     {
                         Shape(member, "name", "value"); var memberName = Text(member, "name"); CheckName(memberName);
@@ -304,7 +307,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -854,6 +857,7 @@ public sealed partial class NativeAssemblyDefinition
         if (type.EnumMembers is { } members)
         {
             var definition = graph.AddEnum(type.Namespace, type.Name, type.Visibility);
+            if (type.IsFlagsEnum) definition.SetEnumFlags();
             foreach (var member in members) definition.AddEnumMember(member.Name, member.Value);
             return definition;
         }

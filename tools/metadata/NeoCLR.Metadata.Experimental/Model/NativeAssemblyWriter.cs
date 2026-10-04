@@ -27,7 +27,7 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("native Char cannot have both a local and external owner");
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
         foreach (var type in types)
-            foreach (var attribute in type.Definition.CustomAttributes)
+            foreach (var attribute in type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)))
             {
                 attribute.ValidateOwner(type.Definition);
                 var reference = attribute.AttributeType;
@@ -327,7 +327,7 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, type.Definition.CustomAttributes.Count == 0 ? null : type.Definition.CustomAttributes.Select(Attribute).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = false, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(Attribute).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),

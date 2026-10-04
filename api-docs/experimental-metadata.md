@@ -7142,3 +7142,22 @@ uses ELEMENT_TYPE_OBJECT for the configured core Object signature, including nes
 arrays/parameters, rather than a nominal CLASS encoding that fails CLR override matching.
 C# tests execute both manual and builder definitions on CLR; native compiler consumers
 exercise separate-assembly class, Object-view and inherited dispatch.
+
+## Flags enums (development, 2026-10-05)
+
+`TypeDefinition.IsFlagsEnum`, `TypeBuilder.IsFlagsEnum` and
+`Introspection.NominalTypeInfo.IsFlagsEnum` report combinable enum values. CLI snapshots
+recognize the exact core FlagsAttribute without loading dependencies; native snapshots
+read the existing enum-info flag. Ordinary enums/non-enums report false. Native raw
+custom-attribute collections do not synthesize a FlagsAttribute: use IsFlagsEnum for the
+portable declaration fact. Reference projections reconstruct the ordinary core marker.
+
+`TypeDefinition.SetEnumFlags()` and `TypeBuilder.SetEnumFlags()` mark attached authored
+enums through a standard core FlagsAttribute. Calls are idempotent. Loaded, detached or
+non-enum definitions reject with InvalidOperationException. A manually added
+`CustomAttributeDefinition(module.ImportReference(core, "System", "FlagsAttribute"), [])`
+uses the same writer path. Duplicate/malformed core markers reject with InvalidDataException.
+Another assembly's similarly named attribute does not set the flags classification.
+Native writing consumes the standard marker into existing enum-info metadata, without
+an executable attribute-constructor dependency. No native format revision is required.
+Supported storage remains Int32; flag names and values retain the normal enum contracts.

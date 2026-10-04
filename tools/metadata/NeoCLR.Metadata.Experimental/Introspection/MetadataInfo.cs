@@ -125,6 +125,8 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <summary>Gets the explicit native closed direct-family classification.</summary>
     /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>
     public bool IsClosedHierarchy => definition.IsClosedHierarchy;
+    /// <summary>Gets the native or core-attribute flags-enum classification without loading dependencies.</summary>
+    public bool IsFlagsEnum => definition.IsFlagsEnum;
     /// <summary>Gets the canonical direct children recorded in this closed family's defining module.</summary>
     /// <returns>Direct children in metadata order, or an empty list for an ordinary class.</returns>
     /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>

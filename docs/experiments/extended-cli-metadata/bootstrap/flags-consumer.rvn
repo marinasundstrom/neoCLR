@@ -1,0 +1,6 @@
+import System.Introspection.*
+
+func Main() -> int {
+    let selection = BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly
+    return (int)selection
+}
