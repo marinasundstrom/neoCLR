@@ -5780,3 +5780,10 @@ now lives in runtime/raven/native and is compiled beside its source-owned caller
 Public wrappers can be separately imported. Public/generic/type-owned service
 contracts and production descriptor factory/snapshot ownership are still pending.
 See [the integration and validation record](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
+
+### Native parameter arrays (2026-10-05)
+
+Final by-value array parameters now preserve ParamArrayAttribute across native import
+and emission. Runtime Contract core/seed selection must provide the canonical marker;
+CLI is the primitive bootstrap only, not a fallback for application references.
+[Implementation and executable evidence](experiments/extended-cli-metadata/parameter-arrays-2026-10-05.md).

@@ -607,10 +607,16 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0)
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null)
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
-                    metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    var parameter = metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    if (method.Definition.ParameterArrayIndex == i)
+                    {
+                        var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ParamArrayAttribute"));
+                        var constructor = metadata.AddMemberReference(marker, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(new byte[] { 0x20, 0, 1 }));
+                        metadata.AddCustomAttribute(parameter, constructor, metadata.GetOrAddBlob(new byte[] { 1, 0, 0, 0 }));
+                    }
                     nextParameter++;
                 }
             if (method.IsAbstract || method.Definition.ImplementationAttributes == 0x1000)

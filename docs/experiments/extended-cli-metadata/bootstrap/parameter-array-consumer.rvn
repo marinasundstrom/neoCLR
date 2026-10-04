@@ -1,0 +1,9 @@
+import ParameterArrays.*
+
+func Main() -> int {
+    if Operations.Count() != 0 { return 1 }
+    if Operations.Count(1, 2, 3) != 3 { return 2 }
+    let values = [42, 7]
+    if Operations.Count(values) != 2 { return 3 }
+    return Operations.First(values)
+}

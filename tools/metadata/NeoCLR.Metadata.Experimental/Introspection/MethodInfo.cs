@@ -25,6 +25,9 @@ public sealed class MethodInfo
         genericArguments = Array.AsReadOnly(arguments ?? GenericParameterNames.Select((_, i) => (TypeInfo)new MethodGenericParameterTypeInfo(context, this, i)).ToArray());
         var typeArguments = owner switch { NominalTypeInfo nominal => nominal.GetGenericArguments(), ConstructedTypeInfo constructed => constructed.TypeArguments, _ => Array.Empty<TypeInfo>() };
         returns = new(() => context.ResolveMemberSignature(signature.ReturnType, typeArguments, genericArguments, owner));
+        if (definition.ParameterArrayIndex is { } parameterArray &&
+            (parameterArray != signature.ParameterTypes.Count - 1 || signature.ParameterTypes[parameterArray].ArrayElement is null))
+            throw new InvalidDataException("parameter-array marker requires a final by-value vector");
         parameters = new(() => Array.AsReadOnly(signature.ParameterTypes.Select((type, i) => new ParameterInfo(this, i,
             context.ResolveMemberSignature(type.ByReferenceElement ?? type, typeArguments, genericArguments, owner),
             type.ByReferenceElement is null ? ParameterPassingMode.Value : signature.OutParameters.Contains(i) ? ParameterPassingMode.Out : ParameterPassingMode.Ref,
@@ -98,6 +101,8 @@ public sealed class ParameterInfo
     public int Position { get; }
     /// <summary>Gets the declared value, ref or out passing convention.</summary>
     public ParameterPassingMode PassingMode { get; }
+    /// <summary>Gets whether this final vector parameter carries the parameter-array expansion contract.</summary>
+    public bool IsParameterArray => DeclaringMethod.Definition.ParameterArrayIndex == Position;
     /// <summary>Gets the projected value type, or the referenced element type for ref/out parameters.</summary>
     public TypeInfo ParameterType { get; }
 }

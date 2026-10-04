@@ -201,6 +201,41 @@ public sealed partial class AssemblyDefinition
                 if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
                     throw new InvalidDataException("missing or excessive method signature data");
                 signatureBytes += length;
+                int? parameterArray = null;
+                foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
+                foreach (var attributeHandle in parameter.GetCustomAttributes())
+                {
+                    var attribute = reader.GetCustomAttribute(attributeHandle);
+                    EntityHandle markerOwner;
+                    BlobHandle markerSignature;
+                    StringHandle markerConstructorName;
+                    if (attribute.Constructor.Kind == HandleKind.MemberReference)
+                    {
+                        var constructor = reader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+                        markerOwner = constructor.Parent; markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
+                    }
+                    else if (attribute.Constructor.Kind == HandleKind.MethodDefinition)
+                    {
+                        var constructor = reader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
+                        markerOwner = constructor.GetDeclaringType(); markerSignature = constructor.Signature; markerConstructorName = constructor.Name;
+                    }
+                    else continue;
+                    var markerName = markerOwner.Kind switch
+                    {
+                        HandleKind.TypeReference => reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeReference((TypeReferenceHandle)markerOwner).Name),
+                        HandleKind.TypeDefinition => reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Namespace) + "." + reader.GetString(reader.GetTypeDefinition((TypeDefinitionHandle)markerOwner).Name),
+                        _ => ""
+                    };
+                    if (markerName != "System.ParamArrayAttribute") continue;
+                    var signatureReader = reader.GetBlobReader(method.Signature);
+                    if (signatureReader.ReadSignatureHeader().IsGeneric) _ = signatureReader.ReadCompressedInteger();
+                    int parameterCount = signatureReader.ReadCompressedInteger();
+                    if (reader.GetString(markerConstructorName) != ".ctor" || parameterArray is not null || parameter.SequenceNumber == 0 || parameter.SequenceNumber != parameterCount ||
+                        !reader.GetBlobBytes(markerSignature).AsSpan().SequenceEqual(new byte[] { 0x20, 0, 1 }) ||
+                        !reader.GetBlobBytes(attribute.Value).AsSpan().SequenceEqual(new byte[] { 1, 0, 0, 0 }))
+                        throw new InvalidDataException("invalid parameter-array attribute");
+                    parameterArray = parameter.SequenceNumber - 1;
+                }
                 var names = new Dictionary<int, string>();
                 foreach (var parameter in method.GetParameters().Select(reader.GetParameter))
                 {
@@ -243,7 +278,7 @@ public sealed partial class AssemblyDefinition
                     reader.GetBlobBytes(method.Signature),
                     unsupportedMethodBounds || method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0).Any(),
                     method.GetParameters().Select(reader.GetParameter).Where(p => p.SequenceNumber > 0 && (p.Attributes & System.Reflection.ParameterAttributes.Out) != 0).Select(p => p.SequenceNumber - 1).ToArray(),
-                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray()));
+                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray(), ParameterArrayIndex: parameterArray));
             }
             var properties = new List<PropertyRow>();
             var methodRows = methods.ToDictionary(m => m.Token);
@@ -334,7 +369,7 @@ public sealed partial class AssemblyDefinition
         internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)), GenericNames, OutParameters);
     }
     internal sealed record MethodConstraintRow(int Parameter, uint Interface);
-    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null);
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null, int? ParameterArrayIndex = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null, bool NativeGrapheme = false, uint BaseTypeToken = 0, bool IsClosedHierarchy = false, bool IsFlagsEnum = false);

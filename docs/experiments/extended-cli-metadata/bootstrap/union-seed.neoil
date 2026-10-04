@@ -161,3 +161,10 @@ ret
 .function neoCLR.Runtime.CharText(Char value) -> String
 .methodimpl InternalCall
 .end
+
+; Metadata-only parameter-array marker; reading attributes never invokes this constructor.
+.type class System.ParamArrayAttribute
+.method instance .ctor() -> noresult
+ret
+.end
+.end

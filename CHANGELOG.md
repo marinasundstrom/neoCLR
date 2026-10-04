@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve final vector parameter arrays through definitions/builders, CLI ParamArrayAttribute,
+  native parameter-target attributes and introspection. Native writing requires an explicit
+  core marker binding; separate consumers execute empty, expanded and existing-array calls.
+
 - Preserve flags-enum intent as the ordinary core FlagsAttribute in CLI projections
   and the existing native enum-info flag. Definitions/builders and introspection expose
   the classification; manual attributes share validation. The unchanged source

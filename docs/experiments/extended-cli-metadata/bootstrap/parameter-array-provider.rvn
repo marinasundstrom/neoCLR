@@ -1,0 +1,6 @@
+namespace ParameterArrays
+
+public class Operations {
+    static func Count(params values: int[]) -> int => values.Length
+    static func First(params values: int[]) -> int => values[0]
+}

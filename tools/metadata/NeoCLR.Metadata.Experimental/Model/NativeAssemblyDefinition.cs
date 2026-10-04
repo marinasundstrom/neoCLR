@@ -19,7 +19,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal ushort ImplementationAttributes { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -493,12 +493,14 @@ public sealed partial class NativeAssemblyDefinition
                 : type.ClassType is { } c ? "class:" + System.Array.IndexOf(signatureOwners, c) : "primitive:" + type.Primitive;
             var methods = new List<MethodRow>();
             var methodNames = new List<string>();
+            var parameterTokens = new HashSet<int>();
             var counts = new Dictionary<int, int>();
             var seenMethods = new HashSet<(int Owner, string Namespace, string Name, string Parameters)>();
             foreach (var method in Array(root, "functions", 4096))
             {
                 var fields = new List<string> { "name", "owner", "parameters", "returns", "no_result", "origin", "body" };
                 if (method.TryGetProperty("parameter_names", out _)) fields.Add("parameter_names");
+                if (method.TryGetProperty("custom_attributes", out _)) fields.Add("custom_attributes");
                 if (method.TryGetProperty("out_parameters", out _)) fields.Add("out_parameters");
                 var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
                 genericArity = genericNames.Length;
@@ -611,7 +613,25 @@ public sealed partial class NativeAssemblyDefinition
                 Require(visibility != MethodVisibility.Protected || ownerIndex >= 0 && instance && name == ".ctor", "protected native member must be an instance constructor");
                 Require(ownerIndex >= 0 || visibility != MethodVisibility.Private, "private native global function unsupported");
                 var tokens = Array(origin, "parameter_tokens", 256);
-                Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");
+                Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0 ||
+                    (t.GetInt32() >> 24 == 8 && (t.GetInt32() & 0xffffff) > 0 && parameterTokens.Add(t.GetInt32()))), "invalid or duplicate native parameter token");
+                int? parameterArray = null;
+                if (method.TryGetProperty("custom_attributes", out _))
+                {
+                    var attributes = Array(method, "custom_attributes", 1);
+                    Require(attributes.Length == 1, "only the parameter-array method attribute is supported");
+                    var attribute = attributes[0]; Shape(attribute, "constructor", "arguments", "target_token");
+                    var markerConstructor = attribute.GetProperty("constructor"); Shape(markerConstructor, "name", "owner", "instance", "parameters");
+                    var marker = markerConstructor.GetProperty("owner"); Shape(marker, "Named");
+                    Require(Text(markerConstructor, "name") == "System.ParamArrayAttribute..ctor" && Text(marker, "Named") == "System.ParamArrayAttribute" &&
+                        markerConstructor.GetProperty("instance").GetBoolean() && Array(markerConstructor, "parameters", 0).Length == 0 && Array(attribute, "arguments", 0).Length == 0 &&
+                        nativeTypeAliases.TryGetValue(("System.ParamArrayAttribute", 0), out var markerAlias) && markerAlias.Namespace == "System" && markerAlias.Name == "ParamArrayAttribute" && !markerAlias.ValueType &&
+                        nativeModuleAliases[markerAlias.Assembly].Module == "System", "unsupported parameter-array marker identity");
+                    int position = System.Array.FindIndex(tokens, t => t.GetInt32() == attribute.GetProperty("target_token").GetInt32());
+                    Require(position >= 0 && position == parameterTypes.Length - 1 && tokens[position].GetInt32() != 0 && parameterTypes[position].ArrayElement is not null,
+                        "parameter-array marker requires the final by-value vector parameter token");
+                    parameterArray = position;
+                }
                 Require(method.GetProperty("body").ValueKind == JsonValueKind.Array, "native body array required");
                 Require(seenMethods.Add((ownerIndex, ns, name, genericArity + ":" + string.Join(",", parameterTypes.Select(TypeKey)))), "duplicate native signature");
                 counts.TryGetValue(ownerIndex, out int count); Require(count < 256, "too many methods per owner"); counts[ownerIndex] = count + 1;
@@ -657,7 +677,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ImplementationAttributes = implementationAttributes, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -812,6 +832,7 @@ public sealed partial class NativeAssemblyDefinition
                 if (bound.Owner < 0) throw new NotSupportedException("external method bounds require direct native import");
                 output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
             }
+            if (method.ParameterArrayIndex is { } parameterArray) output.SetParameterArray(parameterArray);
             projectedMethods.Add(output);
         }
         foreach (var property in properties)

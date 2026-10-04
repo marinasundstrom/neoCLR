@@ -25,7 +25,27 @@ public sealed partial class AssemblyBuilder
         var methods = ValidateGraph();
         if (externalGrapheme is not null && types.Any(t => t.NativeGrapheme))
             throw new InvalidDataException("native Char cannot have both a local and external owner");
+        int nextParameterToken = 0x08000001;
+        var parameterTokens = new Dictionary<MethodBuilder, int[]>();
+        foreach (var method in methods)
+        {
+            var tokens = new int[method.ParameterCount];
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null)
+                for (int position = 0; position < tokens.Length; position++) tokens[position] = nextParameterToken++;
+            parameterTokens.Add(method, tokens);
+        }
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
+        var parameterAttributes = new Dictionary<MethodBuilder, CustomAttributeDefinition>();
+        if (methods.Any(m => m.Definition.ParameterArrayIndex is not null))
+        {
+            (NativeBindingFor(CoreLibrary) ?? throw new InvalidDataException("native parameter arrays require an explicit core marker binding")).ValidateParameterArrayMarker();
+            var marker = ImportTypeIdentity(CoreLibrary, "System", "ParamArrayAttribute", 0);
+            foreach (var method in methods.Where(m => m.Definition.ParameterArrayIndex is not null))
+            {
+                var attribute = new CustomAttributeDefinition(Definition.MainModule.ImportReference(CoreLibrary, "System", "ParamArrayAttribute"), []);
+                attributeOwners.Add(attribute, marker); parameterAttributes.Add(method, attribute);
+            }
+        }
         foreach (var type in types)
             foreach (var attribute in type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)))
             {
@@ -97,7 +117,7 @@ public sealed partial class AssemblyBuilder
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
+            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString(), parameter_tokens = parameterTokens[method] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstructedTarget is { } binding ? TypeOwner(binding.Definition.DeclaringType!, binding.DeclaringTypeArguments) : Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = (instruction.ConstructedTarget?.Signature ?? instruction.Target!.Signature).ParameterTypes.Select(SignatureValue).ToArray() } } },
@@ -261,16 +281,18 @@ public sealed partial class AssemblyBuilder
             if (type.Properties.Count != 0) origin["property_tokens"] = type.Properties.Select(p => propertyTokens[p]).ToArray();
             return origin;
         }
-        object Attribute(CustomAttributeDefinition attribute)
+        object Attribute(CustomAttributeDefinition attribute, int? targetToken = null)
         {
             var owner = attributeOwners[attribute];
             var name = owner.ClassType is { } local ? TypeName(local) : ExternalName(owner.ImportedType!);
             var arguments = attribute.GetArguments();
-            return new
+            var data = new Dictionary<string, object>
             {
-                constructor = new { name = name + "..ctor", owner = SignatureValue(owner), instance = true, parameters = arguments.Select(a => a.Type.ToString()).ToArray() },
-                arguments = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.ToString()] = a.Value }).ToArray()
+                ["constructor"] = new { name = name + "..ctor", owner = SignatureValue(owner), instance = true, parameters = arguments.Select(a => a.Type.ToString()).ToArray() },
+                ["arguments"] = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.ToString()] = a.Value }).ToArray()
             };
+            if (targetToken is { } token) data["target_token"] = token;
+            return data;
         }
         object[]? ExplicitMappings(MethodBuilder method) => method.Definition.ExplicitInterfaceImplementations.Count == 0 ? null :
             method.Definition.ExplicitInterfaceImplementations.Select(mapping =>
@@ -327,7 +349,7 @@ public sealed partial class AssemblyBuilder
                 TypeOrigin(type, index), type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(Attribute).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, !type.Definition.CustomAttributes.Any(a => !type.Definition.IsFlagsAttribute(a)) ? null : type.Definition.CustomAttributes.Where(a => !type.Definition.IsFlagsAttribute(a)).Select(a => Attribute(a)).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = type.IsFlagsEnum, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -337,7 +359,7 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes)).ToArray()
+                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes, parameterAttributes.TryGetValue(method, out var parameterAttribute) ? [Attribute(parameterAttribute, parameterTokens[method][method.Definition.ParameterArrayIndex!.Value])] : null)).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -370,7 +392,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? interface_implementations,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        ushort? impl_flags);
+        ushort? impl_flags,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? custom_attributes);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]

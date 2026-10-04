@@ -7161,3 +7161,24 @@ Another assembly's similarly named attribute does not set the flags classificati
 Native writing consumes the standard marker into existing enum-info metadata, without
 an executable attribute-constructor dependency. No native format revision is required.
 Supported storage remains Int32; flag names and values retain the normal enum contracts.
+
+
+## Parameter arrays (development, 2026-10-05)
+
+`MethodDefinition.SetParameterArray(int position)` and `MethodBuilder.SetParameterArray(int position)`
+mark the final by-value vector parameter. Definitions must be attached and authored;
+loaded/detached methods throw InvalidOperationException, and invalid positions or physical
+signatures throw ArgumentException. Repeating the same marker is harmless.
+`MethodDefinition.ParameterArrayIndex` returns its zero-based position or null.
+`Introspection.ParameterInfo.IsParameterArray` exposes the same fact for CLI/native snapshots.
+The physical signature and calling convention remain ordinary array parameters.
+
+CLI writing uses the standard core ParamArrayAttribute on a Param row. Native writing uses
+existing custom_attributes with the parameter's metadata target_token, retaining exact
+native System marker identity through an explicit bootstrap binding. No format extension
+or implicit dependency loading is introduced. Missing/wrong marker declarations, malformed
+marker signatures/values and invalid parameter targets reject before publication.
+The bootstrap marker constructor is executable but is not invoked during metadata import.
+This marker is recognized by its qualified standard name in CLI metadata; native dependency
+resolution additionally checks the explicit System alias. Other method attribute categories
+remain explicitly unsupported in this reader profile.

@@ -1,0 +1,102 @@
+{
+  "runtimeRevision": "b2ecef7181fbe90a31fc307f26b1cb42563b5d47",
+  "compilerRevision": "b9edd0243c37bc11a3bc5fbc12e025526a88c2aa",
+  "scope": "Native parameter-array import: empty/expanded calls and an existing array return 42. JSON mapping remains open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_parameter_arrays.py": "61469016856d5ad2ccbface18164572c289b22c372015ef8e5fd989069984982",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "b267339d20b22e481dacd205615d02a8fb0b4943d23037f8b9e7bd13708c4802",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "ac2e463c4fe0b616b73f704bfcdf9d7584b8d6cc071dc7c7eae909f1545ec48f",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/introspection-seed-params1005.neox": "5e41c860b23faec997f9ca2b108295b1fc8b346c1b76ca9b917e05f8517447da",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/parameter-array-provider.rvn": "0859b676325e51f1104581ae9cc237a0692ae8683ae823a37ece082ec320ce90",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/parameter-array-consumer.rvn": "c3e23d43fd3d2c696b025b1e783e19eccc1e3ec8a02585788b4004f610e484d6",
+    "/private/tmp/params-gate1005/ParameterArrays.dll": "9349190e064ae529d4b4b92f7e6deced466658e8a7730b9d4c71176bb2ab0d7e",
+    "/private/tmp/params-gate1005/Consumer.dll": "9c5a8dace8ea2b45199e20d0077e8a91eaf07a2b58398e5532f5a440792c987c",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "a7314bb9240ba18bb7569a1f0a82f05a99f2c5dc4f521768e103f02b12cac3e4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "0252fd2f716034c5d3e0f3b4cc900aa21ddcd7484ef94e6b829fe0fdf0ba4cc0",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "6a0e5cd714db64c7a1612949376349e8549776582056b5076c5f61de3df70e8b"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/introspection-seed-params1005.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/params-gate1005/ParameterArrays.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/parameter-array-provider.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/introspection-seed-params1005.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/params-gate1005/ParameterArrays.dll",
+        "-o",
+        "/private/tmp/params-gate1005/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/parameter-array-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/params-gate1005/Consumer.dll",
+        "--module",
+        "/private/tmp/params-gate1005/ParameterArrays.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/introspection-seed-params1005.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (675 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/params-gate1005/Consumer.dll",
+        "--module",
+        "/private/tmp/params-gate1005/ParameterArrays.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/introspection-seed-params1005.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

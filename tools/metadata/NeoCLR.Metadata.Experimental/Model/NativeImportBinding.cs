@@ -58,6 +58,19 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
             throw new InvalidDataException("native boxing requires a public System.Object class in the explicit core binding");
         ValidateType(owners[0]);
     }
+    internal void ValidateParameterArrayMarker()
+    {
+        var owner = reference.MainModule.Types.SingleOrDefault(t => t.Namespace == "System" && t.Name == "ParamArrayAttribute" && t.DeclaringType is null)
+            ?? throw new InvalidDataException("parameter arrays require the explicit core ParamArrayAttribute declaration");
+        ValidateType(owner);
+        var constructor = owner.Methods.SingleOrDefault(m => m.Name == ".ctor" && !m.IsStatic && (m.Attributes & 7) == 6 && m.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 1 }))
+            ?? throw new InvalidDataException("parameter arrays require a public parameterless marker constructor");
+        var native = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
+            f.GetProperty("name").GetString() == "System.ParamArrayAttribute..ctor" && Flag(f, "instance") &&
+            f.TryGetProperty("owner", out var target) && TypeKey(target) == "Named(System.ParamArrayAttribute)" &&
+            Count(f, "parameters") == 0 && Flag(f, "no_result") && TypeKey(f.GetProperty("returns")) == "Void" && NativeLibraryDefinition.IsPublic(f)).ToArray();
+        if (Library.ModuleName != "System" || native.Length != 1) throw new InvalidDataException("parameter arrays require the explicit native ParamArrayAttribute constructor");
+    }
     internal void ValidateObjectToStringSlot() => ValidateObjectSlot("ToString", "String", 0x0e);
     internal void ValidateObjectHashSlot() => ValidateObjectSlot("GetHashCode", "Int32", 0x08);
     internal void ValidateObjectOverride(string name)
