@@ -218,4 +218,7 @@ NeoCLR, including a separate consumer that references only the emitted library.
 External direct children of the closed root reject before output. The next JSON
 blocker is propagation lowering. Local assignment propagation now executes in a
 focused native success/failure consumer and the shared fix is integrated into Raven
-main. Other nested propagation still blocks JSON; JSON execution is not yet complete.
+main. Conditional propagation now also lowers: the five-source JSON library compiles and
+a separate native DOM consumer runs successfully, checking parsing and alias mutation.
+The public serializer and object mapper still require introspection dependencies;
+full document round trips are not yet proven.

@@ -57,10 +57,13 @@ including generated native PE execution. Closed-family metadata and Raven admiss
 now pass the [paired direct and separate-library gate](experiments/extended-cli-metadata/closed-family-2026-10-04.md).
 Native symbols retain closure/direct children and actual bases; emitters author bounded
 reference conversion contracts from symbol facts. External base declarations and
-virtual hierarchy contracts remain open. JSON now reaches an unsupported lowered
-propagation expression and still publishes no output. Shared local-assignment
-propagation now passes a [native executable regression](experiments/extended-cli-metadata/local-assignment-propagation-2026-10-04.md)
-and is independently integrated into Raven main; remaining nested propagation is next.
+virtual hierarchy contracts remain open. Shared local-assignment and conditional
+propagation now unlock the [five-source JSON library and separate native DOM consumer](experiments/extended-cli-metadata/conditional-propagation-json-2026-10-04.md).
+The consumer returns 42, including number parsing, duplicate rejection and alias
+mutation. General lowering fixes are integrated into Raven main at `e1df355a2`.
+The public serializer/object mapper next needs an explicit introspection dependency
+and runtime-service catalog; full document codec execution and .NET JSON-library
+parity remain unproven.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone
 ReflectionError union in its explicit source dependencies; it does not yet require

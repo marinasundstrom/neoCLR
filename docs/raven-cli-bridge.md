@@ -5749,3 +5749,12 @@ the existing explicit seed, source-built libraries and ownership catalog. No bri
 encoding, target configuration or metadata changes. The independent fix is integrated
 into main at `9faabb1a2` with 24 focused .NET tests; its temporary branch is removed.
 See [evidence and remaining JSON gap](experiments/extended-cli-metadata/local-assignment-propagation-2026-10-04.md).
+
+
+## Conditional propagation and JSON library checkpoint (2026-10-04)
+
+Raven `3a99915c8` normalizes conditional propagation through shared lowering, with
+independent main integration `e1df355a2`. No bridge encoding, metadata API or Runtime
+Contract changes. The five unchanged JSON sources compile, verify and serve a separate
+native DOM consumer returning 42. The public serializer still needs introspection
+and reflection services in its dependency catalog. [Gate and limitations](experiments/extended-cli-metadata/conditional-propagation-json-2026-10-04.md).

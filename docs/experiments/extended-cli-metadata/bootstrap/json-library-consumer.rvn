@@ -1,0 +1,33 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+
+func Check() -> Result<int, JsonError> {
+    let number = JsonNumber.Parse("42")?
+    let values = JsonArray()
+    _ = values.Add(number)?
+    let document = JsonObject()
+    _ = document.Add("values", values)?
+    let stored = document.Field("values")?
+    let alias = (JsonArray)stored
+    _ = values.Add(JsonBoolean(true))?
+    if alias.Count != 2 {
+        return Ok(2)
+    }
+    let first = alias.Item(0)?
+    let answer = ((JsonNumber)first).AsInt32()?
+    if JsonNumber.Parse("invalid") is Ok(_) {
+        return Ok(3)
+    }
+    if document.Add("values", JsonNull()) is Ok(_) {
+        return Ok(4)
+    }
+    return Ok(answer)
+}
+
+func Main() -> int {
+    match Check() {
+        Ok(let answer) => return answer
+        Error(_) => return 1
+    }
+}
