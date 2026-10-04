@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Author bodyless nongeneric assembly-function runtime services through the metadata
+  definitions/builders using InternalCall implementation flags. Preserve flags and
+  exact runtime service names in native readers, reference projections and imports;
+  reject incompatible bodies/flags. Generated native PE and an artifact-only C# API
+  consumer verify and return 42 with an explicit test seed. Raven source declarations
+  and production introspection ownership remain pending.
+
 - Extend the explicit native handle-service catalog with identity, generic arguments,
   shape/display/token queries, object-type lookup and parameterless reflection
   construction. A separately compiled provider/consumer verifies and returns 42,

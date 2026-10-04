@@ -10786,3 +10786,20 @@ identity properties now fail with RAV0330, independently of writer validation.
   on both targets and reject external direct children. Raven integration `d618c9667`;
   146 C# metadata groups and 35 Raven regressions pass. JSON progresses to propagation
   lowering. [Milestone and evidence](experiments/extended-cli-metadata/closed-family-2026-10-04.md).
+
+
+## 2026-10-05 — Reflection/object mapping as the bridge to networking
+
+- **Author:** "Once we have reflection and object mapping ready, that proves internal
+  calls snd such work, then the socket snd http stack is not far away".
+- **Assistant response:** reflection/object mapping supplies reusable evidence for calls
+  carrying source-owned types into the runtime. Socket/HTTP error, lifetime and async
+  behavior still require their own tests. Keep JSON mapping as the current gate and
+  the network stack next; do not treat those later capabilities as complete.
+- **Current implementation evidence:** the handle/reflection service gate executes
+  constructor state and identity through native assemblies. The metadata API now
+  authors bodyless runtime service declarations; its C# API consumer executes against
+  the real runtime with an explicit test seed. Raven source admission, production
+  descriptor factories and JSON object mapping remain open.
+- **Links:** [runtime-service authoring](experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md),
+  [handle/reflection gate](experiments/extended-cli-metadata/native-handle-reflection-2026-10-04.md).

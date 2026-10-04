@@ -29,7 +29,7 @@ public sealed partial class MethodDefinition
     private MethodBodyDefinition? authoredBody;
     /// <summary>Gets the canonical authored body shared by emission helpers.</summary>
     /// <exception cref="NotSupportedException">This is a loaded snapshot; body materialization is pending.</exception>
-    /// <remarks>Abstract contracts may expose an empty body, but writing rejects instructions or locals on them.</remarks>
+    /// <remarks>Abstract contracts and internal calls may expose an empty body, but writing rejects instructions or locals on them. Internal calls also reject labels.</remarks>
     public MethodBodyDefinition Body => AuthoredSignature is null
         ? throw new NotSupportedException("loaded method bodies are not materialized yet")
         : authoredBody ??= new MethodBodyDefinition(this);

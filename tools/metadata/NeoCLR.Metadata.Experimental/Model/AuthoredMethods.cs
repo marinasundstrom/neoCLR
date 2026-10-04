@@ -4,6 +4,17 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class MethodDefinition
 {
+    /// <summary>Marks an authored nongeneric assembly function as a bodyless runtime internal call.</summary>
+    /// <remarks>The runtime must bind the exact namespace, name and signature. This does not select P/Invoke or load a native library.</remarks>
+    /// <exception cref="InvalidOperationException">Loaded, type-owned, generic or nonempty declaration.</exception>
+    public void SetInternalCall()
+    {
+        if (AuthoredSignature is null || IsTypeDeclaration || GenericArity != 0 ||
+            Body.Instructions.Count != 0 || Body.LocalStorage.Count != 0 || Body.LabelStorage.Count != 0)
+            throw new InvalidOperationException("internal calls require an empty authored nongeneric assembly function");
+        ImplementationAttributes = 0x1000;
+    }
+
     internal MethodBuilder? Producer { get; set; }
     internal bool IsTypeDeclaration { get; }
     private readonly string? authoredNamespace;
@@ -77,6 +88,10 @@ public sealed partial class MethodDefinition
 
 public sealed partial class MethodBuilder
 {
+    /// <summary>Marks this nongeneric assembly function as a bodyless runtime internal call.</summary>
+    /// <exception cref="InvalidOperationException">Type-owned, generic or nonempty declaration.</exception>
+    public void SetInternalCall() => Definition.SetInternalCall();
+
     /// <summary>Gets the canonical declaration shared with the authored assembly's method views.</summary>
     public MethodDefinition Definition { get; }
     /// <summary>Returns the existing body facade for an attached authored declaration.</summary>

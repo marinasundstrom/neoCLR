@@ -42,7 +42,7 @@ public sealed partial class MethodDefinition
     /// <summary>Gets CLI attributes, including authored accessor and interface implementation flags.</summary>
     public ushort Attributes => Producer?.GetAttributes() ?? declarationAttributes;
     /// <summary>Gets raw CLI MethodImplAttributes bits.</summary>
-    public ushort ImplementationAttributes { get; }
+    public ushort ImplementationAttributes { get; private set; }
     /// <summary>Gets the number of declared method GenericParam rows.</summary>
     public int GenericArity { get; }
     /// <summary>Gets whether the MethodAttributes.Static bit is set.</summary>

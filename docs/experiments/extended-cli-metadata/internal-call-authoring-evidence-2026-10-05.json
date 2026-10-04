@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-05",
+  "neoclr_base_revision": "348a7765e5d97a04b74151ec7c7e6b16695fca64",
+  "implementation": "working changes committed with this evidence",
+  "raven_revision": "80ebdc0a7be56febf5a7b6360a6ee5bb500edec5",
+  "raven_used": false,
+  "gate_command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --internal-call-runtime target/debug/neoclr /tmp/internal-call-entry-final1005",
+  "gate_exit": 0,
+  "metadata_contract_groups": 148,
+  "results": {
+    "direct": {
+      "verify": 0,
+      "run": 42
+    },
+    "imported_consumer": {
+      "verify": 0,
+      "run": 42
+    },
+    "unknown_service": {
+      "verify": 1,
+      "run": 1,
+      "required_diagnostic": "no runtime binding"
+    }
+  },
+  "dependency_ownership": "Explicit empty System test seed; declarations and local type tokens belong to generated assemblies. Not a production bootstrap.",
+  "sha256": {
+    "target/debug/neoclr": "63a141976023b83b9aeecccadc1aa25abaa4905b94297fc5766987469d297aa4",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/InternalCallChecks.cs": "1ce0b650c62738f773bdf8be5eec6f1fb5db8c13462cfcfd77ecf20a836e01fc",
+    "/tmp/internal-call-entry-final1005/Consumer.dll": "4b82f8b9e7eed0179e80590c52cf703b5e39ca5fc69f103f6275ded189639748",
+    "/tmp/internal-call-entry-final1005/EmptySystem.neoil": "df5a8ac68bd6d141da44747f6cbb057cb629950425dffb1d0e87798c09ae7030",
+    "/tmp/internal-call-entry-final1005/InternalCalls.dll": "2149a58d1d61afe82e223d270e62a20958c95cf001be10a16bf8dcf8cd6f89e2",
+    "/tmp/internal-call-entry-final1005/Library.dll": "ebf2c162f8b425ad61ae591478520576cb8e8715bae57e00fca8581fd325429b",
+    "/tmp/internal-call-entry-final1005/Unknown.dll": "f9235ddb06ba04e8707c38c6f9c730fd4a652bbd5b217700621a5ea6fe523039"
+  }
+}

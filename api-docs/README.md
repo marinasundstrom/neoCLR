@@ -996,3 +996,11 @@ Closed-class host authoring, introspection classification/direct children and ex
 reference-base contracts are covered by the experimental manual reference and 146 C#
 contract groups. These host-only additions do not alter guest signatures or refresh
 the pre-existing stale guest reference snapshot.
+
+
+The development host-only MethodDefinition/MethodBuilder.SetInternalCall APIs are
+covered by the [manual metadata reference](experimental-metadata.md#runtime-internal-calls-development-2026-10-05).
+They remain under the existing C# host-library RavenDoc exclusion; the guest reference
+assembly/snapshot is unchanged. Native runtime-service authoring is not a new guest API.
+The 2026-10-05 `scripts/build-api-docs.py --check` run still reports the recorded
+stale guest snapshot; no partial or mismatched reference refresh was performed.

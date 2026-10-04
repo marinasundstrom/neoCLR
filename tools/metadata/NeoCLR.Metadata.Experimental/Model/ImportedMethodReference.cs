@@ -71,7 +71,7 @@ public sealed partial class AssemblyBuilder
         var function = type is not null
             ? (Namespace: type.Namespace, Name: definition.Name)
             : definition.Module.Assembly.IsNative
-                ? (Namespace: definition.Namespace, Name: definition.Name)
+                ? (Namespace: definition.Namespace ?? throw new InvalidDataException("native function namespace missing"), Name: definition.Name)
                 : FunctionNamespaceEncoding.Decode(definition.Name);
         if (!CoreLibrary.Equals(dependencyCoreLibrary)) throw new InvalidDataException("cross-target call requires compatible core identity");
         if (identity.Equals(Identity) || identity.PublicKeyToken.Length != 0 || identity.Flags != 0)
@@ -136,6 +136,11 @@ public sealed partial class AssemblyBuilder
         }
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
+        if (type is null && definition.ImplementationAttributes == 0x1000)
+        {
+            if (definition.GenericArity != 0) throw new InvalidDataException("generic internal-call imports are unsupported");
+            reference.Target.SetInternalCall();
+        }
         reference.Target.NativeImportPrimitiveOwner = type?.NativePrimitive;
         reference.Target.NativeImportCharOwner = type?.NativeGrapheme == true;
         reference.Target.IsCoreObjectToString = isObjectToString;

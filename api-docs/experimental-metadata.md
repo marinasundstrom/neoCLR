@@ -43,6 +43,7 @@ and guest Introspection assembly loading remain pending.
 
 - [Introspection facade and MetadataLoadContext](#metadata-only-introspection-facade-development-2026-10-02): context-owned assembly, module and nominal-type views.
 
+- [Runtime internal calls](#runtime-internal-calls-development-2026-10-05): bodyless service declarations.
 - [IILGenerator](#iilgenerator-development-2026-10-02): independent library body-authoring contract.
 
 - [Authored interface contracts](#authored-interface-contracts-development-2026-10-02): interface identity, conversions and dispatch.
@@ -7052,3 +7053,46 @@ CLI signature import, native signature round trips and rejected operands. The ge
 native PE executes local, constructed, vector and instantiated method-parameter tokens,
 verifies successfully and returns 42. External dependency-token identity and runtime
 handle-service comparisons remain integration gates.
+
+
+## Runtime internal calls (development, 2026-10-05)
+
+`MethodDefinition.SetInternalCall() -> void` marks an authored, nongeneric assembly
+function with implementation attributes `0x1000`. `MethodBuilder.SetInternalCall()`
+is a convenience method over the same canonical definition. Both require an empty
+body, no locals or labels and no type owner. Loaded snapshots, generic declarations,
+type methods and nonempty declarations throw InvalidOperationException. Setting the
+same valid declaration again is idempotent. There is no implicit P/Invoke library or
+entry-point lookup.
+
+`MethodDefinition.ImplementationAttributes` returns the flag for authored and loaded
+CLI/native definitions. CLI writing emits MethodDef.ImplFlags and no method body;
+this does not make an arbitrary InternalCall executable by the desktop CLR. Native
+writing uses the existing `impl_flags` field and the exact namespace-qualified service
+name, rather than an ordinary generated function name. Existing functions keep their
+encoding. Readers and native reference projections preserve the flag, and imported
+assembly-function references preserve the runtime service name.
+
+The declaration's supported signature may reference types defined in the same output
+assembly. That enables a service contract to share ownership with source descriptors;
+it does not implement their runtime factory. The runtime still checks the exact binding
+name/signature. A structurally valid declaration with an unknown service writes, then
+runtime verify/run rejects it. There is no implicit dependency loading or service fallback.
+
+Writing rejects instructions, locals or labels added after marking, and rejects an
+internal-call entry point with InvalidDataException. Native reading rejects unsupported
+implementation bits or an internal-call declaration with a body, locals, owner, generic
+parameters or incompatible abstract/virtual/instance flags. Type-owned and generic
+internal-call authoring remain outside this bounded profile.
+
+```csharp
+var query = assembly.AddFunction("neoCLR.Runtime", "TypeArgumentCount",
+    new MethodSignature(PrimitiveType.Int32, [PrimitiveType.RuntimeTypeHandle]));
+query.SetInternalCall();
+// Emit calls from ordinary method bodies through their separate IILGenerator.
+```
+
+C# tests cover definitions/builders, CLI/native/reference-projection flags, output-owned
+nominal result signatures and invalid graphs. Generated native PE executes with an
+explicit empty test seed, both directly and through a separate native metadata consumer.
+Unknown runtime services reject. See the [integration record](../docs/experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md).

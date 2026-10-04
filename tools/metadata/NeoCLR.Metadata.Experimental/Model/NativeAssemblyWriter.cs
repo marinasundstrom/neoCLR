@@ -85,7 +85,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => type.NativeGrapheme ? "System.Char" : type.NativePrimitive is { } primitive ? "System." + primitive : type.Assembly.NativeBinding is { } binding ? binding.TypeName(type.Definition) : type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? ((method.IsOverride || method.NativeValueOverride || method.DeclaringType?.NativePrimitive is not null || method.DeclaringType?.NativeGrapheme == true) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName));
+        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.Definition.ImplementationAttributes == 0x1000 ? (method.Namespace.Length == 0 ? method.Name : method.Namespace + "." + method.Name) : ((method.IsOverride || method.NativeValueOverride || method.DeclaringType?.NativePrimitive is not null || method.DeclaringType?.NativeGrapheme == true) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName)));
         static object? Owner(MethodBuilder method) => method.NativeImportCharOwner ? "Char" : method.NativeImportPrimitiveOwner is { } primitive ? primitive.ToString() : method.NativeImportIsNamespaceFunction ? null : method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => type.NativeGrapheme ? "Char" : type.NativePrimitive is { } primitive ? primitive.ToString() : arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
         static string ExternalName(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ? "System.Char" : type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
@@ -334,7 +334,7 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray(), ExplicitMappings(method))).ToArray()
+                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray(), ExplicitMappings(method), method.Definition.ImplementationAttributes == 0 ? null : method.Definition.ImplementationAttributes)).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -365,7 +365,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object[]? generic_constraints,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object[]? interface_implementations);
+        object[]? interface_implementations,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        ushort? impl_flags);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]

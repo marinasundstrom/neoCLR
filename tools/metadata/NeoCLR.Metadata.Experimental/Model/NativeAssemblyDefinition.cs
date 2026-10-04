@@ -18,7 +18,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal ushort ImplementationAttributes { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -532,6 +532,13 @@ public sealed partial class NativeAssemblyDefinition
                 if (isAbstract) { fields.Add("is_abstract"); Require(abstractFlag.GetBoolean(), "abstract flag must be true"); }
                 if (isVirtual) { fields.Add("is_virtual"); Require(virtualFlag.GetBoolean(), "virtual flag must be true"); }
                 if (method.TryGetProperty("interface_implementations", out _)) fields.Add("interface_implementations");
+                ushort implementationAttributes = 0;
+                if (method.TryGetProperty("impl_flags", out var implementation))
+                {
+                    fields.Add("impl_flags");
+                    implementationAttributes = implementation.GetUInt16();
+                    Require(implementationAttributes is 0 or 0x1000, "unsupported method implementation flags");
+                }
                 Shape(method, fields.ToArray());
                 var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
@@ -594,7 +601,7 @@ public sealed partial class NativeAssemblyDefinition
                     "unsupported or unbound native Object override");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
-                var expectedName = isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
+                var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
                     Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
@@ -644,7 +651,11 @@ public sealed partial class NativeAssemblyDefinition
                     }
                     Require(explicitMappings.Count != 0, "empty explicit mapping list");
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                if (implementationAttributes == 0x1000)
+                    Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
+                        method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
+                        "internal calls require bodyless nongeneric assembly functions");
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ImplementationAttributes = implementationAttributes, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -703,7 +714,7 @@ public sealed partial class NativeAssemblyDefinition
             uint entryPointToken = 0;
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].ImplementationAttributes == 0 && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }
@@ -791,6 +802,7 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
+            if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
             foreach (var bound in method.InterfaceConstraints)

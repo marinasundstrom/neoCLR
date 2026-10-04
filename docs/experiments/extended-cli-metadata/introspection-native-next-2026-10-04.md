@@ -101,3 +101,12 @@ HashCode and the current catalog still rejects before publication: descriptor-re
 services, ParameterSnapshot, Object.GetType and the production typeof contract need
 coherent ownership. Do not interpret cascading conversion/overload errors as separate
 compiler regressions until that dependency closure binds.
+
+
+## Bodyless service authoring checkpoint — 2026-10-05
+
+The [metadata authoring slice](internal-call-authoring-2026-10-05.md) now encodes
+runtime internal calls as bodyless global functions, retaining output-owned nominal
+signatures and exact service binding names through native import. This is a prerequisite
+for moving descriptor service contracts beside source-owned types, not production
+Raven declaration support yet. No competing descriptor definitions were added to core.
