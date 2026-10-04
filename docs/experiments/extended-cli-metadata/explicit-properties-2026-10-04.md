@@ -33,3 +33,8 @@ performance claim is associated with this slice.
 Validated compiler: 0bc0a65d2; isolated general fix: 5f431d6c3. Metadata contracts:
 141/141; runtime property tests: 7/7; focused .NET controls: 7/7. Both driver consumers
 exit 42 with empty stdout. [Commands and hashes](explicit-properties-native-2026-10-04.json).
+
+The subsequent pattern-expression slice resolves the recorded String.Concat emission
+failure; see [the follow-up evidence](pattern-expressions-native-2026-10-04.json). The script
+accepts `--scenario pattern-expression` for that paired gate. Its null case executes inside
+the implementation library because imported native nullable annotations remain unsupported.

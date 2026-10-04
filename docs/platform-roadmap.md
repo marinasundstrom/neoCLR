@@ -22,8 +22,9 @@ and independently validated main f0c3b75a0 each pass 139 focused .NET tests.
 
 The common text-service prerequisite now executes through native libraries: Unicode
 scalar classification, grapheme/vector operations, Unicode casing and UTF-8 slicing.
-The expanded seed preserves the numeric gate. Explicit interface properties now pass native emission; actual String source next reaches
-`String.Concat` local definite-assignment validation; Char source emission alone does not prove
+The expanded seed preserves the numeric gate. Explicit interface properties and pattern if-expressions now pass native emission. The
+cumulative source String/Char build verifies, and an artifact-only static String consumer
+executes; canonical primitive instance storage/ownership remains open; Char source emission alone does not prove
 canonical ownership. [Text evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).
 
 See [explicit-property integration](experiments/extended-cli-metadata/explicit-properties-2026-10-04.md).

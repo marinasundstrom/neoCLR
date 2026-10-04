@@ -1,0 +1,11 @@
+public static class Reader {
+    static func Run() -> int {
+        if Read(null) != 2 { return 1 }
+        return Read(Cell(21))
+    }
+    static func Read(input: Cell?) -> int {
+        let first = if input is Cell value { value.Value } else { 1 }
+        let second = if input is Cell value { value.Value } else { 1 }
+        return first + second
+    }
+}

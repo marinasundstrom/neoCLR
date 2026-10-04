@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Verify Raven's direct pattern branching in if-expressions: null/non-null cases execute
+  on both targets. Unchanged String/Char join the cumulative emitted library, runtime
+  verification passes and a separate static String consumer exits 42. Canonical primitive
+  instance storage/ownership and imported nullable annotations remain open. The independent
+  constructed-setter .NET fix is validated and integrated into Raven main at 210d891e0.
+
 - Author and round-trip explicit interface mappings through definitions and builders;
   emit standard CLI MethodImpl and existing native scoped relationships. Raven explicit
   getters/setters execute across native assemblies; qualified property names now validate.

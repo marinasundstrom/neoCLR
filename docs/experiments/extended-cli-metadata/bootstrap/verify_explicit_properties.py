@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('compiler', 'runtime', 'core', 'seed', 'base-library', 'ownership', 'output'):
         parser.add_argument('--' + name, required=True, type=Path)
+    parser.add_argument("--scenario", choices=("explicit-property", "pattern-expression"), default="explicit-property")
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
@@ -31,7 +32,7 @@ def main():
     common = ['dotnet', args.compiler.resolve(), 'neoclr', '--core-reference', args.core.resolve(),
               '--runtime-seed', args.seed.resolve(), '--bootstrap-intrinsics',
               '--bootstrap-ownership', args.ownership.resolve(), '--reference', args.base_library.resolve()]
-    sources = [HERE / ('explicit-property-' + part + '.rvn')
+    sources = [HERE / (args.scenario + '-' + part + '.rvn')
                for part in ('contracts', 'implementation', 'consumer')]
     artifacts = []
     for target in ('native', 'dotnet'):
@@ -60,7 +61,7 @@ def main():
                                     args.seed.resolve(), args.base_library.resolve(), args.ownership.resolve()]
     revision = lambda path: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
     evidence = dict(runtimeRepositoryRevision=revision(ROOT), compilerRepositoryRevision=revision(args.compiler.resolve().parent),
-                    scope='Three separately compiled assemblies on each target; explicit getter/setter, constructed generic contract, shared object mutation. Revisions are base revisions; working tree implementation validated.',
+                    scenario=args.scenario, scope='Three separately compiled assemblies on each target; checked scenario source assertions. Revisions are base revisions; working tree implementation validated.',
                     hashes={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, commands=commands)
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(output / 'validation.json')

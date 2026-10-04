@@ -1,0 +1,4 @@
+public class Cell {
+    val Value: int
+    init(value: int) { Value = value }
+}

@@ -1,0 +1,7 @@
+import System.*
+
+func Main() -> int {
+    if String.CompareOrdinal("abc", "abc") != 0 { return 1 }
+    if String.Concat("a", "b") != "ab" { return 2 }
+    return 42
+}

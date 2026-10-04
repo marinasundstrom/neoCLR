@@ -1,0 +1,1 @@
+func Main() -> int => Reader.Run()

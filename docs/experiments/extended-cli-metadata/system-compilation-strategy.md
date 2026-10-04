@@ -689,3 +689,22 @@ mappings. The cumulative source attempt now reaches String.Concat definite-assig
 validation. Resolve that shared lowering/emission boundary next, then establish primitive
 String/Char ownership and execute artifact-only consumers. See
 [the accessor slice](explicit-properties-2026-10-04.md) for limits and independent .NET fix.
+
+
+### String source emission checkpoint (2026-10-04)
+
+The next pattern-expression lowering fix (Raven aa2a7ec69) removes the String.Concat
+assignment rejection without weakening metadata validation. The cumulative build including
+unchanged String and Char now emits and passes runtime verification (654 IL functions).
+An artifact-only consumer calls source String.CompareOrdinal and String.Concat and exits 42.
+A separate paired three-assembly pattern test observes both null and non-null branches,
+returning 42 on each target. [Evidence](pattern-expressions-native-2026-10-04.json).
+
+Next establish canonical String/Char ownership and instance storage/dispatch; static source
+methods do not establish those. The existing ownership manifest still describes the earlier
+numeric subset. Native nullable reference annotations are also not preserved across imports:
+a direct null argument to an imported Cell? parameter rejects RAV1503/RAV1509. This is a
+separate metadata/import fact gap; the pattern test exercises null within the producer.
+Public-plus-explicit same-name property binding remains a general compiler candidate.
+The independent .NET setter fix is validated on main at 210d891e0 (seven focused tests).
+Portable lowering does not exist on main yet, so aa2a7ec69 has no independent main backport.
