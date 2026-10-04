@@ -9,7 +9,7 @@ static partial class RuntimeServiceBindings
         "StringHashOrdinalIgnoreCase", "SystemCultureName", "UnixTimeTicks", "UnixTimeToLocal", "ParseInt64",
         "Utf8Encode", "Utf8Decode", "FileOpenRead", "FileCreateNew", "FilePosition", "FileSeek",
         "FileReadInto", "FileWriteChunk", "FileFlush", "FileClose", "StartWorker", "QueueWorker",
-        "JoinWorker", "RequestWorkerCancellation", "JoinWorkerResult"
+        "JoinWorker", "RequestWorkerCancellation", "JoinWorkerResult", "ScheduleTask", "DrainEntryTasks"
     ];
 
     static string Category(string type) => type switch
@@ -24,7 +24,7 @@ static partial class RuntimeServiceBindings
     };
 
     static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "noresult"
-        or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>";
+        or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
 
     static (string Name, string[] Args, string Result)[] NativeMembers(string[]? selection = null)
     {
@@ -36,13 +36,15 @@ static partial class RuntimeServiceBindings
             var entries = Members.Where(m => m.Name == name).ToArray();
             if (entries.Length != 1) throw new InvalidDataException("Missing or ambiguous native service: " + name);
             var entry = entries[0];
-            if (!NativeTypeSupported(entry.Result) || entry.Args.Any(t => t == "noresult" || !NativeTypeSupported(t)) || IsProperty(name))
+            // CLI Action transports an explicit no-result callback, not an inhabited Void return.
+            entry.Args = entry.Args.Select(t => t == "fn<Void>" ? "fn<noresult Void>" : t).ToArray();
+            if (name == "NotifyWorker" || !NativeTypeSupported(entry.Result) || entry.Args.Any(t => t == "noresult" || !NativeTypeSupported(t)) || IsProperty(name))
                 throw new InvalidDataException("Unsupported native bootstrap service signature: " + name);
             return entry;
         }).ToArray();
     }
 
-    static string NativeCSharp(string type) => type == "fn<Void>" ? "System.Action" : CSharp(type);
+    static string NativeCSharp(string type) => type == "fn<noresult Void>" ? "System.Action" : CSharp(type);
     internal static string NativeBootstrapDeclarations =>
         "namespace System.Runtime.CompilerServices { public static class RuntimeServices { " +
         string.Join(" ", NativeMembers().Select(m => $"public static {NativeCSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => NativeCSharp(t) + " arg" + i))}) " +

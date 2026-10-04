@@ -5455,3 +5455,14 @@ array semantics, service stubs or metadata-format changes are introduced. The
 primitive CLI core remains the explicit temporary service signature source; rebuilt
 libraries use native metadata import. See the combined-library-array evidence and
 System compilation strategy for commands, limits and remaining initializer binding.
+
+### Scheduling callback ABI (2026-10-04)
+
+The generated primitive core exposes ScheduleTask(Action) and DrainEntryTasks().
+Action transports a no-result function signature, `fn<noresult Void>`; native unit
+callbacks with `fn<Void>` remain a separate accepted ScheduleTask overload. The
+runtime retains the bound receiver and verifies the exact function signature.
+No Raven emitter special case or Object-boxing bridge is introduced. The metadata
+library's existing function signature encoding preserves this distinction. Native
+helper library/consumer execution verifies mutation after explicit drain; the full
+source Tasks/Workers gate still requires enum and queue-ownership integration.

@@ -1,0 +1,6 @@
+func Main() -> int {
+    let state = TaskCallbackState()
+    state.Schedule()
+    TaskCallbackState.Drain()
+    return state.Count
+}

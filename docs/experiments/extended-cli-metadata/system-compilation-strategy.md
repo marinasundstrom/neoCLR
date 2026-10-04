@@ -234,3 +234,15 @@ Next capability batch remains queue/callback ABI ownership and reusable enums;
 this result is not proof of full System compilation or dual-target class-library
 execution. No guest public API changed, so the existing API snapshot maintenance
 blocker is unchanged.
+
+### Task scheduling ABI slice (2026-10-04)
+
+ScheduleTask now accepts the existing inhabited-unit callback and an explicit
+no-result callback. The primitive catalog selects the latter for CLI Action and
+adds explicit entry draining. A helper library/consumer proves retained receiver
+mutation with exit 42, with the 57-source combined gate still passing. This is a
+callback ABI subgate, not completion of source Tasks/Workers. Next implement enum
+metadata/emission for TaskState, then canonical source-owned queue service bindings.
+Worker notifications remain unselected because their queue-post convention is still
+legacy. Runtime signature rejection tests and guest-work execution cover both
+existing scheduling behavior and the new no-result path.

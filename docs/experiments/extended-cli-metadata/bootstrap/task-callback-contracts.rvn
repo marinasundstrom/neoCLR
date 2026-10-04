@@ -1,0 +1,18 @@
+import System.Runtime.CompilerServices.*
+
+public class TaskCallbackState {
+    private var count: int = 0
+    val Count: int => count
+
+    func Complete() {
+        count = count + 42
+    }
+
+    func Schedule() {
+        RuntimeServices.ScheduleTask(self.Complete)
+    }
+
+    static func Drain() {
+        RuntimeServices.DrainEntryTasks()
+    }
+}

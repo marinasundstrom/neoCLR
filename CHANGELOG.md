@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Admit explicit no-result callbacks for native ScheduleTask while retaining the
+  existing inhabited-Void convention. The checked bootstrap catalog now includes
+  scheduling and explicit entry draining. A separate native library/consumer verifies
+  retained receiver identity and mutation; source-owned task queues remain pending.
+
 - Validate the combined 57-source native library, including UTF-8/file streams,
   after correcting Raven source-array interface lookup caches. Separate consumers
   verify file mutation, exit 42 and unchanged broad application output. No runtime

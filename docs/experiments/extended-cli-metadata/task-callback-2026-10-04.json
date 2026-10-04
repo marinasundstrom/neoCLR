@@ -1,0 +1,98 @@
+{
+  "runtimeRepositoryRevision": "013e5b20548a1dbb72cb561a6d59cf4bd7b4956c",
+  "compilerRepositoryRevision": "5dda5c5de6900fcf2386c9ca55e2ba1e8b467fd9",
+  "scope": "No-result scheduled callback retains receiver identity and mutates it before explicit drain returns. Full source Tasks/Workers remains open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/task-callback-contracts.rvn": "c6095135441f96f8d3da151057cb55df0d86206498e51394e845c957d1bd5658",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/task-callback-consumer.rvn": "6d3534d05834cb2b2c32ca1e4be3814d3cbe261c0b49e1dc2c793f72e2fdea65",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "00ea1633accba42e56c42e05e8ab9e0016c5d70439836fcf33d792c05217320c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "eac398a08a6244264c1b23fb9d9673ff5be6f882f7bc180c3dda6b42eb62d488",
+    "/private/tmp/TaskCallbackCoreFinal1004.dll": "be7423849859f353b1de70ba675b9444f64b7e7e9d74bcb7cecd6ed998701cf6",
+    "/private/tmp/TaskCallbackSystemFinal1004.neox": "3bd7e94c34408064ccf7db25da4111c45f0886a0b0f14e6350613b9931ed8e1a",
+    "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll": "222c93783456162783fb2eb91407d6e637055ab6caa58ffe0d982da8331ffcce",
+    "/private/tmp/task-callback-finalbase1004/ownership.json": "8b86cf73daa8454c15f50179cc04507a6719d6dc3b56e0eea1bac86a51357075",
+    "/private/tmp/task-callback-final1004/Consumer.dll": "9a7a842ad38de26b20f70b275d2615942065b2b6f9b4b9722fe5b60bd9f8fe3b",
+    "/private/tmp/task-callback-final1004/TaskCallbackContracts.dll": "99a4dc38934a854dc215783909a8f35b9948acf906b1e1608fcd090b0f2c50c1"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TaskCallbackCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-callback-finalbase1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--library",
+        "-o",
+        "/private/tmp/task-callback-final1004/TaskCallbackContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/task-callback-contracts.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TaskCallbackCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-callback-finalbase1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/task-callback-final1004/TaskCallbackContracts.dll",
+        "-o",
+        "/private/tmp/task-callback-final1004/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/task-callback-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/task-callback-final1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/task-callback-final1004/TaskCallbackContracts.dll",
+        "--system",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (474 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/task-callback-final1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/task-callback-final1004/TaskCallbackContracts.dll",
+        "--system",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

@@ -687,7 +687,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::NotifyWorker, Type::Void)
         }
         ("neoCLR.Runtime.ScheduleTask", [callback])
-            if *callback == crate::assembler::parse_type("fn<Void>")? =>
+            if *callback == crate::assembler::parse_type("fn<Void>")?
+                || *callback == crate::assembler::parse_type("fn<noresult Void>")? =>
         {
             (Binding::ScheduleTask, Type::Void)
         }
@@ -1245,5 +1246,23 @@ mod character_tests {
             hash = (hash ^ u64::from(ranges[index].1)).wrapping_mul(1_099_511_628_211);
         }
         assert_eq!(hash, 0x9FB70257D9A6A292);
+    }
+}
+
+#[cfg(test)]
+mod task_callback_tests {
+    #[test]
+    fn scheduling_accepts_only_parameterless_unit_or_no_result_callbacks() {
+        for (callback, accepted) in [
+            ("fn<Void>", true),
+            ("fn<noresult Void>", true),
+            ("fn<Int32>", false),
+            ("fn<Int32,Void>", false),
+        ] {
+            let module = crate::assemble(&format!(
+                ".module Test\n.function neoCLR.Runtime.ScheduleTask({callback} callback) -> Void\n.methodimpl InternalCall\n.end\n"
+            ));
+            assert_eq!(module.is_ok(), accepted, "{callback}");
+        }
     }
 }

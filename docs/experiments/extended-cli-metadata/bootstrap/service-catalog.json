@@ -2041,7 +2041,17 @@
         "callback",
         "no-result"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DrainEntryTasks",
+      "arguments": [],
+      "result": "noresult",
+      "categories": [
+        "no-result"
+      ],
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {

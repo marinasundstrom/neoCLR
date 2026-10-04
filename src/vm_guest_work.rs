@@ -237,6 +237,47 @@ ret
     }
 
     #[test]
+    fn no_result_scheduled_callback_retains_receiver_and_completes_before_exit() {
+        let module = crate::assemble(
+            r#"
+.module App
+.entry Main
+.type class State
+.field Count Int32
+.method instance Complete() -> noresult
+ldarg 0
+ldc.i4 42
+stfld State::Count
+ret
+.end
+.end
+.function neoCLR.Runtime.ScheduleTask(fn<noresult Void> callback) -> Void
+.methodimpl InternalCall
+.end
+.function Main() -> State
+.local State state
+ldc.i4 0
+newobj State
+stloc state
+ldloc state
+function.bind fn<noresult Void> = instance State::Complete()
+call neoCLR.Runtime.ScheduleTask(fn<noresult Void>)
+pop
+ldloc state
+ret
+.end
+"#,
+        )
+        .unwrap();
+        let program = crate::LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        let execution = program.run(Limits::default()).unwrap();
+        let Value::ObjectReference(result) = execution.value else {
+            panic!()
+        };
+        assert_eq!(result.reference.read_field(0).unwrap(), Value::Int32(42));
+    }
+    #[test]
     fn entry_waits_without_spending_fuel_and_redrains_after_native_completion() {
         let module = crate::assemble(
             r#"

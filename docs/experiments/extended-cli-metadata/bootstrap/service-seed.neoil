@@ -177,6 +177,17 @@ ldarg arg0
 call neoCLR.Runtime.JoinWorkerResult(Int32)
 ret
 .end
+.method static ScheduleTask(fn<noresult Void> arg0) -> noresult
+ldarg arg0
+call neoCLR.Runtime.ScheduleTask(fn<noresult Void>)
+pop
+ret
+.end
+.method static DrainEntryTasks() -> noresult
+call neoCLR.Runtime.DrainEntryTasks()
+pop
+ret
+.end
 .end
 .function neoCLR.Runtime.SystemCultureName() -> String
 .methodimpl InternalCall
@@ -233,6 +244,12 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.JoinWorkerResult(Int32 arg0) -> Value
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ScheduleTask(fn<noresult Void> arg0) -> Void
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.DrainEntryTasks() -> Void
 .methodimpl InternalCall
 .end
 .type System.Value

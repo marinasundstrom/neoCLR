@@ -148,6 +148,7 @@ static partial class RuntimeServiceBindings
             ("TypeDisplayName", ["System.RuntimeTypeHandle", "Int32"], "String"),
             ("DefaultTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ScheduleTask", ["fn<Void>"], "noresult"),
+            ("DrainEntryTasks", [], "noresult"),
             ("RegisterDefaultTaskQueue", ["System.Tasks.TaskQueue"], "noresult"),
             ("CurrentTaskQueue", [], "System.Tasks.TaskQueue"),
             ("ExecutingAssembly", [], "System.Introspection.AssemblyInfo"),
