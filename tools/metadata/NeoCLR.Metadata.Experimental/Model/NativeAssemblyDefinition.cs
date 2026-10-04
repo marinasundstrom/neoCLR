@@ -900,6 +900,7 @@ public sealed partial class NativeAssemblyDefinition
         "UInt16" => PrimitiveType.UInt16,
         "UInt32" => PrimitiveType.UInt32,
         "UInt64" => PrimitiveType.UInt64,
+        "RuntimeTypeHandle" => PrimitiveType.RuntimeTypeHandle,
 
         "Single" => PrimitiveType.Single,
         "Double" => PrimitiveType.Double,

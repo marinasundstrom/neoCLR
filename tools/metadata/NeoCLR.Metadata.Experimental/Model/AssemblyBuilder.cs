@@ -433,6 +433,7 @@ public sealed partial class AssemblyBuilder
                 case PrimitiveType.UInt16: encoder.UInt16(); break;
                 case PrimitiveType.UInt32: encoder.UInt32(); break;
                 case PrimitiveType.UInt64: encoder.UInt64(); break;
+                case PrimitiveType.RuntimeTypeHandle: encoder.Type(MetadataTokens.EntityHandle(ElementToken(type)), isValueType: true); break;
 
                 case PrimitiveType.Single: encoder.Single(); break;
                 case PrimitiveType.Double: encoder.Double(); break;
@@ -609,7 +610,7 @@ public sealed partial class AssemblyBuilder
                     "function.bind" => method.Instructions[i].Target!.IsStatic || method.Instructions[i].Target!.IsAbstract ? 12 : 11,
                     "function.invoke" => 5,
                     "label" => 0,
-                    "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
+                    "type.token" or "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "argument.address" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
                     "equal" or "less" or "greater" or "less.unordered" or "greater.unordered" => 2,
@@ -659,6 +660,7 @@ public sealed partial class AssemblyBuilder
                     case "branch.false":
                         code.WriteByte(instruction.Op == "branch" ? (byte)0x38 : instruction.Op == "branch.true" ? (byte)0x3a : (byte)0x39);
                         code.WriteInt32(offsets[labels[instruction.Value]] - (code.Count + 4)); break;
+                    case "type.token": code.WriteByte(0xd0); code.WriteInt32(ElementToken(instruction.Type!)); break;
                     case "string": code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!))); break;
                     case "constant64": code.WriteByte(0x21); code.WriteInt64(instruction.LongValue); break;
                     case "constantSingle": code.WriteByte(0x22); code.WriteInt32(instruction.Value); break;

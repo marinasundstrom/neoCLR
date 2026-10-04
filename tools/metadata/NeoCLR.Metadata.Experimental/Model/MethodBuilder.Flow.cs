@@ -198,6 +198,7 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("unary integer operation requires Int32 or Int64");
                     break;
+                case "type.token": stack.Add(PrimitiveType.RuntimeTypeHandle); break;
                 case "string": stack.Add(PrimitiveType.String); break;
                 case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;

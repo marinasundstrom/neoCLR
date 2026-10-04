@@ -7028,3 +7028,26 @@ definitions; hosts must supply truthful symbol facts. It does not enable authori
 new class that derives from a dependency.
 
 See [the executable compiler gate](../docs/experiments/extended-cli-metadata/closed-family-2026-10-04.md).
+
+## Runtime type handles (development, 2026-10-04)
+
+`PrimitiveType.RuntimeTypeHandle` is an opaque runtime type identity in signatures,
+not a user-authored empty struct. CLI encoding is a value-type reference to
+`System.RuntimeTypeHandle` in the explicitly selected core assembly; native encoding
+uses the existing `RuntimeTypeHandle` category. CLI imports recognize that exact core
+AssemblyRef identity. The library does not load dependencies or expose host Type objects.
+
+`IILGenerator.LoadTypeToken(SignatureType type)` and
+`Emit(OpCode.Ldtoken, SignatureType type)` push one RuntimeTypeHandle. They accept
+owned nominal types, constructed nominal types, primitives, vectors and in-scope
+method/owner generic parameters. Encoding uses CLI `ldtoken` or native `ldtoken`.
+Null throws ArgumentNullException; Void, direct function signatures, byrefs, Self,
+foreign owners and out-of-scope parameters throw ArgumentException. Token authoring
+uses the same generator for builders and attached definitions. It does not construct
+runtime introspection descriptors or promise default-handle/comparison operations.
+
+C# tests check CLI local, constructed, method-generic and owner-generic identity,
+CLI signature import, native signature round trips and rejected operands. The generated
+native PE executes local, constructed, vector and instantiated method-parameter tokens,
+verifies successfully and returns 42. External dependency-token identity and runtime
+handle-service comparisons remain integration gates.

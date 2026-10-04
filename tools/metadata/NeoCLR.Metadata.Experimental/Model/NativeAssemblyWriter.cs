@@ -102,6 +102,7 @@ public sealed partial class AssemblyBuilder
             "array.length" => new { op = "ldlen" },
             "array.reserve" => new { op = "array.reserve", arg = SignatureValue(instruction.Type!) },
             "array.new" or "array.load" or "array.store" => new { op = instruction.Op == "array.new" ? "newarr" : instruction.Op == "array.load" ? "ldelem" : "stelem", arg = SignatureValue(instruction.Type!) },
+            "type.token" => new { op = "ldtoken", arg = SignatureValue(instruction.Type!) },
             "string" => new { op = "ldstr", arg = (object)instruction.Text! },
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
             "negate" => new { op = "neg" },

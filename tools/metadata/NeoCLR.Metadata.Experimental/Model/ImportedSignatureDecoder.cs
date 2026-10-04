@@ -57,7 +57,10 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
                 if (FunctionCarrier(classToken, out var actionArity, out var action) && action && actionArity == 0)
                     return SignatureType.Function(new MethodSignature(PrimitiveType.Void, []));
                 return Nominal(false, classToken);
-            case 0x11: return Nominal(true, Number());
+            case 0x11:
+                var valueToken = Number();
+                if (IsRuntimeTypeHandle(valueToken)) return PrimitiveType.RuntimeTypeHandle;
+                return Nominal(true, valueToken);
             case 0x15:
                 var category = Byte();
                 if (category is not (0x11 or 0x12)) throw new InvalidDataException("invalid nominal signature category");
@@ -78,6 +81,15 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
                 return definition.MakeGenericInstance(arguments);
             default: throw new InvalidDataException("unsupported imported signature type");
         }
+    }
+
+    private bool IsRuntimeTypeHandle(int token)
+    {
+        if ((token & 3) != 1 || token >> 2 == 0) return false;
+        var reference = module.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | (uint)(token >> 2)));
+        var coreIdentity = core;
+        return reference is { Namespace: "System", Name: "RuntimeTypeHandle" } &&
+            module.AssemblyReferences.Any(a => a.MetadataToken == reference.ResolutionScopeToken && a.Identity.Equals(coreIdentity));
     }
 
     private ImportedTypeReference Nominal(bool valueType, int token)

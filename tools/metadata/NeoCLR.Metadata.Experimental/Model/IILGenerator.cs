@@ -6,6 +6,11 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// This does not edit loaded opaque bodies or provide instruction insertion/reordering.</remarks>
 public interface IILGenerator
 {
+    /// <summary>Loads the runtime type handle for a supported output-owned type or scoped generic parameter.</summary>
+    /// <param name="type">Non-Void, non-byref type signature; Self is not a concrete token operand.</param>
+    /// <exception cref="ArgumentException">Foreign/unscoped type or unsupported operand category.</exception>
+    /// <exception cref="ArgumentNullException">Type is null.</exception>
+    void LoadTypeToken(SignatureType type);
     /// <summary>Gets declared locals in slot order. ClearBody retains them.</summary>
     IReadOnlyList<LocalDefinition> Locals { get; }
     /// <summary>Appends an Int32 constant.</summary>

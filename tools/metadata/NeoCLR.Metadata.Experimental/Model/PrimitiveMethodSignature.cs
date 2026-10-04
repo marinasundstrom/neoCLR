@@ -28,7 +28,9 @@ public enum PrimitiveType
     /// <summary>An unsigned 32-bit storage type; evaluation uses Int32 bits.</summary>
     UInt32,
     /// <summary>An unsigned 64-bit storage type; evaluation uses Int64 bits.</summary>
-    UInt64
+    UInt64,
+    /// <summary>An opaque runtime type identity; CLI uses System.RuntimeTypeHandle, native metadata uses RuntimeTypeHandle.</summary>
+    RuntimeTypeHandle
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>

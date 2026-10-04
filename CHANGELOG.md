@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add opaque RuntimeTypeHandle signatures and IILGenerator.LoadTypeToken/raw Ldtoken
+  authoring to the experimental metadata API. CLI output uses the core value-type
+  reference and standard instruction; native PE uses the existing RuntimeTypeHandle
+  and ldtoken contracts. C# tests cover local/constructed/scoped identities and import;
+  generated native PE verifies and executes. Descriptor services and JSON object
+  mapping remain subsequent integration work.
+
 - Record shared conditional propagation lowering, independently integrated into Raven
   main, unlocking the unchanged five-source native JSON library. Runtime verification
   and an artifact-only DOM consumer pass, including alias mutation and number parsing.

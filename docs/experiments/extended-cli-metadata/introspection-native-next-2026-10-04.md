@@ -61,3 +61,21 @@ validation. It does not imply recreating the .NET reflection API or changing the
 metadata-only C# facade into a runtime loader. Scope of supported token categories,
 default-handle behavior and cross-context identity require explicit tests before
 publication; these notes do not declare them implemented.
+
+## Type-token authoring checkpoint
+
+The metadata API now authors opaque handle signatures and standard type tokens.
+147 C# metadata groups pass. The focused executable gate is:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --type-handle-runtime target/debug/neoclr /tmp/type-handle-runtime
+```
+
+This verifies the generated native PE and executes it with exit 42. CLI execution
+also checks canonical local/constructed identities and distinct method/owner generic
+substitution. No runtime opcode or format-version change was necessary. This is a
+partial first slice: external dependency identity, runtime handle-service comparisons,
+Raven typeof, descriptor factories and JSON object mapping are still open. The
+metadata-only C# facade remains independent of runtime descriptors. No website
+capability claim or guest API snapshot change is appropriate for this host-only API.

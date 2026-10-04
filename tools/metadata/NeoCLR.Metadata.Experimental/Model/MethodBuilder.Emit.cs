@@ -144,6 +144,8 @@ public enum OpCode
     Shr_Un,
     /// <summary>Converts unsigned integer bits to Double.</summary>
     Conv_R_Un,
+    /// <summary>Loads an opaque type handle from an output-owned SignatureType operand.</summary>
+    Ldtoken,
 
 }
 

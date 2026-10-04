@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--type-handle-runtime")
+{
+    await TypeHandleChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--closed-class-runtime")
 {
     await ClosedClassChecks.RunRuntime(args[1], args[2]); return 0;
@@ -445,6 +449,7 @@ var tests = new (string Name, Action Body)[]
     ("Runtime PE container and required execution schema", RuntimeContainerChecks.Run),
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
+    ("Opaque runtime type handles and type-token authoring", TypeHandleChecks.Run),
     ("Closed class family authoring and native round trip", ClosedClassChecks.Run),
     ("Class base authoring and constructor initialization", ClassBaseAuthoringChecks.Run),
     ("Native local class base snapshots and facade identity", ClassBaseReaderChecks.Run),
