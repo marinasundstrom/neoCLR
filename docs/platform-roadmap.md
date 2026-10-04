@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Globalization milestone (2026-10-04): the unchanged larger sample now executes through
+native library imports with explicit --instructions 1000000. Default limits are unchanged.
+Expanded --calendar acceptance, Hebrew formatting, broad native application, paired
+Duration and six CLI tests pass. Next bounded source-library work: Clock/SystemClock
+dependency ownership; then Instant/TimeOffset/time-zone contracts. Their absence in the
+current 43-source subset is confirmed by compiler inventory. Full .NET calendar parity
+and array-element receiver addresses remain open. No compiler/metadata change.
+[Evidence](experiments/extended-cli-metadata/globalization-budget-2026-10-04.json).
+
+
 Date/calendar milestone (2026-10-04): terminal runtime-call control flow now closes
 let-else failure paths (Raven 5c60425db). The --calendar gate builds 43 unchanged sources;
 separate Date formatting/arithmetic, generic collections and broad native application

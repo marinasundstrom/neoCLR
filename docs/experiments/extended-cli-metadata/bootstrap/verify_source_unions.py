@@ -141,12 +141,29 @@ def main():
         if args.calendar:
             for source, expected, stdout in [
                 (HERE / 'date-format-consumer.rvn', 42, ''),
+                (ROOT / 'docs/experiments/raven-target/samples/library-date-formatting.rvn', 0,
+                 '2023-09-16\nא׳ תשרי ה׳תשפ״ד 12:34:56.0000000\n5784-01-01T12:34:56.0000000\n'),
                 (ROOT / 'docs/experiments/raven-target/samples/library-generic-collections.rvn', 0, 'Changed\nSecond\n0\n0\n1\n2\n1\n')]:
                 app = output / (source.stem + '.dll')
                 run(common + ['--reference', str(library), '-o', str(app), str(source)])
                 run([runtime, 'verify', str(app), '--module', str(library), '--system', str(seed)])
                 run([runtime, 'run', str(app), '--module', str(library), '--system', str(seed)], expected, stdout)
                 sample_paths.extend([source, app])
+            globalization_source = ROOT / 'docs/experiments/raven-target/samples/library-globalization.rvn'
+            globalization_app = output / 'Globalization.dll'
+            run(common + ['--reference', str(library), '-o', str(globalization_app), str(globalization_source)])
+            run([runtime, 'verify', str(globalization_app), '--module', str(library), '--system', str(seed)])
+            result = run([runtime, 'run', str(globalization_app), '--module', str(library),
+                          '--system', str(seed), '--instructions', '1000000'])
+            lines = result.stdout.splitlines()
+            if (len(lines) != 7 or lines[:4] != [
+                    '2024-02-29', '2024-02-29T12:34:56.1234567',
+                    'א׳ תשרי ה׳תשפ״ד 12:34:56.1234567', '5784-01-01T12:34:56.1234567']
+                    or not lines[4].startswith('System preference: ')
+                    or not lines[5].startswith('Selected culture: ')
+                    or lines[6] != 'Calendar and culture formatting checks passed' or result.stderr):
+                raise RuntimeError('Globalization contract output mismatch: ' + result.stdout + result.stderr)
+            sample_paths.extend([globalization_source, globalization_app])
         if args.calendar_foundation:
             character_source = HERE / 'character-library.rvn'
             character_consumer = HERE / 'character-consumer.rvn'
@@ -252,7 +269,7 @@ def main():
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('Unchanged Date/calendar/globalization sources compile into a separately consumed native library; leap-day formatting/arithmetic, generic collections and the broad native application execute. Paired Duration remains the .NET control; full dual-target library gate is open.' if args.calendar else 'Unchanged Duration and comparison contracts compile into separately consumed libraries on both targets; the same value-contract consumer exits 42 on each. Native ArrayList<Duration> and the broad application also execute. Date and the full dual-target library gate remain open.' if args.calendar_foundation else 'Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.' if args.application else 'Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Unchanged Date/calendar/globalization sources compile into a separately consumed native library; leap-day formatting/arithmetic, Hebrew formatting, globalization (explicit 1000000-instruction budget), generic collections and the broad native application execute. Paired Duration remains the .NET control; full dual-target library gate is open.' if args.calendar else 'Unchanged Duration and comparison contracts compile into separately consumed libraries on both targets; the same value-contract consumer exits 42 on each. Native ArrayList<Duration> and the broad application also execute. Date and the full dual-target library gate remain open.' if args.calendar_foundation else 'Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.' if args.application else 'Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print('PASS native Date/calendar, generic collections, broad application and paired Duration acceptance' if args.calendar else 'PASS dual-target Duration foundation and native collection/application acceptance' if args.calendar_foundation else 'PASS unchanged application-order-collections with a separately compiled native library' if args.application else 'PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')

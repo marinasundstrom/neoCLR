@@ -9,7 +9,7 @@ use std::{
 const USAGE: &str = "Usage:
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
-  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [-- <guest-argument>...]
+  neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [-- <guest-argument>...]
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
@@ -116,6 +116,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut gc_events = false;
     let mut show_result = false;
     let mut output_format = None;
+    let mut instruction_limit = None;
     let mut options = args[required..].iter();
     while let Some(option) = options.next() {
         match option.as_str() {
@@ -130,6 +131,18 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                     .filter(|value| matches!(*value, "json" | "neox"))
                     .ok_or_else(|| format!("Expected --format json or neox\n{USAGE}"))?;
                 output_format = Some(format);
+            }
+            "--instructions" if command == "run" && instruction_limit.is_none() => {
+                let value = options.next().ok_or("Missing count for --instructions")?;
+                instruction_limit = Some(
+                    value
+                        .bytes()
+                        .all(|byte| byte.is_ascii_digit())
+                        .then(|| value.parse::<usize>().ok())
+                        .flatten()
+                        .filter(|count| *count > 0)
+                        .ok_or("Expected a positive integer count for --instructions")?,
+                );
             }
             "--show-result" if command == "run" && !show_result => show_result = true,
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
@@ -250,6 +263,11 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             let execution = unsafe {
                 program.run_with_native(ExecutionOptions {
                     arguments: guest_arguments,
+                    limits: neoclr::Limits {
+                        instructions: instruction_limit
+                            .unwrap_or(neoclr::Limits::default().instructions),
+                        ..neoclr::Limits::default()
+                    },
                     console: Some(std::sync::Arc::new(StdioConsole)),
                     ..ExecutionOptions::default()
                 })

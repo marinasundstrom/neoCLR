@@ -20,6 +20,25 @@ metadata set. `verify` additionally runs the existing typed-stack analysis over 
 IL functions. Neither activates native imports or executes guest code. `run` retains
 the CLI's existing trusted native-execution contract and default resource limits.
 
+## Explicit run instruction budget (development)
+
+`run --instructions <positive-count>` overrides the existing per-execution
+`Limits.instructions` value. The default remains 100,000; frame, stack, heap and
+other limits are unchanged. The budget covers execution across the supplied module
+set, not each assembly separately. It counts interpreter instructions, not elapsed
+time, and does not interrupt native code. This exposes the existing bounded execution
+control; it does not change CLI metadata or guest semantics.
+
+    neoclr run App.dll --module NeoCLR.Collections.dll --system System.neox --instructions 1000000
+
+The option is accepted once, before `--`, by `run` only. A positive decimal count
+must fit the host's unsigned pointer-sized integer. Missing, zero, negative,
+non-numeric, overflowing and repeated values reject before loading any input.
+Arguments after `--` remain guest arguments. Unlike ordinary .NET application
+execution, this interpreter already imposes an instruction quota; the flag makes
+that existing host control explicit for larger samples. It is not a timeout or a
+performance claim.
+
 ## Compile separate artifacts
 
 Use a fresh output directory; assembly continues to refuse overwriting existing files.

@@ -145,6 +145,10 @@ contracts without executing the program. `check` performs structural metadata an
 operand validation only. `run` accepts either `.neoil` source or a JSON artifact;
 it does not automatically run the opt-in typed verifier.
 
+Development CLI runs can select a larger existing instruction budget with
+`--instructions 1000000`; the default remains 100,000 and other limits stay unchanged.
+See [execution-budget options](docs/cli-module-sets.md#explicit-run-instruction-budget-development).
+
 ### Build the runtime library explicitly (optional)
 
 The runtime sources are organized by namespace under `runtime/System/` and

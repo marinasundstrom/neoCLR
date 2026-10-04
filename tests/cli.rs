@@ -116,3 +116,89 @@ fn return_value_is_an_opt_in_stderr_diagnostic() {
         );
     }
 }
+
+#[test]
+fn cli_instruction_budget_is_explicit_and_preserves_default() {
+    let path = std::env::temp_dir().join(format!("neoclr-budget-{}.neoil", std::process::id()));
+    std::fs::write(
+        &path,
+        r#"
+.module Budget
+.entry Main
+.function Main() -> Int32
+.local Int32
+ldc.i4 0
+stloc 0
+Loop:
+ldloc 0
+ldc.i4 1
+add
+stloc 0
+ldloc 0
+ldc.i4 30000
+clt
+brtrue Loop
+ldc.i4 42
+ret
+.end
+"#,
+    )
+    .unwrap();
+    let run = |extra: &[&str]| {
+        Command::new(env!("CARGO_BIN_EXE_neoclr"))
+            .arg("run")
+            .arg(&path)
+            .args(extra)
+            .output()
+            .unwrap()
+    };
+    let default = run(&[]);
+    assert_eq!(default.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&default.stderr).contains("InstructionLimitExceeded"));
+    let small = run(&["--instructions", "1"]);
+    assert_eq!(small.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&small.stderr).contains("InstructionLimitExceeded"));
+    let large = run(&["--instructions", "1000000"]);
+    assert_eq!(large.status.code(), Some(42), "{large:?}");
+    assert!(large.stdout.is_empty() && large.stderr.is_empty());
+    std::fs::remove_file(path).unwrap();
+}
+
+#[test]
+fn cli_rejects_invalid_instruction_budget_before_loading() {
+    for args in [
+        vec!["run", "missing.neoil", "--instructions"],
+        vec!["run", "missing.neoil", "--instructions", "0"],
+        vec!["run", "missing.neoil", "--instructions", "-1"],
+        vec!["run", "missing.neoil", "--instructions", "+1"],
+        vec!["run", "missing.neoil", "--instructions", "abc"],
+        vec![
+            "run",
+            "missing.neoil",
+            "--instructions",
+            "999999999999999999999999999999",
+        ],
+        vec![
+            "run",
+            "missing.neoil",
+            "--instructions",
+            "1",
+            "--instructions",
+            "2",
+        ],
+        vec!["verify", "missing.neoil", "--instructions", "1"],
+        vec!["debug", "missing.neoil", "--instructions", "1"],
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_neoclr"))
+            .args(args)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        let error = String::from_utf8_lossy(&output.stderr);
+        assert!(
+            error.contains("--instructions") && !error.contains("Cannot read"),
+            "{error}"
+        );
+        assert!(output.stdout.is_empty());
+    }
+}

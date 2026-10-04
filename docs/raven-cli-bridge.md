@@ -5357,3 +5357,25 @@ and full dual-target library coverage remain open.
 
 No metadata/public API, runtime implementation or wire-format change is introduced.
 See [evidence](experiments/extended-cli-metadata/calendar-source-2026-10-04.json).
+
+## Explicit native globalization budget (2026-10-04)
+
+The larger unchanged library-globalization sample completes through ordinary native
+compiler/run commands with --instructions 1000000. The --calendar acceptance driver
+checks its deterministic formatting lines and success marker, allowing host locale
+lines to vary. It also executes the unchanged Hebrew formatting example, broad
+application, generic collections and paired Duration controls. Six CLI tests pass,
+including default-budget exhaustion, successful override and invalid-option rejection.
+
+This exposes the existing Limits.instructions host setting, with the default still
+100,000. Native metadata, bootstrap identities, compiler behavior and instruction
+semantics are unchanged. The flag is run-only and applies across the supplied modules;
+other resource limits remain unchanged. This is not a performance improvement.
+Raven implementation revision remains 5c60425db (documentation dd179ac27).
+
+The next native source inventory rejects clock/time samples because Clock/SystemClock,
+TimeZone, Instant and related source declarations are not yet in the owned subset.
+Start with coherent Clock/SystemClock dependencies, then expand instant/offset/time-zone
+contracts; do not add consumer stubs. Full .NET calendar-library parity and array-element
+receiver addresses remain open.
+See [evidence](experiments/extended-cli-metadata/globalization-budget-2026-10-04.json).

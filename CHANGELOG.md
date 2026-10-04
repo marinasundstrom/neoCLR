@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Expose the existing execution budget as run-only `--instructions <positive-count>`,
+  rejecting malformed/repeated values before input loading. Keep the 100,000 default
+  and other limits unchanged. The separately compiled native globalization sample
+  completes with an explicit 1,000,000 budget; CLI tests cover exhaustion and overrides.
+  No metadata/compiler change or performance improvement is claimed.
+
 - Add explicit ownership and native acceptance for 43 unchanged collection/calendar
   sources. Raven 5c60425db closes terminal Fail control flow without weakening metadata
   checks. Separate Date, generic-collections and broad application consumers pass,
