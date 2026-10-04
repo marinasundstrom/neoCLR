@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Extend the explicit comparer primitive bootstrap with Int32.Equals and direct
+  ToString; unchanged library-integers now compiles and runs with exact output.
+  The expanded native application/library gate passes without compiler or runtime
+  changes. This does not compile Int32 from source or establish boxed virtual dispatch.
+
 - Add IILGenerator.LoadArgumentAddress and raw Ldarga for by-value parameter storage
   in CLI/native output; reject receiver/byref/invalid slots and mismatched stores.
   Import CLI Object signatures with the explicit core identity. Raven `1fb1bbd45`

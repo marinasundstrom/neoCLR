@@ -1,5 +1,13 @@
 # neoCLR platform roadmap
 
+Integer bootstrap acceptance (2026-10-04): unchanged library-integers now executes
+with exact output using explicit Int32.Equals/ToString seed contracts. No compiler,
+metadata or runtime code change; the expanded native broad gate passes. Source-built
+Int32 and boxed virtual dispatch remain open. The next unchanged generic-collections
+sample rejects at binding for absent Int64.CompareTo and Date; these are missing
+selected-library contracts, not demonstrated .NET regressions.
+[Evidence](experiments/extended-cli-metadata/integers-2026-10-04.json).
+
 Full comparer sample execution (2026-10-04): Raven `1fb1bbd45` lowers bound signed
 Int32/Int64 ranges behind the explicit native capability and uses argument addresses for
 value-parameter receivers. Metadata now exposes LoadArgumentAddress/Ldarga and decodes

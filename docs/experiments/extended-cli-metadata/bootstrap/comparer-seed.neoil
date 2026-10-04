@@ -1,6 +1,19 @@
 .include "collection-seed.neoil"
 .type System.Int32
 .sealed
+.method instance readonly byref Equals(Int32 other) -> Boolean
+ldarg 0
+ldobj Int32
+ldarg 1
+ceq
+ret
+.end
+.method instance readonly byref ToString() -> String
+ldarg 0
+ldobj Int32
+call neoCLR.Runtime.Int32ToString(Int32)
+ret
+.end
 .method instance readonly byref CompareTo(Int32 other) -> Int32
 ldarg 0
 ldobj Int32

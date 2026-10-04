@@ -104,6 +104,8 @@ def main():
         if args.comparers:
             samples.append((HERE / 'string-comparer-consumer.rvn', 42, ''))
             samples.append((ROOT / 'docs/experiments/raven-target/samples/library-comparers.rvn', 0, 'Comparer contract passed\n'))
+            samples.append((ROOT / 'docs/experiments/raven-target/samples/library-integers.rvn', 0,
+                            '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'))
         for name in ['library-query-basics', 'library-query-names']:
             source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
             expected = source.with_suffix('.expected.txt')
