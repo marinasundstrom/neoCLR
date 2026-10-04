@@ -305,6 +305,7 @@ fn analyze_function(
         stack: vec![],
         initialized: vec![false; function.locals.len()],
         receiver_initialized: !constructing
+            || function.owner == Some(Type::String)
             || function
                 .owner
                 .as_ref()

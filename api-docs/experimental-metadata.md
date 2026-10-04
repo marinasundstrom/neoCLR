@@ -6787,7 +6787,8 @@ external generic diamond contracts and incompatible implementations.
 `TypeDefinition.SetNativePrimitive(PrimitiveType.String)` and the corresponding
 TypeBuilder convenience method now designate the canonical nongeneric top-level
 System.String **reference** declaration. Numeric designations still require value types.
-String must be a nonabstract, noninterface class with no fields or constructors. The
+String must be a nonabstract, noninterface class with no fields or static constructors.
+Instance constructors are supported through AddConstructor and ordinary .ctor definitions. The
 same validation repeats at write time. Wrong category, identity, storage or conflicting
 designation throws ArgumentException; loaded definitions remain immutable.
 
@@ -6855,7 +6856,7 @@ grapheme methods. The caller supplies complete signature facts; runtime linking 
 them against the actual dependency. Native binding tables retain the external assembly
 scope, and introspection resolves it through the explicit metadata catalog.
 
-Raven source-owned Char provider selection remains pending. This API does not silently
+Raven source-owned Char provider selection now uses this designation. This API does not silently
 reinterpret an ordinary .NET Char reference as a grapheme.
 
 The API contract test authors the type and a managed receiver method, round-trips its
@@ -6863,3 +6864,20 @@ metadata and executes a separate neoIL caller with combining-mark and ZWJ emoji 
 The caller uses an empty System seed without a competing Char declaration. It is not proof
 of the full source-built Char class library. Unicode text is the text model; grapheme values
 preserve complete text, while UTF-8 is its native encoding.
+
+
+### Runtime String construction and bootstrap Char signatures
+
+Owned String constructors return Void and retain standard instance .ctor flags and
+parameter signatures. Their IL generator may StoreArgument(0) to replace the private
+construction receiver with a String. Other instance methods still reject receiver stores.
+NewObject returns the completed immutable String; empty construction starts with empty
+text. Numeric primitive and grapheme constructors remain rejected. Native snapshots retain
+constructor classification; both imported and independently authored String constructor
+references are supported. Executable CLI output remains unsupported for native storage.
+
+When a System native bootstrap is explicitly bound, imported CLI Char signature elements
+resolve to the graph's designated local/external grapheme owner, including inside vectors.
+With no such binding, Char preserves its original CLI core scope even if the output
+also declares a native grapheme type. This is a bridge signature rule, not implicit
+loading or a new .NET Char representation.

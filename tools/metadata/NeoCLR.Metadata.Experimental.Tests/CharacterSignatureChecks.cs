@@ -20,6 +20,11 @@ internal static class CharacterSignatureChecks
             var echo = graph.AddFunction(name, new MethodSignature(type, [type]));
             var il = echo.GetILGenerator(); il.LoadArgument(0); il.Return();
         }
+        var unbound = new AssemblyBuilder(new("UnboundGrapheme", new Version(1, 0, 0, 0)), core);
+        unbound.AddValueType("System", "Char").SetNativeGrapheme();
+        var ordinary = unbound.ImportReference(fixture.Methods.Single(m => m.Name == "Echo"), core);
+        if (ordinary.Signature.ReturnType.ImportedType?.AssemblyIdentity != core)
+            throw new Exception("unbound CLI Char must not select native storage");
         var image = graph.Write();
         var snapshot = AssemblyDefinition.ReadAssembly(image, false);
         if (!snapshot.MainModule.Functions.Single(m => m.Name == "Echo").GetSignature().SequenceEqual(new byte[] { 0, 1, 3, 3 }) ||

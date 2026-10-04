@@ -1,0 +1,46 @@
+import System.*
+
+func Classify(value: char) -> int {
+    return match value {
+        'A' => 1
+        '𐐀' => 2
+        '👩‍💻' => 3
+        _ => 0
+    }
+}
+
+func Main() -> int {
+    let combining = Char.FromString("å")
+    let emoji = Char.FromString("👩‍💻")
+    if combining.ToString() != "å" { return 1 }
+    if emoji.ToString() != "👩‍💻" { return 2 }
+    if !combining.Equals(Char.FromString("å")) { return 3 }
+    if combining.Equals(emoji) { return 4 }
+    if combining.CompareTo(combining) != 0 { return 5 }
+    let ordered: ComparableTo<char> = combining
+    if ordered.CompareTo(combining) != 0 { return 6 }
+    let text = "å👩‍💻"
+    let characters: System.Collections.Sequence<char> = text
+    if characters.Count != 2 { return 7 }
+    let iterator = characters.GetIterator()
+    if !iterator.MoveNext() { return 8 }
+    if !iterator.Current.Equals(combining) { return 9 }
+    if !iterator.MoveNext() { return 10 }
+    if !iterator.Current.Equals(emoji) { return 11 }
+    if iterator.MoveNext() { return 12 }
+    iterator.Dispose()
+    if "Straße".ToUpperInvariant() != "STRASSE" { return 13 }
+    if "ΟΣ".ToLowerInvariant() != "ος" { return 14 }
+    if !"".IsEmpty { return 15 }
+    if !text.StartsWithOrdinal("å") || !text.EndsWithOrdinal("👩‍💻") { return 16 }
+    if !text[1].Equals(emoji) { return 17 }
+    let equality: EquatableTo<string> = text
+    if !equality.Equals("å👩‍💻") { return 18 }
+    let interned = String.Intern(String.Concat("å", "👩‍💻"))
+    if !Object.ReferenceEquals(interned, String.Intern(text)) { return 19 }
+    let alias: Object = text
+    if !Object.ReferenceEquals(text, alias) { return 20 }
+    if Classify('A') != 1 || Classify('𐐀') != 2 || Classify(emoji) != 3 { return 21 }
+    if 'A' == emoji || '𐐀' != Char.FromString("𐐀") { return 22 }
+    return 42
+}

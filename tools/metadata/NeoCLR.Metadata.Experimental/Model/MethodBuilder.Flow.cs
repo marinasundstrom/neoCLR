@@ -67,7 +67,7 @@ public sealed partial class MethodBuilder
                 Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)].ByReferenceElement is not null))
                 throw new InvalidDataException("argument address requires a by-value parameter slot");
         }
-        if (!IsStatic && Instructions.Any(i => i.Op == "argument.store" && i.Value == 0))
+        if (!IsStatic && !(IsConstructor && DeclaringType!.NativePrimitive == PrimitiveType.String) && Instructions.Any(i => i.Op == "argument.store" && i.Value == 0))
             throw new InvalidDataException("receiver stores are unsupported");
         MaxStack = 0;
         var states = new FlowState?[Instructions.Count];

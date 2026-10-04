@@ -12,6 +12,28 @@ internal static class NativeStringBindingChecks
         var seed = NativeLibraryDefinition.ReadAssembly(File.ReadAllBytes(seedPath));
         var owner = reference.MainModule.Types.Single(t => t.Namespace == "System" && t.Name == "String");
         var concat = owner.Methods.Single(m => m.Name == "Concat" && m.GetSignature().AsSpan().SequenceEqual(new byte[] { 0, 2, 0x0e, 0x0e, 0x0e }));
+        foreach (var external in new[] { false, true })
+        {
+            var graphemeProjection = new AssemblyBuilder(new("GraphemeProjection", new Version(1, 0, 0, 0)), reference.Identity);
+            graphemeProjection.BindNativeLibrary(reference, seed, reference.Identity);
+            SignatureType character;
+            if (external)
+            {
+                var externalChar = graphemeProjection.CreateValueTypeReference(new("Text", new Version(1, 0, 0, 0)), reference.Identity,
+                    new string('a', 64), "System", "Char");
+                graphemeProjection.SetNativeGrapheme(externalChar);
+                character = externalChar;
+            }
+            else
+            {
+                var local = graphemeProjection.AddValueType("System", "Char");
+                local.SetNativeGrapheme();
+                character = local;
+            }
+            var indexer = graphemeProjection.ImportReference(owner.Methods.Single(m => m.Name == "get_Item"), reference.Identity);
+            if (indexer.Signature.ReturnType != character)
+                throw new Exception("explicit bootstrap signature did not select native grapheme owner");
+        }
         AssemblyBuilder Create(NativeLibraryDefinition implementation)
         {
             var graph = new AssemblyBuilder(new("StaticStringConsumer", new Version(1, 0, 0, 0)), reference.Identity);

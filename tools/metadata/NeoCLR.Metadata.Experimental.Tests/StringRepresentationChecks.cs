@@ -8,6 +8,10 @@ internal static class StringRepresentationChecks
         var graph = new AssemblyBuilder(new("StringImplementation", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
         var text = graph.AddClass("System", "String");
         text.SetNativePrimitive(PrimitiveType.String);
+        var constructor = text.AddConstructor(new MethodSignature(PrimitiveType.Void, [PrimitiveType.String]));
+        constructor.GetILGenerator().LoadArgument(1);
+        constructor.GetILGenerator().Emit(OpCode.Starg, 0);
+        constructor.GetILGenerator().Return();
         var identity = text.AddInstanceMethod("Identity", new(PrimitiveType.String, []));
         identity.GetILGenerator().LoadArgument(0);
         identity.GetILGenerator().Return();
@@ -20,7 +24,7 @@ internal static class StringRepresentationChecks
         var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
         graph.EntryPoint = main;
         var il = main.GetILGenerator();
-        il.Emit(OpCode.Ldstr, "grapheme"); il.Call(identity); il.IsNull();
+        il.Emit(OpCode.Ldstr, "grapheme"); il.NewObject(constructor); il.Call(identity); il.IsNull();
         var fail = il.DefineLabel(); il.Emit(OpCode.Brtrue, fail); il.Emit(OpCode.Ldstr, "count"); il.CastReference(contract); il.CallVirtual(getter); il.Return();
         il.MarkLabel(fail); il.LoadConstant(1); il.Return();
         var bytes = RuntimeAssemblyContainer.WriteBinary(graph);
@@ -38,9 +42,11 @@ internal static class StringRepresentationChecks
             Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(library)), "System", "String");
         consumer.SetNativePrimitive(reference, PrimitiveType.String);
         var imported = consumer.CreateMethodReference(reference, "Identity", new(PrimitiveType.String, []), nativePrimitive: PrimitiveType.String);
+        var importedConstructor = consumer.CreateMethodReference(reference, ".ctor", new(PrimitiveType.Void, [PrimitiveType.String]), nativePrimitive: PrimitiveType.String);
+        if (!loaded.Methods.Any(m => m.Name == ".ctor" && !m.IsStatic)) throw new Exception("String constructor lost");
         var entry = consumer.AddFunction("Main", new(PrimitiveType.Int32, [])); consumer.EntryPoint = entry;
         var body = entry.GetILGenerator();
-        body.Emit(OpCode.Ldstr, "external"); body.Call(imported); body.IsNull();
+        body.Emit(OpCode.Ldstr, "external"); body.NewObject(importedConstructor); body.Call(imported); body.IsNull();
         var missing = body.DefineLabel(); body.Emit(OpCode.Brtrue, missing); body.LoadConstant(42); body.Return();
         body.MarkLabel(missing); body.LoadConstant(1); body.Return();
         var application = RuntimeAssemblyContainer.WriteBinary(consumer);

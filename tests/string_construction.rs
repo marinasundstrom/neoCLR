@@ -129,3 +129,36 @@ call neoCLR.Runtime.StringFromSequence(System.Collections.Sequence<Char>)",
         FaultCode::NullReference
     );
 }
+
+#[test]
+fn runtime_string_constructor_replaces_only_its_private_receiver() {
+    let library = neoclr::assemble(".module System").unwrap();
+    let source = r#"
+.module NativeStringConstructor
+.entry Main
+.type System.String
+.method instance .ctor(String value) -> void
+ldarg value
+starg this
+ret
+.end
+.end
+.function Main() -> String
+ldstr "é👩‍💻"
+newobj instance System.String::.ctor(String)
+ret
+.end
+"#;
+    let module = neoclr::assembler::read_modules(
+        &[neoclr::assembler::ModuleInput::Source(source)],
+        &library,
+    )
+    .unwrap()
+    .remove(0);
+    let program = LoadedProgram::with_library(&module, &library).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("é👩‍💻".into())
+    );
+}

@@ -44,7 +44,7 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
         if (nativePrimitive is { } primitive && (!TypeDefinition.IsSupportedNativePrimitive(primitive) ||
             declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
-            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" || isOverride))
+            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name == ".cctor" || name == ".ctor" && primitive != PrimitiveType.String || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||
             signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))

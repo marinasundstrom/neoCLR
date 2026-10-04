@@ -280,7 +280,7 @@ fn member(
             parameters: contract.parameters.clone(),
         };
         let resolved = crate::vm::resolve(module, &target).or_else(|original| {
-            // Native numeric declarations retain the canonical runtime member spelling.
+            // Native scalar and text declarations retain the canonical runtime member spelling.
             // A metadata-produced interface may use an encoded executable name; its
             // validated declaration origin supplies the corresponding member name.
             if matches!(
@@ -296,6 +296,7 @@ fn member(
                     | Type::Single
                     | Type::Double
                     | Type::String
+                    | Type::Char
             ) {
                 if let Some(origin) = &contract.origin {
                     let mut canonical = target.clone();

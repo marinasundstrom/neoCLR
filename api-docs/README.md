@@ -963,3 +963,9 @@ op_Inequality in Raven source; both signatures and XML entries already exist in 
 reference. No new guest API is omitted. The native gate uses TextCore1004 plus native Numbers,
 not the full documentation bridge. Refreshing the full legacy snapshot from a matching
 bridge remains open; do not substitute this subset's assembly as the documentation core.
+
+Development validation (2026-10-04): the source-owned Char/String gate implements the
+already documented String(Sequence<char>) constructor directly in Raven source. No new
+guest signature is added to the bridge reference. `build-api-docs.py --check` still reports
+the previously stale full snapshot; do not replace it with the subset native Numbers.dll.
+Host metadata storage/constructor contracts are documented in experimental-metadata.md.

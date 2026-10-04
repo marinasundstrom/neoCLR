@@ -10704,3 +10704,17 @@ identity properties now fail with RAV0330, independently of writer validation.
 - Actions: clarify the text API guide and preserve this distinction in native String
   integration. No rune keyword/type was introduced. String source ownership and instance
   execution are developed separately from bootstrap-owned grapheme Char.
+
+### Follow-up: source text integration (2026-10-04)
+
+- Author directed: “Don’t stop until you have solved Char and String”.
+- Assistant extended source-owned Char through native symbols, metadata references and
+  execution. The broader sample exposed missing grapheme literal/pattern/equality lowering
+  and interface boxing/dispatch, which were implemented at their respective layers.
+- The older sequence-construction sample exposed a bridge-only constructor. Assistant
+  added the real constructor to String source and ordinary native constructor metadata
+  and execution, instead of rewriting the sample or retaining competing seed declarations.
+- Separate consumers now execute the unchanged grapheme, comparison, UTF-8 slicing and
+  sequence-construction cases. Unicode remains the text model and UTF-8 the representation;
+  no dedicated rune type or numeric Char category was introduced.
+- [Integration details and reproducible evidence](experiments/extended-cli-metadata/source-text-2026-10-04.md).

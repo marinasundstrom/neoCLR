@@ -49,5 +49,15 @@ public sealed partial class AssemblyBuilder
             throw new InvalidDataException("conflicting native grapheme owner or prior ordinary method contract");
         externalGrapheme = type;
     }
+    // Only the explicitly bound bootstrap's CLI Char signature is a native transport alias.
+    internal SignatureType ImportCharacterSignature(AssemblyIdentity core)
+    {
+        if (NativeBindingFor(core)?.Library.ModuleName == "System")
+        {
+            if (externalGrapheme is not null) return externalGrapheme;
+            if (types.SingleOrDefault(t => t.NativeGrapheme) is { } local) return local;
+        }
+        return ImportTypeIdentity(core, "System", "Char", 0, isValueType: true);
+    }
     internal bool IsNativeGrapheme(ImportedTypeReference type) => Equals(externalGrapheme, type);
 }

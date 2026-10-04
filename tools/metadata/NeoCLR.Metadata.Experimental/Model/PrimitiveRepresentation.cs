@@ -10,15 +10,15 @@ public sealed partial class TypeDefinition
     /// <param name="primitive">A fixed-width numeric primitive or String.</param>
     /// <exception cref="InvalidOperationException">The declaration is a loaded snapshot.</exception>
     /// <exception cref="ArgumentException">The identity/category/storage is incompatible or the designation conflicts.</exception>
-    /// <remarks>No record fields, constructors, nesting or generic parameters are allowed. Numeric bodies access scalar storage through ldobj/stobj; String bodies use the reference receiver directly. This does not authorize duplicate primitive ownership across dependencies.
+    /// <remarks>No record fields, static constructors, nesting or generic parameters are allowed. Only String admits instance constructors. Numeric bodies access scalar storage through ldobj/stobj; String bodies use the reference receiver directly. This does not authorize duplicate primitive ownership across dependencies.
     /// Native emission preserves existing Runtime representation; executable CLI emission rejects this designation.</remarks>
     public void SetNativePrimitive(PrimitiveType primitive)
     {
         if (authoredFields is null) throw new InvalidOperationException("loaded primitive declarations are immutable");
         if (!IsSupportedNativePrimitive(primitive) || NativePrimitive is { } previous && previous != primitive ||
             Namespace != "System" || Name != primitive.ToString() || IsValueType != (primitive != PrimitiveType.String) || GenericArity != 0 || DeclaringType is not null ||
-            (primitive == PrimitiveType.String ? (Attributes & 0xa0) != 0 : (Attributes & 0x1b8) != 0x108) || Fields.Count != 0 || Methods.Any(m => m.Name is ".ctor" or ".cctor"))
-            throw new ArgumentException("native primitive declaration requires its canonical System type category with no record storage or constructors", nameof(primitive));
+            (primitive == PrimitiveType.String ? (Attributes & 0xa0) != 0 : (Attributes & 0x1b8) != 0x108) || Fields.Count != 0 || Methods.Any(m => m.Name == ".cctor" || m.Name == ".ctor" && primitive != PrimitiveType.String))
+            throw new ArgumentException("native primitive declaration requires its canonical System type category with no record storage or unsupported constructors", nameof(primitive));
         NativePrimitive = primitive;
     }
 

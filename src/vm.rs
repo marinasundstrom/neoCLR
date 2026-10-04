@@ -272,10 +272,15 @@ pub(crate) fn resolve_constructor_body(
         || function.pinvoke.is_some()
         || !module
             .type_definition(owner)
-            .is_some_and(|d| d.representation == Representation::Record)
+            .is_some_and(|d| {
+                d.representation == Representation::Record
+                    || *owner == Type::String
+                        && d.representation == Representation::Runtime
+                        && !function.receiver_byref
+            })
     {
         return Err(Fault::new(
-            "newobj constructor requires an instance IL .ctor returning Void on a record type",
+            "newobj constructor requires an instance IL .ctor returning Void on a record or runtime String",
         ));
     }
     Ok(function)
@@ -586,11 +591,16 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 .owner
                 .as_ref()
                 .is_some_and(|owner| !module.is_reference_type(owner));
+        let string_constructor = function.owner == Some(Type::String)
+            && function.name == "System.String..ctor"
+            && function.instance
+            && !function.receiver_byref;
         if function.no_result
             && (function.returns != Type::Void
                 || (function.instance
                     && !class_owner
                     && !value_receiver
+                    && !string_constructor
                     && !nominal_interface_contract)
                 || (function.is_virtual
                     && !nominal_interface_contract
@@ -3306,9 +3316,21 @@ fn interpret_instructions_with_dispatch(
                         ));
                     }
                     let byref = callee.receiver_byref;
-                    let definitions = module.instantiated_fields(&owner)?;
+                    let definitions = if owner == Type::String {
+                        vec![]
+                    } else {
+                        module.instantiated_fields(&owner)?
+                    };
                     let mut child = Frame::new(callee, args)?;
-                    if module.is_reference_type(&owner) {
+                    if owner == Type::String {
+                        // String construction replaces the private receiver slot. No mutable
+                        // text or partially initialized object escapes to the caller.
+                        child.constructing = true;
+                        child.args.insert(
+                            0,
+                            crate::slots::Slot::cell(owner, Some(Value::String("".into()))),
+                        );
+                    } else if module.is_reference_type(&owner) {
                         if heap.len() >= limits.heap_objects {
                             return Err(Fault::coded(
                                 crate::FaultCode::HeapLimitExceeded,

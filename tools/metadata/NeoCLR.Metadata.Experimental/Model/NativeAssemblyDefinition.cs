@@ -525,7 +525,7 @@ public sealed partial class NativeAssemblyDefinition
                     var ownerName = primitiveOwner ? "System." + (owner.GetString() == "Char" ? "Char" : ReadPrimitive(owner.GetString(), false).ToString()) : constructed ? Text(construction, "definition") : Text(owner, "Named");
                     ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
                     Require(types[ownerIndex].EnumMembers is null && primitiveOwner == (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme), "invalid native owner representation");
-                    Require(!primitiveOwner || name is not (".ctor" or ".cctor"), "runtime primitives cannot declare constructors");
+                    Require(!primitiveOwner || name is not (".ctor" or ".cctor") || name == ".ctor" && types[ownerIndex].NativePrimitive == PrimitiveType.String, "runtime primitive constructor is unsupported");
                     var arity = types[ownerIndex].GenericNames.Length;
                     Require(constructed == (arity > 0), "open owner construction required");
                     if (constructed)

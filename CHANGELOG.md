@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Complete source-owned Char/String native import and emission through a retained seed
+  without duplicate text declarations. Separate consumers execute grapheme literals,
+  equality/patterns, interface dispatch, Unicode text operations, String sequence
+  construction and mutation-independent copying. Encode ordinary String constructor
+  metadata and execute it over private immutable-text storage; CLI Char stays unchanged.
+
 - Add explicit owned grapheme Char metadata declarations through definitions/builders
   and expose the fact through native introspection. API-authored managed receiver methods
   preserve combining and ZWJ graphemes in native execution; ordinary .NET Char tests remain

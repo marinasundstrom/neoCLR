@@ -171,17 +171,13 @@ range support. This is integration evidence, not full-library support.
 
 
 Development integration now supports explicit interface property accessors across native
-assemblies, using the existing metadata relationships. Full source-owned String/Char
-compilation remains in progress; this is not full class-library completion.
+assemblies, using the existing metadata relationships. This is not full class-library
+completion.
 
-The development metadata API can now author runtime-owned String reference declarations
-and external instance calls. Raven source String ownership is still being connected;
-this does not change the published class-library support level.
-
-The development native compiler now builds source-owned String and executes instance
-operations and collection iteration from a separate consumer. Its text model is Unicode
-text, stored as UTF-8. Source-owned grapheme Char remains the next integration step.
-
-The development metadata API can now author runtime-owned Char grapheme declarations
-and inspect their storage identity. Raven's source-owned Char integration remains pending;
-.NET Char retains its UTF-16 code-unit behavior.
+The development native compiler builds source-owned String and Char together and imports
+that library into separate consumers. Checked cases cover grapheme literals/patterns,
+Unicode casing and comparison, iteration, UTF-8 slices and String construction from a
+character sequence with independent copying. Metadata constructors keep CLI shape;
+runtime-owned storage preserves Unicode text in UTF-8. Ordinary .NET Char remains a
+UTF-16 code unit. This is development integration evidence, not full class-library support
+or a new published bundle.

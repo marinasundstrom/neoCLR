@@ -9,6 +9,11 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
     #pragma warning disable-next-line RAV9032
     private field m_value: string
 
+    /// Snapshots characters into immutable Unicode text; later input mutation is independent.
+    init(characters: Collections.Sequence<char>) {
+        m_value = CreateFromCharacters(characters)
+    }
+
     internal static func CreateFromCharacters(characters: Collections.Sequence<char>) -> string {
         let count = characters.Count
         let snapshot = Runtime.CompilerServices.CheckedStorage.Reserve<char>(count)

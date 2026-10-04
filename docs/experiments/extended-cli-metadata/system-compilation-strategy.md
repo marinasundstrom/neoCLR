@@ -22,15 +22,14 @@ cache guards; it passes 139 focused .NET tests independently and is fast-forward
 main. The integration branch passes the same 139 tests. See [evidence](source-order-conversions-2026-10-04.json).
 Priority 1 below is now the next feature batch. No runtime/metadata representation changed.
 
-Priority 1 prerequisite now executes: the catalog selects 20 existing text services,
-including Char/UInt32 and vector transports. Separate native library/consumer execution
-covers unchanged UnicodeScalar and a text-service contract fixture; missing declarations
-reject without output. The full numeric gate passes against the expanded seed.
-[Text evidence](text-services-native-2026-10-04.json). Actual String source advances to
-an explicit-interface-property emission rejection (Collection<char>.Count). Char source
-emits, but canonical source ownership and execution are not established. Next bounded
-work is explicit interface accessor emission, followed by source-owned String/Char
-storage and identity; do not infer canonical primitive support from emission alone.
+**Priority 1 text ownership completed:** the explicit service catalog and source-owned
+Char/String now execute together through separate native consumers, with both text
+declarations excluded from the seed. The unchanged grapheme, comparison, UTF-8 slice
+and sequence-construction samples pass. Literal/equality/pattern lowering, interface
+dispatch and native String constructors are implemented rather than projected through
+consumer stubs. See [text gate and evidence](source-text-2026-10-04.md).
+Next use this foundation for larger stream/storage/JSON source groups, with missing
+runtime services and cross-assembly inheritance addressed at their owning layers.
 
 
 **Original reproduction: source-order-dependent generic interface binding.** Prepending

@@ -156,6 +156,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Value" && type.IsValueType && type.GenericArity == 0;
     private string TypeKey(SignatureType type)
     {
+        if (type.ClassType is { NativeGrapheme: true }) return "Char";
         if (type.Primitive is { } primitive) return primitive.ToString();
         if (type.ByReferenceElement is { } byref) return "ByRef(" + TypeKey(byref) + ")";
         if (type.ArrayElement is { } element) return "ArrayRef(" + TypeKey(element) + ")";

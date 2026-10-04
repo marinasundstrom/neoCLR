@@ -22,24 +22,22 @@ and independently validated main f0c3b75a0 each pass 139 focused .NET tests.
 
 The common text-service prerequisite now executes through native libraries: Unicode
 scalar classification, grapheme/vector operations, Unicode casing and UTF-8 slicing.
-The expanded seed preserves the numeric gate. Explicit interface properties and pattern if-expressions now pass native emission. The
-cumulative source String/Char build verifies, and an artifact-only static String consumer
-executes; canonical primitive instance storage/ownership remains open; Char source emission alone does not prove
-canonical ownership. [Text evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).
+The expanded seed preserves the numeric gate. Explicit interface properties and pattern
+if-expressions pass native emission. The text prerequisite evidence below predates the
+completed canonical text ownership gate described next. [Text evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).
 
 See [explicit-property integration](experiments/extended-cli-metadata/explicit-properties-2026-10-04.md).
 
 Source-owned String now executes instance operations and collection-interface dispatch
 through a separate native consumer, with an explicit retained seed and ownership manifest.
 See [the String integration](experiments/extended-cli-metadata/source-string-2026-10-04.md).
-Owned grapheme Char declarations now round-trip and execute through the metadata API
-(143 C# groups). External snapshot-imported and independently authored references now
-execute through separate forwarder libraries. See [external grapheme evidence](experiments/extended-cli-metadata/grapheme-external-2026-10-04.md).
-Next integrate Raven source ownership;
-imported nullability and broader text coverage remain open.
+Source-owned Char and String now execute together, including literal/pattern/equality
+lowering, interfaces and the real Sequence<char> String constructor. Separate native
+consumers pass the existing grapheme, comparison, slice and construction samples.
+See [text gate and evidence](experiments/extended-cli-metadata/source-text-2026-10-04.md).
+Imported nullability and wider source groups remain open.
 
-Next prioritize source-owned String/Char and coherent text-service bindings (shared
-by text, stream, storage and JSON sources), ordinary cross-assembly class inheritance,
+Next expand the verified text-service foundation into stream, storage and JSON sources, ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and
 callback/storage/generic support from demonstrated failures. See the strategy's
 [current reassessment](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04)
