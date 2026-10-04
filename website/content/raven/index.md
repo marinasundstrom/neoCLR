@@ -221,4 +221,5 @@ focused native success/failure consumer and the shared fix is integrated into Ra
 main. Conditional propagation now also lowers: the five-source JSON library compiles and
 a separate native DOM consumer runs successfully, checking parsing and alias mutation.
 The public serializer and object mapper still require introspection dependencies;
-full document round trips are not yet proven.
+internal document round trips now pass a test-only entry point, including Unicode,
+mutation and invalid-input rejection. Public serializer execution remains pending.

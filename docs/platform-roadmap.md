@@ -61,9 +61,12 @@ virtual hierarchy contracts remain open. Shared local-assignment and conditional
 propagation now unlock the [five-source JSON library and separate native DOM consumer](experiments/extended-cli-metadata/conditional-propagation-json-2026-10-04.md).
 The consumer returns 42, including number parsing, duplicate rejection and alias
 mutation. General lowering fixes are integrated into Raven main at `e1df355a2`.
-The public serializer/object mapper next needs an explicit introspection dependency
-and runtime-service catalog; full document codec execution and .NET JSON-library
-parity remain unproven.
+The [internal document codec gate](experiments/extended-cli-metadata/source-json-codec-2026-10-04.md)
+now also executes Unicode round trips, alias mutation and invalid-input/cycle rejection
+through unchanged source bodies. The public serializer/object mapper next needs an
+explicit introspection dependency and runtime-service catalog; follow the
+[handle-first dependency sequence](experiments/extended-cli-metadata/introspection-native-next-2026-10-04.md).
+.NET JSON-library parity remains unproven.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone
 ReflectionError union in its explicit source dependencies; it does not yet require

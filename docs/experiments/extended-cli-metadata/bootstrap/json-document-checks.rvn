@@ -1,0 +1,55 @@
+namespace NeoCLR.Tests
+
+import System.*
+import System.Data.Json.*
+import System.Result.*
+
+// Compiled beside unchanged library sources solely to test internal codec entry points.
+public class JsonDocumentChecks {
+    private static func Check() -> Result<int, JsonError> {
+        let text = "{\"name\":\"å😀\",\"values\":[42,true,null]}"
+        let parsed = DocumentReader(text).Read()?
+        let written = DocumentWriter().Write(parsed)?
+        if !written.Equals(text) {
+            return Ok(2)
+        }
+        let document = (JsonObject)parsed
+        let stored = document.Field("values")?
+        let array = (JsonArray)stored
+        _ = array.Add(JsonBoolean(false))?
+        let updated = DocumentWriter().Write(parsed)?
+        if !updated.Equals("{\"name\":\"å😀\",\"values\":[42,true,null,false]}") {
+            return Ok(3)
+        }
+        let escaped = DocumentReader("\"\\uD83D\\uDE00\"").Read()?
+        let escapedText = DocumentWriter().Write(escaped)?
+        if !escapedText.Equals("\"😀\"") {
+            return Ok(4)
+        }
+        if DocumentReader("{\"a\":1,\"a\":2}").Read() is Ok(_) {
+            return Ok(5)
+        }
+        if DocumentReader("[1,]").Read() is Ok(_) {
+            return Ok(6)
+        }
+        if DocumentReader("true false").Read() is Ok(_) {
+            return Ok(7)
+        }
+        if DocumentReader("\"\\uD800\"").Read() is Ok(_) {
+            return Ok(8)
+        }
+        let cyclic = JsonArray()
+        _ = cyclic.Add(cyclic)?
+        if DocumentWriter().Write(cyclic) is Ok(_) {
+            return Ok(9)
+        }
+        return Ok(42)
+    }
+
+    static func Run() -> int {
+        match Check() {
+            Ok(let answer) => return answer
+            Error(_) => return 1
+        }
+    }
+}

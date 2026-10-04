@@ -5758,3 +5758,13 @@ independent main integration `e1df355a2`. No bridge encoding, metadata API or Ru
 Contract changes. The five unchanged JSON sources compile, verify and serve a separate
 native DOM consumer returning 42. The public serializer still needs introspection
 and reflection services in its dependency catalog. [Gate and limitations](experiments/extended-cli-metadata/conditional-propagation-json-2026-10-04.md).
+
+
+## Native internal JSON codec gate (2026-10-04)
+
+The unchanged document reader/writer now executes Unicode round trips, shared mutation
+and invalid-input/cycle rejection through a test-only entry point compiled beside the
+library. Separate artifact-only consumers and explicit JSON ownership manifests pass.
+No bridge mapping, compiler or Runtime Contract changes are introduced. The public
+serializer remains pending native introspection/handle dependencies. See the
+[gate and next dependency sequence](experiments/extended-cli-metadata/source-json-codec-2026-10-04.md).

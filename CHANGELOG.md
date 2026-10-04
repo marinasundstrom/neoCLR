@@ -11,7 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Record shared conditional propagation lowering, independently integrated into Raven
   main, unlocking the unchanged five-source native JSON library. Runtime verification
   and an artifact-only DOM consumer pass, including alias mutation and number parsing.
-  Public serializer/object mapping still requires introspection dependencies.
+  Add a reproducible internal codec gate for Unicode round trips, mutation and
+  invalid-input/cycle rejection, with separate consumer ownership manifests.
+  Public serializer/object mapping still requires introspection dependencies;
+  record the handle-first capability sequence from the candidate expansion.
 
 - Record shared local-assignment propagation lowering in Raven,
   independently integrated into main, and native success/failure execution against
