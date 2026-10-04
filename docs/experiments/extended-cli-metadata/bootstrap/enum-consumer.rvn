@@ -1,0 +1,13 @@
+import System.Tasks.*
+
+func Main() -> int {
+    let box = TaskStateBox()
+    if box.State != TaskState.Pending { return 1 }
+    box.Complete()
+    let states: TaskState[] = [box.State, TaskState.Cancelled]
+    if states[0] != TaskState.Completed { return 2 }
+    if states[1] != TaskState.Cancelled { return 3 }
+    let value = (int)box.State
+    let unknown = (TaskState)(value + 41)
+    return (int)TaskStateBox.Echo(unknown)
+}

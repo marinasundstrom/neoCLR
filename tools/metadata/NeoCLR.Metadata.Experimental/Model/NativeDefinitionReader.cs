@@ -77,13 +77,19 @@ public sealed partial class NativeAssemblyDefinition
         }
         var typeRows = types.Select((type, index) => new AssemblyDefinition.TypeRow(
             0x02000002u + (uint)index, type.Namespace, type.Name, type.GenericNames.Length, type.DeclaringType < 0 ? 0u : 0x02000002u + (uint)type.DeclaringType,
-            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames)).ToArray();
+            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.EnumMembers is not null ? 0x100 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames, IsEnum: type.EnumMembers is not null)).ToArray();
         var fieldRows = new List<AssemblyDefinition.FieldRow>();
         for (int owner = 0; owner < types.Length; owner++)
+        {
             foreach (var field in types[owner].Fields)
                 fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, field.Name,
-                    (ushort)((field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)),
+                    (ushort)((types[owner].EnumMembers is not null ? 0x600 : 0) | (field.IsReadOnly ? 0x20 : 0) | (field.Visibility == FieldVisibility.Public ? 6 : field.Visibility == FieldVisibility.Internal ? 3 : 1)),
                     [], Copy(field.Signature!)));
+            if (types[owner].EnumMembers is { } members)
+                foreach (var member in members)
+                    fieldRows.Add(new(0x04000001u + (uint)fieldRows.Count, 0x02000002u + (uint)owner, member.Name,
+                        0x8056, [], new(null, 0x02000002u + (uint)owner), member.Value));
+        }
         var accessors = properties.SelectMany(p => new[] { p.Getter, p.Setter }).Where(index => index >= 0).ToHashSet();
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,

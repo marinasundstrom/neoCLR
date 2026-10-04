@@ -63,6 +63,7 @@ public sealed partial class TypeDefinition
             throw new ArgumentException("invalid type name");
         Namespace = @namespace; Name = name; Attributes = attributes; BaseType = baseType; GenericParameterNames = Array.Empty<string>();
         IsValueType = baseType is { Namespace: "System", Name: "ValueType" or "Enum" };
+        IsEnum = baseType is { Namespace: "System", Name: "Enum" };
         authoredProperties = new DefinitionCollection<PropertyDefinition>([], property =>
         {
             if (Producer is null) throw new InvalidOperationException("attach the owner before adding properties");
@@ -112,12 +113,16 @@ public sealed partial class FieldDefinition
     /// <summary>Gets the authored signature; null for an opaque loaded field signature.</summary>
     public SignatureType? FieldType { get; }
     /// <summary>Creates a detached instance field using CLI access and optional InitOnly flags.</summary>
-    public FieldDefinition(string name, ushort attributes, SignatureType fieldType)
+    public FieldDefinition(string name, ushort attributes, SignatureType fieldType) : this(name, attributes, fieldType, null) { }
+    /// <summary>Creates a detached field, including an Int32 enum literal with Static, Literal and HasDefault flags.</summary>
+    /// <exception cref="ArgumentException">The flags, signature or constant combination is unsupported.</exception>
+    public FieldDefinition(string name, ushort attributes, SignatureType fieldType, int? constant)
     {
         ArgumentNullException.ThrowIfNull(fieldType); CheckName(name);
-        if ((attributes & ~0x27) != 0 || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void)
+        if ((attributes & ~0x27) != 0 && attributes is not (0x606 or 0x8056) || (attributes & 7) is not (1 or 3 or 6) || fieldType.Primitive == PrimitiveType.Void ||
+            ((attributes & 0x40) != 0) != constant.HasValue)
             throw new ArgumentException("unsupported field attributes or signature");
-        this.name = name; Attributes = attributes; FieldType = fieldType; signature = [];
+        this.name = name; Attributes = attributes; FieldType = fieldType; Constant = constant; signature = [];
     }
     private static void CheckName(string value)
     {
@@ -148,13 +153,14 @@ public sealed partial class AssemblyBuilder
             if (definition.DeclaringType is null ? (attributes & 7) is not (0 or 1) : (attributes & 7) is not (2 or 5))
                 throw new ArgumentException("visibility does not match lexical ownership");
             var category = attributes & ~7u;
-            if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x180 or 0x108 or 0xa0)) throw new ArgumentException("unsupported manual type shape");
+            if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
+            if (category == 0x100 && !definition.IsEnum) throw new ArgumentException("sealed manual type category requires an enum");
             if (category == 0xa0)
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
             else if (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
-                baseType.Name != (definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108))
+                baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.
             foreach (var field in definition.Fields)

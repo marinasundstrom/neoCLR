@@ -107,7 +107,7 @@ public sealed class ConstructedTypeInfo : TypeInfo
 public sealed class FieldInfo
 {
     internal FieldInfo(FieldDefinition definition, TypeInfo declaringType, TypeInfo fieldType)
-    { Accessibility = MetadataAccess.Member(definition.Attributes); Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType; IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0; }
+    { IsLiteral = definition.IsLiteral; Constant = definition.Constant; Accessibility = MetadataAccess.Member(definition.Attributes); Name = definition.Name; MetadataToken = definition.MetadataToken; DeclaringType = declaringType; FieldType = fieldType; IsStatic = (definition.Attributes & 0x10) != 0; IsReadOnly = (definition.Attributes & 0x20) != 0; }
     /// <summary>Gets the metadata name.</summary>
     public string Name { get; }
     /// <summary>Gets the original declaration's module-local field token.</summary>
@@ -122,6 +122,10 @@ public sealed class FieldInfo
     public MetadataAccessibility Accessibility { get; }
     /// <summary>Gets the metadata init-only flag; this facade cannot write values.</summary>
     public bool IsReadOnly { get; }
+    /// <summary>Gets whether the field is a static literal.</summary>
+    public bool IsLiteral { get; }
+    /// <summary>Gets its supported Int32 constant, or null when absent or unsupported.</summary>
+    public int? Constant { get; }
 }
 
 public sealed partial class MetadataLoadContext

@@ -86,7 +86,7 @@ public sealed partial class AssemblyBuilder
             instruction.Text is null ? 0L : System.Text.Encoding.UTF8.GetByteCount(instruction.Text)) > MetadataArtifactReader.MaxImageSize)
             throw new InvalidDataException("assembly string literal limit exceeded");
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
-        if (types.Sum(type => type.Fields.Count) > 4096) throw new InvalidDataException("too many fields");
+        if (types.Sum(type => type.MetadataFields.Count()) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
         if (EntryPoint is not null && (!methods.Contains(EntryPoint) || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
             throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
@@ -96,6 +96,7 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {
+            foreach (var type in types) type.ValidateEnum();
             ValidateValueLayouts();
             foreach (var type in types)
                 foreach (var attribute in type.Definition.CustomAttributes) attribute.ValidateContract(type.Definition);
@@ -239,6 +240,7 @@ public sealed partial class AssemblyBuilder
             }
             return handle;
         }
+        var enumBase = types.Any(t => t.IsEnum) ? metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Enum")) : default;
         var valueBase = types.Any(t => t.IsValueType) ? metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ValueType")) : default;
         var objectType = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("Object"));
         if (referenceOnly)
@@ -486,7 +488,7 @@ public sealed partial class AssemblyBuilder
             }
             return MetadataTokens.GetToken(handle);
         }
-        var fieldHandles = types.SelectMany(t => t.Fields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
+        var fieldHandles = types.SelectMany(t => t.MetadataFields).Select((field, index) => (field, handle: MetadataTokens.FieldDefinitionHandle(index + 1))).ToDictionary(p => p.field, p => p.handle);
         var failureConstructor = default(MemberReferenceHandle);
         if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "fail")))
         {
@@ -524,6 +526,7 @@ public sealed partial class AssemblyBuilder
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
+                    "enum.from" or "enum.to" => 0,
                     "constant64" => 9,
                     "call.constrained" => 11,
                     "fail" => 11,
@@ -583,6 +586,7 @@ public sealed partial class AssemblyBuilder
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
                     case "convertByte": code.WriteByte(0xd2); break;
+                    case "enum.from": case "enum.to": break;
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;
                     case "argument": code.WriteByte(0xfe); code.WriteByte(0x09); code.WriteUInt16((ushort)instruction.Value); break;
@@ -647,7 +651,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsValueType ? valueBase : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));
@@ -662,17 +666,14 @@ public sealed partial class AssemblyBuilder
                 var constructor = metadata.AddMemberReference(attributeOwner, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(attribute.GetConstructorSignature()));
                 metadata.AddCustomAttribute(typeHandle, constructor, metadata.GetOrAddBlob(attribute.GetValue()));
             }
-            foreach (var field in type.Fields)
+            foreach (var field in type.MetadataFields)
             {
                 var signature = new BlobBuilder();
                 var encoder = new BlobEncoder(signature).FieldSignature();
                 EncodeType(encoder, field.FieldType);
-                metadata.AddFieldDefinition((field.Visibility switch
-                {
-                    FieldVisibility.Public => FieldAttributes.Public,
-                    FieldVisibility.Internal => FieldAttributes.Assembly,
-                    _ => FieldAttributes.Private
-                }) | (field.IsReadOnly ? FieldAttributes.InitOnly : 0), metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
+                var fieldHandle = metadata.AddFieldDefinition((FieldAttributes)field.Definition.Attributes,
+                    metadata.GetOrAddString(field.Name), metadata.GetOrAddBlob(signature));
+                if (field.Definition.Constant is { } constant) metadata.AddConstant(fieldHandle, constant);
                 nextField++;
             }
             foreach (var inherited in type.InterfaceSignatures) metadata.AddInterfaceImplementation(typeHandle, MetadataTokens.EntityHandle(ElementToken(inherited)));

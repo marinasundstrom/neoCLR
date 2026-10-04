@@ -1,0 +1,10 @@
+import System.Tasks.*
+
+public class TaskStateBox {
+    private var state: TaskState = TaskState.Pending
+    val State: TaskState => state
+    func Complete() {
+        state = TaskState.Completed
+    }
+    static func Echo(value: TaskState) -> TaskState => value
+}

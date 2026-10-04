@@ -6253,3 +6253,54 @@ fixture now uses unsupported schema 4, because schema 3 is deliberately supporte
 53-source native library, unchanged broad application and MemoryStream execution.
 No public guest Raven signature changed; the manual development reference covers these
 host C# APIs. No website build or performance claim is part of this change.
+
+### Int32 enum authoring and introspection (development, 2026-10-04)
+
+`AssemblyBuilder.AddEnum(string namespace, string name, TypeVisibility visibility = Public)`
+returns a `TypeBuilder` for a nongeneric top-level enum. It creates the selected core
+`System.Enum` base and a Public/SpecialName/RTSpecialName Int32 `value__` field.
+`TypeBuilder.AddEnumMember(string name, int value)` returns a literal `FieldBuilder`;
+its definition has Public/Static/Literal/HasDefault flags and the owning enum signature.
+Aliases and unnamed integer values are valid. Names must be unique ASCII identifiers.
+`TypeBuilder.Fields` retains its existing instance-storage meaning; all declarations,
+including literals, are available through `TypeBuilder.Definition.Fields`.
+
+Manual definitions use the same validation path: attach a sealed `TypeDefinition`
+extending the explicit core System.Enum, with `value__` attributes 0x606 and Int32
+signature, then add fields with attributes 0x8056, the attached enum signature and an
+Int32 constant. The existing three-argument `FieldDefinition` constructor is retained;
+the four-argument overload accepts `int? constant`. Constants require literal flags;
+ordinary fields cannot carry one. Duplicate or invalid declarations throw
+`ArgumentException`; invalid final enum shapes throw `InvalidDataException` on writing.
+Flags, other widths, generic/nested enums, interfaces and enum-owned methods/properties
+are unsupported by this authoring profile. Existing runtime/frontend flags support
+is unaffected.
+
+`TypeDefinition.IsEnum`, `TypeBuilder.IsEnum` and introspection
+`NominalTypeInfo.IsEnum` report enum declarations. `FieldDefinition.IsLiteral` and
+introspection `FieldInfo.IsLiteral` identify static literals; their `int? Constant`
+returns a supported Int32 constant or null. CLI readers retain other raw signature
+bytes; this does not expand CLI nominal field-signature decoding. Native readers
+project canonical nominal literal signatures and reject unsupported enum shapes.
+
+`AssemblyBuilder.CreateEnumReference(AssemblyIdentity dependency,
+AssemblyIdentity dependencyCoreLibrary, string artifactSha256, string namespace,
+string name)` authors a public output-owned enum identity from symbol/host facts.
+It has the same identity, digest and dependency validation as CreateValueTypeReference.
+It does not load a dependency. `ImportReference` of a native enum definition registers
+its enum category as well. Actual native dependency linking/verification remains required.
+
+`IILGenerator.ConvertToEnum(SignatureType enumType)` consumes Int32 and produces the
+nominal enum; `ConvertFromEnum` performs the inverse. MethodILGenerator implements both.
+Foreign operands and non-enum signatures reject; stack validation checks operands.
+CLI emission requires no instruction because the evaluation stack carries the underlying
+integer. Native emission uses existing newobj and conv.i4 with nominal enum storage.
+These are semantic helpers, not new raw opcodes or a format-version change.
+
+Validation: the C# enum contract group covers builder/manual parity, CLI execution,
+native/CLI declaration round trips, facade facts and malformed metadata rejection.
+`--enum-runtime` additionally loads a separately encoded native library and consumer.
+The paired Raven `bootstrap/verify_enums.py` driver compiles the unchanged TaskState
+source and exercises mutation, array storage, comparisons and integer conversions on
+both targets. No guest public API is added; the existing guest snapshot maintenance
+blocker is unchanged.

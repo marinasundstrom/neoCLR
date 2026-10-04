@@ -5466,3 +5466,16 @@ No Raven emitter special case or Object-boxing bridge is introduced. The metadat
 library's existing function signature encoding preserves this distinction. Native
 helper library/consumer execution verifies mutation after explicit drain; the full
 source Tasks/Workers gate still requires enum and queue-ownership integration.
+
+#### Native source enum gate (2026-10-04)
+
+`bootstrap/verify_enums.py` (relative to the extended-cli-metadata experiment) accepts
+`--compiler --runtime --core --seed --base-library --ownership --output`. Use a matching
+57-source bundle and its ownership manifest. It compiles unchanged TaskState plus
+`enum-contracts.rvn`, imports only that library into `enum-consumer.rvn`, and verifies
+native execution; the same sources compile and execute through ordinary .NET commands.
+Both exit 42 with no stdout. Evidence includes source/artifact hashes and revisions.
+The native target explicitly admits top-level Int32 enums. Symbol facts and artifact
+identities author references; emission does not access importer objects. Ordinary .NET
+Reflection/Emit behavior remains unchanged. Flags/other widths/nested enums are explicit
+limits, and full source Tasks/Workers still requires queue ownership integration.

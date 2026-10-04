@@ -109,6 +109,8 @@ public sealed partial class AssemblyBuilder
             "less" => new { op = "clt" },
             "greater" => new { op = "cgt" },
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
+            "enum.from" => new { op = "newobj", arg = SignatureValue(instruction.Type!) },
+            "enum.to" => new { op = "conv.i4" },
             "argument.store" => new { op = "starg", arg = (object)instruction.Value },
             "argument" => new { op = "ldarg", arg = (object)instruction.Value },
             "new.constructed" or "call.constructed" or "call.virtual.constructed" => new
@@ -211,7 +213,7 @@ public sealed partial class AssemblyBuilder
             }).ToArray();
         }
         foreach (var type in types) CheckText(type.Namespace.Length == 0 ? type.Name : type.Namespace + "." + type.Name);
-        var fieldTokens = types.SelectMany(t => t.Fields).Select((field, index) => (field, token: 0x04000001 + index)).ToDictionary(p => p.field, p => p.token);
+        var fieldTokens = types.SelectMany(t => t.MetadataFields).Select((field, index) => (field, token: 0x04000001 + index)).ToDictionary(p => p.field, p => p.token);
         var propertyTokens = types.SelectMany(t => t.Properties).Select((property, index) => (property, token: 0x17000001 + index)).ToDictionary(p => p.property, p => p.token);
         object TypeOrigin(TypeBuilder type, int index)
         {
@@ -288,11 +290,11 @@ public sealed partial class AssemblyBuilder
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
-                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType, type.IsStatic, type.IsStatic || type.IsValueType,
+                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType, type.IsStatic, type.IsStatic || type.IsValueType,
                 TypeOrigin(type, index), type.IsInterface ? "Interface" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
-                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, type.Definition.CustomAttributes.Count == 0 ? null : type.Definition.CustomAttributes.Select(Attribute).ToArray())).ToArray(),
+                type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, type.Definition.CustomAttributes.Count == 0 ? null : type.Definition.CustomAttributes.Select(Attribute).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = false, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
             functions = methods.Select((method, index) => new NativeMethodRow(
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
@@ -346,6 +348,8 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         object? declaring_type,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object[]? custom_attributes);
+        object[]? custom_attributes,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object? enum_info);
 
 }

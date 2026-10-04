@@ -9,7 +9,8 @@ namespace NeoCLR.Metadata.Experimental.Model;
 /// <remarks>Reads metadata only. Native bodies are opaque and must still be verified by neoCLR. General format-5 assemblies and structural types are unsupported.</remarks>
 public sealed partial class NativeAssemblyDefinition
 {
-    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
+    private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
+        internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
     private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, string> ParameterNames { get; init; } = []; }
@@ -188,6 +189,19 @@ public sealed partial class NativeAssemblyDefinition
                         declaringType >= 0 && declaringType < types.Count && types[declaringType].GenericNames.Length == 0,
                         "invalid or unsupported nested owner");
                 }
+                (string Name, int Value)[]? enumMembers = null;
+                if (type.TryGetProperty("enum_info", out var enumInfo))
+                {
+                    typeFields.Add("enum_info"); Shape(enumInfo, "underlying", "flags", "members");
+                    Require(enumInfo.GetProperty("underlying").GetString() == "Int32" && !enumInfo.GetProperty("flags").GetBoolean(), "only ordinary Int32 enums are supported");
+                    enumMembers = Array(enumInfo, "members", 256).Select(member =>
+                    {
+                        Shape(member, "name", "value"); var memberName = Text(member, "name"); CheckName(memberName);
+                        Require(memberName != "value__" && memberName.Length <= 1024 && memberName.All(c => char.IsAsciiLetterOrDigit(c) || c == '_') && !char.IsDigit(memberName[0]), "invalid enum member");
+                        return (memberName, member.GetProperty("value").GetInt32());
+                    }).ToArray();
+                    Require(enumMembers.Select(m => m.Name).Distinct().Count() == enumMembers.Length && typeNames.Length == 0 && declaringType < 0 && baseInterfaces.Length == 0, "unsupported enum relationships or duplicate members");
+                }
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
                 var isValueType = !isInterface && !type.GetProperty("is_reference_type").GetBoolean();
@@ -209,8 +223,13 @@ public sealed partial class NativeAssemblyDefinition
                     };
                     fieldRows.Add(new(fieldName, field.GetProperty("ty").Clone(), fieldVisibility));
                 }
+                if (enumMembers is not null)
+                {
+                    Require(isValueType && !isStatic && fieldRows.Count == 1 && fieldRows[0].Name == "value__" && fieldRows[0].Visibility == FieldVisibility.Private && fieldRows[0].Type.GetString() == "Int32", "invalid enum storage");
+                    fieldRows[0] = fieldRows[0] with { Visibility = FieldVisibility.Public };
+                }
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
-                Require(nextFieldToken + fieldRows.Count <= 0x04001001, "too many fields");
+                Require(nextFieldToken + fieldRows.Count + (enumMembers?.Length ?? 0) <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
                 Require(nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
                 string ns, name;
@@ -258,10 +277,11 @@ public sealed partial class NativeAssemblyDefinition
                         fieldRows[f] = fieldRows[f] with { IsReadOnly = readOnly[f].GetBoolean() };
                     }
                 }
-                nextFieldToken += fieldRows.Count;
+                Require(enumMembers is null || fieldRows.All(f => !f.IsReadOnly) && propertyElements.Length == 0, "unsupported enum storage flags or properties");
+                nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             // Private identity graph for immutable declaration signatures, remapped into each projection.
             var signatureGraph = new AssemblyBuilder(identity, identity);
@@ -424,7 +444,7 @@ public sealed partial class NativeAssemblyDefinition
                     var field = type.Fields[fieldIndex];
                     var storage = ReadType(field.Type, false);
                     type.Fields[fieldIndex] = field with { Signature = storage };
-                    signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);
+                    if (type.EnumMembers is null) signatureOwners[typeIndex].AddField(field.Name, storage, field.Visibility, field.IsReadOnly);
                 }
             }
             signatureGraph.ValidateValueLayouts();
@@ -483,6 +503,7 @@ public sealed partial class NativeAssemblyDefinition
                     if (constructed) Shape(construction, "definition", "arguments");
                     var ownerName = constructed ? Text(construction, "definition") : Text(owner, "Named");
                     ownerIndex = types.FindIndex(t => t.NativeName == ownerName); Require(ownerIndex >= 0, "missing native method owner");
+                    Require(types[ownerIndex].EnumMembers is null, "enum methods are unsupported");
                     var arity = types[ownerIndex].GenericNames.Length;
                     Require(constructed == (arity > 0), "open owner construction required");
                     if (constructed)
@@ -653,7 +674,7 @@ public sealed partial class NativeAssemblyDefinition
                 else owners[i].AddInterfaceImplementation(contract.ClassType!);
             }
         for (int t = 0; t < types.Length; t++)
-            foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
+            if (types[t].EnumMembers is null) foreach (var field in types[t].Fields) owners[t].AddField(field.Name, ProjectType(field.Type), field.Visibility, field.IsReadOnly);
         var mappedOwners = new Dictionary<TypeBuilder, TypeBuilder>();
         TypeBuilder RemapOwner(TypeBuilder original)
         {
@@ -708,6 +729,12 @@ public sealed partial class NativeAssemblyDefinition
     }
     private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
     {
+        if (type.EnumMembers is { } members)
+        {
+            var definition = graph.AddEnum(type.Namespace, type.Name, type.Visibility);
+            foreach (var member in members) definition.AddEnumMember(member.Name, member.Value);
+            return definition;
+        }
         if (type.GenericNames.Length == 0)
             return type.IsValueType ? graph.AddValueType(type.Namespace, type.Name, type.Visibility)
                 : type.IsInterface ? graph.AddInterface(type.Namespace, type.Name, type.Visibility)

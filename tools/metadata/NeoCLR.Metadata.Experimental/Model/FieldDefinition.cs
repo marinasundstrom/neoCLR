@@ -7,7 +7,7 @@ public sealed partial class FieldDefinition
     private readonly SignatureType? nativeType;
     private readonly uint owner;
     internal FieldDefinition(ModuleDefinition module, AssemblyDefinition.FieldRow row)
-    { Module = module; MetadataToken = row.Token; name = row.Name; Attributes = row.Attributes; owner = row.DeclaringToken; signature = (byte[])row.Signature.Clone(); nativeType = row.NativeType?.Materialize(module); }
+    { Module = module; MetadataToken = row.Token; name = row.Name; Attributes = row.Attributes; Constant = row.Constant; owner = row.DeclaringToken; signature = (byte[])row.Signature.Clone(); nativeType = row.NativeType?.Materialize(module); }
     /// <summary>Gets the owning snapshot.</summary>
     public ModuleDefinition Module { get; internal set; } = null!;
     /// <summary>Gets the CLI Field or validated native origin token.</summary>
@@ -30,6 +30,10 @@ public sealed partial class FieldDefinition
     }
     /// <summary>Gets CLI-shaped FieldAttributes flags.</summary>
     public ushort Attributes { get; }
+    /// <summary>Gets the Int32 literal value, or null when absent or unsupported.</summary>
+    public int? Constant { get; }
+    /// <summary>Gets whether this is a static literal declaration.</summary>
+    public bool IsLiteral => (Attributes & 0x50) == 0x50;
     /// <summary>Copies the raw signature, retaining unsupported encodings.</summary>
     /// <returns>New owned signature bytes.</returns>
     /// <exception cref="NotSupportedException">Native fields have no CLI signature blob; use TryGetSignature.</exception>

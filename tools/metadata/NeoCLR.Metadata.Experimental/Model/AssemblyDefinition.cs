@@ -153,7 +153,7 @@ public sealed partial class AssemblyDefinition
                     : type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Namespace) == "System" && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum");
                 bool unsupportedParameters = type.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0 || p.GetConstraints().Count != 0).Any();
                 rows.Add(new((uint)MetadataTokens.GetToken(handle), ReadName(type.Namespace), ReadName(type.Name),
-                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) == "ValueType" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : valueType && type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Name) == "ValueType" ? identity : null));
+                    type.GetGenericParameters().Count, declaring.IsNil ? 0 : (uint)MetadataTokens.GetToken(declaring), (uint)type.Attributes, !unsupportedParameters && ((uint)type.Attributes & 0x180) != 0x180, valueType, valueType && type.BaseType.Kind == HandleKind.TypeReference && reader.GetString(baseReference.Name) is "ValueType" or "Enum" ? references.FirstOrDefault(r => r.Token == (uint)MetadataTokens.GetToken(baseReference.ResolutionScope))?.Identity : valueType && type.BaseType.Kind == HandleKind.TypeDefinition && reader.GetString(baseDefinition.Name) is "ValueType" or "Enum" ? identity : null, IsEnum: valueType && (type.BaseType.Kind == HandleKind.TypeReference ? reader.GetString(baseReference.Name) : reader.GetString(baseDefinition.Name)) == "Enum"));
             }
             var parents = rows.ToDictionary(row => row.Token, row => row.DeclaringToken);
             foreach (var row in rows)
@@ -168,6 +168,15 @@ public sealed partial class AssemblyDefinition
             int signatureBytes = 0;
             var methods = new List<MethodRow>();
             var typeRows = rows.ToDictionary(row => row.Token);
+            int? ReadInt32Constant(ConstantHandle handle)
+            {
+                if (handle.IsNil) return null;
+                var constant = reader.GetConstant(handle);
+                if (constant.TypeCode != ConstantTypeCode.Int32) return null;
+                var blob = reader.GetBlobReader(constant.Value);
+                if (blob.Length != 4) throw new InvalidDataException("invalid Int32 constant");
+                return blob.ReadInt32();
+            }
             var fields = new List<FieldRow>();
             foreach (var handle in reader.FieldDefinitions)
             {
@@ -178,7 +187,7 @@ public sealed partial class AssemblyDefinition
                 if (length == 0 || length > MetadataArtifactReader.MaxImageSize - signatureBytes)
                     throw new InvalidDataException("missing or excessive field signature data");
                 signatureBytes += length;
-                fields.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(field.Name), (ushort)field.Attributes, reader.GetBlobBytes(field.Signature)));
+                fields.Add(new((uint)MetadataTokens.GetToken(handle), owner, ReadName(field.Name), (ushort)field.Attributes, reader.GetBlobBytes(field.Signature), Constant: ReadInt32Constant(field.GetDefaultValue())));
             }
             foreach (var handle in reader.MethodDefinitions)
             {
@@ -290,7 +299,7 @@ public sealed partial class AssemblyDefinition
     }
     internal sealed record MemberReferenceRow(uint Token, uint ParentToken, string Name, byte[] Signature);
     internal sealed record PropertyRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, uint Getter, uint Setter, uint[] Others, NativeSignatureTypeRow? NativeType = null, NativeSignatureTypeRow[]? NativeParameters = null);
-    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null);
+    internal sealed record FieldRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, byte[] Signature, NativeSignatureTypeRow? NativeType = null, int? Constant = null);
     internal sealed record NativeSignatureTypeRow(PrimitiveType? Primitive, uint TypeToken, NativeSignatureTypeRow? Element = null, int? MethodParameter = null, int? TypeParameter = null, NativeSignatureTypeRow[]? Arguments = null, bool IsSelf = false, bool IsByReference = false, NativeMethodSignatureRow? Function = null)
     {
         internal SignatureType Materialize(ModuleDefinition module) => Function is { } function ? SignatureType.Function(function.Materialize(module)) : IsByReference ? SignatureType.ByReference(Element!.Materialize(module)) : IsSelf ? SignatureType.Self : Arguments is { } arguments ? SignatureType.FromConstruction(module.GetNativeSignatureType(TypeToken).ReferencedType!, arguments.Select(a => a.Materialize(module)))
@@ -307,7 +316,7 @@ public sealed partial class AssemblyDefinition
     internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
-    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null);
+    internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false);
 }
 
 /// <summary>An owned manifest-module definition with local TypeDef lookup.</summary>
@@ -436,11 +445,13 @@ public sealed partial class TypeDefinition
             return relationship;
         }).ToArray()));
         MetadataToken = row.Token; Namespace = row.Namespace;
-        Name = row.Name; IsValueType = row.IsValueType; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
+        Name = row.Name; IsValueType = row.IsValueType; IsEnum = row.IsEnum; GenericArity = row.Arity; CanImportReference = row.CanImportReference; ValueTypeCore = row.ValueTypeCore; declaringToken = row.DeclaringToken; Attributes = row.Attributes;
     }
     /// <summary>Gets the intrinsic native value category, or whether a CLI declaration directly extends System.ValueType or System.Enum.</summary>
     /// <remarks>This is a metadata classification, not runtime type loading or base-identity validation.</remarks>
     public bool IsValueType { get; }
+    /// <summary>Gets whether this declaration directly extends System.Enum.</summary>
+    public bool IsEnum { get; }
     internal bool CanImportReference { get; }
     internal AssemblyIdentity? ValueTypeCore { get; }
     /// <summary>Gets the CLI-shaped TypeAttributes flags.</summary>

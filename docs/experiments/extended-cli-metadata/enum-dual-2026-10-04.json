@@ -1,0 +1,153 @@
+{
+  "runtimeRepositoryRevision": "10e1b580f295da950d34af4f05d365953232006b",
+  "compilerRepositoryRevision": "9659093ce845a333117f31bc66ecc32091d395d0",
+  "scope": "Unchanged TaskState enum: separate library import, fields, array storage, comparisons and unnamed Int32 conversions execute on both targets. Full source Tasks/Workers remains open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-contracts.rvn": "8962ee1f0b82d31dc7a17213d4f156f9226b8c54a808c9589d94c69dff500f45",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-consumer.rvn": "fefa4ef618570f0350442d5b5f3df506106623b09f7ecb884ad95307cab17aa5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Tasks/TaskState.rvn": "297cecd35247b5d8b83e6b9c2d7288a556bd6ec81071f4c0d269d251b64acc87",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "1fcf349feebb1c060ed04a23ae876fbab13213d94705f9ba3e81b2caae7dcdd7",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "d675d1ab6ff031c470f09c370e0db3058d5131dd09938c0715e7e23aeb2ea1ab",
+    "/private/tmp/TaskCallbackCoreFinal1004.dll": "be7423849859f353b1de70ba675b9444f64b7e7e9d74bcb7cecd6ed998701cf6",
+    "/private/tmp/TaskCallbackSystemFinal1004.neox": "3bd7e94c34408064ccf7db25da4111c45f0886a0b0f14e6350613b9931ed8e1a",
+    "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll": "222c93783456162783fb2eb91407d6e637055ab6caa58ffe0d982da8331ffcce",
+    "/private/tmp/task-callback-finalbase1004/ownership.json": "8b86cf73daa8454c15f50179cc04507a6719d6dc3b56e0eea1bac86a51357075",
+    "/private/tmp/enum-dual-final1004/Consumer.dll": "e5178aa92ff69802ef8444d44fb5f1a4357fa4c84013e0634fb74d1d63085c88",
+    "/private/tmp/enum-dual-final1004/EnumContracts.dll": "794fd90943177939637301760d4e9b472fb35b41579a817c9a55a093a6d5671c",
+    "/private/tmp/enum-dual-final1004/dotnet/Consumer.dll": "cd969385e1fb1e5cef9909d6df1c6454592b5cfc63beb920dd1ffb63cb7d44e0",
+    "/private/tmp/enum-dual-final1004/dotnet/EnumContracts.dll": "c01d3b6d11d270f306f68e6d96286f3fc60467104ef69f37e3baa9bff8eccfde"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TaskCallbackCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-callback-finalbase1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--library",
+        "-o",
+        "/private/tmp/enum-dual-final1004/EnumContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Tasks/TaskState.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-contracts.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TaskCallbackCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-callback-finalbase1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/enum-dual-final1004/EnumContracts.dll",
+        "-o",
+        "/private/tmp/enum-dual-final1004/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/enum-dual-final1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/enum-dual-final1004/EnumContracts.dll",
+        "--system",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (473 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/enum-dual-final1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-callback-finalbase1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/enum-dual-final1004/EnumContracts.dll",
+        "--system",
+        "/private/tmp/TaskCallbackSystemFinal1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/private/tmp/enum-dual-final1004/dotnet/EnumContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Tasks/TaskState.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-contracts.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,3s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/private/tmp/enum-dual-final1004/dotnet/EnumContracts.dll",
+        "-o",
+        "/private/tmp/enum-dual-final1004/dotnet/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/enum-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,1s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/enum-dual-final1004/dotnet/Consumer.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "revisionNote": "Repository revisions identify the parent commits; enum implementation and evidence are committed together in the following slice. Artifact hashes identify tested binaries.",
+  "checks": {
+    "metadataContractGroups": 132,
+    "focusedRavenTests": 57,
+    "runtimeEnumTests": 9,
+    "metadataApiRuntime": "separate native library and consumer: exit 42"
+  }
+}

@@ -144,4 +144,6 @@ public sealed class NominalTypeInfo : TypeInfo
     public bool IsInterface => (definition.Attributes & 0x20) != 0;
     /// <summary>Gets the reader's nominal value-type classification.</summary>
     public bool IsValueType => definition.IsValueType;
+    /// <summary>Gets whether the declaration is a nominal enum.</summary>
+    public bool IsEnum => definition.IsEnum;
 }

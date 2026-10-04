@@ -203,6 +203,8 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("integer conversion requires Int32/Int64 or array length for conv.i4");
                     stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
+                case "enum.from": Pop(PrimitiveType.Int32); stack.Add(instruction.Type!); break;
+                case "enum.to": Pop(instruction.Type!); stack.Add(PrimitiveType.Int32); break;
                 case "argument.store":
                     if (ArgumentType(instruction.Value).ByReferenceElement is not null)
                         throw new InvalidDataException("managed-reference argument rebinding is unsupported");

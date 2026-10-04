@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Support ordinary top-level Int32 enums in the experimental metadata definitions,
+  builders and introspection facade. CLI output uses System.Enum, value__ and literal
+  constants; native output retains the existing enum representation. Raven compiles
+  unchanged TaskState into a separate library consumed and executed on both targets.
+  Native conv.i4 reads enum values; non-enum records remain rejected. Flags, other
+  underlying widths and enum-owned methods remain outside this authoring profile.
+
 - Admit explicit no-result callbacks for native ScheduleTask while retaining the
   existing inhabited-Void convention. The checked bootstrap catalog now includes
   scheduling and explicit entry draining. A separate native library/consumer verifies

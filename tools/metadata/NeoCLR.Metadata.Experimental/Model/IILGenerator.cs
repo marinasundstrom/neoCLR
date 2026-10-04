@@ -11,6 +11,12 @@ public interface IILGenerator
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
     void LoadConstant(int value);
+    /// <summary>Consumes Int32 and produces the exact owned or explicitly imported Int32 enum type.</summary>
+    /// <remarks>CLI keeps the integral evaluation value; native output constructs the existing nominal enum storage.</remarks>
+    void ConvertToEnum(SignatureType enumType);
+    /// <summary>Consumes the exact enum type and produces its Int32 underlying value.</summary>
+    void ConvertFromEnum(SignatureType enumType);
+
     /// <summary>Appends a native System.Console.WriteLine call with a constant UTF-8 string.</summary>
     /// <param name="text">Unicode text, at most 64 KiB when UTF-8 encoded.</param>
     /// <exception cref="ArgumentNullException">Text is null.</exception>

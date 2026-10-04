@@ -98,7 +98,7 @@ public sealed partial class AssemblyBuilder
         return ImportReference(definition, core);
     }
     /// <summary>Imports a public class, interface or value-type definition for use in signatures.</summary>
-    /// <param name="definition">External public type; generic definitions must be unconstrained and invariant. Values must extend the explicit core System.ValueType; enums are not admitted.</param>
+    /// <param name="definition">External public type; generic definitions must be unconstrained and invariant. Values must extend the explicit core System.ValueType or System.Enum.</param>
     /// <param name="dependencyCoreLibrary">Explicit matching core contract.</param>
     /// <returns>An interned immutable reference; generic definitions require construction before signature use.</returns>
     /// <exception cref="ArgumentNullException">A required argument is null.</exception>
@@ -114,6 +114,7 @@ public sealed partial class AssemblyBuilder
         var result = ImportTypeIdentity(identity, definition.Namespace, definition.Name, definition.GenericArity, definition.IsValueType, ImportDeclaringScope(definition.DeclaringType, dependencyCoreLibrary));
         if (!importedGraphs.ContainsKey(identity)) importedGraphs.Add(identity, (definition.Module.Assembly.ImportSnapshotIdentity, new AssemblyBuilder(identity, dependencyCoreLibrary)));
         RegisterNominalKind(result, (definition.Attributes & 0x20) != 0);
+        if (definition.IsEnum) enumReferences.Add(result);
         if (definition.Module.Assembly.IsNative) nativeImportedDefinitions[result] = definition;
         return result;
     }

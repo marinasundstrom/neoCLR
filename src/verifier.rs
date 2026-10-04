@@ -1614,6 +1614,10 @@ fn typed_effect(
             let ty = exact(&values[0])?;
             require(
                 numeric(ty)
+                    || (matches!(op, ConvertInt32)
+                        && module
+                            .type_definition(ty)
+                            .is_some_and(|definition| definition.enum_info.is_some()))
                     || (matches!(op, ConvertNativeInt | ConvertNativeUInt)
                         && matches!(ty, T::Ptr(_))),
                 "invalid integer conversion source",

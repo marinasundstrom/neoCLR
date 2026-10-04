@@ -58,6 +58,12 @@ public sealed partial class TypeBuilder
         var visibility = (definition.Attributes & 7) switch { 6 => FieldVisibility.Public, 3 => FieldVisibility.Internal, _ => FieldVisibility.Private };
         ArgumentNullException.ThrowIfNull(type);
         type.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        if (definition.IsLiteral)
+        {
+            if (!IsEnum || !ReferenceEquals(type.ClassType, this) || definition.Constant is null || literalFields.Count >= 256)
+                throw new ArgumentException("literal fields require their enum owner and an Int32 constant");
+            var literal = new FieldBuilder(this, definition, -1); literalFields.Add(literal); definition.Producer = literal; return literal;
+        }
         if (IsValueType && ReferenceEquals(type.ClassType ?? type.GenericInstance?.Definition, this)) throw new ArgumentException("recursive value-type storage", nameof(type));
         if (IsStatic || IsInterface) throw new InvalidOperationException("instance fields require a reference class");
         if (string.IsNullOrWhiteSpace(name) || name.Length > 1024 || name.Any(char.IsControl) ||

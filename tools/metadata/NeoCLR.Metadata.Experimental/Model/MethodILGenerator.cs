@@ -16,6 +16,16 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     public IReadOnlyList<LocalDefinition> Locals => Definition.Body.Locals;
     private static bool IsReferenceSignature(SignatureType type) => MethodBuilder.IsReferenceSignature(type);
     public void LoadConstant(int value) => Emit(OpCode.Ldc_I4, value);
+    public void ConvertToEnum(SignatureType enumType) => ConvertEnum(enumType, "enum.from");
+    public void ConvertFromEnum(SignatureType enumType) => ConvertEnum(enumType, "enum.to");
+    private void ConvertEnum(SignatureType type, string operation)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        type.ValidateOwner(Assembly);
+        if (!Assembly.IsEnumSignature(type)) throw new ArgumentException("requires an owned or explicitly imported Int32 enum", nameof(type));
+        Append(new(operation, Type: type));
+    }
+
 
     public void WriteConsoleLine(string text)
     {

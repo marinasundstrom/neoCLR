@@ -246,3 +246,20 @@ metadata/emission for TaskState, then canonical source-owned queue service bindi
 Worker notifications remain unselected because their queue-post convention is still
 legacy. Runtime signature rejection tests and guest-work execution cover both
 existing scheduling behavior and the new no-result path.
+
+### Reusable enum slice (2026-10-04)
+
+Ordinary Int32 enum authoring/import/emission now passes the paired driver gate.
+Unchanged TaskState is compiled with a helper library and consumed without its sources;
+both targets return 42 after field mutation, enum arrays, comparisons and an unnamed
+integer round trip. The C# metadata API also emits a CLI enum that executes under .NET
+and a native library/consumer that executes in neoCLR. This retains standard CLI enum
+metadata and the existing native nominal enum storage; no format fork is introduced.
+See [recorded execution](enum-dual-2026-10-04.json) and the public metadata API reference.
+This closes the reusable enum prerequisite, not source Tasks/Workers. Next resolve
+source-owned TaskQueue service identities and runtime queue dispatch, then compile the
+actual Tasks/Workers sources and execute their separate consumers.
+
+Compiler slice: Raven `8407c122f`; metadata/runtime changes are committed with this
+evidence. Validation: 132 metadata groups, 57 focused Raven tests, nine Rust enum
+tests, the seven native consumer controls and paired driver execution pass.

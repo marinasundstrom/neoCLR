@@ -2578,6 +2578,17 @@ fn interpret_instructions_with_dispatch(
                 | Op::ConvertInt64
                 | Op::ConvertUInt64 => {
                     let value = frame.pop()?;
+                    let value = match value {
+                        Value::Object { ref ty, ref fields }
+                            if matches!(op, Op::ConvertInt32)
+                                && module
+                                    .type_definition(ty)
+                                    .is_some_and(|definition| definition.enum_info.is_some()) =>
+                        {
+                            fields[0].clone()
+                        }
+                        other => other,
+                    };
                     frame.stack.push(crate::numeric::convert(op, value)?);
                 }
                 Op::PointerFromInt(ty) => {
