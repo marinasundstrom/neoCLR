@@ -56,6 +56,16 @@ internal static class TypeHandleChecks
         var output = new AssemblyBuilder(new("Consumer", new(1, 0, 0, 0)), graph.CoreLibrary);
         var imported = output.ImportReference(snapshot.MainModule.Methods.Single(m => m.Name == "Token"), graph.CoreLibrary);
         if (imported.Signature.ReturnType.Primitive != PrimitiveType.RuntimeTypeHandle) throw new Exception("CLI handle import failed");
+        var bootstrap = new AssemblyBuilder(new("HandleCore", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var handle = bootstrap.AddValueType("System", "RuntimeTypeHandle");
+        var identity = bootstrap.AddFunction("Identity", new MethodSignature(handle, [handle]));
+        identity.LoadArgument(0); identity.Return();
+        var bootstrapImage = AssemblyDefinition.ReadAssembly(bootstrap.Write(), false);
+        var bootstrapConsumer = new AssemblyBuilder(new("BootstrapConsumer", new(1, 0, 0, 0)), bootstrapImage.Identity);
+        var coreMethod = bootstrapConsumer.ImportReference(bootstrapImage.MainModule.Methods.Single(), bootstrapImage.Identity);
+        if (coreMethod.Signature.ReturnType.Primitive != PrimitiveType.RuntimeTypeHandle ||
+            coreMethod.Signature.ParameterTypes.Single().Primitive != PrimitiveType.RuntimeTypeHandle)
+            throw new Exception("core-local handle definition import failed");
         var native = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(graph.WriteNativeAssembly(), graph.CoreLibrary));
         if (!native.MainModule.Methods.Single(m => m.Name == "Token").TryGetStaticPrimitiveSignature(out var signature) || signature!.ReturnType != PrimitiveType.RuntimeTypeHandle)
             throw new Exception("native handle round trip failed");

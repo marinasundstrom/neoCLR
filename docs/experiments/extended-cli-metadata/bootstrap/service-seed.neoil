@@ -34,6 +34,11 @@ ldarg arg0
 call neoCLR.Runtime.Int64ToString(Int64)
 ret
 .end
+.method static TypeName(System.RuntimeTypeHandle arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.TypeName(System.RuntimeTypeHandle)
+ret
+.end
 .method static StringEquals(String arg0,String arg1) -> Boolean
 ldarg arg0
 ldarg arg1
@@ -434,6 +439,9 @@ ret
 .end
 .end
 .function neoCLR.Runtime.Int64ToString(Int64 arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle arg0) -> String
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.StringFromChars(arrayref<Char> arg0) -> String

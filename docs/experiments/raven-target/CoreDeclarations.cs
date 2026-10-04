@@ -11,7 +11,7 @@ static class CoreDeclarations
     {
         collectionStorage |= comparerStorage;
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
-        if (comparerStorage) declarations += "namespace Runtime.CompilerServices { public struct Self { } }";
+        if (comparerStorage) declarations += "public struct RuntimeTypeHandle { } namespace Runtime.CompilerServices { public struct Self { } }";
         if (checkedStorage || collectionStorage) declarations += CheckedStorageBindings.Declarations;
         if (collectionStorage) declarations += FunctionBindings.Declarations + "public static class FailFunctions { public static void Fail(string message) { } }";
         if (unionProbe)

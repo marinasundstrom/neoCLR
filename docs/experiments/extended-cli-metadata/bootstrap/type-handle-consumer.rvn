@@ -1,0 +1,13 @@
+import HandleContract.*
+func Describe<T>() -> string {
+    return typeof(T).Name
+}
+func Main() -> int {
+    if Describe<int>() != "System.Int32" {
+        return 1
+    }
+    if typeof(Descriptor).Name != "HandleContract.Descriptor" {
+        return 2
+    }
+    return 42
+}

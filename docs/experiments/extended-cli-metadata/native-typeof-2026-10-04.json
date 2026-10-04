@@ -1,0 +1,118 @@
+{
+  "runtimeRepositoryRevision": "ad375d0b10382dcb9ec7acddb59747b4068435ec",
+  "compilerRepositoryRevision": "1c3e14bc7287e69e3e421d4cd5010078541b1fc2",
+  "scope": "Generic and external nominal typeof through an artifact-only test provider. Production introspection and JSON mapping remain open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_type_handles.py": "7e0c2b5c0488254ae2d7e6cf33237054b45337f066e3e9febd8e75a1f600a699",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-provider.rvn": "f2871183610df5b535d22328dfd94f61a831d2611f67412b99729331876c2dc7",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-consumer.rvn": "cb77dbb97eaa9c64fa2be270b1766bf9945112ba1bfd240406abd356db35d5e2",
+    "/private/tmp/HandleCoreFinal1004.dll": "dff190960986bb13c108c912383812851cfc20585e69ccc12789d660fe67aecb",
+    "/private/tmp/source-text-committed1004/seed.neoil": "3b85c81b43ad1d0b673383280e92b9497b76c6cb8400b683e166d4c4cef4481c",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "63a141976023b83b9aeecccadc1aa25abaa4905b94297fc5766987469d297aa4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "1a088357f4c38f63f0f49c12885d60ab71fdbe5b8b622d7f2b45c57d00c5e4d9",
+    "/private/tmp/typeof-gate-final1004/seed.neoil": "7c800fce410e34781862b80d3239c41bd69151728cff501e80a1865c88b0308e",
+    "/private/tmp/typeof-gate-final1004/System.neox": "1e680cb250a1add30a31289f99f738ba79ae74466f9a6f7330b0def598ad749d",
+    "/private/tmp/typeof-gate-final1004/HandleProvider.dll": "c92d72246fd46eed77e8d231d29fa3d9c0d6e9ba27fd4879c21caa5a413cbaec",
+    "/private/tmp/typeof-gate-final1004/HandleConsumer.dll": "2a79521df6e8e086869d9a22a602a8b5066586d1e8977856f86af6d4cd8b46da",
+    "/private/tmp/typeof-gate-final1004/consumer-ownership.json": "f8f16a55ad64c6f2e0737152338ab9b2abf907e35de59e031c9e743ddabf9542",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "fbf7f32606dfaac0dfc717cdc9d2a9b35c89e93c7749945d168635b6d592c6bb",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "527c28e10995184d0661a5d90d87ab888da34d093ea3d54cb6b0cfc686079640",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "11fead2eabb48a6bdfe5b3c9371d6924931c1548624546998383166f0087bbce"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/private/tmp/typeof-gate-final1004/seed.neoil",
+        "/private/tmp/typeof-gate-final1004/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/typeof-gate-final1004/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/HandleCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/typeof-gate-final1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/typeof-gate-final1004/HandleProvider.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-provider.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/HandleCoreFinal1004.dll",
+        "--runtime-seed",
+        "/private/tmp/typeof-gate-final1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/typeof-gate-final1004/consumer-ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/typeof-gate-final1004/HandleProvider.dll",
+        "-o",
+        "/private/tmp/typeof-gate-final1004/HandleConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/typeof-gate-final1004/HandleConsumer.dll",
+        "--module",
+        "/private/tmp/typeof-gate-final1004/HandleProvider.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/typeof-gate-final1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AA0B0796BDD289259A17292578F80771E073E10B7FB44F319AA1ECCBA04A0621: typed-stack/control-flow verification passed (667 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/typeof-gate-final1004/HandleConsumer.dll",
+        "--module",
+        "/private/tmp/typeof-gate-final1004/HandleProvider.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/typeof-gate-final1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

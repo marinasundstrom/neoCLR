@@ -1,0 +1,28 @@
+namespace HandleContract
+
+import System.*
+import System.Runtime.CompilerServices.*
+
+// Test contract provider backed by the real runtime handle-name service.
+// This is not a replacement for the production System.Introspection descriptors.
+public interface Info {
+    val Name: string { get; }
+}
+
+public class Descriptor : Info {
+    private val handle: RuntimeTypeHandle
+
+    init(handle: RuntimeTypeHandle) {
+        self.handle = handle
+    }
+
+    val Name: string => RuntimeServices.TypeName(handle)
+}
+
+public class Context {
+    static val Current: Context => Context()
+
+    func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> Info {
+        return Descriptor(handle)
+    }
+}

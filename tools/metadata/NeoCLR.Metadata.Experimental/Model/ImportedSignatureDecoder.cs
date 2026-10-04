@@ -85,7 +85,11 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
 
     private bool IsRuntimeTypeHandle(int token)
     {
-        if ((token & 3) != 1 || token >> 2 == 0) return false;
+        if (token >> 2 == 0) return false;
+        if ((token & 3) == 0 && module.Assembly.Identity.Equals(core))
+            return module.Types.Any(t => t.MetadataToken == (0x02000000u | (uint)(token >> 2)) &&
+                t.Namespace == "System" && t.Name == "RuntimeTypeHandle" && t.IsValueType && t.GenericArity == 0);
+        if ((token & 3) != 1) return false;
         var reference = module.TypeReferences.SingleOrDefault(t => t.MetadataToken == (0x01000000u | (uint)(token >> 2)));
         var coreIdentity = core;
         return reference is { Namespace: "System", Name: "RuntimeTypeHandle" } &&

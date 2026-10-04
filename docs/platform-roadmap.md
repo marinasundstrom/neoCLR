@@ -66,6 +66,10 @@ now also executes Unicode round trips, alias mutation and invalid-input/cycle re
 through unchanged source bodies. The public serializer/object mapper next needs an
 explicit introspection dependency and runtime-service catalog; follow the
 [handle-first dependency sequence](experiments/extended-cli-metadata/introspection-native-next-2026-10-04.md).
+The [native typeof boundary](experiments/extended-cli-metadata/native-typeof-2026-10-04.md)
+now executes generic and external nominal tokens through a separately compiled test
+provider backed by the real TypeName service. Production descriptors/member reflection
+and public JSON object mapping are still open.
 .NET JSON-library parity remains unproven.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone

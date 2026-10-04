@@ -7035,7 +7035,8 @@ See [the executable compiler gate](../docs/experiments/extended-cli-metadata/clo
 not a user-authored empty struct. CLI encoding is a value-type reference to
 `System.RuntimeTypeHandle` in the explicitly selected core assembly; native encoding
 uses the existing `RuntimeTypeHandle` category. CLI imports recognize that exact core
-AssemblyRef identity. The library does not load dependencies or expose host Type objects.
+AssemblyRef identity or a value-type definition inside that exact selected core.
+The library does not load dependencies or expose host Type objects.
 
 `IILGenerator.LoadTypeToken(SignatureType type)` and
 `Emit(OpCode.Ldtoken, SignatureType type)` push one RuntimeTypeHandle. They accept

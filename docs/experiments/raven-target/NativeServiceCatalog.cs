@@ -6,7 +6,7 @@ using System.Text.Json;
 static partial class RuntimeServiceBindings
 {
     static readonly string[] NativeSelection = [
-        "Int32ToString", "Int64ToString",
+        "Int32ToString", "Int64ToString", "TypeName",
         "StringEquals", "StringFromChars", "StringGraphemeAt", "StringIntern", "StringConcat",
         "StringCompareOrdinal", "StringCompareOrdinalIgnoreCase", "StringContainsOrdinal",
         "StringStartsWithOrdinal", "StringEndsWithOrdinal", "StringGraphemeCount",
@@ -31,7 +31,7 @@ static partial class RuntimeServiceBindings
     };
 
     static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "noresult"
-        or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
+        or "System.RuntimeTypeHandle" or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
 
     static (string Name, string[] Args, string Result)[] NativeMembers(string[]? selection = null)
     {

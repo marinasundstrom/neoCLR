@@ -79,3 +79,13 @@ partial first slice: external dependency identity, runtime handle-service compar
 Raven typeof, descriptor factories and JSON object mapping are still open. The
 metadata-only C# facade remains independent of runtime descriptors. No website
 capability claim or guest API snapshot change is appropriate for this host-only API.
+
+
+## Compiler boundary checkpoint
+
+Raven `1c3e14bc7` now passes the [native typeof gate](native-typeof-2026-10-04.md),
+including an instantiated method parameter and an external nominal token. Its
+artifact-only consumer executes the real TypeName binding through a test provider.
+The remaining work in slices 2–4 is production ownership, descriptor factories,
+ParameterSnapshot/vector contracts, declaration/override admission and the member
+services required by the unchanged mapper. This gate does not replace those sources.

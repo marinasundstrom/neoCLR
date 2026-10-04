@@ -13,7 +13,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reference and standard instruction; native PE uses the existing RuntimeTypeHandle
   and ldtoken contracts. C# tests cover local/constructed/scoped identities and import;
   generated native PE verifies and executes. Descriptor services and JSON object
-  mapping remain subsequent integration work.
+  mapping remain subsequent integration work. Recognize core-local handle definitions
+  and expose the real TypeName service in the explicit bootstrap catalog. Raven
+  `1c3e14bc7` now executes generic and external nominal typeof through a separately
+  compiled test provider; no production descriptor is substituted.
 
 - Record shared conditional propagation lowering, independently integrated into Raven
   main, unlocking the unchanged five-source native JSON library. Runtime verification
