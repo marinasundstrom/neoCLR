@@ -122,11 +122,13 @@ if (args.Length == 2 && args[0] == "--globalization-signatures")
 }
 
 
-if (args.Length == 2 && args[0] == "--number-checks") {
+if (args.Length == 2 && args[0] == "--number-checks")
+{
     NumberChecks.Write(args[1]);
     return;
 }
-if (args.Length == 2 && args[0] == "--casing-integer-checks") {
+if (args.Length == 2 && args[0] == "--casing-integer-checks")
+{
     CasingIntegerChecks.Write(args[1]);
     return;
 }
@@ -231,6 +233,18 @@ if (args.Length == 2 && args[0] == "--async-ref-contract-checks")
 if (args.Length == 2 && args[0] == "--reference-primitive-core")
 {
     CoreDeclarations.Write(args[1]);
+    return;
+}
+
+if (args.Length == 1 && args[0] == "--native-service-catalog-checks")
+{
+    RuntimeServiceBindings.CheckNativeCatalog();
+    return;
+}
+
+if (args.Length == 2 && args[0] == "--native-service-catalog")
+{
+    RuntimeServiceBindings.WriteNativeCatalog(args[1]);
     return;
 }
 
@@ -534,8 +548,15 @@ var report = new
         MissingDependencyErrors = missingDependencyErrors
     },
     Scope = "emission plus bounded static and Result imports; execute generated neoIL separately against neoCLR System",
-    UnionProbe = new { Scope = "metadata binding, emission and bounded Result import; execute generated neoIL separately",
-        BindingPassed = true, InvalidArgumentDiagnostics = badUnionDiagnostics, DeclarationClosureErrors = unionErrors, Emission = unionImage, ApplicationClosureErrors = unionClosureErrors },
+    UnionProbe = new
+    {
+        Scope = "metadata binding, emission and bounded Result import; execute generated neoIL separately",
+        BindingPassed = true,
+        InvalidArgumentDiagnostics = badUnionDiagnostics,
+        DeclarationClosureErrors = unionErrors,
+        Emission = unionImage,
+        ApplicationClosureErrors = unionClosureErrors
+    },
     VoidImportRejections = voidImportRejections,
     VoidProbe = new { Emission = voidImage, ApplicationClosureErrors = voidClosureErrors },
     OptionImportRejections = optionImportRejections,

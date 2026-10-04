@@ -134,5 +134,9 @@
   "propagation": {
     "assemblyName": "NeoCLR.Collections",
     "interfaceTypeName": "System.Propagatable`3"
+  },
+  "unit": {
+    "assemblyName": "NeoCLR.CoreProbe",
+    "typeName": "System.Void"
   }
 }

@@ -1,0 +1,2403 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "name": "MathAbs",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathSqrt",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathFloor",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathCeiling",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathTruncate",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathRound",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathExp",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathLog",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathLog10",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathSin",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathCos",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathTan",
+      "arguments": [
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathPow",
+      "arguments": [
+        "Double",
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathMin",
+      "arguments": [
+        "Double",
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "MathMax",
+      "arguments": [
+        "Double",
+        "Double"
+      ],
+      "result": "Double",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketDeadlineAfter",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketDeadlineExpired",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DnsLookupUntil",
+      "arguments": [
+        "String",
+        "Int64",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketConnectAddressesUntil",
+      "arguments": [
+        "arrayref\u003CString\u003E",
+        "Int32",
+        "Int64",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketReceiveUntil",
+      "arguments": [
+        "Int64",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32",
+        "Int64",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketSendUntil",
+      "arguments": [
+        "Int64",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32",
+        "Int64",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DnsLookup",
+      "arguments": [
+        "String",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DnsResult",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DnsAddresses",
+      "arguments": [
+        "Value"
+      ],
+      "result": "arrayref\u003CString\u003E",
+      "categories": [
+        "erased-value",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketListen",
+      "arguments": [
+        "String",
+        "Int32",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketAccept",
+      "arguments": [
+        "Int64",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketLocalPort",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketConnect",
+      "arguments": [
+        "String",
+        "Int32",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketConnectAddresses",
+      "arguments": [
+        "arrayref\u003CString\u003E",
+        "Int32",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketConnectResult",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketReceive",
+      "arguments": [
+        "Int64",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketSend",
+      "arguments": [
+        "Int64",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "callback",
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketTransferResult",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketCancel",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DnsCancel",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SocketClose",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StorageList",
+      "arguments": [
+        "String",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StorageNames",
+      "arguments": [
+        "Value"
+      ],
+      "result": "arrayref\u003CString\u003E",
+      "categories": [
+        "erased-value",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StorageKind",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileOpenRead",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileCreateNew",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FilePosition",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileSeek",
+      "arguments": [
+        "Int32",
+        "Int64"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileReadInto",
+      "arguments": [
+        "Int32",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileWriteChunk",
+      "arguments": [
+        "Int32",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileFlush",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "FileClose",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StartWorker",
+      "arguments": [
+        "fn\u003CString,String\u003E",
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "callback",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "QueueWorker",
+      "arguments": [
+        "fn\u003CString,String\u003E",
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "callback",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "JoinWorker",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "RequestWorkerCancellation",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "JoinWorkerResult",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "NotifyWorker",
+      "arguments": [
+        "Int32",
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "noresult",
+      "categories": [
+        "callback",
+        "no-result",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "LocalDateTime",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "System.LocalDateTime",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "source-factory-alias"
+    },
+    {
+      "name": "TimeZoneExists",
+      "arguments": [
+        "String"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TimeZoneOffset",
+      "arguments": [
+        "String",
+        "Int64"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TimeZoneMapLocal",
+      "arguments": [
+        "String",
+        "Int64"
+      ],
+      "result": "arrayref\u003CInt64\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TimeZoneDatabaseVersion",
+      "arguments": [],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SystemTimeZoneName",
+      "arguments": [],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "SystemCultureName",
+      "arguments": [],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCCollectionCount",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCAllocatedObjectCount",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCHeapObjectCount",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCPeakHeapObjectCount",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCReclaimedObjectCount",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCHeapObjectLimit",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCCollect",
+      "arguments": [],
+      "result": "noresult",
+      "categories": [
+        "no-result"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "GCKeepAlive",
+      "arguments": [
+        "System.Object"
+      ],
+      "result": "noresult",
+      "categories": [
+        "no-result",
+        "nominal"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "UnixTimeTicks",
+      "arguments": [],
+      "result": "Int64",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "UnixTimeToLocal",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "arrayref\u003CInt32\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "PathCombine",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "PathGetFileName",
+      "arguments": [
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "WriteAllText",
+      "arguments": [
+        "String",
+        "String",
+        "Int32"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringEquals",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringFromChars",
+      "arguments": [
+        "arrayref\u003CChar\u003E"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringGraphemeAt",
+      "arguments": [
+        "String",
+        "Int32"
+      ],
+      "result": "Char",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringIntern",
+      "arguments": [
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringConcat",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringCompareOrdinalIgnoreCase",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringHashOrdinalIgnoreCase",
+      "arguments": [
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringCompareOrdinal",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringContainsOrdinal",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringStartsWithOrdinal",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringEndsWithOrdinal",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "Utf8Encode",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CByte\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "Utf8Decode",
+      "arguments": [
+        "arrayref\u003CByte\u003E"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "vector"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringGraphemeCount",
+      "arguments": [
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "CharFromString",
+      "arguments": [
+        "String"
+      ],
+      "result": "Char",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "CharText",
+      "arguments": [
+        "Char"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringGraphemes",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CChar\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringScalars",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CUInt32\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringByteCount",
+      "arguments": [
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringSliceUtf8",
+      "arguments": [
+        "String",
+        "Int32",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReadAllText",
+      "arguments": [
+        "String",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringToUpperInvariant",
+      "arguments": [
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "StringToLowerInvariant",
+      "arguments": [
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseInt64",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": true,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseSByte",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseByte",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseInt16",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseUInt16",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseUInt32",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseUInt64",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseSingle",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseDouble",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseBoolean",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ParseInt32",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ConsoleWriteBytes",
+      "arguments": [
+        "Boolean",
+        "arrayref\u003CByte\u003E",
+        "Int32",
+        "Int32"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ConsoleFlush",
+      "arguments": [
+        "Boolean"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ConsoleReadByte",
+      "arguments": [],
+      "result": "Value",
+      "categories": [
+        "erased-value"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "WriteLine",
+      "arguments": [
+        "String"
+      ],
+      "result": "noresult",
+      "categories": [
+        "no-result",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "EnvironmentArguments",
+      "arguments": [],
+      "result": "arrayref\u003CString\u003E",
+      "categories": [
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "EnvironmentCurrentDirectory",
+      "arguments": [],
+      "result": "Value",
+      "categories": [
+        "erased-value"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "EnvironmentVariable",
+      "arguments": [
+        "String"
+      ],
+      "result": "Value",
+      "categories": [
+        "erased-value",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "Int32ToString",
+      "arguments": [
+        "Int32"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "Int64ToString",
+      "arguments": [
+        "Int64"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "UInt64ToString",
+      "arguments": [
+        "UInt64"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "CharCategory",
+      "arguments": [
+        "UInt32"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "IntPtrToInt64",
+      "arguments": [
+        "IntPtr"
+      ],
+      "result": "Int64",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "UIntPtrToUInt64",
+      "arguments": [
+        "UIntPtr"
+      ],
+      "result": "UInt64",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ObjectEquals",
+      "arguments": [
+        "System.Object",
+        "System.Object"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ObjectReferenceEquals",
+      "arguments": [
+        "System.Object",
+        "System.Object"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ObjectIdentityHash",
+      "arguments": [
+        "System.Object"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionArrayLength",
+      "arguments": [
+        "System.Object"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionArrayGet",
+      "arguments": [
+        "System.Object",
+        "Int32"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionArrayCreate",
+      "arguments": [
+        "System.Introspection.TypeInfo",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionAssignable",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstructArgs",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstructArgsCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstructorInvoke",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstructorInvokeCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionInvoke",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionInvokeCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionFieldGet",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionFieldGetCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionFieldSet",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionFieldSetCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "arrayref\u003CSystem.Object\u003E"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstructionCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "Int32",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionConstruct",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionPropertyGetCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionPropertySetCheck",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "System.Object"
+      ],
+      "result": "Int32",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionPropertyGet",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object"
+      ],
+      "result": "System.Object",
+      "categories": [
+        "nominal",
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ReflectionPropertySet",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32",
+        "System.Object",
+        "System.Object"
+      ],
+      "result": "noresult",
+      "categories": [
+        "no-result",
+        "nominal",
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ObjectTypeHandle",
+      "arguments": [
+        "System.Object"
+      ],
+      "result": "System.RuntimeTypeHandle",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeName",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "String",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeEquals",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeArgumentCount",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "Int32",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeArgument",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "System.RuntimeTypeHandle",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeShape",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "Boolean",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeDisplayName",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "String",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "DefaultTaskQueue",
+      "arguments": [],
+      "result": "System.Tasks.TaskQueue",
+      "categories": [
+        "nominal"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ScheduleTask",
+      "arguments": [
+        "fn\u003CVoid\u003E"
+      ],
+      "result": "noresult",
+      "categories": [
+        "callback",
+        "no-result"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "RegisterDefaultTaskQueue",
+      "arguments": [
+        "System.Tasks.TaskQueue"
+      ],
+      "result": "noresult",
+      "categories": [
+        "no-result",
+        "nominal"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "CurrentTaskQueue",
+      "arguments": [],
+      "result": "System.Tasks.TaskQueue",
+      "categories": [
+        "nominal"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ExecutingAssembly",
+      "arguments": [],
+      "result": "System.Introspection.AssemblyInfo",
+      "categories": [
+        "nominal"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "AssemblyName",
+      "arguments": [
+        "String"
+      ],
+      "result": "String",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "AssemblyMetadataToken",
+      "arguments": [
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "AssemblyReferences",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.AssemblyInfo\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "AssemblyModules",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.ModuleInfo\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "AssemblyTypes",
+      "arguments": [
+        "String"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ModuleAssembly",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "System.Introspection.AssemblyInfo",
+      "categories": [
+        "nominal",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ModuleMetadataToken",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "Int32",
+      "categories": [
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "ModuleTypes",
+      "arguments": [
+        "String",
+        "String"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeMetadataToken",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "Int32",
+      "categories": [
+        "opaque-handle",
+        "scalar"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeDeclaringType",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Option\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeModule",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Introspection.ModuleInfo",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeInfo",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Introspection.TypeInfo",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "source-factory-alias"
+    },
+    {
+      "name": "MemberCustomAttributes",
+      "arguments": [
+        "System.Introspection.TypeInfo",
+        "Int32"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.CustomAttributeData\u003E",
+      "categories": [
+        "nominal",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeFields",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.FieldInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeMethods",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.MethodInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeConstructors",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.ConstructorInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeProperties",
+      "arguments": [
+        "System.RuntimeTypeHandle",
+        "Int32"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.PropertyInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "scalar",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeBaseType",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Option\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeElementType",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Option\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeInterfaces",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeGenericArguments",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "arrayref\u003CSystem.Introspection.TypeInfo\u003E",
+      "categories": [
+        "opaque-handle",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeEnumValues",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "arrayref\u003CSystem.Object\u003E",
+      "categories": [
+        "opaque-handle",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeEnumNames",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "arrayref\u003CString\u003E",
+      "categories": [
+        "opaque-handle",
+        "vector"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    },
+    {
+      "name": "TypeEnumUnderlying",
+      "arguments": [
+        "System.RuntimeTypeHandle"
+      ],
+      "result": "System.Introspection.TypeInfo",
+      "categories": [
+        "nominal",
+        "opaque-handle"
+      ],
+      "nativeBootstrap": false,
+      "implementation": "requires-explicit-binding"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+import System.*
+import System.Runtime.CompilerServices.*
+public static class WorkerContracts {
+    static func Run(callback: (string) -> string, input: string) -> Value {
+        let handle = RuntimeServices.StartWorker(callback, input)
+        return RuntimeServices.JoinWorkerResult(handle)
+    }
+    static func Unpack(value: Value) -> string => RuntimeServices.UnpackValue<string>(value)
+}

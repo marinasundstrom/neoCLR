@@ -1,0 +1,6 @@
+func Transform(value: string) -> string => value
+func Main() -> int {
+    let outcome = WorkerContracts.Run(Transform, "worker-completed")
+    if WorkerContracts.Unpack(outcome) != "worker-completed" { return 1 }
+    return 42
+}

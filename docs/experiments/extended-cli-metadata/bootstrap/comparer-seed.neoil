@@ -35,73 +35,6 @@ ldc.i4 1
 ret
 .end
 .end
-.type System.Runtime.CompilerServices.RuntimeServices
-.method static IsValue<T>(Value value) -> Boolean
-ldarg value
-value.is T
-ret
-.end
-.method static UnpackValue<T>(Value value) -> T
-ldarg value
-value.unpack T
-ret
-.end
-.method static ParseInt64(String text) -> Value
-ldarg text
-call neoCLR.Runtime.ParseInt64(String)
-ret
-.end
-.method static UnixTimeTicks() -> Int64
-call neoCLR.Runtime.UnixTimeTicks()
-ret
-.end
-.method static SystemCultureName() -> String
-call neoCLR.Runtime.SystemCultureName()
-ret
-.end
-.method static UnixTimeToLocal(Int64 ticks) -> arrayref<Int32>
-; Convert the existing service value-array result to nominal reference storage.
-.local Int32[] source
-.local arrayref<Int32> destination
-.local Int32 index
-ldarg ticks
-call neoCLR.Runtime.UnixTimeToLocal(Int64)
-stloc source
-ldloc source
-ldlen
-conv.i4
-newarr Int32
-stloc destination
-ldc.i4 0
-stloc index
-br Test
-Copy:
-ldloc destination
-ldloc index
-ldloc source
-ldloc index
-ldelem Int32
-stelem Int32
-ldloc index
-ldc.i4 1
-add
-stloc index
-Test:
-ldloc index
-ldloc source
-ldlen
-conv.i4
-blt Copy
-ldloc destination
-ret
-.end
-.method static StringHashOrdinalIgnoreCase(String value) -> Int32
-ldarg 0
-call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
-ret
-.end
-.end
-
 .type System.Int64
 .sealed
 .method instance readonly byref CompareTo(Int64 other) -> Int32
@@ -126,19 +59,4 @@ ret
 .end
 .end
 
-.function neoCLR.Runtime.SystemCultureName() -> String
-.methodimpl InternalCall
-.end
-.function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> Int32[]
-.methodimpl InternalCall
-.end
-
-.function neoCLR.Runtime.UnixTimeTicks() -> Int64
-.methodimpl InternalCall
-.end
-.function neoCLR.Runtime.ParseInt64(String text) -> Value
-.methodimpl InternalCall
-.end
-.type System.Value
-.sealed
-.end
+.include "service-seed.neoil"

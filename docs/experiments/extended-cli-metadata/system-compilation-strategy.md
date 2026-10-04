@@ -168,3 +168,36 @@ System.Value identity. The cumulative native application/callback gate passes af
 fixing callback/discard result conventions exposed by inhabited-unit admission. This
 proves two existing payload kinds, not universal erasure. The common service ABI catalog
 is still pending; proceed there before adding individual service families.
+
+
+## Checked service catalog and updated frontier (2026-10-04)
+
+The existing RuntimeServiceBindings signature inventory now drives native core
+declarations and generated seed wrappers for an explicit 20-service profile, plus the
+two generic erased-value helpers. `Probe --native-service-catalog` emits classified
+inventory and executable wrappers; checked generation rejects unknown, duplicate,
+unsupported numeric/nominal or completion-callback selections. C# import validates all
+22 declarations against the real seed. It does not claim every inventory entry is ready.
+
+Nine unchanged System.IO/System.Text files compile as another native library. The
+source-free consumer executes UTF-8 encode/decode/invalid input and file create/write/
+flush/read/position, with an independently checked two-byte file. A separate contract
+library executes a string worker callback and consumes its erased result. Full source
+Tasks/Workers is **not** complete: source-owned TaskQueue services and the inhabited-Void
+versus no-result completion callback boundary remain explicit gaps.
+
+The [updated audit](system-compilation-catalog-audit-2026-10-04.json) keeps the same
+166-source inventory and dependency-closed baseline. The unit probe now emits. The
+single-PE memory-stream group reaches the 1 MiB transport limit instead of rejecting its
+unit signature. Full-source binding still fails (573 diagnostics, 305 missing-member
+errors); more visible signatures expose new cascades, so total counts are not a progress
+score. Text still lacks core String.SliceUtf8; tasks first lack queue ownership/services.
+Float/enum/inheritance/Self/mutable-capture probes retain their previously isolated gaps.
+
+Next high-leverage work: admit the already specified bounded library transport profile
+for API-produced PE assemblies, then connect source-owned queue identities and exact
+completion-callback conventions. Enums remain the first reusable emission category;
+TaskState and broader core/numeric ownership cannot be bypassed with substitute classes.
+Keep no-result/inhabited-unit distinctions explicit in the catalog, shared codegen and
+runtime. Do not resume isolated API wrappers or interpret this profile as full-System
+or full dual-target completion.

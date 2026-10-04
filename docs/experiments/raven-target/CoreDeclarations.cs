@@ -28,7 +28,7 @@ static class CoreDeclarations
                 .Replace("public struct Int64 { }", "public struct Int64 { public int CompareTo(long other) => 0; }")
                 .Replace("public sealed class String {", "public sealed class String { public char this[int index] => default; public static int CompareOrdinalIgnoreCase(string left, string right) => 0;");
         if (comparerStorage)
-            source += "namespace System.Runtime.CompilerServices { public static class RuntimeServices { public static int StringHashOrdinalIgnoreCase(string value) => 0; public static string SystemCultureName() => default; public static int[] UnixTimeToLocal(long ticks) => default; public static long UnixTimeTicks() => 0; public static bool IsValue<T>(System.Value value) => false; public static T UnpackValue<T>(System.Value value) => default; public static System.Value ParseInt64(string text) => default; } }";
+            source += RuntimeServiceBindings.NativeBootstrapDeclarations;
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration);
         if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "").Replace("public abstract class Enum : ValueType { }", EnumHelpersBindings.Declaration)
             .Replace("public abstract class Object {", "public abstract class Object { public System.Introspection.TypeInfo GetType() => default;"));
@@ -46,7 +46,8 @@ static class CoreDeclarations
             if (collectionProbe) { NumberBindings.Project(module); InterfaceBindings.ProjectSelf(module); }
             CalendarBindings.ProjectLayout(module);
             HashCodeBindings.ProjectLayout(module);
-            if (collectionProbe) {
+            if (collectionProbe)
+            {
                 var stringFactory = module.GetType("System.String").Methods.Single(m => m.Name == "CreateFromCharacters");
                 stringFactory.IsPublic = false;
                 stringFactory.IsAssembly = true;
@@ -73,7 +74,8 @@ static class CoreDeclarations
                             | Mono.Cecil.MethodAttributes.SpecialName, module.GetType("System.RuntimeTypeHandle"));
                         info.Methods.Add(getter);
                         info.Properties.Add(new Mono.Cecil.PropertyDefinition("ExecutionHandle",
-                            Mono.Cecil.PropertyAttributes.None, getter.ReturnType) { GetMethod = getter });
+                            Mono.Cecil.PropertyAttributes.None, getter.ReturnType)
+                        { GetMethod = getter });
                     }
                     if (!info.Methods.Any(m => m.Name == "FromHandle"))
                     {

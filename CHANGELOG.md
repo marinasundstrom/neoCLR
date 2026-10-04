@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Generate native bootstrap declarations and executable service wrappers from the
+  existing checked signature catalog: 20 selected services plus generic erased-value
+  helpers. Validate all 22 against the seed and reject unsupported selections. Native
+  separate-library UTF-8, real file I/O and worker callback consumers execute; preserve
+  exact ownership and core/seed rebuild requirements. Record the remaining queue,
+  completion-callback and whole-library transport blockers in the updated audit.
+
 - Map the explicitly bound core System.Value to the existing native erased carrier
   across signature writing, reading and reimport; reject malformed aliases and wrong
   projection cores. Seed generic IsValue/UnpackValue helpers execute through ordinary

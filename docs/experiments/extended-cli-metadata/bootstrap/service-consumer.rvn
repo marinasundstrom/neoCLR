@@ -1,0 +1,30 @@
+import System.*
+import System.IO.*
+import System.Text.*
+import System.Result.*
+
+func Main() -> int {
+    let bytes = Utf8.Encode("héllo")
+    if bytes.Count != 6 { return 1 }
+    let Ok(decoded) = Utf8.Decode(bytes) else { return 2 }
+    if decoded != "héllo" { return 3 }
+    let invalid: byte[] = [(byte)255]
+    match Utf8.Decode(invalid) {
+        .Ok(_) => { return 4 }
+        .Error(_) => {}
+    }
+    let Ok(output) = FileOutputStream.CreateNew("__TEST_FILE__") else { return 5 }
+    let payload: byte[] = [(byte)40, (byte)2]
+    let Ok(written) = output.Write(payload, 0, 2) else { return 6 }
+    if written != 2 { return 7 }
+    let Ok(_) = output.Flush() else { return 8 }
+    output.Close()
+    let Ok(input) = FileInputStream.Open("__TEST_FILE__") else { return 9 }
+    let buffer: byte[] = [(byte)0, (byte)0]
+    let Ok(read) = input.Read(buffer, 0, 2) else { return 10 }
+    if read != 2 || buffer[0] != (byte)40 || buffer[1] != (byte)2 { return 11 }
+    let Ok(position) = input.GetPosition() else { return 12 }
+    if position != 2L { return 13 }
+    input.Close()
+    return 42
+}

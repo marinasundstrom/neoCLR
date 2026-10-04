@@ -776,3 +776,37 @@ The seven-consumer probe retains its fuller typeof-enabled bootstrap core, disti
 the source-library core; no implicit switching occurs in compiler commands.
 
 Compiler integration revision: Raven ed3371e73 (unit admission begins at 82f30272f).
+
+
+## Checked native service bootstrap (2026-10-04)
+
+The existing RuntimeServiceBindings inventory is the single signature source. The
+NativeServiceCatalog profile selects 20 supported host services, plus the generic
+IsValue/UnpackValue helpers. CoreDeclarations computes matching CLI declarations from
+that profile. comparer-seed.neoil includes generated service-seed.neoil; there is no
+second hand-maintained table of service signatures. service-catalog.json classifies the
+larger inventory without claiming unselected entries are implemented in this bootstrap.
+
+Regenerate with `Probe --native-service-catalog <bootstrap-directory>` and run
+`Probe --native-service-catalog-checks`. Check both generated files against a fresh
+output directory. Rebuild the comparer core and seed together, then rebuild dependencies.
+`NeoCLR.Metadata.Experimental.Tests --native-service-bindings <seed> <core>` imports all
+22 contracts and rejects mismatches. Unknown/duplicate selections, unsupported numeric/
+source-owned nominal signatures and inhabited-Void completion callbacks reject explicitly.
+Action/no-result callbacks must not be silently substituted for the latter.
+
+`verify_service_catalog.py` accepts the same --compiler/--runtime/--core/--seed/
+--base-library/--output arguments as verify_erased_values.py. It builds nine unchanged
+IO/Text sources independently, compiles a source-free consumer, verifies and runs it,
+and checks the actual file bytes. UTF-8 vectors are copied from the existing host service
+value array into the nominal array reference backing. A separate generic-free worker
+contract exercises function transfer and an erased String result. This callback probe
+is not a replacement implementation of source Tasks/Workers.
+
+Evidence: /tmp/catalog-services-final-1004/validation.json and the cumulative
+/tmp/catalog-final-1004/validation.json. The shared compiler remains Raven ed3371e73;
+39 focused .NET and seven native semantic controls were established in the preceding
+carrier slice. No shared compiler change in this catalog slice. Native snapshots and
+guest public API signatures are unchanged; no website build is required.
+
+Matching Raven compiler documentation revision: 88b52c667; implementation remains ed3371e73.

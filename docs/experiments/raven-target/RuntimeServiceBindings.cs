@@ -2,7 +2,7 @@ using Mono.Cecil;
 
 // Bootstrap-only access to existing typed host services. This is an authoring
 // boundary, not a public API or a way to select arbitrary native entry points.
-static class RuntimeServiceBindings
+static partial class RuntimeServiceBindings
 {
     const string Owner = "System.Runtime.CompilerServices.RuntimeServices";
     static readonly string[] UnaryMath = ["Abs", "Sqrt", "Floor", "Ceiling", "Truncate", "Round", "Exp", "Log", "Log10", "Sin", "Cos", "Tan"];
@@ -176,10 +176,21 @@ static class RuntimeServiceBindings
             ("TypeEnumNames", ["System.RuntimeTypeHandle"], "arrayref<String>"),
             ("TypeEnumUnderlying", ["System.RuntimeTypeHandle"], "System.Introspection.TypeInfo")
         }).ToArray();
-    static string CSharp(string type) => type switch {
-        "UInt32" => "uint", "Byte" => "byte", "Double" => "double", "String" => "string", "Int32" => "int", "Char" => "char",
-        "Boolean" => "bool", "Int64" => "long", "Value" => "System.Value", "noresult" => "void",
-        "IntPtr" => "System.IntPtr", "UIntPtr" => "System.UIntPtr", "UInt64" => "ulong",
+    static string CSharp(string type) => type switch
+    {
+        "UInt32" => "uint",
+        "Byte" => "byte",
+        "Double" => "double",
+        "String" => "string",
+        "Int32" => "int",
+        "Char" => "char",
+        "Boolean" => "bool",
+        "Int64" => "long",
+        "Value" => "System.Value",
+        "noresult" => "void",
+        "IntPtr" => "System.IntPtr",
+        "UIntPtr" => "System.UIntPtr",
+        "UInt64" => "ulong",
         "fn<String,String>" => "System.Func<string,string>",
         "fn<Void>" => "System.Func<System.PropagationUnit>",
         _ when type.StartsWith("System.") => type,
@@ -193,7 +204,8 @@ static class RuntimeServiceBindings
     public static ResultBindings.Binding? Bind(MethodReference reference, MethodDefinition definition)
     {
         if (reference.DeclaringType.FullName != Owner) return null;
-        if (reference.Name == "TypeHandle") {
+        if (reference.Name == "TypeHandle")
+        {
             if (!RuntimeSignatures.IsCore(reference.DeclaringType.Scope) || reference.HasThis || !definition.IsPublic || !definition.IsStatic || definition.IsVirtual || definition.ExplicitThis
                 || definition.CallingConvention != MethodCallingConvention.Generic || definition.GenericParameters.Count != 1
                 || definition.GenericParameters[0].HasConstraints || definition.GenericParameters[0].Attributes != GenericParameterAttributes.NonVariant
