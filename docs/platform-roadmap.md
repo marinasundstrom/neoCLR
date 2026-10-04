@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Duration foundation (2026-10-04): unchanged Duration, ComparableTo and EquatableTo
+compile into separately consumed libraries on both targets. The same value-contract
+consumer returns 42 on .NET and NeoCLR; native ArrayList<Duration> and broad application
+acceptance also pass. No compiler/metadata/runtime implementation change. The Date
+source inventory now identifies binding prerequisites: string indexing, SystemCultureName
+and UnixTimeToLocal. Next bounded work is the explicit native string-index/character
+contract needed by culture selection/formatting, then the two executable service adapters.
+Do not infer later emission/runtime completeness from this binding inventory.
+[Evidence](experiments/extended-cli-metadata/duration-foundation-2026-10-04.json).
+
 Value-result receiver milestone (2026-10-04): Raven `9d06edf80` preserves getter/call
 copy semantics while native bootstrap imports admit exact Int64 receiver storage.
 A separately compiled ArrayList<long> consumer verifies copy/indexer behavior, evaluation

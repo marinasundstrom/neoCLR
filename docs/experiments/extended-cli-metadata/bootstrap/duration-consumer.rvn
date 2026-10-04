@@ -1,0 +1,29 @@
+import System.*
+import System.Collections.*
+
+func Main() -> int {
+    let values = ArrayList<Duration>()
+    values.Add(Duration.FromTicks(42L))
+    values.Add(default(Duration))
+    let copy = values.Copy()
+    copy[0] = Duration.FromTicks(7L)
+    if values[0].Ticks != 42L || copy[0].Ticks != 7L || values[1].Ticks != 0L {
+        return 1
+    }
+    if !values[0].Equals(Duration.FromTicks(42L)) || values[0].CompareTo(copy[0]) != 1 {
+        return 2
+    }
+    var sum = 0L
+    for value in values {
+        sum += value.Ticks
+    }
+    if sum != 42L {
+        return 3
+    }
+    let least = Duration.FromTicks(-9223372036854775807L - 1L)
+    let greatest = Duration.FromTicks(9223372036854775807L)
+    if least.CompareTo(greatest) != -1 || greatest.CompareTo(least) != 1 {
+        return 4
+    }
+    return 42
+}

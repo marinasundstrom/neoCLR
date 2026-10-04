@@ -26,7 +26,9 @@ def main():
     parser.add_argument('--arrays', action='store_true', help='Execute source Array<T> backing and query iteration over native vectors')
     parser.add_argument('--application', action='store_true', help='Run unchanged application-order-collections against the separately built native library')
     parser.add_argument('--comparers', action='store_true', help='Build unchanged StringComparer and run comparer plus broad application acceptance; requires comparer-storage core')
+    parser.add_argument('--calendar-foundation', action='store_true', help='Build unchanged Duration and comparison contracts with native value-collection acceptance')
     args = parser.parse_args()
+    args.comparers = args.comparers or args.calendar_foundation
     args.application = args.application or args.comparers
     args.arrays = args.arrays or args.application
     args.queries = args.queries or args.arrays
@@ -44,7 +46,7 @@ def main():
             raise RuntimeError(json.dumps(commands[-1], indent=2))
         return result
 
-    manifest = HERE / ('comparer-ownership.json' if args.comparers else 'array-ownership.json' if args.arrays else 'query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
+    manifest = HERE / ('calendar-foundation-ownership.json' if args.calendar_foundation else 'comparer-ownership.json' if args.comparers else 'array-ownership.json' if args.arrays else 'query-ownership.json' if args.queries else 'hashmap-ownership.json' if args.hashmap else 'arraylist-ownership.json' if args.collections else 'union-ownership.json')
     consumer_source = HERE / ('array-consumer.rvn' if args.arrays else 'query-consumer.rvn' if args.queries else 'hashmap-consumer.rvn' if args.hashmap else 'arraylist-consumer.rvn' if args.collections else 'union-consumer.rvn')
     seed_source = HERE / ('comparer-seed.neoil' if args.comparers else 'collection-seed.neoil' if args.collections else 'union-seed.neoil')
     sources = json.loads(manifest.read_text())['libraries'][0]['sources']
@@ -107,6 +109,9 @@ def main():
             samples.append((ROOT / 'docs/experiments/raven-target/samples/library-comparers.rvn', 0, 'Comparer contract passed\n'))
             samples.append((ROOT / 'docs/experiments/raven-target/samples/library-integers.rvn', 0,
                             '42\n1\nEqual\n-2147483648\n-1\nDifferent\n2147483647\n1\nDifferent\n0\n0\nEqual\n'))
+        if args.calendar_foundation:
+            samples.append((HERE / 'duration-consumer.rvn', 42, ''))
+            samples.append((HERE / 'duration-contract-consumer.rvn', 42, ''))
         for name in ['library-query-basics', 'library-query-names']:
             source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
             expected = source.with_suffix('.expected.txt')
@@ -119,6 +124,25 @@ def main():
             run([runtime, 'run', str(app), '--module', str(library), '--system', str(seed)],
                 exit_code, expected_stdout)
             sample_paths.extend([source, app])
+        if args.calendar_foundation:
+            # Ordinary .NET control for the same unchanged source foundation. The
+            # broader native collection gate does not imply full .NET library parity.
+            dotnet_output = output / 'dotnet-duration'
+            dotnet_output.mkdir()
+            duration_sources = [ROOT / ('runtime/raven/src/System/' + name + '.rvn')
+                                for name in ['ComparableTo', 'EquatableTo', 'Duration']]
+            duration_library = dotnet_output / 'NeoCLR.Duration.dll'
+            duration_app = dotnet_output / 'Consumer.dll'
+            duration_source = HERE / 'duration-contract-consumer.rvn'
+            dotnet_common = ['dotnet', compiler, '--framework', 'net10.0', '--emit-core-types-only']
+            run(dotnet_common + ['--output-type', 'classlib', '-o', str(duration_library)] +
+                [str(p) for p in duration_sources])
+            run(dotnet_common + ['--refs', str(duration_library), '-o', str(duration_app), str(duration_source)])
+            config = duration_app.with_suffix('.runtimeconfig.json')
+            config.write_text(json.dumps({'runtimeOptions': {'tfm': 'net10.0', 'framework': {
+                'name': 'Microsoft.NETCore.App', 'version': '10.0.0'}}}) + '\n')
+            run(['dotnet', str(duration_app)], 42, '')
+            sample_paths.extend(duration_sources + [duration_source, duration_library, duration_app, config])
         mutable_source = output / 'MutableCapture.rvn'
         mutable_source.write_text('class Cell {}\nfunc Main() -> int {\n    var cell = Cell()\n    let callback: () -> object = () => cell\n    cell = Cell()\n    return 42\n}\n')
         mutable_output = output / 'MutableCapture.dll'
@@ -183,10 +207,10 @@ def main():
     for name, directory in [('runtime', ROOT), ('compiler', Path(compiler).parent)]:
         revisions[name] = subprocess.check_output(
             ['git', '-C', str(directory), 'rev-parse', 'HEAD'], text=True).strip()
-    evidence = dict(revisions=revisions, scope=('Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.' if args.application else 'Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
+    evidence = dict(revisions=revisions, scope=('Unchanged Duration and comparison contracts compile into separately consumed libraries on both targets; the same value-contract consumer exits 42 on each. Native ArrayList<Duration> and the broad application also execute. Date and the full dual-target library gate remain open.' if args.calendar_foundation else 'Unchanged application-order-collections compiles against a separate native source-library artifact and executes with exact output and exit 0. Full dual-target gate remains open.' if args.application else 'Native vectors dispatch through explicitly selected source Array<T> backing and independently compiled query/iterator methods; full dual-target gate remains open.' if args.arrays else 'Unchanged query library separately imports and executes OfType, Filter, Map, ToList and Single with value unboxing and shared reference identity. Broad array extension lookup remains open.' if args.queries else 'Native generic extension library and separate consumer execute alongside the HashMap gate. Full query library remains blocked by object-to-generic conversion in OfType.' if args.extensions else 'HashMap separate native import: collisions, growth, replacement, missing keys, callback policies, interface dispatch and shared object identity execute. Full dual-target gate remains open.' if args.hashmap else 'ArrayList separate native import, callbacks, mutation, copying and iteration execute. Full dual-target library/application gate remains open.' if args.collections else 'Native unchanged Option/Result plus iteration contracts; separate native import and execution. Not the full dual-target class-library gate.'),
                     commands=commands, artifacts=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest()) for p in paths])
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
-    print('PASS unchanged application-order-collections with a separately compiled native library' if args.application else 'PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
+    print('PASS dual-target Duration foundation and native collection/application acceptance' if args.calendar_foundation else 'PASS unchanged application-order-collections with a separately compiled native library' if args.application else 'PASS separately compiled nominal Array<T> backing and vector query consumer' if args.arrays else 'PASS separately compiled unchanged native query library' if args.queries else 'PASS separately compiled native generic extension library and HashMap' if args.extensions else 'PASS separately compiled native HashMap and comparers' if args.hashmap else 'PASS separately compiled native ArrayList with callback import' if args.collections else 'PASS unchanged source Option/Result native library and separate consumer')
 
 
 if __name__ == '__main__':

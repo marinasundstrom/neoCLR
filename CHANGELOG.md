@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add calendar-foundation acceptance with unchanged source-built Duration,
+  ComparableTo and EquatableTo. The same reference-only consumer executes on .NET
+  and NeoCLR; native ArrayList<Duration> storage/copy/iteration and the broad application
+  pass. Compiler, metadata and runtime implementations are unchanged. Date dependency
+  inventory records missing string indexing and two runtime services before publication.
+
 - Validate explicit bootstrap Int64 member imports with exact-width managed receivers
   and add executable Int64.CompareTo to the comparer seed. Raven `9d06edf80` addresses
   value-returning receivers without write-back; native ArrayList<long> copy/indexer,

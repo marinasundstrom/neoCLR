@@ -1,0 +1,19 @@
+import System.*
+
+func Main() -> int {
+    let zero = default(Duration)
+    let value = Duration.FromTicks(42L)
+    let copy = value
+    if zero.Ticks != 0L || copy.Ticks != 42L || !copy.Equals(value) {
+        return 1
+    }
+    let least = Duration.FromTicks(-9223372036854775807L - 1L)
+    let greatest = Duration.FromTicks(9223372036854775807L)
+    if least.CompareTo(greatest) != -1 || greatest.CompareTo(least) != 1 {
+        return 2
+    }
+    if value.CompareTo(copy) != 0 || zero.Equals(value) {
+        return 3
+    }
+    return 42
+}
