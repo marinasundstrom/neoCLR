@@ -101,7 +101,7 @@ public sealed partial class MethodBuilder
                      type.GenericInstance is { Definition.IsInterface: true } interfaceInstance && instance.ConformsTo(interfaceInstance) ||
                      type.ImportedType is { } externalInterface && instance.ConformsTo(externalInterface));
                 var importedConformance = stack.Count > 0 && stack[^1].ImportedType is { } importedActual && type.ImportedType is { } importedTarget &&
-                    Assembly.HasNativeInterfaceConversion(importedActual, importedTarget);
+                    (Assembly.HasNativeInterfaceConversion(importedActual, importedTarget) || Assembly.HasDeclaredClassBase(importedActual, importedTarget));
                 var localExternalConformance = stack.Count > 0 && stack[^1].Class is { } localClass && type.ImportedType is { } externalTarget &&
                     localClass.InheritedContracts().Any(c => Equals(c.ImportedType, externalTarget));
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&

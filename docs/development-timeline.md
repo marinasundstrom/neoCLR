@@ -10764,3 +10764,25 @@ identity properties now fail with RAV0330, independently of writer validation.
   General protected members, writer/facade/Raven admission and JSON execution remain open.
 - **Evidence:** [hierarchy integration record](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md),
   `tests/protected_constructors.rs`, Raven `docs/compiler/general-fixes-from-neoclr.md`.
+
+### Follow-up: revisit closed-family metadata encoding
+
+- **Author:** asked to continue directly with the next slice, then clarified that a later
+  design pass should investigate encoding closed hierarchies directly in metadata
+  (correcting the word "IL").
+- **Assistant interpretation/action:** retain the existing native closed-family flag and
+  CLI-shaped Abstract declaration for this bounded integration. Do not conflate closure
+  with CLI Sealed or invent an instruction. Richer native family/permits encoding remains
+  a later design decision, not a prerequisite or a claimed completed format redesign.
+
+- **Author follow-up:** asked how closed hierarchies are encoded now.
+- **Assistant explanation:** native type rows carry is_closed_hierarchy/Abstract/nonsealed
+  flags; direct children are inferred from ordinary base relationships in the defining
+  assembly, without a separate permits list. The PE native payload retains this contract;
+  the CLI reference projection retains Abstract only, and ordinary .NET emission keeps
+  its attribute-based representation. A richer explicit family/permits representation
+  remains future work.
+- **Verified outcome:** paired direct and separately compiled library/consumer cases run
+  on both targets and reject external direct children. Raven integration `d618c9667`;
+  146 C# metadata groups and 35 Raven regressions pass. JSON progresses to propagation
+  lowering. [Milestone and evidence](experiments/extended-cli-metadata/closed-family-2026-10-04.md).

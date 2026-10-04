@@ -10,6 +10,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
+        internal bool IsClosedHierarchy { get; init; }
         internal string? BaseName { get; init; }
         internal int BaseIndex { get; set; } = -1;
         internal PrimitiveType? NativePrimitive { get; init; }
@@ -139,6 +140,8 @@ public sealed partial class NativeAssemblyDefinition
             foreach (var type in typeElements)
             {
                 var typeFields = new List<string> { "name", "fields", "is_reference_type", "is_abstract", "is_sealed", "origin" };
+                bool closedHierarchy = type.TryGetProperty("is_closed_hierarchy", out var closedFlag) && closedFlag.GetBoolean();
+                if (type.TryGetProperty("is_closed_hierarchy", out _)) typeFields.Add("is_closed_hierarchy");
                 if (type.TryGetProperty("base", out _)) typeFields.Add("base");
                 var typeNames = type.TryGetProperty("generic_parameters", out _) ? Array(type, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null type parameter name")).ToArray() : [];
                 if (type.TryGetProperty("generic_parameters", out _)) typeFields.Add("generic_parameters");
@@ -210,7 +213,9 @@ public sealed partial class NativeAssemblyDefinition
                     Require(enumMembers.Select(m => m.Name).Distinct().Count() == enumMembers.Length && typeNames.Length == 0 && declaringType < 0 && baseInterfaces.Length == 0, "unsupported enum relationships or duplicate members");
                 }
                 Shape(type, typeFields.ToArray());
-                var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
+                var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean() && !closedHierarchy;
+                Require(!closedHierarchy || !isInterface && !isPrimitive && typeNames.Length == 0 && declaringType < 0 &&
+                    type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean() && !type.GetProperty("is_sealed").GetBoolean(), "unsupported closed class family");
                 var isRuntimeString = isPrimitive && Text(type, "name") == "System.String";
                 var isValueType = !isInterface && !isRuntimeString && !type.GetProperty("is_reference_type").GetBoolean();
                 Require((!isValueType || !isStatic) &&
@@ -299,7 +304,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -821,6 +826,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
     {
+        if (type.IsClosedHierarchy) return graph.AddClosedClass(type.Namespace, type.Name, type.Visibility);
         if (type.NativeGrapheme)
         {
             var grapheme = graph.AddValueType(type.Namespace, type.Name, type.Visibility);

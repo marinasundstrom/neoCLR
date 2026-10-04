@@ -1,0 +1,30 @@
+public class Derived : Base {
+    private var extra: int = 2
+
+    init(number: int): base(number) { }
+
+    func Read() -> int {
+        return Number + extra
+    }
+}
+
+public sealed class Base {
+    field Number: int
+
+    protected init(number: int) {
+        self.Number = number
+    }
+}
+
+func Main() -> int {
+    let value = Derived(40)
+    let alias: Base = value
+    if value.Read() != 42 {
+        return 1
+    }
+    alias.Number = 41
+    if value.Read() != 43 {
+        return 2
+    }
+    return 42
+}

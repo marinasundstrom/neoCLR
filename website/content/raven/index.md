@@ -212,3 +212,8 @@ family identity, including binary dependencies, and prevent external direct exte
 of a closed class family. Protected constructor authoring and reader/facade round trips
 also execute through generated native PE. Closed-family metadata and Raven admission
 remain open; this does not yet make the JSON source library compile.
+
+The development closed-family/protected-constructor case now runs on both .NET and
+NeoCLR, including a separate consumer that references only the emitted library.
+External direct children of the closed root reject before output. The next JSON
+blocker is propagation lowering; JSON execution is not yet complete.

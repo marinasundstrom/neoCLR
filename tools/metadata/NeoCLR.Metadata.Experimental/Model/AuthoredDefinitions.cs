@@ -58,7 +58,18 @@ public sealed partial class TypeDefinition
     /// <summary>Creates a detached type declaration with CLI attributes and an explicit base reference.</summary>
     /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric interfaces, static/root classes, ordinary local derived classes and sealed sequential value types.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
+        : this(@namespace, name, attributes, baseType, false) { }
+
+    /// <summary>Creates a detached declaration, optionally marking an abstract native closed class family.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Nonempty metadata name.</param>
+    /// <param name="attributes">CLI attributes; closed class families require Abstract without Sealed.</param>
+    /// <param name="baseType">Explicit core Object or an attached local ordinary base.</param>
+    /// <param name="isClosedHierarchy">Whether direct children are limited to this output assembly.</param>
+    /// <remarks>Closed families currently require nongeneric top-level classes. CLI executable output rejects this native extension; the PE reference projection retains Abstract and the authoritative native payload retains closure.</remarks>
+    public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType, bool isClosedHierarchy)
     {
+        closedHierarchy = isClosedHierarchy;
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 || (name + @namespace).Any(char.IsControl))
             throw new ArgumentException("invalid type name");
         Namespace = @namespace; Name = name; Attributes = attributes; authoredBaseType = baseType; GenericParameterNames = Array.Empty<string>();
@@ -102,6 +113,11 @@ public sealed partial class TypeDefinition
             field.AuthoredOwner = this; field.Module = Module;
         });
     }
+    private readonly bool closedHierarchy;
+    /// <summary>Gets the explicit native closed-family classification, distinct from CLI Sealed.</summary>
+    /// <exception cref="NotSupportedException">A CLI snapshot has no materialized closed-family contract.</exception>
+    public bool IsClosedHierarchy => Producer is null && Module is not null && !Module.Assembly.IsNative
+        ? throw new NotSupportedException("CLI closed-family attributes are not materialized") : closedHierarchy;
     private readonly TypeReference? authoredBaseType;
     /// <summary>Gets the authored or materialized nominal base reference without resolving dependencies.</summary>
     /// <remarks>Native snapshots currently support local nongeneric class bases. Null means no recorded base.</remarks>
@@ -158,13 +174,15 @@ public sealed partial class AssemblyBuilder
             if (definition.DeclaringType is null ? (attributes & 7) is not (0 or 1) : (attributes & 7) is not (2 or 5))
                 throw new ArgumentException("visibility does not match lexical ownership");
             var category = attributes & ~7u;
-            if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
+            if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x80 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
+            if (definition.IsClosedHierarchy != (category == 0x80) || definition.IsClosedHierarchy && (definition.GenericArity != 0 || definition.DeclaringType is not null))
+                throw new ArgumentException("closed hierarchy requires a nongeneric top-level abstract class");
             if (category == 0x100 && !definition.IsEnum) throw new ArgumentException("sealed manual type category requires an enum");
             if (category == 0xa0)
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
-            else if (!(category == 0 && definition.GenericArity == 0 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+            else if (!(category is 0 or 0x80 && definition.GenericArity == 0 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
                 baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.

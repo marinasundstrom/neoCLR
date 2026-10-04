@@ -122,7 +122,16 @@ public sealed class NominalTypeInfo : TypeInfo
     public IReadOnlyList<MethodInfo> GetConstructors() => context.GetConstructors(definition, this);
     /// <summary>Gets declared metadata accessibility.</summary>
     public MetadataAccessibility Accessibility => MetadataAccess.Type(definition.Attributes);
-    /// <summary>Gets the metadata abstract flag.</summary>
+    /// <summary>Gets the explicit native closed direct-family classification.</summary>
+    /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>
+    public bool IsClosedHierarchy => definition.IsClosedHierarchy;
+    /// <summary>Gets the canonical direct children recorded in this closed family's defining module.</summary>
+    /// <returns>Direct children in metadata order, or an empty list for an ordinary class.</returns>
+    /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>
+    public IReadOnlyList<NominalTypeInfo> GetPermittedDirectSubtypes() => IsClosedHierarchy
+        ? Array.AsReadOnly(Module.GetTypes().Where(type => ReferenceEquals(type.BaseType, this)).ToArray())
+        : Array.Empty<NominalTypeInfo>();
+    /// <summary>Gets the CLI Abstract declaration flag.</summary>
     public bool IsAbstract => (definition.Attributes & 0x80) != 0;
     /// <summary>Gets the metadata sealed flag.</summary>
     public bool IsSealed => (definition.Attributes & 0x100) != 0;

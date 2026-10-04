@@ -24,8 +24,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Metadata builders/manual definitions now author protected constructors using CLI Family;
   native reader/facade round trips preserve accessibility, and unrelated calls fail writer
   validation. All 145 C# groups and 55 runtime regressions pass; generated public/protected
-  assemblies execute. Closed-family authoring and Raven admission remain open, so JSON
-  is not yet supported.
+  assemblies execute. Native closed-family authoring, facade direct-child views and Raven
+  admission now pass direct and separate library/consumer execution on both targets.
+  Output-owned class-base facts validate imported reference conversions without reopening
+  readers. CLI reference projections retain Abstract but no closure marker; executable CLI
+  metadata-library Write rejects native closed declarations. All 146 metadata groups and
+  35 Raven regressions pass. JSON next rejects a lowered propagation expression before output.
 
 - Materialize local nongeneric native class bases in metadata definitions and the
   introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,

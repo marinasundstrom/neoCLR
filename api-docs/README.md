@@ -991,3 +991,8 @@ Runtime protected constructor and closed-class validation changes are documented
 Constructor authoring now includes C# MethodVisibility.Protected, covered by that manual
 reference and executable C# tests. No guest API signatures change; the existing guest snapshot
 is unchanged and its previously recorded refresh blocker remains open.
+
+Closed-class host authoring, introspection classification/direct children and external
+reference-base contracts are covered by the experimental manual reference and 146 C#
+contract groups. These host-only additions do not alter guest signatures or refresh
+the pre-existing stale guest reference snapshot.

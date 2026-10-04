@@ -6984,3 +6984,47 @@ false default is unchanged; source permits lists remain Raven validation. These
 checks do not add closed-interface or general sealed-leaf enforcement. See the
 [runtime access contract](../docs/accessibility.md) and
 [executable scope](../docs/experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
+
+### Native closed-class authoring and facade (2026-10-04)
+
+```csharp
+TypeBuilder AssemblyBuilder.AddClosedClass(string @namespace, string name,
+    TypeVisibility visibility = TypeVisibility.Public);
+TypeDefinition(string @namespace, string name, uint attributes,
+    TypeReference? baseType, bool isClosedHierarchy);
+bool TypeDefinition.IsClosedHierarchy { get; }
+bool TypeBuilder.IsClosedHierarchy { get; }
+bool TypeBuilder.IsAbstract { get; }
+bool NominalTypeInfo.IsClosedHierarchy { get; }
+IReadOnlyList<NominalTypeInfo> NominalTypeInfo.GetPermittedDirectSubtypes();
+void AssemblyBuilder.DeclareClassBase(ImportedTypeReference type,
+    ImportedTypeReference baseType);
+```
+
+The original four-argument TypeDefinition constructor is preserved. Closed declarations
+require Abstract without Sealed and a nongeneric top-level reference class; invalid
+manual definitions throw ArgumentException on attachment before modifying the module.
+AddClosedClass creates a root using the explicitly selected core Object reference.
+Its constructors may be Protected. Ordinary local children use AddClass(baseType);
+abstract allocation fails writer validation with InvalidDataException.
+
+Native closed-family flags survive PE/native reader materialization. Facade children
+are canonical direct BaseType matches in defining-module metadata order; an ordinary
+native class returns an empty list. CLI snapshots throw NotSupportedException for
+closure queries because CLI closed-family attributes are not materialized.
+
+Ordinary executable Write rejects native closed-family declarations. Native PE
+transport retains Abstract in its nonexecutable CLI projection and closure in the
+authoritative native payload; there is currently no projected closed-family attribute.
+Generic/nested closed roots and class virtual/abstract methods remain unsupported.
+
+DeclareClassBase records host-provided signature conversion facts for two output-owned
+nongeneric top-level class references in the same exact dependency assembly. It emits
+no new dependency declaration and opens no metadata reader. Repeating the same edge is
+idempotent; foreign/value/interface/generic/nested/cross-assembly, cyclic or conflicting
+edges throw ArgumentException. Null inputs throw ArgumentNullException; over 4096 edges
+throw InvalidDataException. Runtime verification still checks the actual dependency
+definitions; hosts must supply truthful symbol facts. It does not enable authoring a
+new class that derives from a dependency.
+
+See [the executable compiler gate](../docs/experiments/extended-cli-metadata/closed-family-2026-10-04.md).

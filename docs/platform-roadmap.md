@@ -54,10 +54,11 @@ is integrated into Raven main at `4f95db536` with the other validated independen
 The runtime now checks protected constructor family access and closed class direct-family
 ownership. Protected constructor authoring and reader/facade round trips also pass,
 including generated native PE execution. Closed-family metadata and Raven admission
-remain open. External
-and virtual hierarchy contracts remain open; JSON still rejects its closed-family
-signature before publishing output. Next complete closed-family/protected-constructor
-facts without weakening them to ordinary open/public declarations.
+now pass the [paired direct and separate-library gate](experiments/extended-cli-metadata/closed-family-2026-10-04.md).
+Native symbols retain closure/direct children and actual bases; emitters author bounded
+reference conversion contracts from symbol facts. External base declarations and
+virtual hierarchy contracts remain open. JSON now reaches an unsupported lowered
+propagation expression and still publishes no output; shared lowering is next.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone
 ReflectionError union in its explicit source dependencies; it does not yet require

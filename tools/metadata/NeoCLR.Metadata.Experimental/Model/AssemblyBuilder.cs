@@ -99,6 +99,8 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types)
             {
                 type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
+                if (type.IsClosedHierarchy && (!IsOrdinaryBase(type) || !type.IsAbstract))
+                    throw new InvalidDataException("closed families require ordinary abstract class owners");
                 if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent)))
                     throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
             }
@@ -131,6 +133,8 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
+                    if (instruction.Op is "new.object" or "new.constructed" && instruction.Target?.DeclaringType?.IsAbstract == true)
+                        throw new InvalidDataException("abstract classes cannot be constructed");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition) is { Visibility: MethodVisibility.Protected } familyTarget &&
                         (method.DeclaringType is not { } callerType ||
                          !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!)))
@@ -201,6 +205,21 @@ public sealed partial class AssemblyBuilder
     /// <remarks>CLI base is System.Object. Native root classes have no declared base. Constructors are not synthesized.</remarks>
     public TypeBuilder AddClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, isStatic: false);
+    /// <summary>Adds an abstract root class whose direct family belongs to this output.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Nonempty unique metadata name.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An attached native closed-family definition.</returns>
+    /// <exception cref="ArgumentException">Invalid visibility, name, duplicate type or exceeded limit.</exception>
+    /// <remarks>Use protected constructors for derived initialization. Native PE emission preserves closure; ordinary CLI executable emission rejects it explicitly.</remarks>
+    public TypeBuilder AddClosedClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
+        var definition = new TypeDefinition(@namespace, name, (visibility == TypeVisibility.Public ? 1u : 0u) | 0x80,
+            Definition.MainModule.ImportReference(CoreLibrary, "System", "Object"), true);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
     /// <summary>Adds a nongeneric reference class derived from an owned ordinary class.</summary>
     /// <param name="namespace">Metadata namespace, possibly empty.</param>
     /// <param name="name">Nonempty unique metadata name.</param>
@@ -264,6 +283,8 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (!referenceOnly && types.Any(t => t.IsClosedHierarchy))
+            throw new InvalidDataException("closed class families require native emission; CLI closed-family attributes are not authored");
         if (!referenceOnly && (authoredPrimitiveOwners.Count != 0 || externalGrapheme is not null || types.Any(t => t.NativePrimitive is not null || t.NativeGrapheme) ||
             methods.SelectMany(m => m.Instructions).Any(i => i.Target?.DeclaringType?.NativePrimitive is not null)))
             throw new InvalidDataException("native primitive implementations require native emission");
@@ -832,6 +853,10 @@ public sealed partial class TypeBuilder
 
     /// <summary>Gets immutable declaring-type parameter names in ordinal order.</summary>
     public IReadOnlyList<string> GenericParameterNames => Definition.GenericParameterNames!;
+    /// <summary>Gets whether this declaration has the CLI Abstract flag.</summary>
+    public bool IsAbstract => (Definition.Attributes & 0x80) != 0;
+    /// <summary>Gets whether this class declares a native closed direct family.</summary>
+    public bool IsClosedHierarchy => Definition.IsClosedHierarchy;
     /// <summary>Gets whether this is an abstract sealed static class.</summary>
     public bool IsStatic => (Definition.Attributes & 0x180) == 0x180 && !IsInterface;
     /// <summary>Gets whether this declaration is a CLI value type rather than a reference type.</summary>

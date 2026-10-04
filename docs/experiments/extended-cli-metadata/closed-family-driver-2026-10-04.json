@@ -1,0 +1,280 @@
+{
+  "scope": "Closed root/protected constructor: paired ordinary driver, separately compiled library/consumer, reference-only native import, mutation, alias identity and invalid external-child rejection",
+  "runtimeRevision": "d8ae485f9bbb787f80c59df0cb0fa39b71c39ae1",
+  "compilerRevision": "91b2a1c246a9a9b3ff4141585ca4590a7b42fc7d",
+  "revisionsAreWorkingTreeBases": true,
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/closed-family-consumer.rvn": "8150f708d305d4a97dd208aa6dc5f11418e9eb2902a66f9ef9922417beeba71f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_class_bases.py": "beb4e6e8ccc3a7b4c8a93977067cd06c3b680a983b90b913def08a30a20d73f2",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "3f481e718a679da8f970d8eba47acdb56f6a600bc84d83ba2a4cf2d9eb18038b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "63a141976023b83b9aeecccadc1aa25abaa4905b94297fc5766987469d297aa4",
+    "/private/tmp/TextCore1004.dll": "a468edca76ea30bab4c4ffab39f43afdc8011a6d952d0e761a62137f0970fe66",
+    "/private/tmp/source-text-committed1004/System.neox": "b6bcaa4330c06242b45ac68f6e672bf3bf1f441611bf636d5749f23bcd36ed68",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/closed-library-ready1004/NativeModels.dll": "efdfe651dc5c009921a58b087445c6ab925e8bee6dd28b77e54951180be3fd9a",
+    "/private/tmp/closed-library-ready1004/DotNet.dll": "512f3ae1ebbc14e99dd358c36d84e19ab471de7a88b4e228a66cc16fd0c352f1",
+    "/private/tmp/closed-library-ready1004/DotNetConsumer.dll": "bc65d1271e03185383577a16b98ad93f517569f246c97923241640ef10c09e8a",
+    "/private/tmp/closed-library-ready1004/DotNetModels.dll": "eb3792e387587dec66cdedaacbcc589086096b318e6b7e6e69851f686df25149",
+    "/private/tmp/closed-library-ready1004/Native.dll": "f512c6f7e8008d0a9938134d8559d89ace22a4567c101ccfcdaac3b36e8134a1",
+    "/private/tmp/closed-library-ready1004/NativeConsumer.dll": "82386bc98c8bfd286145090695d64ea96b0eae5b12396f8c301fc04af298adc6",
+    "/private/tmp/closed-library-ready1004/Invalid.rvn": "233609e1e2fcf2df87ec8b8dc9ab3128a0952daa71b165240621d62b4b06e721",
+    "/private/tmp/closed-library-ready1004/Consumer.rvn": "a98df0b71ff7349e9f00636a15c3d647eb972bde08f5685e929317c9a9070ab1",
+    "/private/tmp/closed-library-ready1004/Models.rvn": "4c4f17fd4b187553e7e2452ba67207468cbe34e100fc547877aa8b5ab1f4571a",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "31e2422784ecb8c4caf3aa0fc6c62face60aa19c33da4314c3dcb6700082a2e1",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "b751ec8faebf9249ccdb36d09c840316ae77ae410573d1f00f46205ad5faab10",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "ddf8cb6eaba77768b303d2efb435681f85154b8e7546089a217e18fc24107309",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "7dd9f58a6fb1ccb7f616d1a7f6966cbb7192324074f856538459c7141bfe00e1"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/private/tmp/closed-library-ready1004/DotNet.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/closed-family-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,5s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/private/tmp/closed-library-ready1004/DotNet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/source-text-committed1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "-o",
+        "/private/tmp/closed-library-ready1004/Native.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/closed-family-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/closed-library-ready1004/Native.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_5DE9C8DEAD106170E45E5DE6FAC88AC46CDA0E8C6722A9D9C41CC902173F16E0: typed-stack/control-flow verification passed (663 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/closed-library-ready1004/Native.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "library",
+        "-o",
+        "/private/tmp/closed-library-ready1004/DotNetModels.dll",
+        "/private/tmp/closed-library-ready1004/Models.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,1s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/private/tmp/closed-library-ready1004/DotNetModels.dll",
+        "-o",
+        "/private/tmp/closed-library-ready1004/DotNetConsumer.dll",
+        "/private/tmp/closed-library-ready1004/Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/private/tmp/closed-library-ready1004/DotNetConsumer.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/private/tmp/closed-library-ready1004/DotNetModels.dll",
+        "--output-type",
+        "library",
+        "-o",
+        "/private/tmp/closed-library-ready1004/DotNetInvalid.dll",
+        "/private/tmp/closed-library-ready1004/Invalid.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "../../../../../../private/tmp/closed-library-ready1004/Invalid.rvn(1,24): error RAV0306: Type 'Base' is closed and cannot be inherited\n\nBuild failed with 1 error(s)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/source-text-committed1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/closed-library-ready1004/NativeModels.dll",
+        "/private/tmp/closed-library-ready1004/Models.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/source-text-committed1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/closed-library-ready1004/NativeModels.dll",
+        "-o",
+        "/private/tmp/closed-library-ready1004/NativeConsumer.dll",
+        "/private/tmp/closed-library-ready1004/Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/closed-library-ready1004/NativeConsumer.dll",
+        "--module",
+        "/private/tmp/closed-library-ready1004/NativeModels.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8478DF5BC2196ACBE069889DB3011F09F722DB33D1FF1C57C29AB04C18B6FF71: typed-stack/control-flow verification passed (663 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/closed-library-ready1004/NativeConsumer.dll",
+        "--module",
+        "/private/tmp/closed-library-ready1004/NativeModels.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/source-text-committed1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/closed-library-ready1004/NativeModels.dll",
+        "--library",
+        "-o",
+        "/private/tmp/closed-library-ready1004/NativeInvalid.dll",
+        "/private/tmp/closed-library-ready1004/Invalid.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0306: Type 'Base' is closed and cannot be inherited\n"
+    }
+  ],
+  "metadataTestsPassed": 146,
+  "ravenFocusedTestsPassed": 35,
+  "runtimePrerequisiteTestsPassed": 55
+}
