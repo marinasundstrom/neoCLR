@@ -906,3 +906,19 @@ trust/sandbox boundary for arbitrary metadata. Legacy nominal services remain av
 This native gate does not claim full async frontend lowering or the entire library's
 .NET execution. Focused .NET tests retain ordinary pattern and callback semantics,
 and metadata callback fixtures execute through both CLI and native runtimes.
+
+
+## Native Self contracts (2026-10-04)
+
+Build the current `--reference-comparer-storage-core` bootstrap (which includes the
+Self semantic marker), then run `verify_self.py` with `--compiler`, `--runtime`, `--core`,
+`--seed`, `--base-library`, `--ownership` and a fresh `--output` directory, as for the Tasks
+gate above. The base is the separately built 57-source library. The script adds an
+explicit `self` contract to a copy of the manifest; old manifests remain unchanged.
+
+It compiles actual `System/Clonable.rvn`, then a Counter implementation, then a consumer
+with only native references. Exit 42 proves concrete clone calls and independent mutation.
+Negative cases cover an incompatible implementation and missing/wrong marker selection,
+including absence of output files. This is not a claim of constrained generic Self
+calls or static Number dispatch. [Hashes and commands](../self-native-2026-10-04.json)
+identify the matching experimental compiler/runtime bundle. No native format change.

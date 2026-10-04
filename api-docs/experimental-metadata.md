@@ -6326,3 +6326,20 @@ Inhabited unit and no-result invocation remain distinct. Where Raven converts a
 no-result method to a unit-producing callback, the native emitter generates an
 output-owned adapter that invokes the original callback and produces the configured
 unit value. This allocates an adapter/closure; it is not runtime signature coercion.
+
+
+### Authored Self implementation contracts (2026-10-04)
+
+`AssemblyBuilder.CreateMethodReference` accepts `SignatureType.Self` for an authored
+interface's instance contract, including nested supported signature shapes. A nominal
+class method contract containing Self is rejected with InvalidDataException. Existing
+ownership, completeness and signature-scope validation still applies.
+
+When writing an implementing class/value type, required interface methods substitute
+Self with that implementing type (the open construction for a generic owner). This
+applies to local and output-owned external interface contracts, including inherited
+requirements and arrays/constructions. Wrong concrete parameter/result signatures fail
+with InvalidDataException before output publication. The interface metadata retains
+Self; the implementation's declared methods use concrete signatures. This is conformance
+validation, not an implicit conversion or a new dispatch opcode. Executable CLI output
+with symbolic Self remains unsupported; native SelfType encoding is unchanged.

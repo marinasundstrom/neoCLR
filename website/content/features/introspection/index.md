@@ -302,3 +302,13 @@ in progress; see the [development API reference](/docs/experimental-metadata/).
 The development host reader also preserves nested native case ownership and scoped
 external references below nongeneric owners. Same-named cases remain distinct in the
 metadata facade and Raven symbols; this does not yet complete source-union emission.
+
+
+## Compiler metadata integration (development)
+
+The separate C# metadata facade retains native Self as an interface-scoped type,
+without adding a generic parameter. The development compiler can now import and emit
+these contracts: separately compiled Clonable, implementation and consumer assemblies
+execute concrete clone calls with independent mutation. Constrained generic Self calls
+and complete System-library compilation remain in progress. This development gate does
+not change the published guest introspection API.

@@ -289,3 +289,19 @@ pattern fix. Prioritize the next shared blockers in this order:
 
 Full async lowering, mutable captures and broad introspection remain explicit open
 capabilities. Preserve the default .NET backend and validate shared fixes independently.
+
+
+### Native Self conformance slice (2026-10-04)
+
+The driver can select its existing semantic Self contract explicitly; native import
+and emission preserve Self through the metadata facade. Actual Clonable now participates
+in a three-assembly executable gate with concrete clone calls. Metadata implementation
+matching substitutes Self with the declaring class/value owner, including generic owners.
+
+The numeric-family binding audit with this configuration removes the reported unresolved
+Self and Number implementation errors. It still fails on missing ParseBoolean/ParseByte/
+ParseDouble/ParseInt16/ParseInt32 and related service contracts, plus resulting payload/type
+errors. These are not all independent defects. Next connect a coherent numeric parsing
+service family, then re-assess primitive ownership and static Number emission from the
+remaining first failures. Do not treat this concrete-call gate as constrained generic
+Self dispatch support. [Evidence](self-native-2026-10-04.json).

@@ -1,0 +1,12 @@
+func Main() -> int {
+    let original = Counter(42)
+    let copy = original.Clone()
+    copy.Value = 1
+    if original.Value != 42 {
+        return 0
+    }
+    if copy.Value != 1 {
+        return 0
+    }
+    return original.Value
+}

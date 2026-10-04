@@ -5,7 +5,7 @@ public sealed partial class AssemblyBuilder
     /// <summary>Authors a public nonvirtual member, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
-    /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature.</param>
+    /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <param name="isOverride">Reuse the inherited slot; currently only instance value-type ToString(): String is supported.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
@@ -38,7 +38,7 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("unsupported method or constructor contract", nameof(name));
         if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
             throw new InvalidDataException("unsupported authored method signature");
-        signature.ValidateOwner(this, declaringType.GenericArity);
+        signature.ValidateOwner(this, declaringType.GenericArity, allowSelf: isInterface);
         foreach (var existing in authoredCallableReferences)
         {
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
@@ -65,7 +65,8 @@ public sealed partial class AssemblyBuilder
         authoredCallableReferences.Add(reference);
         return reference;
 
-        static bool Supported(SignatureType type, bool result) =>
+        bool Supported(SignatureType type, bool result) =>
+            type.IsSelf ? isInterface :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
             type.ImportedType is { } nominal ? nominal.TypeArguments.All(t => Supported(t, false)) :

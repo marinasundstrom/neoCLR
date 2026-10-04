@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Admit Self in authored external interface method contracts and substitute the concrete
+  implementing owner when validating required methods, including generic owners. Preserve
+  symbolic Self in native metadata without a format change. The actual Clonable source,
+  separate implementation and artifact-only consumer compile and run with exit 42;
+  this establishes conformance and concrete calls, not constrained generic Self dispatch.
+
 - Execute all six Raven Tasks/Concurrency source files through a separate native
   library and artifact-only consumer, including cancellation, generic continuations,
   interface callbacks, worker results and implicit entry draining. Typed queue services

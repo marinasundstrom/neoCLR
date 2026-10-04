@@ -5493,3 +5493,25 @@ Func/Action are only Raven/CLI transport. Unit-return adapters explicitly invoke
 no-result callback then produce unit, retaining receiver identity with an allocation cost.
 The matching Raven branch is codex/metadata-consumer at 598b16be7 (pre-slice parent 8407c122f).
 No full async frontend or full-System claim follows from this bounded native gate.
+
+
+### Native Self contract pipeline (2026-10-04)
+
+Raven's bootstrap ownership manifest can now select its existing RuntimeSelfTypeContract
+through `self: { assemblyName, typeName }`. The checked comparer/storage core includes
+System.Runtime.CompilerServices.Self. Exact identity is validated; missing configuration
+for a native Self signature rejects explicitly. Introspection supplies Self facts to
+symbols; emission writes native Self from the exact configured semantic marker, with
+no importer reuse. The marker is temporary semantic transport, not a nominal native type.
+
+The actual System.Clonable source, a separately compiled implementation and an artifact-only
+consumer now execute with exit 42 and independent clone mutation. Metadata conformance
+substitutes the implementing owner into local/external Self contracts. Native SelfType
+encoding is unchanged. This bounded gate uses concrete calls; erased-interface and
+constrained generic Self dispatch, static Number members and primitive-source ownership
+remain open. The .NET Reflection/Emit backend is unchanged. See
+[reproduction](experiments/extended-cli-metadata/bootstrap/README.md#native-self-contracts-2026-10-04)
+and [evidence](experiments/extended-cli-metadata/self-native-2026-10-04.json).
+
+Compiler slice: Raven `0014a1241`; matching metadata/bootstrap changes and evidence are
+committed on neoCLR `codex/extended-cli-metadata`.

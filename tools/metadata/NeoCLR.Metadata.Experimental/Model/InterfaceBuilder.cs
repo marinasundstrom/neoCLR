@@ -133,8 +133,18 @@ public sealed partial class TypeBuilder
     }
     internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InheritedContracts().SelectMany(contract =>
         contract.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
-        (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name,
-            contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)));
+        (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name, Signature:
+            contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)))
+        .Select(contract => (contract.Name, new MethodSignature(ResolveImplementationSelf(contract.Signature.ReturnType),
+            contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), outParameters: contract.Signature.OutParameters)));
+
+    private SignatureType ResolveImplementationSelf(SignatureType type) => type.IsSelf && !IsInterface
+        ? GenericParameterNames.Count == 0 ? this : MakeGenericInstance(Enumerable.Range(0, GenericParameterNames.Count).Select(SignatureType.TypeParameter).ToArray())
+        : type.FunctionSignature is { } function ? function.Substitute(ResolveImplementationSelf)
+        : type.ByReferenceElement is { } byref ? SignatureType.ByReference(ResolveImplementationSelf(byref))
+        : type.ArrayElement is { } element ? SignatureType.ArrayOf(ResolveImplementationSelf(element))
+        : type.ImportedType is { } imported ? imported.Substitute(ResolveImplementationSelf)
+        : type.GenericInstance is { } generic ? generic.Definition.MakeGenericInstance(generic.TypeArguments.Select(ResolveImplementationSelf).ToArray()) : type;
     /// <summary>Declares an owned generic interface implementation on a root class or value type, including owner-parameter arguments.</summary>
     /// <exception cref="ArgumentNullException">Contract is null.</exception>
     /// <exception cref="ArgumentException">Foreign, out-of-scope, duplicate, cyclic or noninterface contract.</exception>

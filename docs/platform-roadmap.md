@@ -21,7 +21,10 @@ Full async frontend lowering is not established by this gate. See the strategy's
 audit for remaining first failures; the service catalog is intentionally partial. The full 166-source build
 stops in binding; 178 distinct service names appear across 48 files and the erased-value
 operations each span 23 files. These are potential reach counts, not guaranteed unlocks.
-Follow with enum/numeric/inheritance emission, canonical source-owned core/Self,
+The native Self declaration/import/conformance subgate now executes actual Clonable
+through three separately compiled assemblies; [evidence](experiments/extended-cli-metadata/self-native-2026-10-04.json).
+Constrained Self dispatch and static Number contracts remain open.
+Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service
 catalog. Individual time-zone wrappers are deferred behind common service support.

@@ -382,6 +382,7 @@ var tests = new (string Name, Action Body)[]
     ("Definition body generator", GeneratorChecks.Run),
     ("Native parameter passing modes", ParameterModeChecks.Run),
     ("Native Self signatures and scoped views", SelfSignatureChecks.Run),
+    ("Native Self implementation substitution", SelfImplementationChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),

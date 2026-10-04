@@ -1,0 +1,11 @@
+import System.*
+
+public class Counter : Clonable {
+    var Value: int
+
+    init(value: int) {
+        Value = value
+    }
+
+    func Clone() -> Self => Counter(Value)
+}
