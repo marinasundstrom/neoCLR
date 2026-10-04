@@ -21,7 +21,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   direct-family ownership. Other protected categories reject explicitly. The new
   visibility spelling requires an updated runtime reader; previously descriptive closed
   class flags now require abstract, nonsealed roots and reject external direct children.
-  Metadata authoring/facade and Raven admission remain open, so JSON is not yet supported.
+  Metadata builders/manual definitions now author protected constructors using CLI Family;
+  native reader/facade round trips preserve accessibility, and unrelated calls fail writer
+  validation. All 145 C# groups and 55 runtime regressions pass; generated public/protected
+  assemblies execute. Closed-family authoring and Raven admission remain open, so JSON
+  is not yet supported.
 
 - Materialize local nongeneric native class bases in metadata definitions and the
   introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,

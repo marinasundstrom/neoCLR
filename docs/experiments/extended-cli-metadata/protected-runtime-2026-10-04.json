@@ -1,6 +1,6 @@
 {
   "date": "2026-10-04",
-  "scope": "Runtime prerequisite; C# metadata authoring, facade and Raven admission remain pending",
+  "scope": "Protected runtime and metadata authoring/reader/facade complete; closed-family authoring and Raven admission pending",
   "runtime_parent_revision": "4800295ccd3f825f49fd34d4474b59f89fcf890c",
   "raven_main_revision": "4f95db536",
   "raven_integration_docs_revision": "91b2a1c24",
@@ -19,7 +19,9 @@
     "class_constructors": 8,
     "class_inheritance": 8,
     "accessibility": 7,
-    "raven_reflection": "pending"
+    "raven_reflection": 26,
+    "total_passed": 55,
+    "failed": 0
   },
   "raven_main_validation": {
     "framework": "net11.0",
@@ -41,5 +43,18 @@
     "No source permits-list encoding",
     "No completed JSON compilation claim",
     "No remote push"
-  ]
+  ],
+  "metadata_validation": {
+    "groups_passed": 145,
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+    "native_command": "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --class-base-runtime target/debug/neoclr /tmp/protected-author-final1004",
+    "native_exit_statuses": {
+      "verify": 0,
+      "run": 42
+    },
+    "artifacts_sha256": {
+      "AuthoredBases.dll": "90f20d90e1ed5a18c9d5bf3b60e19e9163e150f6f02b8069ca896cf01ebf2f77",
+      "ProtectedBases.dll": "d90695f6d1548e086e62f1a62459e360e5d0556ea4b7daabf6579d268cc44a2e"
+    }
+  }
 }

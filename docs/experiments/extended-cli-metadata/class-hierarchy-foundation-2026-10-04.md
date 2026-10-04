@@ -118,3 +118,12 @@ Metadata definition/builder authoring, reader/facade declaration facts, Raven ca
 admission and the unchanged JSON consumer remain the next gate.
 
 [Runtime source hashes and validation command](protected-runtime-2026-10-04.json).
+
+Protected constructor authoring is now complete in the metadata library: builders and
+manual Family declarations share validation, CLI emission uses Family, native emission
+uses protected/Family and the reader/facade retains it. An unrelated caller fails writer
+validation. All 145 C# groups pass; the paired generated public/protected native PE cases
+verify and return 42, while their CLI equivalents execute the derived construction.
+The runtime prerequisite's complete affected test run passed 55/55. Closed-family
+authoring and Raven admission remain next; neither JSON nor external class import is
+claimed complete.

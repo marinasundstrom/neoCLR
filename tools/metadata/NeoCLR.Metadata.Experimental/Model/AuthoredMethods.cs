@@ -16,7 +16,7 @@ public sealed partial class MethodDefinition
         IsTypeDeclaration = producer.DeclaringType is not null;
         AuthoredSignature = methodSignature;
         GenericArity = methodSignature.GenericParameterNames.Count;
-        declarationAttributes = (ushort)((visibility switch { MethodVisibility.Public => 6, MethodVisibility.Internal => 3, _ => 1 }) | (isStatic ? 0x10 : 0));
+        declarationAttributes = (ushort)((visibility switch { MethodVisibility.Public => 6, MethodVisibility.Internal => 3, MethodVisibility.Protected => 4, _ => 1 }) | (isStatic ? 0x10 : 0));
         signature = [];
     }
     /// <summary>Creates a detached static assembly-level function declaration.</summary>
@@ -41,7 +41,7 @@ public sealed partial class MethodDefinition
     }
     /// <summary>Creates a detached type method, constructor, bounded value override or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
+    /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
@@ -50,7 +50,7 @@ public sealed partial class MethodDefinition
     {
         ArgumentNullException.ThrowIfNull(signature);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" ||
-            (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 6))
+            (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 4 or 6))
             throw new ArgumentException("invalid type-method declaration");
         bool valueOverride = (attributes & 0x540) == 0x40;
         bool contract = !valueOverride && (attributes & 0x540) != 0;
@@ -60,6 +60,7 @@ public sealed partial class MethodDefinition
         if (contract && ((attributes & 0x540) != 0x540 || (attributes & 7) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
             throw new ArgumentException("invalid interface method flags or signature");
         bool constructor = name == ".ctor";
+        if ((attributes & 7) == 4 && !constructor) throw new ArgumentException("Family visibility currently requires a constructor");
         if (constructor && ((attributes & 0x10) != 0 || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
             (attributes & 0x1800) != 0 && (!constructor || (attributes & 0x1800) != 0x1800))
             throw new ArgumentException("invalid constructor signature or special-name flags");

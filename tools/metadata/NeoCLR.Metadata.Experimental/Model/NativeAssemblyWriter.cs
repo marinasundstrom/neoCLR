@@ -94,7 +94,7 @@ public sealed partial class AssemblyBuilder
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
         object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
             ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
+            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstructedTarget is { } binding ? TypeOwner(binding.Definition.DeclaringType!, binding.DeclaringTypeArguments) : Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = (instruction.ConstructedTarget?.Signature ?? instruction.Target!.Signature).ParameterTypes.Select(SignatureValue).ToArray() } } },

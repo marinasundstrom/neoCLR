@@ -6963,8 +6963,19 @@ Runtime `metadata::Visibility::Protected` serializes as `protected` in the nativ
 method row. It is admitted only for instance `.ctor` methods with a declaring type.
 The verifier and interpreter allow calls from that type or its descendants, using
 resolved definition identities. Unrelated callers and ordinary protected methods,
-fields, module functions or types reject. This addition does **not** yet extend the
-C# `MethodVisibility` authoring enum or the introspection facade.
+fields, module functions or types reject. The C# authoring API now exposes `MethodVisibility.Protected` for both
+`TypeBuilder.AddConstructor` overloads. Manual `MethodDefinition` declarations accept
+CLI access bits `Family` (4) only on instance `.ctor` declarations. Both paths share
+signature/owner checks; unsupported protected members throw `ArgumentException` before
+attachment. Writer validation rejects unrelated-family constructor operands with
+`InvalidDataException` before producing an image. Existing numeric enum values are
+unchanged; Protected is appended.
+
+CLI output uses ordinary MethodAttributes.Family; native output records `protected`
+with origin access `Family`. Native reader materialization and `MethodInfo.Accessibility`
+preserve `MetadataAccessibility.Family`, including `GetConstructors()` views. There is
+no runtime reflection or importer dependency involved in authoring. External class
+base authoring and general protected methods/fields remain unsupported.
 
 Native record type rows with `is_closed_hierarchy: true` must describe an abstract,
 nonsealed reference class. Direct children must share the root's defining assembly

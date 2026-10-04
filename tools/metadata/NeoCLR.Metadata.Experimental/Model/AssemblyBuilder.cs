@@ -131,6 +131,10 @@ public sealed partial class AssemblyBuilder
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
+                    if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition) is { Visibility: MethodVisibility.Protected } familyTarget &&
+                        (method.DeclaringType is not { } callerType ||
+                         !ReferenceEquals(callerType, familyTarget.DeclaringType) && !callerType.DerivesFrom(familyTarget.DeclaringType!)))
+                        throw new InvalidDataException("protected constructor requires a declaring-family caller");
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstrainedOwner is { } implementingType)
@@ -878,7 +882,7 @@ public sealed partial class TypeBuilder
         => AddMethodCore(name, signature, visibility, isStatic: false, constructor: false);
     /// <summary>Adds a class or value constructor with primitive declared parameters and no result.</summary>
     /// <param name="parameterTypes">At most 256 primitive parameters, excluding the receiver.</param>
-    /// <param name="visibility">Public, Internal or Private.</param>
+    /// <param name="visibility">Public, Internal, Private or Protected (CLI Family).</param>
     /// <returns>An owned .ctor body with receiver at argument zero.</returns>
     /// <exception cref="ArgumentException">Invalid/duplicate contract or exceeded limit.</exception>
     /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
@@ -887,7 +891,7 @@ public sealed partial class TypeBuilder
         => AddMethodCore(".ctor", new(PrimitiveType.Void, parameterTypes), visibility, isStatic: false, constructor: true);
     /// <summary>Adds a constructor with an owned nominal/primitive signature whose result must be Void.</summary>
     /// <param name="signature">Void result and up to 256 primitive/owned-class declared parameters.</param>
-    /// <param name="visibility">Public, Internal or Private.</param>
+    /// <param name="visibility">Public, Internal, Private or Protected (CLI Family).</param>
     /// <returns>A constructor owned by this class or value type.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Non-Void result, foreign class, duplicate signature or invalid visibility.</exception>
@@ -904,7 +908,8 @@ public sealed partial class TypeBuilder
         if (IsInterface != abstractContract) throw new InvalidOperationException("interface owners require abstract contract methods");
         if (!isStatic && IsStatic) throw new InvalidOperationException("instance methods require a nonstatic nominal type");
         if (!constructor && name is ".ctor" or ".cctor") throw new ArgumentException("reserved constructor name", nameof(name));
-        if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private)) throw new ArgumentOutOfRangeException(nameof(visibility));
+        if (visibility is not (MethodVisibility.Public or MethodVisibility.Internal or MethodVisibility.Private or MethodVisibility.Protected)) throw new ArgumentOutOfRangeException(nameof(visibility));
+        if (visibility == MethodVisibility.Protected && !constructor) throw new ArgumentException("protected visibility currently requires a constructor", nameof(visibility));
         ArgumentNullException.ThrowIfNull(signature);
         signature.ValidateOwner(Assembly, GenericParameterNames.Count, allowSelf: IsInterface);
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || methods.Count >= 256 ||
@@ -922,7 +927,9 @@ public enum MethodVisibility
     /// <summary>Accessible within the declaring assembly.</summary>
     Internal,
     /// <summary>Accessible only within the declaring type.</summary>
-    Private
+    Private,
+    /// <summary>Accessible from the declaring type or a derived type; currently constructors only.</summary>
+    Protected
 }
 
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
@@ -944,7 +951,7 @@ public sealed partial class MethodBuilder
     public string Namespace => Definition.Namespace!;
     internal string CliName => DeclaringType is null ? FunctionNamespaceEncoding.Encode(Namespace, Name) : Name;
     /// <summary>Gets declared method or assembly-function visibility.</summary>
-    public MethodVisibility Visibility => (Definition.DeclarationAttributes & 7) switch { 6 => MethodVisibility.Public, 3 => MethodVisibility.Internal, _ => MethodVisibility.Private };
+    public MethodVisibility Visibility => (Definition.DeclarationAttributes & 7) switch { 6 => MethodVisibility.Public, 3 => MethodVisibility.Internal, 4 => MethodVisibility.Protected, _ => MethodVisibility.Private };
     /// <summary>Gets the immutable primitive/owned-class method signature.</summary>
     public MethodSignature Signature => Definition.AuthoredSignature!;
     /// <summary>Gets the owning assembly, including for top-level functions.</summary>

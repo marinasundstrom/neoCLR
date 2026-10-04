@@ -988,5 +988,6 @@ stale guest snapshot is unchanged; it is not replaced by a partial library snaps
 
 Runtime protected constructor and closed-class validation changes are documented in
 [the experimental reference](experimental-metadata.md#runtime-protected-constructors-and-closed-class-families-2026-10-04).
-They add no guest API signatures or C# authoring APIs; the existing guest snapshot
+Constructor authoring now includes C# MethodVisibility.Protected, covered by that manual
+reference and executable C# tests. No guest API signatures change; the existing guest snapshot
 is unchanged and its previously recorded refresh blocker remains open.

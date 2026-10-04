@@ -516,6 +516,7 @@ public sealed partial class NativeAssemblyDefinition
                         "public" => MethodVisibility.Public,
                         "internal" => MethodVisibility.Internal,
                         "private" => MethodVisibility.Private,
+                        "protected" => MethodVisibility.Protected,
                         _ => throw new InvalidDataException("unsupported native method visibility")
                     };
                 }
@@ -592,7 +593,8 @@ public sealed partial class NativeAssemblyDefinition
                 Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
                     Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
-                Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
+                Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility == MethodVisibility.Protected ? "Family" : visibility.ToString()), "native method visibility mismatch");
+                Require(visibility != MethodVisibility.Protected || ownerIndex >= 0 && instance && name == ".ctor", "protected native member must be an instance constructor");
                 Require(ownerIndex >= 0 || visibility != MethodVisibility.Private, "private native global function unsupported");
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0), "unsupported native parameter metadata");

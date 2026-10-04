@@ -209,5 +209,6 @@ inheritance is not implied by this development checkpoint.
 
 Development runtime checks now enforce protected base-constructor access by resolved
 family identity, including binary dependencies, and prevent external direct extension
-of a closed class family. The metadata authoring/facade and Raven admission steps
+of a closed class family. Protected constructor authoring and reader/facade round trips
+also execute through generated native PE. Closed-family metadata and Raven admission
 remain open; this does not yet make the JSON source library compile.
