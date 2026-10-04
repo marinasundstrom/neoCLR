@@ -106,7 +106,7 @@ public sealed partial class MethodBuilder
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
-                if (stack.Count == 0 || stack[^1] != type && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException("evaluation stack type mismatch or underflow");
+                if (stack.Count == 0 || stack[^1] != type && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -292,7 +292,7 @@ public sealed partial class MethodBuilder
                         : instruction.Op == "reference.test" && !IsReferenceSignature(instruction.Type!) ? (SignatureType)Assembly.CoreObjectType : instruction.Type!);
                     break;
                 case "function.bind":
-                    if (!instruction.Target!.IsStatic) Pop(BodyValueType.Receiver(instruction.Target.DeclaringType!));
+                    if (!instruction.Target!.IsStatic) Pop(instruction.ConstructedTarget is { } binding ? (SignatureType)binding.Definition.DeclaringType!.MakeGenericInstance(binding.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
                     stack.Add(instruction.Type!); MaxStack = Math.Max(MaxStack, stack.Count + 1); break;
                 case "function.invoke":
                     var function = instruction.Type!.FunctionSignature!;

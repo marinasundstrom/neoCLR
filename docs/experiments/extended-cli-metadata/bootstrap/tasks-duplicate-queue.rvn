@@ -1,0 +1,8 @@
+import System.Tasks.*
+import System.Runtime.CompilerServices.*
+
+func Main() -> int {
+    let queue = TaskQueue.Default
+    RuntimeServices.RegisterTaskQueue(queue)
+    return 0
+}

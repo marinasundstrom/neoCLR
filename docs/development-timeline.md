@@ -10555,3 +10555,23 @@ rejecting frame-backed references whose lifetime cannot escape. Broad nominal/st
 payloads, pointer/reference lifetimes and introspection call contracts still need explicit
 coverage; this direction does not silently remove those safety requirements or turn
 System.Value into System.Object boxing.
+
+
+## 2026-10-04 — Native function types and function values
+
+**Author direction.** The author clarified that function types are native in neoCLR,
+that introspection should represent each signature as its own type, and that function
+objects/references serve the role of delegates without nominal delegate identity.
+
+**Assistant response and evidence.** Confirmed the distinction between a native function
+shape and a bound target/receiver. Inspected the existing `FunctionTypeInfo` facade and
+load-context interning, then extended its C# regression assertions for independently
+authored equal shapes and different result types. Native metadata already carries
+`Function { parameters, returns, no_result }`; no new format was introduced for this
+clarification. Func/Action remain temporary Raven/CLI transport only.
+
+**Actions and limits.** The source Tasks/Concurrency integration now binds callbacks on
+constructed generic classes and interfaces. Unit-return callbacks use explicit generated
+adapters where a no-result method needs a value result; this preserves distinct native
+signatures and has an allocation cost. Structural Function language experiments remain
+on their feature branches; metadata-only introspection does not invoke function objects.

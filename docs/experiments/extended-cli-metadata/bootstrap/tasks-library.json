@@ -1,0 +1,34 @@
+{
+  "assemblyName": "NeoCLR.Tasks",
+  "sources": [
+    "runtime/raven/src/System/Tasks/TaskState.rvn",
+    "runtime/raven/src/System/Tasks/TaskOutcome.rvn",
+    "runtime/raven/src/System/Tasks/Tasks.rvn",
+    "runtime/raven/src/System/Tasks/TaskOperators.rvn",
+    "runtime/raven/src/System/Concurrency/Workers.rvn",
+    "runtime/raven/src/System/Concurrency/Cancellation.rvn"
+  ],
+  "types": [
+    "System.Tasks.TaskState",
+    "System.Tasks.TaskOutcome`1",
+    "System.Tasks.Task",
+    "System.Tasks.Task`1",
+    "System.Tasks.TaskQueue",
+    "System.Tasks.Promise`1",
+    "System.Tasks.TaskRunWork`1",
+    "System.Tasks.TaskRunAsyncWork`1",
+    "System.Tasks.MapContinuation`2",
+    "System.Tasks.ThenContinuation`2",
+    "System.Tasks.OutcomeTransfer`1",
+    "System.Tasks.TaskResultMapContinuation`3",
+    "System.Runtime.CompilerServices.IAsyncStateMachine",
+    "System.Runtime.CompilerServices.ITaskAwaiter",
+    "System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1",
+    "System.Concurrency.Thread",
+    "System.Concurrency.ThreadPool",
+    "System.Concurrency.WorkerCompletion",
+    "System.Concurrency.CancellationToken",
+    "System.Concurrency.CancellationTokenSource",
+    "System.Concurrency.CancellationRegistration"
+  ]
+}

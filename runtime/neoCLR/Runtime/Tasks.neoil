@@ -13,3 +13,15 @@
 .function neoCLR.Runtime.ScheduleTask(fn<Void> callback) -> Void
 .methodimpl InternalCall
 .end
+
+.function neoCLR.Runtime.GetDefaultTaskQueue<T>() -> T
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.GetCurrentTaskQueue<T>() -> T
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.RegisterTaskQueue<T>(T queue) -> Void
+.methodimpl InternalCall
+.end

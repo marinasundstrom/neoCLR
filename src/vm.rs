@@ -673,7 +673,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.instance && !class_owner)
                 || function.is_virtual
                 || function.is_abstract
-                || function.is_internal_call()
+                || (function.is_internal_call() && !matches!(crate::native::bind(function)?,
+                    crate::native::Binding::GenericDefaultTaskQueue | crate::native::Binding::GenericCurrentTaskQueue | crate::native::Binding::GenericRegisterTaskQueue))
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty()
             {
@@ -1867,26 +1868,8 @@ fn completion_notification_frame(
     queue: Value,
     callback: Value,
 ) -> Result<Frame, Fault> {
-    let post = resolve(
-        module,
-        &FunctionRef {
-            definition: None,
-            name: "System.Tasks.TaskQueue.Post".into(),
-            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
-            instance: true,
-            generic_arguments: vec![],
-            parameters: vec![crate::assembler::parse_type("fn<Void>")?],
-        },
-    )?;
-    if !post.no_result
-        || post
-            .definition
-            .as_ref()
-            .is_none_or(|id| id.module != "System")
-    {
-        return Err(Fault::new("Invalid default TaskQueue post contract"));
-    }
-    Frame::new(post, vec![queue, callback])
+    let post = task_queue::method(module, &queue.ty(), "Post", &[callback.ty()])?;
+    Frame::new(post.clone(), vec![queue, callback])
 }
 
 // All interpreter-owned managed roots, shared by automatic and explicit collections.
@@ -1967,6 +1950,8 @@ use guest_work::transfer_task_output;
 
 #[path = "vm_task_atomic.rs"]
 mod task_atomic;
+#[path = "vm_task_queue.rs"]
+mod task_queue;
 
 #[path = "vm_host_call.rs"]
 mod host_call;
@@ -2176,32 +2161,14 @@ fn interpret_instructions_with_dispatch(
             if *drain_required {
                 *drain_required = false;
                 if let Some(queue) = &default_task_queue {
-                    let drain = resolve(
-                        module,
-                        &FunctionRef {
-                            definition: None,
-                            name: "System.Tasks.TaskQueue.Drain".into(),
-                            owner: Some(Type::from_name("System.Tasks.TaskQueue")),
-                            instance: true,
-                            generic_arguments: vec![],
-                            parameters: vec![],
-                        },
-                    )?;
-                    if !drain.no_result
-                        || drain
-                            .definition
-                            .as_ref()
-                            .is_none_or(|id| id.module != "System")
-                    {
-                        return Err(Fault::new("Invalid default TaskQueue dispatch contract"));
-                    }
+                    let drain = task_queue::method(module, &queue.ty(), "Drain", &[])?;
                     if frames.len() >= limits.frames {
                         return Err(Fault::coded(
                             crate::FaultCode::StackOverflow,
                             "frame limit exceeded",
                         ));
                     }
-                    frames.push(Frame::new(drain, vec![queue.clone()])?);
+                    frames.push(Frame::new(drain.clone(), vec![queue.clone()])?);
                     continue;
                 }
             }
@@ -2265,7 +2232,7 @@ fn interpret_instructions_with_dispatch(
             *owner = std::sync::Weak::new();
             return Ok(InstructionProgress::Completed(value));
         }
-        if (executed >= quantum && !task_atomic::active(frames)) || budget.remaining() == 0 {
+        if (executed >= quantum && !task_atomic::active(module, frames)) || budget.remaining() == 0 {
             break;
         }
         executed += 1;
@@ -2393,30 +2360,19 @@ fn interpret_instructions_with_dispatch(
             None
         };
 
-        let current_task_queue = if matches!(op, Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue")
-        {
-            frames
-                .iter()
-                .rev()
-                .find_map(|frame| {
-                    let id = frame.function.definition.as_ref()?;
-                    if id.module != "System"
-                        || !frame.function.instance
-                        || frame.function.owner.as_ref()
-                            != Some(&Type::from_name("System.Tasks.TaskQueue"))
-                        || !matches!(
-                            frame.function.name.as_str(),
-                            "System.Tasks.TaskQueue.Run" | "System.Tasks.TaskQueue.Drain"
-                        )
-                    {
-                        return None;
-                    }
-                    frame.args.first().map(|slot| slot.borrow().get())
-                })
-                .transpose()?
-        } else {
-            None
+        let requested_queue = match op {
+            Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue" => Some(Type::from_name("System.Tasks.TaskQueue")),
+            Op::Call(target) if target.name == "neoCLR.Runtime.GetCurrentTaskQueue" => target.generic_arguments.first().cloned(),
+            _ => None,
         };
+        let current_task_queue = if let Some(owner) = requested_queue {
+            task_queue::validate(module, &owner)?;
+            frames.iter().rev().find_map(|frame| {
+                if !frame.function.instance || frame.function.owner.as_ref() != Some(&owner)
+                    || !matches!(task_queue::member(&frame.function), "Run" | "Drain") { return None; }
+                frame.args.first().map(|slot| slot.borrow().get())
+            }).transpose()?
+        } else { None };
 
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let mut host_call = None;
@@ -2771,8 +2727,8 @@ fn interpret_instructions_with_dispatch(
                             "frame limit exceeded",
                         ));
                     }
-                    let queue_callback = task_atomic::queue_pump(&function);
-                    if task_atomic::active(frames) && !queue_callback {
+                    let queue_callback = task_atomic::queue_pump(module, &function);
+                    if task_atomic::active(module, frames) && !queue_callback {
                         return Err(Fault::new("Task mutation cannot invoke a user callback"));
                     }
                     let mut callback = Frame::new(callee, args)?;
@@ -3681,6 +3637,22 @@ fn interpret_instructions_with_dispatch(
                                 limits.heap_objects,
                             ][index as usize];
                             Value::Int64(i64::try_from(count).unwrap_or(i64::MAX))
+                        } else if matches!(binding, crate::native::Binding::GenericDefaultTaskQueue | crate::native::Binding::GenericCurrentTaskQueue | crate::native::Binding::GenericRegisterTaskQueue) {
+                            let ty = callee.generic_arguments.first().ok_or_else(|| Fault::new("Missing TaskQueue type argument"))?;
+                            task_queue::validate(module, ty)?;
+                            if default_task_queue.as_ref().is_some_and(|queue| queue.ty() != *ty) {
+                                return Err(Fault::new("Conflicting TaskQueue ownership in one invocation"));
+                            }
+                            if matches!(binding, crate::native::Binding::GenericRegisterTaskQueue) {
+                                if default_task_queue.is_some() || !matches!(args.as_slice(), [Value::ObjectReference(_)]) || args[0].ty() != *ty {
+                                    return Err(Fault::new("Default TaskQueue must be registered once with a live queue"));
+                                }
+                                *default_task_queue = Some(args[0].clone());
+                                Value::Void
+                            } else {
+                                let current = if matches!(binding, crate::native::Binding::GenericCurrentTaskQueue) { current_task_queue.clone() } else { None };
+                                current.or_else(|| default_task_queue.clone()).unwrap_or_else(|| Value::NullObjectReference(ty.clone()))
+                            }
                         } else if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
                                 .clone()
@@ -4484,7 +4456,7 @@ fn interpret_instructions_with_dispatch(
             Ok(None)
         })();
         if let Some(mut call) = host_call {
-            if task_atomic::active(frames) {
+            if task_atomic::active(module, frames) {
                 return Err(Fault::new("Task mutation cannot suspend for host I/O"));
             }
             let mut roots = execution_roots(
@@ -4523,28 +4495,18 @@ fn interpret_instructions_with_dispatch(
                 // ready notifications: Post has no suspended mutation here. Never
                 // inject into an arbitrary callback, collection operation or queue.
                 if matches!(op, Op::Return)
-                    && !(function.name == "System.Tasks.TaskQueue.Post"
-                        && function
-                            .definition
-                            .as_ref()
-                            .is_some_and(|id| id.module == "System"))
+                    && task_queue::member(&function) != "Post"
                 {
                     if let (Some(caller), Some(queue)) = (frames.last(), &default_task_queue) {
-                        if caller.function.name == "System.Tasks.TaskQueue.Drain"
-                            && caller
-                                .function
-                                .definition
-                                .as_ref()
-                                .is_some_and(|id| id.module == "System")
+                        if task_queue::member(&caller.function) == "Drain"
                             && caller.function.instance
-                            && caller.function.owner.as_ref()
-                                == Some(&Type::from_name("System.Tasks.TaskQueue"))
+                            && caller.function.owner.as_ref() == Some(&queue.ty())
                             && caller.args.first().is_some_and(|slot| {
                                 slot.borrow().get().is_ok_and(|value| value == *queue)
                             })
                             && matches!(caller.function.body.get(caller.trace_pc), Some(Op::Call(target) | Op::CallVirtual(target))
                         if target.name == "$Function.Invoke" && target.instance
-                            && target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<Void>")?)
+                            && (target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<Void>")?) || target.owner.as_ref() == Some(&crate::assembler::parse_type("fn<noresult Void>")?))
                             && target.parameters.is_empty())
                             && scheduler.poll(heap, queue)?
                         {

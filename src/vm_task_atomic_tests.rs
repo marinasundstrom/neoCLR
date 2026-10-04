@@ -173,7 +173,7 @@ fn generated_promise_terminal_transition_is_not_split_by_one_instruction_quanta(
             )
             .unwrap();
             assert!(
-                !task_atomic::active(&frames[index]),
+                !task_atomic::active(&module, &frames[index]),
                 "must not release graph access mid-transition"
             );
             if let InstructionProgress::Completed(value) = progress {
@@ -272,7 +272,7 @@ fn application_names_do_not_receive_system_atomic_policy() {
         ))],
     )
     .unwrap();
-    assert!(!task_atomic::active(&[frame]));
+    assert!(!task_atomic::active(&module, &[frame]));
 }
 
 #[test]
@@ -338,7 +338,7 @@ fn generated_queue_callbacks_yield_and_posts_during_drain_are_not_lost() {
         )
         .unwrap();
         if frames.iter().any(|frame| frame.queue_callback) && !callback_yielded {
-            assert!(!task_atomic::active(&frames));
+            assert!(!task_atomic::active(&module, &frames));
             // Other guest work can submit while a callback is suspended.
             run("Post", vec![queue.clone(), counter.clone()], &mut caller);
             callback_yielded = true;
@@ -385,7 +385,7 @@ fn interleave(
                 1,
             )
             .unwrap();
-            assert!(!task_atomic::active(&frames[index]));
+            assert!(!task_atomic::active(&module, &frames[index]));
             if let InstructionProgress::Completed(value) = progress {
                 results[index] = Some(value);
             }

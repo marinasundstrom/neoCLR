@@ -91,7 +91,7 @@ public sealed partial class AssemblyBuilder
             : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility.ToString(), parameter_tokens = new int[method.ParameterCount] };
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
-            "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = instruction.Target!.Signature.ParameterTypes.Select(SignatureValue).ToArray() } } },
+            "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstructedTarget is { } binding ? TypeOwner(binding.Definition.DeclaringType!, binding.DeclaringTypeArguments) : Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = (instruction.ConstructedTarget?.Signature ?? instruction.Target!.Signature).ParameterTypes.Select(SignatureValue).ToArray() } } },
             "function.invoke" => new { op = "call", arg = new { name = "$Function.Invoke", owner = SignatureValue(instruction.Type!), instance = true, parameters = instruction.Type!.FunctionSignature!.ParameterTypes.Select(SignatureValue).ToArray() } },
             "array.length" => new { op = "ldlen" },
             "array.reserve" => new { op = "array.reserve", arg = SignatureValue(instruction.Type!) },

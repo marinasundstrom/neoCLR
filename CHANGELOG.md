@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Execute all six Raven Tasks/Concurrency source files through a separate native
+  library and artifact-only consumer, including cancellation, generic continuations,
+  interface callbacks, worker results and implicit entry draining. Typed queue services
+  preserve source-owned identities and reject wrong or duplicate registrations; legacy
+  queue entry points remain supported. Metadata IL generation now binds methods on
+  constructed class/interface owners. Function types retain structural signature identity.
+
 - Support ordinary top-level Int32 enums in the experimental metadata definitions,
   builders and introspection facade. CLI output uses System.Enum, value__ and literal
   constants; native output retains the existing enum representation. Raven compiles

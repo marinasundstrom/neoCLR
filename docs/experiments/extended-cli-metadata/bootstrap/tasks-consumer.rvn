@@ -1,0 +1,125 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+import System.Runtime.CompilerServices.*
+import System.Concurrency.*
+
+class Counter : IAsyncStateMachine {
+    private var count: int = 0
+    val Count: int => count
+
+    func MoveNext() {
+        count = count + 1
+    }
+
+    func SetStateMachine(stateMachine: IAsyncStateMachine) { }
+}
+
+func Answer() -> int => 40
+func Increment(value: int) -> int => value + 1
+func Echo(value: string) -> string => value + "!"
+
+func Completed(value: int) -> Task<int> {
+    let source = Promise<int>()
+    _ = source.Complete(value + 1)
+    return source.Task
+}
+
+func Inner() -> Task<int> => Completed(41)
+
+func Main() -> int {
+    let counter = Counter()
+    let task = Task.Run<int>(Answer).Map<int>(Increment).Then<int>(Completed)
+    let unitTask = Task.Run(counter.MoveNext)
+    let nested = Task.Run<int>(Inner)
+    let worker = ThreadPool.Queue(Echo, "pool")
+    let thread = Thread.Run(Echo, "thread")
+    RuntimeServices.DrainEntryTasks()
+    if task.State != TaskState.Completed {
+        return 1
+    }
+    if task.GetResult() != 42 {
+        return 2
+    }
+    if nested.GetResult() != 42 {
+        return 18
+    }
+    if unitTask.State != TaskState.Completed {
+        return 3
+    }
+    _ = unitTask.GetResult()
+    if counter.Count != 1 {
+        return 4
+    }
+    if worker.GetResult() != "pool!" {
+        return 5
+    }
+    if thread.GetResult() != "thread!" {
+        return 6
+    }
+
+    let promise = Promise<int>()
+    let builder = AsyncTaskMethodBuilder<int>.Create()
+    builder.SetStateMachine(counter)
+    if !builder.HasStateMachine() {
+        return 7
+    }
+    builder.AwaitOnCompleted(promise.Task, builder.GetStateMachine())
+    if !promise.Complete(42) {
+        return 8
+    }
+    if promise.Complete(0) {
+        return 9
+    }
+    RuntimeServices.DrainEntryTasks()
+    if counter.Count != 2 {
+        return 10
+    }
+
+    let cancelled = Promise<int>()
+    let propagated = cancelled.Task.Map<int>(Increment)
+    if !cancelled.Cancel() {
+        return 11
+    }
+    if cancelled.Complete(1) {
+        return 12
+    }
+    RuntimeServices.DrainEntryTasks()
+    if propagated.State != TaskState.Cancelled {
+        return 13
+    }
+    let resultSource = Promise<Result<int, string>>()
+    let resultTask = resultSource.Task.MapResult<int>(Increment)
+    _ = resultSource.Complete(Ok(41))
+    RuntimeServices.DrainEntryTasks()
+    if resultTask.GetResult() is Ok(let result) {
+        if result != 42 {
+            return 19
+        }
+    } else {
+        return 20
+    }
+
+    let tokenSource = CancellationTokenSource()
+    let token = tokenSource.Token
+    if !token.CanBeCancelled {
+        return 14
+    }
+    if CancellationToken.None.CanBeCancelled {
+        return 15
+    }
+    let registration = token.Register(counter.MoveNext)
+    let removed = token.Register(counter.MoveNext)
+    removed.Dispose()
+    tokenSource.Cancel()
+    tokenSource.Cancel()
+    registration.Dispose()
+    if !token.IsCancellationRequested {
+        return 16
+    }
+    if counter.Count != 3 {
+        return 17
+    }
+    tokenSource.Dispose()
+    return task.GetResult()
+}

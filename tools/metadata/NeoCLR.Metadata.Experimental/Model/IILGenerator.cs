@@ -125,10 +125,17 @@ public interface IILGenerator
     void Emit(OpCode opCode, ConstructedMethodReference operand);
     /// <summary>Pushes a Function value bound to an owned method; consumes its object receiver for an instance target.</summary>
     /// <param name="functionType">The exact structural shape.</param>
-    /// <param name="target">Owned nongeneric static or nonvirtual reference-instance target.</param>
+    /// <param name="target">Owned nongeneric static, final/nonvirtual reference-instance or interface target.</param>
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void BindFunction(SignatureType functionType, MethodBuilder target);
+    /// <summary>Binds an exact target on a constructed owned generic reference type or interface.</summary>
+    /// <param name="functionType">The exact substituted structural signature.</param>
+    /// <param name="target">The owned constructed target; consumes its receiver for an instance method.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Invalid target, shape, ownership or caller generic scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
+    void BindFunction(SignatureType functionType, ConstructedMethodReference target);
     /// <summary>Emits a checked Function binding; consumes an instance receiver when required and pushes the callable value.</summary>
     /// <param name="opCode">BindFunction.</param>
     /// <param name="operand">The exact binding owned by this assembly.</param>

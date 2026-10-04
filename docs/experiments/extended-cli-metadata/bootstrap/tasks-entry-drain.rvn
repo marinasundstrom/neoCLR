@@ -1,0 +1,11 @@
+import System.*
+import System.Tasks.*
+
+func Notify() {
+    Console.WriteLine("drained")
+}
+
+func Main() -> int {
+    _ = Task.Run(Notify)
+    return 42
+}

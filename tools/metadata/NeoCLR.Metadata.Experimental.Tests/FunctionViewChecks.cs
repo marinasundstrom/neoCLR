@@ -45,6 +45,9 @@ internal static class FunctionViewChecks
         try { _ = missing.Resolve(snapshot.Identity).GetModules().Single().GetFunctions().Single(m => m.Name == "External").ReturnType; throw new Exception("missing callback dependency admitted"); } catch (InvalidDataException) { }
         var noResult = (FunctionTypeInfo)context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Void, [])));
         Check(noResult.NoResult && noResult.ParameterTypes.Count == 0, "explicit no-result");
+        Check(ReferenceEquals(noResult, context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Void, [])))), "canonical no-result shape");
+        Check(!ReferenceEquals(noResult, context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Int32, [])))), "result is part of function identity");
+        Check(ReferenceEquals(constructed, context.ResolveSignature(SignatureType.Function(new(PrimitiveType.Boolean, [PrimitiveType.Int32])))), "independently authored equal shape");
         var other = new MetadataLoadContext([snapshot, externalSnapshot]);
         Check(!ReferenceEquals(constructed, other.ResolveSignature(SignatureType.Function(new(PrimitiveType.Boolean, [PrimitiveType.Int32])))), "context isolation");
         try { context.ResolveSignature(callback); throw new Exception("unscoped parameter admitted"); } catch (InvalidDataException) { }

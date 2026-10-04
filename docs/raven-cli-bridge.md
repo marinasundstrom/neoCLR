@@ -5479,3 +5479,17 @@ The native target explicitly admits top-level Int32 enums. Symbol facts and arti
 identities author references; emission does not access importer objects. Ordinary .NET
 Reflection/Emit behavior remains unchanged. Flags/other widths/nested enums are explicit
 limits, and full source Tasks/Workers still requires queue ownership integration.
+
+
+### Native source-owned Tasks/Concurrency (2026-10-04)
+
+The [task gate](experiments/extended-cli-metadata/bootstrap/README.md#source-built-tasks-and-concurrency-2026-10-04)
+uses a separately emitted six-source library and native semantic import. Typed generic
+queue services preserve source-owned identities; legacy nominal queue services remain
+supported. Runtime task atomic regions recognize matching source type/method origins,
+and draining resolves the registered queue's exact methods. Constructed/interface
+callbacks use the metadata IL generator. Native Function types are signature-based;
+Func/Action are only Raven/CLI transport. Unit-return adapters explicitly invoke a
+no-result callback then produce unit, retaining receiver identity with an allocation cost.
+The matching Raven branch is codex/metadata-consumer at 598b16be7 (pre-slice parent 8407c122f).
+No full async frontend or full-System claim follows from this bounded native gate.

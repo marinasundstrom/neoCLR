@@ -10,6 +10,20 @@ ldarg value
 value.unpack T
 ret
 .end
+.method static GetDefaultTaskQueue<T>() -> T
+call neoCLR.Runtime.GetDefaultTaskQueue<T>()
+ret
+.end
+.method static GetCurrentTaskQueue<T>() -> T
+call neoCLR.Runtime.GetCurrentTaskQueue<T>()
+ret
+.end
+.method static RegisterTaskQueue<T>(T queue) -> noresult
+ldarg queue
+call neoCLR.Runtime.RegisterTaskQueue<T>(T)
+pop
+ret
+.end
 .method static StringHashOrdinalIgnoreCase(String arg0) -> Int32
 ldarg arg0
 call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
@@ -250,6 +264,15 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.DrainEntryTasks() -> Void
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GetDefaultTaskQueue<T>() -> T
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.GetCurrentTaskQueue<T>() -> T
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.RegisterTaskQueue<T>(T queue) -> Void
 .methodimpl InternalCall
 .end
 .type System.Value

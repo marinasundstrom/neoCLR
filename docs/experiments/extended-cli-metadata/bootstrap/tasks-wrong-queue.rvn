@@ -1,0 +1,8 @@
+import System.Runtime.CompilerServices.*
+
+class OtherQueue { }
+
+func Main() -> int {
+    _ = RuntimeServices.GetDefaultTaskQueue<OtherQueue>()
+    return 0
+}

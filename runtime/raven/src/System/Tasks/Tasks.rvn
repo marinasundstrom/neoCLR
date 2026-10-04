@@ -73,10 +73,10 @@ public class TaskQueue {
 
     static val Default: TaskQueue {
         get {
-            let queue = System.Runtime.CompilerServices.RuntimeServices.DefaultTaskQueue
+            let queue = System.Runtime.CompilerServices.RuntimeServices.GetDefaultTaskQueue<TaskQueue>()
             if queue is null {
                 let created = TaskQueue()
-                System.Runtime.CompilerServices.RuntimeServices.RegisterDefaultTaskQueue(created)
+                System.Runtime.CompilerServices.RuntimeServices.RegisterTaskQueue(created)
                 return created
             }
             return queue
@@ -85,7 +85,7 @@ public class TaskQueue {
 
     internal static val Current: TaskQueue {
         get {
-            let queue = System.Runtime.CompilerServices.RuntimeServices.CurrentTaskQueue
+            let queue = System.Runtime.CompilerServices.RuntimeServices.GetCurrentTaskQueue<TaskQueue>()
             if queue is null {
                 return TaskQueue.Default
             }

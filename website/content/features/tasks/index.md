@@ -8,6 +8,13 @@ Task describes whether an operation produced a value. It does not imply a thread
 
 <a id="await"></a>
 
+## Native compiler integration (development)
+
+The development metadata/compiler branch now compiles the six Tasks/Concurrency source
+files as a separate native library. Artifact-only consumers execute continuations,
+cancellation, worker results and queue draining. This is a bounded integration gate;
+full async compiler lowering and the complete System library remain in progress.
+
 ## Starting and awaiting a worker
 
 Direct async Main uses the matching compiler, bridge and runtime. See [supported entry points](../../raven/#entry-points)

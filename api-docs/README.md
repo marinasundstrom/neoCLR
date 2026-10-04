@@ -921,3 +921,10 @@ reference artifacts were overwritten for this host-only API adjustment.
 2026-10-03: FunctionBinding/BindFunction now admit owned nongeneric nonvirtual
 reference-instance targets, consuming a receiver. Host manual/XML contracts and C#
 execution tests updated; no guest API added. The existing guest snapshot is still stale.
+
+
+2026-10-04 Tasks/Concurrency integration: guest public signatures are unchanged;
+experimental C# constructed callback binding and FunctionTypeInfo identity are documented
+in `experimental-metadata.md`. `build-api-docs.py --check` still reports the existing stale
+reference snapshot. It has not been relabelled as refreshed; regenerate from a matching
+working bridge before publication. Website publication remains separate.

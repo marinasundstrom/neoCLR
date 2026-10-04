@@ -1,6 +1,8 @@
 namespace NeoCLR.Metadata.Experimental.Introspection;
 
-/// <summary>A metadata-only callable signature, with owner/method arguments substituted.</summary>
+/// <summary>A context-canonical native function type, with owner/method arguments substituted.</summary>
+/// <remarks>Ordered parameter types, result type and no-result convention determine identity.
+/// Bound targets and receivers belong to function values, not this metadata-only view.</remarks>
 public sealed class FunctionTypeInfo : TypeInfo
 {
     internal FunctionTypeInfo(MetadataLoadContext context, TypeInfo result, TypeInfo[] parameters, bool noResult) : base(context)

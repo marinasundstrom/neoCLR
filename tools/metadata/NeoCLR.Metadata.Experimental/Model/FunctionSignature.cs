@@ -44,19 +44,30 @@ public sealed partial record SignatureType
 /// <summary>A checked method binding operand. The target is instance data, not part of Function type identity.</summary>
 public sealed class FunctionBinding
 {
-    /// <summary>Creates an operand binding a nongeneric static or nonvirtual reference-instance method to an exact structural shape.</summary>
+    /// <summary>Creates an operand binding a nongeneric static, reference-instance or interface method to an exact structural shape.</summary>
     /// <param name="functionType">A structural Function signature.</param>
-    /// <param name="target">A nongeneric static or nonvirtual reference-instance target with the exact parameter/result signature.</param>
+    /// <param name="target">A nongeneric static, final/nonvirtual reference-instance or interface target with the exact parameter/result signature.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">Shape, target kind or signatures do not match.</exception>
-    public FunctionBinding(SignatureType functionType, MethodBuilder target)
+    public FunctionBinding(SignatureType functionType, MethodBuilder target) : this(functionType, target, null) { }
+    /// <summary>Binds an exact nongeneric method on a constructed owned generic class or interface.</summary>
+    /// <param name="functionType">The structural signature after owner argument substitution.</param>
+    /// <param name="target">An owned constructed method reference; instance binding consumes its receiver.</param>
+    /// <exception cref="ArgumentNullException">Either operand is null.</exception>
+    /// <exception cref="ArgumentException">The target kind or substituted signature is incompatible.</exception>
+    public FunctionBinding(SignatureType functionType, ConstructedMethodReference target) : this(functionType,
+        target?.Definition ?? throw new ArgumentNullException(nameof(target)), target) { }
+    private FunctionBinding(SignatureType functionType, MethodBuilder target, ConstructedMethodReference? constructed)
     {
         ArgumentNullException.ThrowIfNull(functionType); ArgumentNullException.ThrowIfNull(target);
-        if (functionType.FunctionSignature is not { } shape || (!target.IsStatic && (target.DeclaringType is not { IsValueType: false, IsInterface: false } || (target.Definition.Attributes & 0x40) != 0)) || target.IsAbstract || target.IsConstructor ||
-            target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType?.GenericParameterNames.Count > 0 || !shape.Signature.Matches(target.Signature))
-            throw new ArgumentException("function binding requires an exact nongeneric static or nonvirtual reference-instance target");
-        FunctionType = functionType; Target = target;
+        bool contract = target.DeclaringType?.IsInterface == true && target.IsAbstract;
+        if (functionType.FunctionSignature is not { } shape || (!target.IsStatic && (target.DeclaringType is not { IsValueType: false } || (target.Definition.Attributes & 0x60) == 0x40 && !contract)) || target.IsAbstract && !contract || target.IsConstructor ||
+            target.Signature.GenericParameterNames.Count != 0 || constructed is null && target.DeclaringType?.GenericParameterNames.Count > 0 || !shape.Signature.Matches(constructed?.Signature ?? target.Signature))
+            throw new ArgumentException("function binding requires an exact static, reference-instance or interface target");
+        FunctionType = functionType; Target = target; ConstructedTarget = constructed;
     }
+    /// <summary>Gets the substituted owner reference, or null for an unconstructed target.</summary>
+    public ConstructedMethodReference? ConstructedTarget { get; }
     /// <summary>Gets the structural type of the bound value.</summary>
     public SignatureType FunctionType { get; }
     /// <summary>Gets the method selected for invocation.</summary>
@@ -67,7 +78,7 @@ public sealed partial class MethodBuilder
 {
     /// <summary>Pushes a Function value bound to an owned method; consumes its object receiver for an instance target.</summary>
     /// <param name="functionType">The exact structural shape.</param>
-    /// <param name="target">Owned nongeneric static or nonvirtual reference-instance target.</param>
+    /// <param name="target">Owned nongeneric static, final/nonvirtual reference-instance or interface target.</param>
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     public void BindFunction(SignatureType functionType, MethodBuilder target) => GetILGenerator().BindFunction(functionType, target);

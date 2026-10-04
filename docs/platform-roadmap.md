@@ -15,7 +15,9 @@ blocker are closed for the 57-source combined gate, including UTF-8 and file str
 [Execution evidence](experiments/extended-cli-metadata/combined-library-array-2026-10-04.json).
 The no-result scheduling callback and ordinary Int32 enum subgates now execute;
 [paired enum evidence](experiments/extended-cli-metadata/enum-dual-2026-10-04.json).
-Next address source-owned queue ABI ownership and execute Tasks/Workers. See the strategy's updated
+Source-owned queue ABI ownership and all six Tasks/Concurrency sources now execute
+through an artifact-only consumer; see [task gate](experiments/extended-cli-metadata/bootstrap/README.md#source-built-tasks-and-concurrency-2026-10-04).
+Full async frontend lowering is not established by this gate. See the strategy's updated
 audit for remaining first failures; the service catalog is intentionally partial. The full 166-source build
 stops in binding; 178 distinct service names appear across 48 files and the erased-value
 operations each span 23 files. These are potential reach counts, not guaranteed unlocks.

@@ -4076,9 +4076,14 @@ shapes and are substituted recursively. Nesting is limited to sixteen levels.
 Null signatures throw ArgumentNullException; unsupported contracts throw ArgumentException.
 
 `FunctionBinding(SignatureType functionType, MethodBuilder target)` checks a nongeneric
-static or nonvirtual reference-instance target against the exact shape. Generic owners,
-constructors, abstract/virtual targets and value receivers are rejected. Its FunctionType
-and Target properties are read-only.
+static, final/nonvirtual reference-instance or abstract interface target against the exact
+shape. The overload `FunctionBinding(SignatureType, ConstructedMethodReference)` accepts
+an owned constructed generic class/interface method after exact signature substitution.
+`ConstructedTarget` returns that reference (null for the MethodBuilder overload);
+`FunctionType` and `Target` expose the shape and method definition. Constructors,
+generic methods, nonfinal virtual class methods and value receivers are rejected.
+Null arguments throw ArgumentNullException; incompatible signatures throw ArgumentException.
+Emission additionally validates output ownership and caller generic scopes.
 `MethodBuilder.BindFunction(functionType, target)` and
 `Emit(OpCode.BindFunction, FunctionBinding)` push a callable value; the target must belong
 to the output assembly. Instance binding consumes the object receiver already on the
@@ -4092,7 +4097,9 @@ and external binding targets remain future work; ordinary imported methods can a
 Function values.
 
 Native output uses the runtime's structural Function shape, function.bind and ordinary
-instance Invoke. CLI output uses core-scoped Func/Action carriers with ldftn/newobj and
+instance Invoke. `GetILGenerator().BindFunction` supports both target overloads;
+interface binding selects dispatch from the retained receiver. CLI output uses
+core-scoped Func/Action carriers with ldftn (ldvirtftn for interfaces)/newobj and
 callvirt, including generic signature variables on Invoke MemberRefs. This is a bridge
 representation; native Function identity is independent of a nominal delegate declaration.
 The imported-signature reader recognizes those carriers only in the explicit core scope.
@@ -5052,6 +5059,7 @@ void Call(ConstructedMethodReference method);
 void CallVirtual(ConstructedMethodReference method);
 void Emit(OpCode opCode, ConstructedMethodReference operand);
 void BindFunction(SignatureType functionType, MethodBuilder target);
+void BindFunction(SignatureType functionType, ConstructedMethodReference target);
 void Emit(OpCode opCode, FunctionBinding operand);
 void InvokeFunction(SignatureType functionType);
 void Call(GenericMethodInstance method);
@@ -6304,3 +6312,17 @@ The paired Raven `bootstrap/verify_enums.py` driver compiles the unchanged TaskS
 source and exercises mutation, array storage, comparisons and integer conversions on
 both targets. No guest public API is added; the existing guest snapshot maintenance
 blocker is unchanged.
+
+### Native function identity clarification (2026-10-04)
+
+Native metadata encodes a function type as `Function { parameters, returns, no_result }`.
+It does not identify a nominal delegate class. The introspection load context interns
+resolved shapes: equal ordered parameter/result identities and the return convention
+share a `FunctionTypeInfo` instance within that context. Different contexts retain
+separate views. Function objects carry callable targets and optional bound receivers;
+neither participates in type identity, and the metadata facade cannot invoke them.
+Raven's current Func/Action symbol transport is a compiler adapter, not native identity.
+Inhabited unit and no-result invocation remain distinct. Where Raven converts a
+no-result method to a unit-producing callback, the native emitter generates an
+output-owned adapter that invokes the original callback and produces the configured
+unit value. This allocates an adapter/closure; it is not runtime signature coercion.

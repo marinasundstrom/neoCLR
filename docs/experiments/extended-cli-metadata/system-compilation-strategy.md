@@ -263,3 +263,29 @@ actual Tasks/Workers sources and execute their separate consumers.
 Compiler slice: Raven `8407c122f`; metadata/runtime changes are committed with this
 evidence. Validation: 132 metadata groups, 57 focused Raven tests, nine Rust enum
 tests, the seven native consumer controls and paired driver execution pass.
+
+
+## Tasks/Concurrency batch completed (2026-10-04)
+
+[Separate-library execution](tasks-native-2026-10-04.json) now covers the six actual
+Tasks/Concurrency files on top of the 57-source base. It closes source-owned queue
+selection, constructed/interface callback binding, inhabited-unit callbacks and the
+nullable/union patterns required by cancellation. Worker/task legacy controls remain
+part of validation. No new native function-type format was required.
+
+The [refreshed inventory](system-tasks-audit-2026-10-04.json) still stops the full
+166-source build in binding. Its tasks-family case was rerun successfully after the
+pattern fix. Prioritize the next shared blockers in this order:
+
+1. Canonical primitive/Self ownership and numeric source contracts: separate bootstrap
+   identity failures from genuine missing operators; numeric, text and namespace
+   families share these failures. Add minimal source/import controls before expanding.
+2. Extend the checked runtime service boundary by coherent source families (numeric
+   parsing/text before storage/network); missing services dominate the full-source
+   diagnostics. Reach counts do not prove these are the only blockers.
+3. Broader inheritance and float emission where the first two batches expose them.
+4. Metadata-only typeof/introspection facts and their service boundary; JSON depends on
+   this layer, so individual JSON wrappers are premature.
+
+Full async lowering, mutable captures and broad introspection remain explicit open
+capabilities. Preserve the default .NET backend and validate shared fixes independently.

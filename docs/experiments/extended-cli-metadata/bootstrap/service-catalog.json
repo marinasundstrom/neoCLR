@@ -2409,5 +2409,36 @@
       "nativeBootstrap": false,
       "implementation": "requires-explicit-binding"
     }
+  ],
+  "genericQueueServices": [
+    {
+      "name": "GetDefaultTaskQueue",
+      "typeParameters": [
+        "T"
+      ],
+      "arguments": [],
+      "result": "T",
+      "contract": "source-owned TaskQueue selected by exact type argument"
+    },
+    {
+      "name": "GetCurrentTaskQueue",
+      "typeParameters": [
+        "T"
+      ],
+      "arguments": [],
+      "result": "T",
+      "contract": "source-owned TaskQueue selected by exact type argument"
+    },
+    {
+      "name": "RegisterTaskQueue",
+      "typeParameters": [
+        "T"
+      ],
+      "arguments": [
+        "T"
+      ],
+      "result": "noresult",
+      "contract": "source-owned TaskQueue selected by exact type argument"
+    }
   ]
 }

@@ -76,7 +76,10 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             | crate::native::Binding::JoinWorkerResult
             | crate::native::Binding::RequestWorkerCancellation
             | crate::native::Binding::NotifyWorker => RuntimeService::IsolatedWorkers,
-            crate::native::Binding::CurrentTaskQueue
+            crate::native::Binding::GenericCurrentTaskQueue
+            | crate::native::Binding::GenericDefaultTaskQueue
+            | crate::native::Binding::GenericRegisterTaskQueue
+            | crate::native::Binding::CurrentTaskQueue
             | crate::native::Binding::DefaultTaskQueue
             | crate::native::Binding::ScheduleTask
             | crate::native::Binding::DrainEntryTasks

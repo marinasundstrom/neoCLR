@@ -42,6 +42,9 @@ pub(crate) enum Binding {
     ObjectIdentityHash,
     ExecutingAssembly,
     CurrentTaskQueue,
+    GenericCurrentTaskQueue,
+    GenericDefaultTaskQueue,
+    GenericRegisterTaskQueue,
     DefaultTaskQueue,
     RegisterDefaultTaskQueue,
     DrainEntryTasks,
@@ -95,6 +98,23 @@ pub(crate) enum Binding {
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
+    }
+    if matches!(function.name.as_str(), "neoCLR.Runtime.GetDefaultTaskQueue" | "neoCLR.Runtime.GetCurrentTaskQueue" | "neoCLR.Runtime.RegisterTaskQueue") {
+        let parameter = match function.generic_arguments.as_slice() {
+            [] => Type::MethodTypeParameter(0),
+            [argument] => argument.clone(),
+            _ => return Err(Fault::new("task queue service requires one type argument")),
+        };
+        let register = function.name == "neoCLR.Runtime.RegisterTaskQueue";
+        if function.generic_parameters.len() != 1 || !function.generic_constraints.is_empty()
+            || function.no_result || function.parameters != if register { vec![parameter.clone()] } else { vec![] }
+            || function.returns != if register { Type::Void } else { parameter }
+        {
+            return Err(Fault::new("invalid generic task queue service signature"));
+        }
+        return Ok(if register { Binding::GenericRegisterTaskQueue }
+            else if function.name == "neoCLR.Runtime.GetDefaultTaskQueue" { Binding::GenericDefaultTaskQueue }
+            else { Binding::GenericCurrentTaskQueue });
     }
     if let Some((operation, arity)) = crate::math::Operation::binding(&function.name) {
         if function.parameters != vec![Type::Double; arity] || function.returns != Type::Double {
@@ -1251,6 +1271,23 @@ mod character_tests {
 
 #[cfg(test)]
 mod task_callback_tests {
+    #[test]
+    fn typed_queue_services_require_exact_generic_signatures() {
+        for (signature, accepted) in [
+            ("GetDefaultTaskQueue<T>() -> T", true),
+            ("GetCurrentTaskQueue<T>() -> T", true),
+            ("RegisterTaskQueue<T>(T queue) -> Void", true),
+            ("GetDefaultTaskQueue<T>() -> Int32", false),
+            ("GetDefaultTaskQueue<T, U>() -> T", false),
+            ("GetDefaultTaskQueue() -> Int32", false),
+            ("RegisterTaskQueue<T>(Int32 queue) -> Void", false),
+            ("RegisterTaskQueue<T>(T queue) -> noresult", false),
+        ] {
+            let module = crate::assemble(&format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"));
+            assert_eq!(module.is_ok(), accepted, "{signature}");
+        }
+    }
+
     #[test]
     fn scheduling_accepts_only_parameterless_unit_or_no_result_callbacks() {
         for (callback, accepted) in [

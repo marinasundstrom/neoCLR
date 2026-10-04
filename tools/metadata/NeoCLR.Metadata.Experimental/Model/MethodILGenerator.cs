@@ -118,13 +118,17 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     }
 
     public void BindFunction(SignatureType functionType, MethodBuilder target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));
+    public void BindFunction(SignatureType functionType, ConstructedMethodReference target) => Emit(OpCode.BindFunction, new FunctionBinding(functionType, target));
 
     public void Emit(OpCode opCode, FunctionBinding operand)
     {
         ArgumentNullException.ThrowIfNull(operand);
         if (opCode != OpCode.BindFunction || !ReferenceEquals(operand.Target.Assembly, Assembly)) throw new ArgumentException("binding requires BindFunction and an owned target");
         operand.FunctionType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-        Append(new("function.bind", Target: operand.Target, Type: operand.FunctionType));
+        if (operand.ConstructedTarget is { } reference)
+            foreach (var argument in reference.DeclaringTypeArguments.Concat(reference.MethodArguments))
+                argument.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        Append(new("function.bind", Target: operand.Target, Type: operand.FunctionType, ConstructedTarget: operand.ConstructedTarget));
     }
 
     public void InvokeFunction(SignatureType functionType) => Emit(OpCode.Callvirt, functionType);
