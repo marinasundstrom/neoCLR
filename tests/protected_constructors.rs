@@ -115,3 +115,18 @@ fn closed_class_flags_cannot_describe_an_instantiable_or_sealed_root() {
         );
     }
 }
+
+#[test]
+fn closed_interfaces_check_direct_ownership_but_allow_open_branches() {
+    let root = ".module Contracts\n.revision r1\n.interface Closed\n.closedhierarchy\n.end\n.interface Open\n.implements Closed\n.end\n.type Local\n.implements Closed\n.end";
+    let child = ".module Children\n.references (Contracts#r1)\n.type Child\n.implements Open\n.end";
+    assemble_modules(&[root, child]).unwrap();
+    for declaration in [".type Child", ".interface Child"] {
+        let bad = child.replace(".type Child", declaration).replace(".implements Open", ".implements Closed");
+        let error = assemble_modules(&[root, &bad]).unwrap_err();
+        assert!(error.message.contains("closed interface hierarchy"), "{error}");
+    }
+    // Same module name with a different revision does not grant ownership.
+    let old = child.replace(".module Children", ".module Contracts\n.revision r0").replace(".implements Open", ".implements Closed");
+    assert!(assemble_modules(&[root, &old]).is_err());
+}

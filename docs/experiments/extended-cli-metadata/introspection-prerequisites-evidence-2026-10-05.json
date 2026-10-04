@@ -1,0 +1,123 @@
+{
+  "runtimeRevision": "e09ae6a66f6e598f367729bba5d703eb8d584b84",
+  "compilerRevision": "185146e417060996371bf4c743c055d4095f7e2c",
+  "scope": "Focused introspection prerequisites; production descriptor and JSON mapping gate remains open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_introspection_prerequisites.py": "a8338f72eec0ae7846375d59668135f7d787467ee710d93e97b16eae5caa9ef4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "5264b3547cc0d7c3d9f3982fcd32ebff59916d90ded26ab88ceaa9eed8bcad77",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "575d9e604a1d5f47b601b11b142d5d534da5c6bd093387eadd8ebd09e6df98c0",
+    "/private/tmp/IntrospectionCore1005.dll": "cf036147d29269d65729561c54a9e96cf6fe55220cdd3fe7133dc6022dd97a17",
+    "/private/tmp/handle-reflection-complete1004/System.neox": "0732b4453ab06fcf1e0eced1e12417c0a60ff451bbb4a2098a3a2837b3356214",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/closed-interface-consumer.rvn": "f659df14734b0f821f3d82d5b5ecd6c6744087cac5690ef721c6893f755243cd",
+    "/private/tmp/introspection-prerequisites1005/closed-interface-consumer.dll": "2869a05d302e7ab8d8f3a4ca50cab7aaeabdb84380fd0b32e6efe6900945037b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/static-type-handle-consumer.rvn": "ebd7bd5ae53a6c698871f9a12efc2142d03fdf80a99c503aecfa19cdd4a2d999",
+    "/private/tmp/introspection-prerequisites1005/static-type-handle-consumer.dll": "c49674ec14d28335d99cd3bf24b1ba80bc297b19f8e6dc90a0d677feddde70be",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "8a7fb9702b4892573938415ea4430f5e547714c9653ca4e75a451a7eb69f1e78",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "ebca762e7adaceae9b7180f74ec19125799cc2c2136f9fad2069bfc97863b120",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "09207336c75af5f40c770ecac86e46b27e34a87ed7ac0254784b596198ddb5dd"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCore1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "-o",
+        "/private/tmp/introspection-prerequisites1005/closed-interface-consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/closed-interface-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/introspection-prerequisites1005/closed-interface-consumer.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8D4A93D6174335864993CC0B721D746141700594EE921014688B079A58857782: typed-stack/control-flow verification passed (672 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/introspection-prerequisites1005/closed-interface-consumer.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCore1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "-o",
+        "/private/tmp/introspection-prerequisites1005/static-type-handle-consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/static-type-handle-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/introspection-prerequisites1005/static-type-handle-consumer.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_4DC91859CAC7CA79B551D1D1293599672C9BE8CDF99F07DF620FEDEE927F1EC0: typed-stack/control-flow verification passed (673 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/introspection-prerequisites1005/static-type-handle-consumer.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

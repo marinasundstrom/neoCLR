@@ -99,8 +99,8 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types)
             {
                 type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
-                if (type.IsClosedHierarchy && (!IsOrdinaryBase(type) || !type.IsAbstract))
-                    throw new InvalidDataException("closed families require ordinary abstract class owners");
+                if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
+                    throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
                 if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent)))
                     throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
             }
@@ -223,6 +223,20 @@ public sealed partial class AssemblyBuilder
         if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
         var definition = new TypeDefinition(@namespace, name, (visibility == TypeVisibility.Public ? 1u : 0u) | 0x80,
             Definition.MainModule.ImportReference(CoreLibrary, "System", "Object"), true);
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
+    /// <summary>Adds a nongeneric interface whose direct implementations and derived interfaces belong to this output.</summary>
+    /// <param name="namespace">Metadata namespace.</param>
+    /// <param name="name">Nonempty unique metadata name.</param>
+    /// <param name="visibility">Public or Internal.</param>
+    /// <returns>An attached native closed-family interface.</returns>
+    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or exceeded limit.</exception>
+    /// <remarks>CLI flags remain Interface and Abstract. Closure is native metadata, enforced when dependencies are linked; executable CLI emission rejects it.</remarks>
+    public TypeBuilder AddClosedInterface(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
+        var definition = new TypeDefinition(@namespace, name, (visibility == TypeVisibility.Public ? 1u : 0u) | 0xa0, null, true);
         Definition.MainModule.Types.Add(definition);
         return definition.Producer!;
     }

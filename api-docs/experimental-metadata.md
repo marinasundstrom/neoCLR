@@ -7105,3 +7105,17 @@ The runtime validates and materializes its source-owned provider; see the
 No new C# authoring member is required. This bounded runtime capability does not imply
 that arbitrary descriptor-returning services or the full production descriptor library
 are supported.
+
+## Closed interface families (development, 2026-10-05)
+
+`AssemblyBuilder.AddClosedInterface(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)`
+returns an attached nongeneric top-level interface. Manual definitions use
+`new TypeDefinition(ns, name, 0xa1, null, isClosedHierarchy: true)` and the same validation.
+Invalid names, visibility, duplicates or unsupported categories throw ArgumentException.
+Native round trips preserve IsClosedHierarchy independently of CLI Sealed; CLI reference
+flags remain Interface/Abstract. Executable CLI writing rejects the native extension.
+`NominalTypeInfo.GetPermittedDirectSubtypes()` includes directly declared interface
+implementations and derived interfaces, excluding indirect descendants. Runtime linking
+rejects direct children outside the defining module/revision. Open local branches remain
+extensible. Generic closed interfaces are not yet authored. Existing local relationship
+encoding and closed-family flag are reused without a format revision.

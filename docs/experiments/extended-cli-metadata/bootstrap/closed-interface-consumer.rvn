@@ -1,0 +1,12 @@
+public sealed interface ClosedValue {
+    func Read() -> int
+}
+public interface OpenValue : ClosedValue {
+}
+public class ValueProvider : OpenValue {
+    func Read() -> int => 42
+}
+func Main() -> int {
+    let value: ClosedValue = ValueProvider()
+    return value.Read()
+}

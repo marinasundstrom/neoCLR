@@ -129,7 +129,7 @@ public sealed class NominalTypeInfo : TypeInfo
     /// <returns>Direct children in metadata order, or an empty list for an ordinary class.</returns>
     /// <exception cref="NotSupportedException">CLI closed-family attributes are not materialized.</exception>
     public IReadOnlyList<NominalTypeInfo> GetPermittedDirectSubtypes() => IsClosedHierarchy
-        ? Array.AsReadOnly(Module.GetTypes().Where(type => ReferenceEquals(type.BaseType, this)).ToArray())
+        ? Array.AsReadOnly(Module.GetTypes().Where(type => ReferenceEquals(type.BaseType, this) || type.GetDeclaredInterfaces().Any(contract => ReferenceEquals(contract, this))).ToArray())
         : Array.Empty<NominalTypeInfo>();
     /// <summary>Gets the CLI Abstract declaration flag.</summary>
     public bool IsAbstract => (definition.Attributes & 0x80) != 0;

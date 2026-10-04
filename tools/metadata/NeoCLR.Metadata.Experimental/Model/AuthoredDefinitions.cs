@@ -60,13 +60,13 @@ public sealed partial class TypeDefinition
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
         : this(@namespace, name, attributes, baseType, false) { }
 
-    /// <summary>Creates a detached declaration, optionally marking an abstract native closed class family.</summary>
+    /// <summary>Creates a detached declaration, optionally marking a native closed class or interface family.</summary>
     /// <param name="namespace">Metadata namespace.</param>
     /// <param name="name">Nonempty metadata name.</param>
     /// <param name="attributes">CLI attributes; closed class families require Abstract without Sealed.</param>
     /// <param name="baseType">Explicit core Object or an attached local ordinary base.</param>
     /// <param name="isClosedHierarchy">Whether direct children are limited to this output assembly.</param>
-    /// <remarks>Closed families currently require nongeneric top-level classes. CLI executable output rejects this native extension; the PE reference projection retains Abstract and the authoritative native payload retains closure.</remarks>
+    /// <remarks>Closed families require nongeneric top-level abstract classes or interfaces. CLI executable output rejects this native extension; the PE reference projection retains Abstract and the authoritative native payload retains closure.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType, bool isClosedHierarchy)
     {
         closedHierarchy = isClosedHierarchy;
@@ -175,8 +175,8 @@ public sealed partial class AssemblyBuilder
                 throw new ArgumentException("visibility does not match lexical ownership");
             var category = attributes & ~7u;
             if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x80 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
-            if (definition.IsClosedHierarchy != (category == 0x80) || definition.IsClosedHierarchy && (definition.GenericArity != 0 || definition.DeclaringType is not null))
-                throw new ArgumentException("closed hierarchy requires a nongeneric top-level abstract class");
+            if (category == 0x80 && !definition.IsClosedHierarchy || definition.IsClosedHierarchy && (category is not (0x80 or 0xa0) || definition.GenericArity != 0 || definition.DeclaringType is not null))
+                throw new ArgumentException("closed hierarchy requires a nongeneric top-level abstract class or interface");
             if (category == 0x100 && !definition.IsEnum) throw new ArgumentException("sealed manual type category requires an enum");
             if (category == 0xa0)
             {

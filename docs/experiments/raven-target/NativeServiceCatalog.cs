@@ -58,7 +58,7 @@ static partial class RuntimeServiceBindings
         "namespace System.Runtime.CompilerServices { public static class RuntimeServices { " +
         string.Join(" ", NativeMembers().Select(m => $"public static {NativeCSharp(m.Result)} {m.Name}({string.Join(',', m.Args.Select((t, i) => NativeCSharp(t) + " arg" + i))}) " +
             (m.Result == "noresult" ? "{ }" : "=> default;"))) +
-        " public static bool IsValue<T>(System.Value value) => false; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } }";
+        " public static System.RuntimeTypeHandle TypeHandle<T>() => default; public static bool IsValue<T>(System.Value value) => false; public static T UnpackValue<T>(System.Value value) => default; " + QueueDeclarations + " } }";
 
     static readonly string[] QueueServices = ["GetDefaultTaskQueue", "GetCurrentTaskQueue", "RegisterTaskQueue"];
     internal static string QueueDeclarations => string.Join(" ", QueueServices.Select(name => name == "RegisterTaskQueue"

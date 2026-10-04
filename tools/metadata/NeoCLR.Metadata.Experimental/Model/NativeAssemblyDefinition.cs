@@ -214,8 +214,8 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean() && !closedHierarchy;
-                Require(!closedHierarchy || !isInterface && !isPrimitive && typeNames.Length == 0 && declaringType < 0 &&
-                    type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean() && !type.GetProperty("is_sealed").GetBoolean(), "unsupported closed class family");
+                Require(!closedHierarchy || !isPrimitive && typeNames.Length == 0 && declaringType < 0 &&
+                    (isInterface || type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean()) && !type.GetProperty("is_sealed").GetBoolean(), "unsupported closed family");
                 var isRuntimeString = isPrimitive && Text(type, "name") == "System.String";
                 var isValueType = !isInterface && !isRuntimeString && !type.GetProperty("is_reference_type").GetBoolean();
                 Require((!isValueType || !isStatic) &&
@@ -838,7 +838,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
     {
-        if (type.IsClosedHierarchy) return graph.AddClosedClass(type.Namespace, type.Name, type.Visibility);
+        if (type.IsClosedHierarchy) return type.IsInterface ? graph.AddClosedInterface(type.Namespace, type.Name, type.Visibility) : graph.AddClosedClass(type.Namespace, type.Name, type.Visibility);
         if (type.NativeGrapheme)
         {
             var grapheme = graph.AddValueType(type.Namespace, type.Name, type.Visibility);

@@ -1,0 +1,16 @@
+import System.Runtime.CompilerServices.*
+namespace System.Runtime.CompilerServices {
+    internal extension IntrospectionRuntimeServices for RuntimeServices {
+        static func Answer() -> int => 42
+    }
+}
+func Token<T>() -> System.RuntimeTypeHandle => RuntimeServices.TypeHandle<T>()
+func Main() -> int {
+    if !RuntimeServices.TypeEquals(Token<int>(), RuntimeServices.TypeHandle<int>()) {
+        return 1
+    }
+    if RuntimeServices.TypeEquals(Token<int>(), RuntimeServices.TypeHandle<string>()) {
+        return 2
+    }
+    return RuntimeServices.Answer()
+}

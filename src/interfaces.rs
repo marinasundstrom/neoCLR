@@ -695,6 +695,13 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         let mut seen = std::collections::HashSet::new();
         for interface in &definition.implements {
+            let parent = interface_definition(module, interface)?;
+            if parent.is_closed_hierarchy
+                && !definition.definition.as_ref().zip(parent.definition.as_ref())
+                    .is_some_and(|(child, root)| child.module == root.module && child.revision == root.revision)
+            {
+                return Err(Fault::new("closed interface hierarchy cannot be extended outside its defining assembly"));
+            }
             if !seen.insert(interface) {
                 return Err(Fault::new("duplicate interface implementation"));
             }

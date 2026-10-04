@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve nongeneric closed interface families through definition/builder authoring,
+  native readers and metadata introspection. Validate direct implementation ownership
+  at runtime linking while leaving open branches extensible. Native Raven gates also
+  exercise static extension methods and the configured core TypeHandle<T> intrinsic;
+  production descriptor emission and JSON mapping remain in progress.
+
 - Bind native TypeModule results to source-owned ModuleInfo interfaces and instantiate
   their RuntimeModuleInfo provider within the same metadata assembly/module. Validate
   the existing two-string layout, interface relationship and heap budget. Generated

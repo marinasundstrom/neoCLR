@@ -60,6 +60,27 @@ internal static class ClosedClassChecks
                 throw new Exception("closed family native reader/facade contract lost");
             Reject(() => graph.Write(), "native emission");
         }
+        foreach (bool manual in new[] { false, true })
+        {
+            var graph = new AssemblyBuilder(new("ClosedInterfaces", new(1, 0, 0, 0)), Create(false).CoreLibrary);
+            TypeBuilder root;
+            if (manual)
+            {
+                graph.Definition.MainModule.Types.Add(new TypeDefinition("Example", "Contract", 0xa1, null, true));
+                root = graph.Types.Single();
+            }
+            else root = graph.AddClosedInterface("Example", "Contract");
+            var branch = graph.AddInterface("Example", "Branch"); branch.AddBaseInterface(root);
+            var leaf = graph.AddClass("Example", "Leaf"); leaf.AddInterfaceImplementation(root);
+            var indirect = graph.AddClass("Example", "Indirect"); indirect.AddInterfaceImplementation(branch);
+            var native = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(graph));
+            var views = new MetadataLoadContext([native]).Assemblies.Single().GetTypes();
+            var closedContract = views.Single(t => t.Name == "Contract");
+            if (!closedContract.IsClosedHierarchy || closedContract.IsSealed || !closedContract.IsAbstract ||
+                !closedContract.GetPermittedDirectSubtypes().Select(t => t.Name).SequenceEqual(new[] { "Branch", "Leaf" }))
+                throw new Exception("closed interface definition/builder round trip lost direct relationships");
+            Reject(() => graph.Write(), "native emission");
+        }
         var ordinary = new AssemblyBuilder(new("Ordinary", new(1, 0, 0, 0)), Create(false).CoreLibrary);
         ordinary.AddClass("Example", "Open");
         var cliView = new MetadataLoadContext([AssemblyDefinition.ReadAssembly(ordinary.Write(), expectedExtended: false)]).Assemblies.Single().GetTypes().Single();

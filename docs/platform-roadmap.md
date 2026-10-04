@@ -1,5 +1,9 @@
 # neoCLR platform roadmap
 
+Native descriptor prerequisites now include closed interface authoring/linking and
+source static extensions with generic type tokens; see [focused evidence](experiments/extended-cli-metadata/introspection-prerequisites-2026-10-05.md).
+The production JSON mapping gate remains open.
+
 ## Active priority: full-System capability batches (2026-10-04)
 
 The author directed a strategic assessment of blockers that unlock the most library
