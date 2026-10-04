@@ -739,3 +739,40 @@ no-result. The ordinary .NET control uses System.ValueTuple and the existing bac
 containing the previous 48 sources plus streams exceeds schema 2's 1 MiB envelope;
 separate native libraries work. The size limit remains a full-library blocker, not a
 reason to fall back to translated metadata. Website/public APIs are unchanged.
+
+
+## Erased-value native outcomes (2026-10-04)
+
+Rebuild the comparer core and seed together: the selected core now declares generic
+RuntimeServices.IsValue<T>/UnpackValue<T> and ParseInt64, and the executable seed provides
+matching implementations. System.Value is the existing native erased carrier, not an
+ordinary empty struct and not CLR Object boxing. The metadata library maps only the exact
+selected core identity, and native reimport recovers that identity.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_erased_values.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --core /path/to/ValueCore.dll --seed /path/to/System.neox \
+  --base-library /path/to/NeoCLR.Collections.dll --output /tmp/new-erased-gate
+```
+
+The base artifact must be rebuilt against this seed. ErasedContracts.dll wraps the
+helpers using ordinary generic calls. Its source-free consumer checks Int64 success,
+Byte invalid-format/overflow status and wrong-kind testing; a separate negative app
+verifies but fails execution when unpacking Int64 as String. Outputs, source/compiler/
+runtime/dependency hashes and commands are recorded. The representative ParseInt64
+service is an outcome test, not a return to API-by-API expansion. A shared checked
+service catalog remains the next task. Broad nominal/structural payload coverage remains
+open; existing lifetime/complexity checks remain enforced.
+
+Evidence: /tmp/erased-gate-1004/validation.json, /tmp/value-offset-final-1004/validation.json,
+and /tmp/stream-value-final-1004/validation.json. The cumulative native application,
+calendar, collections and callback checks pass. Unit invocation/discard classification
+now respects transported callback result signatures as well as generic method returns.
+
+Validation also passes the seven native semantic consumers (/tmp/value-seven2.log),
+130 metadata contract groups, the explicit C# erased alias test and 39 focused .NET tests.
+The seven-consumer probe retains its fuller typeof-enabled bootstrap core, distinct from
+the source-library core; no implicit switching occurs in compiler commands.
+
+Compiler integration revision: Raven ed3371e73 (unit admission begins at 82f30272f).

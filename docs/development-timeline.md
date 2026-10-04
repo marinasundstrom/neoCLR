@@ -10535,3 +10535,23 @@ every proposed ordering detail is implied.
 and its linked audit. Binding failures mask later phases. Preserve the existing native
 gate and .NET controls; re-rank after each capability batch. Legacy translated snapshot
 regeneration remains a separate recorded failure.
+
+## 2026-10-04 — System.Value across nominal and structural values
+
+**Author direction.** After requesting implementation of the capability batches, the
+user clarified the intended carrier: “System.Value as a type than can hold any value
+both structural and nominal types”, including types outside the System.Object hierarchy,
+for passing values to introspection/reflection APIs.
+
+**Assistant response.** Agreed to keep System.Value independent of the Object hierarchy
+and preserve payload type identity. Proposed first connecting the already implemented
+runtime erased carrier to native metadata using exact core identity, with scalar outcome
+tests as the first integration proof, not a claim that every value category is supported.
+
+**Actions and limits.** The inhabited-unit stream gate was committed first. Work is in
+progress on native System.Value signature import/export and generic IsValue/UnpackValue
+seed methods. Existing runtime erasure already validates payload storage and depth,
+rejecting frame-backed references whose lifetime cannot escape. Broad nominal/structural
+payloads, pointer/reference lifetimes and introspection call contracts still need explicit
+coverage; this direction does not silently remove those safety requirements or turn
+System.Value into System.Object boxing.

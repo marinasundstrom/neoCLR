@@ -1,0 +1,7 @@
+import System.*
+import System.Runtime.CompilerServices.*
+public static class ErasedContracts {
+    public static func Parse(text: string) -> Value => RuntimeServices.ParseInt64(text)
+    public static func Is<T>(value: Value) -> bool => RuntimeServices.IsValue<T>(value)
+    public static func Unpack<T>(value: Value) -> T => RuntimeServices.UnpackValue<T>(value)
+}

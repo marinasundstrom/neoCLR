@@ -320,6 +320,11 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     if (!allowVoid && element.GetString() == "Void" && nativeTypeAliases.TryGetValue(("System.Void", 0), out var unit) && unit.ValueType && unit.Namespace == "System" && unit.Name == "Void")
                         return ImportExternalType(signatureGraph, "System.Void", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                    if (element.GetString() == "Value")
+                    {
+                        Require(nativeTypeAliases.TryGetValue(("System.Value", 0), out var erased) && erased.ValueType && erased.Namespace == "System" && erased.Name == "Value" && erased.Declaring is null, "Value requires an explicit core value alias");
+                        return ImportExternalType(signatureGraph, "System.Value", 0, referenceIdentities, valueTypeReferences, nativeTypeAliases);
+                    }
                     if (element.GetString() == "Char")
                     {
                         Require(nativeTypeAliases.TryGetValue(("System.Char", 0), out var character) && character.ValueType && character.Namespace == "System" && character.Name == "Char" && character.Declaring is null, "Char requires an explicit core value alias");
@@ -607,6 +612,8 @@ public sealed partial class NativeAssemblyDefinition
             throw new InvalidDataException("inhabited Void projection requires the explicit core scope");
         if (nativeTypeAliases.TryGetValue(("System.Char", 0), out var charAlias) && !charAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("Char projection requires the explicit core scope");
+        if (nativeTypeAliases.TryGetValue(("System.Value", 0), out var erasedAlias) && !erasedAlias.Assembly.Equals(coreLibrary))
+            throw new InvalidDataException("Value projection requires the explicit core scope");
         var graph = new AssemblyBuilder(Identity, coreLibrary);
         var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)
@@ -614,7 +621,7 @@ public sealed partial class NativeAssemblyDefinition
                 owners[i].AddBaseTypeConstraint(constraint.Parameter, owners[System.Array.FindIndex(types, t => t.NativeName == constraint.Bound)]);
         for (int i = 0; i < types.Length; i++)
             foreach (var (parameter, flags) in types[i].SpecialConstraints) owners[i].SetSpecialConstraints(parameter, flags);
-        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && nativeTypeAliases.ContainsKey(("System.Void", 0)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
+        SignatureType ProjectType(JsonElement type) => type.ValueKind == JsonValueKind.String ? type.GetString() == "Value" ? ProjectNamed("System.Value") : type.GetString() == "Char" ? ProjectNamed("System.Char") : type.GetString() == "Void" && nativeTypeAliases.ContainsKey(("System.Void", 0)) ? ProjectNamed("System.Void") : (SignatureType)ReadPrimitive(type.GetString(), false)
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())

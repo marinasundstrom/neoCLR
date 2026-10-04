@@ -4,6 +4,8 @@ public static class UnitContracts {
     public static func Run() -> int {
         Echo<unit>(())
         Notify()
+        _ = Notify()
+        _ = Echo<unit>(())
         let copy = Echo<unit>(())
         let values: unit[] = [copy, ()]
         return values.Length + 40

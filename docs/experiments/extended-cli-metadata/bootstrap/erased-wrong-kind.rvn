@@ -1,0 +1,5 @@
+func Main() -> int {
+    let value = ErasedContracts.Parse("42")
+    let wrong = ErasedContracts.Unpack<string>(value)
+    return 42
+}

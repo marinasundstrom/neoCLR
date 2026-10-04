@@ -1,0 +1,11 @@
+func Main() -> int {
+    let value = ErasedContracts.Parse("42")
+    if !ErasedContracts.Is<long>(value) || ErasedContracts.Is<string>(value) { return 1 }
+    if ErasedContracts.Unpack<long>(value) != 42L { return 2 }
+    let error = ErasedContracts.Parse("not a number")
+    if !ErasedContracts.Is<byte>(error) || ErasedContracts.Is<long>(error) { return 3 }
+    if ErasedContracts.Unpack<byte>(error) != (byte)1 { return 4 }
+    let overflow = ErasedContracts.Parse("9223372036854775808")
+    if !ErasedContracts.Is<byte>(overflow) || ErasedContracts.Unpack<byte>(overflow) != (byte)2 { return 5 }
+    return 42
+}

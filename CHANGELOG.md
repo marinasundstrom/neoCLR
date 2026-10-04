@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Map the explicitly bound core System.Value to the existing native erased carrier
+  across signature writing, reading and reimport; reject malformed aliases and wrong
+  projection cores. Seed generic IsValue/UnpackValue helpers execute through ordinary
+  calls. Separate-library tests cover Int64 success, Byte parse statuses and wrong-kind
+  failure. This preserves the independent-of-Object direction, not exhaustive payload
+  support. Fix unit callback/discard regressions exposed by the cumulative native gate.
+
 - Complete explicit inhabited-unit signature/local admission in Raven's portable
   planner. Add separate native stream and generic-unit library/consumer execution:
   unchanged MemoryStream, Flush outcomes, interface identity, unit arrays and generic

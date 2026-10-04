@@ -6191,3 +6191,29 @@ C# checks cover CLI scalar/vector signatures and execution, native materializati
 reimport, CLI projection, grapheme execution and invalid alias/receiver/owner/result
 contracts. No metadata version or VM instruction changed. This host API remains covered
 by this manual reference; the separate guest RavenDoc snapshot is still stale.
+
+
+### Native erased System.Value signatures (development, 2026-10-04)
+
+`AssemblyBuilder.ImportReference` retains System.Value as an ordinary scoped value-type
+reference in the CLI projection. With an explicit native binding for the selected core
+into the System module, native writing maps that exact nongeneric, top-level System.Value
+identity to the existing `Value` signature. `AssemblyDefinition.ReadNativeAssembly`,
+`NativeAssemblyDefinition.ReadAssembly` and signature reimport recover the scoped
+System.Value identity; no runtime reflection or implicit dependency lookup is involved.
+Same-named non-core types are not intrinsic carriers. Native Value requires the explicit
+value alias; malformed/missing aliases and a different projection core are rejected with
+InvalidDataException. This is an extension of existing signature APIs, not a new API.
+
+The native carrier is independent of the System.Object hierarchy: erased payload type
+identity must be retained, including for future structural/nominal introspection inputs.
+The current integration test covers existing Int64 and Byte host outcomes and wrong-kind
+unpacking. It does not establish all payload categories. Existing runtime storage/depth
+and lifetime checks still apply; frame-backed references cannot escape by erasure. The
+CLI reference projection is not a CLR implementation of the erased carrier.
+
+Validation: C# `--native-erased-value <seed.neox> <core.dll>` checks signature encoding,
+round-trip import and invalid aliases. The 130 metadata groups remain passing. Raven's
+`bootstrap/verify_erased_values.py` independently compiles and imports a generic wrapper,
+executes real ParseInt64 calls and checks runtime wrong-kind failure. No guest Raven API
+snapshot signature changed; existing snapshot maintenance blockers remain recorded.

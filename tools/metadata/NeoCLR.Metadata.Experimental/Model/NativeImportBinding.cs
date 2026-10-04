@@ -151,6 +151,9 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     internal static bool IsIntrinsicChar(ImportedTypeReference type) =>
         type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
         type.DeclaringType is null && type.Namespace == "System" && type.Name == "Char" && type.IsValueType && type.GenericArity == 0;
+    internal static bool IsErasedValue(ImportedTypeReference type) =>
+        type.AssemblyIdentity.Equals(type.Owner.CoreLibrary) && type.Owner.NativeBindingFor(type.AssemblyIdentity)?.Library.ModuleName == "System" &&
+        type.DeclaringType is null && type.Namespace == "System" && type.Name == "Value" && type.IsValueType && type.GenericArity == 0;
     private string TypeKey(SignatureType type)
     {
         if (type.Primitive is { } primitive) return primitive.ToString();
@@ -163,6 +166,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         {
             if (IsInhabitedVoid(imported)) return "Void";
             if (IsIntrinsicChar(imported)) return "Char";
+            if (IsErasedValue(imported)) return "Value";
             var binding = imported.Owner.NativeBindingFor(imported.AssemblyIdentity) ?? throw new InvalidDataException("native signature requires an explicit dependency binding");
             var name = binding.TypeName(imported);
             return imported.TypeArguments.Count == 0 ? "Named(" + name + ")" : "Constructed(" + name + ";" + string.Join(",", imported.TypeArguments.Select(TypeKey)) + ")";

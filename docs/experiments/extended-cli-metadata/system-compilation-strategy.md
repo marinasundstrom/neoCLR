@@ -159,3 +159,12 @@ The cumulative 53-source single PE now reaches the schema-2 1 MiB encoding limit
 binding/emission. It does not publish output. The supported separate-library workflow
 passes; whole-library container sizing remains an additional shared blocker. Erased
 Value and the common ABI catalog are still pending; the first batch is not complete.
+
+
+The erased-value subgate now executes a separately imported generic wrapper around
+real ParseInt64 outcomes: Int64 success, Byte invalid-format/overflow, kind tests and
+wrong-kind unpack rejection. Metadata encoding/reimport retains the exact bound core
+System.Value identity. The cumulative native application/callback gate passes after
+fixing callback/discard result conventions exposed by inhabited-unit admission. This
+proves two existing payload kinds, not universal erasure. The common service ABI catalog
+is still pending; proceed there before adding individual service families.

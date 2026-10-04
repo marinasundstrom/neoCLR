@@ -36,6 +36,21 @@ ret
 .end
 .end
 .type System.Runtime.CompilerServices.RuntimeServices
+.method static IsValue<T>(Value value) -> Boolean
+ldarg value
+value.is T
+ret
+.end
+.method static UnpackValue<T>(Value value) -> T
+ldarg value
+value.unpack T
+ret
+.end
+.method static ParseInt64(String text) -> Value
+ldarg text
+call neoCLR.Runtime.ParseInt64(String)
+ret
+.end
 .method static UnixTimeTicks() -> Int64
 call neoCLR.Runtime.UnixTimeTicks()
 ret
@@ -120,4 +135,10 @@ ret
 
 .function neoCLR.Runtime.UnixTimeTicks() -> Int64
 .methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ParseInt64(String text) -> Value
+.methodimpl InternalCall
+.end
+.type System.Value
+.sealed
 .end

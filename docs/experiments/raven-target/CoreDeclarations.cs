@@ -28,7 +28,7 @@ static class CoreDeclarations
                 .Replace("public struct Int64 { }", "public struct Int64 { public int CompareTo(long other) => 0; }")
                 .Replace("public sealed class String {", "public sealed class String { public char this[int index] => default; public static int CompareOrdinalIgnoreCase(string left, string right) => 0;");
         if (comparerStorage)
-            source += "namespace System.Runtime.CompilerServices { public static class RuntimeServices { public static int StringHashOrdinalIgnoreCase(string value) => 0; public static string SystemCultureName() => default; public static int[] UnixTimeToLocal(long ticks) => default; public static long UnixTimeTicks() => 0; } }";
+            source += "namespace System.Runtime.CompilerServices { public static class RuntimeServices { public static int StringHashOrdinalIgnoreCase(string value) => 0; public static string SystemCultureName() => default; public static int[] UnixTimeToLocal(long ticks) => default; public static long UnixTimeTicks() => 0; public static bool IsValue<T>(System.Value value) => false; public static T UnpackValue<T>(System.Value value) => default; public static System.Value ParseInt64(string text) => default; } }";
         if (unionProbe) source = PrimitiveBindings.Project(source).Replace("public struct Boolean { }", BooleanBindings.Declaration);
         if (collectionProbe) source = InterfaceBindings.Project(source.Replace("public class Type { }", "").Replace("public abstract class Enum : ValueType { }", EnumHelpersBindings.Declaration)
             .Replace("public abstract class Object {", "public abstract class Object { public System.Introspection.TypeInfo GetType() => default;"));

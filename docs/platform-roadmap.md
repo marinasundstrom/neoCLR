@@ -8,9 +8,9 @@ compilation, replacing API-by-API progression. Follow the
 and [fresh audit](experiments/extended-cli-metadata/system-compilation-audit-2026-10-04.json).
 Earlier chronological next-step notes below are historical where they conflict.
 
-Next batch: complete inhabited-unit signatures/generic storage (MemoryStream is the
-isolated gate), then establish a checked runtime-service ABI catalog centered on erased
-Value/IsValue/UnpackValue and common signature categories. The full 166-source build
+Current batch: inhabited-unit stream/generic storage and erased Value outcome subgates
+now execute through separate native libraries. Next establish a checked runtime-service
+ABI catalog using the connected Value/IsValue/UnpackValue and common signature categories. The full 166-source build
 stops in binding; 178 distinct service names appear across 48 files and the erased-value
 operations each span 23 files. These are potential reach counts, not guaranteed unlocks.
 Follow with enum/numeric/inheritance emission, canonical source-owned core/Self,
