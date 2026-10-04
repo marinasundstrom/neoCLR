@@ -3,7 +3,7 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyDefinition
 {
     /// <summary>Reads authoritative native namespace-function and bounded class/value/interface declarations directly from PE/#Neo.</summary>
-    /// <param name="image">Complete API-produced schema-1/2 runtime container.</param>
+    /// <param name="image">Complete API-produced schema-1/2/3 runtime container.</param>
     /// <returns>An owned immutable declaration snapshot, without generating or importing a CLI projection.</returns>
     /// <exception cref="InvalidDataException">Invalid container or unsupported declarations, including constrained and generic static owners and generic instance methods, unsupported field types and signatures beyond the bounded native profile.</exception>
     /// <remarks>This materialization profile admits nongeneric methods and unconstrained static generic methods/functions with scoped method/type parameters, primitive, nominal value/reference, local or external generic construction, vector or bounded function signatures, interface-scoped Self member signatures, and unconstrained classes, values and interfaces (including supported nested declarations under nongeneric owners) with primitive, nominal value/reference or vector fields/properties and exact dependency identities.
@@ -13,9 +13,9 @@ public sealed partial class AssemblyDefinition
     /// Mvid is empty because the native manifest declares none. Tokens retain module-local native origin identifiers.</remarks>
     public static AssemblyDefinition ReadNativeAssembly(ReadOnlySpan<byte> image)
     {
-        if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("image exceeds limit");
+        if (image.Length > RuntimeAssemblyContainer.MaxLibraryImageSize) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
-        var native = NativeAssemblyDefinition.ReadAssembly(RuntimeAssemblyContainer.Read(owned));
+        var native = NativeAssemblyDefinition.ReadLibraryAssembly(RuntimeAssemblyContainer.Read(owned));
         return native.MaterializeDeclarations(owned);
     }
 

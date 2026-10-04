@@ -810,3 +810,36 @@ carrier slice. No shared compiler change in this catalog slice. Native snapshots
 guest public API signatures are unchanged; no website build is required.
 
 Matching Raven compiler documentation revision: 88b52c667; implementation remains ed3371e73.
+
+
+## Combined library PE profile (2026-10-04)
+
+Raven `neoclr --library` now uses RuntimeAssemblyContainer.WriteLibraryBinary and required
+schema 3. Application emission remains schema 2. Rebuild the metadata library, compiler
+and runtime together; older runtimes reject the required library schema. Native PE
+references may be up to 16 MiB, validated by the container's actual profile (legacy PE
+still max 4 MiB). No CLI projection fallback is used.
+
+```sh
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_combined_library.py \
+  --compiler /path/to/rvnc.dll --runtime target/debug/neoclr \
+  --core /path/to/CatalogCoreFinal.dll --seed /path/to/CatalogSystemFinal.neox \
+  --output /tmp/new-combined-gate
+```
+
+This compiles the 48 baseline plus five unchanged stream sources as one >1 MiB PE,
+then compiles and runs a source-free stream consumer and unchanged broad application
+with exact output. Evidence: /tmp/combined-library53-gate-1004/validation.json.
+C# `--library-pe-runtime <runtime> <directory>` separately builds a >4 MiB native library,
+reimports it and runs a linked consumer; /tmp/library-pe-large-test3-1004 passed. A Raven
+consumer `func Main() -> int => Answer()` also imports that large fixture through normal
+commands and exits 42 (/tmp/large-raven-consumer-run.json).
+
+The optional --services expansion to 57 sources currently exposes a binding gap:
+Utf8.Encode's byte[] -> Sequence<byte> conversion fails with source-owned Array<T>
+in the same library. Premature interface caching is the current hypothesis. The same
+UTF-8 sources pass in a separate library. This is the next isolated compiler investigation;
+no source rewrite or metadata workaround was applied. The 53-source gate is complete,
+not the whole System library.
+
+Schema-3 compiler revision: Raven 34c553d1c; library/runtime changes are in this paired slice.

@@ -35,8 +35,14 @@ public sealed partial class NativeAssemblyDefinition
     /// <exception cref="InvalidDataException">Malformed/ambiguous JSON, unsupported declarations, inconsistent names/identity, or exceeded bounds.</exception>
     /// <remarks>Rejects unknown declaration fields, duplicate JSON properties and unsupported signatures. Instruction bodies are not interpreted or translated.</remarks>
     public static NativeAssemblyDefinition ReadAssembly(ReadOnlySpan<byte> image)
+        => ReadCore(image, MetadataArtifactReader.MaxImageSize);
+
+    internal static NativeAssemblyDefinition ReadLibraryAssembly(ReadOnlySpan<byte> image)
+        => ReadCore(image, 32 * 1024 * 1024);
+
+    private static NativeAssemblyDefinition ReadCore(ReadOnlySpan<byte> image, int maxSize)
     {
-        if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("native image exceeds limit");
+        if (image.Length > maxSize) throw new InvalidDataException("native image exceeds limit");
         try
         {
             using var document = JsonDocument.Parse(image.ToArray(), new JsonDocumentOptions { MaxDepth = 64 });

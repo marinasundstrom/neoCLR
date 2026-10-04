@@ -32,9 +32,9 @@ public static class MetadataArtifactReader
         return new(envelope is null ? null : MetadataProfile.Read(envelope));
     }
 
-    internal static byte[]? ReadEnvelope(ReadOnlySpan<byte> image, bool expectedExtended = true)
+    internal static byte[]? ReadEnvelope(ReadOnlySpan<byte> image, bool expectedExtended = true, int maxImageSize = MaxImageSize)
     {
-        if (image.Length > MaxImageSize) throw Invalid("image exceeds 4 MiB limit");
+        if (image.Length > maxImageSize) throw Invalid("image exceeds selected PE profile limit");
         var metadata = ContainerMetadata(image.ToArray());
         var data = new Bytes(metadata);
         if (!data.Take(0, 4).SequenceEqual("BSJB"u8)) throw Invalid("invalid metadata signature");

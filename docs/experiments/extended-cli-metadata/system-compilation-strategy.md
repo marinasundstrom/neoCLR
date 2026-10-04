@@ -201,3 +201,12 @@ TaskState and broader core/numeric ownership cannot be bypassed with substitute 
 Keep no-result/inhabited-unit distinctions explicit in the catalog, shared codegen and
 runtime. Do not resume isolated API wrappers or interpret this profile as full-System
 or full dual-target completion.
+
+
+The single-PE transport blocker is closed for the demonstrated subset: schema-3 library
+PE writing/loading admits the 53-source combined library, and separate stream/broad
+consumers execute. A >4 MiB API-produced library also imports into Raven and executes.
+Schema-1/2 limits and declaration budgets remain unchanged. The 57-source combined
+IO/UTF-8 experiment now exposes a source-owned Array<T> interface projection/binding
+failure; these same sources work in separate libraries. Investigate declaration-readiness
+caching before expanding more service APIs. See bootstrap/verify_combined_library.py.

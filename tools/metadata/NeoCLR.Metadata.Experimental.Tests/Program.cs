@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--library-pe-runtime")
+{
+    await LibraryPeProfileChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-service-bindings")
 {
     NativeServiceBindingChecks.Run(args[1], args[2]); return 0;
@@ -419,6 +423,7 @@ var tests = new (string Name, Action Body)[]
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
+    ("Bounded library PE profile and native declaration round trip", LibraryPeProfileChecks.Run),
     ("Character core signatures and CLI code-unit preservation", CharacterSignatureChecks.Run),
     ("Primitive vector imported signatures", VectorImportChecks.Run),
     ("Imported nominal and constructed type signatures", ImportedTypeChecks.Run),

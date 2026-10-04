@@ -68,7 +68,7 @@ public sealed partial class AssemblyDefinition
 
     private static AssemblyDefinition ReadCore(ReadOnlySpan<byte> image, bool expectedExtended, bool runtimeProjection)
     {
-        if (image.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("image exceeds limit");
+        if (image.Length > (runtimeProjection ? RuntimeAssemblyContainer.MaxLibraryImageSize : MetadataArtifactReader.MaxImageSize)) throw new InvalidDataException("image exceeds limit");
         var owned = image.ToArray();
         var artifact = runtimeProjection ? null : MetadataArtifactReader.Read(owned, expectedExtended);
         try

@@ -6217,3 +6217,39 @@ round-trip import and invalid aliases. The 130 metadata groups remain passing. R
 `bootstrap/verify_erased_values.py` independently compiles and imports a generic wrapper,
 executes real ParseInt64 calls and checks runtime wrong-kind failure. No guest Raven API
 snapshot signature changed; existing snapshot maintenance blockers remain recorded.
+
+
+### RuntimeAssemblyContainer library PE profile (development, 2026-10-04)
+
+- `public const int MaxLibraryImageSize = 16 * 1024 * 1024`: maximum complete schema-3
+  library PE image. This is distinct from MetadataArtifactReader.MaxImageSize (4 MiB)
+  and the ordinary structural-reference profile.
+- `public static byte[] WriteLibraryBinary(AssemblyBuilder assembly)`: validates the
+  authored graph and complete external contracts, builds its CLI reference projection,
+  and writes authoritative native metadata in a required schema-3 section. Returns
+  owned unsigned PE32 bytes. Null throws ArgumentNullException; invalid declarations,
+  graph, dependencies, encoding or exceeded bounds throw InvalidDataException.
+- `RuntimeAssemblyContainer.Read`, `ReadCliProjection` and
+  `AssemblyDefinition.ReadNativeAssembly` now accept library schema 3. Native semantic
+  import reads the native declaration graph; ReadCliProjection remains reference-only.
+
+Library transport is bounded to 16 MiB PE, 8 MiB envelope, 32 MiB host JSON, 2,097,152
+binary nodes and depth 64. Existing declaration, signature, body and aggregate literal
+limits remain in force. The ordinary Write/WriteBinary APIs and schema-1/2 readers keep
+4 MiB PE/1 MiB envelope bounds. Public NativeAssemblyDefinition.ReadAssembly(JSON)
+retains its 4 MiB input bound; library container reading uses its bounded internal path.
+Older runtimes reject the required schema-3 section. Standalone schema-3 transport
+already existed; this change admits that profile inside the bound PE container.
+
+```csharp
+byte[] image = RuntimeAssemblyContainer.WriteLibraryBinary(builder);
+var declarations = AssemblyDefinition.ReadNativeAssembly(image);
+```
+
+C# tests prove legacy writer rejection, >4 MiB library read/projection/native reimport,
+owned snapshots, over-budget rejection and linked execution. The malformed-schema
+fixture now uses unsupported schema 4, because schema 3 is deliberately supported.
+131 metadata groups pass. The combined-source compiler gate separately proves a
+53-source native library, unchanged broad application and MemoryStream execution.
+No public guest Raven signature changed; the manual development reference covers these
+host C# APIs. No website build or performance claim is part of this change.

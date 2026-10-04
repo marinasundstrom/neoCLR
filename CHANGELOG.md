@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add explicit schema-3 library PE writing and native reading/loading, bounded to
+  16 MiB PE, 8 MiB envelope and 32 MiB host JSON. Preserve schema-1/2 application
+  bounds and declaration/storage limits. Raven libraries select this profile; 53
+  unchanged sources compile together and separate stream/broad consumers execute.
+  A >4 MiB API library also reimports and executes through both API and Raven consumers.
+  Older readers reject required schema 3; use matching compiler/runtime bundles.
+
 - Generate native bootstrap declarations and executable service wrappers from the
   existing checked signature catalog: 20 selected services plus generic erased-value
   helpers. Validate all 22 against the seed and reject unsupported selections. Native

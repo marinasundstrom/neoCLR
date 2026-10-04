@@ -12,7 +12,11 @@ public sealed partial class AssemblyBuilder
     /// <remarks>Supports bounded built-in typed bodies, cross-assembly top-level functions and native-only console output.
     /// Dependencies must be emitted separately and supplied explicitly to the runtime. No PE conversion or external process runs.
     /// This is the current native JSON format, not the experimental NEOX PE transport.</remarks>
-    public byte[] WriteNativeAssembly()
+    public byte[] WriteNativeAssembly() => WriteNativeCore(MetadataArtifactReader.MaxImageSize);
+
+    internal byte[] WriteNativeLibraryAssembly() => WriteNativeCore(32 * 1024 * 1024);
+
+    private byte[] WriteNativeCore(int maxImageSize)
     {
         var methods = ValidateGraph();
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
@@ -300,7 +304,7 @@ public sealed partial class AssemblyBuilder
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray())).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
-        if (result.Length > MetadataArtifactReader.MaxImageSize) throw new InvalidDataException("output image exceeds limit");
+        if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");
         return result;
     }
     private sealed record NativeMethodRow(string name, object? owner, object[] parameters, object[] locals,

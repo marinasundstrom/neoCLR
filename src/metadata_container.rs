@@ -38,8 +38,8 @@ pub fn native_json(image: &[u8]) -> Result<&str, Fault> {
 }
 
 fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
-    if image.len() > 4 * 1024 * 1024 {
-        return Err(invalid("image exceeds 4 MiB limit"));
+    if image.len() > 16 * 1024 * 1024 {
+        return Err(invalid("image exceeds 16 MiB library PE limit"));
     }
     let pe =
         pe::Image::parse(image, pe::Profile::StaticCallsV1).map_err(|e| invalid(&e.to_string()))?;
@@ -131,14 +131,18 @@ fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
         .ok_or_else(|| invalid("required #Neo stream missing"))?;
     let length = u32_at(envelope, 12)?;
     if length < 16
-        || length > 1024 * 1024
+        || length > 8 * 1024 * 1024
         || length > envelope.len()
         || envelope.len() - length > 3
         || envelope[length..].iter().any(|v| *v != 0)
     {
         return Err(invalid("invalid envelope size/padding"));
     }
-    execution_payload(&envelope[..length])
+    let payload = execution_payload_profile(&envelope[..length], true)?;
+    if payload.0 != 3 && image.len() > 4 * 1024 * 1024 {
+        return Err(invalid("legacy image exceeds 4 MiB limit"));
+    }
+    Ok(payload)
 }
 
 // Keep runtime admission within the same unsigned, overlay-free PE32 bounds as the host writer.
@@ -188,6 +192,7 @@ fn validate_layout(image: &[u8]) -> Result<(), Fault> {
     Ok(())
 }
 
+#[cfg(test)]
 fn execution_payload(envelope: &[u8]) -> Result<(u16, &[u8]), Fault> {
     execution_payload_profile(envelope, false)
 }
