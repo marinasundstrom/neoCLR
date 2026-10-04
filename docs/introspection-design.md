@@ -95,8 +95,10 @@ Constructed nominal types retain their definition's classifications. The importe
 preserves CLI Sealed and Raven ClosedHierarchyAttribute independently; nominal union
 markers already used by the runtime are retained for the new query. neoIL `.sealed`
 and `.closedhierarchy` preserve descriptive metadata, with JSON defaults of false
-for older artifacts. They do not themselves enforce inheritance or encode a permits
-list. Known runtime contract families retain their existing importer checks.
+for older artifacts. Closed class families now reject direct extension from another
+assembly/revision; this does not encode a source permits list or add closed-interface
+or general sealed-leaf enforcement. Known runtime contract families retain their
+existing importer checks.
 
 Rebuild the matching bridge, reference and runtime library for the three added
 properties. Runtime Contract configuration is unchanged; private TypeShape selectors

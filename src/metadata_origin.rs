@@ -309,6 +309,7 @@ pub(crate) fn member_access(function: &crate::metadata::Function) -> SourceAcces
             crate::metadata::Visibility::Public => SourceAccess::Public,
             crate::metadata::Visibility::Private => SourceAccess::Private,
             crate::metadata::Visibility::Internal => SourceAccess::Assembly,
+            crate::metadata::Visibility::Protected => SourceAccess::Family,
         })
 }
 
@@ -340,5 +341,6 @@ pub(crate) fn field_access(owner: &crate::metadata::TypeDef, index: usize) -> So
             crate::metadata::Visibility::Public => SourceAccess::Public,
             crate::metadata::Visibility::Private => SourceAccess::Private,
             crate::metadata::Visibility::Internal => SourceAccess::Assembly,
+            crate::metadata::Visibility::Protected => SourceAccess::Family,
         })
 }

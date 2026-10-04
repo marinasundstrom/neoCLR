@@ -483,6 +483,8 @@ pub enum Visibility {
     Public,
     Internal,
     Private,
+    /// Declaring family access; currently supported for instance constructors only.
+    Protected,
 }
 
 impl Visibility {

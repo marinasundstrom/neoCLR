@@ -206,3 +206,8 @@ The Raven driver now executes a local inheritance and base-typed alias mutation 
 on both .NET and neoCLR. The source-built text-stream gate remains passing. JSON still
 requires closed-family and protected-constructor metadata support; broader external
 inheritance is not implied by this development checkpoint.
+
+Development runtime checks now enforce protected base-constructor access by resolved
+family identity, including binary dependencies, and prevent external direct extension
+of a closed class family. The metadata authoring/facade and Raven admission steps
+remain open; this does not yet make the JSON source library compile.

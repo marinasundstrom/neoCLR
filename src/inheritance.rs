@@ -88,6 +88,14 @@ pub(crate) fn field_owner(
 
 pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
     for definition in &module.types {
+        if definition.is_closed_hierarchy
+            && definition.representation == Representation::Record
+            && (!definition.is_reference_type || !definition.is_abstract || definition.is_sealed)
+        {
+            return Err(Fault::new(
+                "closed class hierarchy requires an abstract nonsealed reference type",
+            ));
+        }
         if definition.is_abstract && definition.representation != Representation::Record {
             return Err(Fault::new("abstract applies only to record definitions"));
         }
@@ -110,8 +118,22 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         let chain = lineage(module, &definition.open_type())?;
         fields(module, &definition.open_type())?;
-        for base in chain.iter().skip(1) {
+        for (level, base) in chain.iter().skip(1).enumerate() {
             let parent = module.type_definition(base).unwrap();
+            if level == 0
+                && parent.is_closed_hierarchy
+                && !definition
+                    .definition
+                    .as_ref()
+                    .zip(parent.definition.as_ref())
+                    .is_some_and(|(child, root)| {
+                        child.module == root.module && child.revision == root.revision
+                    })
+            {
+                return Err(Fault::new(
+                    "closed hierarchy cannot be extended outside its defining assembly",
+                ));
+            }
             if module.functions.iter().any(|f| {
                 f.instance
                     && !f.receiver_byref

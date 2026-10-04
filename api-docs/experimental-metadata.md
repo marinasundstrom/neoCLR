@@ -6956,3 +6956,20 @@ C# tests execute both manual and builder definitions on .NET, round-trip native 
 metadata and reject invalid initialization. `--class-base-runtime <runtime> <fresh-dir>`
 executes a generated native PE that returns 42. This does not add virtual methods,
 protected visibility, closed-hierarchy declarations, or external class import.
+
+### Runtime protected constructors and closed class families (2026-10-04)
+
+Runtime `metadata::Visibility::Protected` serializes as `protected` in the native
+method row. It is admitted only for instance `.ctor` methods with a declaring type.
+The verifier and interpreter allow calls from that type or its descendants, using
+resolved definition identities. Unrelated callers and ordinary protected methods,
+fields, module functions or types reject. This addition does **not** yet extend the
+C# `MethodVisibility` authoring enum or the introspection facade.
+
+Native record type rows with `is_closed_hierarchy: true` must describe an abstract,
+nonsealed reference class. Direct children must share the root's defining assembly
+and revision. Descendants through an open local child may be external. The existing
+false default is unchanged; source permits lists remain Raven validation. These
+checks do not add closed-interface or general sealed-leaf enforcement. See the
+[runtime access contract](../docs/accessibility.md) and
+[executable scope](../docs/experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).

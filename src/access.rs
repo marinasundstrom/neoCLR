@@ -21,11 +21,25 @@ pub(crate) fn check_call(
             .as_ref()
             .zip(callee.definition.as_ref())
             .is_some_and(|(a, b)| a.module == b.module && a.revision == b.revision);
+        if callee.visibility == Visibility::Protected {
+            return caller.owner.as_ref().is_some_and(|owner| {
+                crate::inheritance::lineage(module, owner).is_ok_and(|ancestors| {
+                    ancestors.iter().any(|ancestor| {
+                        module
+                            .type_definition(ancestor)
+                            .and_then(|d| d.definition.as_ref())
+                            .zip(declaring_type(module, callee))
+                            .is_some_and(|(a, b)| a == b)
+                    })
+                })
+            });
+        }
         if !same_module {
             return false;
         }
         match callee.visibility {
             Visibility::Public | Visibility::Internal => true,
+            Visibility::Protected => unreachable!("handled above"),
             Visibility::Private => declaring_type(module, caller)
                 .zip(declaring_type(module, callee))
                 .is_some_and(|(a, b)| a == b),
@@ -90,6 +104,7 @@ pub(crate) fn check_field(
     let allowed = match field.visibility {
         Visibility::Public => true,
         Visibility::Internal => same_module,
+        Visibility::Protected => false,
         Visibility::Private => {
             same_module
                 && declaring_type(module, caller)

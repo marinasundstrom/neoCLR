@@ -31,7 +31,7 @@ assembly/package model has not been implemented.
 
 The optional visibility keyword precedes static/instance on a method, or the signature
 on a free function. Omitting it retains public visibility for existing sources and JSON.
-The JSON `visibility` field accepts `public`, `internal`, or `private`; public is omitted
+The JSON `visibility` field accepts `public`, `internal`, `private`, or constructor-only `protected`; public is omitted
 when serializing. Visibility is not part of overload identity or a call operand.
 
 | Visibility | Allowed IL callers |
@@ -39,11 +39,16 @@ when serializing. Visibility is not part of overload identity or a call operand.
 | public | Any otherwise valid caller |
 | internal | Functions in the declaring module and revision |
 | private | Methods of the same declaring type definition and module/revision |
+| protected | Methods of the declaring type or a derived type; currently instance constructors only |
 
 Private requires a declaring type. Use internal for a module-level helper. Private
 scope refers to the generic type definition, so closed instantiations of that definition
-share its private member access; unrelated types do not. No protected, inheritance,
-nested-type, friend-module, or package access rules are introduced.
+share its private member access; unrelated types do not. Protected constructors use
+resolved ancestry and definition identity, including across assembly/revision boundaries.
+Declaring-type visibility and explicit dependencies still apply. Protected ordinary
+methods, fields and types reject explicitly; nested-family, friend-module and package
+access are not implemented. The bounded constructor rule follows CLI family access;
+it does not claim general protected receiver-access support.
 
 ## Enforcement
 

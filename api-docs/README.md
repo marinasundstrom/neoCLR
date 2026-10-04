@@ -985,3 +985,8 @@ The host-only AddClass base overload, definition parity and IL-generator constru
 calls are covered by the [manual reference](experimental-metadata.md#local-class-base-authoring-development-2026-10-04)
 and C# executable tests. They remain outside guest RavenDoc selection. The existing
 stale guest snapshot is unchanged; it is not replaced by a partial library snapshot.
+
+Runtime protected constructor and closed-class validation changes are documented in
+[the experimental reference](experimental-metadata.md#runtime-protected-constructors-and-closed-class-families-2026-10-04).
+They add no guest API signatures or C# authoring APIs; the existing guest snapshot
+is unchanged and its previously recorded refresh blocker remains open.

@@ -791,6 +791,9 @@ fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
                         Some(("internal", rest)) => {
                             (crate::metadata::Visibility::Internal, rest.trim())
                         }
+                        Some(("protected", rest)) => {
+                            (crate::metadata::Visibility::Protected, rest.trim())
+                        }
                         Some(("private", rest)) => {
                             (crate::metadata::Visibility::Private, rest.trim())
                         }

@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-04",
+  "scope": "Runtime prerequisite; C# metadata authoring, facade and Raven admission remain pending",
+  "runtime_parent_revision": "4800295ccd3f825f49fd34d4474b59f89fcf890c",
+  "raven_main_revision": "4f95db536",
+  "raven_integration_docs_revision": "91b2a1c24",
+  "source_sha256": {
+    "src/access.rs": "8f4bde54747d33be4afabe82d7069768f4c722de728bc0c5d89e75989a9c6130",
+    "src/assembler.rs": "cb9b3fb2ca7dfdbb5f3e42a307671b910eb39ddc7b71569b0a807291e9c76ceb",
+    "src/inheritance.rs": "7e98bd66cb2431937bb3b3a3975907f888f7e6e35b4fb2cd911af1dd13cd8bf6",
+    "src/metadata.rs": "0d9bb5ea0947833d5ceddd9d058ea4e3b78dbf90e2caaa631f3e5b58efc34cc6",
+    "src/metadata_origin.rs": "fcbe46e235116eea7bb77e1fc6aaa0477a6715f9fd5fe5da6bcebe294c9b8c10",
+    "src/vm.rs": "55fedf2fe8729949d7fd4a6f7164fa8ce92cb85703f3afb397888a08f102b1a3",
+    "tests/protected_constructors.rs": "78b93845fc275227280325e3f31794af847f67e1663d11ea1a1edea05338d54a"
+  },
+  "validation": {
+    "command": "cargo test --test protected_constructors --test class_constructors --test class_inheritance --test accessibility --test raven_reflection",
+    "protected_constructors": 6,
+    "class_constructors": 8,
+    "class_inheritance": 8,
+    "accessibility": 7,
+    "raven_reflection": "pending"
+  },
+  "raven_main_validation": {
+    "framework": "net11.0",
+    "passed": 148,
+    "failed": 0,
+    "native_backend": false
+  },
+  "outcomes": [
+    "Cross-assembly protected constructor execution returns 42 after binary round trip",
+    "Unrelated protected calls and unsupported protected ordinary methods reject",
+    "Closed roots reject external direct children",
+    "Local closed-family construction executes",
+    "Open local branches retain external extensibility",
+    "Concrete or sealed closed-class roots reject"
+  ],
+  "limitations": [
+    "No general protected members",
+    "No closed-interface or general sealed-leaf enforcement",
+    "No source permits-list encoding",
+    "No completed JSON compilation claim",
+    "No remote push"
+  ]
+}

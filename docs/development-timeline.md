@@ -10750,3 +10750,17 @@ identity properties now fail with RAV0330, independently of writer validation.
   Main has not been merged. [Evidence and remaining scope](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
 - Open: JSON still fails before output at its closed-family signature. Closed/protected
   declarations, broader inheritance and the full class-library gate remain unfinished.
+
+## 2026-10-04 — Integrate compiler fixes, retire branches, then closed families
+
+- **Author:** asked to ensure valid Raven fixes reach main, then continue closed-hierarchy
+  and protected-constructor support; subsequently asked to clean up integrated fix branches.
+- **Assistant action:** fast-forwarded Raven main through the isolated constructor fix and
+  seven remaining independently tested commits. Main is `4f95db536`; 148 focused .NET 11
+  checks passed. Deleted the four integrated local fix branches, retaining detached clean
+  worktrees and leaving native integration/structural experiments separate. No push performed.
+- **Continuation:** implemented runtime-only protected constructor family checks and closed
+  class direct-child ownership checks, with binary cross-assembly execution and denial tests.
+  General protected members, writer/facade/Raven admission and JSON execution remain open.
+- **Evidence:** [hierarchy integration record](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md),
+  `tests/protected_constructors.rs`, Raven `docs/compiler/general-fixes-from-neoclr.md`.

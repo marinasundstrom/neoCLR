@@ -365,7 +365,10 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
     let mut names = HashSet::new();
     let mut type_identities = HashSet::new();
     for def in &module.types {
-        if def.visibility == crate::metadata::Visibility::Private {
+        if !matches!(
+            def.visibility,
+            crate::metadata::Visibility::Public | crate::metadata::Visibility::Internal
+        ) {
             return Err(Fault::new(
                 "types currently support public or internal visibility",
             ));
@@ -471,6 +474,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         let mut fields = HashSet::new();
         for field in &def.fields {
+            if field.visibility == crate::metadata::Visibility::Protected {
+                return Err(Fault::new("protected fields are not supported yet"));
+            }
             if field.deferred && !def.is_reference_type {
                 return Err(Fault::new("deferred fields require a reference type"));
             }
@@ -650,6 +656,15 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             previous = Some(point.instruction);
         }
 
+        if function.visibility == crate::metadata::Visibility::Protected
+            && !(function.instance
+                && function.owner.is_some()
+                && function.name.ends_with("..ctor"))
+        {
+            return Err(Fault::new(
+                "protected visibility currently requires an instance constructor",
+            ));
+        }
         if function.instance && function.owner.is_none() {
             return Err(Fault::new("instance method requires a declaring type"));
         }

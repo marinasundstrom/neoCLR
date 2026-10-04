@@ -50,7 +50,9 @@ local native base relationships in reader/introspection views. Definition/builde
 calls, including inherited field layout. C# tests execute the generated CLI/native PE.
 Raven's ordinary driver now compiles the same local inheritance/mutation consumer for
 .NET and neoCLR, and both execute with return 42. The general constructor binding fix
-is independently validated on a main-based Raven branch. Closed/protected, external
+is integrated into Raven main at `4f95db536` with the other validated independent fixes.
+The runtime now checks protected constructor family access and closed class direct-family
+ownership; metadata authoring/facade and Raven admission remain open. External
 and virtual hierarchy contracts remain open; JSON still rejects its closed-family
 signature before publishing output. Next complete closed-family/protected-constructor
 facts without weakening them to ordinary open/public declarations.

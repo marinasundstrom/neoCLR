@@ -15,7 +15,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   Raven's paired driver now executes forward base declarations and mutation through
   a base-typed alias on both runtimes. Isolate and validate its general constructor
   binding fix on a branch based on main; preserve the source-built text-stream gate.
-  JSON's closed-family/protected-constructor categories remain unsupported.
+  Integrate the validated Raven fixes into main (`4f95db536`, 148 focused .NET tests)
+  and remove four integrated local fix branches. Runtime protected constructors now
+  enforce family access across assembly identities; closed class roots enforce local
+  direct-family ownership. Other protected categories reject explicitly. The new
+  visibility spelling requires an updated runtime reader; previously descriptive closed
+  class flags now require abstract, nonsealed roots and reject external direct children.
+  Metadata authoring/facade and Raven admission remain open, so JSON is not yet supported.
 
 - Materialize local nongeneric native class bases in metadata definitions and the
   introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,

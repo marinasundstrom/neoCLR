@@ -92,3 +92,29 @@ source type/member categories. Next extend those declaration facts through metad
 reader/facade and Raven, preserving closed-family versus CLI sealed-leaf semantics.
 External/constructed bases and class virtual/abstract dispatch remain separate gates;
 this local driver success does not establish those or complete JSON.
+
+## Main integration and runtime access continuation (2026-10-04)
+
+The earlier main status above is historical. Raven main now includes the constructor
+fix and the remaining validated independent fixes at `4f95db536`; 148 combined focused
+.NET 11 regressions passed on its code predecessor `0d3e5376f`. The four integrated
+local fix branches were deleted at the author's request. Their clean worktrees are
+detached, preserving build caches and old commit recovery. No remote push occurred.
+
+The runtime now recognizes `protected` constructor visibility, comparing resolved
+declaring identities along the caller's ancestry. A separate binary dependency's
+protected base constructor executes; an unrelated caller rejects. Other protected
+member/type categories reject explicitly. Existing public/internal/private values and
+metadata defaults are unchanged; older readers may reject the new enum spelling.
+
+A closed class root must be abstract and nonsealed. Its direct children must be in
+the same assembly/revision; external descendants through an open local child remain
+valid. Source-file and explicit-permits checks belong to Raven. This preserves the
+distinction between a closed family and CLI Sealed. No new format version or permits
+list is introduced. Existing closed-interface flags remain descriptive.
+
+This is the runtime prerequisite, not completed writer/importer/Raven admission.
+Metadata definition/builder authoring, reader/facade declaration facts, Raven capability
+admission and the unchanged JSON consumer remain the next gate.
+
+[Runtime source hashes and validation command](protected-runtime-2026-10-04.json).
