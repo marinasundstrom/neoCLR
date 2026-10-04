@@ -1,0 +1,17 @@
+import CharacterContracts.*
+
+func Main() -> int {
+    let text = "é👩‍👩‍👧‍👦"
+    let first = Graphemes.Read(text, 0)
+    if Graphemes.Echo(first).ToString() != "é" {
+        return 1
+    }
+    if Graphemes.Read(text, 1).ToString() != "👩‍👩‍👧‍👦" {
+        return 2
+    }
+    let values = [first, Graphemes.Read(text, 1)]
+    if values[1].ToString() != "👩‍👩‍👧‍👦" || values[0].ToString() != "é" {
+        return 3
+    }
+    return 42
+}

@@ -331,6 +331,10 @@ public sealed partial class AssemblyBuilder
             }
             if (type.ImportedType is { } imported)
             {
+                if (imported.AssemblyIdentity.Equals(CoreLibrary) && imported is { Namespace: "System", Name: "Char", IsValueType: true, GenericArity: 0, DeclaringType: null })
+                {
+                    encoder.Char(); return;
+                }
                 var handle = ImportedTypeHandle(imported);
                 if (imported.TypeArguments.Count == 0) encoder.Type(handle, imported.IsValueType);
                 else

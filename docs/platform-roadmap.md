@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+Grapheme character milestone (2026-10-04): explicit Char signature import, canonical
+CLI encoding and native intrinsic owners allow separate-library character calls and
+String indexing to execute. Raven `2bd39805c` preserves symbol-only emission for core
+Char. Broad native acceptance, paired Duration, seven consumers and 130 C# groups pass.
+Unchanged Date sources now pass binding; next bounded task is discarded propagated
+values in the portable emitter. Array-element receiver addressing is a separate recorded
+gap with a failure-before-publication test. No VM/format change.
+[Evidence](experiments/extended-cli-metadata/characters-2026-10-04.json).
+
 Calendar bootstrap services (2026-10-04): explicit core/seed bindings now execute host
 culture lookup, local-time conversion and grapheme-count String.Length. The existing
 value-array-to-reference-array adapter preserves nominal array ownership; Unicode,

@@ -1,0 +1,6 @@
+namespace CharacterContracts
+
+public static class Graphemes {
+    public static func Echo(value: char) -> char => value
+    public static func Read(text: string, index: int) -> char => text[index]
+}

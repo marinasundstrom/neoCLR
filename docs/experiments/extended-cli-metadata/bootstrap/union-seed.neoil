@@ -6,9 +6,6 @@
 .type System.Void
 .sealed
 .end
-.type System.Char
-.sealed
-.end
 .type System.RuntimeTypeHandle
 .sealed
 .end
@@ -37,6 +34,12 @@ ret
 .end
 .type System.String
 .sealed
+.method instance get_Item(Int32 index) -> Char
+ldarg 0
+ldarg 1
+call neoCLR.Runtime.StringGraphemeAt(String,Int32)
+ret
+.end
 .method instance get_Length() -> Int32
 ldarg 0
 call neoCLR.Runtime.StringGraphemeCount(String)
@@ -134,5 +137,21 @@ ret
 .end
 
 .function neoCLR.Runtime.StringGraphemeCount(String value) -> Int32
+.methodimpl InternalCall
+.end
+
+.type System.Char
+.sealed
+.method instance readonly byref ToString() -> String
+ldarg 0
+ldobj Char
+call neoCLR.Runtime.CharText(Char)
+ret
+.end
+.end
+.function neoCLR.Runtime.StringGraphemeAt(String value,Int32 index) -> Char
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharText(Char value) -> String
 .methodimpl InternalCall
 .end

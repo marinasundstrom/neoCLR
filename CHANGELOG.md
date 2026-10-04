@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Decode and emit canonical CLI Char signatures while preserving native grapheme
+  storage and intrinsic call owners through explicit core bindings. Native character
+  signatures round-trip through materialization, reimport and declaration projection.
+  Separate-library grapheme execution, broad gate, paired Duration, seven consumers and
+  130 C# groups pass. Date now reaches discard-assignment emission; array-element
+  receiver addresses remain unsupported. No runtime/format change; guest API snapshot stale.
+
 - Connect the explicit calendar bootstrap to existing host culture/local-time services
   and grapheme-count String.Length. Convert service value arrays into fresh nominal
   reference arrays with the established adapter. Native service/Unicode/fault checks,

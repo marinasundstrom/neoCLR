@@ -126,6 +126,20 @@ def main():
                 exit_code, expected_stdout)
             sample_paths.extend([source, app])
         if args.calendar_foundation:
+            character_source = HERE / 'character-library.rvn'
+            character_consumer = HERE / 'character-consumer.rvn'
+            character_library = output / 'CharacterContracts.dll'
+            character_app = output / 'Characters.dll'
+            run(common + ['--library', '--reference', str(library), '-o', str(character_library), str(character_source)])
+            run(common + ['--reference', str(library), '--reference', str(character_library), '-o', str(character_app), str(character_consumer)])
+            for command, expected in [('verify', 0), ('run', 42)]:
+                run([runtime, command, str(character_app), '--module', str(library), '--module', str(character_library), '--system', str(seed)], expected)
+            array_receiver_source = HERE / 'character-array-receiver-unsupported.rvn'
+            array_receiver_app = output / 'UnsupportedCharacterArrayReceiver.dll'
+            failure = run(common + ['--reference', str(library), '--reference', str(character_library), '-o', str(array_receiver_app), str(array_receiver_source)], 1)
+            if array_receiver_app.exists() or 'value receiver requires addressable storage' not in failure.stderr:
+                raise RuntimeError('Unsupported array element address did not reject before publication')
+            sample_paths.extend([character_source, character_consumer, character_library, character_app, array_receiver_source])
             range_source = HERE / 'calendar-services-out-of-range.rvn'
             range_app = output / 'CalendarOutOfRange.dll'
             run(common + ['--reference', str(library), '-o', str(range_app), str(range_source)])

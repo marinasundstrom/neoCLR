@@ -34,6 +34,7 @@ public sealed partial class MethodBuilder
     internal bool IsCoreObjectHash { get; set; }
     internal bool NativeValueOverride { get; set; }
     internal string? NativeImportName { get; set; }
+    internal bool NativeImportCharOwner { get; set; }
     internal PrimitiveType? NativeImportPrimitiveOwner { get; set; }
     internal bool NativeImportIsNamespaceFunction { get; set; }
     internal bool DiscardNativeImportResult { get; set; }
@@ -119,14 +120,16 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         name = (name.Length == 0 ? "" : name + ".") + definition.Name;
         var parameters = target.Signature.ParameterTypes.Select(TypeKey).ToArray();
         var ownerName = TypeName(owner);
-        var ownerKey = intrinsicPrimitiveOwner ? owner.Name : owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
+        var intrinsicCharOwner = reference.Identity.Equals(core) && Library.ModuleName == "System" &&
+            owner is { Namespace: "System", Name: "Char", IsValueType: true, GenericArity: 0, DeclaringType: null };
+        var ownerKey = intrinsicCharOwner ? "Char" : intrinsicPrimitiveOwner ? owner.Name : owner.GenericArity == 0 ? "Named(" + ownerName + ")" : "Constructed(" + ownerName + ";" + string.Join(",", Enumerable.Range(0, owner.GenericArity).Select(i => "TypeParameter(" + i + ")")) + ")";
         var matches = Library.Declarations.GetProperty("functions").EnumerateArray().Where(f =>
             f.GetProperty("name").GetString() == name && f.TryGetProperty("owner", out var nativeOwner) && (namespaceContainer ? nativeOwner.ValueKind == JsonValueKind.Null : TypeKey(nativeOwner) == ownerKey) && Flag(f, "instance") == !definition.IsStatic &&
             Count(f, "generic_parameters") == definition.GenericArity &&
             f.GetProperty("parameters").EnumerateArray().Select(TypeKey).SequenceEqual(parameters)).Take(2).ToArray();
         if (matches.Length != 1) throw new InvalidDataException("native method missing or ambiguous: " + name);
         var function = matches[0];
-        if (intrinsicPrimitiveOwner && (Flag(function, "is_virtual") || Flag(function, "is_abstract")))
+        if ((intrinsicPrimitiveOwner || intrinsicCharOwner) && (Flag(function, "is_virtual") || Flag(function, "is_abstract")))
             throw new InvalidDataException("primitive bootstrap member must be concrete and nonvirtual: " + name);
         if (!NativeLibraryDefinition.IsPublic(function) || (Flag(function, "is_abstract") || (owner.Attributes & 0x20) != 0) != ((definition.Attributes & 0x400) != 0) || (owner.Attributes & 0x20) != 0 && Count(function, "body") != 0)
             throw new InvalidDataException("native method visibility/body contract mismatch: " + name);
@@ -137,6 +140,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var actualOutputs = Indices(function, "out_parameters").Concat(Indices(function, "out_when_true")).Distinct().Order();
         if (!actualOutputs.SequenceEqual(target.Signature.OutParameters.Order())) throw new InvalidDataException("native output contract mismatch: " + name);
         target.NativeImportName = name;
+        target.NativeImportCharOwner = intrinsicCharOwner;
         target.NativeImportPrimitiveOwner = intrinsicPrimitiveOwner ? owner.Name switch { "String" => PrimitiveType.String, "Int64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 } : null;
         target.NativeImportIsNamespaceFunction = namespaceContainer;
         target.DiscardNativeImportResult = target.Signature.ReturnType.Primitive == PrimitiveType.Void && !Flag(function, "no_result");
