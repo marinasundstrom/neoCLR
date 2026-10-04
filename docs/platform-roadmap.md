@@ -8,47 +8,29 @@ compilation, replacing API-by-API progression. Follow the
 and [fresh audit](experiments/extended-cli-metadata/system-compilation-audit-2026-10-04.json).
 Earlier chronological next-step notes below are historical where they conflict.
 
-Current batch: inhabited-unit, erased Value and the first checked service-catalog
-profile execute through separate native libraries (including UTF-8, file I/O and a
-worker callback). The bounded library PE transport gap and same-compilation Array<T> lookup cache
-blocker are closed for the 57-source combined gate, including UTF-8 and file streams.
-[Execution evidence](experiments/extended-cli-metadata/combined-library-array-2026-10-04.json).
-The no-result scheduling callback and ordinary Int32 enum subgates now execute;
-[paired enum evidence](experiments/extended-cli-metadata/enum-dual-2026-10-04.json).
-Source-owned queue ABI ownership and all six Tasks/Concurrency sources now execute
-through an artifact-only consumer; see [task gate](experiments/extended-cli-metadata/bootstrap/README.md#source-built-tasks-and-concurrency-2026-10-04).
-Full async frontend lowering is not established by this gate. See the strategy's updated
-audit for remaining first failures; the service catalog is intentionally partial. The full 166-source build
-stops in binding; 178 distinct service names appear across 48 files and the erased-value
-operations each span 23 files. These are potential reach counts, not guaranteed unlocks.
-The native Self declaration/import/conformance subgate now executes actual Clonable
-through three separately compiled assemblies; [evidence](experiments/extended-cli-metadata/self-native-2026-10-04.json).
-Constrained Self dispatch and static Number contracts remain open. The checked parser
-family and actual Boolean source library now execute separately; [evidence](experiments/extended-cli-metadata/parsing-native-2026-10-04.json).
-The resulting shared primitive-core selection fix is independently validated on Raven main.
-Source nominal APIs do not yet replace the canonical primitive bootstrap.
-The metadata writer now admits Single/Double and executes an API-authored arithmetic,
-NaN and signed-zero program on both runtimes. Raven now compiles a separate floating
-library and imports its artifacts on both targets, with native parsing payload execution;
-[evidence](experiments/extended-cli-metadata/floating-dual-2026-10-04.json).
-The author subsequently clarified that the active story covers the entire numeric
-family and Number interface, not just arithmetic emission. Static Number declaration,
-import and direct implementation calls now execute; intrinsic primitive ownership and
-generic Self dispatch remain open. All fixed-width integer signatures and unsigned
-instruction selection now execute through a separate library/consumer on both targets;
-[integer evidence](experiments/extended-cli-metadata/integer-dual-2026-10-04.json).
-The metadata API also authors and imports explicit native numeric scalar declarations;
-its separate API library/consumer executes managed-receiver mutation. Raven primitive
-ownership and generic dispatch remain open. See the strategy's Number integration checkpoint.
-Follow with numeric/inheritance emission, canonical source-owned core,
-callback/storage/generic coverage and typeof/introspection integration, re-ranking from
-the first independently reproduced failures. Design ownership alongside the service
-catalog. Individual time-zone wrappers are deferred behind common service support.
+Current checkpoint: the Number numeric-family story is complete, including all ten
+source implementations and separate generic-library/consumer execution. The cumulative
+70-source numeric library compiles in the fresh [post-Number audit](experiments/extended-cli-metadata/system-post-number-audit-2026-10-04.json).
+Earlier Number/Self/numeric prerequisite notes below are historical.
 
-The current 48-source native execution gate remains a regression baseline, not a
-percentage-complete claim. Track binding, emission/verification, reimport and execution
-separately. Ordinary .NET controls remain required; no broad backend rewrite, speculative
-async prerequisite or metadata format fork is authorized by this assessment.
+Immediate priority is a newly isolated source-order binding defect: prepending an
+empty source file makes the accepted library reject ArrayList<byte> as List<byte>;
+the baseline and an appended Self probe succeed. Fix and independently validate this
+before expanding source combinations. Do not work around it by imposing input order.
+
+Then prioritize source-owned String/Char and coherent text-service bindings (shared
+by text, stream, storage and JSON sources), ordinary cross-assembly class inheritance,
+and the metadata-handle/introspection cluster. Expand remaining service families and
+callback/storage/generic support from demonstrated failures. See the strategy's
+[current reassessment](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04)
+for bounded gates and ordering.
+
+The full 166-source attempt still stops in binding; its 141 distinct missing runtime
+service members measure the selected bootstrap's coverage, not missing runtime
+implementations. The audit adds compilation evidence only. Preserve existing native
+execution gates and ordinary .NET controls; full rebuilt-library dual-target parity
+remains open. No backend rewrite, format fork, speculative async prerequisite or
+performance claim follows from this assessment.
 
 
 Fixed-offset milestone (2026-10-04): unchanged TimeOffset joins the 48-source --offsets

@@ -20,13 +20,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('compiler', 'core', 'seed', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--ownership', type=Path, default=HERE / 'bootstrap/offset-ownership.json')
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
     files = sorted((ROOT / 'runtime/raven/src/System').rglob('*.rvn'))
     relative = lambda p: str(p.relative_to(ROOT))
     source = {relative(p): p.read_text() for p in files}
-    manifest = HERE / 'bootstrap/offset-ownership.json'
-    baseline = json.loads(manifest.read_text())['libraries'][0]['sources']
+    manifest = args.ownership.resolve()
+    library = json.loads(manifest.read_text())['libraries'][0]
+    baseline = [relative(Path(p)) if Path(p).is_absolute() else p for p in library['sources']]
     prefix = 'runtime/raven/src/System/'
     names = lambda *xs: [prefix + x + '.rvn' for x in xs]
     folder = lambda name: [p for p in source if p.startswith(prefix + name + '/')]
@@ -35,6 +37,7 @@ def main():
                        'Single', 'Double', 'IntPtr', 'UIntPtr', 'RuntimeTypeHandle',
                        'Runtime/CompilerServices/UnionAttribute')
     cases = {
+        'accepted-baseline': [],
         'full-source': list(source),
         'nonprimitive-source': [p for p in source if p not in primitives],
         'memory-stream': names('IO/InputStream', 'IO/OutputStream', 'IO/SeekableStream', 'IO/StreamError', 'IO/MemoryStream'),
@@ -68,7 +71,7 @@ def main():
         selected = sorted(set(baseline + additions))
         directory = args.output / name
         directory.mkdir()
-        artifact = directory / 'NeoCLR.Collections.dll'
+        artifact = directory / (library['assemblyName'] + '.dll')
         command = common + ['-o', str(artifact)] + selected
         try:
             result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
@@ -105,7 +108,7 @@ def main():
                 features[name].append(path)
     revision = lambda path: subprocess.check_output(['git', '-C', str(path), 'rev-parse', 'HEAD'], text=True).strip()
     data = dict(
-        methodology='Frontier audit only. Unchanged source sets over the accepted 48-source baseline; current core/seed. Lexical caller counts are potential reach, not guaranteed unlock counts. Binding failures mask emission/runtime failures. No failed compilation is executed. Family sets are not final ownership manifests.',
+        methodology='Frontier audit only. Unchanged source sets over the explicitly selected ownership baseline; current core/seed. Lexical caller counts are potential reach, not guaranteed unlock counts. Binding failures mask emission/runtime failures. No failed compilation is executed. Family sets are not final ownership manifests.',
         runtimeRevision=revision(ROOT), compilerRevision=revision(args.compiler.parent),
         sourceCount=len(files), baselineCount=len(baseline), probes=probes,
         inputs=[dict(path=str(p), sha256=hashlib.sha256(p.read_bytes()).hexdigest())

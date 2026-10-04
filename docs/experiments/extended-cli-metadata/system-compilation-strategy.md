@@ -4,6 +4,61 @@ Author-directed reprioritization, 2026-10-04. This supersedes the API-by-API
 time-zone continuation in earlier roadmap entries. Individual APIs are acceptance
 consumers of shared capabilities, not the unit of prioritization.
 
+## Current reassessment after Number (2026-10-04)
+
+This section supersedes the original priority table and intermediate checkpoints below.
+The [post-Number audit](system-post-number-audit-2026-10-04.json) uses compiler
+073718ac4 (implementation 41b2573fa), metadata/runtime repository ea7fdf77 and the
+proven numeric ownership profile. The accepted 70-source baseline compiles again.
+Reuse the existing Number execution evidence; this audit adds compilation evidence,
+not another execution or full dual-target gate.
+
+**Immediate blocker: source-order-dependent generic interface binding.** Prepending
+an empty file (`// No declarations.`) to the accepted source set produces two RAV1504
+errors assigning ArrayList<byte> to List<byte> in MemoryStream. The same baseline
+without that file succeeds; appending the Self probe succeeds. Sequential controls
+reproduce the difference. This isolates a compiler binding/identity investigation;
+it does not yet identify the defective cache or prove a general .NET regression.
+Do not fix this by sorting production inputs or rewriting MemoryStream. Reduce it,
+fix the owning layer and validate/backport independently on main if applicable.
+
+The full 166-source attempt stops in binding with 416 diagnostics, including 279
+missing-member diagnostics and 141 distinct missing RuntimeServices member names.
+These are cascades and incomplete bootstrap coverage, not 416 compiler defects or
+141 missing runtime implementations. Inspect existing native implementations and
+catalog bindings before adding any implementation. The earlier offset-profile audit
+is unsuitable for the new numeric seed: it lacks numeric ownership and Self setup.
+The audit tool now accepts an explicit ownership profile, derives the output identity
+from it, and includes an accepted-baseline control.
+
+| Priority | Capability batch | Reach and bounded acceptance gate |
+|---|---|---|
+| 0 | Stable canonical primitive/generic interface binding | Fix the empty-file/order reproduction first. Compile the cumulative library with reordered inputs and combine it with Tasks/Concurrency; execute artifact-only numeric, collection and task consumers. Preserve ordinary .NET controls. |
+| 1 | Source-owned String/Char and coherent text-service bindings | SliceUtf8 is a direct missing dependency in encodings, StreamReader, FileSystem and JsonDocument. Build the real sources with explicit intrinsic ownership/storage, reuse existing native text services through the checked catalog, then execute separate text/stream consumers. Include nominal API reimport and UTF-8 behavior; do not turn bootstrap declarations into fake implementations. |
+| 2 | Ordinary class inheritance across assemblies | Enable base construction, inherited state, overrides and virtual dispatch through existing CLI-compatible metadata and explicit adapters. Test base/derived/consumer assemblies on both targets, then revisit JSON value and introspection descriptor sources. Current combined probes are masked by priority 0; source declaration validity is a separate concern. |
+| 3 | Metadata handles and introspection service contracts | Unblock the introspection cluster and JSON object mapping with explicit dependency resolution, canonical type identity and typeof/handle operations. Keep the C# metadata facade and Raven runtime APIs separate; use real services, not runtime-reflection objects in the importer/emitter boundary. |
+| 4 | Remaining service families and demonstrated callback/storage gaps | Expand storage/network services by common signature category. Reduce mutable-capture, array-address or broader generic failures only when reached by these families; test mutation, retained callbacks and identity. Do not implement every possible generic constraint first. |
+
+Priority 1 is the next large feature story after the stability fix. Priority 2 can be
+isolated without waiting for all text services. JSON should first exercise its document/
+value layer before making all object-mapping/introspection services a prerequisite.
+Network/HTTP follows the common services and storage/callback contracts it actually
+requires. Re-rank from newly exposed first failures after each batch.
+
+Number, numeric widths, floating emission, method-parameter Number dispatch, basic
+Self, enums, inhabited unit and the existing task gate are completed bounded gates;
+masked probes do not reopen them. They do not establish full source-owned Object,
+String, Char, handles, wider inheritance or all generic constraints. The native broad
+application already has execution evidence; the entire rebuilt library and equivalent
+broad .NET source-library execution remain unproved. Keep focused .NET controls and
+paired acceptance checks throughout, without replacing its Reflection/Emit backend.
+
+Reproduce with audit_system_compilation.py --compiler ... --core ... --seed ...
+--ownership <numeric-gate>/ownership.json --output <fresh-directory>, after generating
+the matching artifacts with bootstrap/verify_native_numbers.py. All identities, hashes,
+commands, control source text and first diagnostics are in the linked audit. Failed
+family attempts published no artifacts. Existing output paths must not be reused.
+
 ## Evidence and limits
 
 The fresh [audit](system-compilation-audit-2026-10-04.json) covers all 166 Raven source

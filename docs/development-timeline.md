@@ -10661,3 +10661,17 @@ identity properties now fail with RAV0330, independently of writer validation.
 - **Remaining scope:** this is completion of the bounded Number story, not the entire
   runtime library or all generic constraint forms. The previously stale guest API
   snapshot remains recorded; the experimental host API manual is updated.
+
+
+## 2026-10-04 — Reassess the highest-unlock work after Number
+
+- Author asked: “Re-assess what is left and what is next. Following the same objectives. The fixes that unlocks the most.”
+- Assistant reran the source frontier using the proven numeric ownership profile. The
+  70-source baseline compiles, while adding an empty first source file reproducibly
+  causes ArrayList<byte>/List<byte> binding failures. The owning compiler defect is
+  not yet identified or fixed.
+- Assistant recommends repairing this composition stability issue first, then source-owned
+  String/Char and shared text services, cross-assembly inheritance and introspection.
+  The full library remains blocked in binding; previous Number execution stays valid.
+- Roadmap and strategy now distinguish completed numeric prerequisites from open work.
+  See [assessment and evidence](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04).
