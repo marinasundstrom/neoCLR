@@ -13,6 +13,7 @@ public sealed partial class MethodDefinition
     internal MethodDefinition(ModuleDefinition module, AssemblyDefinition.MethodRow row)
     {
         Module = module;
+        loadedInterfaceConstraints = row.InterfaceConstraints ?? [];
         MetadataToken = row.Token;
         Name = row.Name;
         declarationAttributes = row.Attributes;

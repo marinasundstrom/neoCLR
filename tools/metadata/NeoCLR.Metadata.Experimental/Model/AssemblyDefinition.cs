@@ -218,12 +218,32 @@ public sealed partial class AssemblyDefinition
                     if (parameterCount < 0 || names.Keys.Any(index => index >= parameterCount))
                         throw new InvalidDataException("parameter name outside method signature");
                 }
+                var methodBounds = new List<MethodConstraintRow>();
+                bool unsupportedMethodBounds = false;
+                foreach (var parameterHandle in method.GetGenericParameters())
+                {
+                    var parameter = reader.GetGenericParameter(parameterHandle);
+                    foreach (var constraintHandle in parameter.GetConstraints())
+                    {
+                        var bound = reader.GetGenericParameterConstraint(constraintHandle).Type;
+                        if (bound.Kind != HandleKind.TypeDefinition ||
+                            (reader.GetTypeDefinition((TypeDefinitionHandle)bound).Attributes & System.Reflection.TypeAttributes.Interface) == 0 ||
+                            reader.GetTypeDefinition((TypeDefinitionHandle)bound).GetGenericParameters().Count != 0)
+                            unsupportedMethodBounds = true;
+                        else
+                        {
+                            var row = new MethodConstraintRow(parameter.Index, (uint)MetadataTokens.GetToken(bound));
+                            if (methodBounds.Contains(row)) throw new InvalidDataException("duplicate method interface constraint");
+                            methodBounds.Add(row);
+                        }
+                    }
+                }
                 methods.Add(new((uint)MetadataTokens.GetToken(handle), global ? 0 : declaring, ReadName(method.Name),
                     (ushort)method.Attributes, (ushort)method.ImplAttributes, method.GetGenericParameters().Count,
                     reader.GetBlobBytes(method.Signature),
-                    method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0 || p.GetConstraints().Count != 0).Any(),
+                    unsupportedMethodBounds || method.GetGenericParameters().Select(reader.GetGenericParameter).Where((p, i) => p.Index != i || p.Attributes != 0).Any(),
                     method.GetParameters().Select(reader.GetParameter).Where(p => p.SequenceNumber > 0 && (p.Attributes & System.Reflection.ParameterAttributes.Out) != 0).Select(p => p.SequenceNumber - 1).ToArray(),
-                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names));
+                    UnsupportedParameterModes: method.GetParameters().Select(reader.GetParameter).Any(p => (p.Attributes & System.Reflection.ParameterAttributes.In) != 0), ParameterNames: names, InterfaceConstraints: methodBounds.ToArray()));
             }
             var properties = new List<PropertyRow>();
             var methodRows = methods.ToDictionary(m => m.Token);
@@ -313,7 +333,8 @@ public sealed partial class AssemblyDefinition
     {
         internal MethodSignature Materialize(ModuleDefinition module) => new(Result.Materialize(module), Parameters.Select(p => p.Materialize(module)), GenericNames, OutParameters);
     }
-    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null);
+    internal sealed record MethodConstraintRow(int Parameter, uint Interface);
+    internal sealed record MethodRow(uint Token, uint DeclaringToken, string Name, ushort Attributes, ushort ImplementationAttributes, int Arity, byte[] Signature, bool UnsupportedGenericParameters, int[] OutParameters, NativeMethodSignatureRow? NativeSignature = null, string? NativeNamespace = null, bool UnsupportedParameterModes = false, IReadOnlyDictionary<int, string>? ParameterNames = null, MethodConstraintRow[]? InterfaceConstraints = null);
     internal sealed record TypeReferenceRow(uint Token, string Namespace, string Name, uint Scope);
     internal sealed record ReferenceRow(uint Token, AssemblyIdentity Identity);
     internal sealed record TypeRow(uint Token, string Namespace, string Name, int Arity, uint DeclaringToken, uint Attributes, bool CanImportReference, bool IsValueType, AssemblyIdentity? ValueTypeCore, NativeSignatureTypeRow[]? NativeInterfaces = null, string[]? NativeGenericNames = null, bool IsEnum = false, PrimitiveType? NativePrimitive = null);

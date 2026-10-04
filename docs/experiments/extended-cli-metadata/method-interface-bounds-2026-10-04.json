@@ -1,0 +1,47 @@
+{
+  "scope": "Owned nongeneric method interface bounds: metadata preservation and Raven binding; open constrained emission remains unsupported.",
+  "metadataBaseRevision": "381665ba6f604938bdfae131af4377e11d838932",
+  "ravenBaseRevision": "3787f15fb2c7c848d2ea4ba1248bed8d9221d710",
+  "metadataTests": "139/139",
+  "nativeProbe": "NativeMethodBounds binding and failure-before-publication checks; seven existing native consumers execute",
+  "nativeProbeCommand": "dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --native-symbols-runtime /tmp/neoclr-fail-reference-20261002/NeoCLR.CoreProbe.dll /Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr /tmp/ParseSystem1004.neox /tmp/FRESH",
+  "apiSnapshot": "Known stale snapshot; --check fails. C# manual updated; no guest API changes.",
+  "commands": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/method-bounds1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_0A9D0367AC2BB50E883E81914554FA20D3BE8ACB803BDD1AD42D9D7111ED8DDA: typed-stack/control-flow verification passed (59 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/method-bounds1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/tmp/method-bounds1004.neox": "71219430a1ab65f64a928a9192979cbb1456418aecc086f3939f1c04ee6d3891",
+    "/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/tmp/neoclr-fail-reference-20261002/NeoCLR.CoreProbe.dll": "b7f2b143be11b25fbb91441adc988eb0f2b8dd0a4b9e49f9f8760bae22297eab",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "7a36146da256897652ad7d31da961f566fd47914449e95464c0cb19206fd1a43",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "cdf75a39b05e6d1c8ad182ec4b57ce569f8f7b50bd3038d52f01b1b806c49181",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/GenericMethodConstraint.cs": "6bb76722e3a3e30d915c851793a81e63819c45e478a033788f627ba40b3f0dd9",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/GenericMethodConstraintChecks.cs": "d71e09e55123e5d69fd5ee626050270dbf19d6402f9ea02b432e54f08f9fb5e3",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeTypeParameterSymbol.cs": "da041e427acbb7b481d5e5e1e14cbbed30ec2a40dec55a3e50ddd7fa24f61fc1",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.CodeAnalysis.NeoClr/NativeAssemblySymbol.cs": "d30a83aede45a5ffb4749e9850a0c1218f782d8d4468d05d5e38735ae252f0cc",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/tools/NeoClrMetadataProbe/NativeGenericSymbolChecks.cs": "cf86cc62b39dd960bc0aeae8d2196e8e702a949f183057ef57330e12b6edbfcb"
+  }
+}

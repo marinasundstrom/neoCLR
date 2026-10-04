@@ -111,6 +111,10 @@ public sealed class MethodGenericParameterTypeInfo : TypeInfo
     public MethodInfo DeclaringMethod { get; }
     /// <summary>Gets its zero-based method scope ordinal.</summary>
     public int Position { get; }
+    /// <summary>Resolves the owned nongeneric interface bounds for this method parameter.</summary>
+    /// <remarks>Inference, language conversions and generic argument admission belong to the caller.</remarks>
+    public IReadOnlyList<NominalTypeInfo> GetInterfaceConstraints() => Array.AsReadOnly(DeclaringMethod.Definition.InterfaceConstraints
+        .Where(c => c.ParameterIndex == Position).Select(c => Context.GetType(c.InterfaceType)).ToArray());
     /// <inheritdoc/>
     public override string DisplayName => "!!" + Position;
     /// <inheritdoc/>

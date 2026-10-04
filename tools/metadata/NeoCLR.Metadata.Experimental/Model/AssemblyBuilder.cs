@@ -118,6 +118,9 @@ public sealed partial class AssemblyBuilder
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
+                foreach (var bound in method.InterfaceConstraints)
+                    if (!ReferenceEquals(bound.InterfaceType.Module, Definition.MainModule) || bound.InterfaceType.Producer is not { IsInterface: true, GenericParameterNames.Count: 0 })
+                        throw new InvalidDataException("invalid method interface bound owner");
                 foreach (var local in method.Locals) local.SignatureType.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 foreach (var instruction in method.Instructions)
                 {
@@ -128,10 +131,14 @@ public sealed partial class AssemblyBuilder
                     if (instruction.ConstructedTarget is { } target)
                     {
                         target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments, complete: true);
+                        target.Definition.ValidateMethodArguments(target.MethodArguments);
                         foreach (var argument in target.DeclaringTypeArguments.Concat(target.MethodArguments)) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                     }
                     if (instruction.GenericTarget is { } generic)
+                    {
+                        generic.Definition.ValidateMethodArguments(generic.TypeArguments);
                         foreach (var argument in generic.TypeArguments) argument.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
+                    }
                     if (instruction.ConstructedField is { } field) ((SignatureType)field.DeclaringType).ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                     instruction.Type?.ValidateOwner(this, method.Signature.GenericParameterNames.Count, arity, complete: true);
                 }
@@ -748,6 +755,9 @@ public sealed partial class AssemblyBuilder
                     foreach (var constraint in owner.GenericConstraints.Where(c => c.ParameterIndex == i))
                         metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.BaseType]);
                 }
+                else
+                    foreach (var constraint in methods[MetadataTokens.GetRowNumber(row.Owner) - 1].InterfaceConstraints.Where(c => c.ParameterIndex == i))
+                        metadata.AddGenericParameterConstraint(parameter, typeHandles[constraint.InterfaceType.Producer!]);
             }
         var builder = new ManagedPEBuilder(new PEHeaderBuilder(fileAlignment: 4096, sectionAlignment: 4096,
                 imageCharacteristics: Characteristics.ExecutableImage | Characteristics.LargeAddressAware | (EntryPoint is null ? Characteristics.Dll : 0)),

@@ -1228,7 +1228,9 @@ Single/Double Number implementations through explicit scalar ownership; see the
 [checkpoint](experiments/extended-cli-metadata/system-compilation-strategy.md#source-floating-primitive-ownership-2026-10-04).
 The subsequent cumulative source-library rebuild executes all ten numeric types with
 seed ownership removed. The metadata generator now executes concrete static constrained interface calls on
-both targets; method-level bounds and generic Number lowering remain unfinished.
+both targets. Owned nongeneric method interface bounds now round-trip and import into
+Raven symbols; external bounds, open constrained calls and generic Number lowering remain
+unfinished. See the method-bound checkpoint in the system compilation strategy.
 The next bounded interface slice adds application defaults and public/private static
 helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
 The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)

@@ -1,6 +1,6 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable instantiation of an owned unconstrained generic method or function.</summary>
+/// <summary>An immutable instantiation of an owned generic method or function.</summary>
 public sealed class GenericMethodInstance
 {
     internal GenericMethodInstance(MethodBuilder definition, SignatureType[] arguments)
@@ -34,6 +34,7 @@ public sealed partial class MethodBuilder
             typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void))
             throw new ArgumentException("generic type arguments must match the definition", nameof(typeArguments));
         foreach (var type in typeArguments) type.ValidateOwner(Assembly, 32, 32);
+        ValidateMethodArguments(typeArguments);
         return new(this, (SignatureType[])typeArguments.Clone());
     }
     /// <summary>Appends a call to an instantiated generic method in this output.</summary>

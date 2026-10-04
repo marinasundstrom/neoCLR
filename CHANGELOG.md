@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Preserve owned nongeneric interface bounds on method type parameters through
+  definitions/builders, standard CLI constraints, native metadata and introspection.
+  Validate concrete local generic arguments and recheck after graph edits. Raven
+  imports these bounds for semantic checks. Open constrained calls and imported
+  bounded-method emission remain unsupported; generic Number execution is not complete.
+
 - Record a future function-type constraint using Raven’s proposed `where F: func`
   spelling. Signature requirements, metadata encoding and .NET target behavior
   remain design questions; this does not add compiler or runtime support.

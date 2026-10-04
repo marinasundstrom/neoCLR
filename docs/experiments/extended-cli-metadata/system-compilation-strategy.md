@@ -523,3 +523,20 @@ Compiler implementation remains Raven `d92e2bdc9`; matching compiler direction n
 is `3787f15fb`. This metadata slice is based on neoCLR `907ccff7`. No compiler fix or
 main backport is claimed. The guest API snapshot check still reports its known stale
 state; the C# development API manual covers the changed generator contract.
+
+
+### Method-bound preservation checkpoint (2026-10-04)
+
+Owned nongeneric method interface bounds now survive builder/definition authoring,
+standard CLI GenericParamConstraint rows, native function TypeBound records, snapshots
+and introspection. Raven obtains canonical constraint symbols through the facade,
+including inherited interfaces, and its existing binder rejects incompatible arguments.
+The focused probe also confirms constrained-call emission fails before publishing bytes.
+No importer objects are reused by the emitter and no Reflection/Emit behavior changes.
+
+C# validation covers CLI execution and native/legacy projection round trips. The
+API-generated native bounded method verifies and returns 42; seven existing native
+consumers still execute. See method-interface-bounds-2026-10-04.json. The next bounded
+work is external interface bound identity, then open constrained-call operands and
+semantic authoring in Raven's emitter. Keep its constrained callable rejection until
+these contracts are complete; this checkpoint does not claim generic Number execution.

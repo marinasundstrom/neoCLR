@@ -6592,3 +6592,44 @@ native ordinary/Self artifacts via `NEOCLR_STATIC_ARTIFACT` (the Self image appe
 `.self.neox`). Both native artifacts return 42. This is a metadata-generator capability,
 not yet support for generic Number-constrained Raven programs. No schema or runtime
 instruction change is introduced.
+
+
+### Method interface bounds (development, 2026-10-04)
+
+`Model.GenericMethodInterfaceConstraint(int ParameterIndex, TypeDefinition InterfaceType)`
+records a zero-based method type parameter ordinal and its owned nongeneric interface.
+`MethodDefinition.InterfaceConstraints` and `MethodBuilder.InterfaceConstraints` expose
+read-only lists of these records. Define bounds using:
+
+```csharp
+void MethodDefinition.AddInterfaceConstraint(int parameterIndex, TypeDefinition interfaceType);
+void MethodBuilder.AddInterfaceConstraint(int parameterIndex, TypeBuilder interfaceType);
+```
+
+The builder delegates to the canonical definition. Detached definitions may be attached
+later; writing revalidates module ownership. A null interface throws ArgumentNullException;
+invalid ordinal, duplicate, foreign attached owner, noninterface, generic interface or
+more than 128 bounds throws ArgumentException. Loaded snapshots are immutable and reject
+mutation with InvalidOperationException. Unsupported loaded constraint categories cause
+InterfaceConstraints to throw InvalidDataException rather than return a partial contract.
+
+`Introspection.MethodGenericParameterTypeInfo.GetInterfaceConstraints()` returns
+`IReadOnlyList<NominalTypeInfo>` using canonical views in the same metadata load context.
+No implicit dependency loading occurs. Method construction in introspection substitutes
+signatures; language admission and constraint satisfaction remain compiler responsibilities.
+
+`MethodBuilder.MakeGenericInstance` checks concrete owned arguments against every bound;
+writing repeats this validation so later edits cannot invalidate an existing call silently.
+Open, imported and constructed argument satisfaction is not supported in this first slice.
+`AssemblyBuilder.ImportReference(MethodDefinition, ...)` rejects bounded methods with
+NotSupportedException until its contract can preserve their bounds. Unconstrained imports
+retain their previous behavior.
+
+CLI output uses GenericParamConstraint rows referencing local interface TypeDefs. Native
+output uses existing function generic_constraints / TypeBound records. Native snapshots
+and the explicitly legacy reference-only CLI projection retain these bounds. No runtime
+schema change is required; older experimental readers may reject the added function field.
+C# tests cover builder/definition parity, executable CLI output, native/projection round
+trips, canonical views, invalid ordinals/duplicates and late graph mutation. A native
+API-authored bounded method executes with exit 42. This does not yet enable Raven's
+Number-constrained generic bodies or calls.

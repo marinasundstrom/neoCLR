@@ -14,7 +14,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, string> ParameterNames { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -476,6 +476,7 @@ public sealed partial class NativeAssemblyDefinition
                 var genericNames = method.TryGetProperty("generic_parameters", out _) ? Array(method, "generic_parameters", 32).Select(p => p.GetString() ?? throw new InvalidDataException("null generic name")).ToArray() : [];
                 genericArity = genericNames.Length;
                 if (method.TryGetProperty("generic_parameters", out _)) fields.Add("generic_parameters");
+                if (method.TryGetProperty("generic_constraints", out _)) fields.Add("generic_constraints");
                 if (method.TryGetProperty("locals", out _)) fields.Add("locals");
                 var ns = "";
                 if (method.TryGetProperty("namespace", out var scope))
@@ -536,6 +537,19 @@ public sealed partial class NativeAssemblyDefinition
                     foreach (var local in Array(method, "locals", 256)) _ = ReadType(local, false);
                 var parameters = Array(method, "parameters", 256);
                 var parameterTypes = parameters.Select(p => ReadType(p, false, allowByReference: true, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface)).ToArray();
+                var methodConstraints = new List<(int Parameter, int Owner)>();
+                if (method.TryGetProperty("generic_constraints", out _))
+                    foreach (var constraint in Array(method, "generic_constraints", 128))
+                    {
+                        Shape(constraint, "parameter", "kind");
+                        var parameter = constraint.GetProperty("parameter").GetInt32();
+                        var kind = constraint.GetProperty("kind"); Shape(kind, "TypeBound");
+                        var bound = ReadType(kind.GetProperty("TypeBound"), false);
+                        var boundOwner = System.Array.IndexOf(signatureOwners, bound.ClassType);
+                        Require(parameter >= 0 && parameter < genericArity && boundOwner >= 0 && types[boundOwner].IsInterface &&
+                            types[boundOwner].GenericNames.Length == 0 && !methodConstraints.Contains((parameter, boundOwner)), "unsupported or duplicate method interface bound");
+                        methodConstraints.Add((parameter, boundOwner));
+                    }
                 var noResult = method.GetProperty("no_result").GetBoolean();
                 var resultType = ReadType(method.GetProperty("returns"), noResult, allowSelf: ownerIndex >= 0 && types[ownerIndex].IsInterface);
                 Require(noResult == (resultType == PrimitiveType.Void), "inconsistent native result");
@@ -576,7 +590,7 @@ public sealed partial class NativeAssemblyDefinition
                         parameterNames.Add(i, parameterName!);
                     }
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -721,6 +735,7 @@ public sealed partial class NativeAssemblyDefinition
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
+            foreach (var bound in method.InterfaceConstraints) output.AddInterfaceConstraint(bound.Parameter, owners[bound.Owner]);
             projectedMethods.Add(output);
         }
         foreach (var property in properties)

@@ -64,6 +64,7 @@ public sealed partial class AssemblyBuilder
     public ImportedMethodReference ImportReference(MethodDefinition definition, AssemblyIdentity dependencyCoreLibrary, IAssemblyResolver? resolver)
     {
         ArgumentNullException.ThrowIfNull(definition);
+        if (definition.InterfaceConstraints.Count != 0) throw new NotSupportedException("imported method interface bounds require an explicit supported contract");
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
