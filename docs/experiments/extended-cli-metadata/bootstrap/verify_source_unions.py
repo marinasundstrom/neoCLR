@@ -95,6 +95,7 @@ def main():
             (HERE / 'primitive-capture-consumer.rvn', 42, ''),
             (HERE / 'query-lifetime-consumer.rvn', 42, ''),
             (HERE / 'range-consumer.rvn', 42, ''),
+            (HERE / 'discard-propagation-consumer.rvn', 42, ''),
             (ROOT / 'docs/experiments/raven-target/samples/library-list-filters.rvn', 0,
              '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-array-callbacks.rvn', 0, '7\n42\nFirst\nSecond\n'),

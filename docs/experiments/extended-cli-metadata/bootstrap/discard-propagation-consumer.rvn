@@ -1,0 +1,48 @@
+import System.*
+
+class Effects {
+    var Count: int = 0
+    func Read(fail: bool) -> Result<int, string> {
+        Count += 1
+        if fail {
+            return .Error("failed")
+        }
+        return .Ok(42)
+    }
+    func Touch() {
+        Count += 1
+    }
+}
+
+func Run(effects: Effects, fail: bool) -> Result<int, string> {
+    _ = effects.Read(fail)?
+    effects.Count += 10
+    return .Ok(42)
+}
+
+func Main() -> int {
+    let effects = Effects()
+    _ = 7
+    _ = "discarded"
+    _ = ()
+    _ = effects.Touch()
+    let success = Run(effects, false)
+    match success {
+        .Ok(let value) => {
+            if value != 42 || effects.Count != 12 {
+                return 1
+            }
+        }
+        .Error(_) => { return 2 }
+    }
+    let failure = Run(effects, true)
+    match failure {
+        .Ok(_) => { return 3 }
+        .Error(let message) => {
+            if message != "failed" || effects.Count != 13 {
+                return 4
+            }
+        }
+    }
+    return 42
+}

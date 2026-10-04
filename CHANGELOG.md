@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Execute discarded Result propagation against a separately compiled native library.
+  Raven a99152da0 preserves once-only evaluation and early failure returns; the broad
+  native gate, paired Duration consumers and 18 focused .NET tests pass. The general
+  lowering fix is backported to Raven main as 22539952c with six passing tests. Date reaches
+  nested-expression propagation, reproduced with failure before output publication.
+  No metadata/runtime/format or bootstrap change.
+
+
 - Decode and emit canonical CLI Char signatures while preserving native grapheme
   storage and intrinsic call owners through explicit core bindings. Native character
   signatures round-trip through materialization, reimport and declaration projection.

@@ -1,5 +1,19 @@
 # neoCLR platform roadmap
 
+Discard propagation milestone (2026-10-04): Raven a99152da0 normalizes discarded
+propagation in shared lowering and emits portable discard statements. The independently
+compiled native Result consumer checks once-only evaluation and early failure returns;
+expanded native application acceptance and paired Duration pass. Eighteen focused
+.NET checks pass; the general lowering fix is independently isolated at 8e0f88eda
+with six tests, then backported to main as 22539952c with the same six checks passing.
+Unchanged Date/calendar sources move to an unlowered nested propagation
+expression; a minimal `Read()? + 1` reproduces rejection before publication.
+Next bounded task: normalize nested expression propagation while preserving evaluation
+order and early returns. Array-element receiver addresses and full Date execution remain
+open. No metadata/runtime/bootstrap change.
+[Evidence](experiments/extended-cli-metadata/discard-propagation-2026-10-04.json).
+
+
 Grapheme character milestone (2026-10-04): explicit Char signature import, canonical
 CLI encoding and native intrinsic owners allow separate-library character calls and
 String indexing to execute. Raven `2bd39805c` preserves symbol-only emission for core
