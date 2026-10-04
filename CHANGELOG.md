@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Expand native source ownership to Instant, Clock, SystemClock and OverflowError
+  (47 sources), binding the existing UnixTimeTicks service explicitly. Instant now
+  calls its source-owned local-time factory directly instead of a bridge alias.
+  Clock/overflow/interface consumers, full native gate, paired Duration and two runtime
+  clock tests pass. Rebuild comparer core/seed together. Legacy snapshot refresh remains
+  blocked by its union-reference build; no unverified generated hashes were updated.
+
 - Expose the existing execution budget as run-only `--instructions <positive-count>`,
   rejecting malformed/repeated values before input loading. Keep the 100,000 default
   and other limits unchanged. The separately compiled native globalization sample

@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+Clock milestone (2026-10-04): the 47-source --clock gate builds source-owned Instant,
+Clock and SystemClock, then executes separate clock/overflow/interface consumers.
+Expanded native application/calendar/globalization and paired Duration pass; two runtime
+clock tests pass. Explicit UnixTimeTicks core/seed binding is required. Next bounded
+library work: fixed offsets, then time-zone service contracts. Full .NET clock/calendar
+parity and array-element receiver addresses remain open. Legacy translated snapshot
+refresh fails in its union-reference build ('None' not in scope); keep that maintenance
+blocker explicit without changing unverified hashes.
+[Evidence](experiments/extended-cli-metadata/clock-source-2026-10-04.json).
+
+
 Globalization milestone (2026-10-04): the unchanged larger sample now executes through
 native library imports with explicit --instructions 1000000. Default limits are unchanged.
 Expanded --calendar acceptance, Hebrew formatting, broad native application, paired

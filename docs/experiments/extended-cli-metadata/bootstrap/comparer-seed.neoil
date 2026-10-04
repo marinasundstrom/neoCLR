@@ -36,6 +36,10 @@ ret
 .end
 .end
 .type System.Runtime.CompilerServices.RuntimeServices
+.method static UnixTimeTicks() -> Int64
+call neoCLR.Runtime.UnixTimeTicks()
+ret
+.end
 .method static SystemCultureName() -> String
 call neoCLR.Runtime.SystemCultureName()
 ret
@@ -111,5 +115,9 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.UnixTimeToLocal(Int64 ticks) -> Int32[]
+.methodimpl InternalCall
+.end
+
+.function neoCLR.Runtime.UnixTimeTicks() -> Int64
 .methodimpl InternalCall
 .end

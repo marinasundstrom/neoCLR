@@ -1,0 +1,44 @@
+import System.*
+import System.Result.*
+
+class FixedClock : Clock {
+    val Now: Instant => Instant.FromUnixTimeTicks(123456789L)
+}
+
+func Read(clock: Clock) -> long {
+    return clock.Now.UnixTimeTicks
+}
+
+func Main() -> int {
+    if Read(FixedClock()) != 123456789L {
+        return 1
+    }
+    let start = Instant.FromUnixTimeTicks(-1L)
+    let Ok(next) = start.Add(Duration.FromTicks(2L)) else {
+        return 2
+    }
+    if next.UnixTimeTicks != 1L || start.UnixTimeTicks != -1L {
+        return 3
+    }
+    let maximum = Instant.FromUnixTimeTicks(9223372036854775807L)
+    let minimum = Instant.FromUnixTimeTicks(-9223372036854775808L)
+    match maximum.Add(Duration.FromTicks(1L)) {
+        .Ok(_) => { return 4 }
+        .Error(_) => {}
+    }
+    match minimum.Add(Duration.FromTicks(-1L)) {
+        .Ok(_) => { return 5 }
+        .Error(_) => {}
+    }
+    if minimum.CompareTo(maximum) != -1 || maximum.CompareTo(minimum) != 1 {
+        return 6
+    }
+    let clock = SystemClock()
+    let before = clock.Now.UnixTimeTicks
+    let imported = Read(clock)
+    let after = clock.Now.UnixTimeTicks
+    if before <= 0L || imported <= 0L || after <= 0L {
+        return 7
+    }
+    return 42
+}

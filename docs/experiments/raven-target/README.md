@@ -1684,3 +1684,14 @@ existing expected outputs. It records library-size failures separately and keeps
 same matching JSON System when library translation exceeds bounds. It does not select
 the new direct compiler emitter or alter Runtime Contract settings.
 [Commands, limits and results](../extended-cli-metadata/raven-sample-translation.md).
+
+### Legacy Instant snapshot maintenance (2026-10-04)
+
+The native source library now calls LocalDateTime.FromUnixTimeTicks directly from
+Instant.ToLocalDateTime; the old RuntimeServices.LocalDateTime alias translated to
+that same method. The legacy source digest is stale. Attempted --slice Instant
+regeneration stops in --reference-library-core / SourceUnionReferences.Project with
+RAV0103: 'None' is not in scope. No generated output or hashes were changed.
+Resolve that legacy union-reference build before refreshing translated snapshots.
+Native clock acceptance rebuilds the library from Raven sources and is independent
+of those translated artifacts.

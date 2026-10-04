@@ -67,3 +67,13 @@ and scheduling remain future work. Resource localization remains separate from c
 
 [API reference →](../../docs/namespaces.html)
 · [Detailed contracts and evidence →](https://github.com/marinasundstrom/neoCLR/blob/main/docs/time-zones.md)
+
+
+## Native compiler integration (development)
+
+The metadata integration branch builds Instant, Clock and SystemClock from Raven
+sources into a separate native library. The unchanged clock example and independent
+consumers execute interface dispatch, local-time conversion and checked Instant
+arithmetic. An explicit primitive bootstrap supplies the existing wall-clock service;
+the library owns local-time construction. This development result does not establish
+full .NET library parity or native time-zone support.
