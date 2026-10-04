@@ -6821,6 +6821,7 @@ bool TypeDefinition.NativeGrapheme { get; }
 void TypeDefinition.SetNativeGrapheme();
 bool TypeBuilder.NativeGrapheme { get; }
 void TypeBuilder.SetNativeGrapheme();
+void AssemblyBuilder.SetNativeGrapheme(ImportedTypeReference type);
 bool NominalTypeInfo.NativeGrapheme { get; }
 ```
 
@@ -6841,10 +6842,21 @@ no format-version change is needed.
 
 Executable CLI output rejects this native storage designation. Ordinary imported .NET Char
 and its UTF-16 code-unit signature remain unchanged. This does not replace the .NET char
-contract. The current slice supports owned declarations only. ImportReference(TypeDefinition)
-and ImportReference(MethodDefinition) explicitly throw NotSupportedException for a native
-owned-grapheme snapshot; external storage-aware authoring and Raven provider selection are
-next. This avoids silently importing it as an ordinary allocated value record.
+contract. Native snapshot ImportReference(TypeDefinition/MethodDefinition) preserves the
+storage designation. For emission from independent semantic facts, create an output-owned
+System.Char value reference with the dependency identity, core and artifact digest, call
+AssemblyBuilder.SetNativeGrapheme(reference), then CreateMethodReference. This loads no
+metadata. Repeated designation of the same reference is harmless. Null throws
+ArgumentNullException; foreign references and incompatible identity/category throw
+ArgumentException. Conflicting owners and designation after ordinary method authoring
+throw InvalidDataException. Native writing also rejects competing local/external owners.
+Constructors, overrides and numeric primitive reinterpretation are unsupported on authored
+grapheme methods. The caller supplies complete signature facts; runtime linking validates
+them against the actual dependency. Native binding tables retain the external assembly
+scope, and introspection resolves it through the explicit metadata catalog.
+
+Raven source-owned Char provider selection remains pending. This API does not silently
+reinterpret an ordinary .NET Char reference as a grapheme.
 
 The API contract test authors the type and a managed receiver method, round-trips its
 metadata and executes a separate neoIL caller with combining-mark and ZWJ emoji graphemes.

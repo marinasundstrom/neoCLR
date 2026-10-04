@@ -68,7 +68,6 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
-        if (type?.NativeGrapheme == true) throw new NotSupportedException("native grapheme method imports require an explicit storage-aware reference contract");
         var function = type is not null
             ? (Namespace: type.Namespace, Name: definition.Name)
             : definition.Module.Assembly.IsNative
@@ -132,11 +131,13 @@ public sealed partial class AssemblyBuilder
                 isInterface: (declaration.Attributes & 0x20) != 0, isValueType: declaration.IsValueType);
             result.Definition.AuthoredDeclaringType = MakeOwner(declaration.DeclaringType)?.Definition;
             if (declaration.NativePrimitive is { } primitive) result.SetNativePrimitive(primitive);
+            if (declaration.NativeGrapheme) result.SetNativeGrapheme();
             return result;
         }
         var owner = MakeOwner(type);
         var reference = new ImportedMethodReference(this, new MethodBuilder(imported.Graph, owner, function.Name, signature!, @namespace: function.Namespace, isStatic: definition.IsStatic)) { DeclaringReference = declaringReference, RequiresVirtualDispatch = !definition.IsStatic && !type!.IsValueType && isVirtual };
         reference.Target.NativeImportPrimitiveOwner = type?.NativePrimitive;
+        reference.Target.NativeImportCharOwner = type?.NativeGrapheme == true;
         reference.Target.IsCoreObjectToString = isObjectToString;
         reference.Target.IsCoreObjectHash = isObjectHash;
         if (isObjectHash) NativeBindingFor(identity)?.ValidateObjectHashSlot();

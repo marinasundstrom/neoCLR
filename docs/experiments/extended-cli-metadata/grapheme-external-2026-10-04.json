@@ -1,0 +1,133 @@
+{
+  "results": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/metadata-empty-system.neoil",
+        "/tmp/grapheme-external-final-verified1004/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exit": 0,
+      "stdout": "Assembled System -> /tmp/grapheme-external-final-verified1004/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/tmp/grapheme-external-final-verified1004/authored.neoil",
+        "/tmp/grapheme-external-final-verified1004/authored.neox",
+        "--format",
+        "neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.authored",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 0,
+      "stdout": "Assembled Consumer -> /tmp/grapheme-external-final-verified1004/authored.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/grapheme-external-final-verified1004/authored.neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.authored",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 0,
+      "stdout": "Consumer: typed-stack/control-flow verification passed (4 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/grapheme-external-final-verified1004/authored.neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.authored",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/tmp/grapheme-external-final-verified1004/imported.neoil",
+        "/tmp/grapheme-external-final-verified1004/imported.neox",
+        "--format",
+        "neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.imported",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 0,
+      "stdout": "Assembled Consumer -> /tmp/grapheme-external-final-verified1004/imported.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/grapheme-external-final-verified1004/imported.neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.imported",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 0,
+      "stdout": "Consumer: typed-stack/control-flow verification passed (4 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/grapheme-external-final-verified1004/imported.neox",
+        "--module",
+        "/tmp/grapheme-external.neox",
+        "--module",
+        "/tmp/grapheme-external.neox.imported",
+        "--system",
+        "/tmp/grapheme-external-final-verified1004/System.neox"
+      ],
+      "exit": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "artifacts": {
+    "/tmp/grapheme-external.neox": "8577bd45a77c067024cd00eed313002453046bcb5e82d63be2d212a9c57a6be5",
+    "/tmp/grapheme-external-final-verified1004/System.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "target/debug/neoclr": "a52ccab7563f8042e2ebe3db5fad921bb11be605c9978e4712dd4dc056e6f738",
+    "/tmp/grapheme-external.neox.authored": "1dfaf87e9a2061bcac1b3834b33c85e38cbe1a3eb0bd8d44bfb84ef4ed64d3cf",
+    "/tmp/grapheme-external-final-verified1004/authored.neoil": "8619784921e8084d89a437dfaa0867f0bd11103596890061cf0bce72b934c70f",
+    "/tmp/grapheme-external-final-verified1004/authored.neox": "a60c62b69fa1789bc8a5f0cedd9234c038822e935b036a9f6521406b0af80cbd",
+    "/tmp/grapheme-external.neox.imported": "df49bae36db28091a28ab35e404a46eb80ab50f8bb66c5280eeaaf25aa3138ea",
+    "/tmp/grapheme-external-final-verified1004/imported.neoil": "0c64927b5da4258c8352de46e3f8d0c7d742eab2e40ee37b7b45d7eb2f4101d9",
+    "/tmp/grapheme-external-final-verified1004/imported.neox": "4bded7f0154f93a2483028c67c4f1e254f779816fdccff630bba4931336d8265"
+  },
+  "metadata_groups": "143/143",
+  "neoclr_parent": "4a73c54c",
+  "raven_revision": "6c5b43ff6"
+}

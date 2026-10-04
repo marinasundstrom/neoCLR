@@ -49,6 +49,8 @@ public sealed partial class AssemblyBuilder
         if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||
             signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("override reference requires instance value ToString(): String");
+        if (IsNativeGrapheme(declaringType) && (name is ".ctor" or ".cctor" || isOverride || nativePrimitive is not null))
+            throw new ArgumentException("grapheme members require ordinary methods without primitive reinterpretation");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
         if (isInterface && (constructor || signature.GenericParameterNames.Count != 0))
@@ -84,10 +86,12 @@ public sealed partial class AssemblyBuilder
         if (nativePrimitive is { } declaredPrimitive) SetNativePrimitive(declaringType, declaredPrimitive);
         var owner = MaterializeOwner(declaringType);
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
+        if (IsNativeGrapheme(declaringType)) owner.SetNativeGrapheme();
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
         reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
+        reference.Target.NativeImportCharOwner = IsNativeGrapheme(declaringType);
         authoredCallableReferences.Add(reference);
         return reference;
 

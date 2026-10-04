@@ -33,7 +33,9 @@ Source-owned String now executes instance operations and collection-interface di
 through a separate native consumer, with an explicit retained seed and ownership manifest.
 See [the String integration](experiments/extended-cli-metadata/source-string-2026-10-04.md).
 Owned grapheme Char declarations now round-trip and execute through the metadata API
-(143 C# groups). Next add external grapheme references and Raven source ownership;
+(143 C# groups). External snapshot-imported and independently authored references now
+execute through separate forwarder libraries. See [external grapheme evidence](experiments/extended-cli-metadata/grapheme-external-2026-10-04.md).
+Next integrate Raven source ownership;
 imported nullability and broader text coverage remain open.
 
 Next prioritize source-owned String/Char and coherent text-service bindings (shared
