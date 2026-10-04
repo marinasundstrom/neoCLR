@@ -5444,3 +5444,14 @@ index/case errors follow the unresolved signatures and are not yet independent b
 Next wire those explicit services, including nominal Int64 array mapping, then resume
 unchanged time-zone consumers. The legacy translated snapshot's union-reference
 regeneration failure and array-element receiver addresses remain open.
+
+### Combined source array contracts (2026-10-04)
+
+Raven must not cache a missing source-owned array shape during declaration setup.
+Deferring that lookup and provisional array-interface caches allows unchanged
+Utf8.Encode to return imported byte[] as source-owned Sequence<byte> in the same
+57-source native library. Arrays retain nominal Array<T> backing; no structural
+array semantics, service stubs or metadata-format changes are introduced. The
+primitive CLI core remains the explicit temporary service signature source; rebuilt
+libraries use native metadata import. See the combined-library-array evidence and
+System compilation strategy for commands, limits and remaining initializer binding.

@@ -210,3 +210,27 @@ Schema-1/2 limits and declaration budgets remain unchanged. The 57-source combin
 IO/UTF-8 experiment now exposes a source-owned Array<T> interface projection/binding
 failure; these same sources work in separate libraries. Investigate declaration-readiness
 caching before expanding more service APIs. See bootstrap/verify_combined_library.py.
+
+## Combined array binding closure (2026-10-04)
+
+The 57-source `verify_combined_library.py --services` gate now passes, building all
+selected sources together and then importing only that library into separate
+consumers. UTF-8/file mutation and unchanged broad application output execute.
+[Recorded commands, revisions and hashes](combined-library-array-2026-10-04.json)
+identify the tested bundle. Compiler fix `5dda5c5de` was independently reproduced
+and validated on main, where it is integrated as `340fdb759`. Integration validation
+passes 65 focused compiler tests and seven native consumers; the independent
+main-based iteration suite passes 22 cases.
+
+The blocker was premature caching of absent source-owned array shapes during
+declarations, followed by empty interface projection. Raven now defers these cache
+entries while declarations are provisional. CLI representation and native runtime
+semantics are unchanged; arrays remain backed by nominal Array<T>. The shared
+.NET regression uses imported array member access in an inferred static initializer
+followed by an interface conversion in a method. Direct interface conversion in the
+early initializer itself remains a separate declaration-binding gap.
+
+Next capability batch remains queue/callback ABI ownership and reusable enums;
+this result is not proof of full System compilation or dual-target class-library
+execution. No guest public API changed, so the existing API snapshot maintenance
+blocker is unchanged.

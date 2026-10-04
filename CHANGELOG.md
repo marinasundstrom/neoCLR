@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Validate the combined 57-source native library, including UTF-8/file streams,
+  after correcting Raven source-array interface lookup caches. Separate consumers
+  verify file mutation, exit 42 and unchanged broad application output. No runtime
+  or metadata-format change; full System compilation remains open.
+
 - Add explicit schema-3 library PE writing and native reading/loading, bounded to
   16 MiB PE, 8 MiB envelope and 32 MiB host JSON. Preserve schema-1/2 application
   bounds and declaration/storage limits. Raven libraries select this profile; 53

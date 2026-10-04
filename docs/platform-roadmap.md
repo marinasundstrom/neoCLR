@@ -10,9 +10,10 @@ Earlier chronological next-step notes below are historical where they conflict.
 
 Current batch: inhabited-unit, erased Value and the first checked service-catalog
 profile execute through separate native libraries (including UTF-8, file I/O and a
-worker callback). The bounded library PE transport gap is closed for the 53-source combined gate.
-Next isolate same-compilation Array<T> interface binding (exposed by combined UTF-8),
-then queue/callback ABI ownership and the reusable enum emission category. See the strategy's updated
+worker callback). The bounded library PE transport gap and same-compilation Array<T> lookup cache
+blocker are closed for the 57-source combined gate, including UTF-8 and file streams.
+[Execution evidence](experiments/extended-cli-metadata/combined-library-array-2026-10-04.json).
+Next address queue/callback ABI ownership and the reusable enum emission category. See the strategy's updated
 audit for remaining first failures; the service catalog is intentionally partial. The full 166-source build
 stops in binding; 178 distinct service names appear across 48 files and the erased-value
 operations each span 23 files. These are potential reach counts, not guaranteed unlocks.
