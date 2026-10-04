@@ -1,0 +1,35 @@
+import System.*
+import System.Text.*
+import System.Result.*
+
+func Main() -> int {
+    let encoding = Encodings.Utf8
+    let encoder = encoding.CreateEncoder()
+    let text = "Aé😀"
+    let Ok(_) = encoder.Accept(text, true) else { return 1 }
+    let buffer: byte[] = [(byte)0, (byte)0]
+    let decoder = encoding.CreateDecoder()
+    var result = ""
+    var total = 0
+    var finished = false
+    while !finished {
+        let Ok(step) = encoder.Drain(buffer, 0, 2) else { return 2 }
+        finished = step.State is EncoderState.Finished
+        let Ok(part) = decoder.Decode(buffer, 0, step.BytesWritten, finished) else { return 3 }
+        result = result + part
+        total += step.BytesWritten
+    }
+    if result != text || total != 7 { return 4 }
+    let ascii = Encodings.Ascii
+    match ascii.Encode(text) {
+        Error(EncodingError.UnrepresentableText) => {}
+        _ => return 5
+    }
+    let broken = encoding.CreateDecoder()
+    let prefix: byte[] = [(byte)240]
+    match broken.Decode(prefix, 0, 1, true) {
+        Error(EncodingError.InvalidUtf8) => {}
+        _ => return 6
+    }
+    return 42
+}

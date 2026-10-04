@@ -181,3 +181,8 @@ character sequence with independent copying. Metadata constructors keep CLI shap
 runtime-owned storage preserves Unicode text in UTF-8. Ordinary .NET Char remains a
 UTF-16 code unit. This is development integration evidence, not full class-library support
 or a new published bundle.
+
+Development encoding coverage now includes seven unchanged source-library files emitted
+as a separate native assembly. An artifact-only consumer incrementally encodes and
+decodes UTF-8, including split scalar boundaries, and checks ASCII and malformed-input
+errors. Text-stream integration and the broader JSON library gate remain in progress.

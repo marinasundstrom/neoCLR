@@ -1,0 +1,17 @@
+class Holder {
+    private var value: int = 0
+
+    func Set(fail: bool) {
+        value = if fail {
+            System.Fail("field assignment failed")
+            0
+        } else {
+            42
+        }
+    }
+}
+
+func Main() -> int {
+    Holder().Set(true)
+    return 99
+}

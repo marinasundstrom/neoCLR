@@ -1,0 +1,28 @@
+class Holder {
+    private var value: int = 0
+    private var trace: int = 0
+
+    func Next() -> Holder {
+        trace = trace * 10 + 1
+        return self
+    }
+
+    func Read() -> int {
+        trace = trace * 10 + 2
+        return 40
+    }
+
+    func Run() -> int {
+        Next().value = if Read() == 40 {
+            42
+        } else {
+            0
+        }
+        if trace != 12 {
+            return -1
+        }
+        return value
+    }
+}
+
+func Main() -> int => Holder().Run()

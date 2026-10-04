@@ -37,13 +37,20 @@ consumers pass the existing grapheme, comparison, slice and construction samples
 See [text gate and evidence](experiments/extended-cli-metadata/source-text-2026-10-04.md).
 Imported nullability and wider source groups remain open.
 
+The [post-text audit and encoding gate](experiments/extended-cli-metadata/source-encoding-2026-10-04.md)
+now prove seven unchanged encoding sources in a separate native library, incremental
+UTF-8/ASCII execution, and preserved native text/.NET emission controls. The 75-source
+baseline and 81-source task combination compile. Memory streams are already part of
+that baseline. Next fix the lowered required-result wrapper exposed by StreamReader/Writer
+and execute them over MemoryStream, then expand JSON document/value support.
+
 Next expand the verified text-service foundation into stream, storage and JSON sources, ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and
 callback/storage/generic support from demonstrated failures. See the strategy's
 [current reassessment](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04)
 for bounded gates and ordering.
 
-The full 166-source attempt still stops in binding; its 141 distinct missing runtime
+The older full 166-source attempt stops in binding; its 141 distinct missing runtime
 service members measure the selected bootstrap's coverage, not missing runtime
 implementations. The audit adds compilation evidence only. Preserve existing native
 execution gates and ordinary .NET controls; full rebuilt-library dual-target parity

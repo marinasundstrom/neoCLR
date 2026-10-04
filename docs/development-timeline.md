@@ -10718,3 +10718,17 @@ identity properties now fail with RAV0330, independently of writer validation.
   sequence-construction cases. Unicode remains the text model and UTF-8 the representation;
   no dedicated rune type or numeric Char category was introduced.
 - [Integration details and reproducible evidence](experiments/extended-cli-metadata/source-text-2026-10-04.md).
+
+## 2026-10-04 — Next milestone after Char/String
+
+- Author asked “What is next?” and then directed “Proceed”.
+- Assistant proposed refreshing the full-System audit, prioritizing shared blockers,
+  and extending source-built text into streams and JSON with native artifact-only
+  consumers and ordinary .NET regression checks.
+- Performed: refreshed the 166-source audit; kept the 75-source baseline passing and
+  verified the 81-source task combination compiles. A separate seven-source encoding
+  library exposed a field-receiver stack defect, fixed in Raven's portable emitter.
+  Native UTF-8/ASCII consumers and field-order/failure regressions execute.
+- Open: text-stream required-result lowering, cumulative bootstrap String binding,
+  JSON, class inheritance, metadata-handle services and full dual-target library parity.
+- Evidence: [encoding milestone](experiments/extended-cli-metadata/source-encoding-2026-10-04.md).

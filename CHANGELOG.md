@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Refresh the full-System audit after native Char/String ownership and establish a
+  separate source-built encoding-library gate. UTF-8 incremental encode/decode, ASCII
+  rejection, malformed input, and field evaluation/failure consumers execute through
+  native metadata imports. Record the portable receiver fix and the next text-stream
+  lowered-expression blocker; full System and dual-target library parity remain open.
+
 - Complete source-owned Char/String native import and emission through a retained seed
   without duplicate text declarations. Separate consumers execute grapheme literals,
   equality/patterns, interface dispatch, Unicode text operations, String sequence

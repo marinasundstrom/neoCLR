@@ -749,3 +749,12 @@ storage-aware external references and map that metadata fact into Raven symbols/
 ownership selection. Then remove seed Char and compile unchanged source Char. Current
 snapshot convenience imports reject the owned grapheme category rather than losing it.
 The explicit nominal category avoids conflating neoCLR graphemes with CLR UTF-16 code units.
+
+### Post-text encoding gate (2026-10-04)
+
+See [fresh audit, source encoding execution and next blocker](source-encoding-2026-10-04.md).
+Native separate-library composition resolves String.SliceUtf8 through the completed
+provider. Seven encoding sources execute after a portable field-receiver fix. The next
+high-leverage demonstrated failure is a required-result expression wrapper in text
+streams; address it before broadening services or beginning JSON object mapping.
+The cumulative source/bootstrap String binding limitation remains recorded.
