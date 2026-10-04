@@ -5413,3 +5413,34 @@ generic collections and paired Duration remain green. Both existing runtime Inst
 tests pass. Raven implementation remains 5c60425db; matching integration docs are
 236b0f49c. No public API shape changed; on-site APIs and guest documentation signatures
 are unchanged. The site time overview now distinguishes this native development gate.
+
+
+## Source-built fixed offsets (2026-10-04)
+
+The --offsets acceptance mode selects offset-ownership.json and adds unchanged
+TimeOffset to the source-owned native library (48 sources). Its separate consumer
+checks whole-second offsets through +/-18 hours, negative fractional Unix ticks,
+value-preserving round trips, signed Int64 extrema and the exact civil boundaries
+0001-01-01 through 9999-12-31. Values one tick beyond the shifted boundary reject
+through the declared Result error. No host-local zone is consulted for these checks.
+
+Raven bc30fb0f2 fixes portable static-property admission for imported value-type
+owners, exposed by TimeOffset.Zero. It uses the existing external-value capability;
+reference owners retain their separate capability. Seventeen C# external-signature
+tests pass, including independently emitted property owners and ordinary .NET execution.
+The shared portable layer is absent on main, so this fix cannot be cherry-picked
+independently of that abstraction; no general binder/.NET behavior fix is held back.
+
+The complete native offset/clock/calendar/globalization/application gate and paired
+Duration controls pass. Reuse the Clock comparer core and seed; no bootstrap, metadata,
+runtime, source implementation or public API changes are required. Full .NET
+calendar/offset library parity remains unproved. Existing API signatures remain current;
+no new RavenDoc selection or snapshot regeneration is needed for this slice.
+
+The next source inventory adds the five time-zone declarations only for diagnosis.
+It rejects before output because RuntimeServices lacks TimeZoneDatabaseVersion,
+TimeZoneExists, SystemTimeZoneName, TimeZoneOffset and TimeZoneMapLocal; further
+index/case errors follow the unresolved signatures and are not yet independent blockers.
+Next wire those explicit services, including nominal Int64 array mapping, then resume
+unchanged time-zone consumers. The legacy translated snapshot's union-reference
+regeneration failure and array-element receiver addresses remain open.

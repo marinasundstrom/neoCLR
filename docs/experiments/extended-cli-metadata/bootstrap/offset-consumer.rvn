@@ -1,0 +1,72 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let Ok(east) = TimeOffset.FromSeconds(19800) else {
+        return 1
+    }
+    let Ok(west) = TimeOffset.FromSeconds(-64800) else {
+        return 2
+    }
+    let Ok(limit) = TimeOffset.FromSeconds(64800) else {
+        return 3
+    }
+    if east.Seconds != 19800 || west.CompareTo(limit) != -1 || !TimeOffset.Zero.Equals(TimeOffset.Zero) {
+        return 4
+    }
+    match TimeOffset.FromSeconds(64801) {
+        .Ok(_) => { return 5 }
+        .Error(_) => {}
+    }
+    match TimeOffset.FromSeconds(-64801) {
+        .Ok(_) => { return 6 }
+        .Error(_) => {}
+    }
+    let instant = Instant.FromUnixTimeTicks(-1L)
+    let Ok(local) = east.AtInstant(instant) else {
+        return 7
+    }
+    if local.Date.Year != 1970 || local.Date.Month != 1 || local.Date.Day != 1 {
+        return 8
+    }
+    if local.Time.Hour != 5 || local.Time.Minute != 29 || local.Time.Second != 59 {
+        return 9
+    }
+    if east.ToInstant(local).UnixTimeTicks != -1L || instant.UnixTimeTicks != -1L {
+        return 10
+    }
+    let firstTicks = -621355968000000000L - 648000000000L
+    let lastTicks = 2534023007999999999L + 648000000000L
+    let Ok(first) = limit.AtInstant(Instant.FromUnixTimeTicks(firstTicks)) else {
+        return 11
+    }
+    let Ok(last) = west.AtInstant(Instant.FromUnixTimeTicks(lastTicks)) else {
+        return 12
+    }
+    if first.Date.Year != 1 || first.Date.DayNumber != 0 || first.Time.Ticks != 0L {
+        return 13
+    }
+    if last.Date.Year != 9999 || last.Date.Month != 12 || last.Date.Day != 31 || last.Time.Ticks != 863999999999L {
+        return 14
+    }
+    if limit.ToInstant(first).UnixTimeTicks != firstTicks || west.ToInstant(last).UnixTimeTicks != lastTicks {
+        return 15
+    }
+    match limit.AtInstant(Instant.FromUnixTimeTicks(firstTicks - 1L)) {
+        .Ok(_) => { return 16 }
+        .Error(_) => {}
+    }
+    match west.AtInstant(Instant.FromUnixTimeTicks(lastTicks + 1L)) {
+        .Ok(_) => { return 17 }
+        .Error(_) => {}
+    }
+    match east.AtInstant(Instant.FromUnixTimeTicks(9223372036854775807L)) {
+        .Ok(_) => { return 18 }
+        .Error(_) => {}
+    }
+    match east.AtInstant(Instant.FromUnixTimeTicks(-9223372036854775808L)) {
+        .Ok(_) => { return 19 }
+        .Error(_) => {}
+    }
+    return 42
+}

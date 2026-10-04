@@ -1,5 +1,17 @@
 # neoCLR platform roadmap
 
+Fixed-offset milestone (2026-10-04): unchanged TimeOffset joins the 48-source --offsets
+gate. Separate native consumers execute signed/fractional tick round trips, offset
+limits and civil boundaries; expanded native acceptance and paired Duration pass.
+Raven bc30fb0f2 admits imported value-type static properties via explicit capability;
+17 focused C# controls pass. Next bounded work: explicit time-zone bootstrap services
+(database version, lookup, system zone, offset and local mapping). Source inventory
+rejects those missing services before output; cascading errors remain unassessed.
+Full .NET calendar/offset parity, array-element addresses and legacy snapshot refresh
+remain open. No metadata/runtime/bootstrap change in this slice.
+[Evidence](experiments/extended-cli-metadata/offset-source-2026-10-04.json).
+
+
 Clock milestone (2026-10-04): the 47-source --clock gate builds source-owned Instant,
 Clock and SystemClock, then executes separate clock/overflow/interface consumers.
 Expanded native application/calendar/globalization and paired Duration pass; two runtime

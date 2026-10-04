@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add unchanged TimeOffset to explicit native source ownership (48 sources), with
+  separate-consumer coverage for signed tick round trips, offset limits and civil-range
+  rejection. Fix portable admission for imported value-type static properties such as
+  TimeOffset.Zero in Raven; preserve separate reference-owner capabilities and the
+  ordinary .NET backend. No metadata/runtime/bootstrap or public API change.
+
 - Expand native source ownership to Instant, Clock, SystemClock and OverflowError
   (47 sources), binding the existing UnixTimeTicks service explicitly. Instant now
   calls its source-owned local-time factory directly instead of a bridge alias.
