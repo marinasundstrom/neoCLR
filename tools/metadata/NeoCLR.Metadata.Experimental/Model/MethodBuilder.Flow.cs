@@ -48,7 +48,7 @@ public sealed partial class MethodBuilder
         return type.ByReferenceElement is null ? type : type with { AddressedParameter = parameter };
     }
     private static BodyValueType LocalType(LocalDefinition local) => local.SignatureType;
-    private sealed record FlowState(BodyValueType[] Stack, bool[] Assigned);
+    private sealed record FlowState(BodyValueType[] Stack, bool[] Assigned, bool BaseInitialized);
 
     internal void Validate()
     {
@@ -74,10 +74,11 @@ public sealed partial class MethodBuilder
         var work = new Queue<int>();
         var initiallyAssigned = new bool[locals.Count + ParameterCount + (IsConstructor && DeclaringType!.IsValueType ? DeclaringType.Fields.Count : 0)];
         for (int i = 0; i < ParameterCount; i++) initiallyAssigned[locals.Count + i] = !Signature.OutParameters.Contains(i);
-        states[0] = new([], initiallyAssigned); work.Enqueue(0);
+        states[0] = new([], initiallyAssigned, !(IsConstructor && DeclaringType!.LocalBase is not null)); work.Enqueue(0);
         while (work.TryDequeue(out var index))
         {
             var state = states[index]!;
+            var baseInitialized = state.BaseInitialized;
             var stack = state.Stack.ToList(); var assigned = (bool[])state.Assigned.Clone();
             var instruction = Instructions[index];
             // Preserve native primitive identity across stack operations and joins.
@@ -106,7 +107,7 @@ public sealed partial class MethodBuilder
                 if (stack.Count > 0 && (stack[^1].Class?.IsValueType == true || stack[^1].GenericInstance?.Definition.IsValueType == true || stack[^1].ImportedType?.IsValueType == true) &&
                     (type.Class?.IsInterface == true || type.GenericInstance?.Definition.IsInterface == true || type.ImportedType is { IsValueType: false }))
                     throw new InvalidDataException("value-to-interface conversion requires explicit boxing or constrained dispatch");
-                if (stack.Count == 0 || stack[^1] != type && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
+                if (stack.Count == 0 || stack[^1] != type && !(stack[^1].Class is { } derived && type.Class is { } ancestor && derived.DerivesFrom(ancestor)) && !importedConformance && !constructedConformance && !localExternalConformance && !(type.Class is { IsInterface: true } contract && stack[^1].Class is { } actual && actual.ConformsTo(contract)) && !(type.GenericInstance is { Definition.IsInterface: true } constructed && stack[^1].Class is { } concrete && concrete.ConformsTo(constructed))) throw new InvalidDataException($"evaluation stack type mismatch or underflow at {index} ({instruction.Op}): expected {type}, actual {(stack.Count == 0 ? "<empty>" : stack[^1].ToString())}");
                 stack.RemoveAt(stack.Count - 1);
             }
             switch (instruction.Op)
@@ -139,6 +140,7 @@ public sealed partial class MethodBuilder
                         ? fieldReference.DeclaringType : instruction.Field!.DeclaringType.OpenSignature;
                     if (stack.Count > 0 && stack[^1].ConstructionReceiver)
                     {
+                        if (!DeclaringType!.IsValueType) throw new InvalidDataException("base constructor must run before field access");
                         if (!ReferenceEquals(instruction.Field!.DeclaringType, DeclaringType)) throw new InvalidDataException("constructor requires an owned field");
                         var fieldSlot = locals.Count + ParameterCount + instruction.Field.Index;
                         if (instruction.Op != "field.store" && !assigned[fieldSlot]) throw new InvalidDataException("constructor field read before assignment");
@@ -230,7 +232,7 @@ public sealed partial class MethodBuilder
                     if (ArgumentType(instruction.Value).ByReferenceElement is not null)
                         throw new InvalidDataException("managed-reference argument rebinding is unsupported");
                     Pop(ArgumentType(instruction.Value)); break;
-                case "argument": stack.Add(ArgumentType(instruction.Value)); break;
+                case "argument": stack.Add(!baseInitialized && instruction.Value == 0 ? ArgumentType(0) with { ConstructionReceiver = true } : ArgumentType(instruction.Value)); break;
                 case "argument.address":
                     stack.Add(SignatureType.ByReference(Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)])); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
@@ -354,7 +356,14 @@ public sealed partial class MethodBuilder
                         }
                         Pop(callSignature.ParameterTypes[i], output);
                     }
-                    if (!instruction.Target.IsStatic)
+                    if (instruction.Target.IsConstructor)
+                    {
+                        if (baseInitialized || !IsConstructor || !ReferenceEquals(DeclaringType!.LocalBase, instruction.Target.DeclaringType) ||
+                            stack.Count != 1 || !stack[0].ConstructionReceiver || !ReferenceEquals(stack[0].Class, DeclaringType))
+                            throw new InvalidDataException("base constructor must initialize the current receiver exactly once");
+                        stack.Clear(); baseInitialized = true;
+                    }
+                    else if (!instruction.Target.IsStatic)
                     {
                         var receiver = instruction.Type ?? (instruction.ConstructedTarget is { } reference ? (SignatureType)reference.Definition.DeclaringType!.MakeGenericInstance(reference.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);
                         Pop(instruction.Op == "call.constrained" || instruction.Target.DeclaringType!.IsValueType ? SignatureType.ByReference(receiver) : receiver);
@@ -374,6 +383,7 @@ public sealed partial class MethodBuilder
                     MaxStack = Math.Max(MaxStack, 1); // CLI diagnostic/exception construction.
                     continue;
                 case "return":
+                    if (!baseInitialized) throw new InvalidDataException("derived constructor must initialize its base before returning");
                     if (IsConstructor && DeclaringType!.IsValueType && assigned.Skip(locals.Count + ParameterCount).Any(value => !value))
                         throw new InvalidDataException("value constructor must assign every field on every normal return");
                     if (Signature.OutParameters.Any(i => !assigned[locals.Count + i]))
@@ -387,9 +397,10 @@ public sealed partial class MethodBuilder
             void Merge(int target)
             {
                 if (target >= Instructions.Count) throw new InvalidDataException("reachable fallthrough outside method");
-                var next = new FlowState(stack.ToArray(), (bool[])assigned.Clone());
+                var next = new FlowState(stack.ToArray(), (bool[])assigned.Clone(), baseInitialized);
                 if (states[target] is { } previous)
                 {
+                    if (previous.BaseInitialized != next.BaseInitialized) throw new InvalidDataException("incompatible constructor initialization at branch join");
                     if (!previous.Stack.SequenceEqual(next.Stack)) throw new InvalidDataException("incompatible branch stack");
                     for (int i = 0; i < next.Assigned.Length; i++) next.Assigned[i] &= previous.Assigned[i];
                     if (previous.Assigned.SequenceEqual(next.Assigned)) return;

@@ -196,3 +196,8 @@ Development hierarchy work now preserves local nongeneric native bases in the me
 reader/introspection facade. A three-binary-assembly runtime control verifies base
 construction, inherited mutation, dispatch and identity. Raven and metadata-builder
 inheritance emission remain in progress; this is not yet JSON compilation support.
+
+Development class-base authoring now supports ordinary local nongeneric inheritance
+and direct base-constructor calls in the host metadata library. Generated assemblies
+execute with separate base and derived fields on .NET and neoCLR. This bounded
+checkpoint does not yet complete JSON's closed hierarchy or external class import.

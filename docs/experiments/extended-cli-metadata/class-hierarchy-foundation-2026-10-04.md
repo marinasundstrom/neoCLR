@@ -49,3 +49,20 @@ No Raven code changed in this slice and no main backport is required. The existi
 host C# facade has a linked manual API reference.
 
 [Source hashes and validation summary](class-hierarchy-foundation-2026-10-04.json).
+
+## Authoring follow-up
+
+The host library now accepts an attached local base through AddClass or a manual
+TypeDefinition. CLI Extends and existing native `base` encode the same relationship.
+Derived constructors explicitly initialize their direct base, with definite-once flow
+checks and no duplicate injected Object constructor. Native field indices include base
+storage, while CLI field tokens remain declaration-owned. The expanded C# fixture uses
+both base and derived fields and executes on both runtimes. 145 metadata groups pass;
+`--class-base-runtime` verifies and runs the generated native PE, returning 42.
+
+The guest API snapshot check remains stale as recorded previously; host API documentation
+is in the manual reference. No guest snapshot or unrelated website build was substituted.
+Raven's equivalent driver test also uncovered an ordinary constructor binding defect
+reproducing on main: initializer resolution was attempted before all source members
+were available, and binder re-entry could publish a different constructor symbol.
+That compiler correction is isolated independently of the metadata work.

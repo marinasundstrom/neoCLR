@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--class-base-runtime")
+{
+    await ClassBaseAuthoringChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 3 && args[0] == "--enum-runtime")
 {
     await EnumChecks.RunRuntime(args[1], args[2]); return 0;
@@ -437,6 +441,7 @@ var tests = new (string Name, Action Body)[]
     ("Runtime PE container and required execution schema", RuntimeContainerChecks.Run),
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
+    ("Class base authoring and constructor initialization", ClassBaseAuthoringChecks.Run),
     ("Native local class base snapshots and facade identity", ClassBaseReaderChecks.Run),
     ("Read-only callable imports and emission", ImportedReferenceChecks.Run),
     ("CLI and native Int32 enum definitions and builders", EnumChecks.Run),

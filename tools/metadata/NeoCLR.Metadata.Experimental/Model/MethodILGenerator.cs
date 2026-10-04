@@ -483,7 +483,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         else
         {
             RequireCall(opCode);
-            if (operand.IsConstructor) throw new ArgumentException("constructor chaining is unsupported", nameof(operand));
+            if (operand.IsConstructor && (!bodyBuilder.IsConstructor || !ReferenceEquals(DeclaringType?.LocalBase, operand.DeclaringType)))
+                throw new ArgumentException("constructor calls require the direct base of the current constructor", nameof(operand));
             Append(new("call", Target: operand));
         }
     }

@@ -96,7 +96,12 @@ public sealed partial class AssemblyBuilder
                 throw new InvalidDataException("external nominal method references require an import contract");
         try
         {
-            foreach (var type in types) { type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); }
+            foreach (var type in types)
+            {
+                type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
+                if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent)))
+                    throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
+            }
             ValidateValueLayouts();
             foreach (var type in types)
                 foreach (var attribute in type.Definition.CustomAttributes) attribute.ValidateContract(type.Definition);
@@ -192,6 +197,17 @@ public sealed partial class AssemblyBuilder
     /// <remarks>CLI base is System.Object. Native root classes have no declared base. Constructors are not synthesized.</remarks>
     public TypeBuilder AddClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, isStatic: false);
+    /// <summary>Adds a nongeneric reference class derived from an owned ordinary class.</summary>
+    /// <remarks>The base must already be attached. Constructors explicitly call a direct base constructor through their IL generator.</remarks>
+    /// <exception cref="ArgumentException">The base is foreign, generic, nested, static, an interface or a value type.</exception>
+    public TypeBuilder AddClass(string @namespace, string name, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)
+    {
+        ArgumentNullException.ThrowIfNull(baseType);
+        if (!Enum.IsDefined(visibility)) throw new ArgumentException("invalid visibility", nameof(visibility));
+        var definition = new TypeDefinition(@namespace, name, visibility == TypeVisibility.Public ? 1u : 0u, baseType.Definition.ToReference());
+        Definition.MainModule.Types.Add(definition);
+        return definition.Producer!;
+    }
     /// <summary>Adds an unconstrained static generic class, appending CLI arity to its name.</summary>
     /// <param name="namespace">Namespace, possibly empty.</param>
     /// <param name="name">Simple name without an arity suffix.</param>
@@ -550,7 +566,7 @@ public sealed partial class AssemblyBuilder
             }
             var code = new BlobBuilder();
             var offsets = new int[method.Instructions.Count + 1];
-            offsets[0] = method.IsConstructor && !method.DeclaringType!.IsValueType ? 6 : 0;
+            offsets[0] = method.IsConstructor && !method.DeclaringType!.IsValueType && method.DeclaringType.LocalBase is null ? 6 : 0;
             for (int i = 0; i < method.Instructions.Count; i++)
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
@@ -571,7 +587,7 @@ public sealed partial class AssemblyBuilder
                 });
             var labels = method.LabelPositions();
             if (referenceOnly) { code.WriteByte(0x14); code.WriteByte(0x7a); } // ldnull; throw: never substitute native behavior.
-            else if (method.IsConstructor && !method.DeclaringType!.IsValueType)
+            else if (method.IsConstructor && !method.DeclaringType!.IsValueType && method.DeclaringType.LocalBase is null)
             {
                 code.WriteByte(0x02); // ldarg.0: initialize the sole supported CLI root base.
                 code.WriteByte(0x28); code.WriteInt32(MetadataTokens.GetToken(objectConstructor));
@@ -698,7 +714,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));
@@ -860,7 +876,7 @@ public sealed partial class TypeBuilder
     /// <returns>An owned .ctor body with receiver at argument zero.</returns>
     /// <exception cref="ArgumentException">Invalid/duplicate contract or exceeded limit.</exception>
     /// <exception cref="InvalidOperationException">The declaring type is static.</exception>
-    /// <remarks>CLI emission initializes System.Object before reference-class bodies; value bodies assign their own fields. Native root construction requires no base call. Constructor chaining is unsupported.</remarks>
+    /// <remarks>CLI emission initializes System.Object before reference-class bodies; value bodies assign their own fields. Native root construction requires no base call. Derived classes explicitly call their direct base constructor.</remarks>
     public MethodBuilder AddConstructor(IEnumerable<PrimitiveType> parameterTypes, MethodVisibility visibility = MethodVisibility.Public)
         => AddMethodCore(".ctor", new(PrimitiveType.Void, parameterTypes), visibility, isStatic: false, constructor: true);
     /// <summary>Adds a constructor with an owned nominal/primitive signature whose result must be Void.</summary>

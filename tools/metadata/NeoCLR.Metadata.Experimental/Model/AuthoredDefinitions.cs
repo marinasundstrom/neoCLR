@@ -146,6 +146,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(definition);
         return definition.Producer ?? throw new InvalidOperationException("loaded definition editing remains unsupported");
     }
+    private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
         if (types.Count >= 256 || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
@@ -163,8 +164,8 @@ public sealed partial class AssemblyBuilder
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");
             }
-            else if (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
-                baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum))
+            else if (!(category == 0 && definition.GenericArity == 0 && definition.DeclaringType is null && definition.BaseType is { ExplicitScope: null } localBase && ReferenceEquals(localBase.Module, Definition.MainModule) && localBase.Resolve().Producer is { } parent && IsOrdinaryBase(parent)) && (definition.BaseType is not { } baseType || !ReferenceEquals(baseType.Module, Definition.MainModule) || !Equals(baseType.ExplicitScope, CoreLibrary) || baseType.Namespace != "System" ||
+                baseType.Name != (definition.IsEnum ? "Enum" : definition.IsValueType ? "ValueType" : "Object") || definition.IsValueType != (category == 0x108 || category == 0x100 && definition.IsEnum)))
                 throw new ArgumentException("type base/category does not match the explicit core contract");
             // Validate pending fields before attaching any ownership or writer handles.
             foreach (var field in definition.Fields)
@@ -180,5 +181,17 @@ public sealed partial class AssemblyBuilder
         }
         types.Add(definition.Producer!);
         return definition;
+    }
+}
+
+public sealed partial class TypeBuilder
+{
+    internal TypeBuilder? LocalBase => Definition.BaseType is { ExplicitScope: null } reference ? reference.Resolve().Producer : null;
+    internal int InheritedFieldCount => LocalBase is { } parent ? parent.InheritedFieldCount + parent.Fields.Count : 0;
+    internal bool DerivesFrom(TypeBuilder target)
+    {
+        for (var parent = LocalBase; parent is not null; parent = parent.LocalBase)
+            if (ReferenceEquals(parent, target)) return true;
+        return false;
     }
 }

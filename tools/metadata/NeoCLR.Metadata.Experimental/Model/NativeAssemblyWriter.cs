@@ -163,7 +163,7 @@ public sealed partial class AssemblyBuilder
             "call.virtual" or "call" or "new.object" => new { op = instruction.Op == "call.virtual" ? "callvirt" : instruction.Op == "call" ? "call" : "newobj.ctor", arg = (object)new { name = FunctionName(instruction.Target!), owner = Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, parameters = Parameters(instruction.Target!) } },
             "duplicate" => new { op = "dup" },
             "field.import.load" or "field.import.store" => new { op = instruction.Op == "field.import.load" ? "ldfld" : "stfld", arg = (object)(instruction.ImportedField!.NativeIndex ?? throw new InvalidDataException("native field emission requires a native layout ordinal")) },
-            "field.address" or "field.load" or "field.store" => new { op = instruction.Op == "field.address" ? "ldflda" : instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)instruction.Field!.Index },
+            "field.address" or "field.load" or "field.store" => new { op = instruction.Op == "field.address" ? "ldflda" : instruction.Op == "field.load" ? "ldfld" : "stfld", arg = (object)(instruction.Field!.DeclaringType.InheritedFieldCount + instruction.Field.Index) },
             "argument.address" => new { op = "ldarga", arg = (object)instruction.Value },
             "local.address" => new { op = "ldloca", arg = (object)instruction.Value },
             "object.box" => new { op = "box", arg = SignatureValue(instruction.Type!) },
@@ -320,7 +320,7 @@ public sealed partial class AssemblyBuilder
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
                 TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType && type.NativePrimitive is null, type.IsStatic, type.IsStatic || type.IsValueType,
-                TypeOrigin(type, index), type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
+                TypeOrigin(type, index), type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,
                 type.Properties.Count == 0 ? null : type.Properties.Select(p => (object)new { name = p.Name, instance = !p.IsStatic, parameters = p.ParameterTypes.Select(SignatureValue).ToArray(), ty = SignatureValue(p.PropertyType), getter = Accessor(p.GetMethod), setter = Accessor(p.SetMethod) }).ToArray(), type.GenericParameterNames.Count == 0 ? null : type.GenericParameterNames.ToArray(), Constraints(type), type.Definition.DeclaringType is { } parent ? new { module = ModuleName(this), revision = Identity.Version.ToString(), index = types.IndexOf(parent.Producer!) } : null, type.Definition.CustomAttributes.Count == 0 ? null : type.Definition.CustomAttributes.Select(Attribute).ToArray(), type.IsEnum ? new { underlying = "Int32", flags = false, members = type.MetadataFields.Where(f => f.Definition.IsLiteral).Select(f => new { name = f.Name, value = f.Definition.Constant!.Value }).ToArray() } : null)).ToArray(),
@@ -367,6 +367,8 @@ public sealed partial class AssemblyBuilder
         object[]? interface_implementations);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object? @base,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string? representation,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

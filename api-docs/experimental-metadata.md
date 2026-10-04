@@ -2323,7 +2323,7 @@ contract, not arbitrary identical IL bodies or general constructor chaining.
 Reference projections preserve instance signatures and constructor flags with throwing
 bodies; executable native bodies still reside in the required #Neo payload.
 
-No constructor is synthesized. Inheritance, virtual dispatch, constructor chaining,
+No constructor is synthesized. External inheritance, virtual dispatch, arbitrary constructor chaining,
 indexed properties and external instance snapshot imports remain outside this bounded
 producer. Owned nominal parameters/results/locals, fields and properties are supported. The C# fixture constructs an Order,
 mutates it through one alias and reads through another; both targets return 42.
@@ -3370,7 +3370,7 @@ It implements only the assembly/type/field part of the definition-first plan abo
 | `AssemblyBuilder.Definition` / `AssemblyBuilder.ForDefinition(AssemblyDefinition)` | Returns the same assembly/facade without copying declarations. Null input throws `ArgumentNullException`; loaded input throws `InvalidOperationException`. |
 | `ModuleDefinition.ImportReference(AssemblyIdentity scope, string namespace, string name)` | Creates an explicitly scoped reference; does not load a dependency or consult host reflection. Invalid/null arguments reject. Explicit resolution requires matching assembly identity. |
 | `TypeDefinition(string namespace, string name, uint attributes, TypeReference? baseType)` | Creates a detached declaration. Attachment admits nongeneric root classes, static classes or sealed sequential value types with the same module's explicitly imported core Object/ValueType base. Unsupported shape, foreign ownership or duplicate name throws `ArgumentException`. |
-| `TypeDefinition.BaseType` | Authored base reference; loaded base decoding is pending, so loaded null is not proof of no base. |
+| `TypeDefinition.BaseType` | Authored base reference or a loaded local native base; CLI base decoding remains pending. |
 | `FieldDefinition(string name, ushort attributes, SignatureType fieldType)` | Creates a detached instance field. Supports Private, Assembly or Public access and optional InitOnly; nonvoid signature required. Value-type storage retains existing primitive/generic-payload restrictions. |
 | `FieldDefinition.FieldType` | Authored signature; null for opaque loaded signatures. `GetSignature()` rejects authored fields until encoded/read; use FieldType instead. |
 | `FieldDefinition.Name` | Authored fields can be renamed with Unicode/name and duplicate checks. Loaded edits throw `InvalidOperationException`. |
@@ -6920,3 +6920,39 @@ missing/self/cyclic/unsupported bases and explicit rejection of lossy projection
 unmaterialized CLI base views. These are .NET-host APIs documented manually here; no
 guest RavenDoc signature was added. Builder authoring, external/generic base projection,
 Raven symbols and emission remain subsequent work.
+
+## Local class-base authoring (development, 2026-10-04)
+
+```csharp
+TypeBuilder AssemblyBuilder.AddClass(string @namespace, string name,
+    TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public);
+```
+
+This overload creates an ordinary nongeneric top-level reference class derived from
+an already attached class in the same output. Both owners must be ordinary reference
+classes, without intrinsic representation, generic parameters or nesting. Null bases
+throw `ArgumentNullException`; unsupported/foreign bases and invalid declarations
+throw `ArgumentException` before attachment. Representation changes that invalidate
+an existing base relationship reject at write time.
+
+Manual `TypeDefinition` construction with `parent.ToReference()` followed by
+`module.Types.Add(definition)` uses the same validation. Bases are immutable and must
+already be attached, so authoring cannot create inheritance cycles. CLI output uses
+TypeDef.Extends; native output uses the existing `base` Named relationship. No new
+format version is introduced. External/constructed base authoring remains unsupported.
+
+`IILGenerator.Call(MethodBuilder)` and `Emit(OpCode.Call, MethodBuilder)` now accept
+a direct base constructor from a derived constructor. Load argument zero, then the
+constructor arguments, before calling. A normal return requires exactly one base
+initialization on every path. Receiver escape, field access before base initialization,
+repeated initialization and incompatible initialization at branch joins reject with
+`InvalidDataException` during writing. Constructors of unrelated types and calls from
+ordinary methods reject at emission with `ArgumentException`. Allocation continues to
+use `NewObject`/`Newobj`. Native root construction remains implicit; CLI root constructors
+still receive Object::.ctor, while derived constructors receive only their explicit call.
+
+An initialized derived receiver can be used for inherited field and method access.
+C# tests execute both manual and builder definitions on .NET, round-trip native PE
+metadata and reject invalid initialization. `--class-base-runtime <runtime> <fresh-dir>`
+executes a generated native PE that returns 42. This does not add virtual methods,
+protected visibility, closed-hierarchy declarations, or external class import.

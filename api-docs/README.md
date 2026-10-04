@@ -978,3 +978,10 @@ including NominalTypeInfo.BaseType, TypeDefinition.BaseType and rejection contra
 Host C# APIs remain outside the guest RavenDoc selection. The required snapshot check
 still reports the pre-existing stale guest snapshot; no mismatched bridge refresh or
 website build was performed.
+
+### Local class-base authoring (2026-10-04)
+
+The host-only AddClass base overload, definition parity and IL-generator constructor
+calls are covered by the [manual reference](experimental-metadata.md#local-class-base-authoring-development-2026-10-04)
+and C# executable tests. They remain outside guest RavenDoc selection. The existing
+stale guest snapshot is unchanged; it is not replaced by a partial library snapshot.

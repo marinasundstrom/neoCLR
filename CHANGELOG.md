@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Author local nongeneric class bases through definitions or builders, emit CLI
+  TypeDef.Extends and native base relationships, and call direct base constructors
+  through IILGenerator. Validate initialization before publication and preserve
+  inherited field offsets. C# coverage executes both CLI and native PE construction.
+
 - Materialize local nongeneric native class bases in metadata definitions and the
   introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,
   missing and unsupported bases; reject reference projection rather than dropping
