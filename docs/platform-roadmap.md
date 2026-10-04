@@ -58,7 +58,9 @@ now pass the [paired direct and separate-library gate](experiments/extended-cli-
 Native symbols retain closure/direct children and actual bases; emitters author bounded
 reference conversion contracts from symbol facts. External base declarations and
 virtual hierarchy contracts remain open. JSON now reaches an unsupported lowered
-propagation expression and still publishes no output; shared lowering is next.
+propagation expression and still publishes no output. Shared local-assignment
+propagation now passes a [native executable regression](experiments/extended-cli-metadata/local-assignment-propagation-2026-10-04.md)
+and is independently integrated into Raven main; remaining nested propagation is next.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone
 ReflectionError union in its explicit source dependencies; it does not yet require

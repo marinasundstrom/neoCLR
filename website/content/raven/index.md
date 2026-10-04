@@ -216,4 +216,6 @@ remain open; this does not yet make the JSON source library compile.
 The development closed-family/protected-constructor case now runs on both .NET and
 NeoCLR, including a separate consumer that references only the emitted library.
 External direct children of the closed root reject before output. The next JSON
-blocker is propagation lowering; JSON execution is not yet complete.
+blocker is propagation lowering. Local assignment propagation now executes in a
+focused native success/failure consumer and the shared fix is integrated into Raven
+main. Other nested propagation still blocks JSON; JSON execution is not yet complete.

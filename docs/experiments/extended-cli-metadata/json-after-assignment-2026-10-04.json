@@ -1,0 +1,32 @@
+{
+  "command": [
+    "dotnet",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+    "neoclr",
+    "--core-reference",
+    "/private/tmp/TextCore1004.dll",
+    "--runtime-seed",
+    "/private/tmp/source-text-committed1004/System.neox",
+    "--bootstrap-intrinsics",
+    "--bootstrap-ownership",
+    "/tmp/streams-after-class-base1004/ownership.json",
+    "--reference",
+    "/private/tmp/source-text-committed1004/Numbers.dll",
+    "--reference",
+    "/private/tmp/source-encoding-gate1004c/Encoding.dll",
+    "--reference",
+    "/tmp/streams-after-class-base1004/TextStreams.dll",
+    "--library",
+    "-o",
+    "/tmp/json-after-assignment1004.dll",
+    "runtime/raven/src/System/Data/Json/JsonDocument.rvn",
+    "runtime/raven/src/System/Data/Json/JsonSyntax.rvn",
+    "runtime/raven/src/System/Data/Json/JsonValue.rvn",
+    "runtime/raven/src/System/Data/Json/JsonError.rvn",
+    "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn"
+  ],
+  "exitCode": 1,
+  "stdout": "",
+  "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support lowered expression BoundPropagateExpression.\n",
+  "outputPublished": false
+}

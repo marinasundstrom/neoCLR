@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Record shared local-assignment propagation lowering in Raven,
+  independently integrated into main, and native success/failure execution against
+  source-built libraries. JSON still rejects remaining nested propagation before output.
+
 - Author local nongeneric class bases through definitions or builders, emit CLI
   TypeDef.Extends and native base relationships, and call direct base constructors
   through IILGenerator. Validate initialization before publication and preserve

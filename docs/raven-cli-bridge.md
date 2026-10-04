@@ -5739,3 +5739,13 @@ introduced. Primitive core, retained seed and Numbers ownership remain explicit 
 The equivalent source executes on ordinary .NET. The general constructor-binding fix
 is separately validated on main-based `2416a1646`; main is not merged by this checkpoint.
 [Gate, limitations and hashes](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
+
+
+## Local assignment propagation checkpoint (2026-10-04)
+
+Raven `eb83baa4d` normalizes direct/eager-binary propagation in local assignments
+through shared lowering. The reduced native consumer verifies and returns 42 using
+the existing explicit seed, source-built libraries and ownership catalog. No bridge
+encoding, target configuration or metadata changes. The independent fix is integrated
+into main at `9faabb1a2` with 24 focused .NET tests; its temporary branch is removed.
+See [evidence and remaining JSON gap](experiments/extended-cli-metadata/local-assignment-propagation-2026-10-04.md).

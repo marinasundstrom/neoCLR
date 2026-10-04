@@ -1,0 +1,35 @@
+import System.*
+class Harness {
+    private var count: int = 0
+    private func Read(fail: bool) -> Result<int, int> {
+        count += 1
+        if fail { return .Error(9) }
+        return .Ok(7)
+    }
+    private func Run(fail: bool) -> Result<int, int> {
+        var value = 3
+        value = value + Read(fail)?
+        count += 10
+        return .Ok(value)
+    }
+    func Check(fail: bool) -> bool {
+        count = 0
+        let result = Run(fail)
+        if fail {
+            if result is .Error(let error) {
+                return count == 1 && error == 9
+            }
+            return false
+        }
+        if result is .Ok(let value) {
+            return count == 11 && value == 10
+        }
+        return false
+    }
+}
+
+func Main() -> int {
+    if !Harness().Check(false) { return 1 }
+    if !Harness().Check(true) { return 2 }
+    return 42
+}
