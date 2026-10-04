@@ -5674,10 +5674,12 @@ void CallConstrained(TypeBuilder receiverType, MethodBuilder target);
 void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);
 ```
 
-The initial call profile requires an owned nongeneric concrete value type implementing
-an owned nongeneric interface, and an abstract instance method on that interface. The
-raw overload accepts only `OpCode.Callvirt`. Null operands throw ArgumentNullException;
-foreign, generic, nonvalue, nonconforming or invalid targets/opcodes throw ArgumentException
+The call profile requires an owned nongeneric implementing type and an owned nongeneric
+interface contract. Instance calls require a value-type implementation; static calls
+admit class or value-type implementations and consume no receiver. The raw overload
+accepts `OpCode.Callvirt` for instance contracts and `OpCode.Call` for static contracts.
+Null operands throw ArgumentNullException; foreign, generic, nonconforming, nonvalue
+instance receivers or invalid targets/opcodes throw ArgumentException
 before appending. The existing instruction bound applies. Writing validates complete
 implementations, parameters and the exact managed receiver address; invalid bodies throw
 InvalidDataException. Arguments follow the receiver on the stack.
@@ -5690,8 +5692,8 @@ il.CallConstrained(counterType, nextInterfaceMethod);
 // il.Emit(OpCode.Callvirt, counterType, nextInterfaceMethod);
 ```
 
-CLI encoding is `constrained.` plus `callvirt`; native encoding uses the existing borrowed
-`callself` instruction. Both dispatch to the implementation using the addressed storage,
+For instance contracts, CLI encoding is `constrained.` plus `callvirt`; native encoding
+uses the existing borrowed `callself` instruction. Both dispatch using the addressed storage,
 so mutations affect that instance and leave prior copies independent. This implements
 the value-implementation branch of [.NET constrained dispatch](https://learn.microsoft.com/en-us/dotnet/api/system.reflection.emit.opcodes.constrained?view=net-10.0).
 Reference receivers, external/constructed call targets, open generic receivers, and boxing
@@ -6557,3 +6559,36 @@ container and instruction formats are unchanged.
 Raven’s symbol-authored primitive references use the new canonical ABI. Rebuild older
 experimental primitive-provider artifacts for that path; reader-mediated ImportReference
 continues to preserve the older artifact’s executable name.
+
+
+### Static constrained interface dispatch (development, 2026-10-04)
+
+`IILGenerator.CallConstrained(implementingType, staticInterfaceMethod)` and
+`Emit(OpCode.Call, implementingType, staticInterfaceMethod)` now author the static
+counterpart of the instance operation above. The implementing type is an output-owned,
+nongeneric class or value type, including explicitly designated native numeric types.
+The interface and its nongeneric method must be owned by the same output assembly;
+external/constructed contracts and open method/type parameters remain unsupported.
+
+```csharp
+var il = main.GetILGenerator();
+il.LoadConstant(42);
+il.CallConstrained(implementation, interfaceEcho);
+il.Return();
+```
+
+This consumes the declared arguments and produces the declared result, without a
+receiver value or address. The writer checks the complete interface implementation.
+`Self` inside parameter/result signatures substitutes the implementing type, including
+nested signature shapes already supported by implementation conformance. Invalid stack
+operands fail writing with InvalidDataException. Invalid opcodes or ownership/conformance
+fail before the instruction is appended with ArgumentException; null operands use
+ArgumentNullException. The current instruction-count limit remains in force.
+
+The CLI writer emits standard `constrained.` followed by `call`; the native writer uses
+existing nonborrowed `callself`. Native Self signatures still cannot be emitted as an
+executable CLI assembly. C# tests execute ordinary static contracts on .NET and save
+native ordinary/Self artifacts via `NEOCLR_STATIC_ARTIFACT` (the Self image appends
+`.self.neox`). Both native artifacts return 42. This is a metadata-generator capability,
+not yet support for generic Number-constrained Raven programs. No schema or runtime
+instruction change is introduced.

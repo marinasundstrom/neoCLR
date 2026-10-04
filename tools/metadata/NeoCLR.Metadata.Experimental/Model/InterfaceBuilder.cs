@@ -141,7 +141,7 @@ public sealed partial class TypeBuilder
                 contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), outParameters: contract.Signature.OutParameters),
                 contract.IsStatic, contract.Declaration, owner)));
 
-    private SignatureType ResolveImplementationSelf(SignatureType type) => type.IsSelf && !IsInterface
+    internal SignatureType ResolveImplementationSelf(SignatureType type) => type.IsSelf && !IsInterface
         ? GenericParameterNames.Count == 0 ? this : MakeGenericInstance(Enumerable.Range(0, GenericParameterNames.Count).Select(SignatureType.TypeParameter).ToArray())
         : type.FunctionSignature is { } function ? function.Substitute(ResolveImplementationSelf)
         : type.ByReferenceElement is { } byref ? SignatureType.ByReference(ResolveImplementationSelf(byref))

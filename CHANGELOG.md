@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Extend the metadata IL generator's constrained call operation to static interface
+  contracts, using standard CLI constrained./call and native nonborrowed callself.
+  Substitute Self in stack signatures and retain exact implementation/operand checks.
+  C# tests execute .NET dispatch and native ordinary/Self consumers return 42.
+  Open generic call operands and Raven Number-constrained methods remain unsupported.
+
 - Rebuild the cumulative runtime-library subset with all ten unchanged numeric source
   implementations under one owner, replacing seed Int32/Int64 declarations. Select
   existing integer formatting services explicitly. Preserve canonical primitive member

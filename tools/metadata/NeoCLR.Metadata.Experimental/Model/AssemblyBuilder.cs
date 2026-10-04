@@ -123,6 +123,8 @@ public sealed partial class AssemblyBuilder
                 {
                     if ((instruction.Target ?? instruction.ConstructedTarget?.Definition ?? instruction.GenericTarget?.Definition)?.IsAbstract == true && instruction.Op is not ("call.virtual" or "call.virtual.constructed" or "call.constrained" or "function.bind"))
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
+                    if (instruction.ConstrainedOwner is { } implementingType)
+                        MethodILGenerator.ValidateConstrainedOperands(this, implementingType, instruction.Target!);
                     if (instruction.ConstructedTarget is { } target)
                     {
                         target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments, complete: true);
@@ -643,7 +645,7 @@ public sealed partial class AssemblyBuilder
                     case "new.constructed": case "call.constructed": case "call.virtual.constructed": code.WriteByte(instruction.Op == "new.constructed" ? (byte)0x73 : instruction.Op == "call.virtual.constructed" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ConstructedCallToken(instruction.ConstructedTarget!)); break;
                     case "call.constrained":
                         code.WriteByte(0xfe); code.WriteByte(0x16); code.WriteInt32(ElementToken(instruction.Type!));
-                        code.WriteByte(0x6f); code.WriteInt32(ImportMethod(instruction.Target!)); break;
+                        code.WriteByte(instruction.Target!.IsStatic ? (byte)0x28 : (byte)0x6f); code.WriteInt32(ImportMethod(instruction.Target)); break;
                     case "call.generic": code.WriteByte(0x28); code.WriteInt32(GenericCallToken(instruction.GenericTarget!)); break;
                     case "call.virtual": case "call": code.WriteByte(instruction.Op == "call.virtual" ? (byte)0x6f : (byte)0x28); code.WriteInt32(ImportMethod(instruction.Target!)); break;
                     case "function.bind":
@@ -885,7 +887,7 @@ public enum MethodVisibility
 /// <summary>Typed Int32/Int64/Boolean/String body construction; invalid control-flow contracts fail before emission.</summary>
 public sealed partial class MethodBuilder
 {
-    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null, ImportedFieldReference? ImportedField = null, ImportedConstructedFieldReference? ImportedConstructedField = null);
+    internal sealed record Operation(string Op, int Value = 0, MethodBuilder? Target = null, string? Text = null, NativeFunctionDefinition? NativeTarget = null, long LongValue = 0, FieldBuilder? Field = null, SignatureType? Type = null, GenericMethodInstance? GenericTarget = null, ConstructedMethodReference? ConstructedTarget = null, ConstructedFieldReference? ConstructedField = null, ImportedFieldReference? ImportedField = null, ImportedConstructedFieldReference? ImportedConstructedField = null, TypeBuilder? ConstrainedOwner = null);
     internal List<Operation> Instructions => Definition.Body.Instructions;
     internal int MaxStack { get; private set; }
     internal MethodBuilder(AssemblyBuilder assembly, TypeBuilder? owner, string name, int count, bool result)

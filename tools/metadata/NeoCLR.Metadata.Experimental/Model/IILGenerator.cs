@@ -236,19 +236,19 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void CallVirtual(MethodBuilder target);
-    /// <summary>Calls an owned nongeneric interface on an addressed owned nongeneric value type without boxing.</summary>
-    /// <param name="receiverType">The concrete implementing value type from this assembly.</param>
-    /// <param name="target">An owned nongeneric abstract interface method.</param>
+    /// <summary>Calls an owned nongeneric interface using a concrete owned implementing type.</summary>
+    /// <param name="receiverType">The nongeneric implementing class or value type; instance dispatch requires a value type.</param>
+    /// <param name="target">An owned nongeneric static or instance abstract interface method.</param>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
-    /// <exception cref="ArgumentException">Foreign, generic, nonvalue or nonconforming receiver, or invalid target.</exception>
-    /// <remarks>Consumes an exact managed receiver address followed by arguments. Writing verifies implementations and stack types.
-    /// CLI encoding uses constrained. plus callvirt; native encoding uses borrowed callself. Reference receivers, boxing fallbacks,
+    /// <exception cref="ArgumentException">Foreign, generic or nonconforming implementing type, nonvalue instance receiver, or invalid target.</exception>
+    /// <remarks>Instance calls consume an exact managed receiver address followed by arguments; static calls consume only arguments. Self signatures are substituted with the implementing type. Writing verifies implementations and stack types.
+    /// CLI encoding uses constrained. plus call for static calls, callvirt for instance calls. Native encoding uses callself, borrowed only for instance calls. Reference receivers, boxing fallbacks,
     /// open generics, external and constructed interface targets are outside this initial profile.</remarks>
     void CallConstrained(TypeBuilder receiverType, MethodBuilder target);
     /// <summary>Emits an atomic constrained interface call with typed receiver and method operands.</summary>
-    /// <param name="opCode">Callvirt; other opcodes reject before mutation.</param>
-    /// <param name="receiverType">An owned nongeneric implementing value type.</param>
-    /// <param name="target">An owned nongeneric abstract interface method.</param>
+    /// <param name="opCode">Call for static contracts, Callvirt for instance contracts; other opcodes reject before mutation.</param>
+    /// <param name="receiverType">An owned nongeneric implementing class or value type; instance calls require a value type.</param>
+    /// <param name="target">An owned nongeneric static or instance abstract interface method.</param>
     /// <exception cref="ArgumentException">Unsupported opcode or operand contract.</exception>
     /// <exception cref="ArgumentNullException">A required operand is null.</exception>
     void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);

@@ -1,0 +1,66 @@
+{
+  "scope": "Concrete owned static interface dispatch through the metadata IL generator; native Self argument/result substitution. Open generic Number lowering is not implemented.",
+  "runtimeBaseRevision": "907ccff7bd738e2707cb58a3de1d6861348d0b16",
+  "compilerRevision": "d92e2bdc9",
+  "metadataTests": "138/138 including executable CLI typed/raw constrained dispatch",
+  "ravenBaseline": "20/20 Self and imported static-interface tests",
+  "commands": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/static-constrained-next.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_FCA5825A56605523ACF398680DF2D5B57AAEF1A73305F36E7BE2269CC527B02C: typed-stack/control-flow verification passed (59 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/static-constrained-next.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/static-constrained-next.neox.self.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8E7B05453D53FC9D5F29030DF520A164BE50AD8DBB126755104641EF54E5F45E: typed-stack/control-flow verification passed (59 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/static-constrained-next.neox.self.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/private/tmp/static-constrained-next.neox": "0d24c8690bee8325744fe7c82bde067fc8a6a326fef25536f5532d374da2ef38",
+    "/private/tmp/static-constrained-next.neox.self.neox": "2383847b3a1168c7afc4d0d46ae5d52bb8438ce5b24807844824acc175852684",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "7a36146da256897652ad7d31da961f566fd47914449e95464c0cb19206fd1a43",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/StaticInterfaceChecks.cs": "309bb6ab27394e831a6bb53df1cd6abe503d2bd7fe2fee0e98f76721ebcec070"
+  },
+  "apiSnapshot": "Known stale guest API snapshot; experimental C# manual updated, guest API unchanged",
+  "compilerDocumentationCommit": "3787f15fb"
+}

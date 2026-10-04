@@ -492,3 +492,34 @@ Compiler implementation: Raven `d92e2bdc9` over `da502f04a`; matching runtime/me
 slice is above neoCLR `6fe30a80`. Validation: 138 C# metadata groups, 43 focused runtime
 interface tests, seven existing native consumers, and the source-family gate pass.
 The earlier 38 focused .NET controls and paired floating control remain unchanged.
+
+
+### Static constrained-call prerequisite (2026-10-04)
+
+The reduced Raven repro `Sum<T>(left: T, right: T) -> T where T: Number => left + right`
+binds successfully against the rebuilt numeric library, then rejects with NEOMETA001
+at callable-declaration admission. Inspection found two independent gaps: the portable
+callable filter rejects method constraints, and the metadata IL generator exposed only
+concrete instance constrained calls. Do not relax the filter until bounds are preserved.
+
+The latter gap is now closed. The existing CallConstrained operation also accepts owned
+static interface contracts on owned nongeneric class/value implementations. Raw Emit
+uses Call for static and Callvirt for instance methods. Both use the same validation
+path. Self substitutes the implementing type in stack arguments/results. CLI uses its
+standard constrained./call pair; native uses existing nonborrowed callself. No runtime
+or schema change was necessary. The C# suite executes .NET dispatch; ordinary and
+primitive-Self native artifacts both verify/run with exit 42 and empty stdout.
+
+The next slice is method generic bounds across definitions/builders, CLI GenericParam
+and GenericParamConstraint, native function constraints, reader snapshots and introspection.
+Then admit those semantic bounds through the explicit NeoCLR capability and lower
+static interface calls with a method-parameter implementing type. Imported bounds and
+reference-only generic consumers must be tested before claiming generic Number support.
+The importer/emitter boundary and ordinary .NET backend remain unchanged. Baselines:
+138 metadata groups and 20 focused Raven Self/static-interface tests pass. See
+static-constrained-2026-10-04.json for artifact hashes and executable evidence.
+
+Compiler implementation remains Raven `d92e2bdc9`; matching compiler direction note
+is `3787f15fb`. This metadata slice is based on neoCLR `907ccff7`. No compiler fix or
+main backport is claimed. The guest API snapshot check still reports its known stale
+state; the C# development API manual covers the changed generator contract.

@@ -5588,3 +5588,29 @@ commands, hashes and source ownership. The metadata C# suite covers canonical an
 legacy names/accessors; focused runtime interface tests cover semantic name matching
 and inaccessible implementation rejection. The stale guest API snapshot is unchanged;
 no guest public signature changed.
+
+
+### Static constrained-call prerequisite (2026-10-04)
+
+The reduced Raven repro `Sum<T>(left: T, right: T) -> T where T: Number => left + right`
+binds successfully against the rebuilt numeric library, then rejects with NEOMETA001
+at callable-declaration admission. Inspection found two independent gaps: the portable
+callable filter rejects method constraints, and the metadata IL generator exposed only
+concrete instance constrained calls. Do not relax the filter until bounds are preserved.
+
+The latter gap is now closed. The existing CallConstrained operation also accepts owned
+static interface contracts on owned nongeneric class/value implementations. Raw Emit
+uses Call for static and Callvirt for instance methods. Both use the same validation
+path. Self substitutes the implementing type in stack arguments/results. CLI uses its
+standard constrained./call pair; native uses existing nonborrowed callself. No runtime
+or schema change was necessary. The C# suite executes .NET dispatch; ordinary and
+primitive-Self native artifacts both verify/run with exit 42 and empty stdout.
+
+The next slice is method generic bounds across definitions/builders, CLI GenericParam
+and GenericParamConstraint, native function constraints, reader snapshots and introspection.
+Then admit those semantic bounds through the explicit NeoCLR capability and lower
+static interface calls with a method-parameter implementing type. Imported bounds and
+reference-only generic consumers must be tested before claiming generic Number support.
+The importer/emitter boundary and ordinary .NET backend remain unchanged. Baselines:
+138 metadata groups and 20 focused Raven Self/static-interface tests pass. See
+static-constrained-2026-10-04.json for artifact hashes and executable evidence.

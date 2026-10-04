@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using OpCode = NeoCLR.Metadata.Experimental.Model.OpCode;
 using NeoCLR.Metadata.Experimental;
 using NeoCLR.Metadata.Experimental.Introspection;
 using NeoCLR.Metadata.Experimental.Model;
@@ -24,9 +25,14 @@ internal static class StaticInterfaceChecks
             var echo = implementation.AddMethod("Echo", signature);
             echo.GetILGenerator().LoadArgument(0); echo.GetILGenerator().Return();
             var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
-            main.GetILGenerator().LoadConstant(42); main.GetILGenerator().Call(echo); main.GetILGenerator().Return();
+            main.GetILGenerator().LoadConstant(42);
+            var interfaceMethod = contract.Methods.Single();
+            if (detached) main.GetILGenerator().Emit(OpCode.Call, implementation, interfaceMethod);
+            else main.GetILGenerator().CallConstrained(implementation, interfaceMethod);
+            main.GetILGenerator().Return();
             graph.EntryPoint = main;
             var loaded = Assembly.Load(graph.Write());
+            if ((int)loaded.EntryPoint!.Invoke(null, null)! != 42) throw new Exception("metadata-authored static constrained call");
             var owner = loaded.GetType("Example.IdentityImpl", true)!;
             var declaration = loaded.GetType("Example.Identity", true)!.GetMethod("Echo")!;
             var call = new DynamicMethod("InvokeContract", typeof(int), [], owner.Module);
@@ -38,6 +44,32 @@ internal static class StaticInterfaceChecks
             var view = new MetadataLoadContext([snapshot]).Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "Identity").GetMethods().Single();
             if (!view.IsStatic || !view.IsAbstract) throw new Exception("static contract flags lost");
             if (Environment.GetEnvironmentVariable("NEOCLR_STATIC_ARTIFACT") is { } path) File.WriteAllBytes(path, native);
+        }
+        {
+            var graph = new AssemblyBuilder(new("StaticPrimitiveSelf", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
+            var contract = graph.AddInterface("Example", "Number");
+            var add = contract.AddInterfaceMethod("Add", new(SignatureType.Self, [SignatureType.Self, SignatureType.Self]), isStatic: true);
+            var implementation = graph.AddValueType("System", "Double");
+            implementation.SetNativePrimitive(PrimitiveType.Double);
+            implementation.AddInterfaceImplementation(contract);
+            var body = implementation.AddMethod("Add", new(PrimitiveType.Double, [PrimitiveType.Double, PrimitiveType.Double])).GetILGenerator();
+            body.LoadArgument(0); body.LoadArgument(1); body.Add(); body.Return();
+            var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
+            var il = main.GetILGenerator();
+            Reject(() => il.Emit(OpCode.Callvirt, implementation, add));
+            var unrelated = graph.AddValueType("Example", "Unrelated");
+            Reject(() => il.CallConstrained(unrelated, add));
+            il.LoadConstant(20.0); il.LoadConstant(22.0);
+            il.Emit(OpCode.Call, implementation, add); il.Emit(OpCode.Conv_I4); il.Return();
+            graph.EntryPoint = main;
+            var native = RuntimeAssemblyContainer.WriteBinary(graph);
+            _ = AssemblyDefinition.ReadNativeAssembly(native);
+            if (Environment.GetEnvironmentVariable("NEOCLR_STATIC_ARTIFACT") is { } path) File.WriteAllBytes(path + ".self.neox", native);
+            main.Definition.Body.ClearInstructions();
+            il.LoadConstant(20); il.LoadConstant(22);
+            il.CallConstrained(implementation, add); il.Emit(OpCode.Conv_I4); il.Return();
+            try { _ = RuntimeAssemblyContainer.WriteBinary(graph); throw new Exception("wrong Self operands accepted"); }
+            catch (InvalidDataException) { }
         }
         foreach (var external in new[] { false, true })
         foreach (var correct in new[] { false, true })
@@ -74,5 +106,10 @@ internal static class StaticInterfaceChecks
             }
             catch (InvalidDataException) when (!correct) { }
         }
+    }
+    private static void Reject(Action action)
+    {
+        try { action(); } catch (ArgumentException) { return; }
+        throw new Exception("invalid constrained operand accepted");
     }
 }

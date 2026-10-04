@@ -335,6 +335,10 @@ public sealed partial class MethodBuilder
                 case "call.constructed":
                 case "call.generic":
                     var callSignature = instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature;
+                    if (instruction.ConstrainedOwner is { } implementingType)
+                        callSignature = new MethodSignature(implementingType.ResolveImplementationSelf(callSignature.ReturnType),
+                            callSignature.ParameterTypes.Select(implementingType.ResolveImplementationSelf),
+                            callSignature.GenericParameterNames, callSignature.OutParameters);
                     var outputs = new List<int>();
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--)
                     {
