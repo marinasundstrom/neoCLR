@@ -221,7 +221,7 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
-        if (!referenceOnly && (types.Any(t => t.NativePrimitive is not null) ||
+        if (!referenceOnly && (authoredPrimitiveOwners.Count != 0 || types.Any(t => t.NativePrimitive is not null) ||
             methods.SelectMany(m => m.Instructions).Any(i => i.Target?.DeclaringType?.NativePrimitive is not null)))
             throw new InvalidDataException("native primitive implementations require native emission");
         if (!referenceOnly && methods.Any(m => m.Instructions.Any(i => i.Op == "array.reserve")))

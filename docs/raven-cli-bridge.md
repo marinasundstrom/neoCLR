@@ -5531,3 +5531,28 @@ Raven's shared primitive preference now honors MetadataImportOptions.CoreAssembl
 The bug was independently reproduced on .NET main; fix f749c1a75 and 20 focused tests
 are integrated there without the experimental target. [Evidence and reproduction](experiments/extended-cli-metadata/bootstrap/README.md#source-boolean-parsing-and-numeric-service-family-2026-10-04)
 identify the matching bundle. Ordinary .NET defaults remain System.Runtime.
+
+
+### Source floating primitive ownership (2026-10-04)
+
+Unchanged Single.rvn, Double.rvn and NumberParseError.rvn now compile into a native
+library and execute through a separate artifact-only consumer. The explicit ownership
+manifest selects nativePrimitives by canonical name and owning library. Raven retains
+the declared CLI bootstrap while compiling the provider, checks its sole private
+mutable m_value field, and emits scalar receiver operations rather than record storage.
+Consumers select native declarations consistently for keyword, namespace and metadata
+name lookup. Missing providers fail before publication. Emission authors references
+from symbols and host dependency identities/digests, independent of reader objects.
+The metadata writer preserves canonical scalar dependency names for authored references.
+
+This matches the CLR distinction between primitive signatures/storage and ordinary
+value types; allowing an explicitly selected external native provider is a NeoCLR host
+configuration, not a .NET replacement rule. No runtime instruction or schema changed.
+Generic Number-constrained calls, integer source providers and complete numeric-family
+acceptance remain open. Run bootstrap/verify_native_floating.py with explicit compiler,
+runtime, core, seed, base-library, number-contracts and ownership artifacts. It verifies
+parsing payloads/errors, NaN ordering, scalar methods, identities and arrays (exit 42,
+empty stdout), and failed missing-provider publication. See native-floating-2026-10-04.json.
+38 focused .NET metadata-import/Self/operator/interface controls and 138 C# metadata
+contract groups pass. The guest API snapshot remains the recorded stale artifact;
+this change updates the development C# API manual and introduces no guest API.

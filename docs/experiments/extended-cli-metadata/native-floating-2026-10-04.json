@@ -1,0 +1,348 @@
+{
+  "runtimeRepositoryRevision": "a37fa6b956bf77ca29104eab45b4bdbf429f101d",
+  "compilerRepositoryRevision": "17d7c50f59cccbc36160ea4d57382ec8696c3556",
+  "scope": "Unchanged source Single/Double declarations execute via direct native import: scalar receivers, properties, parsing Result payloads/errors, NaN ordering and arrays. Generic Number-constrained calls remain open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Single.rvn": "420cd12c42f66979a7f4cfbba1d06504ad1441934c9106843e46a3d7f05e2ab3",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Double.rvn": "44fac550e7b88c92256764db1241ec8dc05d06440e68a698941e540ac070dbfc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/NumberParseError.rvn": "bd2c461d481a292aa0d1758254e890a16e4a9a91b95dbe0f3789f0a8deca7c88",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-floating-consumer.rvn": "98528fb2b98b899572b1e4cd51f448fd1e2b0089689f37085322316235cb4d28",
+    "/private/tmp/native-float-verified1004/ownership.json": "5505319862f960f3d970c16478e30eab5dab9a9ae36375829600b4f1e20bd9ec",
+    "/private/tmp/number-contracts-final21004/NumberContracts.dll": "bf2cbf298d1090f5a945a3f531a8beafbe034ae6a30ed45927042db4001c7001",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f6afd4741893c772082d1ee7d059461afb9558b3a36152373f625a5dc43560ff",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c",
+    "/private/tmp/ParseCore1004.dll": "008cc8a110b358f9cb7a60cdd3cdb44485b7898e8e0c8676c0c4aad020969479",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll": "a572ea77764d03d3d0a887ff105cfd0e81270492dd155e93d78ce7b4bb4b0dc5",
+    "/private/tmp/number-ownership1004.json": "0ab9ecaa6aac546739e982889ad1191ed9c40f4674249ac7045537b954f6865c",
+    "/private/tmp/native-float-verified1004/Consumer.dll": "dc7cd2612467239d785b1fb752c77908b0501023bb82db6e185f378e3ff799d2",
+    "/private/tmp/native-float-verified1004/FloatingNumbers.dll": "7046f27d1e24af37071f1eb4bcadd34468da09bb2e02359958a57ec58f398959"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-float-verified1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-float-verified1004/FloatingNumbers.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Single.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Double.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/NumberParseError.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "info RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'double' to 'double' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'int' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'float' to 'float' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-float-verified1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--reference",
+        "/private/tmp/native-float-verified1004/FloatingNumbers.dll",
+        "-o",
+        "/private/tmp/native-float-verified1004/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-floating-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/native-float-verified1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--module",
+        "/private/tmp/native-float-verified1004/FloatingNumbers.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (515 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/native-float-verified1004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--module",
+        "/private/tmp/native-float-verified1004/FloatingNumbers.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-float-verified1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "-o",
+        "/private/tmp/native-float-verified1004/Missing.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-floating-consumer.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Missing or incompatible native primitive provider: System.Single in FloatingNumbers\n"
+    }
+  ],
+  "workingTreeChanges": "Matching committed slice includes explicit native provider selection and authored primitive member references; revisions above are base commits.",
+  "regressions": {
+    "metadataGroups": "138/138",
+    "focusedDotNetTests": "38/38",
+    "pairedFloatingControl": {
+      "runtimeRepositoryRevision": "a37fa6b956bf77ca29104eab45b4bdbf429f101d",
+      "compilerRepositoryRevision": "17d7c50f59cccbc36160ea4d57382ec8696c3556",
+      "scope": "Separate floating library and artifact-only consumer: fields, properties, arrays, generic calls, numeric conversions, NaN comparisons and signed zero execute on both targets. Source Single/Double class-library declarations remain open.",
+      "hashes": {
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-contracts.rvn": "7ec0fac73d6c6bd4a3769ca1a0df46218a1a9919d98d417f051c24a0ce3a734b",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-consumer.rvn": "a040fffbe0c90373e7228bf0412068adc8f66656e34506ef2e3f0a057ebbc65c",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-parsing-consumer.rvn": "47a878414814bd9a1215de5d5544e60ba8167c0344e97f52f43ca53a186f4744",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f6afd4741893c772082d1ee7d059461afb9558b3a36152373f625a5dc43560ff",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c",
+        "/private/tmp/ParseCore1004.dll": "008cc8a110b358f9cb7a60cdd3cdb44485b7898e8e0c8676c0c4aad020969479",
+        "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll": "a572ea77764d03d3d0a887ff105cfd0e81270492dd155e93d78ce7b4bb4b0dc5",
+        "/private/tmp/task-queue-base-final1004/ownership.json": "8b86cf73daa8454c15f50179cc04507a6719d6dc3b56e0eea1bac86a51357075",
+        "/private/tmp/primitive-floating-verified1004/Consumer.dll": "7a6697099561312d7f4a01ad94bfd2c27cd477f7955467b0320c0d27eccc79f4",
+        "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll": "8504c90d611b0568564557d1db91b95e51ade4ac4711c1c5e3cf3d389c1a5428",
+        "/private/tmp/primitive-floating-verified1004/ParsingConsumer.dll": "35dd0010b4896163c535583b587715a9fdda9f00868e0248c1f835f2d6869b39",
+        "/private/tmp/primitive-floating-verified1004/dotnet/Consumer.dll": "ef8a5d451dae5f3cf30d8d202d5bb987084983770496ece0e7aa49f5120743c4",
+        "/private/tmp/primitive-floating-verified1004/dotnet/FloatingContracts.dll": "6aad372afe1653e489d07ff402738c639bea4247cdcf40855524c923ea5b2c40"
+      },
+      "commands": [
+        {
+          "command": [
+            "dotnet",
+            "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+            "neoclr",
+            "--core-reference",
+            "/private/tmp/ParseCore1004.dll",
+            "--runtime-seed",
+            "/private/tmp/ParseSystem1004.neox",
+            "--bootstrap-intrinsics",
+            "--bootstrap-ownership",
+            "/private/tmp/task-queue-base-final1004/ownership.json",
+            "--reference",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--library",
+            "-o",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-contracts.rvn"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "dotnet",
+            "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+            "neoclr",
+            "--core-reference",
+            "/private/tmp/ParseCore1004.dll",
+            "--runtime-seed",
+            "/private/tmp/ParseSystem1004.neox",
+            "--bootstrap-intrinsics",
+            "--bootstrap-ownership",
+            "/private/tmp/task-queue-base-final1004/ownership.json",
+            "--reference",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--reference",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "-o",
+            "/private/tmp/primitive-floating-verified1004/Consumer.dll",
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-consumer.rvn"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "info RAV1508: Explicit cast from 'long' to 'double' is unnecessary because an implicit conversion exists.\n"
+        },
+        {
+          "command": [
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+            "verify",
+            "/private/tmp/primitive-floating-verified1004/Consumer.dll",
+            "--module",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--module",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "--system",
+            "/private/tmp/ParseSystem1004.neox"
+          ],
+          "exitCode": 0,
+          "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (495 IL functions; maximum stack 6; runtime value checks remain)\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+            "run",
+            "/private/tmp/primitive-floating-verified1004/Consumer.dll",
+            "--module",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--module",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "--system",
+            "/private/tmp/ParseSystem1004.neox"
+          ],
+          "exitCode": 42,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "dotnet",
+            "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+            "neoclr",
+            "--core-reference",
+            "/private/tmp/ParseCore1004.dll",
+            "--runtime-seed",
+            "/private/tmp/ParseSystem1004.neox",
+            "--bootstrap-intrinsics",
+            "--bootstrap-ownership",
+            "/private/tmp/task-queue-base-final1004/ownership.json",
+            "--reference",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--reference",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "-o",
+            "/private/tmp/primitive-floating-verified1004/ParsingConsumer.dll",
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-parsing-consumer.rvn"
+          ],
+          "exitCode": 0,
+          "stdout": "",
+          "stderr": "info RAV1508: Explicit cast from 'float' to 'double' is unnecessary because an implicit conversion exists.\n"
+        },
+        {
+          "command": [
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+            "verify",
+            "/private/tmp/primitive-floating-verified1004/ParsingConsumer.dll",
+            "--module",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--module",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "--system",
+            "/private/tmp/ParseSystem1004.neox"
+          ],
+          "exitCode": 0,
+          "stdout": "NeoMetadata_44A56BC8D3D86948F9E462A9C3265C2858CE5BE02E78DDC8DE9D3ADE0F64CC48: typed-stack/control-flow verification passed (495 IL functions; maximum stack 6; runtime value checks remain)\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+            "run",
+            "/private/tmp/primitive-floating-verified1004/ParsingConsumer.dll",
+            "--module",
+            "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+            "--module",
+            "/private/tmp/primitive-floating-verified1004/FloatingContracts.dll",
+            "--system",
+            "/private/tmp/ParseSystem1004.neox"
+          ],
+          "exitCode": 42,
+          "stdout": "",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "dotnet",
+            "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+            "--framework",
+            "net10.0",
+            "--emit-core-types-only",
+            "--output-type",
+            "classlib",
+            "-o",
+            "/private/tmp/primitive-floating-verified1004/dotnet/FloatingContracts.dll",
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-contracts.rvn"
+          ],
+          "exitCode": 0,
+          "stdout": "Build succeeded in 1,2s\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "dotnet",
+            "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+            "--framework",
+            "net10.0",
+            "--emit-core-types-only",
+            "--refs",
+            "/private/tmp/primitive-floating-verified1004/dotnet/FloatingContracts.dll",
+            "-o",
+            "/private/tmp/primitive-floating-verified1004/dotnet/Consumer.dll",
+            "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/floating-consumer.rvn"
+          ],
+          "exitCode": 0,
+          "stdout": "docs/experiments/extended-cli-metadata/bootstrap/floating-consumer.rvn(5,8): info RAV1508: Explicit cast from 'long' to 'double' is unnecessary because an implicit conversion exists.\n\nBuild succeeded in 1,3s\n",
+          "stderr": ""
+        },
+        {
+          "command": [
+            "dotnet",
+            "/private/tmp/primitive-floating-verified1004/dotnet/Consumer.dll"
+          ],
+          "exitCode": 42,
+          "stdout": "",
+          "stderr": ""
+        }
+      ]
+    }
+  },
+  "authoredPrimitiveConsumer": {
+    "exitCode": 42,
+    "stdout": "",
+    "stderr": ""
+  },
+  "compilerImplementationCommit": "da502f04a"
+}

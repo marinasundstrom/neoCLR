@@ -2,12 +2,15 @@ namespace NeoCLR.Metadata.Experimental.Model;
 
 public sealed partial class AssemblyBuilder
 {
+    private readonly Dictionary<ImportedTypeReference, PrimitiveType> authoredPrimitiveOwners = [];
+    internal PrimitiveType? AuthoredPrimitiveOwner(ImportedTypeReference type) => authoredPrimitiveOwners.TryGetValue(type, out var primitive) ? primitive : null;
     /// <summary>Authors a public nonvirtual member, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
     /// <param name="name">Simple member name, or .ctor for a constructor.</param>
     /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <param name="isOverride">Reuse the inherited slot; currently only instance value-type ToString(): String is supported.</param>
+    /// <param name="nativePrimitive">Explicit canonical numeric owner representation, or null for an ordinary owner.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
@@ -17,7 +20,7 @@ public sealed partial class AssemblyBuilder
     /// Authored interfaces require nongeneric abstract contracts. Instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
-        MethodSignature signature, bool isStatic = false, bool isOverride = false)
+        MethodSignature signature, bool isStatic = false, bool isOverride = false, PrimitiveType? nativePrimitive = null)
     {
         ArgumentNullException.ThrowIfNull(declaringType);
         ArgumentNullException.ThrowIfNull(name);
@@ -25,6 +28,10 @@ public sealed partial class AssemblyBuilder
         if (!ReferenceEquals(declaringType.Owner, this) ||
             declaringType.TypeArguments.Count != 0 || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph))
             throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
+        if (nativePrimitive is { } primitive && (!TypeDefinition.IsNumericPrimitive(primitive) ||
+            !declaringType.IsValueType || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
+            declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" || isOverride))
+            throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||
             signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("override reference requires instance value ToString(): String");
@@ -39,12 +46,14 @@ public sealed partial class AssemblyBuilder
         if (!Supported(signature.ReturnType, true) || signature.ParameterTypes.Any(t => !Supported(t.ByReferenceElement ?? t, false)) || constructor && signature.ParameterTypes.Any(t => t.ByReferenceElement is not null))
             throw new InvalidDataException("unsupported authored method signature");
         signature.ValidateOwner(this, declaringType.GenericArity, allowSelf: isInterface);
+        if (authoredCallableReferences.Any(m => Equals(m.DeclaringReference, declaringType) && m.Target.DeclaringType?.NativePrimitive != nativePrimitive))
+            throw new InvalidDataException("conflicting primitive owner contract");
         foreach (var existing in authoredCallableReferences)
         {
             if (!Equals(existing.DeclaringReference, declaringType) || existing.Name != name ||
                 existing.Signature.GenericParameterNames.Count != signature.GenericParameterNames.Count ||
                 !existing.Signature.ParameterTypes.SequenceEqual(signature.ParameterTypes)) continue;
-            if (existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
+            if (existing.Target.DeclaringType?.NativePrimitive != nativePrimitive || existing.Target.NativeValueOverride != isOverride || existing.IsStatic != isStatic || !existing.Signature.Matches(signature))
                 throw new InvalidDataException("conflicting method contract");
             return existing;
         }
@@ -58,10 +67,13 @@ public sealed partial class AssemblyBuilder
             result.Definition.AuthoredDeclaringType = type.DeclaringType is { } parent ? MaterializeOwner(parent).Definition : null;
             return result;
         }
+        if (nativePrimitive is { } declaredPrimitive) authoredPrimitiveOwners[declaringType] = declaredPrimitive;
         var owner = MaterializeOwner(declaringType);
+        if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
         { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
+        reference.Target.NativeImportPrimitiveOwner = nativePrimitive;
         authoredCallableReferences.Add(reference);
         return reference;
 

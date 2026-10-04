@@ -1,0 +1,37 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let single = Single.One
+    let value = Double.One
+    if single != 1.0f || value != 1.0 { return 1 }
+    if Single.Zero != 0.0f || Double.Zero != 0.0 { return 2 }
+    if single.CompareTo(2.0f) != -1 || value.CompareTo(2.0) != -1 { return 3 }
+    if single.CompareTo(single) != 0 || value.CompareTo(0.0) != 1 { return 4 }
+    let nan = 0.0 / 0.0
+    if nan.CompareTo(value) != -1 || value.CompareTo(nan) != 1 { return 5 }
+    if nan.CompareTo(nan) != 0 { return 6 }
+    match Single.Parse("20.5") {
+        .Ok(let parsed) => { if parsed != 20.5f { return 7 } }
+        .Error(_) => { return 8 }
+    }
+    match Double.Parse("21.5") {
+        .Ok(let parsed) => { if parsed != 21.5 { return 9 } }
+        .Error(_) => { return 10 }
+    }
+    match Single.Parse("bad") {
+        .Ok(_) => { return 11 }
+        .Error(let error) => {
+            if error is not NumberParseError.InvalidFormat { return 12 }
+        }
+    }
+    match Double.Parse("1e9999") {
+        .Ok(_) => { return 13 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 14 }
+        }
+    }
+    let values = [single, 2.0f]
+    if values[1] + values[0] != 3.0f { return 15 }
+    return 42
+}

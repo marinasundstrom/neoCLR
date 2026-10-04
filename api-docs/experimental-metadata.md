@@ -6526,3 +6526,16 @@ input, immutable snapshots, introspection, late invalid edits and independent na
 method import. With `NEOCLR_PRIMITIVE_ARTIFACT` and `NEOCLR_PRIMITIVE_CONSUMER` set,
 the C# suite saves a primitive library and consumer; running the consumer with that
 module and the explicit seed returns 42 after mutation through its primitive receiver.
+
+
+`AssemblyBuilder.CreateMethodReference` also accepts optional
+`PrimitiveType? nativePrimitive = null`. Supply the same explicit numeric designation
+for every member of an output-owned canonical System value reference. This authors
+scalar receivers and dependency records using only identity/signature facts; it does
+not reopen reader definitions or validate the dependency's implementation. Invalid
+names, nesting, arity, constructors or overrides throw ArgumentException; conflicting
+primitive/nominal owner contracts throw InvalidDataException. Ordinary references keep
+the null default. Runtime linking verifies the supplied dependency. Executable CLI
+output rejects these native calls. `PrimitiveRepresentationChecks` now also saves
+`NEOCLR_PRIMITIVE_CONSUMER + ".authored.neox"`, an independently executable consumer
+created through this symbol-facts-only path.

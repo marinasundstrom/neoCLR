@@ -65,6 +65,21 @@ internal static class PrimitiveRepresentationChecks
         consumerIL.LoadLocalAddress(storage);
         consumerIL.Call(consumer.ImportReference(declaration.Methods.Single(m => m.Name == "Identity"), graph.CoreLibrary));
         consumerIL.Emit(OpCode.Conv_I4); consumerIL.Return(); consumer.EntryPoint = entry;
+        var authored = new AssemblyBuilder(new("AuthoredPrimitiveConsumer", new Version(1, 0, 0, 0)), graph.CoreLibrary);
+        var primitiveReference = authored.CreateValueTypeReference(snapshot.Identity, graph.CoreLibrary,
+            Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(native)), "System", "Double");
+        var importedIdentity = authored.CreateMethodReference(primitiveReference, "Identity", new(PrimitiveType.Double, []), nativePrimitive: PrimitiveType.Double);
+        Reject<ArgumentException>(() => authored.CreateMethodReference(primitiveReference, "Identity", new(PrimitiveType.Double, []), nativePrimitive: PrimitiveType.Single));
+        Reject<InvalidDataException>(() => authored.CreateMethodReference(primitiveReference, "Identity", new(PrimitiveType.Double, [])));
+        Reject<InvalidDataException>(() => authored.CreateMethodReference(primitiveReference, "Other", new(PrimitiveType.Double, [])));
+        Reject<InvalidDataException>(() => authored.Write());
+        var authoredEntry = authored.AddFunction("Main", new(PrimitiveType.Int32, []));
+        var authoredIL = authoredEntry.GetILGenerator();
+        var scalarStorage = authoredIL.DeclareLocal(PrimitiveType.Double);
+        authoredIL.LoadConstant(42.0); authoredIL.StoreLocal(scalarStorage); authoredIL.LoadLocalAddress(scalarStorage);
+        authoredIL.Call(importedIdentity); authoredIL.Emit(OpCode.Conv_I4); authoredIL.Return(); authored.EntryPoint = authoredEntry;
+        var authoredNative = RuntimeAssemblyContainer.WriteBinary(authored);
+        if (Environment.GetEnvironmentVariable("NEOCLR_PRIMITIVE_CONSUMER") is { } authoredPath) File.WriteAllBytes(authoredPath + ".authored.neox", authoredNative);
         var consumerNative = RuntimeAssemblyContainer.WriteBinary(consumer);
         Reject<InvalidDataException>(() => consumer.Write());
         if (Environment.GetEnvironmentVariable("NEOCLR_PRIMITIVE_CONSUMER") is { } consumerPath) File.WriteAllBytes(consumerPath, consumerNative);

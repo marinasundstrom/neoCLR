@@ -265,5 +265,8 @@ future direction.
 
 The development native compiler gate now builds Boolean and BooleanParseError from Raven
 source into a separate library and executes an artifact-only consumer. The checked service
-catalog includes all existing numeric parsers; this does not yet provide every primitive
-payload category or the complete numeric source library in the native compiler.
+catalog includes all existing numeric parsers. A further development gate builds the
+unchanged Single/Double Number implementations and NumberParseError with explicit
+native scalar ownership, then imports and executes parsing and ordering from a separate
+consumer. The complete numeric source family and generic Number-constrained calls
+remain unfinished in the native compiler.

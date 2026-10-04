@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Compile unchanged source Single/Double Number implementations and NumberParseError
+  into a native library, then execute an artifact-only consumer covering parsing,
+  ordering and arrays. Raven selects explicit native primitive providers and maps
+  checked intrinsic storage to scalar receivers. Metadata member references can be
+  authored from semantic contracts without reader handles; dependency records retain
+  canonical scalar identity. Generic Number dispatch and remaining numeric source
+  ownership are not yet complete.
+
 - Add explicit native numeric primitive designation to metadata definitions/builders
   and expose it through introspection. Preserve existing runtime scalar representation,
   Self substitution and imported managed receivers. Reject ordinary record fields and
