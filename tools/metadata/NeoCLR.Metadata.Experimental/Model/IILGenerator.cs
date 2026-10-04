@@ -313,7 +313,7 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
     void LoadArrayLength();
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Conv_R4, Conv_R8, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Clt_Un, Cgt_Un, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Conv_R4, Conv_R8, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>

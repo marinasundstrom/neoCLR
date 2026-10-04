@@ -6386,3 +6386,18 @@ when running the C# tests to save the matching executable native assembly, then 
 with neoCLR and the explicit System seed. Success exits 42 after arithmetic, NaN and
 signed-zero checks. This does not establish Raven floating-point code generation or
 complete compilation of the Single/Double class-library sources.
+
+
+### Unordered floating comparisons (development, 2026-10-04)
+
+`IILGenerator.Emit(OpCode.Clt_Un)` and `Emit(OpCode.Cgt_Un)` consume two matching
+Single or Double operands and produce Boolean: less/greater respectively, or true
+if either operand is NaN. CLI output uses `clt.un`/`cgt.un`; native output uses the
+same existing instructions. The current authoring profile rejects integer operands
+with `InvalidDataException`; unsigned integer comparison support is not implied.
+Operand-bearing overloads reject these opcodes with `ArgumentException`.
+
+Combining `Cgt_Un` with Boolean negation implements ordered `<=`, and `Clt_Un`
+with Boolean negation implements ordered `>=`. The floating metadata C# contract
+executes NaN in both Double operand positions and Single NaN on .NET and NeoCLR.
+The Raven driver gate separately validates all six source comparison operators.

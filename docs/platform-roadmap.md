@@ -28,8 +28,10 @@ family and actual Boolean source library now execute separately; [evidence](expe
 The resulting shared primitive-core selection fix is independently validated on Raven main.
 Source nominal APIs do not yet replace the canonical primitive bootstrap.
 The metadata writer now admits Single/Double and executes an API-authored arithmetic,
-NaN and signed-zero program on both runtimes; Raven emission is the next integration
-step, not yet established by this metadata-only gate.
+NaN and signed-zero program on both runtimes. Raven now compiles a separate floating
+library and imports its artifacts on both targets, with native parsing payload execution;
+[evidence](experiments/extended-cli-metadata/floating-dual-2026-10-04.json).
+Source primitive declarations and static Number contracts remain open.
 Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service

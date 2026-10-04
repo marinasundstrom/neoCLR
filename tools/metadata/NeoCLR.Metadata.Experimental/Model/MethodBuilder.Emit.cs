@@ -121,7 +121,11 @@ public enum OpCode
     /// <summary>Converts a supported numeric value to Single.</summary>
     Conv_R4,
     /// <summary>Converts a supported numeric value to Double.</summary>
-    Conv_R8
+    Conv_R8,
+    /// <summary>Floating comparison: less than or unordered.</summary>
+    Clt_Un,
+    /// <summary>Floating comparison: greater than or unordered.</summary>
+    Cgt_Un
 
 }
 

@@ -539,7 +539,7 @@ public sealed partial class AssemblyBuilder
                     "object.unbox" or "reference.test" or "object.box" or "reference.cast" or "object.load" or "object.store" or "array.new" or "array.load" or "array.store" or "string" or "constant" or "call" or "call.virtual" or "call.generic" or "call.constructed" or "call.virtual.constructed" or "new.object" or "new.constructed" or "field.address" or "field.load" or "field.store" or "field.import.load" or "field.import.store" or "branch" or "branch.true" or "branch.false" => 5,
                     "argument" or "argument.store" or "argument.address" or "local.load" or "local.store" or "local.address" => 4,
                     "local.initialize" => 6,
-                    "equal" or "less" or "greater" => 2,
+                    "equal" or "less" or "greater" or "less.unordered" or "greater.unordered" => 2,
                     "reference.isnull" => 3,
                     _ => 1
                 });
@@ -578,6 +578,8 @@ public sealed partial class AssemblyBuilder
                     case "boolean": code.WriteByte(instruction.Value == 0 ? (byte)0x16 : (byte)0x17); break;
                     case "equal": code.WriteByte(0xfe); code.WriteByte(0x01); break;
                     case "less": code.WriteByte(0xfe); code.WriteByte(0x04); break;
+                    case "less.unordered": code.WriteByte(0xfe); code.WriteByte(0x05); break;
+                    case "greater.unordered": code.WriteByte(0xfe); code.WriteByte(0x03); break;
                     case "greater": code.WriteByte(0xfe); code.WriteByte(0x02); break;
                     case "branch":
                     case "branch.true":

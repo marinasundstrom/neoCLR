@@ -115,6 +115,8 @@ public sealed partial class AssemblyBuilder
             "pop" => new { op = "pop" },
             "equal" => new { op = "ceq" },
             "less" => new { op = "clt" },
+            "less.unordered" => new { op = "clt.un" },
+            "greater.unordered" => new { op = "cgt.un" },
             "greater" => new { op = "cgt" },
             "constant" => new { op = "ldc.i4", arg = (object)instruction.Value },
             "enum.from" => new { op = "newobj", arg = SignatureValue(instruction.Type!) },

@@ -12,7 +12,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   to the experimental metadata IL generator. CLI and native output execute the same
   arithmetic, NaN and signed-zero checks. Graph-based binary emission selects existing
   schema 3 for high-bit Double literals; older schema-2-only readers reject those images.
-  Raven floating-point emission remains a subsequent integration step.
+  Raven now imports and emits those primitives through its native target; a separately
+  compiled floating library and artifact-only consumers execute on both targets, plus
+  native parser payloads. Expose existing unordered comparisons through the IL generator
+  so NaN keeps correct <=/>= behavior. Primitive unary +/- binding is isolated as a
+  general Raven fix. Source primitive declarations and static Number contracts remain open.
 
 - Select all eleven existing numeric/Boolean parsing services in the checked native
   bootstrap catalog. Actual Boolean and BooleanParseError sources compile separately

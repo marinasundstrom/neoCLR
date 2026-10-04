@@ -1,0 +1,24 @@
+public class FloatingBox {
+    private var value: double
+
+    init(value: double) {
+        self.value = value
+    }
+
+    val Value: double => value
+
+    func Add(amount: float) {
+        value = value + amount
+    }
+
+    static func Echo<T>(value: T) -> T { return value }
+    static func Narrow(value: double) -> float { return (float)value }
+    static func Less(left: double, right: double) -> bool { return left < right }
+    static func Greater(left: double, right: double) -> bool { return left > right }
+    static func LessOrEqual(left: double, right: double) -> bool { return left <= right }
+    static func GreaterOrEqual(left: double, right: double) -> bool { return left >= right }
+    static func Equal(left: double, right: double) -> bool { return left == right }
+    static func NotEqual(left: double, right: double) -> bool { return left != right }
+    static func Divide(left: double, right: double) -> double { return left / right }
+    static func Negate(value: double) -> double { return -value }
+}

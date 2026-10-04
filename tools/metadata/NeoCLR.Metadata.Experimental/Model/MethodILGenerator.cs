@@ -311,6 +311,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Pop => "pop",
             OpCode.Ceq => "equal",
             OpCode.Clt => "less",
+            OpCode.Clt_Un => "less.unordered",
+            OpCode.Cgt_Un => "greater.unordered",
             OpCode.Cgt => "greater",
             OpCode.Shl => "shift.left",
             OpCode.Shr => "shift.right",

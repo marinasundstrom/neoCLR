@@ -341,3 +341,21 @@ portable primitive identities, literal/conversion lowering and both target adapt
 retain correct unordered comparison behavior. Then compile a separate floating
 library/consumer and consume successful Single/Double parser payloads. Static Number
 contracts and canonical source-owned primitive declarations remain separate gaps.
+
+
+## Floating-point compiler integration gate (2026-10-04)
+
+The follow-on Raven slice now passes separate-library import and execution on both
+.NET and NeoCLR: Single/Double literals, casts, arithmetic, unary minus, generic
+calls, fields, properties, arrays, signed zero and ordered/unordered comparisons.
+A native-only consumer also unpacks successful ParseSingle/ParseDouble service
+results and passes those values into the emitted library. Seven prior native
+consumers remain green. Run `bootstrap/verify_floating.py` with the explicit core,
+seed, base library and ownership manifest; it records commands, revisions and hashes.
+See [execution evidence](floating-dual-2026-10-04.json).
+
+This closes the audit's floating arithmetic emission capability. It does not compile
+the actual Single/Double source declarations or implement static Number/Self dispatch.
+Revisit those static contracts and canonical source primitive ownership next; missing
+formatting/comparison services remain explicit catalog work. The primitive floating
+unary binding correction is independently isolated on Raven's main-based fix branch.

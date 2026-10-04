@@ -22,6 +22,12 @@ internal static class FloatingPointChecks
         il.Call(nan); il.Call(nan); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brtrue, failed);
         il.LoadConstant(1.0); il.Call(negativeZero); il.Divide();
         il.LoadConstant(double.NegativeInfinity); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
+        foreach (var comparison in new[] { OpCode.Clt_Un, OpCode.Cgt_Un })
+        {
+            il.Call(nan); il.LoadConstant(0.0); il.Emit(comparison); il.Emit(OpCode.Brfalse, failed);
+            il.LoadConstant(0.0); il.Call(nan); il.Emit(comparison); il.Emit(OpCode.Brfalse, failed);
+            il.LoadConstant(float.NaN); il.LoadConstant(0.0f); il.Emit(comparison); il.Emit(OpCode.Brfalse, failed);
+        }
         il.LoadConstant(20.5f); il.Call(single);
         il.Emit(OpCode.Conv_R8); il.LoadConstant(1.0); il.Add(); il.Emit(OpCode.Conv_I4); il.Return();
         il.MarkLabel(failed); il.LoadConstant(1); il.Return();

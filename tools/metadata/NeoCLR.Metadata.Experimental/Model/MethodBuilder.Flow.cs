@@ -280,6 +280,12 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("numeric operands required");
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);
                     stack.Add(instruction.Op is "less" or "greater" ? PrimitiveType.Boolean : integerType); break;
+                case "less.unordered":
+                case "greater.unordered":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Single or PrimitiveType.Double))
+                        throw new InvalidDataException("unordered comparison requires floating operands");
+                    var floatingType = stack[^1]; Pop(floatingType); Pop(floatingType);
+                    stack.Add(PrimitiveType.Boolean); break;
                 case "equal":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");

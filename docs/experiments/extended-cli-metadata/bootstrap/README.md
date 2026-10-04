@@ -946,3 +946,19 @@ routing every bool instance member through the source library. The compiler hono
 configured metadata core when names overlap. This fix was independently reproduced and
 validated for .NET on main (`f749c1a75`). [Evidence](../parsing-native-2026-10-04.json)
 records source, dependency and executable hashes plus the reduced numeric-family audit.
+
+
+### Floating library and parsing gate (2026-10-04)
+
+`verify_floating.py --compiler <rvnc.dll> --runtime <neoclr> --core <core.dll>
+--seed <System.neox> --base-library <NeoCLR.Collections.dll> --ownership <ownership.json>
+--output <new-directory>` compiles `floating-contracts.rvn` into a library, then compiles
+`floating-consumer.rvn` using only that artifact and executes both targets (exit 42,
+empty output). It checks arrays/field mutation, generic calls, numeric conversions,
+NaN comparisons and signed zero. `floating-parsing-consumer.rvn` additionally executes
+native Single/Double parser payloads. Use the parser gate's explicit core/seed catalog
+and the combined 57-source base-library ownership manifest; no application reference
+uses CLI projection fallback. Native symbol import maps primitive introspection views
+to the selected core; emission consumes symbol contracts through the independent adapter.
+The primitive CLI bootstrap remains temporary. Actual Single/Double source classes,
+static Number contracts and full source-owned primitive replacement are not established.

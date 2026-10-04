@@ -1,0 +1,16 @@
+import System.Runtime.CompilerServices.*
+
+func Main() -> int {
+    let parsedSingle = RuntimeServices.ParseSingle("20.5")
+    if !RuntimeServices.IsValue<float>(parsedSingle) { return 1 }
+    let parsedDouble = RuntimeServices.ParseDouble("0.5")
+    if !RuntimeServices.IsValue<double>(parsedDouble) { return 2 }
+    let box = FloatingBox((double)RuntimeServices.UnpackValue<float>(parsedSingle))
+    box.Add(FloatingBox.Narrow(RuntimeServices.UnpackValue<double>(parsedDouble)))
+    let negative = RuntimeServices.ParseDouble("-0")
+    if !RuntimeServices.IsValue<double>(negative) { return 3 }
+    if !FloatingBox.Less(FloatingBox.Divide(1.0, RuntimeServices.UnpackValue<double>(negative)), 0.0) {
+        return 4
+    }
+    return (int)(box.Value * 2.0)
+}

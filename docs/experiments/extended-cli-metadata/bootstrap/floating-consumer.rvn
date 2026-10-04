@@ -1,0 +1,24 @@
+func Main() -> int {
+    let small = 1.5f
+    if FloatingBox.Echo<float>(small) != FloatingBox.Narrow(1.5) { return 12 }
+    let wide = 20L
+    if (double)wide + 0.5 != 20.5 { return 13 }
+    let box = FloatingBox(20.5)
+    box.Add(FloatingBox.Narrow(0.5))
+    let values: double[] = [box.Value, 2.0]
+    values[0] = values[0] * values[1]
+    let nan = FloatingBox.Divide(0.0, 0.0)
+    if FloatingBox.Equal(nan, nan) { return 1 }
+    if !FloatingBox.NotEqual(nan, nan) { return 2 }
+    if FloatingBox.Less(nan, 0.0) { return 3 }
+    if FloatingBox.Greater(nan, 0.0) { return 4 }
+    if FloatingBox.LessOrEqual(nan, 0.0) { return 5 }
+    if FloatingBox.GreaterOrEqual(nan, 0.0) { return 6 }
+    if FloatingBox.LessOrEqual(0.0, nan) { return 7 }
+    if FloatingBox.GreaterOrEqual(0.0, nan) { return 8 }
+    if !FloatingBox.LessOrEqual(2.0, 2.0) { return 9 }
+    if !FloatingBox.GreaterOrEqual(3.0, 2.0) { return 10 }
+    let zero = FloatingBox.Negate(0.0)
+    if !FloatingBox.Less(FloatingBox.Divide(1.0, zero), 0.0) { return 11 }
+    return (int)FloatingBox.Echo<double>(values[0])
+}
