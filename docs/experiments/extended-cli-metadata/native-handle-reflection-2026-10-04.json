@@ -1,0 +1,163 @@
+{
+  "runtimeRepositoryRevision": "573c750aa28498e9ba345ff8dc1cd5d2b9c42626",
+  "compilerRepositoryRevision": "1c3e14bc7287e69e3e421d4cd5010078541b1fc2",
+  "scope": "Handle identity, generic arguments, object-type lookup and real parameterless reflection construction through an artifact-only provider; invalid argument and unsupported construction checks. Production introspection and JSON mapping remain open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-invalid-argument.rvn": "995c9d1165516571d4b8a9aea9d08a96232832ed084c222405acd0d69d3f0518",
+    "/private/tmp/handle-reflection-complete1004/InvalidArgument.dll": "bffc9b2d1aa192a892c5a22b54e9bd2a3279008c4c9fbacc62a08914b67b0126",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_type_handles.py": "8bb46a5ae96bd9839ac3918de387dd6e4fbecf2657370aa85ca5fd3358c2e97c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-provider.rvn": "482425e92fb9a8586228282df3517b36ae99a742e35d340df155dca22181d01c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-consumer.rvn": "d0d4d28b195cbd27ec81eb756c41fe52cf3f2a01ad9330712376bf2a3d350015",
+    "/private/tmp/ReflectionCore1004.dll": "b2b184ee5de6d14237f847d694edcd157b26c2e1b8698e7674880cac397c4ad4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/service-seed.neoil": "d048fc35525b055e56700fdb53b6c6025a0a2c2a9e75138865df75d4aec4ab17",
+    "/private/tmp/source-text-committed1004/seed.neoil": "3b85c81b43ad1d0b673383280e92b9497b76c6cb8400b683e166d4c4cef4481c",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "63a141976023b83b9aeecccadc1aa25abaa4905b94297fc5766987469d297aa4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "e969a6db38294fe5e21e5551122b9e6c7d6594f3f41c00d2cbf559480b502719",
+    "/private/tmp/handle-reflection-complete1004/seed.neoil": "35e4486e3ad9c0f0b3f5eee2e60dd5aae2b2428fa3a24e33ed7922f1c1efc3b9",
+    "/private/tmp/handle-reflection-complete1004/System.neox": "0732b4453ab06fcf1e0eced1e12417c0a60ff451bbb4a2098a3a2837b3356214",
+    "/private/tmp/handle-reflection-complete1004/HandleProvider.dll": "69c68e9832410f11f72a8e3323c8fbb95b9255928d5b09682e80069c54c451bb",
+    "/private/tmp/handle-reflection-complete1004/HandleConsumer.dll": "5ed8e15366bdccbde4f0d82c47d15de659c051ec13d8fe739e0c9c6967c1fe3f",
+    "/private/tmp/handle-reflection-complete1004/consumer-ownership.json": "cc8ed35651d26e04a71f5982d061eaa2a58606cdec1751d95c71a9e7f3b21590",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "c39577eea2a98d33a38072c66b933937515a300ec1b931f558e192509c4ed7f2",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "25f10cad7027c683e4989c1cc7da274ba63f3d95b98427b0bbb1e47ebe891442",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "dcc91cdcdc333459fbe054b9e84e128af3fad1e4858fb00dd04df73ff82cd640"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/private/tmp/handle-reflection-complete1004/seed.neoil",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/handle-reflection-complete1004/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ReflectionCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-provider.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ReflectionCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-reflection-complete1004/consumer-ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "-o",
+        "/private/tmp/handle-reflection-complete1004/HandleConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/handle-reflection-complete1004/HandleConsumer.dll",
+        "--module",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AA0B0796BDD289259A17292578F80771E073E10B7FB44F319AA1ECCBA04A0621: typed-stack/control-flow verification passed (688 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/handle-reflection-complete1004/HandleConsumer.dll",
+        "--module",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ReflectionCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-reflection-complete1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-reflection-complete1004/consumer-ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "-o",
+        "/private/tmp/handle-reflection-complete1004/InvalidArgument.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/type-handle-invalid-argument.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/handle-reflection-complete1004/InvalidArgument.dll",
+        "--module",
+        "/private/tmp/handle-reflection-complete1004/HandleProvider.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/handle-reflection-complete1004/System.neox"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: generic argument index out of range [code=RuntimeError] at System.Runtime.CompilerServices.RuntimeServices.TypeArgument:2\n  at System.Runtime.CompilerServices.RuntimeServices.TypeArgument(RuntimeTypeHandle, Int32) owner=Named(\"System.Runtime.CompilerServices.RuntimeServices\") [System:24] IL instruction 2\n  at NeoMetadata_258289134FB964C00B3C9FEB721AB319ABF15216B2EDB5C9205CC879B37C203D.T_48616E646C65436F6E7472616374_44657363726970746F72.M_417267756D656E74(Int32) owner=Named(\"NeoMetadata_258289134FB964C00B3C9FEB721AB319ABF15216B2EDB5C9205CC879B37C203D.T_48616E646C65436F6E7472616374_44657363726970746F72\") [NeoMetadata_258289134FB964C00B3C9FEB721AB319ABF15216B2EDB5C9205CC879B37C203D#1.0.0.0:5] IL instruction 3\n  at NeoMetadata_8BAA33557DEC401E14B599BBFFED754AD435803EFC9F126EAF6E5427ADEC1B20.F_4D61696E() [NeoMetadata_8BAA33557DEC401E14B599BBFFED754AD435803EFC9F126EAF6E5427ADEC1B20#1.0.0.0:0] IL instruction 4\n"
+    }
+  ],
+  "compilerImplementationCommit": "80ebdc0a7",
+  "revisionNote": "Execution recorded before the verified adapter change was committed; artifact hashes identify the tested binaries."
+}

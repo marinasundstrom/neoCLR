@@ -89,3 +89,15 @@ artifact-only consumer executes the real TypeName binding through a test provide
 The remaining work in slices 2–4 is production ownership, descriptor factories,
 ParameterSnapshot/vector contracts, declaration/override admission and the member
 services required by the unchanged mapper. This gate does not replace those sources.
+
+
+## Runtime handle-service checkpoint
+
+The [expanded gate](native-handle-reflection-2026-10-04.md) now exercises real runtime
+identity, generic argument, shape/display/token and object-type services, plus
+parameterless reflection construction. The compiler's native Object signature gap is
+fixed in Raven `80ebdc0a7`. Reassessing the unchanged production source closure with
+HashCode and the current catalog still rejects before publication: descriptor-returning
+services, ParameterSnapshot, Object.GetType and the production typeof contract need
+coherent ownership. Do not interpret cascading conversion/overload errors as separate
+compiler regressions until that dependency closure binds.

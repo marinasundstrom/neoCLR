@@ -6,7 +6,9 @@ using System.Text.Json;
 static partial class RuntimeServiceBindings
 {
     static readonly string[] NativeSelection = [
-        "Int32ToString", "Int64ToString", "TypeName",
+        "Int32ToString", "Int64ToString", "TypeName", "TypeEquals", "TypeArgumentCount", "TypeArgument",
+        "TypeShape", "TypeDisplayName", "TypeMetadataToken", "ObjectTypeHandle",
+        "ReflectionConstructionCheck", "ReflectionConstruct",
         "StringEquals", "StringFromChars", "StringGraphemeAt", "StringIntern", "StringConcat",
         "StringCompareOrdinal", "StringCompareOrdinalIgnoreCase", "StringContainsOrdinal",
         "StringStartsWithOrdinal", "StringEndsWithOrdinal", "StringGraphemeCount",
@@ -31,7 +33,7 @@ static partial class RuntimeServiceBindings
     };
 
     static bool NativeTypeSupported(string type) => type is "String" or "Int32" or "Int64" or "Boolean" or "Byte" or "Value" or "noresult"
-        or "System.RuntimeTypeHandle" or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
+        or "System.Object" or "System.RuntimeTypeHandle" or "Char" or "UInt32" or "arrayref<Char>" or "arrayref<UInt32>" or "arrayref<Byte>" or "arrayref<Int32>" or "fn<String,String>" or "fn<noresult Void>";
 
     static (string Name, string[] Args, string Result)[] NativeMembers(string[]? selection = null)
     {
@@ -98,7 +100,7 @@ static partial class RuntimeServiceBindings
             // These services are already required by the primitive string/console seed.
             if (member.Name is "StringEquals" or "StringHashOrdinalIgnoreCase" or "Int32ToString"
                 or "StringConcat" or "StringCompareOrdinal" or "StringCompareOrdinalIgnoreCase"
-                or "StringGraphemeCount" or "StringGraphemeAt" or "CharText") continue;
+                or "StringGraphemeCount" or "StringGraphemeAt" or "CharText" or "TypeDisplayName" or "ObjectTypeHandle") continue;
             var nativeResult = member.Result == "noresult" ? "Void" : member.Result.StartsWith("arrayref<", StringComparison.Ordinal) ? member.Result[9..^1] + "[]" : member.Result;
             text.AppendLine($".function neoCLR.Runtime.{member.Name}({string.Join(',', member.Args.Select((t, i) => t + " arg" + i))}) -> {nativeResult}\n.methodimpl InternalCall\n.end");
         }
@@ -114,7 +116,7 @@ static partial class RuntimeServiceBindings
     internal static void CheckNativeCatalog()
     {
         _ = NativeMembers();
-        foreach (var selection in new[] { new[] { "Missing" }, new[] { "MathSqrt" }, new[] { "NotifyWorker" }, new[] { "CurrentTaskQueue" }, new[] { "ParseInt64", "ParseInt64" } })
+        foreach (var selection in new[] { new[] { "Missing" }, new[] { "TypeInfo" }, new[] { "TypeFields" }, new[] { "MathSqrt" }, new[] { "NotifyWorker" }, new[] { "CurrentTaskQueue" }, new[] { "ParseInt64", "ParseInt64" } })
         {
             bool rejected = false;
             try { _ = NativeMembers(selection); } catch (InvalidDataException) { rejected = true; }

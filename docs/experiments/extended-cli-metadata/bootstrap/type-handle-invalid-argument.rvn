@@ -1,0 +1,6 @@
+import HandleContract.*
+
+func Main() -> int {
+    let argument = typeof(int).Argument(0)
+    return 42
+}

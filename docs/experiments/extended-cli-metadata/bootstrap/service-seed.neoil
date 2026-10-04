@@ -39,6 +39,55 @@ ldarg arg0
 call neoCLR.Runtime.TypeName(System.RuntimeTypeHandle)
 ret
 .end
+.method static TypeEquals(System.RuntimeTypeHandle arg0,System.RuntimeTypeHandle arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle,System.RuntimeTypeHandle)
+ret
+.end
+.method static TypeArgumentCount(System.RuntimeTypeHandle arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle)
+ret
+.end
+.method static TypeArgument(System.RuntimeTypeHandle arg0,Int32 arg1) -> System.RuntimeTypeHandle
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.method static TypeShape(System.RuntimeTypeHandle arg0,Int32 arg1) -> Boolean
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.method static TypeDisplayName(System.RuntimeTypeHandle arg0,Int32 arg1) -> String
+ldarg arg0
+ldarg arg1
+call neoCLR.Runtime.TypeDisplayName(System.RuntimeTypeHandle,Int32)
+ret
+.end
+.method static TypeMetadataToken(System.RuntimeTypeHandle arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.TypeMetadataToken(System.RuntimeTypeHandle)
+ret
+.end
+.method static ObjectTypeHandle(System.Object arg0) -> System.RuntimeTypeHandle
+ldarg arg0
+call neoCLR.Runtime.ObjectTypeHandle(System.Object)
+ret
+.end
+.method static ReflectionConstructionCheck(System.RuntimeTypeHandle arg0) -> Int32
+ldarg arg0
+call neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle)
+ret
+.end
+.method static ReflectionConstruct(System.RuntimeTypeHandle arg0) -> System.Object
+ldarg arg0
+call neoCLR.Runtime.ReflectionConstruct(System.RuntimeTypeHandle)
+ret
+.end
 .method static StringEquals(String arg0,String arg1) -> Boolean
 ldarg arg0
 ldarg arg1
@@ -442,6 +491,27 @@ ret
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle arg0) -> String
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeEquals(System.RuntimeTypeHandle arg0,System.RuntimeTypeHandle arg1) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeArgumentCount(System.RuntimeTypeHandle arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeArgument(System.RuntimeTypeHandle arg0,Int32 arg1) -> System.RuntimeTypeHandle
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeShape(System.RuntimeTypeHandle arg0,Int32 arg1) -> Boolean
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.TypeMetadataToken(System.RuntimeTypeHandle arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionConstructionCheck(System.RuntimeTypeHandle arg0) -> Int32
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.ReflectionConstruct(System.RuntimeTypeHandle arg0) -> System.Object
 .methodimpl InternalCall
 .end
 .function neoCLR.Runtime.StringFromChars(arrayref<Char> arg0) -> String

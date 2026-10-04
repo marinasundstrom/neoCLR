@@ -6,6 +6,15 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-05
+
+- Extend the explicit native handle-service catalog with identity, generic arguments,
+  shape/display/token queries, object-type lookup and parameterless reflection
+  construction. A separately compiled provider/consumer verifies and returns 42,
+  checking real constructor state; invalid arguments and unsupported construction
+  reject. Raven `80ebdc0a7` supplies core Object dependency signatures. Production
+  descriptor services and JSON mapping remain open; record the refreshed source audit.
+
 ### 2026-10-04
 
 - Add opaque RuntimeTypeHandle signatures and IILGenerator.LoadTypeToken/raw Ldtoken

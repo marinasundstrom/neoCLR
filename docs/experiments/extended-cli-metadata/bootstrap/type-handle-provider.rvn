@@ -7,6 +7,14 @@ import System.Runtime.CompilerServices.*
 // This is not a replacement for the production System.Introspection descriptors.
 public interface Info {
     val Name: string { get; }
+    val DisplayName: string { get; }
+    val ArgumentCount: int { get; }
+    val MetadataToken: int { get; }
+    func Argument(index: int) -> Info
+    func Same(other: Info) -> bool
+    func Shape(kind: int) -> bool
+    func ConstructionStatus() -> int
+    func Create() -> Object
 }
 
 public class Descriptor : Info {
@@ -17,10 +25,44 @@ public class Descriptor : Info {
     }
 
     val Name: string => RuntimeServices.TypeName(handle)
+    val DisplayName: string => RuntimeServices.TypeDisplayName(handle, 0)
+    val ArgumentCount: int => RuntimeServices.TypeArgumentCount(handle)
+    val MetadataToken: int => RuntimeServices.TypeMetadataToken(handle)
+
+    func Argument(index: int) -> Info {
+        return Descriptor(RuntimeServices.TypeArgument(handle, index))
+    }
+
+    func Same(other: Info) -> bool {
+        if other is Descriptor descriptor {
+            return RuntimeServices.TypeEquals(handle, descriptor.handle)
+        }
+        return false
+    }
+
+    func Shape(kind: int) -> bool => RuntimeServices.TypeShape(handle, kind)
+    func ConstructionStatus() -> int => RuntimeServices.ReflectionConstructionCheck(handle)
+    func Create() -> Object => RuntimeServices.ReflectionConstruct(handle)
+}
+
+public class Box<T> { }
+
+public class Constructed {
+    private var marker: int
+
+    init() {
+        marker = 42
+    }
+
+    val Marker: int => marker
 }
 
 public class Context {
     static val Current: Context => Context()
+
+    func GetObjectType(value: Object) -> Info {
+        return Descriptor(RuntimeServices.ObjectTypeHandle(value))
+    }
 
     func GetTypeInfoFromHandle(handle: RuntimeTypeHandle) -> Info {
         return Descriptor(handle)

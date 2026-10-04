@@ -70,6 +70,10 @@ The [native typeof boundary](experiments/extended-cli-metadata/native-typeof-202
 now executes generic and external nominal tokens through a separately compiled test
 provider backed by the real TypeName service. Production descriptors/member reflection
 and public JSON object mapping are still open.
+The [handle/reflection service gate](experiments/extended-cli-metadata/native-handle-reflection-2026-10-04.md)
+also proves identity, generic arguments, object-type lookup and real parameterless
+construction across native assemblies. Descriptor-returning service ownership remains
+the next dependency boundary.
 .NET JSON-library parity remains unproven.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone

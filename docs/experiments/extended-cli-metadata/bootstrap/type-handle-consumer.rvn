@@ -9,5 +9,36 @@ func Main() -> int {
     if typeof(Descriptor).Name != "HandleContract.Descriptor" {
         return 2
     }
+    let integer = typeof(int)
+    let generic = typeof(Box<int>)
+    if generic.ArgumentCount != 1 || !generic.Argument(0).Same(integer) {
+        return 3
+    }
+    if generic.Same(typeof(Box<string>)) || !integer.Shape(7) {
+        return 4
+    }
+    let value = Box<int>()
+    if !Context.Current.GetObjectType(value).Same(generic) {
+        return 5
+    }
+    let descriptor = typeof(Descriptor)
+    if descriptor.MetadataToken == 0 || descriptor.DisplayName != "HandleContract.Descriptor" {
+        return 6
+    }
+    let constructible = typeof(Constructed)
+    if constructible.ConstructionStatus() != 0 {
+        return 7
+    }
+    let created = constructible.Create()
+    if created is Constructed instance {
+        if instance.Marker != 42 || !Context.Current.GetObjectType(instance).Same(constructible) {
+            return 8
+        }
+    } else {
+        return 9
+    }
+    if descriptor.ConstructionStatus() != 4 || generic.ConstructionStatus() != 2 {
+        return 10
+    }
     return 42
 }

@@ -1843,7 +1843,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1856,7 +1856,7 @@
         "nominal",
         "opaque-handle"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1936,7 +1936,7 @@
         "nominal",
         "opaque-handle"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1963,7 +1963,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1976,7 +1976,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1990,7 +1990,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -2004,7 +2004,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -2018,7 +2018,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -2201,7 +2201,7 @@
         "opaque-handle",
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {

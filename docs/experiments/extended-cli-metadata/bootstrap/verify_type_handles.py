@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import re
 from pathlib import Path
 import subprocess
 
@@ -19,31 +20,37 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     commands = []
 
-    def run(command, expected=0):
+    def run(command, expected=0, error=None):
         command = [str(x) for x in command]
         result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=120)
         commands.append(dict(command=command, exitCode=result.returncode,
                              stdout=result.stdout, stderr=result.stderr))
         (output / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
-        if result.returncode != expected or expected == 42 and result.stdout:
+        if result.returncode != expected or expected == 42 and result.stdout or error and error not in result.stderr:
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
-    # Explicitly extend the existing retained seed with the one exercised service.
+    # Copy checked catalog wrappers, preserving services already owned by the seed.
     seed_text = args.seed_source.read_text()
+    catalog = (HERE / 'service-seed.neoil').read_text()
     marker = '.type System.Runtime.CompilerServices.RuntimeServices\n'
-    if seed_text.count(marker) != 1 or '.method static TypeName(' in seed_text:
-        raise ValueError('Expected exactly one service owner without a TypeName wrapper')
-    seed_text = seed_text.replace(marker, marker + '''.method static TypeName(System.RuntimeTypeHandle handle) -> String
-ldarg handle
-call neoCLR.Runtime.TypeName(System.RuntimeTypeHandle)
-ret
-.end
-''', 1)
-    if '.function neoCLR.Runtime.TypeName(' not in seed_text:
-        seed_text += '''\n.function neoCLR.Runtime.TypeName(System.RuntimeTypeHandle handle) -> String
-.methodimpl InternalCall
-.end
-'''
+    if seed_text.count(marker) != 1:
+        raise ValueError('Expected exactly one service owner')
+    wrappers = []
+    for name in ('TypeName', 'TypeEquals', 'TypeArgumentCount', 'TypeArgument',
+                 'TypeShape', 'TypeDisplayName', 'TypeMetadataToken', 'ObjectTypeHandle',
+                 'ReflectionConstructionCheck', 'ReflectionConstruct'):
+        if '.method static ' + name + '(' in seed_text:
+            raise ValueError('Seed already owns wrapper: ' + name)
+        match = re.search(r'\.method static ' + name + r'\(.*?\n.end', catalog, re.S)
+        if match is None:
+            raise ValueError('Missing checked catalog wrapper: ' + name)
+        wrappers.append(match.group(0))
+        if '.function neoCLR.Runtime.' + name + '(' not in seed_text:
+            native = re.search(r'\.function neoCLR.Runtime.' + name + r'\(.*?\n.end', catalog, re.S)
+            if native is None:
+                raise ValueError('Missing retained native binding: ' + name)
+            seed_text += '\n' + native.group(0) + '\n'
+    seed_text = seed_text.replace(marker, marker + '\n'.join(wrappers) + '\n', 1)
     seed_source = output / 'seed.neoil'
     seed_source.write_text(seed_text)
     seed = output / 'System.neox'
@@ -57,7 +64,7 @@ ret
     run(common + ['--library', '-o', provider, provider_source])
     manifest = json.loads(args.ownership.read_text())
     manifest['libraries'].append(dict(assemblyName='HandleProvider', sources=[str(provider_source.relative_to(ROOT))],
-                                     types=['HandleContract.Info', 'HandleContract.Descriptor', 'HandleContract.Context']))
+                                     types=['HandleContract.Info', 'HandleContract.Descriptor', 'HandleContract.Context', 'HandleContract.Box`1', 'HandleContract.Constructed']))
     manifest['typeOf'] = dict(assemblyName='HandleProvider', typeInfoTypeName='HandleContract.Info',
                               contextTypeName='HandleContract.Context')
     ownership = output / 'consumer-ownership.json'
@@ -68,14 +75,18 @@ ret
     dependencies = ['--module', provider, '--module', args.base_library.resolve(), '--system', seed]
     run([args.runtime.resolve(), 'verify', app] + dependencies)
     run([args.runtime.resolve(), 'run', app] + dependencies, 42)
-    inputs = [Path(__file__).resolve(), provider_source, consumer_source, args.core.resolve(),
-              args.seed_source.resolve(), args.base_library.resolve(), args.ownership.resolve(),
+    invalid_source = HERE / 'type-handle-invalid-argument.rvn'
+    invalid_app = output / 'InvalidArgument.dll'
+    run(common + ['--reference', provider, '-o', invalid_app, invalid_source])
+    run([args.runtime.resolve(), 'run', invalid_app] + dependencies, 1, 'generic argument index out of range')
+    inputs = [invalid_source, invalid_app, Path(__file__).resolve(), provider_source, consumer_source, args.core.resolve(),
+              HERE / 'service-seed.neoil', args.seed_source.resolve(), args.base_library.resolve(), args.ownership.resolve(),
               args.runtime.resolve(), args.compiler.resolve(), seed_source, seed, provider, app, ownership]
     inputs += [args.compiler.resolve().parent / name for name in
                ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     revision = lambda cwd: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=cwd, text=True).strip()
     evidence = dict(runtimeRepositoryRevision=revision(ROOT), compilerRepositoryRevision=revision(args.compiler.resolve().parent),
-                    scope='Generic and external nominal typeof through an artifact-only test provider. Production introspection and JSON mapping remain open.',
+                    scope='Handle identity, generic arguments, object-type lookup and real parameterless reflection construction through an artifact-only provider; invalid argument and unsupported construction checks. Production introspection and JSON mapping remain open.',
                     hashes={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, commands=commands)
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(output / 'validation.json')
