@@ -210,7 +210,7 @@ public sealed partial class MethodDefinition
             0x01 when allowVoid && !vector => PrimitiveType.Void,
             0x02 => PrimitiveType.Boolean,
             0x08 => PrimitiveType.Int32,
-            0x0c => PrimitiveType.Single, 0x0d => PrimitiveType.Double, 0x05 => PrimitiveType.Byte, 0x0a => PrimitiveType.Int64,
+            0x0c => PrimitiveType.Single, 0x0d => PrimitiveType.Double, 0x05 => PrimitiveType.Byte, 0x04 => PrimitiveType.SByte, 0x06 => PrimitiveType.Int16, 0x07 => PrimitiveType.UInt16, 0x09 => PrimitiveType.UInt32, 0x0b => PrimitiveType.UInt64,  0x0a => PrimitiveType.Int64,
             0x0e => PrimitiveType.String,
             _ => null
         };

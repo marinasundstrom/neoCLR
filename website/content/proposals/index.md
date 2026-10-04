@@ -722,3 +722,10 @@ a separate generic library on both targets; the broad source-library gate is sti
 Development checkpoint (2026-10-03): external generic interface contracts now cross separately compiled Raven libraries and execute on both targets, including diamond dispatch. The source-built collections application gate remains open.
 
 Development checkpoint (2026-10-03): source-built iteration/collection interfaces now support separately compiled consumers on both targets using explicit bootstrap ownership. The retained-seed partition, ArrayList and broad application remain in development.
+
+
+Development checkpoint (2026-10-04): the native compiler path now imports and emits
+all eight fixed-width integer signatures with standard CLI signedness rules. Separate
+integer libraries and consumers run on .NET and NeoCLR, including high-bit unsigned
+arithmetic, shifts and conversions. Canonical source primitive ownership and generic
+Number dispatch remain unfinished; this is not full class-library numeric support.

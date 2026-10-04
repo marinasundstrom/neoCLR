@@ -122,10 +122,28 @@ public enum OpCode
     Conv_R4,
     /// <summary>Converts a supported numeric value to Double.</summary>
     Conv_R8,
-    /// <summary>Floating comparison: less than or unordered.</summary>
+    /// <summary>Unsigned integer less-than, or floating less-than or unordered.</summary>
     Clt_Un,
-    /// <summary>Floating comparison: greater than or unordered.</summary>
-    Cgt_Un
+    /// <summary>Unsigned integer greater-than, or floating greater-than or unordered.</summary>
+    Cgt_Un,
+    /// <summary>Truncates to signed 8-bit and sign-extends to Int32.</summary>
+    Conv_I1,
+    /// <summary>Truncates to signed 16-bit and sign-extends to Int32.</summary>
+    Conv_I2,
+    /// <summary>Truncates to unsigned 16-bit and zero-extends to Int32.</summary>
+    Conv_U2,
+    /// <summary>Retains the low 32 bits.</summary>
+    Conv_U4,
+    /// <summary>Converts to unsigned 64-bit, zero-extending Int32 bits.</summary>
+    Conv_U8,
+    /// <summary>Divides matching integers using unsigned interpretation.</summary>
+    Div_Un,
+    /// <summary>Computes unsigned integer remainder.</summary>
+    Rem_Un,
+    /// <summary>Shifts an integer right with zero fill.</summary>
+    Shr_Un,
+    /// <summary>Converts unsigned integer bits to Double.</summary>
+    Conv_R_Un,
 
 }
 

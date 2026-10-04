@@ -34,7 +34,10 @@ library and imports its artifacts on both targets, with native parsing payload e
 The author subsequently clarified that the active story covers the entire numeric
 family and Number interface, not just arithmetic emission. Static Number declaration,
 import and direct implementation calls now execute; intrinsic primitive ownership and
-generic Self dispatch remain open. See the strategy's Number integration checkpoint.
+generic Self dispatch remain open. All fixed-width integer signatures and unsigned
+instruction selection now execute through a separate library/consumer on both targets;
+[integer evidence](experiments/extended-cli-metadata/integer-dual-2026-10-04.json).
+See the strategy's Number integration checkpoint.
 Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service

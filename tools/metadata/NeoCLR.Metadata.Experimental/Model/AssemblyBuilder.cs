@@ -361,6 +361,12 @@ public sealed partial class AssemblyBuilder
                 case PrimitiveType.Int32: encoder.Int32(); break;
                 case PrimitiveType.Int64: encoder.Int64(); break;
                 case PrimitiveType.Byte: encoder.Byte(); break;
+                case PrimitiveType.SByte: encoder.SByte(); break;
+                case PrimitiveType.Int16: encoder.Int16(); break;
+                case PrimitiveType.UInt16: encoder.UInt16(); break;
+                case PrimitiveType.UInt32: encoder.UInt32(); break;
+                case PrimitiveType.UInt64: encoder.UInt64(); break;
+
                 case PrimitiveType.Single: encoder.Single(); break;
                 case PrimitiveType.Double: encoder.Double(); break;
                 case PrimitiveType.Boolean: encoder.Boolean(); break;
@@ -595,6 +601,16 @@ public sealed partial class AssemblyBuilder
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
                     case "convertByte": code.WriteByte(0xd2); break;
+                    case "convertSByte": code.WriteByte(0x67); break;
+                    case "convertInt16": code.WriteByte(0x68); break;
+                    case "convertUInt16": code.WriteByte(0xd1); break;
+                    case "convertUInt32": code.WriteByte(0x6d); break;
+                    case "convertUInt64": code.WriteByte(0x6e); break;
+                    case "divide.unsigned": code.WriteByte(0x5c); break;
+                    case "remainder.unsigned": code.WriteByte(0x5e); break;
+                    case "shift.right.unsigned": code.WriteByte(0x64); break;
+                    case "convertUnsignedDouble": code.WriteByte(0x76); break;
+
                     case "enum.from": case "enum.to": break;
                     case "constant": code.WriteByte(0x20); code.WriteInt32(instruction.Value); break;
                     case "argument.store": code.WriteByte(0xfe); code.WriteByte(0x0b); code.WriteUInt16((ushort)instruction.Value); break;

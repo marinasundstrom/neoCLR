@@ -26,7 +26,7 @@ public sealed partial class MethodBuilder
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
     public LocalDefinition DeclareInt32Local() => GetILGenerator().DeclareInt32Local();
     /// <summary>Declares a typed primitive local. ClearBody retains the slot and type.</summary>
-    /// <param name="type">Int32, Int64, Boolean or String; Void is not a local type.</param>
+    /// <param name="type">Any defined PrimitiveType except Void.</param>
     /// <returns>A stable local handle owned by this method.</returns>
     /// <exception cref="ArgumentException">Type is Void or an invalid enum value.</exception>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>

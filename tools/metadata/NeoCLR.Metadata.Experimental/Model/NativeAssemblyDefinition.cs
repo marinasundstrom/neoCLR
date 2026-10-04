@@ -784,6 +784,12 @@ public sealed partial class NativeAssemblyDefinition
     {
         "String" => PrimitiveType.String,
         "Byte" => PrimitiveType.Byte,
+        "SByte" => PrimitiveType.SByte,
+        "Int16" => PrimitiveType.Int16,
+        "UInt16" => PrimitiveType.UInt16,
+        "UInt32" => PrimitiveType.UInt32,
+        "UInt64" => PrimitiveType.UInt64,
+
         "Single" => PrimitiveType.Single,
         "Double" => PrimitiveType.Double,
         "Int64" => PrimitiveType.Int64,

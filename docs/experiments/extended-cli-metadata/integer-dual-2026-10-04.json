@@ -1,0 +1,143 @@
+{
+  "runtimeRepositoryRevision": "5bf9204540305d840979661a6c8e58741bb474ed",
+  "compilerRepositoryRevision": "650b921191695ddec794dea074b4a6235a99de2f",
+  "scope": "Separate fixed-width integer library and artifact-only consumer: exact signatures, generic calls, high-bit unsigned arithmetic, comparisons, shifts, numeric conversions, fields, properties and arrays. Actual primitive source ownership and generic Number dispatch remain open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-contracts.rvn": "89067afad16e3dbbca9792d7fc1203b770ff7adf3c4dcb8265c9fa1f0716454c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-consumer.rvn": "f860c77a4b7e94aa84ed80e77acdb116c6dd4d8b9457881f6b29d868157286e1",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "af12a5fc8ff21796e41ec4104bf798d703db9c77bf1296ee9ba44f5758f13813",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c",
+    "/private/tmp/ParseCore1004.dll": "008cc8a110b358f9cb7a60cdd3cdb44485b7898e8e0c8676c0c4aad020969479",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll": "a572ea77764d03d3d0a887ff105cfd0e81270492dd155e93d78ce7b4bb4b0dc5",
+    "/private/tmp/task-queue-base-final1004/ownership.json": "8b86cf73daa8454c15f50179cc04507a6719d6dc3b56e0eea1bac86a51357075",
+    "/private/tmp/integer-consumer21004/Consumer.dll": "cb2aff9cccb30b57b02c90db39ae7e179d728dac6251c923882e60349e476de9",
+    "/private/tmp/integer-consumer21004/IntegerContracts.dll": "93958d366651b580567091581c7c5196738ad7a95824b4db4b1fe9a569d4388f",
+    "/private/tmp/integer-consumer21004/dotnet/Consumer.dll": "bda8d237da8751f099167ddaff9245d559862d8e7a54fad20116e962489c019d",
+    "/private/tmp/integer-consumer21004/dotnet/IntegerContracts.dll": "ae2b94bf9802997c2a30651abd101fd5b0502209428154a61744983d70ad04c6"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-queue-base-final1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--library",
+        "-o",
+        "/private/tmp/integer-consumer21004/IntegerContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-contracts.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "info RAV1508: Explicit cast from 'uint' to 'long' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'ulong' to 'double' is unnecessary because an implicit conversion exists.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/task-queue-base-final1004/ownership.json",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--reference",
+        "/private/tmp/integer-consumer21004/IntegerContracts.dll",
+        "-o",
+        "/private/tmp/integer-consumer21004/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/integer-consumer21004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/integer-consumer21004/IntegerContracts.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (502 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/integer-consumer21004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/integer-consumer21004/IntegerContracts.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/private/tmp/integer-consumer21004/dotnet/IntegerContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-contracts.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "docs/experiments/extended-cli-metadata/bootstrap/integer-contracts.rvn(14,52): info RAV1508: Explicit cast from 'uint' to 'long' is unnecessary because an implicit conversion exists.\n\ndocs/experiments/extended-cli-metadata/bootstrap/integer-contracts.rvn(16,55): info RAV1508: Explicit cast from 'ulong' to 'double' is unnecessary because an implicit conversion exists.\n\nBuild succeeded in 1,4s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/private/tmp/integer-consumer21004/dotnet/IntegerContracts.dll",
+        "-o",
+        "/private/tmp/integer-consumer21004/dotnet/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/integer-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/integer-consumer21004/dotnet/Consumer.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+public class IntegerBox {
+    private var value: ulong
+
+    init(value: ulong) {
+        self.value = value
+    }
+
+    val Value: ulong => value
+    func Set(value: ulong) { self.value = value }
+    static func Echo<T>(value: T) -> T { return value }
+    static func Signed8(value: int) -> sbyte { return (sbyte)value }
+    static func Signed16(value: int) -> short { return (short)value }
+    static func Unsigned16(value: int) -> ushort { return (ushort)value }
+    static func Wide(value: uint) -> long { return (long)value }
+    static func WideSigned(value: int) -> ulong { return (ulong)value }
+    static func Real(value: ulong) -> double { return (double)value }
+    static func Divide32(left: uint, right: uint) -> uint { return left / right }
+    static func Divide64(left: ulong, right: ulong) -> ulong { return left / right }
+    static func Remainder32(left: uint, right: uint) -> uint { return left % right }
+    static func Remainder64(left: ulong, right: ulong) -> ulong { return left % right }
+    static func Shift32(value: uint) -> uint { return value >> 1 }
+    static func Shift64(value: ulong) -> ulong { return value >> 1 }
+    static func Greater32(left: uint, right: uint) -> bool { return left > right }
+    static func Greater64(left: ulong, right: ulong) -> bool { return left > right }
+    static func Less32(left: uint, right: uint) -> bool { return left <= right }
+    static func Less64(left: ulong, right: ulong) -> bool { return left <= right }
+}

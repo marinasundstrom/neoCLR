@@ -6391,10 +6391,9 @@ complete compilation of the Single/Double class-library sources.
 ### Unordered floating comparisons (development, 2026-10-04)
 
 `IILGenerator.Emit(OpCode.Clt_Un)` and `Emit(OpCode.Cgt_Un)` consume two matching
-Single or Double operands and produce Boolean: less/greater respectively, or true
-if either operand is NaN. CLI output uses `clt.un`/`cgt.un`; native output uses the
-same existing instructions. The current authoring profile rejects integer operands
-with `InvalidDataException`; unsigned integer comparison support is not implied.
+numeric operands and produce Boolean: unsigned integer less/greater, or floating
+less/greater respectively, or true if either floating operand is NaN. CLI output uses
+`clt.un`/`cgt.un`; native output uses the same existing instructions.
 Operand-bearing overloads reject these opcodes with `ArgumentException`.
 
 Combining `Cgt_Un` with Boolean negation implements ordered `<=`, and `Clt_Un`
@@ -6435,3 +6434,42 @@ conformance and rejection, inherited Self views, native round trips, and observa
 Raven Number gate additionally executes actual source contracts across three native
 assemblies. Compiler generic callself emission and intrinsic primitive ownership
 remain separate work; this authoring support does not claim they are complete.
+
+
+## Fixed-width integer signatures and unsigned instructions (development, 2026-10-04)
+
+`PrimitiveType.SByte`, `Int16`, `UInt16`, `UInt32` and `UInt64` complete the eight
+fixed-width integer signatures alongside Byte, Int32 and Int64. They can be used in
+method results/parameters, fields, properties, vectors, generic arguments and
+`IILGenerator.DeclareLocal(PrimitiveType)`. The local overload also accepts Single
+and Double; Void and undefined enum values reject with ArgumentException.
+Readers preserve exact storage types. CLI signatures use the standard element codes;
+native signatures use existing primitive names without a new format version.
+
+Evaluation normalizes SByte/Byte/Int16/UInt16/UInt32 to Int32 and UInt64 to Int64 bits,
+as CLI does. Storage and by-reference element identities remain exact. Unsignedness
+is an instruction property, not inferred from a stack value's storage signature.
+
+Operand-free `IILGenerator.Emit(OpCode)` additionally accepts:
+
+| Opcode | Input and result |
+| --- | --- |
+| Conv_I1, Conv_I2 | Numeric input, low signed 8/16 bits sign-extended to Int32 |
+| Conv_U2, Conv_U4 | Numeric input, unsigned 16/32-bit conversion, Int32 evaluation bits |
+| Conv_U8 | Numeric input, unsigned 64-bit conversion; zero-extends Int32 bits |
+| Conv_R_Un | Int32/Int64 bits interpreted unsigned, converted to Double |
+| Div_Un, Rem_Un | Two matching integer evaluation types; unsigned quotient/remainder |
+| Shr_Un | Integer and Int32 count; zero-filled right shift |
+| Clt_Un, Cgt_Un | Matching integers compared unsigned, or matching floats with unordered semantics |
+
+These emit standard CLI opcodes and existing native instructions. Floating operands
+for unsigned division, remainder, shift or Conv_R_Un reject during body validation;
+integer width mismatches likewise reject. Conversion to UInt64 from a signed Int32
+requires sign extension with Conv_I8 when that is the source-language contract.
+Use `Emit(OpCode.Ldc_I8, longBits)` for 64-bit integer constants.
+
+`IntegerWidthChecks.cs` executes the same authored program on .NET and NeoCLR,
+including high-bit arithmetic, conversion and signature round trips. The separately
+compiled Raven integer gate covers native import, fields/properties, arrays and generic
+calls. This does not yet make source-owned primitive Number implementations or generic
+Number-constrained dispatch complete.

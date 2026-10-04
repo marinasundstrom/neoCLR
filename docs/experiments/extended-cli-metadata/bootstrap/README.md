@@ -975,3 +975,16 @@ The fixture exercises static contracts, imported operators and inherited orderin
 It deliberately does not claim intrinsic primitive storage or generic Self calls;
 actual Single source still reproduces the ownership/conformance blocker recorded in
 the strategy. [Evidence](../number-contracts-2026-10-04.json).
+
+
+### Fixed-width integer gate (2026-10-04)
+
+`verify_integers.py` takes the same compiler/runtime/core/seed/base-library/ownership
+arguments as `verify_floating.py`. It compiles `integer-contracts.rvn`, then an
+artifact-only `integer-consumer.rvn`, and runs unchanged sources on both targets.
+All eight widths, unsigned high-bit arithmetic/comparisons/shifts, narrowing and
+widening, unsigned floating conversion, generic calls, fields/properties and arrays
+execute with exit 42 and empty output. Runtime Contract and seed selection are
+unchanged. [Commands and hashes](../integer-dual-2026-10-04.json).
+These are primitive signatures; canonical source primitive ownership and Number
+constrained calls remain open. No native dependency falls back to CLI projection.

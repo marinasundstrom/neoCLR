@@ -18,15 +18,25 @@ public enum PrimitiveType
     /// <summary>An IEEE 754 binary32 value.</summary>
     Single,
     /// <summary>An IEEE 754 binary64 value.</summary>
-    Double
+    Double,
+    /// <summary>A signed 8-bit storage type; evaluation uses Int32.</summary>
+    SByte,
+    /// <summary>A signed 16-bit storage type; evaluation uses Int32.</summary>
+    Int16,
+    /// <summary>An unsigned 16-bit storage type; evaluation uses Int32.</summary>
+    UInt16,
+    /// <summary>An unsigned 32-bit storage type; evaluation uses Int32 bits.</summary>
+    UInt32,
+    /// <summary>An unsigned 64-bit storage type; evaluation uses Int64 bits.</summary>
+    UInt64
 }
 
 /// <summary>An immutable nongeneric primitive signature whose declared parameters exclude any instance receiver.</summary>
 public sealed class PrimitiveMethodSignature : MethodSignature
 {
     /// <summary>Copies parameter types and validates the bounded signature.</summary>
-    /// <param name="returnType">Void, Byte, Int32, Int64, Single, Double, Boolean or String.</param>
-    /// <param name="parameterTypes">At most 256 Byte/Int32/Int64/Single/Double/Boolean/String parameters in order.</param>
+    /// <param name="returnType">Any defined PrimitiveType, including Void for no result.</param>
+    /// <param name="parameterTypes">At most 256 non-Void primitive parameters in order.</param>
     /// <exception cref="ArgumentNullException">Parameters are null.</exception>
     /// <exception cref="ArgumentException">Invalid type or too many parameters.</exception>
     public PrimitiveMethodSignature(PrimitiveType returnType, IEnumerable<PrimitiveType> parameterTypes)

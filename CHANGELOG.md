@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Complete fixed-width integer metadata signatures and expose standard unsigned
+  arithmetic, comparisons, shifts and conversions through the IL generator. Preserve
+  storage signedness while using CLI evaluation widths. Raven imports and emits the
+  corresponding native operations; separate integer libraries and consumers run on
+  both targets. Fix the primitive local overload to admit floating locals. Primitive
+  source ownership and generic Number dispatch remain separate unfinished work.
+
 - Author/read static interface contracts and inherited ComparableTo<Self> through the
   metadata definitions, builders and introspection views. Validate static/instance
   implementation identity and emit CLI MethodImpl rows. Actual Number source, a

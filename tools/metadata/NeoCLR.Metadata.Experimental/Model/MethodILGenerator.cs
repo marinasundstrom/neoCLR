@@ -308,6 +308,16 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Conv_I8 => "convert64",
             OpCode.Conv_I4 => "convert32",
             OpCode.Conv_U1 => "convertByte",
+            OpCode.Conv_I1 => "convertSByte",
+            OpCode.Conv_I2 => "convertInt16",
+            OpCode.Conv_U2 => "convertUInt16",
+            OpCode.Conv_U4 => "convertUInt32",
+            OpCode.Conv_U8 => "convertUInt64",
+            OpCode.Div_Un => "divide.unsigned",
+            OpCode.Rem_Un => "remainder.unsigned",
+            OpCode.Shr_Un => "shift.right.unsigned",
+            OpCode.Conv_R_Un => "convertUnsignedDouble",
+
             OpCode.Pop => "pop",
             OpCode.Ceq => "equal",
             OpCode.Clt => "less",
@@ -489,7 +499,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
 
     public LocalDefinition DeclareLocal(PrimitiveType type)
     {
-        if (type is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean or PrimitiveType.String or PrimitiveType.Byte)) throw new ArgumentException("unsupported local type", nameof(type));
+        if (!Enum.IsDefined(type) || type == PrimitiveType.Void) throw new ArgumentException("unsupported local type", nameof(type));
         if (locals.Count >= 256) throw new InvalidDataException("local limit exceeded");
         var local = new LocalDefinition(bodyBuilder, locals.Count, type); locals.Add(local); return local;
     }

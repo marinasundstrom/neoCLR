@@ -32,6 +32,12 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             case 0x03: return consumer.ImportTypeIdentity(core, "System", "Char", 0, isValueType: true);
             case 0x08: return PrimitiveType.Int32;
             case 0x05: return PrimitiveType.Byte;
+            case 0x04: return PrimitiveType.SByte;
+            case 0x06: return PrimitiveType.Int16;
+            case 0x07: return PrimitiveType.UInt16;
+            case 0x09: return PrimitiveType.UInt32;
+            case 0x0b: return PrimitiveType.UInt64;
+
             case 0x0c: return PrimitiveType.Single;
             case 0x0d: return PrimitiveType.Double;
             case 0x0a: return PrimitiveType.Int64;

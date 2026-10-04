@@ -1,0 +1,28 @@
+func Main() -> int {
+    let high32 = (uint)-1
+    let high64 = (ulong)-1L
+    if IntegerBox.Echo<uint>(high32) != high32 { return 1 }
+    if IntegerBox.Echo<ulong>(high64) != high64 { return 2 }
+    if IntegerBox.Signed8(128) != -128 { return 3 }
+    if IntegerBox.Signed16(32768) != -32768 { return 4 }
+    if IntegerBox.Unsigned16(-1) != 65535 { return 5 }
+    if IntegerBox.Wide(high32) != 4294967295L { return 6 }
+    if IntegerBox.WideSigned(-1) != high64 { return 7 }
+    if IntegerBox.Real(high64) != 18446744073709551616.0 { return 8 }
+    if IntegerBox.Divide32(high32, (uint)2) != (uint)2147483647 { return 9 }
+    if IntegerBox.Divide64(high64, (ulong)2L) != (ulong)9223372036854775807L { return 10 }
+    if IntegerBox.Remainder32(high32, (uint)2) != (uint)1 { return 11 }
+    if IntegerBox.Remainder64(high64, (ulong)2L) != (ulong)1L { return 12 }
+    if IntegerBox.Shift32(high32) != (uint)2147483647 { return 13 }
+    if IntegerBox.Shift64(high64) != (ulong)9223372036854775807L { return 14 }
+    if !IntegerBox.Greater32(high32, (uint)0) { return 15 }
+    if !IntegerBox.Greater64(high64, (ulong)0L) { return 16 }
+    if IntegerBox.Less32(high32, (uint)0) { return 17 }
+    if IntegerBox.Less64(high64, (ulong)0L) { return 18 }
+    let box = IntegerBox(high64)
+    if box.Value != high64 { return 19 }
+    box.Set((ulong)42L)
+    let values: ulong[] = [box.Value, high64]
+    if values[1] != high64 { return 20 }
+    return (int)values[0]
+}

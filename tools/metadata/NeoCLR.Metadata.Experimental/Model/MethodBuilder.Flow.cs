@@ -37,7 +37,7 @@ public sealed partial class MethodBuilder
     private readonly record struct BodyValueType(PrimitiveType Primitive, TypeBuilder? Class = null, SignatureType? ArrayElement = null, bool NativeLength = false, int? MethodParameter = null, int? AddressedLocal = null, int? TypeParameter = null, GenericTypeInstance? GenericInstance = null, ImportedTypeReference? ImportedType = null, SignatureType? ByReferenceElement = null, int? AddressedParameter = null, bool ConstructionReceiver = false, FunctionSignature? Function = null)
     {
         internal static BodyValueType Receiver(TypeBuilder owner) => owner.IsValueType ? SignatureType.ByReference(owner.OpenSignature) : owner.OpenSignature;
-        public static implicit operator BodyValueType(PrimitiveType type) => new(type == PrimitiveType.Byte ? PrimitiveType.Int32 : type);
+        public static implicit operator BodyValueType(PrimitiveType type) => new(type switch { PrimitiveType.SByte or PrimitiveType.Byte or PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.UInt32 => PrimitiveType.Int32, PrimitiveType.UInt64 => PrimitiveType.Int64, _ => type });
         public static implicit operator BodyValueType(SignatureType type) => type.FunctionSignature is { } function ? new(PrimitiveType.Void, Function: function) : type.ByReferenceElement is { } target ? new(PrimitiveType.Void, ByReferenceElement: target) : type.ImportedType is { } imported ? new(PrimitiveType.Void, ImportedType: imported) : type.GenericInstance is { } instance ? new(PrimitiveType.Void, GenericInstance: instance) : type.TypeParameterIndex is { } ordinal ? new(PrimitiveType.Void, TypeParameter: ordinal) : type.MethodParameterIndex is { } index ? new(PrimitiveType.Void, MethodParameter: index) : type.ArrayElement is { } element ? new(PrimitiveType.Void, ArrayElement: element) : type.ClassType is { } c ? new(PrimitiveType.Void, c) : (BodyValueType)type.Primitive!.Value;
     }
     private BodyValueType ArgumentType(int index)
@@ -203,12 +203,26 @@ public sealed partial class MethodBuilder
                 case "constantDouble": stack.Add(PrimitiveType.Double); break;
                 case "convertSingle":
                 case "convertDouble":
+                case "convertSByte":
+                case "convertInt16":
+                case "convertUInt16":
+                case "convertUInt32":
+                case "convertUInt64":
                 case "convertByte":
                 case "convert32":
                 case "convert64":
                     if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
                         throw new InvalidDataException("numeric conversion requires Int32, Int64, Single or Double; array length is supported only by conv.i4");
-                    stack[^1] = instruction.Op switch { "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
+                    stack[^1] = instruction.Op switch { "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" or "convertUInt64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
+                case "convertUnsignedDouble":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                        throw new InvalidDataException("conv.r.un requires integer operands");
+                    stack[^1] = PrimitiveType.Double; break;
+                case "divide.unsigned":
+                case "remainder.unsigned":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
+                        throw new InvalidDataException("unsigned division requires integer operands");
+                    var unsignedType = stack[^1]; Pop(unsignedType); Pop(unsignedType); stack.Add(unsignedType); break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
                 case "enum.from": Pop(PrimitiveType.Int32); stack.Add(instruction.Type!); break;
                 case "enum.to": Pop(instruction.Type!); stack.Add(PrimitiveType.Int32); break;
@@ -259,6 +273,7 @@ public sealed partial class MethodBuilder
                 case "local.store": Pop(LocalType(locals[instruction.Value])); assigned[instruction.Value] = true; break;
                 case "shift.left":
                 case "shift.right":
+                case "shift.right.unsigned":
                     Pop(PrimitiveType.Int32);
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("shift requires an Int32/Int64 value and Int32 count");
@@ -282,8 +297,8 @@ public sealed partial class MethodBuilder
                     stack.Add(instruction.Op is "less" or "greater" ? PrimitiveType.Boolean : integerType); break;
                 case "less.unordered":
                 case "greater.unordered":
-                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Single or PrimitiveType.Double))
-                        throw new InvalidDataException("unordered comparison requires floating operands");
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double))
+                        throw new InvalidDataException("unsigned/unordered comparison requires matching numeric operands");
                     var floatingType = stack[^1]; Pop(floatingType); Pop(floatingType);
                     stack.Add(PrimitiveType.Boolean); break;
                 case "equal":

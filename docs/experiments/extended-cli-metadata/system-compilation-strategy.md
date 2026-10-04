@@ -381,3 +381,21 @@ service selection and generic Number callself emission. Verify the existing comp
 numeric consumer across all ten types, parsing boundaries and NaN ordering before
 claiming this story complete. Preserve the CLI primitive bootstrap explicitly while
 source ownership transitions; duplicate seed implementations must be removed.
+
+
+### Number prerequisite: integer width emission (2026-10-04)
+
+All eight fixed-width integer signatures and unsigned instruction selection now
+execute through separately compiled libraries and consumers on both targets.
+[Evidence](integer-dual-2026-10-04.json). Standard CLI encodings and runtime operations
+are reused, including sign/zero extension and unsigned comparisons; this introduces
+no new numeric semantics. The primitive local API also admits floating locals.
+The current blocking Number issue remains explicit canonical primitive ownership:
+source Single's Self maps to float while its emitted declaring type is nominal.
+Do not relax implementation signature checking to hide it. Generic Number dispatch
+and intrinsic backing-field storage follow the same ownership decision.
+
+Validation: 137 metadata C# groups, the paired integer and floating driver gates,
+31 focused .NET controls, and all seven existing native consumers pass. API manual
+updated; `build-api-docs.py --check` still reports the known stale guest snapshot.
+No guest public API changed, and no snapshot was regenerated against a mismatched bridge.
