@@ -25,7 +25,7 @@ def main():
         commands.append(dict(command=[str(x) for x in command], exitCode=result.returncode,
                              stdout=result.stdout, stderr=result.stderr))
         (output / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
-        if result.returncode != expected or error and error not in result.stderr or expected == 99 and result.stdout:
+        if result.returncode != expected or error and error not in result.stderr or expected in (42, 99) and result.stdout:
             raise RuntimeError(json.dumps(commands[-1], indent=2))
 
     ownership = json.loads(args.ownership.read_text())
@@ -54,6 +54,21 @@ def main():
     dependencies = ['--module', library, '--system', args.seed.resolve()]
     run([args.runtime.resolve(), 'verify', app] + dependencies)
     run([args.runtime.resolve(), 'run', app] + dependencies, 99)
+    algorithms = output / 'NumberAlgorithms.dll'
+    algorithm_source = HERE / 'native-number-algorithms.rvn'
+    generic_source = HERE / 'native-number-generic-consumer.rvn'
+    run(common + ['--reference', library, '--library', '-o', algorithms, algorithm_source])
+    generic_app = output / 'GenericConsumer.dll'
+    run(common + ['--reference', library, '--reference', algorithms, '-o', generic_app, generic_source])
+    generic_dependencies = dependencies + ['--module', algorithms]
+    run([args.runtime.resolve(), 'verify', generic_app] + generic_dependencies)
+    run([args.runtime.resolve(), 'run', generic_app] + generic_dependencies, 42)
+    invalid_source = output / 'InvalidBound.rvn'
+    invalid_source.write_text('import NumberAlgorithms.*\nfunc Bad() -> string => Sum<string>("a", "b")\n')
+    invalid_output = output / 'InvalidBound.dll'
+    run(common + ['--reference', library, '--reference', algorithms, '--library', '-o', invalid_output, invalid_source], 1, 'RAV0320')
+    if invalid_output.exists():
+        raise RuntimeError('Incompatible generic argument published an assembly')
     # Missing native providers must never select bootstrap declarations or publish output.
     missing = output / 'Missing.dll'
     run(common + ['-o', missing, consumer], 1)
@@ -67,12 +82,12 @@ def main():
     run(conflicting + ['--reference', library, '-o', rejected, consumer], 1)
     if rejected.exists():
         raise RuntimeError('Duplicate primitive seed ownership published an assembly')
-    inputs = [HERE / name for name in ('numeric-seed.neoil', 'collection-seed.neoil', 'union-seed.neoil', 'service-seed.neoil', 'service-catalog.json')] + [ROOT / source for source in sources] + [consumer, manifest]
+    inputs = [HERE / name for name in ('numeric-seed.neoil', 'collection-seed.neoil', 'union-seed.neoil', 'service-seed.neoil', 'service-catalog.json')] + [ROOT / source for source in sources] + [consumer, algorithm_source, generic_source, invalid_source, manifest]
     inputs += [args.compiler.resolve(), args.runtime.resolve(), args.core.resolve(), args.seed.resolve(),
                args.ownership.resolve()] + sorted(output.rglob('*.dll'))
     revision = lambda directory: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=directory, text=True).strip()
     evidence = dict(runtimeRepositoryRevision=revision(ROOT), compilerRepositoryRevision=revision(args.compiler.resolve().parent),
-                    scope='The cumulative source-library subset plus all ten unchanged numeric sources execute via direct native import: scalar receivers, identities, parsing boundaries/errors, NaN ordering, arrays, integer display and checked division. Int32/Int64 seed copies are absent. Generic Number-constrained calls remain open.',
+                    scope='The cumulative source-library subset plus all ten unchanged numeric sources execute via direct native import: scalar receivers, identities, parsing boundaries/errors, NaN ordering, arrays, integer display and checked division. Int32/Int64 seed copies are absent. A separately compiled generic algorithms library and source-free consumer execute all ten types through Number arithmetic, Zero/One, inherited ComparableTo<Self> dispatch and generic forwarding.',
                     hashes={str(p): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}, commands=commands)
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(output / 'validation.json')

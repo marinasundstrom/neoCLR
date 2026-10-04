@@ -10640,3 +10640,24 @@ identity properties now fail with RAV0330, independently of writer validation.
 - **Action:** recorded the direction while continuing the owned-interface method-bound
   metadata slice. Open decisions include signature compatibility, generic inference,
   metadata representation and how the ordinary .NET target would reject or map it.
+
+
+### 2026-10-04 — Number generic native integration gate
+
+- **Author direction:** finish the Number feature, including the numeric classes/structs,
+  and continue until the feature works rather than stopping at each prerequisite.
+- **Assistant implementation:** completed method interface bounds, native semantic import,
+  external static and constructed instance constrained calls, and generic forwarding.
+  Explicit numeric ownership remains in the host/emitter contract. No importer handles
+  enter shared code generation; default .NET behavior and structural Function branches
+  are unchanged.
+- **Observed outcome:** ordinary Raven commands rebuild all ten unchanged numeric source
+  types and the cumulative library subset, compile a separate generic algorithms library,
+  then compile and run a consumer using only their artifacts. Every Number member,
+  inherited CompareTo and forwarding pass with exit 42 and empty stdout; the concrete
+  parsing/boundary consumer returns 99. Invalid string arguments diagnose RAV0320 without
+  publishing output. 140 C# metadata groups, 122 focused .NET tests and seven existing
+  native consumers pass. See the [evidence](experiments/extended-cli-metadata/number-generic-end-to-end-2026-10-04.json).
+- **Remaining scope:** this is completion of the bounded Number story, not the entire
+  runtime library or all generic constraint forms. The previously stale guest API
+  snapshot remains recorded; the experimental host API manual is updated.

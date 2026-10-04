@@ -1,0 +1,27 @@
+import System.*
+import NumberAlgorithms.*
+func Check<T>() -> bool where T: Number {
+    let zero = Zero<T>()
+    let one = One<T>()
+    let two = Sum(one, one)
+    let four = Product(two, two)
+    if Compare(zero, one) != -1 { return false }
+    if Compare(two, one) != 1 { return false }
+    if Compare(Difference(two, one), one) != 0 { return false }
+    if Compare(Quotient(four, two), two) != 0 { return false }
+    if Compare(Forward(one, one), two) != 0 { return false }
+    return true
+}
+func Main() -> int {
+    if !Check<sbyte>() { return 1 }
+    if !Check<byte>() { return 2 }
+    if !Check<short>() { return 3 }
+    if !Check<ushort>() { return 4 }
+    if !Check<int>() { return 5 }
+    if !Check<uint>() { return 6 }
+    if !Check<long>() { return 7 }
+    if !Check<ulong>() { return 8 }
+    if !Check<float>() { return 9 }
+    if !Check<double>() { return 10 }
+    return 42
+}

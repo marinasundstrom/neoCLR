@@ -8,24 +8,31 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Complete the native generic Number integration gate: rebuild all ten numeric source
+  implementations, compile a separate generic algorithms library and execute a consumer
+  with no library sources. Arithmetic, Zero/One, inherited CompareTo and forwarding
+  return the expected result across all ten types. Invalid string arguments reject with
+  RAV0320 without output. This completes the Number slice, not the entire class library.
+
 - Add IL-generator constrained static calls through method type parameters with local
   interface bounds, including inherited bounds and Self signature substitution.
   Typed and raw Emit overloads share validation. CLI constrained./call and native
   callself execute the generic fixtures with exit 42; no runtime encoding change.
-  External targets and Raven constrained-call emission remain unfinished.
+  External static and constructed instance targets now retain scoped contracts;
+  bounded method forwarding validates the caller, and Raven emits these operations.
 
 - Extend method interface bounds to explicit external nongeneric interfaces, using
   CLI TypeRefs and existing native TypeBound identities. Introspection checks the
   resolved dependency category; .NET and NeoCLR execute a separate-contract fixture.
   The experimental constraint record now exposes TypeReference instead of TypeDefinition.
   Legacy CLI projection rejects external bounds explicitly; direct native Raven import
-  preserves them. Open constrained-call emission remains unfinished.
+  preserves them.
 
 - Preserve owned nongeneric interface bounds on method type parameters through
   definitions/builders, standard CLI constraints, native metadata and introspection.
   Validate concrete local generic arguments and recheck after graph edits. Raven
-  imports these bounds for semantic checks. Open constrained calls and imported
-  bounded-method emission remain unsupported; generic Number execution is not complete.
+  imports these bounds for semantic checks. The direct snapshot ImportReference
+  convenience API still rejects bounded methods; Raven authors calls from symbol facts.
 
 - Record a future function-type constraint using Raven’s proposed `where F: func`
   spelling. Signature requirements, metadata encoding and .NET target behavior
@@ -35,7 +42,6 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   contracts, using standard CLI constrained./call and native nonborrowed callself.
   Substitute Self in stack signatures and retain exact implementation/operand checks.
   C# tests execute .NET dispatch and native ordinary/Self consumers return 42.
-  Open generic call operands and Raven Number-constrained methods remain unsupported.
 
 - Rebuild the cumulative runtime-library subset with all ten unchanged numeric source
   implementations under one owner, replacing seed Int32/Int64 declarations. Select
@@ -44,22 +50,21 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   exact signature and visibility checks. Readers continue accepting previous encoded
   primitive names. Rebuild earlier experimental primitive-provider artifacts before
   using Raven’s new canonical member authoring. The source-free numeric consumer
-  verifies and runs with exit 99;
-  generic Number-constrained compiler calls remain open.
+  verifies and runs with exit 99; the generic follow-through gate returns 42.
 
 - Compile unchanged source Single/Double Number implementations and NumberParseError
   into a native library, then execute an artifact-only consumer covering parsing,
   ordering and arrays. Raven selects explicit native primitive providers and maps
   checked intrinsic storage to scalar receivers. Metadata member references can be
   authored from semantic contracts without reader handles; dependency records retain
-  canonical scalar identity. Generic Number dispatch and remaining numeric source
-  ownership are not yet complete.
+  canonical scalar identity.
 
 - Add explicit native numeric primitive designation to metadata definitions/builders
   and expose it through introspection. Preserve existing runtime scalar representation,
   Self substitution and imported managed receivers. Reject ordinary record fields and
   executable CLI emission for these declarations. A separate API-authored primitive
-  library/consumer loads and executes; Raven source ownership remains unfinished.
+  library/consumer loads and executes. Imported scalar ownership can now also be
+  designated explicitly through AssemblyBuilder.SetNativePrimitive for constraint checks.
 
 - Complete fixed-width integer metadata signatures and expose standard unsigned
   arithmetic, comparisons, shifts and conversions through the IL generator. Preserve

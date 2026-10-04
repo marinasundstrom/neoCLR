@@ -153,6 +153,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         RequireCall(opCode);
         if (!ReferenceEquals(operand.Definition.Assembly, Assembly)) throw new ArgumentException("generic calls require an owned definition", nameof(operand));
         foreach (var type in operand.TypeArguments) type.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
+        operand.Definition.ValidateMethodArguments(operand.TypeArguments, bodyBuilder);
         Append(new("call.generic", Target: operand.Definition, GenericTarget: operand));
     }
 
@@ -387,6 +388,50 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     {
         ValidateOpenConstrainedOperands(bodyBuilder, implementingType, target);
         Append(new("call.constrained", Target: target, Type: implementingType));
+    }
+
+    public void Emit(OpCode opCode, SignatureType implementingType, ImportedMethodReference target)
+    {
+        if (opCode != OpCode.Call) throw OperandError(opCode);
+        CallConstrained(implementingType, target);
+    }
+    public void CallConstrained(SignatureType implementingType, ImportedMethodReference target)
+    {
+        ValidateExternalConstrainedOperands(bodyBuilder, implementingType, target);
+        Append(new("call.constrained", Target: target.Target, Type: implementingType, ConstrainedReference: target));
+    }
+    public void Emit(OpCode opCode, SignatureType implementingType, ImportedConstructedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        if (opCode != (target.Definition.IsStatic ? OpCode.Call : OpCode.Callvirt)) throw OperandError(opCode);
+        CallConstrained(implementingType, target);
+    }
+    public void CallConstrained(SignatureType implementingType, ImportedConstructedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(target);
+        ValidateExternalConstructedConstrainedOperands(bodyBuilder, implementingType, target);
+        Append(new("call.constrained", Target: target.Definition.Target, Type: implementingType, ConstructedTarget: target.Target, ConstrainedConstructedReference: target));
+    }
+    internal static void ValidateExternalConstructedConstrainedOperands(MethodBuilder caller, SignatureType implementingType, ImportedConstructedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(implementingType);
+        if (!ReferenceEquals(target.Definition.Owner, caller.Assembly) || !target.Definition.IsInterfaceMethod || target.MethodArguments.Count != 0 ||
+            implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
+            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), target.DeclaringType, implementingType)))
+            throw new ArgumentException("constructed constrained call requires a matching method interface bound");
+        foreach (var argument in target.DeclaringType.TypeArguments) argument.ValidateOwner(caller.Assembly, caller.Signature.GenericParameterNames.Count, caller.DeclaringType?.GenericParameterNames.Count ?? 0);
+        _ = caller.Assembly.ExternalInterfaceMethods(target.DeclaringType).ToArray();
+    }
+
+    internal static void ValidateExternalConstrainedOperands(MethodBuilder caller, SignatureType implementingType, ImportedMethodReference target)
+    {
+        ArgumentNullException.ThrowIfNull(implementingType); ArgumentNullException.ThrowIfNull(target);
+        if (!ReferenceEquals(target.Owner, caller.Assembly) || !target.IsStatic || !target.IsInterfaceMethod ||
+            target.Signature.GenericParameterNames.Count != 0 || target.DeclaringReference is not { GenericArity: 0 } owner ||
+            implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
+            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Assembly.SatisfiesInterfaceBound(caller.Definition.ConstraintSignature(c.InterfaceType), owner)))
+            throw new ArgumentException("external constrained call requires a bounded method parameter and completed static interface target");
+        _ = caller.Assembly.ExternalInterfaceMethods(owner).ToArray();
     }
 
     internal static void ValidateOpenConstrainedOperands(MethodBuilder caller, SignatureType implementingType, MethodBuilder target)

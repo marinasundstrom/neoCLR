@@ -79,15 +79,26 @@ public sealed partial class MethodBuilder
         Definition.AddInterfaceConstraint(parameterIndex, Assembly.Definition.MainModule.ImportReference(interfaceType.AssemblyIdentity, interfaceType.Namespace, interfaceType.Name));
     }
 
-    internal void ValidateMethodArguments(IReadOnlyList<SignatureType> arguments)
+    internal void ValidateMethodArguments(IReadOnlyList<SignatureType> arguments, MethodBuilder? caller = null, bool deferOpen = false)
     {
         foreach (var constraint in InterfaceConstraints)
         {
             var argument = arguments[constraint.ParameterIndex];
+            if (argument.MethodParameterIndex is { } parameter)
+            {
+                if (caller is null && deferOpen) continue;
+                var required = Definition.ConstraintSignature(constraint.InterfaceType);
+                if (caller is not null && parameter < caller.Signature.GenericParameterNames.Count &&
+                    caller.InterfaceConstraints.Any(c => c.ParameterIndex == parameter &&
+                        (required.ClassType is { } requiredLocal ? caller.Definition.ConstraintSignature(c.InterfaceType).ClassType?.ConformsTo(requiredLocal) == true
+                         : Assembly.SatisfiesConstrainedBound(caller.Definition.ConstraintSignature(c.InterfaceType), required.ImportedType!, argument)))) continue;
+                throw new ArgumentException("forwarded method argument lacks required interface bounds");
+            }
             var type = argument.ClassType ?? (argument.Primitive is { } primitive
                 ? Assembly.Types.SingleOrDefault(t => t.NativePrimitive == primitive) : null);
             var bound = Definition.ConstraintSignature(constraint.InterfaceType);
-            if (type is null || !(bound.ClassType is { } local ? type.ConformsTo(local) : type.InheritedContracts().Any(c => Equals(c, bound))))
+            var actual = type is not null ? (SignatureType)type : argument.Primitive is { } scalar && Assembly.ExternalPrimitive(scalar) is { } external ? (SignatureType)external : argument;
+            if (!(bound.ClassType is { } local ? type?.ConformsTo(local) == true : Assembly.SatisfiesInterfaceBound(actual, bound.ImportedType!)))
                 throw new ArgumentException("generic method argument does not satisfy its interface bound");
         }
     }

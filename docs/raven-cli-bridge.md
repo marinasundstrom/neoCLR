@@ -5665,3 +5665,32 @@ an explicit capability. Its CallableSignature admission still rejects method con
 do not relax that guard until the emitter can retain bounds and dispatch correctly.
 The .NET backend, explicit primitive bootstrap and runtime seed selection are unchanged.
 The C# API manual is updated; the existing stale guest API snapshot remains unresolved.
+
+
+### Generic Number end-to-end gate completed (2026-10-04)
+
+The Number feature now passes through ordinary compiler commands with direct native
+references. The gate rebuilds the cumulative class-library subset plus all ten unchanged
+numeric sources as Numbers.dll, compiles native-number-algorithms.rvn as a separate
+library, and compiles native-number-generic-consumer.rvn with only emitted references.
+NeoCLR verifies and executes all ten instantiations, checking +, -, *, /, Zero, One,
+inherited ComparableTo<Self>.CompareTo and constrained generic forwarding. Exit 42 and
+empty stdout are required. The earlier parsing/boundary/array consumer still returns 99.
+A string type argument fails binding with RAV0320 and publishes no output.
+
+Method bounds are emitted from semantic symbols through an explicit native capability;
+the importer remains independent. Shared linear calls carry compiler-owned method/type
+operands. The native adapter uses metadata IL-generator calls, with managed addresses for
+constructed instance dispatch. External numeric ownership and interface conversions are
+explicit semantic facts. The default .NET Reflection/Emit implementation is unchanged.
+CLI uses its existing constraint tables and constrained instructions; native uses existing
+TypeBound/callself behavior. No runtime schema fork, new arithmetic semantics or performance
+claim was needed. No independently useful binder fix was introduced for main backport.
+
+Run bootstrap/verify_native_numbers.py with the same explicit primitive core, numeric
+runtime seed and cumulative ownership manifest as the preceding source-family gate.
+It records source/artifact hashes, revisions, commands and failures. See
+number-generic-end-to-end-2026-10-04.json for this run's evidence. This completes the
+Number numeric-family story; it does not claim full class-library compilation or broader
+generic constraint categories. Generic owner-parameter forwarding, special method bounds,
+structural Function experiments and replacing .NET Reflection/Emit remain separate work.

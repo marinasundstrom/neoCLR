@@ -110,6 +110,26 @@ public sealed partial class AssemblyBuilder
 
     private bool IsAuthoredInterface(ImportedTypeReference type) => authoredInterfaces.Contains(InterfaceDefinition(type));
 
+    internal bool SatisfiesConstrainedBound(SignatureType bound, ImportedTypeReference target, SignatureType implementing)
+    {
+        var pending = new Stack<SignatureType>(); pending.Push(bound);
+        var seen = new HashSet<SignatureType>();
+        while (pending.TryPop(out var current))
+        {
+            if (!seen.Add(current)) continue;
+            if (seen.Count > 4096) throw new InvalidDataException("constraint interface traversal exceeds limit");
+            if (Equals(current.ImportedType, target)) return true;
+            IEnumerable<SignatureType> bases = current.ImportedType is { } external ? ExternalInterfaceBases(external).Select(b => (SignatureType)b)
+                : current.ClassType is { } local ? local.InterfaceSignatures : [];
+            foreach (var parent in bases) pending.Push(MethodILGenerator.SubstituteConstrainedSelf(parent, implementing));
+        }
+        return false;
+    }
+
+    internal bool SatisfiesInterfaceBound(SignatureType argument, ImportedTypeReference bound) =>
+        argument.ImportedType is { } imported ? HasAuthoredInterfaceConversion(imported, bound)
+        : argument.ClassType is { } local && local.InheritedContracts().Any(c => c.ImportedType is { } external && HasAuthoredInterfaceConversion(external, bound));
+
     private bool HasAuthoredInterfaceConversion(ImportedTypeReference source, ImportedTypeReference target, bool definitionsOnly = false)
     {
         var seen = new HashSet<ImportedTypeReference>();

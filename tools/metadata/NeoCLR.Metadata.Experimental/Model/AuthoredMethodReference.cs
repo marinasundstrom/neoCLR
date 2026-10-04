@@ -3,6 +3,20 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<ImportedTypeReference, PrimitiveType> authoredPrimitiveOwners = [];
+    /// <summary>Declares the scalar representation of an output-owned external numeric type from host semantic facts.</summary>
+    /// <exception cref="ArgumentException">The reference is foreign or does not name the matching nongeneric System numeric value type.</exception>
+    /// <exception cref="InvalidDataException">Another dependency already owns the scalar representation.</exception>
+    public void SetNativePrimitive(ImportedTypeReference type, PrimitiveType primitive)
+    {
+        ArgumentNullException.ThrowIfNull(type);
+        if (!ReferenceEquals(type.Owner, this) || !TypeDefinition.IsNumericPrimitive(primitive) || !type.IsValueType ||
+            type.Namespace != "System" || type.Name != primitive.ToString() || type.GenericArity != 0 || type.DeclaringType is not null)
+            throw new ArgumentException("invalid external primitive designation");
+        if (authoredPrimitiveOwners.Any(p => p.Value == primitive && !Equals(p.Key, type)))
+            throw new InvalidDataException("conflicting external primitive ownership");
+        authoredPrimitiveOwners[type] = primitive;
+    }
+    internal ImportedTypeReference? ExternalPrimitive(PrimitiveType primitive) => authoredPrimitiveOwners.SingleOrDefault(p => p.Value == primitive).Key;
     internal PrimitiveType? AuthoredPrimitiveOwner(ImportedTypeReference type) => authoredPrimitiveOwners.TryGetValue(type, out var primitive) ? primitive : null;
     /// <summary>Authors a public nonvirtual member, bounded value override or abstract interface method reference without a reader definition.</summary>
     /// <param name="declaringType">Output-owned class/value/interface definition, not a construction.</param>
@@ -67,7 +81,7 @@ public sealed partial class AssemblyBuilder
             result.Definition.AuthoredDeclaringType = type.DeclaringType is { } parent ? MaterializeOwner(parent).Definition : null;
             return result;
         }
-        if (nativePrimitive is { } declaredPrimitive) authoredPrimitiveOwners[declaringType] = declaredPrimitive;
+        if (nativePrimitive is { } declaredPrimitive) SetNativePrimitive(declaringType, declaredPrimitive);
         var owner = MaterializeOwner(declaringType);
         if (nativePrimitive is { } scalar) owner.SetNativePrimitive(scalar);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))

@@ -6624,7 +6624,7 @@ signatures; language admission and constraint satisfaction remain compiler respo
 
 `MethodBuilder.MakeGenericInstance` checks concrete owned arguments against every bound;
 writing repeats this validation so later edits cannot invalidate an existing call silently.
-Open, imported and constructed argument satisfaction is not supported in this first slice.
+Method-parameter forwarding is now checked against the caller bounds at emission; see the external dispatch update below. Constructed argument satisfaction remains bounded by supported explicit interface conversions.
 `AssemblyBuilder.ImportReference(MethodDefinition, ...)` rejects bounded methods with
 NotSupportedException until its contract can preserve their bounds. Unconstrained imports
 retain their previous behavior.
@@ -6646,7 +6646,7 @@ writing. Both definition and builder overloads use this output-owned contract; t
 not reopen importer objects. Definition-level external bounds require an attached method.
 Foreign/unregistered references, duplicates and generic bounds reject. Concrete local
 arguments may satisfy external bounds through their declared interface relationships;
-open argument forwarding and imported bounded-method emission remain unsupported.
+method-parameter forwarding is now checked at emission. Direct snapshot import of bounded methods remains unsupported; see the symbol-authored call-reference distinction below.
 
 Migration (development only, 2026-10-04): GenericMethodInterfaceConstraint.InterfaceType
 is now TypeReference. Use MetadataLoadContext.Resolve for canonical views or an explicit
@@ -6681,7 +6681,62 @@ required. The earlier TypeBuilder receiver overloads retain their existing behav
 
 Tests execute a generic static-interface call on both .NET and NeoCLR. A separate native
 Self fixture instantiates the method with Double, adds 20 and 22 and returns exit 42.
-Typed/raw calls and inherited bounds are covered. Type-owner parameters, open instance
-calls, external interface targets, generic argument forwarding and Raven's constrained
-emission remain outside this increment. CLI Self representation is not introduced by
+Typed/raw calls and inherited bounds are covered. Type-owner parameters and open instance calls are outside this owned-target overload.
+The subsequent external overloads and Raven integration are documented below. CLI Self representation is not introduced by
 this API; the portable CLI fixture uses ordinary scalar signatures.
+
+
+### External constrained dispatch and Number integration (development, 2026-10-04)
+
+Additional `IILGenerator` overloads are available beside the owned-target overloads:
+
+```csharp
+void CallConstrained(SignatureType implementingType, ImportedMethodReference target);
+void Emit(OpCode opCode, SignatureType implementingType, ImportedMethodReference target);
+void CallConstrained(SignatureType implementingType, ImportedConstructedMethodReference target);
+void Emit(OpCode opCode, SignatureType implementingType, ImportedConstructedMethodReference target);
+```
+
+The implementing operand is an in-scope method parameter. The nongeneric external
+reference overload accepts static nongeneric abstract interface contracts and Call.
+The constructed reference overload accepts a completed constructed interface contract,
+with no method arguments, using Call for static methods and Callvirt for instance methods.
+Instance calls consume a managed receiver address followed by their explicit arguments.
+The caller's method bounds must entail the target interface. Traversal substitutes Self
+with the implementing parameter, so Number's ComparableTo<Self> relationship admits
+CompareTo on ComparableTo<!!0>. Contract identities, declaring arguments and methods
+remain output-owned. No importer or runtime reflection object is retained.
+
+Null operands throw ArgumentNullException. Unsupported scope, foreign references,
+missing bounds, wrong opcode or target category throw ArgumentException. Incomplete
+contracts or excessive relationship traversal throw InvalidDataException. Validation
+repeats before writing; stack argument/result mismatches reject before publication.
+Standard CLI constrained./call or constrained./callvirt and existing native callself
+encode these calls. No native format or runtime behavior change is required.
+
+`MethodBuilder.MakeGenericInstance` now permits provisional method-parameter arguments.
+Call emission validates the forwarding caller's scope and bounds; writing rechecks them.
+Creating a reference alone does not prove that an arbitrary caller can use it. Concrete
+arguments still validate at reference creation. Generic owner-parameter forwarding and
+special method constraints remain unsupported. The direct snapshot convenience overload
+ImportReference(MethodDefinition, ...) still rejects bounded methods; Raven authors
+ordinary call references from validated symbol contracts, retaining the bounds in the
+producer's method definitions as CLI metadata does.
+
+```csharp
+void AssemblyBuilder.SetNativePrimitive(ImportedTypeReference type, PrimitiveType primitive);
+```
+
+This explicit host assertion binds an output-owned external numeric value declaration
+to its canonical scalar category. It requires a nongeneric top-level System type whose
+name matches one of the ten numeric PrimitiveType values. The reference already carries
+its exact dependency identity/core/digest. A null reference throws ArgumentNullException;
+a foreign or incompatible reference throws ArgumentException; a second dependency owning
+the same scalar throws InvalidDataException. Repeating the same designation is idempotent.
+Declared interface conversions can then prove scalar generic arguments satisfy bounds.
+This does not infer primitive ownership merely from an arbitrary metadata name.
+
+C# tests execute external static and constructed instance calls plus bounded forwarding
+on .NET and NeoCLR. The native compiler gate independently rebuilds numeric sources,
+imports them into a generic algorithms library, and imports both emitted libraries into
+a source-free consumer covering every Number member across all ten numeric types.

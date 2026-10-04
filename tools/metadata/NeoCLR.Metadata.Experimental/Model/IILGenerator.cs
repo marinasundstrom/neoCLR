@@ -260,6 +260,25 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Scope, bound, ownership or target category is unsupported.</exception>
     /// <remarks>Self substitutes the method parameter. Type-owner parameters, instance calls and external targets remain unsupported.</remarks>
     void CallConstrained(SignatureType implementingType, MethodBuilder target);
+    /// <summary>Calls a completed external static interface contract through a bounded method parameter.</summary>
+    /// <param name="implementingType">In-scope method parameter whose bounds admit the declaring interface.</param>
+    /// <param name="target">Output-owned nongeneric static abstract interface reference.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Foreign target, unsupported method or missing interface bound.</exception>
+    void CallConstrained(SignatureType implementingType, ImportedMethodReference target);
+    /// <summary>Calls a constructed external interface through a bounded method parameter; instance calls consume a managed receiver address.</summary>
+    /// <param name="implementingType">In-scope method parameter whose bounds admit the constructed interface.</param>
+    /// <param name="target">Output-owned constructed static or instance abstract interface reference without method arguments.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Unsupported scope, bounds, ownership or target.</exception>
+    /// <exception cref="InvalidDataException">An external contract is incomplete or traversal exceeds its limit.</exception>
+    void CallConstrained(SignatureType implementingType, ImportedConstructedMethodReference target);
+    /// <summary>Emits a constructed constrained call: Call for static, Callvirt for instance contracts.</summary>
+    void Emit(OpCode opCode, SignatureType implementingType, ImportedConstructedMethodReference target);
+
+    /// <summary>Emits Call through a bounded method parameter to an external static interface contract.</summary>
+    void Emit(OpCode opCode, SignatureType implementingType, ImportedMethodReference target);
+
     /// <summary>Emits a static constrained call through an in-scope bounded method parameter.</summary>
     /// <param name="opCode">Call only.</param>
     /// <param name="implementingType">See CallConstrained(SignatureType, MethodBuilder).</param>

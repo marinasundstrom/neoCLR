@@ -269,5 +269,8 @@ catalog includes all existing numeric parsers. A further development gate builds
 unchanged Single/Double Number implementations and NumberParseError with explicit
 native scalar ownership, then imports and executes parsing and ordering from a separate
 consumer. The cumulative source subset now also builds and executes all ten numeric
-implementations without seed numeric declarations. Generic Number-constrained calls
-remain unfinished in the native compiler.
+implementations without seed numeric declarations. Generic Number-constrained code now
+also compiles into a separate algorithms library. A consumer using only emitted native
+references executes arithmetic, Zero/One, inherited ordering and generic forwarding for
+all ten numeric types. This is a development integration gate; full class-library
+compilation and broader generic constraints remain ongoing.

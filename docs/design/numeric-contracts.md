@@ -141,3 +141,16 @@ The historical runtime-api inventory audit still references the already-missing
 `runtime/raven/generated/File.methods.neoil`; its old audit cannot be refreshed
 without separate inventory maintenance. This does not substitute for the current
 RavenDoc type/member selection and snapshot checks used here.
+
+
+## Native metadata compiler checkpoint — 2026-10-04
+
+The preceding CLI/JSON importer restrictions are historical bridge limitations. The
+native compiler now retains bounded generic methods rather than specializing copies.
+A separately compiled algorithms library uses every Number member and inherited
+CompareTo across all ten source-built numeric implementations. A consumer compiled
+without library sources verifies and runs with exit 42. Static and managed instance
+constrained dispatch use existing runtime semantics; .NET controls continue to pass.
+See the system-compilation-strategy generic Number checkpoint and its executable evidence.
+This does not extend the public Number API, add parsing to Number, or complete every
+constraint/category in the compiler. No performance comparison is claimed.

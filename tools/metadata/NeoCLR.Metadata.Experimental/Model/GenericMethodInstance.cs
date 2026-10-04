@@ -34,7 +34,7 @@ public sealed partial class MethodBuilder
             typeArguments.Any(t => t is null || t.Primitive == PrimitiveType.Void))
             throw new ArgumentException("generic type arguments must match the definition", nameof(typeArguments));
         foreach (var type in typeArguments) type.ValidateOwner(Assembly, 32, 32);
-        ValidateMethodArguments(typeArguments);
+        ValidateMethodArguments(typeArguments, deferOpen: true);
         return new(this, (SignatureType[])typeArguments.Clone());
     }
     /// <summary>Appends a call to an instantiated generic method in this output.</summary>

@@ -946,3 +946,12 @@ detached static contract flags, completed external contracts and inherited Self 
 The 136 C# metadata groups pass, including CLI constrained static dispatch and native
 round trips. Guest API declarations did not change. The required snapshot check still
 reports the existing stale guest snapshot; no mismatched bridge refresh was performed.
+
+
+### Generic Number metadata integration (2026-10-04)
+
+The experimental C# host manual covers external constrained IL-generator overloads,
+caller-bound forwarding validation and explicit imported primitive designation. These
+host APIs remain excluded from guest RavenDoc as documented above; no guest public
+signature changed. The existing guest snapshot check still reports stale input. Do not
+refresh or publish it using an unmatched bridge. No website build was needed.

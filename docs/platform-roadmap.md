@@ -1232,7 +1232,10 @@ both targets. Owned nongeneric method interface bounds now round-trip and import
 Raven symbols; external nongeneric method bounds now also retain scoped identity and
 execute in a separate-contract metadata fixture. Open method-parameter constrained calls
 now execute for owned interface targets, including native Self substitution. External
-call targets and Raven generic Number lowering remain unfinished. See the method-bound checkpoint in the system compilation strategy.
+static and constructed instance call targets now execute through Raven. The ordinary
+driver rebuilds all ten numeric source types, compiles a separate generic algorithms
+library, and runs a source-free consumer of every Number member and generic forwarding
+with exit 42. See the completed generic Number gate in the system compilation strategy.
 The next bounded interface slice adds application defaults and public/private static
 helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
 The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)

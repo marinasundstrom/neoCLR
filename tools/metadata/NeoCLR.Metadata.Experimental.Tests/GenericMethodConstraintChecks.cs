@@ -35,7 +35,10 @@ internal static class GenericMethodConstraintChecks
             Reject<ArgumentException>(() => method.AddInterfaceConstraint(1, bound));
             Reject<ArgumentException>(() => method.AddInterfaceConstraint(0, implementation));
             Reject<ArgumentException>(() => method.MakeGenericInstance(PrimitiveType.Int32));
-            Reject<ArgumentException>(() => method.MakeGenericInstance(SignatureType.MethodParameter(0)));
+            var forwarded = method.MakeGenericInstance(SignatureType.MethodParameter(0));
+            var unbounded = graph.AddFunction("Unbounded", new(PrimitiveType.Int32, [], ["U"]));
+            Reject<ArgumentException>(() => unbounded.GetILGenerator().Call(forwarded));
+            unbounded.GetILGenerator().LoadConstant(0); unbounded.GetILGenerator().Return();
             var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
             main.GetILGenerator().Call(method.MakeGenericInstance(implementation)); main.GetILGenerator().Return();
             graph.EntryPoint = main;

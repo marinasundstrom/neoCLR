@@ -1,0 +1,10 @@
+import System.*
+namespace NumberAlgorithms
+public func Sum<T>(left: T, right: T) -> T where T: Number => left + right
+public func Difference<T>(left: T, right: T) -> T where T: Number => left - right
+public func Product<T>(left: T, right: T) -> T where T: Number => left * right
+public func Quotient<T>(left: T, right: T) -> T where T: Number => left / right
+public func Zero<T>() -> T where T: Number => T.Zero
+public func One<T>() -> T where T: Number => T.One
+public func Compare<T>(left: T, right: T) -> int where T: Number => left.CompareTo(right)
+public func Forward<T>(left: T, right: T) -> T where T: Number => Sum(left, right)
