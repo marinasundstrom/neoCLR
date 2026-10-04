@@ -68,6 +68,7 @@ public sealed partial class AssemblyBuilder
         ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
         var identity = definition.Module.Assembly.Identity;
         var type = definition.DeclaringType;
+        if (type?.NativeGrapheme == true) throw new NotSupportedException("native grapheme method imports require an explicit storage-aware reference contract");
         var function = type is not null
             ? (Namespace: type.Namespace, Name: definition.Name)
             : definition.Module.Assembly.IsNative

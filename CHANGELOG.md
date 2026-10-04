@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add explicit owned grapheme Char metadata declarations through definitions/builders
+  and expose the fact through native introspection. API-authored managed receiver methods
+  preserve combining and ZWJ graphemes in native execution; ordinary .NET Char tests remain
+  unchanged. External grapheme authoring and Raven source ownership are still pending and
+  unsupported imports reject explicitly. No numeric Char category or format fork is added.
+
 - Compile source-owned String with an explicit ownership manifest and retained seed;
   separate consumers execute Unicode casing, byte/grapheme counts, equality and interface
   iteration. Implement existing equality operators in Raven source. Runtime dispatch now

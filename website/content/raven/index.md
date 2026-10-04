@@ -181,3 +181,7 @@ this does not change the published class-library support level.
 The development native compiler now builds source-owned String and executes instance
 operations and collection iteration from a separate consumer. Its text model is Unicode
 text, stored as UTF-8. Source-owned grapheme Char remains the next integration step.
+
+The development metadata API can now author runtime-owned Char grapheme declarations
+and inspect their storage identity. Raven's source-owned Char integration remains pending;
+.NET Char retains its UTF-16 code-unit behavior.

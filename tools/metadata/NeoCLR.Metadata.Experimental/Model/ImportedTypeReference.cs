@@ -106,6 +106,7 @@ public sealed partial class AssemblyBuilder
     public ImportedTypeReference ImportReference(TypeDefinition definition, AssemblyIdentity dependencyCoreLibrary)
     {
         ArgumentNullException.ThrowIfNull(definition); ArgumentNullException.ThrowIfNull(dependencyCoreLibrary);
+        if (definition.NativeGrapheme) throw new NotSupportedException("native grapheme dependencies require an explicit storage-aware reference contract");
         if (!CoreLibrary.Equals(dependencyCoreLibrary) || !definition.CanImportReference || definition.IsValueType && !definition.Module.Assembly.IsNative && !Equals(definition.ValueTypeCore, dependencyCoreLibrary) || (definition.Attributes & 7) != (definition.DeclaringType is null ? 1u : 2u))
             throw new InvalidDataException("unsupported imported type or core contract: " + definition.Namespace + "." + definition.Name + " (value core " + definition.ValueTypeCore?.Name + ", expected " + dependencyCoreLibrary.Name + ")");
         var identity = definition.Module.Assembly.Identity;

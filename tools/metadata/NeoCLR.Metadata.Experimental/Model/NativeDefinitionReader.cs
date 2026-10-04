@@ -77,7 +77,7 @@ public sealed partial class NativeAssemblyDefinition
         }
         var typeRows = types.Select((type, index) => new AssemblyDefinition.TypeRow(
             0x02000002u + (uint)index, type.Namespace, type.Name, type.GenericNames.Length, type.DeclaringType < 0 ? 0u : 0x02000002u + (uint)type.DeclaringType,
-            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.EnumMembers is not null ? 0x100 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames, IsEnum: type.EnumMembers is not null, NativePrimitive: type.NativePrimitive)).ToArray();
+            (uint)(0x100000 | (type.IsInterface ? 0xa0 : type.IsStatic ? 0x180 : type.EnumMembers is not null ? 0x100 : type.IsValueType ? 0x108 : 0) | (type.DeclaringType < 0 ? type.Visibility == TypeVisibility.Public ? 1 : 0 : type.Visibility == TypeVisibility.Public ? 2 : 5)), !type.IsStatic, type.IsValueType, null, type.InterfaceSignatures.Select(Copy).ToArray(), type.GenericNames, IsEnum: type.EnumMembers is not null, NativePrimitive: type.NativePrimitive, NativeGrapheme: type.NativeGrapheme)).ToArray();
         var fieldRows = new List<AssemblyDefinition.FieldRow>();
         for (int owner = 0; owner < types.Length; owner++)
         {

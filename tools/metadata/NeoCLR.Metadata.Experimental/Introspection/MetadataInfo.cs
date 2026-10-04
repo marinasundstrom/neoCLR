@@ -146,6 +146,8 @@ public sealed class NominalTypeInfo : TypeInfo
     public bool IsValueType => definition.IsValueType;
     /// <summary>Gets the native runtime scalar implemented by this declaration, without resolving a runtime type.</summary>
     public PrimitiveType? NativePrimitive => definition.NativePrimitive;
+    /// <summary>Whether this declaration owns native Unicode grapheme storage.</summary>
+    public bool NativeGrapheme => definition.NativeGrapheme;
     /// <summary>Gets whether the declaration is a nominal enum.</summary>
     public bool IsEnum => definition.IsEnum;
 }

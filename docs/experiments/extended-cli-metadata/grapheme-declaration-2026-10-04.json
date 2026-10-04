@@ -1,0 +1,75 @@
+{
+  "repositoryBaseRevision": "f9c9ac86c82e1965cbc3af3e8832c905ca1d48d9",
+  "scope": "API-authored native Char declaration and neoIL consumer; grapheme round trips. Working tree implementation on recorded base. Raven source ownership and metadata-library external authoring remain pending.",
+  "metadataGroups": 143,
+  "producerCommand": "NEOCLR_GRAPHEME_ARTIFACT=/tmp/grapheme-owner.neox dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/metadata-empty-system.neoil",
+        "/tmp/grapheme-verified1004/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /tmp/grapheme-verified1004/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/metadata-grapheme-consumer.neoil",
+        "/tmp/grapheme-verified1004/Consumer.neox",
+        "--format",
+        "neox",
+        "--module",
+        "/tmp/grapheme-owner.neox",
+        "--system",
+        "/tmp/grapheme-verified1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled Consumer -> /tmp/grapheme-verified1004/Consumer.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/grapheme-verified1004/Consumer.neox",
+        "--module",
+        "/tmp/grapheme-owner.neox",
+        "--system",
+        "/tmp/grapheme-verified1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Consumer: typed-stack/control-flow verification passed (3 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/grapheme-verified1004/Consumer.neox",
+        "--module",
+        "/tmp/grapheme-owner.neox",
+        "--system",
+        "/tmp/grapheme-verified1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/tmp/grapheme-owner.neox": "23242f944649b62ac20390d706ca303c1aaa0d72255cb8cb34b9652ca718e0df",
+    "/tmp/grapheme-verified1004/System.neox": "0c72a8656e7158d6bb2f31c0b019d8747dd61a6c4127b278155e104de437769b",
+    "/tmp/grapheme-verified1004/Consumer.neox": "f9b43c8088b54cb7dcab7f0670dd583715e45825727a08e07a56b6c3ce3dd710",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "a52ccab7563f8042e2ebe3db5fad921bb11be605c9978e4712dd4dc056e6f738",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/metadata-grapheme-consumer.neoil": "a2bf9b5661edfd23170e796c8b7984c4432c8355feedf4bfaacdaf51e7d44bc8",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/metadata-empty-system.neoil": "4b1878f9f513fcc9976f146f42e953685344b87dff667ce21159eccc57071d43",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/GraphemeRepresentationChecks.cs": "9f93702c9a3a73c752a7927978dfdf6ea9eabb902a78192e7c4f9b3495bc54a2"
+  }
+}

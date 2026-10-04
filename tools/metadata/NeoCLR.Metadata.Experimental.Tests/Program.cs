@@ -391,6 +391,7 @@ var tests = new (string Name, Action Body)[]
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
+    ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),
     ("Metadata-only introspection load context", MetadataLoadContextChecks.Run),
     ("Native nominal signature snapshot and import", NativeNominalSignatureChecks.Run),
     ("Native nominal field snapshot and import", NativeNominalFieldChecks.Run),

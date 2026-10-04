@@ -735,3 +735,18 @@ The provider selection and retained-seed step now passes instance text operation
 explicit Count and grapheme iteration from a separate consumer. Char is deliberately
 still bootstrap-owned. Next establish its grapheme representation without converting it
 to a numeric CLI char. See [the integration gate](source-string-2026-10-04.md).
+
+
+### Owned grapheme metadata prerequisite (2026-10-04)
+
+The metadata API now authors canonical runtime-owned System.Char with an explicit
+NativeGrapheme fact, preserving its nominal signature identity and value receiver. A
+separate neoIL consumer round-trips combining text and a ZWJ emoji through the API-authored
+method. 143 C# metadata groups pass, including the unchanged CLI Char tests. See
+[execution evidence](grapheme-declaration-2026-10-04.json) and the host API reference.
+
+This is a bounded prerequisite, not completed Raven Char integration. Next implement
+storage-aware external references and map that metadata fact into Raven symbols/host
+ownership selection. Then remove seed Char and compile unchanged source Char. Current
+snapshot convenience imports reject the owned grapheme category rather than losing it.
+The explicit nominal category avoids conflating neoCLR graphemes with CLR UTF-16 code units.

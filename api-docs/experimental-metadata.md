@@ -6812,3 +6812,42 @@ String designation and explicit external method references. Native local and sep
 encoded consumer calls execute with reference receivers. The fixture uses an empty System
 seed to exclude competing String ownership; it is a metadata contract test, not the full
 Raven class-library bootstrap gate.
+
+
+## Owned native grapheme declaration (development, 2026-10-04)
+
+```csharp
+bool TypeDefinition.NativeGrapheme { get; }
+void TypeDefinition.SetNativeGrapheme();
+bool TypeBuilder.NativeGrapheme { get; }
+void TypeBuilder.SetNativeGrapheme();
+bool NominalTypeInfo.NativeGrapheme { get; }
+```
+
+SetNativeGrapheme designates the canonical top-level, nongeneric System.Char value
+declaration as runtime-owned Unicode grapheme storage. It must have sealed sequential
+value-type attributes, no fields and no constructors. Builder convenience delegates to
+exactly the definition validation. Wrong identity, category or storage throws
+ArgumentException. Loaded definitions throw InvalidOperationException. Writing revalidates
+so adding a field after designation cannot bypass the contract. Repeated designation is
+idempotent. NativePrimitive remains null: no numeric or UTF-16-code-unit category is added.
+
+A local Char signature uses the owning nominal declaration in the API and the existing
+native Char signature in the artifact. Instance bodies receive a managed value address:
+LoadArgument(0), LoadObject(characterDefinition), Return() preserves the whole grapheme.
+The native reader and introspection facade retain NativeGrapheme, IsValueType and canonical
+signature identity. Native Runtime representation and System.Char callable names are reused;
+no format-version change is needed.
+
+Executable CLI output rejects this native storage designation. Ordinary imported .NET Char
+and its UTF-16 code-unit signature remain unchanged. This does not replace the .NET char
+contract. The current slice supports owned declarations only. ImportReference(TypeDefinition)
+and ImportReference(MethodDefinition) explicitly throw NotSupportedException for a native
+owned-grapheme snapshot; external storage-aware authoring and Raven provider selection are
+next. This avoids silently importing it as an ordinary allocated value record.
+
+The API contract test authors the type and a managed receiver method, round-trips its
+metadata and executes a separate neoIL caller with combining-mark and ZWJ emoji graphemes.
+The caller uses an empty System seed without a competing Char declaration. It is not proof
+of the full source-built Char class library. Unicode text is the text model; grapheme values
+preserve complete text, while UTF-8 is its native encoding.

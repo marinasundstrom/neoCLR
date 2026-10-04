@@ -40,5 +40,6 @@ public sealed partial class TypeBuilder
     internal void ValidatePrimitiveRepresentation()
     {
         if (NativePrimitive is { } primitive) Definition.SetNativePrimitive(primitive);
+        if (NativeGrapheme) Definition.SetNativeGrapheme();
     }
 }

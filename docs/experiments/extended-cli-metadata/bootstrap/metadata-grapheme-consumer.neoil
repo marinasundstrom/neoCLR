@@ -1,0 +1,34 @@
+; Metadata API-owned System.Char, executed without a competing bootstrap Char.
+.module Consumer
+.entry Main
+.function neoCLR.Runtime.CharFromString(String text) -> Char
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.CharText(Char value) -> String
+.methodimpl InternalCall
+.end
+.function Check(String text) -> Boolean
+.local Char value
+ldarg text
+call neoCLR.Runtime.CharFromString(String)
+stloc value
+ldloca value
+call instance System.Char::Echo()
+call neoCLR.Runtime.CharText(Char)
+ldarg text
+ceq
+ret
+.end
+.function Main() -> Int32
+ldstr "å"
+call Check(String)
+brfalse Failed
+ldstr "👩‍💻"
+call Check(String)
+brfalse Failed
+ldc.i4 42
+ret
+Failed:
+ldc.i4 1
+ret
+.end
