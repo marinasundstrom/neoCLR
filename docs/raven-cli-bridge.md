@@ -5648,3 +5648,20 @@ external-method-bounds-2026-10-04.json. The legacy reference-only projection exp
 rejects external bounds; it is not a fallback. Primitive bootstrap and runtime seed
 configuration are unchanged. Open constrained calls, imported bounded-method authoring
 and Raven's constrained emission admission remain the next implementation work.
+
+
+### Open constrained method calls (2026-10-04)
+
+The metadata IL generator can call owned static interface declarations through bounded
+method parameters. Typed and raw overloads validate the method scope and direct/inherited
+local interface bound. Self is substituted with the method parameter in stack signatures.
+Standard CLI constrained./call and native callself already encode the operation; no
+runtime changes were needed. API-generated ordinary and native Self/Double fixtures
+verify and execute with exit 42. C# metadata checks pass 140/140 groups.
+
+See open-constrained-methods-2026-10-04.json. The next work is external interface target
+operands, followed by Raven semantic constraint authoring and open-call lowering behind
+an explicit capability. Its CallableSignature admission still rejects method constraints;
+do not relax that guard until the emitter can retain bounds and dispatch correctly.
+The .NET backend, explicit primitive bootstrap and runtime seed selection are unchanged.
+The C# API manual is updated; the existing stale guest API snapshot remains unresolved.

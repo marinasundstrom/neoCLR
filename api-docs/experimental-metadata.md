@@ -6653,3 +6653,35 @@ is now TypeReference. Use MetadataLoadContext.Resolve for canonical views or an 
 resolver for TypeReference.Resolve. The TypeDefinition authoring overload is retained.
 Separate contract fixtures execute on .NET and NeoCLR; the direct Raven importer checks
 valid/invalid arguments and canonical external symbol identity without a CLI projection.
+
+
+### Open constrained static calls (development, 2026-10-04)
+
+The independent metadata `IILGenerator`, returned by `MethodBuilder.GetILGenerator()`,
+now exposes these additional overloads:
+
+```csharp
+void CallConstrained(SignatureType implementingType, MethodBuilder target);
+void Emit(OpCode opCode, SignatureType implementingType, MethodBuilder target);
+```
+
+`implementingType` must be `SignatureType.MethodParameter(index)` in the body's method
+scope. The parameter must have an owned nongeneric interface bound admitting the target
+interface, directly or through inheritance. `target` must be an owned nongeneric static
+abstract interface method. Raw Emit accepts only OpCode.Call. Null operands throw
+ArgumentNullException; missing bounds, invalid scope, foreign targets, instance methods
+and unsupported opcodes throw ArgumentException before adding an instruction. Writing
+revalidates the operands and the body stack.
+
+Self in the target signature substitutes the method parameter for argument/result
+verification, including supported nested signature shapes. CLI emits standard constrained.
+with an MVAR TypeSpec followed by call. Native output uses the existing nonborrowed
+callself operation with MethodTypeParameter. No runtime or metadata format change is
+required. The earlier TypeBuilder receiver overloads retain their existing behavior.
+
+Tests execute a generic static-interface call on both .NET and NeoCLR. A separate native
+Self fixture instantiates the method with Double, adds 20 and 22 and returns exit 42.
+Typed/raw calls and inherited bounds are covered. Type-owner parameters, open instance
+calls, external interface targets, generic argument forwarding and Raven's constrained
+emission remain outside this increment. CLI Self representation is not introduced by
+this API; the portable CLI fixture uses ordinary scalar signatures.

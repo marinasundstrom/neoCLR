@@ -339,6 +339,10 @@ public sealed partial class MethodBuilder
                         callSignature = new MethodSignature(implementingType.ResolveImplementationSelf(callSignature.ReturnType),
                             callSignature.ParameterTypes.Select(implementingType.ResolveImplementationSelf),
                             callSignature.GenericParameterNames, callSignature.OutParameters);
+                    else if (instruction.Op == "call.constrained")
+                        callSignature = new MethodSignature(MethodILGenerator.SubstituteConstrainedSelf(callSignature.ReturnType, instruction.Type!),
+                            callSignature.ParameterTypes.Select(t => MethodILGenerator.SubstituteConstrainedSelf(t, instruction.Type!)),
+                            callSignature.GenericParameterNames, callSignature.OutParameters);
                     var outputs = new List<int>();
                     for (int i = instruction.Target!.ParameterCount - 1; i >= 0; i--)
                     {

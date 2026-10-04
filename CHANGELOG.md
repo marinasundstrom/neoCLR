@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add IL-generator constrained static calls through method type parameters with local
+  interface bounds, including inherited bounds and Self signature substitution.
+  Typed and raw Emit overloads share validation. CLI constrained./call and native
+  callself execute the generic fixtures with exit 42; no runtime encoding change.
+  External targets and Raven constrained-call emission remain unfinished.
+
 - Extend method interface bounds to explicit external nongeneric interfaces, using
   CLI TypeRefs and existing native TypeBound identities. Introspection checks the
   resolved dependency category; .NET and NeoCLR execute a separate-contract fixture.

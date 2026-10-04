@@ -253,6 +253,22 @@ public interface IILGenerator
     /// <exception cref="ArgumentNullException">A required operand is null.</exception>
     void Emit(OpCode opCode, TypeBuilder receiverType, MethodBuilder target);
 
+    /// <summary>Calls an owned static interface contract through a bounded method type parameter.</summary>
+    /// <param name="implementingType">An in-scope method type parameter with the required local interface bound.</param>
+    /// <param name="target">Owned nongeneric static abstract interface method.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Scope, bound, ownership or target category is unsupported.</exception>
+    /// <remarks>Self substitutes the method parameter. Type-owner parameters, instance calls and external targets remain unsupported.</remarks>
+    void CallConstrained(SignatureType implementingType, MethodBuilder target);
+    /// <summary>Emits a static constrained call through an in-scope bounded method parameter.</summary>
+    /// <param name="opCode">Call only.</param>
+    /// <param name="implementingType">See CallConstrained(SignatureType, MethodBuilder).</param>
+    /// <param name="target">Owned nongeneric static abstract interface method.</param>
+    /// <exception cref="ArgumentException">Opcode or operands are unsupported.</exception>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    void Emit(OpCode opCode, SignatureType implementingType, MethodBuilder target);
+
+
 
     /// <summary>Appends a typed vector operation or addressed-local operation.</summary>
     /// <param name="opCode">Newarr, ReserveArray, Ldelem, Stelem, Initobj, Ldobj, Stobj, Castclass, Box, Isinst, or Callvirt for a Function signature.</param>

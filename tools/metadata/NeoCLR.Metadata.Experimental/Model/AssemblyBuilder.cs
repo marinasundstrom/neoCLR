@@ -130,6 +130,8 @@ public sealed partial class AssemblyBuilder
                         throw new InvalidDataException("interface dispatch requires a supported virtual-call contract");
                     if (instruction.ConstrainedOwner is { } implementingType)
                         MethodILGenerator.ValidateConstrainedOperands(this, implementingType, instruction.Target!);
+                    else if (instruction.Op == "call.constrained")
+                        MethodILGenerator.ValidateOpenConstrainedOperands(method, instruction.Type!, instruction.Target!);
                     if (instruction.ConstructedTarget is { } target)
                     {
                         target.Definition.DeclaringType!.ValidateTypeArguments(target.DeclaringTypeArguments, complete: true);

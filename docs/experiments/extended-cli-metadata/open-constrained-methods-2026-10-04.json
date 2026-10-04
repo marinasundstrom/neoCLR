@@ -1,0 +1,66 @@
+{
+  "scope": "Open static constrained calls through method parameters bounded by owned interfaces; direct/inherited bounds, typed/raw calls and native Self substitution. Raven lowering and external call targets remain unsupported.",
+  "metadataBaseRevision": "a2450bfc8052215a509c0439177e128da149d921",
+  "ravenRevision": "56cfefbc0620929e18d4aa9c9a8aa2338a28cd4b",
+  "metadataTests": "140/140 groups including executable .NET generic dispatch",
+  "testCommand": "NEOCLR_OPEN_CALL_ARTIFACT=/tmp/open-call1004 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+  "apiSnapshot": "Known stale guest API snapshot: --check fails. C# manual updated.",
+  "commands": [
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/open-call1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_8CBFCF9B538DD28998185CA56BBDDA660788EF8D96C14DC16DB1F73FC8642BA1: typed-stack/control-flow verification passed (60 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/open-call1004.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/open-call1004.self.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_B8684FDA7257C29225868BB63CEBB479FDFF31C13226E23E93437033CCE28B4F: typed-stack/control-flow verification passed (60 IL functions; maximum stack 4; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/open-call1004.self.neox",
+        "--system",
+        "/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "sha256": {
+    "/private/tmp/open-call1004.neox": "4f062e59b5b1fd9066219d5b20aead927b211bc1027d26dfeca8226201b767d8",
+    "/private/tmp/open-call1004.self.neox": "87e20060be3b15935ef65fb7336a7488d7122814796064e1ad54758d8fb06a1a",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "7a36146da256897652ad7d31da961f566fd47914449e95464c0cb19206fd1a43",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/OpenConstrainedCallChecks.cs": "e4fcd80e50599e8a916c6bc693d5880177f81be26ade2619fc879507184b4fff",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental/Model/MethodILGenerator.cs": "39c27cd7e07530ab627abca4335646123c647900fb5f8abe2ce6fe775cd54b20"
+  }
+}

@@ -377,6 +377,36 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         Append(new("call.constrained", Target: target, Type: receiverType, ConstrainedOwner: receiverType));
     }
 
+    public void Emit(OpCode opCode, SignatureType implementingType, MethodBuilder target)
+    {
+        if (opCode != OpCode.Call) throw OperandError(opCode);
+        CallConstrained(implementingType, target);
+    }
+
+    public void CallConstrained(SignatureType implementingType, MethodBuilder target)
+    {
+        ValidateOpenConstrainedOperands(bodyBuilder, implementingType, target);
+        Append(new("call.constrained", Target: target, Type: implementingType));
+    }
+
+    internal static void ValidateOpenConstrainedOperands(MethodBuilder caller, SignatureType implementingType, MethodBuilder target)
+    {
+        ArgumentNullException.ThrowIfNull(implementingType);
+        ArgumentNullException.ThrowIfNull(target);
+        if (implementingType.MethodParameterIndex is not { } index || index >= caller.Signature.GenericParameterNames.Count ||
+            !ReferenceEquals(target.Assembly, caller.Assembly) || !target.IsStatic || !target.IsAbstract ||
+            target.Signature.GenericParameterNames.Count != 0 || target.DeclaringType is not { IsInterface: true, GenericParameterNames.Count: 0 } owner ||
+            !caller.InterfaceConstraints.Any(c => c.ParameterIndex == index && caller.Definition.ConstraintSignature(c.InterfaceType).ClassType is { } bound && bound.ConformsTo(owner)))
+            throw new ArgumentException("open constrained call requires a method parameter with an owned interface bound and a static nongeneric contract");
+    }
+
+    internal static SignatureType SubstituteConstrainedSelf(SignatureType type, SignatureType implementingType) => type.IsSelf ? implementingType
+        : type.FunctionSignature is { } function ? function.Substitute(t => SubstituteConstrainedSelf(t, implementingType))
+        : type.ByReferenceElement is { } byref ? SignatureType.ByReference(SubstituteConstrainedSelf(byref, implementingType))
+        : type.ArrayElement is { } element ? SignatureType.ArrayOf(SubstituteConstrainedSelf(element, implementingType))
+        : type.ImportedType is { } imported ? imported.Substitute(t => SubstituteConstrainedSelf(t, implementingType))
+        : type.GenericInstance is { } generic ? generic.Definition.MakeGenericInstance(generic.TypeArguments.Select(t => SubstituteConstrainedSelf(t, implementingType)).ToArray()) : type;
+
     internal static void ValidateConstrainedOperands(AssemblyBuilder assembly, TypeBuilder receiverType, MethodBuilder target)
     {
         ArgumentNullException.ThrowIfNull(receiverType);

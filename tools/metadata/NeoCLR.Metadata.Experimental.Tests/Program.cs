@@ -384,6 +384,7 @@ var tests = new (string Name, Action Body)[]
     ("Native Self signatures and scoped views", SelfSignatureChecks.Run),
     ("Native Self implementation substitution", SelfImplementationChecks.Run),
     ("Static interface contracts and inherited Self", StaticInterfaceChecks.Run),
+    ("Open method-parameter constrained calls", OpenConstrainedCallChecks.Run),
     ("Method interface bounds, snapshots and introspection", GenericMethodConstraintChecks.Run),
     ("Floating point signatures and execution", FloatingPointChecks.Run),
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
