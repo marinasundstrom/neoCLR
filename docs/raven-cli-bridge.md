@@ -5694,3 +5694,17 @@ number-generic-end-to-end-2026-10-04.json for this run's evidence. This complete
 Number numeric-family story; it does not claim full class-library compilation or broader
 generic constraint categories. Generic owner-parameter forwarding, special method bounds,
 structural Function experiments and replacing .NET Reflection/Emit remain separate work.
+
+
+### Source-order-independent numeric library binding (2026-10-04)
+
+Raven 459856a71 fixes provisional conversion caching during declaration binding. Native
+source intent, primitive ownership, Runtime Contract settings, temporary CLI bootstrap,
+metadata encoding and importer/emitter separation are unchanged. The 70-source numeric
+library now builds with an empty file first and in reverse order; separate numeric,
+generic Number and unchanged broad application consumers execute. The 76-source Tasks
+combination also compiles and its artifact-only consumer executes. The shared .NET
+regression is independently fixed and validated on main at f0c3b75a0, with 139 tests
+passing on each line. [Evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
+Next capability batch remains source-owned String/Char and common text-service binding;
+full System and complete rebuilt-library dual-target execution remain open.

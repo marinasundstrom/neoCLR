@@ -13,12 +13,21 @@ proven numeric ownership profile. The accepted 70-source baseline compiles again
 Reuse the existing Number execution evidence; this audit adds compilation evidence,
 not another execution or full dual-target gate.
 
-**Immediate blocker: source-order-dependent generic interface binding.** Prepending
+**Priority 0 completed:** Raven 459856a71 bypasses conversion caching while source
+relationships are provisional. Empty-first and reversed 70-source builds pass; the
+76-source combination with Tasks/Concurrency compiles. Numeric (99), generic Number
+(42), broad application (exact output, 0) and task (42) consumers execute from native
+artifacts. The main-based backport f0c3b75a0 also includes the prerequisite interface-list
+cache guards; it passes 139 focused .NET tests independently and is fast-forwarded to
+main. The integration branch passes the same 139 tests. See [evidence](source-order-conversions-2026-10-04.json).
+Priority 1 below is now the next feature batch. No runtime/metadata representation changed.
+
+**Original reproduction: source-order-dependent generic interface binding.** Prepending
 an empty file (`// No declarations.`) to the accepted source set produces two RAV1504
 errors assigning ArrayList<byte> to List<byte> in MemoryStream. The same baseline
 without that file succeeds; appending the Self probe succeeds. Sequential controls
-reproduce the difference. This isolates a compiler binding/identity investigation;
-it does not yet identify the defective cache or prove a general .NET regression.
+reproduce the difference. This initially isolated a compiler binding/identity investigation; the subsequent
+regression identified provisional conversion caching, including on ordinary .NET.
 Do not fix this by sorting production inputs or rewriting MemoryStream. Reduce it,
 fix the owning layer and validate/backport independently on main if applicable.
 

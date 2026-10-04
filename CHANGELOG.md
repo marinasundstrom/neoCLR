@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Verify the shared Raven conversion-cache fix (459856a71; independently validated
+  main backport f0c3b75a0): empty-first and reverse-order numeric source builds pass.
+  Native numeric, generic Number, broad application and combined Tasks consumers execute;
+  139 focused .NET tests pass on each compiler line. No metadata/runtime format change.
+
 - Reassess the full-System frontier after Number with explicit numeric ownership.
   Add an ownership-aware inventory baseline and record a reproducible empty-file/source-
   order binding failure. Prioritize its repair, then shared text/core services, inheritance

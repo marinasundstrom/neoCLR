@@ -13,12 +13,14 @@ source implementations and separate generic-library/consumer execution. The cumu
 70-source numeric library compiles in the fresh [post-Number audit](experiments/extended-cli-metadata/system-post-number-audit-2026-10-04.json).
 Earlier Number/Self/numeric prerequisite notes below are historical.
 
-Immediate priority is a newly isolated source-order binding defect: prepending an
-empty source file makes the accepted library reject ArrayList<byte> as List<byte>;
-the baseline and an appended Self probe succeed. Fix and independently validate this
-before expanding source combinations. Do not work around it by imposing input order.
+The source-order binding defect is now fixed: provisional conversions no longer enter
+Raven's cache during declaration binding. Empty-first and reversed 70-source builds
+pass; the 76-source combination with Tasks/Concurrency also compiles. Artifact-only
+numeric, generic Number, broad application and task consumers execute. Raven 459856a71
+and independently validated main f0c3b75a0 each pass 139 focused .NET tests.
+[Execution and regression evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
 
-Then prioritize source-owned String/Char and coherent text-service bindings (shared
+Next prioritize source-owned String/Char and coherent text-service bindings (shared
 by text, stream, storage and JSON sources), ordinary cross-assembly class inheritance,
 and the metadata-handle/introspection cluster. Expand remaining service families and
 callback/storage/generic support from demonstrated failures. See the strategy's

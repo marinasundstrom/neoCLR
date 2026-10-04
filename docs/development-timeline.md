@@ -10675,3 +10675,18 @@ identity properties now fail with RAV0330, independently of writer validation.
   The full library remains blocked in binding; previous Number execution stays valid.
 - Roadmap and strategy now distinguish completed numeric prerequisites from open work.
   See [assessment and evidence](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04).
+
+
+### Follow-up: fix authorized and verified (2026-10-04)
+
+- Author directed: “Go ahead fix”.
+- Assistant traced the order-dependent failure to cached conversion answers obtained
+  before source interface relationships completed, added a failing C# regression and
+  fixed the shared cache boundary. Raven integration 459856a71 passes 139 focused tests.
+- The regression also fails independently on main. Minimal prerequisite interface-list
+  guards plus the conversion guard pass the same 139 tests on a main-based fix branch;
+  f0c3b75a0 was fast-forwarded into main without the experimental backend.
+- Empty-first/reversed native source builds and separate numeric, broad application and
+  combined task consumers succeed. No metadata/runtime code change was needed. The
+  next proposed feature batch is source-owned String/Char and shared text services.
+- [Recorded execution evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
