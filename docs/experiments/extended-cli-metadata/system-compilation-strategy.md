@@ -727,3 +727,11 @@ String sources. Char needs a separate representation-aware contract. See the pub
 [host API reference](../../../api-docs/experimental-metadata.md).
 
 [String metadata execution commands and hashes](string-reference-metadata-2026-10-04.json).
+
+
+### Source String ownership completed for the bounded gate (2026-10-04)
+
+The provider selection and retained-seed step now passes instance text operations,
+explicit Count and grapheme iteration from a separate consumer. Char is deliberately
+still bootstrap-owned. Next establish its grapheme representation without converting it
+to a numeric CLI char. See [the integration gate](source-string-2026-10-04.md).

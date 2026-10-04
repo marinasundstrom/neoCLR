@@ -2941,6 +2941,10 @@ fn interpret_instructions_with_dispatch(
                                 receiver.restrict_readonly();
                             }
                             args.insert(0, Value::SlotReference(receiver));
+                        } else if callee.owner == Some(Type::String) && object.concrete_type() == Type::String {
+                            // Interface views wrap intrinsic text, while String IL takes
+                            // the immutable text reference itself as its receiver.
+                            args.insert(0, object.reference.read()?);
                         } else {
                             object.view = if callee.instance {
                                 callee.owner.clone()

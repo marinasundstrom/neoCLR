@@ -295,6 +295,7 @@ fn member(
                     | Type::UInt64
                     | Type::Single
                     | Type::Double
+                    | Type::String
             ) {
                 if let Some(origin) = &contract.origin {
                     let mut canonical = target.clone();
@@ -588,16 +589,17 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             .type_definition(owner)
             .ok_or_else(|| Fault::new("unknown explicit implementation owner"))?;
         let interface_owner = definition.representation == Representation::Interface;
-        // Intrinsic String supplies readonly IL members over its text payload.
+        // Intrinsic String supplies IL members over immutable text. Reference receivers
+        // need no readonly-byref flag; retained byref bodies must be readonly.
         let string_owner = *owner == Type::String
             && definition.representation == Representation::Runtime
-            && body.receiver_readonly;
+            && (!body.receiver_byref || body.receiver_readonly);
         if !matches!(
             definition.representation,
             Representation::Record | Representation::Interface
         ) && !string_owner
             || !body.instance
-            || (!body.receiver_byref && !module.is_reference_type(owner))
+            || (!body.receiver_byref && !module.is_reference_type(owner) && !string_owner)
             || body.visibility != Visibility::Private
             || (body.is_virtual && !interface_owner)
             || body.is_override
@@ -607,7 +609,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
             || body.pinvoke.is_some()
         {
             return Err(Fault::new(
-                "explicit implementations require private concrete managed IL value/class or readonly String methods",
+                "explicit implementations require private concrete managed IL value/class or immutable String methods",
             ));
         }
         for target in &body.interface_implementations {

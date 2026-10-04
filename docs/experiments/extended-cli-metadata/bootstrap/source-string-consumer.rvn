@@ -1,0 +1,16 @@
+import System.*
+func Main() -> int {
+    let text = "åb"
+    if text.Length != 2 { return 1 }
+    if text.ToUpperInvariant() != "ÅB" { return 2 }
+    if text.GetUtf8ByteCount() != 4 { return 3 }
+    if !text.ContainsOrdinal("b") { return 4 }
+    if text == "other" { return 5 }
+    let characters: System.Collections.Sequence<char> = text
+    if characters.Count != 2 { return 6 }
+    let iterator = characters.GetIterator()
+    if !iterator.MoveNext() { return 7 }
+    if iterator.Current.ToString() != "å" { return 8 }
+    iterator.Dispose()
+    return 42
+}

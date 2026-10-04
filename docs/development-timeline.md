@@ -10690,3 +10690,17 @@ identity properties now fail with RAV0330, independently of writer validation.
   combined task consumers succeed. No metadata/runtime code change was needed. The
   next proposed feature batch is source-owned String/Char and shared text services.
 - [Recorded execution evidence](experiments/extended-cli-metadata/source-order-conversions-2026-10-04.json).
+
+
+## 2026-10-04 — Unicode text model versus native encoding
+
+- Author asked whether string is a sequence of graphemes, char one grapheme, rune one
+  Unicode scalar and byte one byte. Assistant confirmed the conceptual distinctions,
+  identifying that the implementation currently uses uint plus UnicodeScalar helpers,
+  not a dedicated rune type.
+- Author clarified: “The runtime's native representation is UTF-8, but the runtime's
+  native *text model* is Unicode text”. Assistant accepted this correction: graphemes
+  and scalars are views of Unicode text; bytes describe its encoded representation.
+- Actions: clarify the text API guide and preserve this distinction in native String
+  integration. No rune keyword/type was introduced. String source ownership and instance
+  execution are developed separately from bootstrap-owned grapheme Char.

@@ -46,6 +46,10 @@ public class String : EquatableTo<string>, Collections.Sequence<char> {
         return RuntimeServices.StringConcat(first, second)
     }
 
+    static func ==(left: string, right: string) -> bool => RuntimeServices.StringEquals(left, right)
+
+    static func !=(left: string, right: string) -> bool => !RuntimeServices.StringEquals(left, right)
+
     func Equals(other: string) -> bool {
         return RuntimeServices.StringEquals(m_value, other)
     }

@@ -29,9 +29,11 @@ canonical ownership. [Text evidence](experiments/extended-cli-metadata/text-serv
 
 See [explicit-property integration](experiments/extended-cli-metadata/explicit-properties-2026-10-04.md).
 
-The metadata API now supports explicit runtime-owned String reference declarations and
-external instance calls (142 C# groups); Raven provider selection and retained-seed ownership
-remain the next integration step. Char retains its separate grapheme representation.
+Source-owned String now executes instance operations and collection-interface dispatch
+through a separate native consumer, with an explicit retained seed and ownership manifest.
+See [the String integration](experiments/extended-cli-metadata/source-string-2026-10-04.md).
+Next establish source-owned grapheme Char; imported nullability and broader text coverage
+remain open.
 
 Next prioritize source-owned String/Char and coherent text-service bindings (shared
 by text, stream, storage and JSON sources), ordinary cross-assembly class inheritance,

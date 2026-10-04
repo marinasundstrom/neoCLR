@@ -955,3 +955,11 @@ caller-bound forwarding validation and explicit imported primitive designation. 
 host APIs remain excluded from guest RavenDoc as documented above; no guest public
 signature changed. The existing guest snapshot check still reports stale input. Do not
 refresh or publish it using an unmatched bridge. No website build was needed.
+
+
+Development validation (2026-10-04, source-owned String): the snapshot check still reports
+stale cached input. This slice implements the already documented String op_Equality and
+op_Inequality in Raven source; both signatures and XML entries already exist in the bridge
+reference. No new guest API is omitted. The native gate uses TextCore1004 plus native Numbers,
+not the full documentation bridge. Refreshing the full legacy snapshot from a matching
+bridge remains open; do not substitute this subset's assembly as the documentation core.

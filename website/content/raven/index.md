@@ -177,3 +177,7 @@ compilation remains in progress; this is not full class-library completion.
 The development metadata API can now author runtime-owned String reference declarations
 and external instance calls. Raven source String ownership is still being connected;
 this does not change the published class-library support level.
+
+The development native compiler now builds source-owned String and executes instance
+operations and collection iteration from a separate consumer. Its text model is Unicode
+text, stored as UTF-8. Source-owned grapheme Char remains the next integration step.

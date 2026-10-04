@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Compile source-owned String with an explicit ownership manifest and retained seed;
+  separate consumers execute Unicode casing, byte/grapheme counts, equality and interface
+  iteration. Implement existing equality operators in Raven source. Runtime dispatch now
+  passes String reference payloads through interface views and resolves canonical String
+  members. Char remains bootstrap-owned. Clarify Unicode text model versus UTF-8 storage.
+
 - Support explicitly owned System.String reference declarations in the experimental
   metadata definition/builder APIs, native snapshots and external method references.
   Local and separately encoded instance consumers execute on NeoCLR; numeric value

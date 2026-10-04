@@ -286,3 +286,61 @@ ret
         Value::Boolean(false)
     );
 }
+
+#[test]
+fn intrinsic_string_reference_receiver_dispatches_implicit_and_explicit_members() {
+    let library = assemble(".module System").unwrap();
+    for explicit in [false, true] {
+        let member = if explicit {
+            ".method private instance Hidden(String other) -> Boolean\n.override instance Equal::Equals(String)"
+        } else {
+            ".method instance Equals(String other) -> Boolean"
+        };
+        let source = format!(
+            r#"
+.module Strings
+.entry Main
+.interface Equal
+.method instance Equals(String other) -> Boolean
+.end
+.end
+.type System.String
+.implements Equal
+{member}
+ldarg this
+ldarg other
+ceq
+ret
+.end
+.end
+.function Main() -> Int32
+.local Equal value
+ldstr "å"
+castclass Equal
+stloc value
+ldloc value
+ldstr "å"
+callvirt instance Equal::Equals(String)
+brfalse Failed
+ldc.i4 42
+ret
+Failed:
+ldc.i4 1
+ret
+.end
+"#
+        );
+        let module = neoclr::assembler::read_modules(
+            &[neoclr::assembler::ModuleInput::Source(&source)],
+            &library,
+        )
+        .unwrap()
+        .remove(0);
+        let program = neoclr::LoadedProgram::with_library(&module, &library).unwrap();
+        program.verify().unwrap();
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Int32(42)
+        );
+    }
+}

@@ -11,11 +11,17 @@ internal static class StringRepresentationChecks
         var identity = text.AddInstanceMethod("Identity", new(PrimitiveType.String, []));
         identity.GetILGenerator().LoadArgument(0);
         identity.GetILGenerator().Return();
+        var contract = graph.AddInterface("Example", "TextCount");
+        var getter = contract.AddInterfaceMethod("get_Count", new(PrimitiveType.Int32, []));
+        text.AddInterfaceImplementation(contract);
+        var implementation = text.AddInstanceMethod("TextCount.get_Count", new(PrimitiveType.Int32, []), MethodVisibility.Private);
+        implementation.AddExplicitInterfaceImplementation(contract, "get_Count");
+        implementation.GetILGenerator().LoadConstant(42); implementation.GetILGenerator().Return();
         var main = graph.AddFunction("Main", new(PrimitiveType.Int32, []));
         graph.EntryPoint = main;
         var il = main.GetILGenerator();
         il.Emit(OpCode.Ldstr, "grapheme"); il.Call(identity); il.IsNull();
-        var fail = il.DefineLabel(); il.Emit(OpCode.Brtrue, fail); il.LoadConstant(42); il.Return();
+        var fail = il.DefineLabel(); il.Emit(OpCode.Brtrue, fail); il.Emit(OpCode.Ldstr, "count"); il.CastReference(contract); il.CallVirtual(getter); il.Return();
         il.MarkLabel(fail); il.LoadConstant(1); il.Return();
         var bytes = RuntimeAssemblyContainer.WriteBinary(graph);
         var loaded = AssemblyDefinition.ReadNativeAssembly(bytes).MainModule.Types.Single(t => t.Name == "String");

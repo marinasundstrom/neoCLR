@@ -1,5 +1,10 @@
 # Casing and decimal reporting (development)
 
+The native **text model is Unicode text**; **UTF-8 is the native storage representation**.
+String exposes grapheme and scalar views. Char represents one grapheme cluster, potentially
+containing several scalar values. Scalar APIs currently use uint and UnicodeScalar helpers;
+a dedicated rune type is not implemented. Byte represents one encoded byte.
+
 These APIs are included in Preview 11 and require matching runtime, System library
 and compiler references.
 
