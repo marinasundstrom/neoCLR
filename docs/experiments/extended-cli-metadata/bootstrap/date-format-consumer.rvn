@@ -1,0 +1,22 @@
+import System.*
+import System.Result.*
+import System.Globalization.*
+
+func Main() -> int {
+    let Ok(date) = Date.Create(2024, 2, 29) else {
+        return 1
+    }
+    if date.Year != 2024 || date.Month != 2 || date.Day != 29 {
+        return 2
+    }
+    if date.ToString(Culture.Invariant) != "2024-02-29" {
+        return 3
+    }
+    let Ok(next) = date.AddDays(1) else {
+        return 4
+    }
+    if next.ToString(Culture.Invariant) != "2024-03-01" {
+        return 5
+    }
+    return 42
+}

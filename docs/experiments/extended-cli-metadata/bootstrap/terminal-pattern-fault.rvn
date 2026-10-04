@@ -1,0 +1,13 @@
+import System.*
+import System.Result.*
+
+func Read(input: Result<int, string>, message: string) -> int {
+    let Ok(value) = input else {
+        System.Fail(message)
+    }
+    return value
+}
+
+func Main() -> int {
+    return Read(.Error("input failed"), "Preserved dynamic failure message")
+}

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add explicit ownership and native acceptance for 43 unchanged collection/calendar
+  sources. Raven 5c60425db closes terminal Fail control flow without weakening metadata
+  checks. Separate Date, generic-collections and broad application consumers pass,
+  alongside paired Duration and 60 focused .NET checks. Hebrew formatting matches
+  expected output; larger globalization execution reaches the CLI instruction limit.
+  Full .NET calendar coverage remains open; no metadata/runtime implementation change.
+
 - Validate nested binary propagation in local initializers through separate native
   Result imports, preserving evaluation order, field snapshots and early failure.
   Expanded native/paired Duration acceptance passes. Raven cb0f48bd7 is independently

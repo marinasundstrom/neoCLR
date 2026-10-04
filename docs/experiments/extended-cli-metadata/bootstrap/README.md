@@ -581,3 +581,39 @@ Unchanged Date/calendar sources now reach metadata verification:
 Investigating that definite-assignment/control-flow failure is next; full Date execution,
 array-element receiver addresses and the full dual-target library gate remain open.
 See [execution and inventory evidence](../nested-propagation-2026-10-04.json).
+
+## Source-built Date/calendar acceptance (2026-10-04)
+
+Raven `5c60425db` preserves the existing terminal System.Fail semantic fact in
+portable emission: execute the original call and message, then guard an impossible
+return with the existing compiler-failure instruction. CLI void signatures do not
+encode non-returning behavior. This closes the failure branch of let-else without
+default-initializing pattern variables or weakening metadata verification.
+The existing identity policy is unchanged; unrelated Fail methods remain ordinary calls.
+This target-policy fix stays on the integration line; no additional main backport is
+needed. Sixty focused .NET identity/control-flow and shared planner checks pass.
+
+The new `--calendar` acceptance option selects `calendar-ownership.json`: 43 unchanged
+sources covering collections, unions, query, Date, Time, LocalDateTime, calendars and
+globalization. The explicit primitive core and retained seed are unchanged; application
+and rebuilt-library references still use native semantic import. The independent
+consumer verifies leap-day creation, invariant formatting and AddDays. Unchanged
+library-generic-collections now runs with exact output, including ArrayList<Date>.
+Expanded application acceptance, dynamic-message failure checks and paired Duration
+also pass. The complete calendar subset has not been executed on .NET.
+
+Additional unchanged sample inventory: library-date-formatting compiles and runs with
+its existing Hebrew/Gregorian expected output. library-globalization compiles but the
+ordinary CLI run reaches InstructionLimitExceeded. The earlier bridge harness uses an
+explicit larger runner budget for this sample. Next bounded work is making this budget
+explicit for the native multi-assembly execution path and verifying the broader sample;
+no optimization or performance improvement is claimed. Array-element receiver addresses
+and full dual-target library coverage remain open.
+
+No metadata/public API, runtime implementation or wire-format change is introduced.
+See [evidence](../calendar-source-2026-10-04.json).
+
+Use the existing command with `--calendar` instead of `--calendar-foundation`.
+Keep the matching comparer-storage Char core and seed; no bootstrap regeneration is
+required by this slice. The driver records all 43 source hashes, ownership, compiler,
+runtime and dependency artifacts. Library sources are absent from consumer commands.

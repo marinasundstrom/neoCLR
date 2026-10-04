@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+Date/calendar milestone (2026-10-04): terminal runtime-call control flow now closes
+let-else failure paths (Raven 5c60425db). The --calendar gate builds 43 unchanged sources;
+separate Date formatting/arithmetic, generic collections and broad native application
+consumers execute. Paired Duration and 60 focused .NET checks pass. Unchanged Hebrew
+date formatting also matches expected output. The larger globalization consumer compiles
+but reaches the CLI instruction budget; next bounded work is explicit execution-budget
+configuration for that native multi-assembly case. Full .NET calendar coverage and
+array-element receiver addresses remain open. No metadata/runtime implementation change.
+[Evidence](experiments/extended-cli-metadata/calendar-source-2026-10-04.json).
+
+
 Nested propagation milestone (2026-10-04): eager binary local initializers now lower
 in evaluation order (Raven cb0f48bd7; main backport 7db0f3dfe). Native reference-only
 Result checks, broad application acceptance and paired Duration pass; focused .NET
