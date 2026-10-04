@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Nested propagation milestone (2026-10-04): eager binary local initializers now lower
+in evaluation order (Raven cb0f48bd7; main backport 7db0f3dfe). Native reference-only
+Result checks, broad application acceptance and paired Duration pass; focused .NET
+tests pass (12 integration, 11 main). Next bounded task: Date.ToString's metadata
+verifier rejection, local loaded before store on some path. Date compilation publishes
+no artifact and execution remains open. This slice does not generalize arbitrary
+expression propagation or change metadata/runtime contracts.
+[Evidence](experiments/extended-cli-metadata/nested-propagation-2026-10-04.json).
+
+
 Discard propagation milestone (2026-10-04): Raven a99152da0 normalizes discarded
 propagation in shared lowering and emits portable discard statements. The independently
 compiled native Result consumer checks once-only evaluation and early failure returns;

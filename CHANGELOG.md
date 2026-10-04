@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Validate nested binary propagation in local initializers through separate native
+  Result imports, preserving evaluation order, field snapshots and early failure.
+  Expanded native/paired Duration acceptance passes. Raven cb0f48bd7 is independently
+  backported to main (7db0f3dfe); 12 integration and 11 main checks pass. Date now reaches
+  a local-before-store verifier error with no published output. No metadata/runtime change.
+
 - Execute discarded Result propagation against a separately compiled native library.
   Raven a99152da0 preserves once-only evaluation and early failure returns; the broad
   native gate, paired Duration consumers and 18 focused .NET tests pass. The general

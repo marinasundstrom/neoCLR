@@ -1,0 +1,66 @@
+import System.*
+
+class Effects {
+    var Count: int = 0
+    func Left() -> int {
+        Count = Count * 10 + 1
+        return 10
+    }
+    func Read(fail: bool) -> Result<int, string> {
+        Count = Count * 10 + 2
+        if fail {
+            return .Error("failed")
+        }
+        return .Ok(7)
+    }
+    func Right() -> int {
+        Count = Count * 10 + 3
+        return 2
+    }
+}
+
+func Run(effects: Effects, fail: bool) -> Result<int, string> {
+    let value = effects.Left() + effects.Read(fail)? * effects.Right()
+    effects.Count = effects.Count * 10 + 4
+    return .Ok(value)
+}
+
+func Snapshot(effects: Effects) -> Result<int, string> {
+    let value = effects.Count + effects.Read(false)?
+    return .Ok(value)
+}
+
+func Main() -> int {
+    let successEffects = Effects()
+    let success = Run(successEffects, false)
+    match success {
+        .Ok(let value) => {
+            if value != 24 || successEffects.Count != 1234 {
+                return 1
+            }
+        }
+        .Error(_) => { return 2 }
+    }
+    let failureEffects = Effects()
+    let failure = Run(failureEffects, true)
+    match failure {
+        .Error(let message) => {
+            if message != "failed" || failureEffects.Count != 12 {
+                return 3
+            }
+        }
+        .Ok(_) => { return 4 }
+    }
+    let snapshotEffects = Effects()
+    snapshotEffects.Count = 5
+    let snapshot = Snapshot(snapshotEffects)
+    match snapshot {
+        .Ok(let value) => {
+            if value != 12 || snapshotEffects.Count != 52 {
+                return 5
+            }
+        }
+        .Error(_) => { return 6 }
+    }
+    return 42
+}

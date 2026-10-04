@@ -1,8 +1,0 @@
-import System.*
-
-func Read() -> Result<int, string> => .Ok(41)
-
-func Next() -> Result<int, string> {
-    let value = Read()? + 1
-    return .Ok(value)
-}

@@ -5304,3 +5304,25 @@ runtime, bootstrap or public API changes accompany this slice.
 The author-authorized backport is committed on Raven main as `22539952c`.
 All six focused propagation checks pass there; only the general lowering fix, tests
 and documentation were backported. No push or experimental emitter merge was performed.
+
+## Eager binary propagation initializers (2026-10-04)
+
+Raven `cb0f48bd7` lowers propagation nested in eager binary local initializers
+into statement-level checks. Earlier operand values are saved before later operand
+evaluation, including when a later operand mutates earlier storage. Success and early
+failure execute through native Result imports from the separate source-built library.
+The native consumer validates nested arithmetic, skipped operands/statements after
+failure and field-value snapshots. The expanded native application gate and paired
+.NET/NeoCLR Duration consumers pass.
+
+Twelve focused integration tests pass. The general change is also committed on Raven
+main as `7db0f3dfe`, with eleven focused tests passing there. No native emitter,
+metadata, bootstrap, Runtime Contract or runtime implementation changes are required.
+Short-circuit operators and arbitrary argument/other expression propagation are outside
+this bounded initializer normalization.
+
+Unchanged Date/calendar sources now reach metadata verification:
+`Date.ToString: local loaded before store on some path`. No output is published.
+Investigating that definite-assignment/control-flow failure is next; full Date execution,
+array-element receiver addresses and the full dual-target library gate remain open.
+See [execution and inventory evidence](experiments/extended-cli-metadata/nested-propagation-2026-10-04.json).
