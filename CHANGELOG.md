@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Reprioritize full-System compilation by shared capability blockers at the author's
+  direction. Add a reproducible 166-source/family/probe audit and evidence-backed
+  strategy: unit/erased values and common service ABI first, then reusable metadata,
+  core identity and execution categories. Defer isolated time-zone wiring. This is an
+  assessment and plan, not newly implemented compiler/runtime support.
+
 - Add unchanged TimeOffset to explicit native source ownership (48 sources), with
   separate-consumer coverage for signed tick round trips, offset limits and civil-range
   rejection. Fix portable admission for imported value-type static properties such as

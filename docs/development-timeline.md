@@ -10505,3 +10505,33 @@ This is a target-boundary cleanup, not a capture fix. Native introspection, buil
 ILGenerator and nominal Array<T> remain intact. The next cleanup is an inventory of
 remaining native/legacy reference consumers; no speculative adapter was introduced.
 [Evidence](experiments/extended-cli-metadata/portable-array-boundary-2026-10-03.json).
+
+
+## 2026-10-04 — Prioritize full-library compilation by shared blockers
+
+**Author direction.** The author asked to investigate the large blockers for compiling
+the entire neoCLR System library and prioritize fixes by how much additional code
+they enable, rather than implementing individual APIs for their own sake. The author
+then emphasized: “We need a strategy”.
+
+**Assistant investigation.** Ran a fresh full 166-file source compilation, twelve
+source-family attempts and six minimal capability probes through the native driver.
+Recorded source/artifact hashes, compiler/runtime revisions and complete diagnostics.
+Full compilation stopped during binding. Missing runtime-service declarations dominate;
+minimal probes independently expose unit, enum, floating arithmetic, inheritance,
+mutable-capture and ordinary-driver Self limitations. An explicit-unit-contract
+experiment still rejects the MemoryStream Result<unit, E> signature.
+
+**Assistant proposal and recorded direction.** Prioritize capability batches:
+inhabited unit and erased values; a checked service ABI catalog and ownership plan;
+reusable enum/numeric/inheritance shapes; core identity/Self; callbacks/storage/generics;
+typeof/introspection. API samples become acceptance cases. Time-zone-specific continuation
+is superseded by this author-requested high-leverage strategy. No new compiler/runtime
+capability was implemented in this assessment, and no subsequent author acceptance of
+every proposed ordering detail is implied.
+
+**Evidence and open work.** See the
+[full-System strategy](experiments/extended-cli-metadata/system-compilation-strategy.md)
+and its linked audit. Binding failures mask later phases. Preserve the existing native
+gate and .NET controls; re-rank after each capability batch. Legacy translated snapshot
+regeneration remains a separate recorded failure.

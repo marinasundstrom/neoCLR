@@ -1,5 +1,29 @@
 # neoCLR platform roadmap
 
+## Active priority: full-System capability batches (2026-10-04)
+
+The author directed a strategic assessment of blockers that unlock the most library
+compilation, replacing API-by-API progression. Follow the
+[full-System strategy](experiments/extended-cli-metadata/system-compilation-strategy.md)
+and [fresh audit](experiments/extended-cli-metadata/system-compilation-audit-2026-10-04.json).
+Earlier chronological next-step notes below are historical where they conflict.
+
+Next batch: complete inhabited-unit signatures/generic storage (MemoryStream is the
+isolated gate), then establish a checked runtime-service ABI catalog centered on erased
+Value/IsValue/UnpackValue and common signature categories. The full 166-source build
+stops in binding; 178 distinct service names appear across 48 files and the erased-value
+operations each span 23 files. These are potential reach counts, not guaranteed unlocks.
+Follow with enum/numeric/inheritance emission, canonical source-owned core/Self,
+callback/storage/generic coverage and typeof/introspection integration, re-ranking from
+the first independently reproduced failures. Design ownership alongside the service
+catalog. Individual time-zone wrappers are deferred behind common service support.
+
+The current 48-source native execution gate remains a regression baseline, not a
+percentage-complete claim. Track binding, emission/verification, reimport and execution
+separately. Ordinary .NET controls remain required; no broad backend rewrite, speculative
+async prerequisite or metadata format fork is authorized by this assessment.
+
+
 Fixed-offset milestone (2026-10-04): unchanged TimeOffset joins the 48-source --offsets
 gate. Separate native consumers execute signed/fractional tick round trips, offset
 limits and civil boundaries; expanded native acceptance and paired Duration pass.
