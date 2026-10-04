@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+Full comparer sample execution (2026-10-04): Raven `1fb1bbd45` lowers bound signed
+Int32/Int64 ranges behind the explicit native capability and uses argument addresses for
+value-parameter receivers. Metadata now exposes LoadArgumentAddress/Ldarga and decodes
+CLI Object signatures through the explicit core identity. Unchanged library-comparers
+compiles and runs with exact output against the separately built native source library.
+129 metadata groups, native address/binding execution checks, 55 focused .NET tests,
+seven native consumers and the expanded broad gate pass. No runtime/format change.
+Next bounded work is reassessing the remaining unchanged numeric/collection samples
+against the expanded library; broader guest introspection and full primitive source
+ownership remain open. [Evidence](experiments/extended-cli-metadata/ranges-comparers-2026-10-04.json).
+
 Native source comparer milestone (2026-10-04): unchanged StringComparer.rvn now
 compiles into the independently consumed native class library. The explicit comparer
 bootstrap supplies primitive String/Int32 members and runtime services; metadata imports

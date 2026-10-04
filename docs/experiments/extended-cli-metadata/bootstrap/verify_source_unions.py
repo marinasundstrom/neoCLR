@@ -92,6 +92,7 @@ def main():
             (HERE / 'captured-reference-consumer.rvn', 42, ''),
             (HERE / 'primitive-capture-consumer.rvn', 42, ''),
             (HERE / 'query-lifetime-consumer.rvn', 42, ''),
+            (HERE / 'range-consumer.rvn', 42, ''),
             (ROOT / 'docs/experiments/raven-target/samples/library-list-filters.rvn', 0,
              '7\n7\n1\n3\nAbsent\nExists\nNot all positive\n3\n7\n42\n7\n7\nAbsent\nAbsent\nAbsent\n0\nAll empty elements satisfy the predicate\n5\n7\n99\n1\n2\n'),
             (ROOT / 'docs/experiments/raven-target/samples/library-array-callbacks.rvn', 0, '7\n42\nFirst\nSecond\n'),
@@ -102,6 +103,7 @@ def main():
         ]
         if args.comparers:
             samples.append((HERE / 'string-comparer-consumer.rvn', 42, ''))
+            samples.append((ROOT / 'docs/experiments/raven-target/samples/library-comparers.rvn', 0, 'Comparer contract passed\n'))
         for name in ['library-query-basics', 'library-query-names']:
             source = ROOT / 'docs/experiments/raven-target/samples' / (name + '.rvn')
             expected = source.with_suffix('.expected.txt')

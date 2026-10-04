@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 3 && args[0] == "--argument-address-runtime")
+{
+    await ArgumentAddressChecks.RunRuntime(args[1], args[2]); return 0;
+}
 if (args.Length == 5 && args[0] == "--native-comparer-binding")
 {
     await NativeComparerBindingChecks.Run(args[1], args[2], args[3], args[4]); return 0;
@@ -371,6 +375,7 @@ var tests = new (string Name, Action Body)[]
     ("Imported primitive field operands", ImportedFieldChecks.Run),
     ("Local core nominal and Function signatures", LocalCoreSignatureChecks.Run),
     ("Explicit native library bindings preserve CLI reference scope", NativeBindingChecks.Run),
+    ("By-value argument address contracts", ArgumentAddressChecks.Run),
     ("Constructed generic static owners", GenericOwnerChecks.Run),
     ("Constructed generic instance classes", GenericClassChecks.Run),
     ("Nominal type constraints", TypeConstraintChecks.Run),

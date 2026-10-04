@@ -36,6 +36,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         catch (System.Text.EncoderFallbackException error) { throw new ArgumentException("invalid Unicode", nameof(text), error); }
     }
 
+    public void LoadArgumentAddress(int index) => Emit(OpCode.Ldarga, index);
     public void LoadArgument(int index) => Emit(OpCode.Ldarg, index);
 
     public void StoreArgument(int index) => Emit(OpCode.Starg, index);
@@ -302,6 +303,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         {
             OpCode.Ldc_I4 => "constant",
             OpCode.Ldarg => "argument",
+            OpCode.Ldarga => "argument.address",
             OpCode.Starg => "argument.store",
             OpCode.Ldloca => "local.address",
             OpCode.Ldloc => "local.load",

@@ -33,6 +33,7 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
             case 0x05: return PrimitiveType.Byte;
             case 0x0a: return PrimitiveType.Int64;
             case 0x0e: return PrimitiveType.String;
+            case 0x1c: return consumer.CoreObjectType;
             case 0x13:
                 var ownerOrdinal = Number();
                 if (ownerOrdinal >= ownerArity) throw new InvalidDataException("unscoped imported owner parameter");

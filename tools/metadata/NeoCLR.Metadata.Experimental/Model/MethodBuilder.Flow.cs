@@ -61,8 +61,11 @@ public sealed partial class MethodBuilder
                 throw new InvalidDataException("unmarked branch label");
             if (instruction.Op is "local.load" or "local.store" or "local.address" && (instruction.Value < 0 || instruction.Value >= locals.Count))
                 throw new InvalidDataException("local outside declarations");
-            if (instruction.Op is "argument" or "argument.store" && (instruction.Value < 0 || instruction.Value >= ArgumentCount))
+            if (instruction.Op is "argument" or "argument.store" or "argument.address" && (instruction.Value < 0 || instruction.Value >= ArgumentCount))
                 throw new InvalidDataException("argument outside signature");
+            if (instruction.Op == "argument.address" && ((!IsStatic && instruction.Value == 0) ||
+                Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)].ByReferenceElement is not null))
+                throw new InvalidDataException("argument address requires a by-value parameter slot");
         }
         if (!IsStatic && Instructions.Any(i => i.Op == "argument.store" && i.Value == 0))
             throw new InvalidDataException("receiver stores are unsupported");
@@ -205,6 +208,8 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("managed-reference argument rebinding is unsupported");
                     Pop(ArgumentType(instruction.Value)); break;
                 case "argument": stack.Add(ArgumentType(instruction.Value)); break;
+                case "argument.address":
+                    stack.Add(SignatureType.ByReference(Signature.ParameterTypes[instruction.Value - (IsStatic ? 0 : 1)])); break;
                 case "boolean": stack.Add(PrimitiveType.Boolean); break;
                 case "local.address": stack.Add(new BodyValueType(PrimitiveType.Void, AddressedLocal: instruction.Value)); break;
                 case "object.load":

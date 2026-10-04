@@ -359,3 +359,31 @@ The unchanged full library-comparers sample now reaches an unsupported integer-r
 BoundForStatement. It was not edited or replaced as an acceptance claim. Range lowering
 is the next bounded task; general primitive source ownership and the larger guest
 introspection library are separate subsequent work.
+
+## Unchanged comparer sample execution (2026-10-04)
+
+Raven `1fb1bbd45` removes the signed integer-range blocker. The `--comparers` gate now
+compiles and executes unchanged library-comparers against the separate source-built
+library, requiring exactly `Comparer contract passed` and exit 0. The original sample
+was not rewritten. The focused range-consumer returns 42 after checking evaluation
+order/once-only bounds, inclusive/exclusive ascending and descending loops, zero-step
+and direction-mismatch empty loops, nested labeled continue, break, loop captures and
+Int64 ranges. Ordinary .NET range emission remains the established independent path.
+
+A subsequent comparer parameter-receiver gap required argument-address emission.
+The metadata IILGenerator now offers LoadArgumentAddress(index) and raw Ldarga; CLI
+and native writers share exact-type/slot validation. Static and instance parameters,
+generic method scopes and mutation execute on both runtimes. Receiver slots, already
+byref parameters, invalid indices (including unreachable code) and mismatched stores
+reject. Runtime ldarga already existed, so no VM or format change was necessary.
+The final Object.ReferenceEquals call required support for CLI ELEMENT_TYPE_OBJECT;
+that signature now retains the output's explicitly supplied core identity, including
+Object array elements. No implicit dependency resolution or nominal layout is inferred.
+
+The comparer core, retained seed and ownership manifest are unchanged from the preceding
+slice. CLI remains the primitive bootstrap only; source library/application references
+remain native. 129 metadata groups, 55 focused .NET tests, seven native consumers,
+native argument-address/binding checks and the expanded application gate pass. API
+manual docs include the new host member; the separate guest API snapshot remains stale.
+Signed range increment retains existing add semantics, with no new overflow policy;
+unsigned/fractional ranges and broader captures remain outside this native profile.

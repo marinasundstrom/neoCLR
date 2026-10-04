@@ -111,7 +111,9 @@ public enum OpCode
     /// <summary>Consumes a reference and pushes whether it is null (CLI ldnull/ceq).</summary>
     ReferenceIsNull,
     /// <summary>Extracts an exact boxed value or converts a reference using a storage type or generic parameter operand.</summary>
-    UnboxAny
+    UnboxAny,
+    /// <summary>Loads the address of an ordinary by-value argument; receiver and managed-reference slots are excluded.</summary>
+    Ldarga
 
 }
 
@@ -125,7 +127,7 @@ public sealed partial class MethodBuilder
     public void Emit(OpCode opCode) => GetILGenerator().Emit(opCode);
 
     /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
-    /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc, Ldloca or Stloc.</param>
+    /// <param name="opCode">Ldc_I4, Ldarg, Ldarga, Starg, Ldloc, Ldloca or Stloc.</param>
     /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>

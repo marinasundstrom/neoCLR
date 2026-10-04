@@ -166,5 +166,5 @@ and general closure support remain outside this bounded native profile; ordinary
 
 Development source-library coverage now includes separately compiled StringComparer
 with explicit primitive/runtime bootstrap bindings. Native consumers exercise ordinal
-and case-folded equality, hashing and ordering. The full comparer sample still awaits
-integer-range loop support; this is bounded integration evidence, not full-library support.
+and case-folded equality, hashing and ordering. The unchanged comparer sample now also compiles and runs with bounded signed integer
+range support. This is integration evidence, not full-library support.

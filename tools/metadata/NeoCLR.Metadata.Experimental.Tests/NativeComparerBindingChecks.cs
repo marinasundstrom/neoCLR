@@ -17,6 +17,9 @@ internal static class NativeComparerBindingChecks
             graph.BindNativeLibrary(reference, implementation, reference.Identity);
             var equals = graph.ImportReference(Method("String", "Equals"), reference.Identity);
             var compare = graph.ImportReference(Method("Int32", "CompareTo"), reference.Identity);
+            var identity = graph.ImportReference(Method("Object", "ReferenceEquals"), reference.Identity);
+            if (identity.Signature.ParameterTypes.Any(t => t != (SignatureType)graph.CoreObjectType))
+                throw new Exception("CLI Object signature lost explicit core scope");
             var hash = graph.ImportReference(Method("Object", "GetHashCode"), reference.Identity);
             if (equals.RequiresManagedReceiver || !compare.RequiresManagedReceiver || !hash.RequiresVirtualDispatch)
                 throw new Exception("primitive or Object receiver contract lost");
@@ -29,6 +32,7 @@ internal static class NativeComparerBindingChecks
             il.LoadConstant(int.MaxValue); il.Call(compare); il.LoadConstant(-1); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
             il.Emit(OpCode.Ldstr, "café"); il.CastReference(graph.CoreObjectType); il.CallVirtual(hash);
             il.Emit(OpCode.Ldstr, "café"); il.CastReference(graph.CoreObjectType); il.CallVirtual(hash); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
+            il.Emit(OpCode.Ldstr, "same"); il.CastReference(graph.CoreObjectType); il.Emit(OpCode.Dup); il.Call(identity); il.Emit(OpCode.Brfalse, failed);
             il.LoadConstant(42); il.Return(); il.MarkLabel(failed); il.LoadConstant(1); il.Return();
             Reject(() => graph.ImportReference(reference.MainModule.Types.Single(t => t.Namespace == "System" && t.Name == "String"), reference.Identity));
             return graph;

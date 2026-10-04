@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add IILGenerator.LoadArgumentAddress and raw Ldarga for by-value parameter storage
+  in CLI/native output; reject receiver/byref/invalid slots and mismatched stores.
+  Import CLI Object signatures with the explicit core identity. Raven `1fb1bbd45`
+  adds bounded signed-range lowering and parameter receivers; unchanged library-comparers
+  now compiles and runs against the source-built library. All 129 metadata groups,
+  55 .NET tests, seven native consumers and the expanded broad gate pass. Runtime and
+  format versions are unchanged; the separate guest API snapshot remains stale.
+
 - Extend explicit bootstrap method imports for intrinsic String/Int32 receivers and
   the exact Object.GetHashCode virtual slot, with receiver/identity/signature rejection
   tests. Compile unchanged StringComparer into the native source library using a

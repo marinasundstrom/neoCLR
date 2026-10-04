@@ -24,6 +24,12 @@ public interface IILGenerator
     /// <summary>Appends a parameter load; bounds are checked at Write.</summary>
     /// <param name="index">Argument slot index; instance receiver is zero and declared parameters start at one.</param>
     void LoadArgument(int index);
+
+    /// <summary>Loads the managed address of an ordinary by-value argument.</summary>
+    /// <param name="index">CLI argument index, including an instance receiver offset.</param>
+    /// <remarks>Receiver slots, managed-reference parameters and invalid indices reject during writing, including unreachable instructions.</remarks>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; invalid slot or address use is rejected when writing.</exception>
+    void LoadArgumentAddress(int index);
     /// <summary>Stores a value into a by-value argument slot in this invocation.</summary>
     /// <param name="index">Argument slot index; instance declared parameters start at one. Bounds and exact type are checked when writing.</param>
     /// <exception cref="InvalidDataException">Instruction limit exceeded, or invalid index/stack type when writing.</exception>
@@ -288,7 +294,7 @@ public interface IILGenerator
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
     void Emit(OpCode opCode);
     /// <summary>Appends an Int32 constant, argument-index or local-index instruction.</summary>
-    /// <param name="opCode">Ldc_I4, Ldarg, Starg, Ldloc, Ldloca or Stloc.</param>
+    /// <param name="opCode">Ldc_I4, Ldarg, Ldarga, Starg, Ldloc, Ldloca or Stloc.</param>
     /// <param name="operand">Signed constant, or zero-based argument/local index validated when writing.</param>
     /// <exception cref="ArgumentException">Unknown opcode or opcode incompatible with an Int32 operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>

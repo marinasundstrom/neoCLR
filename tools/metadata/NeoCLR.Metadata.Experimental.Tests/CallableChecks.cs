@@ -41,7 +41,6 @@ internal static class CallableChecks
     internal static void SignatureRecognition()
     {
         foreach (byte[] signature in new byte[][] {
-            [0, 0, 0x1c], // Object result, outside the supported built-in subset.
             [0x20, 0, 8], // Instance calling convention.
             [0x10, 1, 0, 8], // Generic calling convention.
             [5, 0, 8], // Vararg.
@@ -55,7 +54,6 @@ internal static class CallableChecks
             [0, 0, 0x1d, 0x1d, 0x10, 8], // By-reference vector element.
             [0, 0, 0x1d, 1], // Void vector result.
             [0, 1, 1, 0x1d, 1], // Void vector parameter.
-            [0, 1, 1, 0x1d, 0x1c], // Unsupported element.
             [0, 0, 0x1d, 8, 8], // Trailing vector signature data.
             [0, 1, 0x1d, 8] // Missing vector parameter.
         })
@@ -67,6 +65,16 @@ internal static class CallableChecks
             try { consumer.ImportReference(method, consumer.CoreLibrary); throw new Exception("unsupported signature imported"); }
             catch (InvalidDataException) { }
             Check(method.GetSignature().SequenceEqual(signature), "opaque signature preserved exactly");
+        }
+        foreach (byte[] signature in new byte[][] { [0, 0, 0x1c], [0, 1, 1, 0x1d, 0x1c] })
+        {
+            var method = AssemblyDefinition.ReadAssembly(Image(1, signature), false).MainModule.Functions.Single();
+            Check(!method.TryGetStaticValueSignature(out _), "Object remains outside primitive-only recognition");
+            var consumer = new AssemblyBuilder(new("ObjectConsumer", new Version(1, 0, 0, 0)), new("ExplicitCore", new Version(2, 0, 0, 0)));
+            var imported = consumer.ImportReference(method, consumer.CoreLibrary);
+            var objectType = signature.Length == 3 ? imported.Signature.ReturnType : imported.Signature.ParameterTypes.Single().ArrayElement!;
+            Check(objectType == (SignatureType)consumer.CoreObjectType, "Object signature retains explicit core scope");
+            Check(method.GetSignature().SequenceEqual(signature), "Object signature source bytes preserved");
         }
         var instance = AssemblyDefinition.ReadAssembly(Image(1, [0, 0, 8], global: false, isStatic: false), false).MainModule.Methods.Single();
         Check(!instance.TryGetStaticInt32Signature(out _, out _), "attributes checked as well as signature");
