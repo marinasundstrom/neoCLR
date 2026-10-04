@@ -93,7 +93,7 @@ public sealed partial class NativeAssemblyDefinition
         var accessors = properties.SelectMany(p => new[] { p.Getter, p.Setter }).Where(index => index >= 0).ToHashSet();
         var rows = methods.Select((method, index) => new AssemblyDefinition.MethodRow(
             0x06000001u + (uint)index, method.Owner < 0 ? 0 : 0x02000002u + (uint)method.Owner, method.Name,
-            (ushort)((method.Override ? 0xc0 : 0) | (method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, method.Signature.GenericParameterNames.Count, [], false, [],
+            (ushort)((method.ExplicitInterfaces.Length != 0 ? 0x160 : 0) | (method.Override ? 0xc0 : 0) | (method.Owner >= 0 && types[method.Owner].IsInterface ? 0x5c0 : 0) | (accessors.Contains(index) ? 0x800 : 0) | (method.Instance ? 0 : 0x10) | (method.Instance && method.Name == ".ctor" ? 0x1800 : 0) | (method.Visibility == MethodVisibility.Public ? 6 : method.Visibility == MethodVisibility.Internal ? 3 : 1)), 0, method.Signature.GenericParameterNames.Count, [], false, [],
             new AssemblyDefinition.NativeMethodSignatureRow(Copy(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Copy).ToArray(), method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.ToArray()), method.Namespace, ParameterNames: method.ParameterNames, InterfaceConstraints: method.InterfaceConstraints.Select(c => new AssemblyDefinition.MethodConstraintRow(c.Parameter, Copy(c.Type).TypeToken)).ToArray())).ToArray();
         var propertyRows = properties.Select((property, index) => new AssemblyDefinition.PropertyRow(
             0x17000001u + (uint)index, 0x02000002u + (uint)property.Owner, property.Name, 0, [],
@@ -101,10 +101,20 @@ public sealed partial class NativeAssemblyDefinition
             property.Setter < 0 ? 0 : 0x06000001u + (uint)property.Setter, [], Copy(property.Type), property.Parameters.Select(Copy).ToArray())).ToArray();
         var references = References.Select((identity, index) => new AssemblyDefinition.ReferenceRow(0x23000001u + (uint)index, identity)).ToArray();
         var attributes = types.Select(type => type.Attributes.Select(a => (Owner: Copy(a.Owner), a.Arguments)).ToArray()).ToArray();
+        var explicitRows = methods.Select(m => m.ExplicitInterfaces.Select(e => (Owner: Copy(e.Owner), e.Name)).ToArray()).ToArray();
         var result = AssemblyDefinition.NativeDeclarations(Identity, typeRows, fieldRows.ToArray(), rows, propertyRows, references, externalRows.ToArray(), image, entryPointToken);
         for (int i = 0; i < types.Length; i++)
             result.MainModule.GetTypeDefinition(0x02000002u + (uint)i)!.SetLoadedAttributes(attributes[i].Select(a =>
                 new CustomAttributeDefinition(a.Owner.Materialize(result.MainModule).ReferencedType!, a.Arguments)));
+        for (int i = 0; i < methods.Length; i++)
+            result.MainModule.GetMethodDefinition(0x06000001u + (uint)i)!.SetLoadedExplicitInterfaces(explicitRows[i].Select(mapping =>
+            {
+                var owner = mapping.Owner.Materialize(result.MainModule);
+                var relationship = owner.ReferencedGenericInstance is { } constructed
+                    ? new InterfaceImplementation(constructed.Definition, constructed.TypeArguments)
+                    : new InterfaceImplementation(owner.ReferencedType!);
+                return new ExplicitInterfaceImplementation(relationship, mapping.Name);
+            }));
         return result;
     }
 }

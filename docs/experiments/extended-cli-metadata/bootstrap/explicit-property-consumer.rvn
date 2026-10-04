@@ -1,0 +1,10 @@
+import Contracts.*
+
+func Main() -> int {
+    let counter = Counter()
+    let contract: Counted<int> = counter
+    contract.Current = 17
+    let same: Counted<int> = counter
+    if same.Current != 17 { return 1 }
+    return contract.Count
+}

@@ -7,7 +7,7 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ExternalInterfaceChecks
 {
-    private static (AssemblyBuilder Contracts, AssemblyBuilder Implementation, byte[] ContractsImage) Create(bool complete = true, bool implement = true, bool manual = false, bool wrongSignature = false)
+    private static (AssemblyBuilder Contracts, AssemblyBuilder Implementation, byte[] ContractsImage) Create(bool complete = true, bool implement = true, bool manual = false, bool wrongSignature = false, bool explicitImplementation = false)
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, "", Convert.ToHexString(host.GetPublicKeyToken()!));
@@ -46,7 +46,9 @@ internal static class ExternalInterfaceChecks
         var constructor = box.AddConstructor(Array.Empty<PrimitiveType>()); constructor.Return();
         if (implement)
         {
-            var method = box.AddInstanceMethod("Get", new(PrimitiveType.Int32, wrongSignature ? [PrimitiveType.Int32] : [])); method.LoadConstant(42); method.Return();
+            var method = box.AddInstanceMethod(explicitImplementation ? "Root.Get" : "Get", new(PrimitiveType.Int32, wrongSignature ? [PrimitiveType.Int32] : []), explicitImplementation ? MethodVisibility.Private : MethodVisibility.Public);
+            if (explicitImplementation) method.AddExplicitInterfaceImplementation(importedRoot.MakeGenericInstance(PrimitiveType.Int32), "Get");
+            method.LoadConstant(42); method.Return();
         }
         var main = app.AddFunction("Main"); app.EntryPoint = main;
         main.NewObject(constructor); main.CallVirtual(get.MakeConstructedReference([PrimitiveType.Int32])); main.Return();
@@ -57,34 +59,46 @@ internal static class ExternalInterfaceChecks
 
     internal static void Run()
     {
-        foreach (var manual in new[] { false, true })
-        {
-            var (contracts, app, image) = Create(manual: manual);
-            var load = new AssemblyLoadContext("external-interface-test", isCollectible: true);
-            try
+        foreach (var explicitImplementation in new[] { false, true })
+            foreach (var manual in new[] { false, true })
             {
-                var dependency = load.LoadFromStream(new MemoryStream(contracts.Write()));
-                load.Resolving += (_, name) => name.Name == dependency.GetName().Name ? dependency : null;
-                var executable = load.LoadFromStream(new MemoryStream(app.Write()));
-                Check(Equals(executable.EntryPoint!.Invoke(null, null), 42), "CLR external interface dispatch");
+                var (contracts, app, image) = Create(manual: manual, explicitImplementation: explicitImplementation);
+                var load = new AssemblyLoadContext("external-interface-test", isCollectible: true);
+                try
+                {
+                    var dependency = load.LoadFromStream(new MemoryStream(contracts.Write()));
+                    load.Resolving += (_, name) => name.Name == dependency.GetName().Name ? dependency : null;
+                    var executable = load.LoadFromStream(new MemoryStream(app.Write()));
+                    Check(Equals(executable.EntryPoint!.Invoke(null, null), 42), "CLR external interface dispatch");
+                }
+                finally { load.Unload(); }
+                var unrelated = app.Types.Single(t => t.Name == "Box").AddInstanceMethod("Unrelated", new(PrimitiveType.Int32, []));
+                unrelated.LoadConstant(7); unrelated.Return();
+                var appImage = RuntimeAssemblyContainer.WriteBinary(app);
+                var context = new MetadataLoadContext([AssemblyDefinition.ReadNativeAssembly(image), AssemblyDefinition.ReadNativeAssembly(appImage)]);
+                var view = context.Resolve(app.Identity).GetTypes().Single(t => t.Name == "Box");
+                Check(view.GetInterfaces().Count == 4, "external generic diamond closure");
+                var cli = RuntimeAssemblyContainer.ReadCliProjection(appImage);
+                var method = cli.MainModule.Types.Single(t => t.Name == "Box").Methods.Single(m => m.Name == (explicitImplementation ? "Root.Get" : "Get"));
+                Check((method.Attributes & 0x160) == 0x160, "CLI implementation flags");
+                Check((cli.MainModule.Types.Single(t => t.Name == "Box").Methods.Single(m => m.Name == "Unrelated").Attributes & 0x40) == 0, "unrelated method is not virtual");
+                if (explicitImplementation)
+                {
+                    var definition = AssemblyDefinition.ReadNativeAssembly(appImage).MainModule.Types.Single(t => t.Name == "Box").Methods.Single(m => m.Name == "Root.Get");
+                    Check(definition.ExplicitInterfaceImplementations.Single().MemberName == "Get", "external constructed explicit mapping roundtrip");
+                    if (!manual && Environment.GetEnvironmentVariable("NEOCLR_EXPLICIT_ARTIFACT") is { } path)
+                    {
+                        File.WriteAllBytes(path + ".contracts", image);
+                        File.WriteAllBytes(path + ".external", appImage);
+                    }
+                }
+                var missing = new MetadataLoadContext([AssemblyDefinition.ReadNativeAssembly(appImage)]);
+                Reject<InvalidDataException>(() => missing.Resolve(app.Identity).GetTypes().Single(t => t.Name == "Box").GetInterfaces());
             }
-            finally { load.Unload(); }
-            var unrelated = app.Types.Single(t => t.Name == "Box").AddInstanceMethod("Unrelated", new(PrimitiveType.Int32, []));
-            unrelated.LoadConstant(7); unrelated.Return();
-            var appImage = RuntimeAssemblyContainer.WriteBinary(app);
-            var context = new MetadataLoadContext([AssemblyDefinition.ReadNativeAssembly(image), AssemblyDefinition.ReadNativeAssembly(appImage)]);
-            var view = context.Resolve(app.Identity).GetTypes().Single(t => t.Name == "Box");
-            Check(view.GetInterfaces().Count == 4, "external generic diamond closure");
-            var cli = RuntimeAssemblyContainer.ReadCliProjection(appImage);
-            var method = cli.MainModule.Types.Single(t => t.Name == "Box").Methods.Single(m => m.Name == "Get");
-            Check((method.Attributes & 0x160) == 0x160, "CLI implementation flags");
-            Check((cli.MainModule.Types.Single(t => t.Name == "Box").Methods.Single(m => m.Name == "Unrelated").Attributes & 0x40) == 0, "unrelated method is not virtual");
-            var missing = new MetadataLoadContext([AssemblyDefinition.ReadNativeAssembly(appImage)]);
-            Reject<InvalidDataException>(() => missing.Resolve(app.Identity).GetTypes().Single(t => t.Name == "Box").GetInterfaces());
-        }
         Reject<InvalidDataException>(() => Create(complete: false).Implementation.WriteNativeAssembly());
         Reject<InvalidDataException>(() => Create(implement: false).Implementation.WriteNativeAssembly());
         Reject<InvalidDataException>(() => Create(wrongSignature: true).Implementation.WriteNativeAssembly());
+        Reject<InvalidDataException>(() => Create(wrongSignature: true, explicitImplementation: true).Implementation.WriteNativeAssembly());
         var foreign = Create();
         var external = foreign.Implementation.CreateInterfaceReference(foreign.Contracts.Identity, foreign.Contracts.CoreLibrary,
             Convert.ToHexString(SHA256.HashData(foreign.ContractsImage)), "Example", "Empty");

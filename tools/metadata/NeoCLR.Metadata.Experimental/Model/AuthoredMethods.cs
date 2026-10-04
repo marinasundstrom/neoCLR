@@ -95,7 +95,7 @@ public sealed partial class MethodBuilder
         bool special = accessor ?? DeclaringType?.Properties.Any(p => ReferenceEquals(p.GetMethod, this) || ReferenceEquals(p.SetMethod, this)) == true;
         var flags = (MethodAttributes)Definition.DeclarationAttributes | MethodAttributes.HideBySig;
         if (IsAbstract) flags |= MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot;
-        else if (!IsOverride && DeclaringType?.Implements(this) == true) flags |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
+        else if (!IsOverride && (DeclaringType?.Implements(this) == true || Definition.ExplicitInterfaceImplementations.Count != 0)) flags |= MethodAttributes.Virtual | MethodAttributes.Final | MethodAttributes.NewSlot;
         if (IsConstructor) flags |= MethodAttributes.SpecialName | MethodAttributes.RTSpecialName;
         else if (special) flags |= MethodAttributes.SpecialName;
         return (ushort)flags;

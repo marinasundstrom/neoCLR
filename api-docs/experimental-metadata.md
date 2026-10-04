@@ -6740,3 +6740,43 @@ C# tests execute external static and constructed instance calls plus bounded for
 on .NET and NeoCLR. The native compiler gate independently rebuilds numeric sources,
 imports them into a generic algorithms library, and imports both emitted libraries into
 a source-free consumer covering every Number member across all ten numeric types.
+
+
+## Explicit interface bodies (development, 2026-10-04)
+
+```csharp
+public sealed record ExplicitInterfaceImplementation(
+    InterfaceImplementation Interface, string MemberName);
+IReadOnlyList<ExplicitInterfaceImplementation> MethodDefinition.ExplicitInterfaceImplementations { get; }
+void MethodDefinition.AddExplicitInterfaceImplementation(InterfaceImplementation contract, string memberName);
+void MethodBuilder.AddExplicitInterfaceImplementation(TypeBuilder contract, string memberName, params SignatureType[] arguments);
+void MethodBuilder.AddExplicitInterfaceImplementation(ImportedTypeReference contract, string memberName);
+```
+
+These APIs map a private concrete nongeneric instance body to a member of an interface
+implemented by its declaring type, including inherited and constructed external contracts.
+`Interface` preserves the output-owned declaration and copied generic arguments;
+`MemberName` is the declared method name (`get_Count` for a property getter). The body's
+signature selects the overload. Builders delegate to the same definition validation.
+External references require the existing complete, explicitly supplied interface contract.
+No importer or runtime reflection object is reused and no dependency is implicitly loaded.
+
+Null contracts throw ArgumentNullException. Invalid visibility/category, foreign references,
+duplicate mappings and invalid scopes throw ArgumentException. Detached or loaded definitions
+cannot be edited (InvalidOperationException). Writing rejects missing members, incompatible
+signatures or multiple bodies for the same interface slot with InvalidDataException.
+Mappings are limited to 128 per body; generic explicit methods and static explicit bodies
+are outside this profile. Call `method.GetILGenerator()` to emit the body separately.
+
+CLI output uses standard MethodImpl rows and private/final/virtual/newslot bodies. Native
+output uses the existing scoped `interface_implementations` contract and runtime dispatch;
+there is no new metadata version. Native snapshots expose mappings and method flags.
+CLI snapshot MethodImpl materialization remains unsupported: reading this property throws
+NotSupportedException. Native reference-only CLI projection also rejects these mappings
+rather than silently discarding them; direct native semantic import is supported.
+
+Qualified explicit property names are descriptive metadata names; actual accessor identity,
+visibility and signatures remain validated independently. The runtime permits bounded ASCII
+qualification used by Raven, not arbitrary new identifier syntax. C# contracts cover definition/
+builder parity, two same-named interface slots, native round trips, private CLI dispatch,
+external generic diamond contracts and incompatible implementations.

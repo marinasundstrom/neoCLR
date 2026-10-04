@@ -377,6 +377,7 @@ var tests = new (string Name, Action Body)[]
     ("Native generic static method definitions", NativeGenericMethodChecks.Run),
     ("Native generic class definitions", NativeGenericOwnerChecks.Run),
     ("External native generic signatures", ExternalGenericSignatureChecks.Run),
+    ("Explicit interface mappings", ExplicitInterfaceChecks.Run),
     ("External interface declarations", ExternalInterfaceChecks.Run),
     ("Authored native function references", AuthoredFunctionReferenceChecks.Run),
     ("Definition body generator", GeneratorChecks.Run),

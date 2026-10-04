@@ -1,0 +1,6 @@
+namespace Contracts
+
+public interface Counted<T> {
+    val Count: int { get; }
+    var Current: T { get; set; }
+}

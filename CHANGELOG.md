@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Author and round-trip explicit interface mappings through definitions and builders;
+  emit standard CLI MethodImpl and existing native scoped relationships. Raven explicit
+  getters/setters execute across native assemblies; qualified property names now validate.
+  Source String proceeds to a String.Concat definite-assignment blocker. CLI snapshot
+  mapping materialization remains unsupported; native CLI projection rejects mapping loss.
+
 - Extend the checked native bootstrap catalog with 20 existing text services, including
   graphemes, scalar vectors and UTF-8 slice outcomes. Separate native library/consumer
   tests execute UnicodeScalar and text operations, including character-array mutation;

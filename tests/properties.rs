@@ -197,3 +197,24 @@ fn property_metadata_is_optional_and_system_accessors_are_explicit() {
         assert!(def.properties[0].setter.is_none());
     }
 }
+
+#[test]
+fn qualified_property_metadata_names_preserve_accessor_execution() {
+    let mut module = assemble(SAMPLE).unwrap();
+    module.types[0].properties[0].name = "Contracts.Counted`1.Value".into();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().output,
+        ["42", "Properties describe ordinary methods"]
+    );
+    for name in [
+        "Contracts.Counted.
+Value",
+        "Contracts.Counted.bad name",
+        ".Value",
+    ] {
+        module.types[0].properties[0].name = name.into();
+        assert!(LoadedProgram::new(&module).is_err());
+    }
+}

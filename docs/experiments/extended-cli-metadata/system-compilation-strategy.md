@@ -680,3 +680,12 @@ generic constraint categories. Generic owner-parameter forwarding, special metho
 structural Function experiments and replacing .NET Reflection/Emit remain separate work.
 
 Compiler implementation: Raven `41b2573fa`, with matching metadata changes above `812417c7`.
+
+
+### Explicit accessor follow-up (2026-10-04)
+
+The source String Count-property emission rejection is repaired through actual interface
+mappings. The cumulative source attempt now reaches String.Concat definite-assignment
+validation. Resolve that shared lowering/emission boundary next, then establish primitive
+String/Char ownership and execute artifact-only consumers. See
+[the accessor slice](explicit-properties-2026-10-04.md) for limits and independent .NET fix.

@@ -1,0 +1,13 @@
+import Contracts.*
+
+public class Counter : Counted<int> {
+    private var current: int = 0
+
+    init() {}
+
+    val Counted<int>.Count: int => 42
+    var Counted<int>.Current: int {
+        get => current
+        set => current = value
+    }
+}

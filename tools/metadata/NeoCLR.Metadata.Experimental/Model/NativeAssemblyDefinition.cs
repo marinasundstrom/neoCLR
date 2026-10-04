@@ -14,7 +14,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -506,6 +506,7 @@ public sealed partial class NativeAssemblyDefinition
                 if (isOverride) { fields.Add("is_override"); Require(overrideFlag.GetBoolean(), "override flag must be true"); }
                 if (isAbstract) { fields.Add("is_abstract"); Require(abstractFlag.GetBoolean(), "abstract flag must be true"); }
                 if (isVirtual) { fields.Add("is_virtual"); Require(virtualFlag.GetBoolean(), "virtual flag must be true"); }
+                if (method.TryGetProperty("interface_implementations", out _)) fields.Add("interface_implementations");
                 Shape(method, fields.ToArray());
                 var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
@@ -592,7 +593,32 @@ public sealed partial class NativeAssemblyDefinition
                         parameterNames.Add(i, parameterName!);
                     }
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray() }); methodNames.Add(Text(method, "name"));
+                var explicitMappings = new List<(SignatureType Owner, string Name)>();
+                if (method.TryGetProperty("interface_implementations", out _))
+                {
+                    Require(instance && !interfaceOwner && !isOverride && !constructor && genericArity == 0 && visibility == MethodVisibility.Private,
+                        "explicit mapping requires a private nongeneric concrete instance body");
+                    foreach (var mapping in Array(method, "interface_implementations", 128))
+                    {
+                        Shape(mapping, "name", "owner", "instance", "parameters");
+                        Require(mapping.GetProperty("instance").GetBoolean(), "explicit target must be instance");
+                        var targetOwner = ReadType(mapping.GetProperty("owner"), false);
+                        Require(targetOwner.ImportedType is not null || (targetOwner.GenericInstance?.Definition ?? targetOwner.ClassType)?.IsInterface == true,
+                            "explicit target must be nominal interface");
+                        var ownerJson = mapping.GetProperty("owner");
+                        var ownerName = ownerJson.TryGetProperty("Constructed", out var constructedOwner)
+                            ? Text(constructedOwner, "definition") : Text(ownerJson, "Named");
+                        var targetName = Text(mapping, "name");
+                        var prefix = ownerName + ".M_";
+                        Require(targetName.StartsWith(prefix, StringComparison.Ordinal), "invalid explicit target name");
+                        var memberName = Decode(targetName[prefix.Length..]);
+                        Require(memberName.Length > 0 && Array(mapping, "parameters", 256).Select(p => ReadType(p, false, allowByReference: true)).SequenceEqual(parameterTypes), "explicit parameter mismatch");
+                        Require(!explicitMappings.Any(m => Equals(m.Owner, targetOwner) && m.Name == memberName), "duplicate explicit mapping");
+                        explicitMappings.Add((targetOwner, memberName));
+                    }
+                    Require(explicitMappings.Count != 0, "empty explicit mapping list");
+                }
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -677,6 +703,7 @@ public sealed partial class NativeAssemblyDefinition
             throw new InvalidDataException("Char projection requires the explicit core scope");
         if (nativeTypeAliases.TryGetValue(("System.Value", 0), out var erasedAlias) && !erasedAlias.Assembly.Equals(coreLibrary))
             throw new InvalidDataException("Value projection requires the explicit core scope");
+        if (methods.Any(m => m.ExplicitInterfaces.Length != 0)) throw new NotSupportedException("explicit mappings require direct native import");
         var graph = new AssemblyBuilder(Identity, coreLibrary);
         var owners = DefineTypes(graph, types);
         for (int i = 0; i < types.Length; i++)

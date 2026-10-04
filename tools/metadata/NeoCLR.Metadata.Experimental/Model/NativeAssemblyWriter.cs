@@ -266,6 +266,13 @@ public sealed partial class AssemblyBuilder
                 arguments = arguments.Select(a => (object)new Dictionary<string, object?> { [a.Type.ToString()] = a.Value }).ToArray()
             };
         }
+        object[]? ExplicitMappings(MethodBuilder method) => method.Definition.ExplicitInterfaceImplementations.Count == 0 ? null :
+            method.Definition.ExplicitInterfaceImplementations.Select(mapping =>
+            {
+                var owner = method.ExplicitOwner(mapping);
+                var contract = method.DeclaringType!.RequiredInterfaceMethods.Single(c => c.Name == mapping.MemberName && Equals(c.Owner, owner) && c.Signature.Matches(method.Signature));
+                return (object)new { name = FunctionName(contract.Declaration), owner = SignatureValue(owner), instance = true, parameters = contract.Signature.ParameterTypes.Select(SignatureValue).ToArray() };
+            }).ToArray();
         object? Accessor(MethodBuilder? method) => method is null ? null : new { name = FunctionName(method), owner = Owner(method), instance = !method.IsStatic, parameters = Parameters(method) };
         object[]? Constraints(TypeBuilder type)
         {
@@ -324,7 +331,7 @@ public sealed partial class AssemblyBuilder
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,
                 method.Definition.ParameterNames.Count == 0 ? null : Enumerable.Range(0, method.ParameterCount).Select(i => method.Definition.ParameterNames.GetValueOrDefault(i)).ToArray(),
-                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray())).ToArray()
+                method.InterfaceConstraints.Count == 0 ? null : method.InterfaceConstraints.Select(c => (object)new { parameter = c.ParameterIndex, kind = new { TypeBound = SignatureValue(method.Definition.ConstraintSignature(c.InterfaceType)) } }).ToArray(), ExplicitMappings(method))).ToArray()
         };
         var result = JsonSerializer.SerializeToUtf8Bytes(artifact);
         if (result.Length > maxImageSize) throw new InvalidDataException("output image exceeds limit");
@@ -353,7 +360,9 @@ public sealed partial class AssemblyBuilder
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
         string?[]? parameter_names,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
-        object[]? generic_constraints);
+        object[]? generic_constraints,
+        [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        object[]? interface_implementations);
     private sealed record NativeTypeRow(string name, object[] fields, bool is_reference_type,
         bool is_abstract, bool is_sealed, object origin,
         [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]

@@ -168,3 +168,8 @@ Development source-library coverage now includes separately compiled StringCompa
 with explicit primitive/runtime bootstrap bindings. Native consumers exercise ordinal
 and case-folded equality, hashing and ordering. The unchanged comparer sample now also compiles and runs with bounded signed integer
 range support. This is integration evidence, not full-library support.
+
+
+Development integration now supports explicit interface property accessors across native
+assemblies, using the existing metadata relationships. Full source-owned String/Char
+compilation remains in progress; this is not full class-library completion.

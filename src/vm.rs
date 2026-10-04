@@ -1149,7 +1149,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         let owner = definition.open_type();
         let mut signatures = HashSet::new();
         for property in &definition.properties {
-            if !crate::metadata::valid_slot_name(&property.name)
+            // Explicit interface properties retain their qualified CLI metadata name.
+            // Properties are descriptive associations; accessor identities are checked below.
+            let qualified_name = property.name.len() <= 1024
+                && property
+                    .name
+                    .rsplit_once('.')
+                    .is_some_and(|(scope, member)| {
+                        !scope.is_empty()
+                            && scope
+                                .chars()
+                                .all(|c| c.is_ascii_alphanumeric() || "_.+`<>,[]".contains(c))
+                            && crate::metadata::valid_slot_name(member)
+                    });
+            if !(crate::metadata::valid_slot_name(&property.name) || qualified_name)
                 || !signatures.insert((&property.name, property.instance, &property.parameters))
             {
                 return Err(Fault::new("invalid or duplicate property signature"));

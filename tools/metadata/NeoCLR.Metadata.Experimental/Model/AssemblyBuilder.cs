@@ -104,9 +104,9 @@ public sealed partial class AssemblyBuilder
                 foreach (var contract in type.InheritedContracts()) { _ = contract; }
             foreach (var type in types.Where(t => !t.IsInterface))
                 foreach (var contract in type.RequiredInterfaceMethods)
-                    if (!type.Methods.Any(m => m.IsStatic == contract.IsStatic && m.Visibility == MethodVisibility.Public && m.Name == contract.Name &&
-                        m.Signature.GenericParameterNames.Count == 0 && m.Signature.Matches(contract.Signature)))
+                    if (type.FindInterfaceImplementation(contract.Name, contract.Signature, contract.IsStatic, contract.Owner) is null)
                         throw new InvalidDataException("missing public interface implementation: " + contract.Name);
+            foreach (var type in types) type.ValidateExplicitImplementations();
             foreach (var type in types)
                 foreach (var contract in type.InterfaceSignatures)
                 {
@@ -726,9 +726,10 @@ public sealed partial class AssemblyBuilder
             foreach (var inherited in type.InterfaceSignatures) metadata.AddInterfaceImplementation(typeHandle, MetadataTokens.EntityHandle(ElementToken(inherited)));
             foreach (var method in type.Methods) EmitMethod(method);
             if (!type.IsInterface)
-                foreach (var contract in type.RequiredInterfaceMethods.Where(c => c.IsStatic))
+                foreach (var contract in type.RequiredInterfaceMethods)
                 {
-                    var implementation = type.Methods.Single(m => m.IsStatic && m.Name == contract.Name && m.Signature.Matches(contract.Signature));
+                    var implementation = type.FindInterfaceImplementation(contract.Name, contract.Signature, contract.IsStatic, contract.Owner)!;
+                    if (!contract.IsStatic && implementation.Definition.ExplicitInterfaceImplementations.Count == 0) continue;
                     var declaration = metadata.AddMemberReference(MetadataTokens.EntityHandle(ElementToken(contract.Owner)),
                         metadata.GetOrAddString(contract.Name), Signature(contract.Declaration));
                     metadata.AddMethodImplementation(typeHandle, handles[implementation], declaration);
