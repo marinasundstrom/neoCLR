@@ -361,6 +361,8 @@ public sealed partial class AssemblyBuilder
                 case PrimitiveType.Int32: encoder.Int32(); break;
                 case PrimitiveType.Int64: encoder.Int64(); break;
                 case PrimitiveType.Byte: encoder.Byte(); break;
+                case PrimitiveType.Single: encoder.Single(); break;
+                case PrimitiveType.Double: encoder.Double(); break;
                 case PrimitiveType.Boolean: encoder.Boolean(); break;
                 case PrimitiveType.String: encoder.String(); break;
                 default: throw new InvalidDataException("unsupported value type");
@@ -527,7 +529,8 @@ public sealed partial class AssemblyBuilder
                 offsets[i + 1] = offsets[i] + (method.Instructions[i].Op switch
                 {
                     "enum.from" or "enum.to" => 0,
-                    "constant64" => 9,
+                    "constant64" or "constantDouble" => 9,
+                    "constantSingle" => 5,
                     "call.constrained" => 11,
                     "fail" => 11,
                     "function.bind" => method.Instructions[i].Target!.IsStatic || method.Instructions[i].Target!.IsAbstract ? 12 : 11,
@@ -583,6 +586,10 @@ public sealed partial class AssemblyBuilder
                         code.WriteInt32(offsets[labels[instruction.Value]] - (code.Count + 4)); break;
                     case "string": code.WriteByte(0x72); code.WriteInt32(MetadataTokens.GetToken(metadata.GetOrAddUserString(instruction.Text!))); break;
                     case "constant64": code.WriteByte(0x21); code.WriteInt64(instruction.LongValue); break;
+                    case "constantSingle": code.WriteByte(0x22); code.WriteInt32(instruction.Value); break;
+                    case "constantDouble": code.WriteByte(0x23); code.WriteInt64(instruction.LongValue); break;
+                    case "convertSingle": code.WriteByte(0x6b); break;
+                    case "convertDouble": code.WriteByte(0x6c); break;
                     case "convert64": code.WriteByte(0x6a); break;
                     case "convert32": code.WriteByte(0x69); break;
                     case "convertByte": code.WriteByte(0xd2); break;

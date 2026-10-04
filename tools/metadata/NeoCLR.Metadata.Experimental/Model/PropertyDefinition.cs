@@ -74,7 +74,7 @@ public sealed partial class PropertyDefinition
             return type != PrimitiveType.Void;
         }
         type = signature.Length == 3 && signature[0] is 0x08 or 0x28 && signature[1] == 0 ? signature[2] switch {
-            0x08 => PrimitiveType.Int32, 0x05 => PrimitiveType.Byte, 0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
+            0x08 => PrimitiveType.Int32, 0x0c => PrimitiveType.Single, 0x0d => PrimitiveType.Double, 0x05 => PrimitiveType.Byte, 0x0a => PrimitiveType.Int64, 0x02 => PrimitiveType.Boolean, 0x0e => PrimitiveType.String,
             _ => PrimitiveType.Void } : PrimitiveType.Void;
         isStatic = type != PrimitiveType.Void && signature[0] == 0x08;
         return type != PrimitiveType.Void;

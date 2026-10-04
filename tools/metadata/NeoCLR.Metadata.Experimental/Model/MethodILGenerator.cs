@@ -15,6 +15,18 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
     private List<BranchLabel> labels => Definition.Body.LabelStorage;
     public IReadOnlyList<LocalDefinition> Locals => Definition.Body.Locals;
     private static bool IsReferenceSignature(SignatureType type) => MethodBuilder.IsReferenceSignature(type);
+    public void LoadConstant(float value) => Emit(OpCode.Ldc_R4, value);
+    public void LoadConstant(double value) => Emit(OpCode.Ldc_R8, value);
+    public void Emit(OpCode opCode, float operand)
+    {
+        if (opCode != OpCode.Ldc_R4) throw OperandError(opCode);
+        Append(new("constantSingle", Value: BitConverter.SingleToInt32Bits(operand)));
+    }
+    public void Emit(OpCode opCode, double operand)
+    {
+        if (opCode != OpCode.Ldc_R8) throw OperandError(opCode);
+        Append(new("constantDouble", LongValue: BitConverter.DoubleToInt64Bits(operand)));
+    }
     public void LoadConstant(int value) => Emit(OpCode.Ldc_I4, value);
     public void ConvertToEnum(SignatureType enumType) => ConvertEnum(enumType, "enum.from");
     public void ConvertFromEnum(SignatureType enumType) => ConvertEnum(enumType, "enum.to");
@@ -291,6 +303,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             OpCode.Dup => "duplicate",
             OpCode.Neg => "negate",
             OpCode.Not => "complement",
+            OpCode.Conv_R4 => "convertSingle",
+            OpCode.Conv_R8 => "convertDouble",
             OpCode.Conv_I8 => "convert64",
             OpCode.Conv_I4 => "convert32",
             OpCode.Conv_U1 => "convertByte",

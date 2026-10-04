@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Add Single/Double signatures, exact-bit floating literals and numeric conversions
+  to the experimental metadata IL generator. CLI and native output execute the same
+  arithmetic, NaN and signed-zero checks. Graph-based binary emission selects existing
+  schema 3 for high-bit Double literals; older schema-2-only readers reject those images.
+  Raven floating-point emission remains a subsequent integration step.
+
 - Select all eleven existing numeric/Boolean parsing services in the checked native
   bootstrap catalog. Actual Boolean and BooleanParseError sources compile separately
   and execute through an artifact-only consumer; boundary/error cases also exercise

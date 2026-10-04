@@ -1815,7 +1815,7 @@ invalid joins/initialization; Raven's executable consumer includes Console insid
 All types below are in `NeoCLR.Metadata.Experimental.Model`.
 
 ```csharp
-public enum PrimitiveType { Void, Int32, Boolean, Int64, String }
+public enum PrimitiveType { Void, Int32, Boolean, Int64, String, Byte, Single, Double }
 public sealed class PrimitiveMethodSignature
 {
     public PrimitiveMethodSignature(PrimitiveType returnType,
@@ -1942,8 +1942,8 @@ Int64 values. Typed calls, returns, local stores and branch joins preserve exact
 CLI emission uses Int64 signatures, ldc.i8 and conv.i4/conv.i8. Native emission uses
 the corresponding existing neoIL operations and Int64 type names, without a schema
 change. Older experimental host readers may reject these newly admitted declarations.
-Unsigned, floating-point, checked and user-defined conversions remain unsupported by
-this bounded writer. Native verification is still required before execution.
+Checked and user-defined conversions remain unsupported. See the floating-point
+profile below for Single/Double conversions. Native verification is still required before execution.
 
 C# tests cover extrema, sign extension, truncation, local types, native projection,
 imports, strict legacy recognition and invalid conversions/mixed arithmetic. Raven's
@@ -1962,8 +1962,8 @@ instruction bounds throw InvalidDataException.
 
 Both writers reject empty stacks and Boolean operands with InvalidDataException
 during flow validation. CLI emission uses neg/not; native emission uses the existing
-neoIL neg/not operations without a format change. Checked, unsigned and floating-point
-unary support is not implied. Native verification remains required. C# contracts check
+neoIL neg/not operations without a format change. Checked and unsigned unary support is not implied; the floating-point profile below
+also admits Single/Double negation. Native verification remains required. C# contracts check
 both widths, extrema, invalid stack operands and native projections. Raven's shared
 body path handles built-in signed unary + (identity), - and ~; the native consumer
 executes minimum-value wrapping and complements in binary assemblies.
@@ -6343,3 +6343,46 @@ with InvalidDataException before output publication. The interface metadata reta
 Self; the implementation's declared methods use concrete signatures. This is conformance
 validation, not an implicit conversion or a new dispatch opcode. Executable CLI output
 with symbolic Self remains unsupported; native SelfType encoding is unchanged.
+
+
+### Floating-point signatures and IL generation (development, 2026-10-04)
+
+`PrimitiveType.Single` and `PrimitiveType.Double` represent CLI binary32/binary64
+signature types. Readers retain these identities in methods, fields and properties;
+value-type generic constraints admit both. No nominal wrapper type is introduced.
+
+The public `IILGenerator` returned by `MethodBuilder.GetILGenerator()` provides:
+
+```csharp
+void LoadConstant(float value);
+void LoadConstant(double value);
+void Emit(OpCode opCode, float operand);
+void Emit(OpCode opCode, double operand);
+```
+
+The raw overloads require `Ldc_R4` and `Ldc_R8`, respectively; an incompatible opcode
+throws `ArgumentException` without appending an instruction. Constants retain their
+IEEE bits, including signed zero, infinities and NaNs. Operandless `Emit` accepts
+`Conv_R4` and `Conv_R8`; the existing integer conversions also accept floating inputs.
+This is unchecked numeric conversion, not a guarantee for out-of-range conversions.
+
+Flow validation admits matching Single/Double arithmetic, remainder, negation and
+Ceq/Clt/Cgt comparisons. Mixed numeric types require explicit conversions. Bitwise
+operations and shifts still reject floating operands with `InvalidDataException`
+before output is returned. CLI output uses the standard signatures and opcodes;
+native output uses the existing Single/Double types and neoIL instructions.
+
+Native literals store integer bit patterns, not JSON/CBOR floating-point values.
+`RuntimeAssemblyContainer.WriteBinary(AssemblyBuilder)` chooses existing schema 3
+when a Double literal needs the full UInt64 range (including negative zero).
+Otherwise it retains schema 2. The application host-image size limit is unchanged.
+The native-bytes overload continues to require schema-2-compatible input;
+`WriteLibraryBinary` always uses schema 3. Older schema-2-only readers reject schema 3.
+No runtime or format-version change is introduced by this writer extension.
+
+`FloatingPointChecks` exercises CLI and native signature round trips, literal overload
+validation, invalid bitwise operations and .NET execution. Set `NEOCLR_FLOAT_ARTIFACT`
+when running the C# tests to save the matching executable native assembly, then run it
+with neoCLR and the explicit System seed. Success exits 42 after arithmetic, NaN and
+signed-zero checks. This does not establish Raven floating-point code generation or
+complete compilation of the Single/Double class-library sources.

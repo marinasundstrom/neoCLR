@@ -325,3 +325,19 @@ signature/storage capabilities and static Number/Self contracts needed by the se
 numeric sources, using coherent service families rather than isolated API wrappers.
 The core bool identity and native source System.Boolean declaration are still distinct;
 full primitive-source ownership and instance dispatch remain explicit work.
+
+
+## Floating-point writer subgate (2026-10-04)
+
+The metadata API now supports Single/Double signatures, exact-bit literals, arithmetic
+and unchecked numeric conversions. The same authored graph executes on .NET and
+neoCLR with exit 42, checking NaN and signed zero. This reuses CLI signatures/opcodes
+and the existing native runtime representation; high-bit Double literals select the
+already-supported schema-3 UInt64 payload profile. See
+[floating-point evidence](floating-metadata-2026-10-04.json).
+
+This removes a writer prerequisite, not the Raven emission blocker. Next connect
+portable primitive identities, literal/conversion lowering and both target adapters;
+retain correct unordered comparison behavior. Then compile a separate floating
+library/consumer and consume successful Single/Double parser payloads. Static Number
+contracts and canonical source-owned primitive declarations remain separate gaps.

@@ -171,7 +171,7 @@ See the host API reference for strict bounds and the temporary input bridge cont
 format-5 payload in a required PE/#Neo execution section. `Read` retrieves owned native
 bytes; `ReadCliProjection` supplies a Cecil-style snapshot of the reference declarations.
 The same PE file can be a Raven compiler reference and a neoCLR runtime input.
-Schema 1 contains JSON. `WriteBinary` selects schema 2 (bounded CBOR), which the
+Schema 1 contains JSON. `WriteBinary` normally selects schema 2 (bounded CBOR), which the
 runtime decodes directly without JSON parsing. Read/ReadCliProjection accept both.
 See the [load comparison](../../docs/experiments/extended-cli-metadata/binary-loading.md);
 indexed tables and broader signature coverage remain future work.
@@ -240,3 +240,9 @@ The runtime case returns 42 with Box<consumer Order>, interface references, fiel
 scoped generic forwarding, defaults and array operands. This is signature support;
 imported constructors/members and translated-System linkage remain pending. See
 [the API reference](../../api-docs/experimental-metadata.md#imported-type-signatures-development-2026-10-01).
+
+
+The graph-based `WriteBinary` overload selects existing schema 3 when a Double
+literal's raw bits require UInt64. The native-bytes overload remains schema 2.
+Single/Double signatures, literal overloads on `IILGenerator`, conversions and their
+validation are documented in the [public API reference](../../api-docs/experimental-metadata.md#floating-point-signatures-and-il-generation-development-2026-10-04).

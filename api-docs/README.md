@@ -928,3 +928,12 @@ experimental C# constructed callback binding and FunctionTypeInfo identity are d
 in `experimental-metadata.md`. `build-api-docs.py --check` still reports the existing stale
 reference snapshot. It has not been relabelled as refreshed; regenerate from a matching
 working bridge before publication. Website publication remains separate.
+
+
+### Floating-point metadata writer checkpoint (2026-10-04)
+
+The experimental C# metadata API adds Single/Double signatures and IL generator
+literal overloads, documented in the existing manual host API reference. The existing
+host-API exclusion from guest RavenDoc remains unchanged. `build-api-docs.py --check`
+still reports the previously recorded stale guest snapshot; this slice neither changes
+guest APIs nor refreshes them from an unmatched bridge. No website build was run.

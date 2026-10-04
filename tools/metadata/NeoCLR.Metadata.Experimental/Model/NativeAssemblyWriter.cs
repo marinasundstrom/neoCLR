@@ -14,6 +14,10 @@ public sealed partial class AssemblyBuilder
     /// This is the current native JSON format, not the experimental NEOX PE transport.</remarks>
     public byte[] WriteNativeAssembly() => WriteNativeCore(MetadataArtifactReader.MaxImageSize);
 
+    // Schema 2 is signed-integer-only; high binary64 bits require the existing schema 3 profile.
+    internal bool RequiresWideNumericPayload => functions.Concat(types.SelectMany(t => t.Methods))
+        .Any(m => m.Instructions.Any(i => i.Op == "constantDouble" && i.LongValue < 0));
+
     internal byte[] WriteNativeLibraryAssembly() => WriteNativeCore(32 * 1024 * 1024);
 
     private byte[] WriteNativeCore(int maxImageSize)
@@ -100,6 +104,10 @@ public sealed partial class AssemblyBuilder
             "boolean" => new { op = "ldc.bool", arg = (object)(instruction.Value != 0) },
             "negate" => new { op = "neg" },
             "complement" => new { op = "not" },
+            "constantSingle" => new { op = "ldc.r4", arg = new { bits = unchecked((uint)instruction.Value) } },
+            "constantDouble" => new { op = "ldc.r8", arg = new { bits = unchecked((ulong)instruction.LongValue) } },
+            "convertSingle" => new { op = "conv.r4" },
+            "convertDouble" => new { op = "conv.r8" },
             "constant64" => new { op = "ldc.i8", arg = (object)instruction.LongValue },
             "convert64" => new { op = "conv.i8" },
             "convert32" => new { op = "conv.i4" },

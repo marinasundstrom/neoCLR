@@ -11,6 +11,18 @@ public interface IILGenerator
     /// <summary>Appends an Int32 constant.</summary>
     /// <param name="value">Constant value.</param>
     void LoadConstant(int value);
+    /// <summary>Pushes Single, preserving IEEE bits including signed zero and NaN.</summary>
+    /// <param name="value">The binary32 literal.</param>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    void LoadConstant(float value);
+    /// <summary>Pushes Double, preserving IEEE bits including signed zero and NaN.</summary>
+    /// <param name="value">The binary64 literal.</param>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
+    void LoadConstant(double value);
+    /// <summary>Emits Ldc_R4 with exact Single bits; other opcodes throw ArgumentException.</summary>
+    void Emit(OpCode opCode, float operand);
+    /// <summary>Emits Ldc_R8 with exact Double bits; other opcodes throw ArgumentException.</summary>
+    void Emit(OpCode opCode, double operand);
     /// <summary>Consumes Int32 and produces the exact owned or explicitly imported Int32 enum type.</summary>
     /// <remarks>CLI keeps the integral evaluation value; native output constructs the existing nominal enum storage.</remarks>
     void ConvertToEnum(SignatureType enumType);
@@ -41,16 +53,16 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded, or invalid index/stack type when writing.</exception>
     /// <remarks>Does not update caller storage. Receiver stores and by-reference parameters are unsupported.</remarks>
     void StoreArgument(int index);
-    /// <summary>Appends matching-width Int32/Int64 addition.</summary>
+    /// <summary>Appends matching-type Int32/Int64/Single/Double addition.</summary>
     void Add();
-    /// <summary>Appends matching-width Int32/Int64 subtraction.</summary>
+    /// <summary>Appends matching-type Int32/Int64/Single/Double subtraction.</summary>
     void Subtract();
-    /// <summary>Appends matching-width Int32/Int64 multiplication.</summary>
+    /// <summary>Appends matching-type Int32/Int64/Single/Double multiplication.</summary>
     void Multiply();
-    /// <summary>Appends matching-width signed Int32/Int64 division, truncating toward zero.</summary>
+    /// <summary>Appends matching-type numeric division; signed integer division truncates toward zero.</summary>
     /// <remarks>Zero and minimum-value divided by -1 fault at execution, not when writing.</remarks>
     void Divide();
-    /// <summary>Appends matching-width signed Int32/Int64 remainder, with the dividend's sign.</summary>
+    /// <summary>Appends matching-type numeric remainder.</summary>
     /// <remarks>Zero faults at execution, not when writing. Native minimum/-1 faults; CLI follows the host CLR edge behavior.</remarks>
     void Remainder();
     /// <summary>Appends bitwise AND of matching Int32/Int64 or Boolean operands.</summary>
@@ -301,7 +313,7 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validation occurs on write.</exception>
     void LoadArrayLength();
     /// <summary>Appends an operand-free arithmetic, comparison, stack or return instruction.</summary>
-    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
+    /// <param name="opCode">Add, Sub, Mul, Div, Rem, And, Or, Xor, Shl, Shr, Ceq, Clt, Cgt, Dup, Pop, Conv_I4, Conv_I8, Conv_U1, Conv_R4, Conv_R8, Neg, Not, Ldlen, ReferenceIsNull or Ret.</param>
     /// <exception cref="ArgumentException">Unknown opcode or an opcode requiring an operand.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     /// <remarks>Stack and return-flow validation remains deferred until writing. Rejected emission does not change the body.</remarks>
@@ -437,7 +449,7 @@ public interface IILGenerator
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>
     LocalDefinition DeclareInt32Local();
     /// <summary>Declares a typed primitive local. ClearBody retains the slot and type.</summary>
-    /// <param name="type">Int32, Int64, Boolean or String; Void is not a local type.</param>
+    /// <param name="type">Byte, Int32, Int64, Single, Double, Boolean or String; Void is not a local type.</param>
     /// <returns>A stable local handle owned by this method.</returns>
     /// <exception cref="ArgumentException">Type is Void or an invalid enum value.</exception>
     /// <exception cref="InvalidDataException">The method already has 256 locals.</exception>

@@ -27,6 +27,9 @@ Constrained Self dispatch and static Number contracts remain open. The checked p
 family and actual Boolean source library now execute separately; [evidence](experiments/extended-cli-metadata/parsing-native-2026-10-04.json).
 The resulting shared primitive-core selection fix is independently validated on Raven main.
 Source nominal APIs do not yet replace the canonical primitive bootstrap.
+The metadata writer now admits Single/Double and executes an API-authored arithmetic,
+NaN and signed-zero program on both runtimes; Raven emission is the next integration
+step, not yet established by this metadata-only gate.
 Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service

@@ -113,7 +113,15 @@ public enum OpCode
     /// <summary>Extracts an exact boxed value or converts a reference using a storage type or generic parameter operand.</summary>
     UnboxAny,
     /// <summary>Loads the address of an ordinary by-value argument; receiver and managed-reference slots are excluded.</summary>
-    Ldarga
+    Ldarga,
+    /// <summary>Pushes binary32 bits; requires a float operand.</summary>
+    Ldc_R4,
+    /// <summary>Pushes binary64 bits; requires a double operand.</summary>
+    Ldc_R8,
+    /// <summary>Converts a supported numeric value to Single.</summary>
+    Conv_R4,
+    /// <summary>Converts a supported numeric value to Double.</summary>
+    Conv_R8
 
 }
 

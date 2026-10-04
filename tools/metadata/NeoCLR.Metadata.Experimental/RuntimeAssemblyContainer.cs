@@ -40,13 +40,15 @@ public static class RuntimeAssemblyContainer
     /// <exception cref="ArgumentNullException">The graph is null.</exception>
     /// <exception cref="InvalidDataException">The graph, dependency contracts or encoding are invalid.</exception>
     /// <remarks>No dependency reader is consulted. Use this overload for external interface declarations;
-    /// the native-bytes overload cannot reconstruct external method contracts for its CLI projection.</remarks>
+    /// the native-bytes overload cannot reconstruct external method contracts for its CLI projection.
+    /// Selects schema 3 when Double literal bits require UInt64; otherwise retains schema 2.
+    /// The application host-image size limit remains unchanged.</remarks>
     public static byte[] WriteBinary(AssemblyBuilder assembly)
     {
         ArgumentNullException.ThrowIfNull(assembly);
         var native = assembly.WriteNativeAssembly();
         var projection = assembly.WriteReferenceImage();
-        return WriteCore(native, assembly.CoreLibrary, binary: true, projection);
+        return WriteCore(native, assembly.CoreLibrary, binary: true, projection, library: assembly.RequiresWideNumericPayload);
     }
 
     /// <summary>Builds a schema-3 library PE with explicit larger bounded binary metadata budgets.</summary>

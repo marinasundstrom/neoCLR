@@ -189,6 +189,9 @@ public sealed partial class MethodBuilder
                     if (stack.Count == 0) throw new InvalidDataException("evaluation stack underflow");
                     stack.RemoveAt(stack.Count - 1); break;
                 case "negate":
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double))
+                        throw new InvalidDataException("negation requires numeric operands");
+                    break;
                 case "complement":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("unary integer operation requires Int32 or Int64");
@@ -196,12 +199,16 @@ public sealed partial class MethodBuilder
                 case "string": stack.Add(PrimitiveType.String); break;
                 case "console.write": Pop(PrimitiveType.String); break;
                 case "constant64": stack.Add(PrimitiveType.Int64); break;
+                case "constantSingle": stack.Add(PrimitiveType.Single); break;
+                case "constantDouble": stack.Add(PrimitiveType.Double); break;
+                case "convertSingle":
+                case "convertDouble":
                 case "convertByte":
                 case "convert32":
                 case "convert64":
-                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
-                        throw new InvalidDataException("integer conversion requires Int32/Int64 or array length for conv.i4");
-                    stack[^1] = instruction.Op == "convert64" ? PrimitiveType.Int64 : PrimitiveType.Int32; break;
+                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
+                        throw new InvalidDataException("numeric conversion requires Int32, Int64, Single or Double; array length is supported only by conv.i4");
+                    stack[^1] = instruction.Op switch { "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
                 case "constant": stack.Add(PrimitiveType.Int32); break;
                 case "enum.from": Pop(PrimitiveType.Int32); stack.Add(instruction.Type!); break;
                 case "enum.to": Pop(instruction.Type!); stack.Add(PrimitiveType.Int32); break;
@@ -269,12 +276,12 @@ public sealed partial class MethodBuilder
                 case "remainder":
                 case "less":
                 case "greater":
-                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
-                        throw new InvalidDataException("integer operands required");
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double))
+                        throw new InvalidDataException("numeric operands required");
                     var integerType = stack[^1]; Pop(integerType); Pop(integerType);
                     stack.Add(instruction.Op is "less" or "greater" ? PrimitiveType.Boolean : integerType); break;
                 case "equal":
-                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Boolean))
+                    if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double or PrimitiveType.Boolean))
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "object.box":

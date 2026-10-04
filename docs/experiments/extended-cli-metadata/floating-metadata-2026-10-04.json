@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-04",
+  "scope": "metadata writer subgate; Raven floating emission is not yet implemented",
+  "neoclrBaseRevision": "3bd906fcf40f3a3a70c857271a4d10891faa49af",
+  "ravenRevision": "f7a02722d9b3968ce545a9f5e6862d5981ae3edb",
+  "source": "tools/metadata/NeoCLR.Metadata.Experimental.Tests/FloatingPointChecks.cs",
+  "sourceSha256": "23c4358f446e7607f85f22d3dc04838201010da3b6fbe9545cae80f604749c60",
+  "commands": [
+    "NEOCLR_FLOAT_ARTIFACT=/tmp/float-api1004.dll dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -p:WarningLevel=0",
+    "target/debug/neoclr assemble docs/experiments/extended-cli-metadata/bootstrap/comparer-seed.neoil /tmp/ParseSystem1004.neox --format neox",
+    "target/debug/neoclr run /tmp/float-api1004.dll --system /tmp/ParseSystem1004.neox"
+  ],
+  "results": {
+    "metadataGroupsPassed": 135,
+    "metadataGroupsTotal": 135,
+    "dotnetMainResult": 42,
+    "nativeProcessExit": 42,
+    "nativeStdout": "",
+    "nativeStderr": "",
+    "checks": [
+      "arithmetic and conversions",
+      "NaN inequality",
+      "negative zero produces negative infinity",
+      "CLI/native signatures",
+      "wrong literal overload rejection",
+      "floating bitwise rejection"
+    ],
+    "apiSnapshot": "existing stale guest snapshot; manual C# reference updated"
+  },
+  "hashes": {
+    "/tmp/float-api1004.dll": "64f91b16e65a3c43986be88def143871cec942785e39e4671683113751ac3da3",
+    "/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c",
+    "docs/experiments/extended-cli-metadata/bootstrap/comparer-seed.neoil": "ae37e3911fc4b1a9ea4eee374656538527bc8830715c1bec9cfc3bbbf8805a44"
+  },
+  "compatibility": "existing native Single/Double and IL instructions; graph writer selects schema 3 for high-bit binary64 literals; no runtime changes"
+}
