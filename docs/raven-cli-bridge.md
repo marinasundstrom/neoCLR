@@ -5768,3 +5768,15 @@ library. Separate artifact-only consumers and explicit JSON ownership manifests 
 No bridge mapping, compiler or Runtime Contract changes are introduced. The public
 serializer remains pending native introspection/handle dependencies. See the
 [gate and next dependency sequence](experiments/extended-cli-metadata/source-json-codec-2026-10-04.md).
+
+
+### Native source-owned internal calls (2026-10-05)
+
+Raven consumes the configured core's explicit MethodImpl(InternalCall) marker for
+internal nongeneric functions in neoCLR.Runtime. Runtime implementations are selected
+by exact native signatures; ordinary extern/PInvoke and .NET emission are unchanged.
+The marker's CLI bootstrap constructor never executes. Runtime handle-service source
+now lives in runtime/raven/native and is compiled beside its source-owned callers.
+Public wrappers can be separately imported. Public/generic/type-owned service
+contracts and production descriptor factory/snapshot ownership are still pending.
+See [the integration and validation record](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).

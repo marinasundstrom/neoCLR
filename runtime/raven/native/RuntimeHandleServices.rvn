@@ -1,0 +1,11 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+// Native library declarations. The runtime binds these exact signatures;
+// the enclosing source-built library owns them and their managed callers.
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeArgumentCount(handle: System.RuntimeTypeHandle) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ObjectTypeHandle(value: object) -> System.RuntimeTypeHandle;

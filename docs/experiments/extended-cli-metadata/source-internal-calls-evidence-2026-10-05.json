@@ -1,0 +1,293 @@
+{
+  "runtimeRepositoryRevision": "aeb1cbb59dae9b9cb2746ee7c3b0b704cd42a255",
+  "compilerRepositoryRevision": "80ebdc0a7be56febf5a7b6360a6ee5bb500edec5",
+  "scope": "Source-declared internal calls, separate native consumer, failed publication and unknown binding. Production descriptors/JSON remain open.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_internal_calls.py": "0c339e6b24493883d27a1e02d590392a37f43db59cd7c5c7c85ef36f98119166",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHandleServices.rvn": "460c0fe793dac31c4713521dd8a2db134fe33b677d324ed45895cb79f38bf33e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/internal-call-provider.rvn": "55311bc1131d1000071a2717116ea343b36238bb73e555d5e3561ff724f8a8fa",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/internal-call-consumer.rvn": "5fb787703b10be459dfaad0162e756f9927ac9fa3b13f835e74ddea98c715ad3",
+    "/private/tmp/InternalCallCoreFinal1005.dll": "001f67ad947f0251e798cba068bfc010dd82874a506e2a3adfb3ee6fc5fc3be2",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "63a141976023b83b9aeecccadc1aa25abaa4905b94297fc5766987469d297aa4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "8a12ec3a0e1e5608f832d921923ab6480cef2adc3d9ccd5f57512b2fc2425f7f",
+    "/private/tmp/native-services-gate1005final/System.neoil": "1330f4674e6de394b62c89775a57cd79d4e9d0d51f8a3dbc8c94e4099f828cca",
+    "/private/tmp/native-services-gate1005final/System.neox": "e9ba9c4cf6dd6874fd1667535304b322f97d728fb64492d8c0d32e70e3455a10",
+    "/private/tmp/native-services-gate1005final/HandleServices.dll": "e303e178ecd70ae2667a29bb66079fd3e5d4c9b9590688c1a2a692c276a85cbf",
+    "/private/tmp/native-services-gate1005final/Consumer.dll": "4479a1f49e4280941025658039c5083825938d031931f6a8616020bc6e673755",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "8d908b4ce7cde7ece102f81d3ab25d9b3256c3b085f9aa6e863bed17ed54942c",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "64faec458a4c74c1da29d0995f4f2d74c5e6b6d17249a459576916368aec49ec",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "cd6ca12b9f7089b822e6b44e19eb48ba5106c25dc8049c1a410515f3870d92ea"
+  },
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "assemble",
+        "/private/tmp/native-services-gate1005final/System.neoil",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--format",
+        "neox"
+      ],
+      "exitCode": 0,
+      "stdout": "Assembled System -> /private/tmp/native-services-gate1005final/System.neox\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/HandleServices.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHandleServices.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/internal-call-provider.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--reference",
+        "/private/tmp/native-services-gate1005final/HandleServices.dll",
+        "-o",
+        "/private/tmp/native-services-gate1005final/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/internal-call-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/native-services-gate1005final/Consumer.dll",
+        "--module",
+        "/private/tmp/native-services-gate1005final/HandleServices.dll",
+        "--system",
+        "/private/tmp/native-services-gate1005final/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (5 IL functions; maximum stack 2; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/native-services-gate1005final/Consumer.dll",
+        "--module",
+        "/private/tmp/native-services-gate1005final/HandleServices.dll",
+        "--system",
+        "/private/tmp/native-services-gate1005final/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/unmarked.dll",
+        "/private/tmp/native-services-gate1005final/unmarked.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/public.dll",
+        "/private/tmp/native-services-gate1005final/public.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/wrong-namespace.dll",
+        "/private/tmp/native-services-gate1005final/wrong-namespace.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/generic.dll",
+        "/private/tmp/native-services-gate1005final/generic.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/wrong-flags.dll",
+        "/private/tmp/native-services-gate1005final/wrong-flags.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support runtime services require internal nongeneric bodyless functions in neoCLR.Runtime with the core MethodImpl(InternalCall) attribute.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/body.dll",
+        "/private/tmp/native-services-gate1005final/body.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV1916: 'TypeArgumentCount' cannot declare a body because it is marked extern\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/InternalCallCoreFinal1005.dll",
+        "--runtime-seed",
+        "/private/tmp/native-services-gate1005final/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/native-services-gate1005final/Unknown.dll",
+        "/private/tmp/native-services-gate1005final/unknown.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/native-services-gate1005final/Consumer.dll",
+        "--module",
+        "/private/tmp/native-services-gate1005final/HandleServices.dll",
+        "--module",
+        "/private/tmp/native-services-gate1005final/Unknown.dll",
+        "--system",
+        "/private/tmp/native-services-gate1005final/System.neox"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: no runtime binding for neoCLR.Runtime.MissingService([]) [code=RuntimeError]\n"
+    }
+  ],
+  "compilerImplementationCommit": "185146e417060996371bf4c743c055d4095f7e2c",
+  "implementationNote": "Executed with the compiler changes subsequently committed above; runtime source and bootstrap changes are committed with this evidence."
+}

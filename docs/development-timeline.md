@@ -10803,3 +10803,10 @@ identity properties now fail with RAV0330, independently of writer validation.
   descriptor factories and JSON object mapping remain open.
 - **Links:** [runtime-service authoring](experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md),
   [handle/reflection gate](experiments/extended-cli-metadata/native-handle-reflection-2026-10-04.md).
+
+- **Author follow-up:** "Implement the necessary types in NeoCLR runtime library if necessary".
+  **Action:** the tested native service declarations now live in the runtime library's
+  native source directory. Existing Object/RuntimeTypeHandle identities are reused;
+  no additional descriptor types were needed for this bounded gate. The compiler-facing
+  marker remains bootstrap metadata until source-built core ownership is integrated.
+  [Source declaration evidence](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).

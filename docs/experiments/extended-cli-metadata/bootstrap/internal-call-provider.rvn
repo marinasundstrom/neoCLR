@@ -1,0 +1,10 @@
+namespace ServiceContract
+
+public class Item { }
+
+public class Probe {
+    static func Run() -> int {
+        let item = Item()
+        return neoCLR.Runtime.TypeArgumentCount(neoCLR.Runtime.ObjectTypeHandle(item)) + 42
+    }
+}

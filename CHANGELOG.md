@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Compile the runtime library's explicit native handle-service declarations through
+  Raven into bodyless InternalCall metadata. A separate artifact-only consumer
+  verifies and returns 42. Reject unsupported service declarations before output;
+  unknown runtime bindings still fail verification. The bootstrap marker is temporary
+  compiler metadata; production reflection descriptors and JSON mapping remain open.
+
 - Author bodyless nongeneric assembly-function runtime services through the metadata
   definitions/builders using InternalCall implementation flags. Preserve flags and
   exact runtime service names in native readers, reference projections and imports;

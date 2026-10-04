@@ -1004,3 +1004,9 @@ They remain under the existing C# host-library RavenDoc exclusion; the guest ref
 assembly/snapshot is unchanged. Native runtime-service authoring is not a new guest API.
 The 2026-10-05 `scripts/build-api-docs.py --check` run still reports the recorded
 stale guest snapshot; no partial or mismatched reference refresh was performed.
+
+The 2026-10-05 native service-source gate adds only internal Raven runtime declarations.
+The temporary CLI bootstrap's MethodImplAttribute/MethodImplOptions are compiler-facing
+markers consumed into implementation flags, not new executable guest APIs. They are
+excluded from RavenDoc with the other bootstrap-only declarations; see the
+[source-service contract](../docs/experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
