@@ -1226,7 +1226,8 @@ Number is a first consumer, not a permanent numeric-only interface model.
 Native metadata integration now separately compiles and executes the unchanged
 Single/Double Number implementations through explicit scalar ownership; see the
 [checkpoint](experiments/extended-cli-metadata/system-compilation-strategy.md#source-floating-primitive-ownership-2026-10-04).
-Integer source ownership and constrained Number calls remain unfinished in that path.
+The subsequent cumulative source-library rebuild executes all ten numeric types with
+seed ownership removed. Constrained Number calls remain unfinished in that path.
 The next bounded interface slice adds application defaults and public/private static
 helpers through Raven, with [focused evidence](experiments/interface-helpers/README.md).
 The [interface limitations table](tracking/runtime-language.md#interface-limitations--development-checkpoint-2026-09-27)

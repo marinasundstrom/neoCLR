@@ -988,3 +988,23 @@ execute with exit 42 and empty output. Runtime Contract and seed selection are
 unchanged. [Commands and hashes](../integer-dual-2026-10-04.json).
 These are primitive signatures; canonical source primitive ownership and Number
 constrained calls remain open. No native dependency falls back to CLI projection.
+
+
+### Native source numeric family (2026-10-04)
+
+Rebuild the matching Probe and compiler first. Generate the bootstrap artifacts:
+
+```sh
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll --native-service-catalog docs/experiments/extended-cli-metadata/bootstrap
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll --reference-comparer-storage-core /tmp/NumericCore.dll
+target/debug/neoclr assemble docs/experiments/extended-cli-metadata/bootstrap/numeric-seed.neoil /tmp/NumericSystem.neox --format neox
+python3 docs/experiments/extended-cli-metadata/bootstrap/verify_native_numbers.py --compiler /path/to/rvnc.dll --runtime target/debug/neoclr --core /tmp/NumericCore.dll --seed /tmp/NumericSystem.neox --ownership /path/to/cumulative-ownership-with-self.json --output /tmp/fresh-numeric-gate
+```
+
+The input ownership file has one cumulative source library and the existing explicit
+Self marker. The test combines its sources with Number and all numeric source structs,
+remaps iteration/propagation ownership to the resulting Numbers assembly, and builds
+an artifact-only consumer. It expects exit 99 and empty stdout. The retained seed has
+no competing Int32/Int64 copies. Old consumers of seed-owned numeric members require
+rebuilding; undeclared dependency errors are not bypassed. Generic constrained Number
+calls remain separate work. See ../numeric-source-family-2026-10-04.json.

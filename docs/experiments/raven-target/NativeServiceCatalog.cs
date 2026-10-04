@@ -6,6 +6,7 @@ using System.Text.Json;
 static partial class RuntimeServiceBindings
 {
     static readonly string[] NativeSelection = [
+        "Int32ToString", "Int64ToString",
         "StringHashOrdinalIgnoreCase", "SystemCultureName", "UnixTimeTicks", "UnixTimeToLocal",
         "ParseBoolean", "ParseSByte", "ParseByte", "ParseInt16", "ParseUInt16", "ParseInt32", "ParseUInt32", "ParseInt64", "ParseUInt64", "ParseSingle", "ParseDouble",
         "Utf8Encode", "Utf8Decode", "FileOpenRead", "FileCreateNew", "FilePosition", "FileSeek",
@@ -88,8 +89,8 @@ static partial class RuntimeServiceBindings
         text.AppendLine(".end");
         foreach (var member in NativeMembers())
         {
-            // String hashing is already required by the primitive string seed.
-            if (member.Name == "StringHashOrdinalIgnoreCase") continue;
+            // These services are already required by the primitive string/console seed.
+            if (member.Name is "StringHashOrdinalIgnoreCase" or "Int32ToString") continue;
             var nativeResult = member.Result == "noresult" ? "Void" : member.Result.StartsWith("arrayref<", StringComparison.Ordinal) ? member.Result[9..^1] + "[]" : member.Result;
             text.AppendLine($".function neoCLR.Runtime.{member.Name}({string.Join(',', member.Args.Select((t, i) => t + " arg" + i))}) -> {nativeResult}\n.methodimpl InternalCall\n.end");
         }

@@ -68,3 +68,47 @@ fn static_interface_virtual_defaults_and_direct_abstract_calls_are_rejected() {
     });
     assert!(rejected.is_err());
 }
+
+#[test]
+fn numeric_implementation_matches_metadata_declaration_name() {
+    let source = SOURCE
+        .replace("TestInteger", "System.Int32")
+        .replace(".module ContractProbe", ".module System");
+    let mut module = assemble(&source).unwrap();
+    let contract = module
+        .functions
+        .iter_mut()
+        .find(|f| f.name == "TestNumber.Add")
+        .unwrap();
+    contract.name = "TestNumber.M_416464".into();
+    contract.origin = Some(
+        serde_json::from_value(serde_json::json!({
+            "assembly": "Contracts", "module": "Contracts.dll", "name": "Add", "token": 0x06000001, "parameter_tokens": [0, 0]
+        }))
+        .unwrap(),
+    );
+    module.assemblies.push(serde_json::from_value(serde_json::json!({
+        "name": "Contracts", "full_name": "Contracts", "modules": ["Contracts.dll"], "references": []
+    })).unwrap());
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program
+            .resolve_function(&parse_function_ref("Run()").unwrap())
+            .unwrap()
+            .invoke(vec![], Limits::default())
+            .unwrap()
+            .value,
+        Value::Int32(42)
+    );
+    let implementation = module
+        .functions
+        .iter_mut()
+        .find(|f| f.name == "System.Int32.Add")
+        .unwrap();
+    implementation.visibility = neoclr::metadata::Visibility::Private;
+    assert!(
+        LoadedProgram::new(&module).is_err(),
+        "canonical lookup bypassed accessibility"
+    );
+}

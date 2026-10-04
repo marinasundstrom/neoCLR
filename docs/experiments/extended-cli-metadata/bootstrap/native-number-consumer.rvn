@@ -1,0 +1,133 @@
+import System.*
+import System.Result.*
+
+func Main() -> int {
+    let one0 = SByte.One
+    if one0 != (sbyte)1 || SByte.Zero != (sbyte)0 { return 1 }
+    if one0.CompareTo((sbyte)2) != -1 { return 2 }
+    match SByte.Parse("-128") {
+        .Ok(let parsed) => { if parsed != (sbyte)-128 { return 3 } }
+        .Error(_) => { return 4 }
+    }
+    match SByte.Parse("-129") {
+        .Ok(_) => { return 5 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 6 }
+        }
+    }
+    let one1 = Byte.One
+    if one1 != (byte)1 || Byte.Zero != (byte)0 { return 11 }
+    if one1.CompareTo((byte)2) != -1 { return 12 }
+    match Byte.Parse("255") {
+        .Ok(let parsed) => { if parsed != (byte)255 { return 13 } }
+        .Error(_) => { return 14 }
+    }
+    match Byte.Parse("256") {
+        .Ok(_) => { return 15 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 16 }
+        }
+    }
+    let one2 = Int16.One
+    if one2 != (short)1 || Int16.Zero != (short)0 { return 21 }
+    if one2.CompareTo((short)2) != -1 { return 22 }
+    match Int16.Parse("-32768") {
+        .Ok(let parsed) => { if parsed != (short)-32768 { return 23 } }
+        .Error(_) => { return 24 }
+    }
+    match Int16.Parse("-32769") {
+        .Ok(_) => { return 25 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 26 }
+        }
+    }
+    let one3 = UInt16.One
+    if one3 != (ushort)1 || UInt16.Zero != (ushort)0 { return 31 }
+    if one3.CompareTo((ushort)2) != -1 { return 32 }
+    match UInt16.Parse("65535") {
+        .Ok(let parsed) => { if parsed != (ushort)65535 { return 33 } }
+        .Error(_) => { return 34 }
+    }
+    match UInt16.Parse("65536") {
+        .Ok(_) => { return 35 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 36 }
+        }
+    }
+    let one4 = UInt32.One
+    if one4 != (uint)1 || UInt32.Zero != (uint)0 { return 41 }
+    if one4.CompareTo((uint)2) != -1 { return 42 }
+    match UInt32.Parse("4294967295") {
+        .Ok(let parsed) => { if parsed != (uint)-1 { return 43 } }
+        .Error(_) => { return 44 }
+    }
+    match UInt32.Parse("4294967296") {
+        .Ok(_) => { return 45 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 46 }
+        }
+    }
+    let one5 = UInt64.One
+    if one5 != (ulong)1 || UInt64.Zero != (ulong)0 { return 51 }
+    if one5.CompareTo((ulong)2) != -1 { return 52 }
+    match UInt64.Parse("18446744073709551615") {
+        .Ok(let parsed) => { if parsed != (ulong)-1L { return 53 } }
+        .Error(_) => { return 54 }
+    }
+    match UInt64.Parse("18446744073709551616") {
+        .Ok(_) => { return 55 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 56 }
+        }
+    }
+    let signed = Int32.One
+    if signed.CompareTo(2) != -1 || !signed.Equals(1) { return 71 }
+    if signed.ToString() != "1" { return 72 }
+    if Int64.MaxValue.ToString() != "9223372036854775807" { return 73 }
+    match Int32.Parse("-2147483648") {
+        .Ok(let value) => { if value != -2147483648 { return 74 } }
+        .Error(_) => { return 75 }
+    }
+    match Int64.Parse("-9223372036854775808") {
+        .Ok(let value) => { if value != Int64.MinValue { return 76 } }
+        .Error(_) => { return 77 }
+    }
+    match Int32.Divide(1, 0) {
+        .Ok(_) => { return 78 }
+        .Error(let error) => {
+            if error is not IntegerDivisionError.DivisionByZero { return 79 }
+        }
+    }
+    let single = Single.One
+    let doubleOne = Double.One
+    if single != 1.0f || doubleOne != 1.0 { return 100 + 1 }
+    if Single.Zero != 0.0f || Double.Zero != 0.0 { return 100 + 2 }
+    if single.CompareTo(2.0f) != -1 || doubleOne.CompareTo(2.0) != -1 { return 100 + 3 }
+    if single.CompareTo(single) != 0 || doubleOne.CompareTo(0.0) != 1 { return 100 + 4 }
+    let nan = 0.0 / 0.0
+    if nan.CompareTo(doubleOne) != -1 || doubleOne.CompareTo(nan) != 1 { return 100 + 5 }
+    if nan.CompareTo(nan) != 0 { return 100 + 6 }
+    match Single.Parse("20.5") {
+        .Ok(let parsed) => { if parsed != 20.5f { return 100 + 7 } }
+        .Error(_) => { return 100 + 8 }
+    }
+    match Double.Parse("21.5") {
+        .Ok(let parsed) => { if parsed != 21.5 { return 100 + 9 } }
+        .Error(_) => { return 100 + 10 }
+    }
+    match Single.Parse("bad") {
+        .Ok(_) => { return 100 + 11 }
+        .Error(let error) => {
+            if error is not NumberParseError.InvalidFormat { return 100 + 12 }
+        }
+    }
+    match Double.Parse("1e9999") {
+        .Ok(_) => { return 100 + 13 }
+        .Error(let error) => {
+            if error is not NumberParseError.Overflow { return 100 + 14 }
+        }
+    }
+    let doubleOnes = [single, 2.0f]
+    if doubleOnes[1] + doubleOnes[0] != 3.0f { return 100 + 15 }
+    return 99
+}

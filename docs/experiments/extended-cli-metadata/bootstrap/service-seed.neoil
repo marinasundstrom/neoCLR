@@ -24,6 +24,16 @@ call neoCLR.Runtime.RegisterTaskQueue<T>(T)
 pop
 ret
 .end
+.method static Int32ToString(Int32 arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.Int32ToString(Int32)
+ret
+.end
+.method static Int64ToString(Int64 arg0) -> String
+ldarg arg0
+call neoCLR.Runtime.Int64ToString(Int64)
+ret
+.end
 .method static StringHashOrdinalIgnoreCase(String arg0) -> Int32
 ldarg arg0
 call neoCLR.Runtime.StringHashOrdinalIgnoreCase(String)
@@ -252,6 +262,9 @@ call neoCLR.Runtime.DrainEntryTasks()
 pop
 ret
 .end
+.end
+.function neoCLR.Runtime.Int64ToString(Int64 arg0) -> String
+.methodimpl InternalCall
 .end
 .function neoCLR.Runtime.SystemCultureName() -> String
 .methodimpl InternalCall

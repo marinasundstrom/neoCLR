@@ -6539,3 +6539,21 @@ the null default. Runtime linking verifies the supplied dependency. Executable C
 output rejects these native calls. `PrimitiveRepresentationChecks` now also saves
 `NEOCLR_PRIMITIVE_CONSUMER + ".authored.neox"`, an independently executable consumer
 created through this symbol-facts-only path.
+
+
+Native primitive definitions and authored member references now use canonical runtime
+member names, such as `System.Int32.CompareTo`, so seed-facing primitive calls retain
+their ABI spelling. The native reader accepts the preceding encoded member spelling
+as well and retains each artifact's actual callable/accessor names. This does not
+change signatures, opcodes or container version. Numeric interface resolution uses
+the declaration origin name when needed; exact type, visibility and parameter-mode
+contracts are still validated. Existing libraries must be rebuilt when ownership
+moves from the implicit System seed to a separately referenced source library.
+
+Earlier experimental metadata readers that require encoded primitive member names
+must be upgraded before reading newly emitted canonical members. Existing runtime
+container and instruction formats are unchanged.
+
+Raven’s symbol-authored primitive references use the new canonical ABI. Rebuild older
+experimental primitive-provider artifacts for that path; reader-mediated ImportReference
+continues to preserve the older artifact’s executable name.

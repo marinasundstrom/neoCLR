@@ -45,6 +45,12 @@ internal static class PrimitiveRepresentationChecks
         body.MarkLabel(fail); body.LoadConstant(1); body.Return();
         graph.EntryPoint = main;
         var json = graph.WriteNativeAssembly();
+        // Readers retain the previous encoded member spelling, including accessor links.
+        var legacy = System.Text.Encoding.UTF8.GetString(json);
+        foreach (var method in primitive.Methods)
+            legacy = legacy.Replace("System.Double." + method.Name,
+                "System.Double.M_" + Convert.ToHexString(System.Text.Encoding.UTF8.GetBytes(method.Name)));
+        _ = NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(legacy));
         graph.EntryPoint = null;
         var native = RuntimeAssemblyContainer.WriteBinary(graph);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(native);

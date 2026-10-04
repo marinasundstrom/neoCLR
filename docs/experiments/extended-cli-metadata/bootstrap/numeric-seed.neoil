@@ -1,0 +1,3 @@
+; Source numeric declarations own Int32/Int64; retain only core and runtime services.
+.include "collection-seed.neoil"
+.include "service-seed.neoil"

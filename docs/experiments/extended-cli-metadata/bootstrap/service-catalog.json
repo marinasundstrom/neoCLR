@@ -1492,7 +1492,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {
@@ -1504,7 +1504,7 @@
       "categories": [
         "scalar"
       ],
-      "nativeBootstrap": false,
+      "nativeBootstrap": true,
       "implementation": "requires-explicit-binding"
     },
     {

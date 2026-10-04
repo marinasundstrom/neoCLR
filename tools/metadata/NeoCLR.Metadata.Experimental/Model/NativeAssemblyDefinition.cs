@@ -553,7 +553,8 @@ public sealed partial class NativeAssemblyDefinition
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
                 var expectedName = isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
-                Require(Text(method, "name") == expectedName, "native callable name mismatch");
+                Require(Text(method, "name") == expectedName || ownerIndex >= 0 && types[ownerIndex].NativePrimitive is not null &&
+                    Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility.ToString()), "native method visibility mismatch");
                 Require(ownerIndex >= 0 || visibility != MethodVisibility.Private, "private native global function unsupported");
@@ -575,7 +576,7 @@ public sealed partial class NativeAssemblyDefinition
                         parameterNames.Add(i, parameterName!);
                     }
                 }
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames }); methodNames.Add(expectedName);
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ParameterNames = parameterNames }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();

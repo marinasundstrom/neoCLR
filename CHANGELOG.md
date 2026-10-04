@@ -8,6 +8,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Rebuild the cumulative runtime-library subset with all ten unchanged numeric source
+  implementations under one owner, replacing seed Int32/Int64 declarations. Select
+  existing integer formatting services explicitly. Preserve canonical primitive member
+  names and match encoded interface contracts by metadata declaration name, retaining
+  exact signature and visibility checks. Readers continue accepting previous encoded
+  primitive names. Rebuild earlier experimental primitive-provider artifacts before
+  using Raven’s new canonical member authoring. The source-free numeric consumer
+  verifies and runs with exit 99;
+  generic Number-constrained compiler calls remain open.
+
 - Compile unchanged source Single/Double Number implementations and NumberParseError
   into a native library, then execute an artifact-only consumer covering parsing,
   ordering and arrays. Raven selects explicit native primitive providers and maps

@@ -455,3 +455,40 @@ Compiler implementation: Raven `da502f04a`; metadata changes are the matching na
 floating ownership slice above neoCLR `a37fa6b9`. The paired floating .NET/native
 control also passes with provider selection disabled. No independent main backport is
 required: these changes are explicit native target integration, not general binder fixes.
+
+
+### All numeric source implementations (2026-10-04)
+
+The cumulative source-library subset now builds with unchanged Number, all ten numeric
+structs, NumberParseError and IntegerDivisionError under one native owner. A separate
+consumer imports that artifact without sources and executes parsing boundaries/errors,
+identities, ordering, integer formatting, checked division and floating arrays/NaN cases
+(exit 99, empty stdout). This goes beyond compiling declarations; runtime linking and
+verification succeed without seed-owned Int32/Int64. Generic Number-constrained calls
+remain open, so this is not the completion of the Number story.
+
+Replacing seed primitive owners requires rebuilding their existing consumers. Loading
+the old collections artifact alongside a new numeric provider correctly rejects its
+undeclared dependency. The fixture rebuilds the actual cumulative source subset rather
+than relaxing direct-reference rules. Provider emission maps exact bootstrap member
+contracts to output-owned source methods. Object remains the bootstrap anchor.
+
+Primitive members now retain canonical runtime names (System.Int32.ToString, etc.).
+Native readers also accept the earlier encoded member names and preserve accessor
+associations. Numeric interface matching can use the metadata declaration name when
+an interface executable name is encoded; signature and accessibility checks remain.
+This preserves the CLR-like distinction between declaration identity and executable
+representation without introducing a new runtime instruction or metadata schema.
+The checked service catalog adds existing Int32ToString/Int64ToString bindings, and
+numeric-seed.neoil retains no duplicate numeric declarations.
+
+See numeric-source-family-2026-10-04.json and bootstrap/verify_native_numbers.py for
+commands, hashes and source ownership. The metadata C# suite covers canonical and
+legacy names/accessors; focused runtime interface tests cover semantic name matching
+and inaccessible implementation rejection. The stale guest API snapshot is unchanged;
+no guest public signature changed.
+
+Compiler implementation: Raven `d92e2bdc9` over `da502f04a`; matching runtime/metadata
+slice is above neoCLR `6fe30a80`. Validation: 138 C# metadata groups, 43 focused runtime
+interface tests, seven existing native consumers, and the source-family gate pass.
+The earlier 38 focused .NET controls and paired floating control remain unchanged.

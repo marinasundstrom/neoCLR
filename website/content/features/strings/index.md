@@ -268,5 +268,6 @@ source into a separate library and executes an artifact-only consumer. The check
 catalog includes all existing numeric parsers. A further development gate builds the
 unchanged Single/Double Number implementations and NumberParseError with explicit
 native scalar ownership, then imports and executes parsing and ordering from a separate
-consumer. The complete numeric source family and generic Number-constrained calls
+consumer. The cumulative source subset now also builds and executes all ten numeric
+implementations without seed numeric declarations. Generic Number-constrained calls
 remain unfinished in the native compiler.

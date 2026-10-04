@@ -279,7 +279,33 @@ fn member(
             generic_arguments: vec![],
             parameters: contract.parameters.clone(),
         };
-        if let Ok(function) = crate::vm::resolve(module, &target) {
+        let resolved = crate::vm::resolve(module, &target).or_else(|original| {
+            // Native numeric declarations retain the canonical runtime member spelling.
+            // A metadata-produced interface may use an encoded executable name; its
+            // validated declaration origin supplies the corresponding member name.
+            if matches!(
+                owner,
+                Type::SByte
+                    | Type::Byte
+                    | Type::Int16
+                    | Type::UInt16
+                    | Type::Int32
+                    | Type::UInt32
+                    | Type::Int64
+                    | Type::UInt64
+                    | Type::Single
+                    | Type::Double
+            ) {
+                if let Some(origin) = &contract.origin {
+                    let mut canonical = target.clone();
+                    canonical.name =
+                        format!("{}.{}", owner.definition_name().unwrap(), origin.name);
+                    return crate::vm::resolve(module, &canonical);
+                }
+            }
+            Err(original)
+        });
+        if let Ok(function) = resolved {
             if function.interface_implementations.is_empty()
                 && function.visibility == Visibility::Public
             {
