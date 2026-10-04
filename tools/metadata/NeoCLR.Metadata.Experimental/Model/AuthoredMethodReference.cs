@@ -3,13 +3,13 @@ namespace NeoCLR.Metadata.Experimental.Model;
 public sealed partial class AssemblyBuilder
 {
     private readonly Dictionary<ImportedTypeReference, PrimitiveType> authoredPrimitiveOwners = [];
-    /// <summary>Declares the scalar representation of an output-owned external numeric type from host semantic facts.</summary>
-    /// <exception cref="ArgumentException">The reference is foreign or does not name the matching nongeneric System numeric value type.</exception>
+    /// <summary>Declares the scalar representation of an output-owned external numeric value type or String reference type from host semantic facts.</summary>
+    /// <exception cref="ArgumentException">The reference is foreign or does not name the matching nongeneric System primitive category.</exception>
     /// <exception cref="InvalidDataException">Another dependency already owns the scalar representation.</exception>
     public void SetNativePrimitive(ImportedTypeReference type, PrimitiveType primitive)
     {
         ArgumentNullException.ThrowIfNull(type);
-        if (!ReferenceEquals(type.Owner, this) || !TypeDefinition.IsNumericPrimitive(primitive) || !type.IsValueType ||
+        if (!ReferenceEquals(type.Owner, this) || !TypeDefinition.IsSupportedNativePrimitive(primitive) || type.IsValueType != (primitive != PrimitiveType.String) ||
             type.Namespace != "System" || type.Name != primitive.ToString() || type.GenericArity != 0 || type.DeclaringType is not null)
             throw new ArgumentException("invalid external primitive designation");
         if (authoredPrimitiveOwners.Any(p => p.Value == primitive && !Equals(p.Key, type)))
@@ -24,7 +24,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="signature">Primitive, scoped parameter, external nominal construction, vector or bounded function signature; Self is admitted only for an interface contract.</param>
     /// <param name="isStatic">Whether the member has no receiver. Constructors must be instance members.</param>
     /// <param name="isOverride">Reuse the inherited slot; currently only instance value-type ToString(): String is supported.</param>
-    /// <param name="nativePrimitive">Explicit canonical numeric owner representation, or null for an ordinary owner.</param>
+    /// <param name="nativePrimitive">Explicit canonical numeric or String owner representation, or null for an ordinary owner.</param>
     /// <returns>An interned output-owned method contract. Construct generic owners before calling.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid owner, name, constructor or signature scope.</exception>
@@ -42,8 +42,8 @@ public sealed partial class AssemblyBuilder
         if (!ReferenceEquals(declaringType.Owner, this) ||
             declaringType.TypeArguments.Count != 0 || !importedGraphs.TryGetValue(declaringType.AssemblyIdentity, out var graph))
             throw new ArgumentException("method requires an owned nominal definition", nameof(declaringType));
-        if (nativePrimitive is { } primitive && (!TypeDefinition.IsNumericPrimitive(primitive) ||
-            !declaringType.IsValueType || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
+        if (nativePrimitive is { } primitive && (!TypeDefinition.IsSupportedNativePrimitive(primitive) ||
+            declaringType.IsValueType != (primitive != PrimitiveType.String) || declaringType.Namespace != "System" || declaringType.Name != primitive.ToString() ||
             declaringType.GenericArity != 0 || declaringType.DeclaringType is not null || name is ".ctor" or ".cctor" || isOverride))
             throw new ArgumentException("invalid native primitive member owner", nameof(nativePrimitive));
         if (isOverride && (!declaringType.IsValueType || isStatic || name != "ToString" ||

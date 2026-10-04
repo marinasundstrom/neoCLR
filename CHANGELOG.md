@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Support explicitly owned System.String reference declarations in the experimental
+  metadata definition/builder APIs, native snapshots and external method references.
+  Local and separately encoded instance consumers execute on NeoCLR; numeric value
+  categories remain unchanged. Raven ownership selection and grapheme Char are not yet
+  integrated. No runtime instruction or metadata version change is required.
+
 - Verify Raven's direct pattern branching in if-expressions: null/non-null cases execute
   on both targets. Unchanged String/Char join the cumulative emitted library, runtime
   verification passes and a separate static String consumer exits 42. Canonical primitive

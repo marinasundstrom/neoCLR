@@ -708,3 +708,22 @@ separate metadata/import fact gap; the pattern test exercises null within the pr
 Public-plus-explicit same-name property binding remains a general compiler candidate.
 The independent .NET setter fix is validated on main at 210d891e0 (seven focused tests).
 Portable lowering does not exist on main yet, so aa2a7ec69 has no independent main backport.
+
+
+### Runtime-owned String metadata prerequisite (2026-10-04)
+
+The instance consumer confirms that Char still resolves to the bootstrap declaration
+(FromString is absent). The existing native primitive provider configuration accepts only
+numeric value types. Do not broaden Char to a numeric/CLI-char signature: its runtime
+representation is a grapheme.
+
+The metadata prerequisite now accepts an explicitly designated System.String reference
+owner. Native local and external instance calls execute with a direct reference receiver;
+142 C# metadata groups pass. A minimal empty System seed prevents duplicate ownership in
+this API-level test. No Raven compiler selection or full class-library ownership claim is
+made. Next connect String provider selection, map its intrinsic m_value read to the receiver,
+and generate a retained seed excluding that canonical declaration before testing unchanged
+String sources. Char needs a separate representation-aware contract. See the public
+[host API reference](../../../api-docs/experimental-metadata.md).
+
+[String metadata execution commands and hashes](string-reference-metadata-2026-10-04.json).

@@ -1,0 +1,90 @@
+{
+  "repositoryBaseRevision": "5de8cc8ea6f35eafac262f0af1517020c4476b3f",
+  "scope": "Metadata API String reference ownership; uncommitted slice on recorded base. Does not establish Raven source ownership.",
+  "metadataGroups": 142,
+  "commands": [
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/source-string-api.neox",
+        "--system",
+        "/tmp/source-string-api.neox.seed"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_10046E1B409F20B2F894B7C1D3032AEF509E50C220BCE3D3C57BCB0FA4D4C3E4: typed-stack/control-flow verification passed (2 IL functions; maximum stack 1; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/source-string-api.neox",
+        "--system",
+        "/tmp/source-string-api.neox.seed"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/tmp/source-string-api.neox.consumer",
+        "--module",
+        "/tmp/source-string-api.neox.library",
+        "--system",
+        "/tmp/source-string-api.neox.seed"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_520F9873239706FC7E372EAA01A9B02227848F45EC751FE26FBF94D6A7CE5665: typed-stack/control-flow verification passed (3 IL functions; maximum stack 1; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/tmp/source-string-api.neox.consumer",
+        "--module",
+        "/tmp/source-string-api.neox.library",
+        "--system",
+        "/tmp/source-string-api.neox.seed"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/tmp/source-string-api.neox": "71c099530ac997f0e34f746a1d427b1b041235518e7b6eece5ede3ba1faddf75",
+    "/tmp/source-string-api.neox.seed": "d76e6c85ae3256c061b0982481c068105d97ac35050c63caebd3e5f411100268",
+    "/tmp/source-string-api.neox.library": "b6b72c8bd7bba502201827b8667b58b031d247554281d36f9f691adb3ccde87e",
+    "/tmp/source-string-api.neox.consumer": "097393c15e77841e7ec0156eb86eabec33e2b715dd9d7c14290f6985cb6f3b07",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "a8624eb58c7a5120e931b278af54dffca68136999810182d23d3e0b8701b9170"
+  },
+  "compilerProbe": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/TextSystem1004.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/native-number-feature-verified/ownership.json",
+        "--reference",
+        "/tmp/string-pattern-retry/Numbers.dll",
+        "-o",
+        "/tmp/string-instance1004/Consumer.dll",
+        "/tmp/string-instance1004/consumer.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0117: 'Char' has no member 'FromString'.\n"
+    }
+  ]
+}

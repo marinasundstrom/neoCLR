@@ -6780,3 +6780,35 @@ visibility and signatures remain validated independently. The runtime permits bo
 qualification used by Raven, not arbitrary new identifier syntax. C# contracts cover definition/
 builder parity, two same-named interface slots, native round trips, private CLI dispatch,
 external generic diamond contracts and incompatible implementations.
+
+
+## Runtime-owned String declaration (development, 2026-10-04)
+
+`TypeDefinition.SetNativePrimitive(PrimitiveType.String)` and the corresponding
+TypeBuilder convenience method now designate the canonical nongeneric top-level
+System.String **reference** declaration. Numeric designations still require value types.
+String must be a nonabstract, noninterface class with no fields or constructors. The
+same validation repeats at write time. Wrong category, identity, storage or conflicting
+designation throws ArgumentException; loaded definitions remain immutable.
+
+`AssemblyBuilder.SetNativePrimitive(ImportedTypeReference, PrimitiveType.String)` and
+`CreateMethodReference(..., nativePrimitive: PrimitiveType.String)` accept an output-owned
+external String reference. They retain the existing explicit dependency identity, core and
+digest requirements. No declaration is inferred from its name alone. Foreign/wrong-category
+references reject; conflicting owners reject with InvalidDataException.
+
+String instance bodies receive the string reference directly: LoadArgument(0) is the
+storage value. Do not use the numeric managed receiver's ldobj/stobj convention. Native
+encoding uses the existing Runtime representation, String signature and System.String
+identity. Its is_reference_type field describes ordinary record-class semantics, so is
+false for this runtime-owned representation; the reader derives String's reference category
+from its canonical Runtime identity. No format version or runtime instruction changed.
+Native snapshots retain NativePrimitive=String and IsValueType=false. Executable CLI
+writing still rejects native primitive implementations; this is not a host System.String
+replacement. Char remains outside this API and retains its grapheme representation.
+
+C# tests cover definition/builder category parity, native round trips, invalid value-type
+String designation and explicit external method references. Native local and separately
+encoded consumer calls execute with reference receivers. The fixture uses an empty System
+seed to exclude competing String ownership; it is a metadata contract test, not the full
+Raven class-library bootstrap gate.

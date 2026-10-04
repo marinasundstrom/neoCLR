@@ -173,3 +173,7 @@ range support. This is integration evidence, not full-library support.
 Development integration now supports explicit interface property accessors across native
 assemblies, using the existing metadata relationships. Full source-owned String/Char
 compilation remains in progress; this is not full class-library completion.
+
+The development metadata API can now author runtime-owned String reference declarations
+and external instance calls. Raven source String ownership is still being connected;
+this does not change the published class-library support level.

@@ -207,9 +207,10 @@ public sealed partial class NativeAssemblyDefinition
                 }
                 Shape(type, typeFields.ToArray());
                 var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean();
-                var isValueType = !isInterface && !type.GetProperty("is_reference_type").GetBoolean();
+                var isRuntimeString = isPrimitive && Text(type, "name") == "System.String";
+                var isValueType = !isInterface && !isRuntimeString && !type.GetProperty("is_reference_type").GetBoolean();
                 Require((!isValueType || !isStatic) &&
-                    type.GetProperty("is_reference_type").GetBoolean() == (!isInterface && !isValueType) && type.GetProperty("is_sealed").GetBoolean() == (isStatic || isValueType) &&
+                    type.GetProperty("is_reference_type").GetBoolean() == (!isInterface && !isValueType && !isRuntimeString) && type.GetProperty("is_sealed").GetBoolean() == (isStatic || isValueType) &&
                     (!isInterface || !type.GetProperty("is_abstract").GetBoolean() && Array(type, "fields", 256).Length == 0), "unsupported native type shape");
                 var fieldRows = new List<FieldRow>();
                 foreach (var field in Array(type, "fields", 256))
@@ -241,9 +242,9 @@ public sealed partial class NativeAssemblyDefinition
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
                     primitive = ReadPrimitive(nativeName[7..], false);
-                    Require(TypeDefinition.IsNumericPrimitive(primitive.Value) && isValueType && !isStatic &&
+                    Require(TypeDefinition.IsSupportedNativePrimitive(primitive.Value) && isValueType == (primitive != PrimitiveType.String) && !isStatic &&
                         declaringType < 0 && typeNames.Length == 0 && fieldRows.Count == 0 && enumMembers is null,
-                        "invalid runtime numeric declaration");
+                        "invalid runtime primitive declaration");
                     ns = "System"; name = primitive.ToString()!;
                 }
                 else if (declaringType >= 0)
@@ -799,7 +800,8 @@ public sealed partial class NativeAssemblyDefinition
     {
         if (type.NativePrimitive is { } primitive)
         {
-            var definition = graph.AddValueType(type.Namespace, type.Name, type.Visibility);
+            var definition = type.IsValueType ? graph.AddValueType(type.Namespace, type.Name, type.Visibility)
+                : graph.AddClass(type.Namespace, type.Name, type.Visibility);
             definition.SetNativePrimitive(primitive);
             return definition;
         }
