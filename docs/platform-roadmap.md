@@ -1,5 +1,15 @@
 # neoCLR platform roadmap
 
+Value-result receiver milestone (2026-10-04): Raven `9d06edf80` preserves getter/call
+copy semantics while native bootstrap imports admit exact Int64 receiver storage.
+A separately compiled ArrayList<long> consumer verifies copy/indexer behavior, evaluation
+order, signed extrema and mutable struct receiver semantics. Broad native acceptance,
+seven consumers, 129 metadata groups and 29 focused C#/.NET checks pass. The unchanged
+full generic-collections sample now rejects only for absent Date. Next bounded work is
+inventorying Date/globalization source dependencies before selecting a coherent library
+expansion; do not substitute a Date stub. Source primitive ownership remains open.
+[Evidence](experiments/extended-cli-metadata/value-receivers-2026-10-04.json).
+
 Integer bootstrap acceptance (2026-10-04): unchanged library-integers now executes
 with exact output using explicit Int32.Equals/ToString seed contracts. No compiler,
 metadata or runtime code change; the expanded native broad gate passes. Source-built

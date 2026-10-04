@@ -112,8 +112,8 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         // nominal layouts. Validate every signature and receiver mode against the seed;
         // this does not admit primitive owners as ordinary imported nominal types.
         var intrinsicPrimitiveOwner = reference.Identity.Equals(core) &&
-            Library.ModuleName == "System" && owner is { Namespace: "System", Name: "String" or "Int32", GenericArity: 0, DeclaringType: null } &&
-            owner.IsValueType == (owner.Name == "Int32");
+            Library.ModuleName == "System" && owner is { Namespace: "System", Name: "String" or "Int32" or "Int64", GenericArity: 0, DeclaringType: null } &&
+            owner.IsValueType == (owner.Name is "Int32" or "Int64");
         if (!namespaceContainer) ValidateType(owner, intrinsicPrimitiveOwner && owner.Name == "String");
         var name = (namespaceContainer ? owner.Namespace : TypeName(owner));
         name = (name.Length == 0 ? "" : name + ".") + definition.Name;
@@ -137,7 +137,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
         var actualOutputs = Indices(function, "out_parameters").Concat(Indices(function, "out_when_true")).Distinct().Order();
         if (!actualOutputs.SequenceEqual(target.Signature.OutParameters.Order())) throw new InvalidDataException("native output contract mismatch: " + name);
         target.NativeImportName = name;
-        target.NativeImportPrimitiveOwner = intrinsicPrimitiveOwner ? owner.Name == "String" ? PrimitiveType.String : PrimitiveType.Int32 : null;
+        target.NativeImportPrimitiveOwner = intrinsicPrimitiveOwner ? owner.Name switch { "String" => PrimitiveType.String, "Int64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 } : null;
         target.NativeImportIsNamespaceFunction = namespaceContainer;
         target.DiscardNativeImportResult = target.Signature.ReturnType.Primitive == PrimitiveType.Void && !Flag(function, "no_result");
     }

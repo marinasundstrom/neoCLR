@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Validate explicit bootstrap Int64 member imports with exact-width managed receivers
+  and add executable Int64.CompareTo to the comparer seed. Raven `9d06edf80` addresses
+  value-returning receivers without write-back; native ArrayList<long> copy/indexer,
+  evaluation-order and mutable-struct checks pass. Expanded broad gate, seven consumers,
+  129 metadata groups and 29 focused C#/.NET checks pass. Full generic-collections still
+  lacks Date. No runtime/format change; guest API snapshot remains stale.
+
 - Extend the explicit comparer primitive bootstrap with Int32.Equals and direct
   ToString; unchanged library-integers now compiles and runs with exact output.
   The expanded native application/library gate passes without compiler or runtime

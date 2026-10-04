@@ -1,0 +1,79 @@
+import System.Collections.*
+
+struct Counter {
+    var Value: int = 0
+
+    func Bump() -> int {
+        Value += 1
+        return Value
+    }
+}
+
+class Copies {
+    // Explicit field distinguishes stored receivers from value-returning properties.
+    field Stored: Counter = default(Counter)
+    var Reads: int = 0
+
+    val Copy: Counter {
+        get {
+            Reads += 1
+            return Stored
+        }
+    }
+}
+
+class Reads {
+    var Trace: int = 0
+
+    val Value: long {
+        get {
+            Trace = Trace * 10 + 1
+            return 42L
+        }
+    }
+
+    func Read() -> long {
+        Trace = Trace * 10 + 2
+        return 42L
+    }
+
+    func Argument() -> long {
+        Trace = Trace * 10 + 3
+        return 42L
+    }
+}
+
+func Main() -> int {
+    let source = ArrayList<long>()
+    source.Add(42L)
+    let copy = source.Copy()
+    copy[0] = 7L
+    if source[0].CompareTo(42L) != 0 || copy[0].CompareTo(7L) != 0 {
+        return 1
+    }
+    copy.Add(9L)
+    if source.Count != 1 || copy.Count != 2 {
+        return 2
+    }
+    let reads = Reads()
+    if reads.Value.CompareTo(reads.Argument()) != 0 || reads.Trace != 13 {
+        return 3
+    }
+    reads.Trace = 0
+    if reads.Read().CompareTo(reads.Argument()) != 0 || reads.Trace != 23 {
+        return 4
+    }
+    let minimum = -9223372036854775807L - 1L
+    let maximum = 9223372036854775807L
+    if minimum.CompareTo(maximum) != -1 || maximum.CompareTo(minimum) != 1 {
+        return 5
+    }
+    let copies = Copies()
+    if copies.Copy.Bump() != 1 || copies.Reads != 1 || copies.Stored.Value != 0 {
+        return 6
+    }
+    if copies.Stored.Bump() != 1 || copies.Stored.Value != 1 {
+        return 7
+    }
+    return 42
+}

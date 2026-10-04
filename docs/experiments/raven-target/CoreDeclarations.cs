@@ -24,6 +24,7 @@ static class CoreDeclarations
             .Replace("// Union probe attribute", unionProbe ? "public sealed class UnionAttribute : System.Attribute { }" : "");
         if (comparerStorage)
             source = source.Replace("public struct Int32 { }", "public struct Int32 { public int CompareTo(int other) => 0; public bool Equals(int other) => false; public new string ToString() => default; }")
+                .Replace("public struct Int64 { }", "public struct Int64 { public int CompareTo(long other) => 0; }")
                 .Replace("public sealed class String {", "public sealed class String { public static int CompareOrdinalIgnoreCase(string left, string right) => 0;");
         if (comparerStorage)
             source += "namespace System.Runtime.CompilerServices { public static class RuntimeServices { public static int StringHashOrdinalIgnoreCase(string value) => 0; } }";

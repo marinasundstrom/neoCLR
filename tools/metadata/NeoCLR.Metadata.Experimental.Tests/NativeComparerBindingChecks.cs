@@ -17,11 +17,12 @@ internal static class NativeComparerBindingChecks
             graph.BindNativeLibrary(reference, implementation, reference.Identity);
             var equals = graph.ImportReference(Method("String", "Equals"), reference.Identity);
             var compare = graph.ImportReference(Method("Int32", "CompareTo"), reference.Identity);
+            var compare64 = graph.ImportReference(Method("Int64", "CompareTo"), reference.Identity);
             var identity = graph.ImportReference(Method("Object", "ReferenceEquals"), reference.Identity);
             if (identity.Signature.ParameterTypes.Any(t => t != (SignatureType)graph.CoreObjectType))
                 throw new Exception("CLI Object signature lost explicit core scope");
             var hash = graph.ImportReference(Method("Object", "GetHashCode"), reference.Identity);
-            if (equals.RequiresManagedReceiver || !compare.RequiresManagedReceiver || !hash.RequiresVirtualDispatch)
+            if (equals.RequiresManagedReceiver || !compare.RequiresManagedReceiver || !compare64.RequiresManagedReceiver || !hash.RequiresVirtualDispatch)
                 throw new Exception("primitive or Object receiver contract lost");
             var main = graph.AddFunction("Main"); graph.EntryPoint = main;
             var il = main.GetILGenerator();
@@ -30,6 +31,12 @@ internal static class NativeComparerBindingChecks
             var value = il.DeclareLocal(PrimitiveType.Int32);
             il.LoadConstant(int.MinValue); il.StoreLocal(value); il.LoadLocalAddress(value);
             il.LoadConstant(int.MaxValue); il.Call(compare); il.LoadConstant(-1); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
+            var wide = il.DeclareLocal(PrimitiveType.Int64);
+            foreach (var (left, right, expected) in new[] { (long.MinValue, long.MaxValue, -1), (long.MaxValue, long.MinValue, 1), (42L, 42L, 0) })
+            {
+                il.Emit(OpCode.Ldc_I8, left); il.StoreLocal(wide); il.LoadLocalAddress(wide);
+                il.Emit(OpCode.Ldc_I8, right); il.Call(compare64); il.LoadConstant(expected); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
+            }
             il.Emit(OpCode.Ldstr, "café"); il.CastReference(graph.CoreObjectType); il.CallVirtual(hash);
             il.Emit(OpCode.Ldstr, "café"); il.CastReference(graph.CoreObjectType); il.CallVirtual(hash); il.Emit(OpCode.Ceq); il.Emit(OpCode.Brfalse, failed);
             il.Emit(OpCode.Ldstr, "same"); il.CastReference(graph.CoreObjectType); il.Emit(OpCode.Dup); il.Call(identity); il.Emit(OpCode.Brfalse, failed);
@@ -44,6 +51,11 @@ internal static class NativeComparerBindingChecks
             ("System.String.Equals", "receiver_byref", "true"),
             ("System.String.Equals", "is_virtual", "true"),
             ("System.Int32.CompareTo", "receiver_byref", "false"),
+            ("System.Int64.CompareTo", "receiver_byref", "false"),
+            ("System.Int64.CompareTo", "returns", "\"Int64\""),
+            ("System.Int64.CompareTo", "is_virtual", "true"),
+            ("System.Int64.CompareTo", "owner", "\"Int32\""),
+            ("System.Int64.CompareTo", "name", "\"System.Int64.Missing\""),
             ("System.Object.GetHashCode", "is_virtual", "false"),
             ("System.Object.GetHashCode", "returns", "\"Int64\"") })
         {

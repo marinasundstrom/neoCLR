@@ -46,7 +46,7 @@ public sealed partial class AssemblyBuilder
     /// <returns>A reference owned by this output builder, independent of the producer's mutable graph.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="InvalidDataException">Unsupported signature/owner, conflicting identity or module snapshot, incompatible core contract, or resource limit.</exception>
-    /// <remarks>With an explicit native System binding, core String and Int32 methods use validated intrinsic receiver signatures. Core Object.GetHashCode requires its exact virtual Int32 slot.
+    /// <remarks>With an explicit native System binding, core String, Int32 and Int64 methods use validated intrinsic receiver signatures. Core Object.GetHashCode requires its exact virtual Int32 slot.
     /// No core identity is inferred from the host or from primitive signature bytes. Nested public owners are supported; signed dependencies are unsupported. Generic nominal owners must be invariant and unconstrained; instance methods must be nongeneric.
     /// Nominal signature types must be public top-level unconstrained class/interface/value definitions in the same dependency; native cross-dependency signatures require the explicit-resolver overload; CLI cross-dependency decoding remains unsupported.
     /// Native primitive/nominal-reference/vector namespace functions, unconstrained static generic calls with method parameters, and bounded class methods/constructors are imported directly; native snapshots use an image fingerprint instead of a CLI MVID. Global references support native emission only. The native dependency must use the same format-5 naming contract as this writer.</remarks>
@@ -89,8 +89,8 @@ public sealed partial class AssemblyBuilder
             isVirtual && !isAbstract && (definition.Attributes & 7) == 6 &&
             definition.GetSignature().AsSpan().SequenceEqual(new byte[] { 0x20, 0, 0x08 });
         bool intrinsicPrimitiveOwner = NativeBindingFor(identity) is not null && identity.Equals(CoreLibrary) &&
-            type is { Namespace: "System", Name: "String" or "Int32", GenericArity: 0, DeclaringType: null } &&
-            type.IsValueType == (type.Name == "Int32");
+            type is { Namespace: "System", Name: "String" or "Int32" or "Int64", GenericArity: 0, DeclaringType: null } &&
+            type.IsValueType == (type.Name is "Int32" or "Int64");
         if (type is { GenericArity: > 0, CanImportReference: false })
             throw new InvalidDataException("unsupported imported method owner");
         if (!definition.IsStatic && (type is null || definition.GenericArity != 0 ||
