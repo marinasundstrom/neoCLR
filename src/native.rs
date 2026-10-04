@@ -95,6 +95,21 @@ pub(crate) enum Binding {
     ConsoleFlush,
 }
 
+/// Bind descriptor signatures against their actual source-owned nominal identity.
+/// Other services retain their existing exact physical-signature contract.
+pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Binding, Fault> {
+    if function.name == "neoCLR.Runtime.TypeModule"
+        && function.returns != Type::from_name("System.Introspection.ModuleInfo")
+    {
+        crate::reflection::source_module_provider(module, &function.returns)?;
+        let mut contract = function.clone();
+        contract.returns = Type::from_name("System.Introspection.ModuleInfo");
+        bind(&contract)
+    } else {
+        bind(function)
+    }
+}
+
 pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));

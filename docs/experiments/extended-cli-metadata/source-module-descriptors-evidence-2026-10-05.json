@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-05",
+  "runtime_base_revision": "2a3864b0b86f97aee11bf97fb732ff98e18688f0",
+  "implementation": "Working source changes committed with this record.",
+  "compiler_integration_revision": "185146e41",
+  "compiler_invoked": false,
+  "baseline": {
+    "command": "dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --source-module-runtime target/debug/neoclr /tmp/source-module-baseline1005b",
+    "result": "Previous runtime rejected verification with reflection binding signature mismatch."
+  },
+  "commands": [
+    {
+      "command": "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- --source-module-runtime target/debug/neoclr /tmp/source-module-final1005b",
+      "exit": 0,
+      "assertions": "valid PE verify=0/run=42; wrong layout verify=1/run=1 with provider layout mismatch"
+    },
+    {
+      "command": "dotnet run --no-build --project tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+      "exit": 0,
+      "groups_passed": 149
+    },
+    {
+      "command": "cargo test --lib source_module_tests",
+      "exit": 0,
+      "passed": 2
+    },
+    {
+      "command": "cargo test --test runtime_services",
+      "exit": 0,
+      "passed": 12
+    },
+    {
+      "command": "cargo test --test reflection",
+      "exit": 0,
+      "passed": 11
+    }
+  ],
+  "dependency": "Explicit empty System test seed. Interface/provider and service declarations belong to generated assembly. Not a production descriptor-library build.",
+  "sha256": {
+    "src/native.rs": "fae29037ea9b0bbdaefef18660071ad25257cf962a6c772c1f2d7c9f651c462f",
+    "src/reflection.rs": "57cb3c851443b04bdb6b4b1f045546ee5c6c222c5a433ee7a44de485f3e7ddd4",
+    "src/services.rs": "1537d0f7c6f5d36e90d6967082d507b1e5c236d53ccc0d7d0255006b338ef070",
+    "src/reachability.rs": "96e7d55079ba684713ee05838e1bb9f9ecf7de6adc29e4da8a7bc8034cb9e2f1",
+    "src/vm.rs": "58152e5fe1e67211596494eaf9e7fb15703631c2b58019e01a80da5b650efb1a",
+    "tools/metadata/NeoCLR.Metadata.Experimental.Tests/SourceModuleInfoChecks.cs": "268af25617272ec4d01d21e7890a759823d3f62609f1b733599ed92605373218",
+    "target/debug/neoclr": "1dec6f4af3a13782fe1fc117e74e34d2fa40321cf2826ac8eddc516964785f40",
+    "/tmp/source-module-final1005/Invalid.dll": "0d1f365958510be528f767b0a6438a8c92dae2bd1bfc9734a1599d5b4989ef65",
+    "/tmp/source-module-final1005/System.neoil": "df5a8ac68bd6d141da44747f6cbb057cb629950425dffb1d0e87798c09ae7030",
+    "/tmp/source-module-final1005/ModuleInfo.dll": "83ba4bb47c16af20ac084aba29b7ab13fd5b0442f212f898a7f7ea3d7a8540f1"
+  }
+}

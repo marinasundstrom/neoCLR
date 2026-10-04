@@ -1098,6 +1098,92 @@ pub(crate) fn from_identity(module: &Module, identity: &TypeIdentity) -> Result<
     })
 }
 
+/// Resolve the source-owned ModuleInfo provider in the contract's own assembly.
+/// The descriptive name selects a known ABI; it never replaces the nominal identity.
+pub(crate) fn source_module_provider(module: &Module, contract: &Type) -> Result<Type, Fault> {
+    let interface = module
+        .type_definition(contract)
+        .ok_or_else(|| Fault::new("missing source ModuleInfo contract"))?;
+    let origin = interface
+        .origin
+        .as_ref()
+        .ok_or_else(|| Fault::new("missing source ModuleInfo identity"))?;
+    if origin.name != "System.Introspection.ModuleInfo"
+        || interface.representation != Representation::Interface
+        || !interface.generic_parameters.is_empty()
+        || interface.declaring_type.is_some()
+    {
+        return Err(Fault::new("invalid source ModuleInfo contract"));
+    }
+    let mut candidates = module.types.iter().filter(|definition| {
+        definition.origin.as_ref().is_some_and(|candidate| {
+            candidate.assembly == origin.assembly
+                && candidate.module == origin.module
+                && candidate.name == "System.Introspection.RuntimeModuleInfo"
+        })
+    });
+    let provider = candidates
+        .next()
+        .ok_or_else(|| Fault::new("missing source ModuleInfo provider"))?;
+    if candidates.next().is_some()
+        || !provider.generic_parameters.is_empty()
+        || provider.declaring_type.is_some()
+        || !provider.is_reference_type
+        || provider.is_abstract
+    {
+        return Err(Fault::new(
+            "invalid or ambiguous source ModuleInfo provider",
+        ));
+    }
+    let ty = provider.open_type();
+    let fields = crate::inheritance::fields(module, &ty)?;
+    if !module.reference_assignable(&ty, contract)
+        || fields.len() != 2
+        || fields.iter().any(|field| field.ty != Type::String)
+        || fields[0].name != "StoredIdentity"
+        || fields[1].name != "StoredName"
+    {
+        return Err(Fault::new("source ModuleInfo provider layout mismatch"));
+    }
+    Ok(ty)
+}
+
+pub(crate) fn materialize_result(
+    module: &Module,
+    heap: &mut crate::ManagedHeap,
+    limits: &Limits,
+    value: Value,
+    expected: &Type,
+) -> Result<Value, Fault> {
+    if expected != &Type::from_name("System.Introspection.ModuleInfo")
+        && matches!(&value, Value::Object { ty, .. } if ty == &Type::from_name("System.Introspection.ModuleInfo"))
+    {
+        let ty = source_module_provider(module, expected)?;
+        let Value::Object { fields, .. } = value else {
+            unreachable!()
+        };
+        if fields.len() != 2
+            || fields
+                .iter()
+                .any(|field| !matches!(field, Value::String(_)))
+        {
+            return Err(Fault::new("source ModuleInfo snapshot mismatch"));
+        }
+        if heap.len() >= limits.heap_objects {
+            return Err(Fault::coded(
+                crate::FaultCode::HeapLimitExceeded,
+                "heap object limit exceeded",
+            ));
+        }
+        let index = heap.allocate(Value::Object { ty, fields })?;
+        return Ok(Value::ObjectReference(crate::value::ObjectReference {
+            reference: heap.address(index)?,
+            view: Some(expected.clone()),
+        }));
+    }
+    materialize(module, heap, limits, value)
+}
+
 /// Project trusted metadata snapshots into the library's declared storage categories.
 /// This is deliberately confined to reflection results, never arbitrary host inputs.
 pub(crate) fn materialize(
@@ -1347,5 +1433,119 @@ mod visibility_tests {
         assert!(!publicly_visible(&module, &Type::from_name("Public")));
         module.types[0].origin.as_mut().unwrap().publicly_visible = Some(true);
         assert!(publicly_visible(&module, &Type::from_name("Public")));
+    }
+}
+
+#[cfg(test)]
+mod source_module_tests {
+    use super::*;
+
+    fn fixture() -> Module {
+        let mut module = crate::assemble(".module Test\n.interface Contract\n.end\n.type class Provider\n.implements Contract\n.field private StoredIdentity String\n.field private StoredName String\n.end\n").unwrap();
+        for (index, name) in [
+            "System.Introspection.ModuleInfo",
+            "System.Introspection.RuntimeModuleInfo",
+        ]
+        .iter()
+        .enumerate()
+        {
+            module.types[index].origin = Some(
+                serde_json::from_value(serde_json::json!({
+                    "assembly": "Descriptors", "module": "Descriptors.dll", "name": name,
+                    "token": 0x02000001u32 + index as u32
+                }))
+                .unwrap(),
+            );
+        }
+        module
+    }
+
+    #[test]
+    fn provider_resolution_stays_in_the_contract_assembly_and_module() {
+        let module = fixture();
+        let contract = Type::from_name("Contract");
+        assert_eq!(
+            source_module_provider(&module, &contract).unwrap(),
+            Type::from_name("Provider")
+        );
+        for different_assembly in [true, false] {
+            let mut other = module.clone();
+            let origin = other.types[1].origin.as_mut().unwrap();
+            if different_assembly {
+                origin.assembly = "Other".into();
+            } else {
+                origin.module = "Other.dll".into();
+            }
+            assert!(
+                source_module_provider(&other, &contract)
+                    .unwrap_err()
+                    .to_string()
+                    .contains("missing source ModuleInfo provider")
+            );
+        }
+        let mut service = crate::assemble(".module Test\n.type System.Introspection.ModuleInfo\n.end\n.function neoCLR.Runtime.TypeModule(System.RuntimeTypeHandle handle) -> System.Introspection.ModuleInfo\n.methodimpl InternalCall\n.end\n").unwrap().functions.remove(0);
+        service.returns = contract.clone();
+        let uses = crate::services::uses(&module, &service).unwrap();
+        assert!(
+            uses.iter()
+                .any(|usage| usage.service == crate::RuntimeService::TypeInspection)
+        );
+        let mut ambiguous = module.clone();
+        let mut second = ambiguous.types[1].clone();
+        second.name = "OtherProvider".into();
+        ambiguous.types.push(second);
+        assert!(
+            source_module_provider(&ambiguous, &contract)
+                .unwrap_err()
+                .to_string()
+                .contains("ambiguous")
+        );
+    }
+
+    #[test]
+    fn snapshots_preserve_selected_identity_and_enforce_heap_limits() {
+        let module = fixture();
+        let contract = Type::from_name("Contract");
+        let snapshot = crate::assembly_info::module_value("Example", "Example.dll");
+        let mut heap = crate::ManagedHeap::default();
+        let result = materialize_result(
+            &module,
+            &mut heap,
+            &Limits::default(),
+            snapshot.clone(),
+            &contract,
+        )
+        .unwrap();
+        assert_eq!(result.ty(), contract);
+        let Value::ObjectReference(reference) = result else {
+            panic!()
+        };
+        assert_eq!(reference.concrete_type(), Type::from_name("Provider"));
+        let Value::Object { fields, .. } = reference.reference.read().unwrap() else {
+            panic!()
+        };
+        assert_eq!(
+            fields,
+            vec![
+                Value::String("Example".into()),
+                Value::String("Example.dll".into())
+            ]
+        );
+        let limits = Limits {
+            heap_objects: 0,
+            ..Limits::default()
+        };
+        assert!(
+            materialize_result(
+                &module,
+                &mut crate::ManagedHeap::default(),
+                &limits,
+                snapshot,
+                &contract
+            )
+            .unwrap_err()
+            .to_string()
+            .contains("heap object limit")
+        );
     }
 }

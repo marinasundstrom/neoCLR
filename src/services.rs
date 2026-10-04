@@ -58,7 +58,7 @@ pub struct MissingService {
     pub service: RuntimeService,
 }
 
-pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
+pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<ServiceUse>, Fault> {
     if function.pinvoke.is_some() {
         return Ok(vec![ServiceUse {
             service: RuntimeService::NativeInterop,
@@ -66,7 +66,8 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
         }]);
     }
     if function.is_internal_call() {
-        let service = match crate::native::bind(function)? {
+        let binding = crate::native::bind_in(module, function)?;
+        let service = match &binding {
             crate::native::Binding::Socket(_) => RuntimeService::SocketIo,
             crate::native::Binding::Resolve(_) => RuntimeService::NameResolution,
             #[cfg(test)]
@@ -185,7 +186,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             instruction: None,
         }];
         if matches!(
-            crate::native::bind(function)?,
+            &binding,
             crate::native::Binding::ReflectionConstruct
                 | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionProperty(_)
@@ -203,7 +204,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             );
         }
         if matches!(
-            crate::native::bind(function)?,
+            &binding,
             crate::native::Binding::NotifyWorker
                 | crate::native::Binding::Resolve(
                     crate::name_resolution::Operation::Lookup
@@ -226,7 +227,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             });
         }
         if matches!(
-            crate::native::bind(function)?,
+            &binding,
             crate::native::Binding::UnixTimeToLocal
                 | crate::native::Binding::ReflectionMember(_)
                 | crate::native::Binding::ReflectionMemberCheck(_)
@@ -242,7 +243,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
             });
         }
         if matches!(
-            crate::native::bind(function)?,
+            &binding,
             crate::native::Binding::AssemblyInfo(
                 crate::assembly_info::Query::References
                     | crate::assembly_info::Query::Modules
@@ -255,7 +256,7 @@ pub(crate) fn uses(function: &Function) -> Result<Vec<ServiceUse>, Fault> {
                 instruction: None,
             });
         }
-        if let crate::native::Binding::Reflection(query) = crate::native::bind(function)? {
+        if let crate::native::Binding::Reflection(query) = &binding {
             use crate::reflection::Query;
             if !matches!(
                 query,

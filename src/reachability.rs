@@ -194,7 +194,7 @@ pub(crate) fn analyze(
                 });
             }
         }
-        let services = crate::services::uses(&function)?;
+        let services = crate::services::uses(module, &function)?;
         nodes.push(ReachableFunction {
             target: FunctionRef {
                 definition: function.definition,

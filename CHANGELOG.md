@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Bind native TypeModule results to source-owned ModuleInfo interfaces and instantiate
+  their RuntimeModuleInfo provider within the same metadata assembly/module. Validate
+  the existing two-string layout, interface relationship and heap budget. Generated
+  native PE executes interface dispatch; production descriptor-library compilation
+  and JSON mapping are not yet complete.
+
 - Compile the runtime library's explicit native handle-service declarations through
   Raven into bodyless InternalCall metadata. A separate artifact-only consumer
   verifies and returns 42. Reject unsupported service declarations before output;

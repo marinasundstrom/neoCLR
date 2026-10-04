@@ -77,7 +77,9 @@ the next dependency boundary. The metadata API now
 [authors bodyless runtime-service functions](experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md),
 including output-owned result types. Raven now admits explicit internal declarations
 and executes the [source-owned handle-service gate](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
-Descriptor/factory integration and snapshot/vector ownership remain the next steps. The author reaffirmed on 2026-10-05 that reflection
+The first [source-owned module descriptor factory](experiments/extended-cli-metadata/source-module-descriptors-2026-10-05.md)
+also executes with assembly/module-scoped provider resolution. TypeInfo/member factories,
+production descriptor compilation and snapshot/vector ownership remain the next steps. The author reaffirmed on 2026-10-05 that reflection
 and JSON object mapping are the current proof point before expanding into sockets and
 HTTP. Reuse the internal-call/type-ownership foundation there, while validating network
 error, resource-lifetime and async contracts separately.

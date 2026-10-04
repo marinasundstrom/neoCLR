@@ -698,7 +698,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.instance && !class_owner)
                 || function.is_virtual
                 || function.is_abstract
-                || (function.is_internal_call() && !matches!(crate::native::bind(function)?,
+                || (function.is_internal_call() && !matches!(crate::native::bind_in(module, function)?,
                     crate::native::Binding::GenericDefaultTaskQueue | crate::native::Binding::GenericCurrentTaskQueue | crate::native::Binding::GenericRegisterTaskQueue))
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty()
@@ -869,7 +869,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                         "InternalCall must not have an IL body or locals",
                     ));
                 }
-                crate::native::bind(function)?;
+                crate::native::bind_in(module, function)?;
                 continue;
             }
             0 => (),
@@ -3562,7 +3562,7 @@ fn interpret_instructions_with_dispatch(
                         )?);
                         return Ok(None);
                     } else if callee.is_internal_call() {
-                        let binding = crate::native::bind(&callee)?;
+                        let binding = crate::native::bind_in(module, &callee)?;
                         if HostCall::supports(&binding) {
                             host_call = Some(HostCall::new(
                                 callee,
@@ -3815,7 +3815,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::AssemblyInfo(_)
                                 | crate::native::Binding::ExecutingAssembly
                         ) {
-                            crate::reflection::materialize(module, heap, &limits, value)?
+                            crate::reflection::materialize_result(module, heap, &limits, value, &callee.returns)?
                         } else {
                             value
                         };

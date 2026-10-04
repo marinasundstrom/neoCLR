@@ -110,3 +110,13 @@ runtime internal calls as bodyless global functions, retaining output-owned nomi
 signatures and exact service binding names through native import. This is a prerequisite
 for moving descriptor service contracts beside source-owned types, not production
 Raven declaration support yet. No competing descriptor definitions were added to core.
+
+
+## Source-owned descriptor factory checkpoint — 2026-10-05
+
+Source service declarations now execute through Raven. The next runtime boundary is
+[proven for ModuleInfo](source-module-descriptors-2026-10-05.md): generated native PE
+retains the interface's assembly identity, resolves its provider in the same source
+module, checks its real storage contract, and dispatches its getter. The test fixture
+is not the complete production descriptor source build. TypeInfo/member factories,
+Option and vector adaptation remain explicit pending work.

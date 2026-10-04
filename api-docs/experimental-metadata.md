@@ -7096,3 +7096,12 @@ C# tests cover definitions/builders, CLI/native/reference-projection flags, outp
 nominal result signatures and invalid graphs. Generated native PE executes with an
 explicit empty test seed, both directly and through a separate native metadata consumer.
 Unknown runtime services reject. See the [integration record](../docs/experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md).
+
+
+Runtime execution checkpoint (2026-10-05): native internal-call declarations can now
+return an output-owned System.Introspection.ModuleInfo interface through TypeModule.
+The runtime validates and materializes its source-owned provider; see the
+[scope, layout and executable contract](../docs/experiments/extended-cli-metadata/source-module-descriptors-2026-10-05.md).
+No new C# authoring member is required. This bounded runtime capability does not imply
+that arbitrary descriptor-returning services or the full production descriptor library
+are supported.
