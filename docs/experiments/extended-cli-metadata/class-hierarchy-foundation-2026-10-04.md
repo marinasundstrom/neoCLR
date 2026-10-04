@@ -66,3 +66,29 @@ Raven's equivalent driver test also uncovered an ordinary constructor binding de
 reproducing on main: initializer resolution was attempted before all source members
 were available, and binder re-entry could publish a different constructor symbol.
 That compiler correction is isolated independently of the metadata work.
+
+## Raven driver gate completed
+
+Raven `f38dbfb75` now emits ordinary local nongeneric class bases and bound direct
+base-constructor calls through its explicit native capability. Both .NET 10 and
+neoCLR compile the unchanged `bootstrap/class-base-consumer.rvn` and return 42.
+The source puts Derived before Base, initializes separate base and derived fields,
+upcasts to a base-typed alias and observes mutation through the original object.
+[Commands, hashes and bootstrap catalog](class-base-driver-2026-10-04.json).
+Run `bootstrap/verify_class_bases.py --help` for reproducible driver arguments.
+
+The general constructor fix is isolated on Raven's main-based branch
+`codex/fix-constructor-initializer-binding`, commit `2416a1646` (base `210d891e0`).
+The defect reproduced on main before changes. Twelve constructor diagnostics/runtime
+and canonical-symbol tests pass on that branch; 34 focused .NET tests pass on the
+integration branch. Main itself has not been changed. The five-source text-stream
+library and separate consumers also pass after the changes:
+[regression evidence](source-text-streams-after-class-bases-2026-10-04.json).
+
+JSON was retried against these artifacts. It still rejects
+`DocumentReader.Value(depth): Result<JsonValue, JsonError>` before publishing output.
+Its JsonValue closed family and protected constructor remain outside the admitted
+source type/member categories. Next extend those declaration facts through metadata,
+reader/facade and Raven, preserving closed-family versus CLI sealed-leaf semantics.
+External/constructed bases and class virtual/abstract dispatch remain separate gates;
+this local driver success does not establish those or complete JSON.

@@ -5728,3 +5728,14 @@ Canonical source-owned String/Char storage remains open; actual String reaches i
 explicit interface Count-property rejection. The eventual replacement is native source
 primitive ownership and accessor emission, not additional CLI application projections.
 [Evidence](experiments/extended-cli-metadata/text-services-native-2026-10-04.json).
+
+## Local inheritance driver checkpoint (2026-10-04)
+
+Raven `f38dbfb75` selects local nongeneric inheritance through an explicit native
+capability. Semantic base identity and constructor calls stay compiler-owned; native
+builders emit existing CLI Extends/native base relations and correct inherited storage
+indices. No importer handles cross into emission, and no application CLI projection is
+introduced. Primitive core, retained seed and Numbers ownership remain explicit inputs.
+The equivalent source executes on ordinary .NET. The general constructor-binding fix
+is separately validated on main-based `2416a1646`; main is not merged by this checkpoint.
+[Gate, limitations and hashes](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).

@@ -12,6 +12,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   TypeDef.Extends and native base relationships, and call direct base constructors
   through IILGenerator. Validate initialization before publication and preserve
   inherited field offsets. C# coverage executes both CLI and native PE construction.
+  Raven's paired driver now executes forward base declarations and mutation through
+  a base-typed alias on both runtimes. Isolate and validate its general constructor
+  binding fix on a branch based on main; preserve the source-built text-stream gate.
+  JSON's closed-family/protected-constructor categories remain unsupported.
 
 - Materialize local nongeneric native class bases in metadata definitions and the
   introspection facade, including standalone NEOX assembly snapshots. Reject cyclic,

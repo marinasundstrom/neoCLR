@@ -201,3 +201,8 @@ Development class-base authoring now supports ordinary local nongeneric inherita
 and direct base-constructor calls in the host metadata library. Generated assemblies
 execute with separate base and derived fields on .NET and neoCLR. This bounded
 checkpoint does not yet complete JSON's closed hierarchy or external class import.
+
+The Raven driver now executes a local inheritance and base-typed alias mutation case
+on both .NET and neoCLR. The source-built text-stream gate remains passing. JSON still
+requires closed-family and protected-constructor metadata support; broader external
+inheritance is not implied by this development checkpoint.

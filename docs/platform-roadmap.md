@@ -48,8 +48,12 @@ The [class-hierarchy foundation](experiments/extended-cli-metadata/class-hierarc
 now proves runtime inheritance across three binary assemblies and materializes bounded
 local native base relationships in reader/introspection views. Definition/builder authoring now preserves local nongeneric bases and direct constructor
 calls, including inherited field layout. C# tests execute the generated CLI/native PE.
-Raven integration is under validation; closed/protected, external and virtual hierarchy
-support remains necessary before admitting the JSON hierarchy.
+Raven's ordinary driver now compiles the same local inheritance/mutation consumer for
+.NET and neoCLR, and both execute with return 42. The general constructor binding fix
+is independently validated on a main-based Raven branch. Closed/protected, external
+and virtual hierarchy contracts remain open; JSON still rejects its closed-family
+signature before publishing output. Next complete closed-family/protected-constructor
+facts without weakening them to ordinary open/public declarations.
 
 The focused JSON DocumentReader/JsonValue source group also requires the standalone
 ReflectionError union in its explicit source dependencies; it does not yet require

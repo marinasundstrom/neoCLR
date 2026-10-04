@@ -10732,3 +10732,21 @@ identity properties now fail with RAV0330, independently of writer validation.
 - Open: text-stream required-result lowering, cumulative bootstrap String binding,
   JSON, class inheritance, metadata-handle services and full dual-target library parity.
 - Evidence: [encoding milestone](experiments/extended-cli-metadata/source-encoding-2026-10-04.md).
+
+## 2026-10-04 — Native inheritance exposes a general Raven constructor defect
+
+- Author directed continued work on the immediate blockers and welcomed discovering
+  general Raven issues while implementing the neoCLR target.
+- Assistant extended the host metadata writer from reader-only class bases to local
+  base authoring, constructor calls and inherited field layout, then connected Raven's
+  semantic base/constructor operations to that writer.
+- The paired test exposed an ordinary .NET omission of base initialization. Assistant
+  reproduced it on Raven main, moved explicit initializer resolution after member
+  registration, and retained canonical constructor symbols without skipping declaration
+  diagnostics. A test caught and prevented a transient lost-static-initializer diagnostic.
+- Performed: isolated the compiler fix as `2416a1646` on a branch based on main, with
+  12 focused tests. Integration `f38dbfb75` passes 34 focused tests and paired driver
+  execution. Metadata has 145 passing groups; text-stream consumers remain passing.
+  Main has not been merged. [Evidence and remaining scope](experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
+- Open: JSON still fails before output at its closed-family signature. Closed/protected
+  declarations, broader inheritance and the full class-library gate remain unfinished.

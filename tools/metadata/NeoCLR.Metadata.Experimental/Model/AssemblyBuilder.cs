@@ -198,6 +198,12 @@ public sealed partial class AssemblyBuilder
     public TypeBuilder AddClass(string @namespace, string name, TypeVisibility visibility = TypeVisibility.Public)
         => AddTypeCore(@namespace, name, visibility, isStatic: false);
     /// <summary>Adds a nongeneric reference class derived from an owned ordinary class.</summary>
+    /// <param name="namespace">Metadata namespace, possibly empty.</param>
+    /// <param name="name">Nonempty unique metadata name.</param>
+    /// <param name="baseType">Already attached ordinary nongeneric base in this output.</param>
+    /// <param name="visibility">Public or Internal visibility.</param>
+    /// <returns>The attached derived type builder.</returns>
+    /// <exception cref="ArgumentNullException">The base is null.</exception>
     /// <remarks>The base must already be attached. Constructors explicitly call a direct base constructor through their IL generator.</remarks>
     /// <exception cref="ArgumentException">The base is foreign, generic, nested, static, an interface or a value type.</exception>
     public TypeBuilder AddClass(string @namespace, string name, TypeBuilder baseType, TypeVisibility visibility = TypeVisibility.Public)

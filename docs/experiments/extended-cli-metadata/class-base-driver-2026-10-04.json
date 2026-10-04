@@ -1,0 +1,142 @@
+{
+  "scope": "Local nongeneric class bases, constructor chaining, inherited field mutation and alias identity; both targets execute. External/virtual/closed hierarchies and JSON remain open.",
+  "runtimeRevision": "f02f893d5557fd1ecb4c0c4179c5065a1692e248",
+  "compilerRevision": "6bf0fb4fd84252a9d6cdcf97e961e73eda61cf51",
+  "revisionsAreWorkingTreeBases": true,
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/class-base-consumer.rvn": "620f52c82a501e899e80965ad142161df8392f6a6430a025a0e49865fc269916",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_class_bases.py": "4878c758315a4c0574159bec049127faebe6a8c3bb45ec1489b84c81cef7fe03",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "a05a8c4cc4fcd8e88850d88e6c37bbef4dc9101b28bd64f0f4c04731bfb3db4c",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "660cc942e296b5c9c5f0d321161c4fed9f83926658ffc7195ef8904673763956",
+    "/private/tmp/TextCore1004.dll": "a468edca76ea30bab4c4ffab39f43afdc8011a6d952d0e761a62137f0970fe66",
+    "/private/tmp/source-text-committed1004/System.neox": "b6bcaa4330c06242b45ac68f6e672bf3bf1f441611bf636d5749f23bcd36ed68",
+    "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
+    "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
+    "/private/tmp/class-base-final1004/DotNet.dll": "46b2d65a25d5797b973236b306aa8be5d945012ece490361e6d10ee0711adbcc",
+    "/private/tmp/class-base-final1004/Native.dll": "353c7241ba3925393567f688297ffa0f1deb76510df5a792b89d3d886add415f",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.Console.dll": "200bd1f3b29d4feab081661eda5618dd8a0951cb55f49cde7caf9ae39daab7dd",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "62e1bedd59b9ba4f85b2235a491695c24535c36da0b87dfaa952541398666162",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "a3c46cdba887d2bb6c65b658e859d28f9e85082394521e5739cf64f39d20e146",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ae345899973678f2b1576fb2cb694214cc181c9a244a422a89d9d2dd01f1783c"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/private/tmp/class-base-final1004/DotNet.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/class-base-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,4s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/private/tmp/class-base-final1004/DotNet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/TextCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/source-text-committed1004/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/source-text-committed1004/ownership.json",
+        "--reference",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "-o",
+        "/private/tmp/class-base-final1004/Native.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/class-base-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/class-base-final1004/Native.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_5DE9C8DEAD106170E45E5DE6FAC88AC46CDA0E8C6722A9D9C41CC902173F16E0: typed-stack/control-flow verification passed (663 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/class-base-final1004/Native.dll",
+        "--module",
+        "/private/tmp/source-text-committed1004/Numbers.dll",
+        "--system",
+        "/private/tmp/source-text-committed1004/System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "verifiedCompilerCommit": "f38dbfb75",
+  "isolatedMainFixCommit": "2416a1646",
+  "metadataAuthoringCommit": "f02f893d",
+  "validation": {
+    "metadataContractGroups": 145,
+    "isolatedMainConstructorTests": 12,
+    "integrationConstructorAndEmissionTests": 34,
+    "guestApiSnapshot": "pre-existing stale snapshot; manual host API reference updated"
+  },
+  "jsonFrontier": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/private/tmp/TextCore1004.dll",
+      "--runtime-seed",
+      "/private/tmp/source-text-committed1004/System.neox",
+      "--bootstrap-intrinsics",
+      "--bootstrap-ownership",
+      "/tmp/streams-after-class-base1004/ownership.json",
+      "--reference",
+      "/private/tmp/source-text-committed1004/Numbers.dll",
+      "--reference",
+      "/private/tmp/source-encoding-gate1004c/Encoding.dll",
+      "--reference",
+      "/tmp/streams-after-class-base1004/TextStreams.dll",
+      "--library",
+      "-o",
+      "/tmp/json-after-local-bases1004.dll",
+      "runtime/raven/src/System/Data/Json/JsonDocument.rvn",
+      "runtime/raven/src/System/Data/Json/JsonSyntax.rvn",
+      "runtime/raven/src/System/Data/Json/JsonValue.rvn",
+      "runtime/raven/src/System/Data/Json/JsonError.rvn",
+      "runtime/raven/src/System/Runtime/Reflection/ReflectionError.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "warning RAV2103: This catch-all never matches.\nerror NEOMETA001: Native emission does not support callable declaration: func Value(depth: int) -> Result<JsonValue, JsonError>.\n",
+    "outputPublished": false
+  }
+}

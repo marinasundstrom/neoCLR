@@ -56,7 +56,7 @@ public sealed partial class TypeDefinition
     private readonly IList<MethodDefinition>? authoredMethods;
     private readonly IList<PropertyDefinition>? authoredProperties;
     /// <summary>Creates a detached type declaration with CLI attributes and an explicit base reference.</summary>
-    /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric interfaces, static/root classes and sealed sequential value types.</remarks>
+    /// <remarks>Attach to an authored module's Types collection. This slice admits nongeneric interfaces, static/root classes, ordinary local derived classes and sealed sequential value types.</remarks>
     public TypeDefinition(string @namespace, string name, uint attributes, TypeReference? baseType)
     {
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 || (name + @namespace).Any(char.IsControl))
