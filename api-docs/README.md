@@ -937,3 +937,12 @@ literal overloads, documented in the existing manual host API reference. The exi
 host-API exclusion from guest RavenDoc remains unchanged. `build-api-docs.py --check`
 still reports the previously recorded stale guest snapshot; this slice neither changes
 guest APIs nor refreshes them from an unmatched bridge. No website build was run.
+
+
+### Static interface metadata checkpoint (2026-10-04)
+
+The manual experimental host reference covers the static AddInterfaceMethod overload,
+detached static contract flags, completed external contracts and inherited Self views.
+The 136 C# metadata groups pass, including CLI constrained static dispatch and native
+round trips. Guest API declarations did not change. The required snapshot check still
+reports the existing stale guest snapshot; no mismatched bridge refresh was performed.

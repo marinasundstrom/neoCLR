@@ -1,0 +1,24 @@
+import System.*
+
+public struct Scalar : Number {
+    private var value: int
+
+    init(value: int) {
+        self.value = value
+    }
+
+    val Value: int => value
+    static val Zero: Self => Scalar(0)
+    static val One: Self => Scalar(1)
+
+    static func +(left: Self, right: Self) -> Self => Scalar(left.value + right.value)
+    static func -(left: Self, right: Self) -> Self => Scalar(left.value - right.value)
+    static func *(left: Self, right: Self) -> Self => Scalar(left.value * right.value)
+    static func /(left: Self, right: Self) -> Self => Scalar(left.value / right.value)
+
+    func CompareTo(other: Self) -> int {
+        if value < other.value { return -1 }
+        if value > other.value { return 1 }
+        return 0
+    }
+}

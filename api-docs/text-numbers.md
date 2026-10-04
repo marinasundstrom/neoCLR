@@ -83,3 +83,11 @@ writes `Self` for the concrete implementing type. This marker has no constructib
 runtime value. Change old `where T: Number<T>` constraints to `where T: Number` and
 rebuild against matching references. The numeric importer retains native Self
 dispatch while specializing its currently supported closed helper functions.
+
+
+The separate native metadata/compiler integration branch now emits the unchanged
+Number interface and imports it into a separately compiled ordinary struct and
+consumer. Direct operators, identities and ordering execute. This is a contract
+integration checkpoint, not completion of source-built numeric primitives or generic
+Number emission on that newer path; the older bridge's closed specialization evidence
+above remains distinct.

@@ -31,7 +31,10 @@ The metadata writer now admits Single/Double and executes an API-authored arithm
 NaN and signed-zero program on both runtimes. Raven now compiles a separate floating
 library and imports its artifacts on both targets, with native parsing payload execution;
 [evidence](experiments/extended-cli-metadata/floating-dual-2026-10-04.json).
-Source primitive declarations and static Number contracts remain open.
+The author subsequently clarified that the active story covers the entire numeric
+family and Number interface, not just arithmetic emission. Static Number declaration,
+import and direct implementation calls now execute; intrinsic primitive ownership and
+generic Self dispatch remain open. See the strategy's Number integration checkpoint.
 Follow with numeric/inheritance emission, canonical source-owned core,
 callback/storage/generic coverage and typeof/introspection integration, re-ranking from
 the first independently reproduced failures. Design ownership alongside the service

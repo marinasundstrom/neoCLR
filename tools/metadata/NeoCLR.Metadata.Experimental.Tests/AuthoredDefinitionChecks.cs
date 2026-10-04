@@ -215,7 +215,6 @@ internal static class AuthoredDefinitionChecks
         answerBody.LoadConstant(42); answerBody.NewObject(constructorBody); answerBody.CallVirtual(MethodBuilder.ForDefinition(contractRead)); answerBody.Return();
         Reject<InvalidOperationException>(() => contract.Methods.Add(new MethodDefinition("Concrete", (ushort)MethodAttributes.Public, PrimitiveMethodSignature.Int32(0, true))));
         Reject<ArgumentException>(() => new MethodDefinition("Incomplete", (ushort)(MethodAttributes.Public | MethodAttributes.Abstract), PrimitiveMethodSignature.Int32(0, true)));
-        Reject<ArgumentException>(() => new MethodDefinition("Static", (ushort)(MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.Abstract | MethodAttributes.Virtual | MethodAttributes.NewSlot), PrimitiveMethodSignature.Int32(0, true)));
         var invalidInterface = new TypeDefinition("Example", "InvalidInterface", 0xa1, null);
         invalidInterface.Fields.Add(new FieldDefinition("Storage", (ushort)FieldAttributes.Public, PrimitiveType.Int32));
         Reject<ArgumentException>(() => assembly.MainModule.Types.Add(invalidInterface));

@@ -1,0 +1,8 @@
+func Main() -> int {
+    let left = Scalar(6)
+    let right = Scalar(2)
+    let actual = ((left + right) * (right + Scalar.One) - left + Scalar.Zero) / right
+    if actual.CompareTo(Scalar(9)) != 0 { return 1 }
+    if Scalar.Zero.Value != 0 || Scalar.One.Value != 1 { return 2 }
+    return 42
+}

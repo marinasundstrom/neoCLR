@@ -31,12 +31,12 @@ public sealed partial class AssemblyBuilder
         return bases.Select(b => b.Substitute(t => SubstituteExternalInterfaceType(t, reference)));
     }
 
-    internal IEnumerable<(string Name, MethodSignature Signature)> ExternalInterfaceMethods(ImportedTypeReference reference)
+    internal IEnumerable<(string Name, MethodSignature Signature, bool IsStatic, MethodBuilder Declaration)> ExternalInterfaceMethods(ImportedTypeReference reference)
     {
         if (!completedInterfaceContracts.TryGetValue(InterfaceDefinition(reference), out var methods))
             throw new InvalidDataException("external interface contract is incomplete: " + reference);
         return methods.Select(m => (m.Name, new MethodSignature(SubstituteExternalInterfaceType(m.Signature.ReturnType, reference),
-            m.Signature.ParameterTypes.Select(t => SubstituteExternalInterfaceType(t, reference)), outParameters: m.Signature.OutParameters)));
+            m.Signature.ParameterTypes.Select(t => SubstituteExternalInterfaceType(t, reference)), outParameters: m.Signature.OutParameters), m.IsStatic, m.Target));
     }
 
     private static SignatureType SubstituteExternalInterfaceType(SignatureType type, ImportedTypeReference owner) =>
@@ -86,7 +86,7 @@ public sealed partial class AssemblyBuilder
             source.DeclaringType is not null || !IsAuthoredInterface(target) ||
             InterfaceDefinition(source).Equals(InterfaceDefinition(target)) || HasAuthoredInterfaceConversion(target, source, definitionsOnly: true))
             throw new ArgumentException("invalid or cyclic interface conversion");
-        ((SignatureType)target).ValidateOwner(this, typeArity: source.GenericArity);
+        ((SignatureType)target).ValidateOwner(this, typeArity: source.GenericArity, allowSelf: IsAuthoredInterface(source));
         authoredInterfaceBases.TryGetValue(source, out var edges);
         if (edges?.Contains(target) == true) return;
         if (completedInterfaceContracts.ContainsKey(source)) throw new InvalidOperationException("interface contract is complete");

@@ -41,7 +41,7 @@ public sealed partial class MethodDefinition
     }
     /// <summary>Creates a detached type method, constructor, bounded value override or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; public instance interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
+    /// <param name="attributes">Public, Assembly or Private; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. A public value-type ToString override uses Virtual without Abstract or NewSlot.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
@@ -57,7 +57,7 @@ public sealed partial class MethodDefinition
         if (valueOverride && ((attributes & 0x17) != 6 || name != "ToString" ||
             signature.ReturnType != PrimitiveType.String || signature.ParameterTypes.Count != 0 || signature.GenericParameterNames.Count != 0))
             throw new ArgumentException("only public parameterless String-returning ToString overrides are supported");
-        if (contract && ((attributes & 0x540) != 0x540 || (attributes & 0x17) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
+        if (contract && ((attributes & 0x540) != 0x540 || (attributes & 7) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
             throw new ArgumentException("invalid interface method flags or signature");
         bool constructor = name == ".ctor";
         if (constructor && ((attributes & 0x10) != 0 || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||

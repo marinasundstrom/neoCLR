@@ -71,7 +71,7 @@ public sealed class ConstructedTypeInfo : TypeInfo
         Definition = definition; TypeArguments = Array.AsReadOnly(arguments);
         fields = new(() => context.ProjectFields(definition.Definition, this, TypeArguments));
         properties = new(() => context.ProjectProperties(Definition.Definition, this, TypeArguments));
-        interfaces = new(() => context.ProjectInterfaces(Definition.Definition, TypeArguments));
+        interfaces = new(() => context.ProjectInterfaces(Definition.Definition, TypeArguments, this));
         allInterfaces = new(() => context.ProjectInterfaceClosure(this));
     }
     /// <summary>Gets the canonical open declaration.</summary>

@@ -76,7 +76,7 @@ public sealed class NominalTypeInfo : TypeInfo
         parameters = Array.AsReadOnly(Enumerable.Range(0, definition.GenericArity).Select(i => (TypeInfo)new GenericParameterTypeInfo(context, this, i)).ToArray());
         fields = new(() => context.ProjectFields(definition, this, parameters));
         properties = new(() => context.ProjectProperties(definition, this, parameters));
-        interfaces = new(() => context.ProjectInterfaces(definition, parameters));
+        interfaces = new(() => context.ProjectInterfaces(definition, parameters, this));
         allInterfaces = new(() => context.ProjectInterfaceClosure(this));
         attributes = new(() => Array.AsReadOnly(definition.CustomAttributes.Select(a => new CustomAttributeInfo(context, a)).ToArray()));
     }

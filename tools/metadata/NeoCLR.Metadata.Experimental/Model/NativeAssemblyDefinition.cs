@@ -309,7 +309,7 @@ public sealed partial class NativeAssemblyDefinition
                     if (parent < 0)
                     {
                         typeArity = types[i].GenericNames.Length;
-                        var external = ReadType(inherited, false);
+                        var external = ReadType(inherited, false, allowSelf: types[i].IsInterface);
                         Require(external.ImportedType is { IsValueType: false }, "invalid external interface relationship");
                         types[i].InterfaceSignatures.Add(external);
                         typeArity = 0;
@@ -318,7 +318,7 @@ public sealed partial class NativeAssemblyDefinition
                     if (constructed)
                     {
                         typeArity = types[i].GenericNames.Length;
-                        var inheritedType = signatureOwners[parent].MakeGenericInstance(Array(instance, "arguments", 32).Select(a => ReadType(a, false)).ToArray());
+                        var inheritedType = signatureOwners[parent].MakeGenericInstance(Array(instance, "arguments", 32).Select(a => ReadType(a, false, allowSelf: types[i].IsInterface)).ToArray());
                         types[i].InterfaceSignatures.Add(inheritedType);
                         if (types[i].IsInterface) signatureOwners[i].AddBaseInterface(inheritedType);
                         else signatureOwners[i].AddInterfaceImplementation(inheritedType);
@@ -527,8 +527,8 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
                 Require(receiverByRef == (instance && types[ownerIndex].IsValueType), "value instance receiver must be byref");
                 var interfaceOwner = ownerIndex >= 0 && types[ownerIndex].IsInterface;
-                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner || isOverride), "interface method flags mismatch");
-                Require(!interfaceOwner || instance && visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
+                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner && instance || isOverride), "interface method flags mismatch");
+                Require(!interfaceOwner || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract interface method");
                 Require(!isOverride || !interfaceOwner && instance && types[ownerIndex].IsValueType &&
                     visibility == MethodVisibility.Public && name == "ToString" && resultType == PrimitiveType.String &&
@@ -694,7 +694,7 @@ public sealed partial class NativeAssemblyDefinition
         {
             var signature = new MethodSignature(Remap(method.Signature.ReturnType), method.Signature.ParameterTypes.Select(Remap), method.Signature.GenericParameterNames, method.Signature.OutParameters);
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
-                : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature)
+                : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature, !method.Instance)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)

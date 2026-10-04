@@ -359,3 +359,25 @@ the actual Single/Double source declarations or implement static Number/Self dis
 Revisit those static contracts and canonical source primitive ownership next; missing
 formatting/comparison services remain explicit catalog work. The primitive floating
 unary binding correction is independently isolated on Raven's main-based fix branch.
+
+
+## Number integration checkpoint (2026-10-04)
+
+The author clarified the active story as the entire numeric family and Number interface.
+The unchanged Number source now emits separately with static Zero/One/operators and
+external ComparableTo<Self> inheritance. A separate Scalar struct and source-free
+consumer execute direct arithmetic, identities and ordering. This fixture tests the
+contract; it does not stand in for the ten primitive numeric sources. Metadata C# tests
+also execute CLI constrained static dispatch and validate detached/builder parity and
+static-vs-instance implementation rejection. See `bootstrap/verify_number_contracts.py`.
+
+Actual Single.rvn advances past unsupported operator declarations to an ownership error:
+`missing public interface implementation: get_Zero`. Binding already substitutes native
+Self with the selected canonical primitive; metadata conformance currently substitutes
+the ordinary nominal source owner. Do not resolve this by accepting arbitrary wrong
+return types. Next establish explicit intrinsic primitive declarations/storage and
+canonical import ownership, followed by the remaining numeric widths, checked runtime
+service selection and generic Number callself emission. Verify the existing complete
+numeric consumer across all ten types, parsing boundaries and NaN ordering before
+claiming this story complete. Preserve the CLI primitive bootstrap explicitly while
+source ownership transitions; duplicate seed implementations must be removed.

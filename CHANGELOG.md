@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-04
 
+- Author/read static interface contracts and inherited ComparableTo<Self> through the
+  metadata definitions, builders and introspection views. Validate static/instance
+  implementation identity and emit CLI MethodImpl rows. Actual Number source, a
+  separate struct implementation and artifact-only consumer execute direct arithmetic,
+  identities and ordering natively. Intrinsic numeric storage and generic callself
+  compiler emission remain open; this is not completion of the numeric family.
+
 - Add Single/Double signatures, exact-bit floating literals and numeric conversions
   to the experimental metadata IL generator. CLI and native output execute the same
   arithmetic, NaN and signed-zero checks. Graph-based binary emission selects existing

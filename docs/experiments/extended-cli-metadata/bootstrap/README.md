@@ -962,3 +962,16 @@ uses CLI projection fallback. Native symbol import maps primitive introspection 
 to the selected core; emission consumes symbol contracts through the independent adapter.
 The primitive CLI bootstrap remains temporary. Actual Single/Double source classes,
 static Number contracts and full source-owned primitive replacement are not established.
+
+
+### Number contract gate (2026-10-04)
+
+`verify_number_contracts.py` uses the same compiler/runtime/core/seed/base-library/
+ownership/output arguments as `verify_self.py`. It creates an explicit Self-configured
+manifest, compiles actual `System/Number.rvn`, then `number-scalar.rvn` and its consumer
+in separate invocations. The consumer sees artifacts only and exits 42; a static One
+replaced by an instance member rejects with RAV0330 before output publication.
+The fixture exercises static contracts, imported operators and inherited ordering.
+It deliberately does not claim intrinsic primitive storage or generic Self calls;
+actual Single source still reproduces the ownership/conformance blocker recorded in
+the strategy. [Evidence](../number-contracts-2026-10-04.json).

@@ -82,7 +82,7 @@ public sealed partial class TypeBuilder
     }
 
     /// <summary>Adds an external interface implementation to a root class or value type.</summary>
-    /// <remarks>All required public instance methods are checked against the completed external contracts when writing.</remarks>
+    /// <remarks>All required public methods, including static/instance classification, are checked against the completed external contracts when writing.</remarks>
     /// <exception cref="ArgumentException">The reference is foreign, unregistered, duplicate or has invalid generic scope.</exception>
     /// <exception cref="InvalidOperationException">The owner is not a root class or value type.</exception>
     public void AddInterfaceImplementation(ImportedTypeReference contract)
@@ -103,7 +103,7 @@ public sealed partial class TypeBuilder
     {
         if (!IsInterface && IsStatic) throw new InvalidOperationException("interface relationship requires an interface or root class or value type");
         SignatureType signature = contract;
-        signature.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        signature.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count, allowSelf: IsInterface);
         if (externalInterfaces.Contains(contract) || externalInterfaces.Count >= 256) throw new ArgumentException("duplicate or excessive interface relationship");
         externalInterfaces.Add(contract);
     }
@@ -131,12 +131,15 @@ public sealed partial class TypeBuilder
         }
         return InterfaceSignatures.SelectMany(Visit);
     }
-    internal IEnumerable<(string Name, MethodSignature Signature)> RequiredInterfaceMethods => InheritedContracts().SelectMany(contract =>
-        contract.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
-        (contract.GenericInstance?.Definition ?? contract.ClassType!).Methods.Select(method => (method.Name, Signature:
-            contract.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature)))
-        .Select(contract => (contract.Name, new MethodSignature(ResolveImplementationSelf(contract.Signature.ReturnType),
-            contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), outParameters: contract.Signature.OutParameters)));
+    internal IEnumerable<(string Name, MethodSignature Signature, bool IsStatic, MethodBuilder Declaration, SignatureType Owner)> RequiredInterfaceMethods =>
+        InheritedContracts().SelectMany(owner =>
+            (owner.ImportedType is { } external ? Assembly.ExternalInterfaceMethods(external) :
+                (owner.GenericInstance?.Definition ?? owner.ClassType!).Methods.Select(method => (method.Name, Signature:
+                    owner.GenericInstance is { } instance ? new ConstructedMethodReference(method, instance.TypeArguments.ToArray(), []).Signature : method.Signature,
+                    method.IsStatic, Declaration: method)))
+            .Select(contract => (contract.Name, new MethodSignature(ResolveImplementationSelf(contract.Signature.ReturnType),
+                contract.Signature.ParameterTypes.Select(ResolveImplementationSelf), outParameters: contract.Signature.OutParameters),
+                contract.IsStatic, contract.Declaration, owner)));
 
     private SignatureType ResolveImplementationSelf(SignatureType type) => type.IsSelf && !IsInterface
         ? GenericParameterNames.Count == 0 ? this : MakeGenericInstance(Enumerable.Range(0, GenericParameterNames.Count).Select(SignatureType.TypeParameter).ToArray())
@@ -162,7 +165,7 @@ public sealed partial class TypeBuilder
         if (!contract.Definition.IsInterface || !ReferenceEquals(contract.Definition.Assembly, Assembly) ||
             contract.Definition.Reaches(this) || constructedInterfaces.Count >= 256 || constructedInterfaces.Contains(contract))
             throw new ArgumentException("unsupported or duplicate constructed interface");
-        foreach (var argument in contract.TypeArguments) argument.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count);
+        foreach (var argument in contract.TypeArguments) argument.ValidateOwner(Assembly, typeArity: GenericParameterNames.Count, allowSelf: IsInterface);
         constructedInterfaces.Add(contract);
     }
     internal bool ConformsTo(GenericTypeInstance contract) => InheritedContracts().Any(t => Equals(t.GenericInstance, contract));
@@ -170,14 +173,14 @@ public sealed partial class TypeBuilder
     internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InheritedContracts().Any(t => ReferenceEquals(t.ClassType, contract));
     internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
     internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
-        RequiredInterfaceMethods.Any(c => c.Name == method.Name && c.Signature.Matches(method.Signature));
+        RequiredInterfaceMethods.Any(c => !c.IsStatic && c.Name == method.Name && c.Signature.Matches(method.Signature));
 
     /// <summary>Declares implicit public implementation of an owned nongeneric interface.</summary>
     /// <param name="contract">An interface from this assembly, including its inherited contracts.</param>
     /// <exception cref="ArgumentNullException">Contract is null.</exception>
     /// <exception cref="ArgumentException">Foreign, generic, duplicate or noninterface contract, or limit exceeded.</exception>
     /// <exception cref="InvalidOperationException">Owner is not a root class or value type.</exception>
-    /// <remarks>Writing requires an exact public instance implementation for every inherited method.</remarks>
+    /// <remarks>Writing requires an exact public implementation, including static/instance classification, for every inherited method.</remarks>
     public void AddInterfaceImplementation(TypeBuilder contract)
     {
         ArgumentNullException.ThrowIfNull(contract);
@@ -206,10 +209,23 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">Invalid/duplicate signature, generic method or exceeded limit.</exception>
     /// <exception cref="InvalidOperationException">Owner is not an interface.</exception>
     public MethodBuilder AddInterfaceMethod(string name, MethodSignature signature)
+        => AddInterfaceMethod(name, signature, false);
+
+    /// <summary>Adds a public abstract instance or static interface contract.</summary>
+    /// <param name="name">Nonempty simple metadata name.</param>
+    /// <param name="signature">Nongeneric signature; native Self is allowed.</param>
+    /// <param name="isStatic">True for a contract with no receiver.</param>
+    /// <returns>A bodyless declaration.</returns>
+    /// <exception cref="ArgumentNullException">Null signature.</exception>
+    /// <exception cref="ArgumentException">Invalid name/signature, duplicate method or exceeded limit.</exception>
+    /// <exception cref="InvalidOperationException">Owner is not an interface.</exception>
+    /// <remarks>Instructions and locals are forbidden. Static implementation matching is exact;
+    /// native constrained Self calls are a separate emission category.</remarks>
+    public MethodBuilder AddInterfaceMethod(string name, MethodSignature signature, bool isStatic)
     {
         ArgumentNullException.ThrowIfNull(signature);
         if (signature.GenericParameterNames.Count != 0) throw new ArgumentException("generic interface methods are not supported yet", nameof(signature));
-        return AddMethodCore(name, signature, MethodVisibility.Public, false, false, abstractContract: true);
+        return AddMethodCore(name, signature, MethodVisibility.Public, isStatic, false, abstractContract: true);
     }
 }
 

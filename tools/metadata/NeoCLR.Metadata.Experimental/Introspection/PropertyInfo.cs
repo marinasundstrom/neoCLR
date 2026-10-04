@@ -41,7 +41,7 @@ public sealed partial class MetadataLoadContext
     internal IReadOnlyList<PropertyInfo> ProjectProperties(TypeDefinition definition, TypeInfo owner, IReadOnlyList<TypeInfo> arguments)
         => Array.AsReadOnly(definition.Properties.Select(p => new PropertyInfo(this, p, owner, arguments)).ToArray());
 
-    internal IReadOnlyList<TypeInfo> ProjectInterfaces(TypeDefinition definition, IReadOnlyList<TypeInfo> arguments)
+    internal IReadOnlyList<TypeInfo> ProjectInterfaces(TypeDefinition definition, IReadOnlyList<TypeInfo> arguments, TypeInfo owner)
         => Array.AsReadOnly(definition.Interfaces.Select(relationship =>
         {
             var target = Resolve(relationship.InterfaceType);
@@ -53,7 +53,7 @@ public sealed partial class MetadataLoadContext
             }
             try
             {
-                return target.MakeGenericType(relationship.TypeArguments.Select(t => ResolveSignature(t, arguments)).ToArray());
+                return target.MakeGenericType(relationship.TypeArguments.Select(t => ResolveMemberSignature(t, arguments, [], owner)).ToArray());
             }
             catch (ArgumentException error)
             {

@@ -14,7 +14,7 @@ public sealed partial class AssemblyBuilder
     /// <exception cref="InvalidDataException">Unsupported signature, conflicting contract or reference limit.</exception>
     /// <exception cref="InvalidOperationException">A new method is added after interface completion.</exception>
     /// <remarks>The caller supplies public nonvirtual class semantics or an abstract interface contract. No dependency is loaded or verified.
-    /// Authored interfaces require nongeneric abstract instance contracts and emit virtual dispatch. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
+    /// Authored interfaces require nongeneric abstract contracts. Instance contracts use virtual dispatch; static contracts have no receiver. Writable ref/out parameters are supported; byref constructors, instance generic methods are unsupported. Value/nested owners retain managed receiver and physical scope semantics.
     /// Dependency identity, core and artifact checks are established by the declaring type reference.</remarks>
     public ImportedMethodReference CreateMethodReference(ImportedTypeReference declaringType, string name,
         MethodSignature signature, bool isStatic = false, bool isOverride = false)
@@ -30,8 +30,8 @@ public sealed partial class AssemblyBuilder
             throw new ArgumentException("override reference requires instance value ToString(): String");
         bool constructor = name == ".ctor";
         bool isInterface = authoredInterfaces.Contains(declaringType);
-        if (isInterface && (isStatic || constructor || signature.GenericParameterNames.Count != 0))
-            throw new ArgumentException("interface contract requires a nongeneric instance method");
+        if (isInterface && (constructor || signature.GenericParameterNames.Count != 0))
+            throw new ArgumentException("interface contract requires a nongeneric method");
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" || name.Any(char.IsControl) ||
             constructor && (isStatic || signature.ReturnType != PrimitiveType.Void || signature.GenericParameterNames.Count != 0) ||
             !isStatic && signature.GenericParameterNames.Count != 0)
@@ -60,7 +60,7 @@ public sealed partial class AssemblyBuilder
         }
         var owner = MaterializeOwner(declaringType);
         var reference = new ImportedMethodReference(this, new MethodBuilder(graph.Graph, owner, name, signature, isStatic: isStatic))
-        { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface };
+        { DeclaringReference = declaringType, RequiresVirtualDispatch = isInterface && !isStatic };
         reference.Target.NativeValueOverride = isOverride;
         authoredCallableReferences.Add(reference);
         return reference;

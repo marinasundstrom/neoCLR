@@ -6401,3 +6401,37 @@ Combining `Cgt_Un` with Boolean negation implements ordered `<=`, and `Clt_Un`
 with Boolean negation implements ordered `>=`. The floating metadata C# contract
 executes NaN in both Double operand positions and Single NaN on .NET and NeoCLR.
 The Raven driver gate separately validates all six source comparison operators.
+
+
+### Static interface contracts and inherited Self (development, 2026-10-04)
+
+`TypeBuilder.AddInterfaceMethod(string name, MethodSignature signature, bool isStatic)`
+adds a public bodyless contract, allowing nongeneric static members alongside existing
+instance members. The original two-argument overload retains instance behavior.
+Static properties reuse `AddProperty` with static accessors. Invalid owners throw
+InvalidOperationException; invalid/duplicate signatures throw ArgumentException.
+Instructions or locals on abstract methods fail write validation with InvalidDataException.
+
+Detached `MethodDefinition` accepts Public | Static | Abstract | Virtual | NewSlot,
+with the same attachment and signature validation. `CreateMethodReference` accepts
+static authored interface contracts; the host still supplies and completes the entire
+contract explicitly. Required implementations match static/instance classification,
+visibility, name and substituted parameter/result types. An instance method cannot
+satisfy a static requirement, nor the reverse. Missing/wrong implementations fail
+before writing output. CLI output includes MethodImpl rows for static implementations;
+native output uses existing bodyless static interface declarations, without virtual
+instance dispatch flags. Symbolic Self still requires native output or a CLI reference
+projection, not executable CLI Self semantics.
+
+An interface may inherit a local or explicitly scoped external construction such as
+`ComparableTo<Self>`. Classes cannot declare unbound Self inheritance. Reader and
+introspection views retain that scoped Self argument; declaration/constructed owner
+views supply the scope, and conformance substitutes the concrete implementer.
+No generic parameter is added. The facade does not load code or invoke contracts.
+
+`StaticInterfaceChecks` verifies definition/builder parity, local/external static
+conformance and rejection, inherited Self views, native round trips, and observable
+.NET constrained static dispatch. The API-authored native program exits 42. The
+Raven Number gate additionally executes actual source contracts across three native
+assemblies. Compiler generic callself emission and intrinsic primitive ownership
+remain separate work; this authoring support does not claim they are complete.

@@ -10575,3 +10575,33 @@ constructed generic classes and interfaces. Unit-return callbacks use explicit g
 adapters where a no-result method needs a value result; this preserves distinct native
 signatures and has an allocation cost. Structural Function language experiments remain
 on their feature branches; metadata-only introspection does not invoke function objects.
+
+
+## 2026-10-04 — Number means the entire numeric feature
+
+The author directed: “Continue solving the rest of the issues with Number”, then
+clarified: “I mean the entire feature around number classes/structs and Number interface”.
+The assistant adopted the complete numeric feature as the active story: actual source
+numeric structs, Number's static identities/operators and inherited ordering, concrete
+parsing and generic consumers. Floating arithmetic alone is not the completion gate.
+This follows the recorded numeric design (ten fixed-width integer/floating types;
+Decimal, native-sized arithmetic contracts and a new Parsable interface are not inferred).
+
+Actions so far: floating library/consumer execution now passes on both targets;
+static interface metadata and scoped Self inheritance unblock the unchanged Number
+source, followed by a separate ordinary struct and consumer. The independently useful
+floating unary binding fix was verified on a main-based Raven branch and integrated
+into local main as 87ba62572. No push is reported. The primitive source ownership/storage
+mismatch is reproduced with actual Single.rvn: binding resolves Self to the canonical
+primitive while the writer still treats the source owner as a nominal wrapper. This
+requires an explicit representation contract; the ordinary Scalar acceptance fixture
+is a static-contract test, not a substitute for primitive numeric implementations.
+Full primitive-family and generic algorithm execution remain open.
+
+
+A negative Number implementation then exposed a shared conformance bug: imported
+static abstract properties were skipped during binding. A .NET-only, main-based
+regression reproduced three invalid variants accepted before the fix; all 27 focused
+interface/Self tests pass afterwards. The isolated fix b88a8d19d was fast-forwarded
+into local main and integrated separately as 90c02af96. Missing/instance/wrong-result
+identity properties now fail with RAV0330, independently of writer validation.

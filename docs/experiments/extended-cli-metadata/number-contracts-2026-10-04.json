@@ -1,0 +1,168 @@
+{
+  "runtimeRepositoryRevision": "b4133f12927c14f6066cf63c6e0d7052a76fd244",
+  "compilerRepositoryRevision": "f3aeba8bf91284e9c66ed3707c3c76c21d7d2be0",
+  "scope": "Actual Number source, separate ordinary struct implementation and source-free consumer execute direct operators, identities and ordering. This does not replace the numeric primitive family or establish generic callself emission.",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Number.rvn": "1080546358f76bc15ddaf82cef0774c4a3675e7cabf67d3a1de5998ee839564d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/number-scalar.rvn": "2dbee799117150bd579a58275a22acef97dbf5d41870805952961ae0fdc37412",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/number-scalar-consumer.rvn": "918ca389b797448971d9540633ab0816808f5935b374b1265a2e6847e57a2155",
+    "/private/tmp/number-contracts-final21004/ownership.json": "c2594ea3ae166d4ab16fa1fe54096d422266df739fda8fb5762b332023062d67",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "5cbbe7bfb098569ffa1b6919c6c2e6e57910c929b63f54907e52bb70a5ab94d0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "c92676ec9712d0766c03cd2186b0c4eab9eee1d225a94aa94c4927f92306b64c",
+    "/private/tmp/ParseCore1004.dll": "008cc8a110b358f9cb7a60cdd3cdb44485b7898e8e0c8676c0c4aad020969479",
+    "/private/tmp/ParseSystem1004.neox": "fd69427db48b1fe6e0a91a7f423972e14e053f3befdfd577554c84c888b82962",
+    "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll": "a572ea77764d03d3d0a887ff105cfd0e81270492dd155e93d78ce7b4bb4b0dc5",
+    "/private/tmp/task-queue-base-final1004/ownership.json": "8b86cf73daa8454c15f50179cc04507a6719d6dc3b56e0eea1bac86a51357075",
+    "/private/tmp/number-contracts-final21004/NumberContracts.dll": "bf2cbf298d1090f5a945a3f531a8beafbe034ae6a30ed45927042db4001c7001",
+    "/private/tmp/number-contracts-final21004/NumberImplementation.dll": "81228938bd79246415cd6d69866535710547e6627bfb48006e609018d3ba572b",
+    "/private/tmp/number-contracts-final21004/Consumer.dll": "699a4603a633934a5ee8ea7f6a8ff718079f74454cb765cfe40da6651874ed83"
+  },
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/number-contracts-final21004/ownership.json",
+        "--library",
+        "-o",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Number.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/number-contracts-final21004/ownership.json",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--library",
+        "-o",
+        "/private/tmp/number-contracts-final21004/NumberImplementation.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/number-scalar.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/number-contracts-final21004/ownership.json",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberImplementation.dll",
+        "-o",
+        "/private/tmp/number-contracts-final21004/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/number-scalar-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/number-contracts-final21004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberImplementation.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (491 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/number-contracts-final21004/Consumer.dll",
+        "--module",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--module",
+        "/private/tmp/number-contracts-final21004/NumberImplementation.dll",
+        "--system",
+        "/private/tmp/ParseSystem1004.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/ParseCore1004.dll",
+        "--runtime-seed",
+        "/private/tmp/ParseSystem1004.neox",
+        "--reference",
+        "/private/tmp/task-queue-base-final1004/NeoCLR.Collections.dll",
+        "--bootstrap-ownership",
+        "/private/tmp/number-contracts-final21004/ownership.json",
+        "--reference",
+        "/private/tmp/number-contracts-final21004/NumberContracts.dll",
+        "--library",
+        "-o",
+        "/private/tmp/number-contracts-final21004/Rejected.dll",
+        "/private/tmp/number-contracts-final21004/wrong-implementation.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV0330: Type 'Scalar' does not implement abstract member 'One { get; }' from base type 'Number'\n"
+    }
+  ],
+  "independentMainFix": "b88a8d19d",
+  "validation": {
+    "metadataGroupsPassed": 136,
+    "independentMainTestsPassed": 27,
+    "mainBaseline": "3 invalid imported static property implementations incorrectly accepted before the fix",
+    "nativeConsumers": 7,
+    "limits": [
+      "primitive source storage/ownership",
+      "generic Number callself emission"
+    ],
+    "compilerIntegrationTestsPassed": 29,
+    "nativeApiAuthoredStaticProgramExit": 42,
+    "apiSnapshot": "existing stale guest snapshot; manual host reference updated"
+  },
+  "compilerSliceRevision": "650b921191695ddec794dea074b4a6235a99de2f"
+}
