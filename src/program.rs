@@ -37,7 +37,8 @@ impl LoadedProgram {
     }
 
     /// Prepare an explicit load set. Additional modules must have unique names and
-    /// no entry points. Symbol lookup currently uses one shared namespace.
+    /// no entry points. Symbol lookup uses one shared namespace, except matching
+    /// InternalCall declarations retain their module identities and local binding.
     pub fn with_modules(
         module: &Module,
         library: &Module,

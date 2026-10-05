@@ -1,0 +1,12 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ObjectReferenceEquals(left: object?, right: object?) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ObjectEquals(left: object, right: object?) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ObjectIdentityHash(value: object) -> int;

@@ -104,7 +104,7 @@ pub(crate) fn check_call(
     source: &Module,
     target: &FunctionRef,
 ) -> Result<(), Fault> {
-    let function = crate::vm::resolve(linked, target)?;
+    let function = crate::vm::resolve_from(linked, target, &source.name)?;
     if matches!(function.owner, Some(Type::Function(_))) {
         return check_type(linked, source, function.owner.as_ref().unwrap());
     }

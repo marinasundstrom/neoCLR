@@ -89,6 +89,33 @@ pub(crate) fn resolve(
     }
 }
 
+pub(crate) fn resolve_from(
+    module: &Module,
+    target: &FunctionRef,
+    source_module: &str,
+) -> Result<crate::metadata::Function, Fault> {
+    if target.definition.is_none() {
+        let local: Vec<_> = module
+            .functions
+            .iter()
+            .enumerate()
+            .filter_map(|(index, function)| {
+                (function.is_internal_call()
+                    && function.name == target.name
+                    && function
+                        .definition
+                        .as_ref()
+                        .is_some_and(|id| id.module == source_module))
+                .then_some(index)
+            })
+            .collect();
+        if !local.is_empty() {
+            return resolve_candidates(module, target, local.into_iter());
+        }
+    }
+    resolve(module, target)
+}
+
 fn resolve_candidates(
     module: &Module,
     target: &FunctionRef,
@@ -487,7 +514,8 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     let mut identities = HashSet::new();
-    let mut access_signatures = HashSet::new();
+    let mut access_signatures = std::collections::HashMap::new();
+    let mut internal_signatures = HashSet::new();
     let mut signatures = HashSet::new();
     let free_signatures: HashSet<_> = module
         .functions
@@ -510,6 +538,20 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         {
             return Err(Fault::new("duplicate function definition identity"));
         }
+        if function.is_internal_call()
+            && !internal_signatures.insert((
+                function.definition.as_ref().map(|id| &id.module),
+                &function.owner,
+                &function.name,
+                &function.parameters,
+                function.instance,
+                function.generic_parameters.len(),
+            ))
+        {
+            return Err(Fault::new(
+                "duplicate internal-call declaration in one module",
+            ));
+        }
         let parameters_without_access: Vec<_> = function
             .parameters
             .iter()
@@ -518,13 +560,31 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 other => other.clone(),
             })
             .collect();
-        if !access_signatures.insert((
-            &function.owner,
-            &function.name,
-            function.instance,
-            function.generic_parameters.len(),
-            parameters_without_access,
-        )) {
+        if let Some(previous) = access_signatures.insert(
+            (
+                &function.owner,
+                &function.name,
+                function.instance,
+                function.generic_parameters.len(),
+                parameters_without_access,
+            ),
+            function,
+        ) {
+            // Separate assemblies may declare the same runtime service. Keep their
+            // definition identities; do not merge declarations or relax overloads.
+            if previous.is_internal_call()
+                && function.is_internal_call()
+                && previous.parameters == function.parameters
+                && previous.returns == function.returns
+                && previous.no_result == function.no_result
+                && previous
+                    .definition
+                    .as_ref()
+                    .zip(function.definition.as_ref())
+                    .is_some_and(|(left, right)| left.module != right.module)
+            {
+                continue;
+            }
             return Err(Fault::new(
                 "duplicate function signature differing only by reference access",
             ));

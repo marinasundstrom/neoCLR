@@ -1,0 +1,107 @@
+{
+  "runtimeBase": "3d92e41f88b0d2744894b2952fe12ddb9773ef38",
+  "compilerRevision": "485b364fc5bfce506341a52e55b150d70a0aaac1",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-recorded1005/ownership.json",
+        "--reference",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/object-services-checked1005/ObjectServices.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeObjectCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeObjectServices.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/object-services-library.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-recorded1005/ownership.json",
+        "--reference",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/object-services-checked1005/ObjectServices.dll",
+        "-o",
+        "/private/tmp/object-services-checked1005/App.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/object-services-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/object-services-checked1005/App.dll",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "--module",
+        "/private/tmp/object-services-checked1005/ObjectServices.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5: typed-stack/control-flow verification passed (2199 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/object-services-checked1005/App.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "--module",
+        "/private/tmp/object-services-checked1005/ObjectServices.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Object service checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeObjectCalls.rvn": "dbc11a5cabadb308005c3cceea148329ff2f64fee82fa509c9d34ff8ed3b4a53",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeObjectServices.rvn": "cec440af99fe5e1e99233aaec10f41bbd6de4195c68b150c4f8274762e8fc80e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/object-services-library.rvn": "4d7af8b2b50e1d158cf5aa0932ea888362def9c1a1f4725d6ab8f108846aaaad",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/object-services-consumer.rvn": "c2dde582a89d99888ab3b358b0de7737a45cdfb5c8272dbdbbdf1bcd7027dcf7",
+    "/private/tmp/object-services-checked1005/ObjectServices.dll": "481618fd440b0a05db2f86b1d79d61e854d0980b9b8de5e2fc70e56757941973",
+    "/private/tmp/object-services-checked1005/App.dll": "a7a971b442c323d92c9487cc9e754f6f86e7e32635eb4c1bad56451de7b96e9f",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "572788c153c1740b75f435b3b3ef8167633f62c3153206dc8f61a311d326938f",
+    "/private/tmp/handle-recorded1005/Numbers.dll": "e5ee22e22c59b5aa42789ed7f30b472290c5b306e3eeb17138d8b8cb60f1e4be",
+    "/private/tmp/handle-recorded1005/ownership.json": "5a2d54d347e8800bbed7a5b8496a0c14363b8209c4c463f87c59d703690bbc9d",
+    "/private/tmp/handle-recorded1005/System.neox": "95fd92733fecf3432f2712ebce26e52fd83b4aac377e51c667de7bcaba6883a2",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "b41ed54e91001278f5021532c7bd04a889ddc74ff8bbcd89aa6f9fef7e54bdec",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_object_services.py": "2ddda1f2bf5065e032ff281e0bb28bdd8e68c2aab3636ccdf6a95549697c486c",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "42ef68b07dc3736ade2636761b53274cf55ff9f4d2cc0681bd3b887066487404",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "e8019abcf6220490687d77c198d65b70b31422545d089cfa2ad221205b0f3762",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ff12b26c0022008fd16d53c765a85de990d6fb417034289ed7153e7b9a4fa015"
+  }
+}

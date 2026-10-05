@@ -4,6 +4,16 @@ The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
 
+## Object service prerequisite executes (2026-10-05)
+
+The [Object service gate](experiments/extended-cli-metadata/object-services-2026-10-05.md)
+executes source adapters for reference equality, base equality and identity hashing.
+A runtime linking fix preserves separate assemblies' InternalCall declaration identities.
+The source Object probe now has no missing-service errors; root identity, override and
+generic conversion errors remain. Next implement explicit canonical Object ownership
+across binding, metadata boxing/slot authoring and runtime dispatch. Object is not a
+scalar primitive, and its seed root must remain until that replacement is executable.
+
 ## Source-owned runtime handle executes (2026-10-05)
 
 The [source handle gate](experiments/extended-cli-metadata/source-handle-ownership-2026-10-05.md)

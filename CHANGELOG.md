@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve assembly identities for matching runtime-service InternalCall declarations,
+  binding symbolic calls locally while retaining signature and access validation.
+  Add native source Object equality/identity adapters and an artifact-only executable
+  contract test. Source Object no longer lacks those services; canonical root ownership
+  remains unresolved and is not claimed complete.
+
 - Record the author-directed release requirement for native metadata-backed editor/LSP
   support and compiler emission from editor builds, with .NET regression coverage.
   A read-only disassembler remains a release candidate; neither tooling feature is

@@ -1,0 +1,16 @@
+namespace System.Runtime.CompilerServices
+
+// Native adapters for the runtime-owned identity operations used by source Object.
+internal extension ObjectRuntimeServices for RuntimeServices {
+    static func ObjectReferenceEquals(left: object?, right: object?) -> bool {
+        return neoCLR.Runtime.ObjectReferenceEquals(left, right)
+    }
+
+    static func ObjectEquals(left: object, right: object?) -> bool {
+        return neoCLR.Runtime.ObjectEquals(left, right)
+    }
+
+    static func ObjectIdentityHash(value: object) -> int {
+        return neoCLR.Runtime.ObjectIdentityHash(value)
+    }
+}

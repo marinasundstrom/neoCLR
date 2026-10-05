@@ -1,0 +1,45 @@
+import System.Runtime.CompilerServices.*
+
+namespace ObjectServiceTests
+
+class Cell {
+    var Value: int = 0
+    override func Equals(other: object?) -> bool => true
+    var HashCalls: int = 0
+    override func GetHashCode() -> int {
+        HashCalls += 1
+        return 7
+    }
+}
+
+// Test-only facade: exercises internal source adapters without exposing them publicly.
+public class Checks {
+    static func Run() -> bool {
+        let first = Cell()
+        let alias = first
+        let second = Cell()
+        let firstHash = RuntimeServices.ObjectIdentityHash(first)
+        first.Value = 42
+        if alias.Value != 42 || RuntimeServices.ObjectIdentityHash(alias) != firstHash {
+            return false
+        }
+        if !RuntimeServices.ObjectReferenceEquals(first, alias) || RuntimeServices.ObjectReferenceEquals(first, second) {
+            return false
+        }
+        // The base equality service must not dispatch recursively to an override.
+        if !RuntimeServices.ObjectEquals(first, alias) || RuntimeServices.ObjectEquals(first, second) {
+            return false
+        }
+        if first.HashCalls != 0 {
+            return false
+        }
+        if !first.Equals(second) || first.GetHashCode() != 7 || first.HashCalls != 1 {
+            return false
+        }
+        let absent: object? = null
+        return RuntimeServices.ObjectReferenceEquals(absent, absent) &&
+            !RuntimeServices.ObjectReferenceEquals(first, absent) &&
+            !RuntimeServices.ObjectReferenceEquals(absent, first) &&
+            !RuntimeServices.ObjectEquals(first, absent)
+    }
+}

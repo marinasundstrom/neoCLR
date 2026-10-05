@@ -7276,3 +7276,13 @@ handle reference and the existing native RuntimeTypeHandle category. Executable 
 output of native primitive implementations remains unsupported. Dependency catalogs must
 select one owner; a source handle cannot compete with a retained seed handle. C# tests
 cover definition/builder authoring, native round trip, introspection and invalid storage.
+
+### Internal-call declarations in separate assemblies (development, 2026-10-05)
+
+Native loading now admits matching runtime-service InternalCall declarations in distinct
+assemblies. Each retains its definition identity. Symbolic calls with a local service
+declaration bind locally; explicit external identities remain exact, including access
+checks. Duplicate declarations within one module, incompatible service signatures and
+ambiguous unqualified calls without a local declaration still reject. Registry validation
+is unchanged: a matching name alone never grants a native service. See the
+[Object service integration gate](../docs/experiments/extended-cli-metadata/object-services-2026-10-05.md).

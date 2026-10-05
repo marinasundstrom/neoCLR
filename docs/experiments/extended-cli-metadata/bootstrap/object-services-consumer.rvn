@@ -1,0 +1,9 @@
+import System.*
+import ObjectServiceTests.*
+
+func Main() {
+    if !Checks.Run() {
+        System.Fail("Object service contract failed")
+    }
+    Console.WriteLine("Object service checks passed")
+}

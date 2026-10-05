@@ -68,6 +68,7 @@ pub(crate) fn link_modules(
         linked.functions.extend(dependency.functions);
     }
     let mut linked = crate::scope::normalize_module(&linked, &linked)?;
+    bind_local_internal_references(&mut linked)?;
     crate::vm::validate_linked(&linked)?;
     bind_member_references(&mut linked)?;
     for source in std::iter::once(application).chain(dependencies) {
@@ -75,6 +76,55 @@ pub(crate) fn link_modules(
         crate::references::validate_uses(&linked, &normalized)?;
     }
     Ok(linked)
+}
+
+// Establish local runtime-service identities before whole-load-set validation.
+// All declarations still pass the normal signature/native-registry/access checks.
+fn bind_local_internal_references(module: &mut Module) -> Result<(), Fault> {
+    let local_services: std::collections::HashSet<_> = module
+        .functions
+        .iter()
+        .filter(|function| function.is_internal_call())
+        .filter_map(|function| {
+            function
+                .definition
+                .as_ref()
+                .map(|id| (id.module.as_str(), function.name.as_str()))
+        })
+        .collect();
+    let mut bindings = Vec::new();
+    for (index, function) in module.functions.iter().enumerate() {
+        let source = function
+            .definition
+            .as_ref()
+            .map_or(module.name.as_str(), |id| id.module.as_str());
+        for (pc, instruction) in function.body.iter().enumerate() {
+            if let crate::metadata::Instruction::Call(target)
+            | crate::metadata::Instruction::CallVirtual(target)
+            | crate::metadata::Instruction::BindFunction { target, .. } = instruction
+            {
+                if target.definition.is_none()
+                    && local_services.contains(&(source, target.name.as_str()))
+                {
+                    bindings.push((
+                        index,
+                        pc,
+                        crate::vm::resolve_from(module, target, source)?.definition,
+                    ));
+                }
+            }
+        }
+    }
+    for (index, pc, identity) in bindings {
+        if let crate::metadata::Instruction::Call(target)
+        | crate::metadata::Instruction::CallVirtual(target)
+        | crate::metadata::Instruction::BindFunction { target, .. } =
+            &mut module.functions[index].body[pc]
+        {
+            target.definition = identity;
+        }
+    }
+    Ok(())
 }
 
 // Bind symbolic references while their declaring generic context is still open.
