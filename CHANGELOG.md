@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Inventory ten unchanged POC samples through the native compiler driver. Order
+  collections, interfaces and JSON object mapping compile and execute with exact output;
+  five samples fail native Task recognition, with constructor and inheritance gaps in
+  the other two. Add a reproducible inventory runner and hashed evidence; prioritize
+  native async integration over full Object-root replacement for the retained-seed POC.
+
 - Expose explicit Object-root loading through `--object-root <module-input>` with an
   explicit `--system` seed. Reuse exact module/revision/type-row validation, reject
   unregistered or incompatible roots before assembly publication, and keep default

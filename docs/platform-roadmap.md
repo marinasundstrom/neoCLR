@@ -3,9 +3,19 @@
 The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 The author-requested initial metadata disassembler is implemented; broader integration
-resumes with source-root driver/consumer wiring.
+now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
+
+## POC sample gate and next blocker (2026-10-05)
+
+Three of ten selected unchanged samples compile through the native driver and execute
+with exact output: order collections, interfaces and JSON object mapping. Five samples
+share native Task async-identity failures; constructor-receiver validation and inheritance
+account for the other two. [Inventory, evidence and reproduction](experiments/extended-cli-metadata/poc-sample-inventory-2026-10-05.md).
+Next connect native Task/builder identities to existing heap async lowering and validate
+the async/HTTP samples. Source-root replacement is not a prerequisite for these retained-
+seed POC cases. Full System completeness does not gate the POC.
 
 ## Author scope clarification: end-to-end POC (2026-10-05)
 

@@ -10941,3 +10941,11 @@ The active slice now compiles a root library through `rvnc neoclr` and executes 
 explicit root selection through the NeoCLR CLI. The caller is neoIL, so a separately
 compiled Raven root consumer remains open. Thirty runtime/CLI checks and the driver
 acceptance controls pass. See [the reproduction](experiments/extended-cli-metadata/source-object-driver-2026-10-05.md).
+
+The assistant then ran the selected ten-sample native driver inventory: three compile
+and execute with exact output, five stop at native Task async recognition, and two expose
+constructor/inheritance gaps. The [recorded evidence](experiments/extended-cli-metadata/poc-sample-inventory-2026-10-05.md)
+changes the next bounded priority to native async identity/lowering. Full Object-root
+replacement is not required by the already-executing retained-seed samples. This is
+assistant-observed evidence and a proposed implementation sequence, not a new author
+requirement or a claim that all release samples are covered.
