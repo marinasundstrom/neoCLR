@@ -122,6 +122,12 @@ exports.run = async function () {
       report.unionHovers[term] = signature;
     }
     record('native Option and Result type hovers retain union kind and constructed arguments');
+    if (config.systemDocumentation) {
+      assert(report.unionHovers['Option<Order>'].includes('A nominal union containing Some'));
+      assert(report.unionHovers['Result<Order, SingleError>'].includes('A nominal union containing a successful value'));
+      assert(!Object.values(report.unionHovers).some(text => text.includes('generated IUnion contract')));
+      record('source-built Option and Result display shared authored API documentation');
+    }
     const tasks = await vscode.tasks.fetchTasks();
     const build = tasks.find(t => t.name === 'neoCLR: Build');
     assert(build, 'configured native build task');

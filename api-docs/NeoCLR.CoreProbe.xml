@@ -1338,7 +1338,7 @@
     <member name="M:System.Option.Some`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="P:System.Option.Some`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Option`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. The generated IUnion contract exposes the boxed active case. Default carriers are inactive; construct None explicitly for absence.</remarks></member>
+    <member name="T:System.Option`1"><summary>A nominal union containing Some with a value or None without one.</summary><remarks>Prefer Some/None construction, union patterns and propagation in Raven source. Construct None explicitly for absence.</remarks></member>
 
 
 
@@ -1373,7 +1373,7 @@
     <member name="M:System.Result.Error`1.Deconstruct(`0@)"><summary>Writes the case payload to the output parameter.</summary><param name="value">The value on which this operation acts.</param></member>
 
     <member name="P:System.Result.Error`1.Value"><summary>Gets the stored payload; prefer typed case patterns for nominal union carriers.</summary></member>
-    <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values. The generated IUnion contract exposes the boxed active case. Default carriers are inactive.</remarks></member>
+    <member name="T:System.Result`2"><summary>A nominal union containing a successful value or an expected error.</summary><remarks>Prefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values.</remarks></member>
 
 
 

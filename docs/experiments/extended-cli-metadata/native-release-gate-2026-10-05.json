@@ -1,0 +1,138 @@
+{
+  "date": "2026-10-05",
+  "releaseReady": false,
+  "published": false,
+  "neoclrSourceRevision": "954fb2d78e2daa750a2d33721c63eb6f3bbab69b",
+  "ravenIntegrationRevision": "5f6298c1237ecc34d8f00d0ee3c681e9316b9a5b",
+  "ravenMainPublisherRevision": "137431e44109c6050af23075401cc2090784729c",
+  "localPackageLabel": "0.1.13-neoclr.dev.20261005",
+  "installation": "isolated VSIX installation, installed directory loaded by VS Code extension-test harness; bundled server without checkout override",
+  "editor": {
+    "vscode": "1.140.0",
+    "checks": [
+      "native imported hover",
+      "native imported Markdown documentation hover",
+      "native Markdown sidecar edit refreshes hover",
+      "native XML fallback after Markdown member deletion",
+      "read-only metadata declaration navigation",
+      "native imported completion",
+      "native imported completion documentation",
+      "actual file watcher invalidates replaced native library",
+      "unsaved buffer survives native workspace reload",
+      "missing native reference produces a project diagnostic",
+      "native dependency recovery clears the project diagnostic",
+      "unchanged broad sample imports source-built class library",
+      "native Option and Result type hovers retain union kind and constructed arguments",
+      "source-built Option and Result display shared authored API documentation",
+      "configured VS Code native build task",
+      "VS Code task executes exact broad-sample output on native runtime",
+      "failed build preserves last successful artifact",
+      "ordinary .NET editor hover and diagnostics",
+      "unchanged Tasks/await sample builds and executes from VS Code"
+    ],
+    "passed": true,
+    "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "diagnostics": [],
+    "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+    "completion": [
+      {
+        "label": "VersionOne",
+        "description": "EditorApi"
+      }
+    ],
+    "unionHovers": {
+      "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`\n\n---\n\nA nominal union containing Some with a value or None without one.\n\n**Remarks**\n\nPrefer Some/None construction, union patterns and propagation in Raven source. Construct None explicitly for absence.",
+      "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`\n\n---\n\nA nominal union containing a successful value or an expected error.\n\n**Remarks**\n\nPrefer Ok/Error construction, union patterns and propagation in Raven source. Expected errors remain values."
+    },
+    "stdout": "Native build output: /private/tmp/native-matched-editor1005/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n"
+  },
+  "sha256": {
+    "/tmp/raven-native-matched1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64.tar.gz": "5cb1df4d054ea02740fd54a8f684da55ea7541f66ff9678c03a915f5fabf43f1",
+    "/tmp/raven-native-vsix1005/raven-vscode.vsix": "6f7f671d79364499d2888f742d8a7396a0eb9fbc4af649943159c6b81ba1096e",
+    "target/release/neoclr": "5e6652fcdfa22c051f55bfe2ced4b0599c5353168bf213240c43e0d471cc6ca8",
+    "scripts/native-vscode-acceptance.cjs": "729f82ab8c274e633cd63a66711046701ddde4b785f7a78ecd669e4f6be654af",
+    "scripts/prepare-native-editor.py": "ea85fec5da5019a69b11b7a42ce436a5e56b657c12a95327d4c75847d55c1931",
+    "api-docs/NeoCLR.CoreProbe.xml": "61ce759a2c40a61ee0bd72b949ea43da42b8a429cabe64ac7fe17c1fd917c417",
+    "/tmp/native-matched-editor1005/references/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/tmp/native-matched-editor1005/references/EditorLibrary.dll": "4ca6ef35d095c50ac462494a33767649f0b43ecd3cb769ccd48f2b6d3901a804",
+    "/tmp/native-matched-editor1005/references/EditorLibrary.docs/invariant/symbols/M/a2866a2470bbd27c96f188690a3d308c84a8bc6bfbd8a38573f0748d7b7c714b.md": "61467122d2a9d49cfb42ff08386b677c50d710b5a91efd96839892113faae159",
+    "/tmp/native-matched-editor1005/references/EditorLibrary.docs/invariant/symbols/T/0191c30c9197a99cef03ae980dde1be39bfe445503b3464907e54a60e2536d83.md": "ae0f1186044071ca1712075a827e4162e4f8377178112c8a7565a5e506506afc",
+    "/tmp/native-matched-editor1005/references/EditorLibrary.docs/manifest.json": "824f305a09b0d65d91973e7f97968bccceaa6b44cb8bb093620b811ff800b1aa",
+    "/tmp/native-matched-editor1005/references/EditorLibrary.xml": "ed7d20bdfc4a2ea768329f5412fed0e870379f54158430bad5f13ac98f253b97",
+    "/tmp/native-matched-editor1005/references/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/tmp/native-matched-editor1005/references/Http.xml": "61ce759a2c40a61ee0bd72b949ea43da42b8a429cabe64ac7fe17c1fd917c417",
+    "/tmp/native-matched-editor1005/references/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/tmp/native-matched-editor1005/references/Numbers.xml": "61ce759a2c40a61ee0bd72b949ea43da42b8a429cabe64ac7fe17c1fd917c417",
+    "/tmp/native-matched-editor1005/references/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/tmp/native-matched-editor1005/references/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/tmp/native-installed-matched-profile1005/logs/20261005T192722/window1/exthost/output_logging_20261005T192723/1-Raven.log": "e403b3c3f12273a52a8d369e8930f2d8e6c770d499a885521045dae559fa2042",
+    "/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/logs/raven-lsp.log": "bccb5a71e9015ddda11859c1cacb33846e10b9cbfbb0b215dc56feb19f293bdb",
+    "/tmp/native-release-runtime-optimized1005.log": "106796ca383b98dc7f07e126d0a0b41c867819e32e4f35100ac6d1c2fbb1ed25",
+    "/tmp/native-release-corrected-tests1005.log": "639f6b0803b32861d1ac25947c9e3a4a84029e6f80484dccb138416dd218e84d",
+    "/tmp/native-matched-dotnet-build1005.log": "9b26c8b257d4dfce7a2dc1065f3c77cfd2ed30e03c0c25b5345088f3bf813712"
+  },
+  "clientLogExcerpt": [
+    "Using language server (installed extension bundle): /tmp/native-installed-vsix-extensions1005/raven.raven-vscode-0.1.13-neoclr.dev.20261005/server/Raven.LanguageServer.dll",
+    "Using isolated language server: /tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/Raven.LanguageServer.dll",
+    "2026-10-05T17:27:24.6763000+00:00 [Information] Raven.LanguageServer.Startup: Starting Raven language server. pid=33137 cwd=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659 baseDirectory=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/ processPath=/usr/local/share/dotnet/dotnet logPath=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/logs/raven-lsp.log args=<none> commandLine=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/Raven.LanguageServer.dll"
+  ],
+  "serverLogExcerpt": [
+    "2026-10-05T17:27:24.6763000+00:00 [Information] Raven.LanguageServer.Startup: Starting Raven language server. pid=33137 cwd=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659 baseDirectory=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/ processPath=/usr/local/share/dotnet/dotnet logPath=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/logs/raven-lsp.log args=<none> commandLine=/private/tmp/native-installed-matched-profile1005/User/globalStorage/raven.raven-vscode/language-server/7f6740a23659/Raven.LanguageServer.dll",
+    "2026-10-05T17:27:49.7291230+00:00 [Warning] Raven.LanguageServer.WorkspaceManager: Failed to open Raven project '/private/tmp/native-matched-editor1005/App.rvnproj' for root '/private/tmp/native-matched-editor1005'. Continuing with remaining projects.",
+    "System.IO.FileNotFoundException: Could not find file '/private/tmp/native-matched-editor1005/references/EditorLibrary.dll'.",
+    "File name: '/private/tmp/native-matched-editor1005/references/EditorLibrary.dll'"
+  ],
+  "sourceAudit": {
+    "status": "failed",
+    "platform": "macOS-27.0-arm64-arm-64bit",
+    "toolchain": "stable",
+    "full_tests": false,
+    "smoke_programs": [],
+    "build_profile": "debug",
+    "validator_sha256": "1a2b5c1423f28950433b55608e545697e883d591bb3d9a5c7a9dfbe03919c4cc",
+    "commit": "954fb2d78e2daa750a2d33721c63eb6f3bbab69b",
+    "archive_sha256": "1a2de0545fa3dcfa2f62ddd9b079dcc8fca3798fb34dce1869872451c795dbf7",
+    "tracked_files": 4082,
+    "registry_packages": 79,
+    "notice_files": 156,
+    "error": "Command '['/Applications/Xcode.app/Contents/Developer/usr/bin/python3', 'docs/experiments/raven-target/build_runtime_library.py', '--check-snapshot']' returned non-zero exit status 1.",
+    "elapsed_seconds": 1.195
+  },
+  "website": {
+    "pages": 1803,
+    "testsPassed": 18,
+    "apiSnapshotCheck": "passed",
+    "browserInspection": "desktop and 390x844 mobile; union case summaries visible"
+  },
+  "dotnetControl": {
+    "exitCode": 42,
+    "expectedExitCode": 42,
+    "stdout": "",
+    "buildLog": "/tmp/native-matched-dotnet-build1005.log",
+    "compiler": "/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/rvnc.dll"
+  },
+  "limits": [
+    "Existing native runtime/bootstrap/library artifacts are hashed, not a completed clean-source distributable bundle.",
+    "Sidecars copied from authored API reference for matching native symbol IDs; not full runtime documentation coverage.",
+    "Editor acceptance is macOS arm64 only."
+  ],
+  "runtimeTests": {
+    "command": "cargo +stable test --release --locked --all-targets --no-fail-fast",
+    "source": "extracted source archive at 954fb2d78e2daa750a2d33721c63eb6f3bbab69b",
+    "exitCode": 101,
+    "targets": 236,
+    "passed": 1782,
+    "failed": 2,
+    "ignored": 0,
+    "failures": [
+      "reflection_properties::signature_checks_reject_wrong_types_and_noresult_setter_service",
+      "system_fault::fault_binding_requires_void_return_and_string_argument"
+    ],
+    "correctionCommit": "76e970a0",
+    "correction": "Test expectations only; runtime behavior unchanged. Copied the two corrected test files into the extracted source for a focused rerun.",
+    "rerunCommand": "cargo +stable test --release --locked --test reflection_properties --test system_fault",
+    "rerunExitCode": 0,
+    "rerunPassed": 10,
+    "fullSuiteRerun": false
+  }
+}

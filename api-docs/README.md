@@ -5,7 +5,8 @@ It reads a checked-in compiler reference assembly and the authored XML sidecar,
 then renders Raven signatures with the same layout, navigation and development
 notice as the Markdown guides. No DocFX build, metadata YAML or second site exists.
 
-The site documents Preview 11; proposals remain labeled separately.
+The current site build is a development snapshot with a link to published Preview 11;
+new behavior and proposals remain labeled separately.
 Comparer policies, the HashMap policy constructor and explicit String comparison
 modes are included in Preview 11. StringComparison, both comparison methods and
 StringComparer.OrdinalIgnoreCase have type/member coverage; the reference describes

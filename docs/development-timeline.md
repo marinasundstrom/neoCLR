@@ -11016,3 +11016,19 @@ model for native references, added native project sidecar generation and checked
 documentation in the actual VS Code extension host. Updated development website
 instructions without changing published Preview 11 claims. This does not assert
 that every runtime API already has bundled documentation.
+
+**Author follow-up:** Explicitly included the website and API rendering through
+RavenDoc in the release gate. **Assistant action:** Tested the extracted SDK with
+an isolated installed VSIX (19 checks), discovered missing union-case summaries on
+the rendered site, and integrated the independently proven general documentation-ID
+fix into Raven main. Kept CLI carrier details in website support documentation while
+sharing useful authored API prose with native hover. The website build and 18 tests
+pass. The release remains unpublished: clean-source validation rejects stale bootstrap
+snapshots, and attempted regeneration exposed field-address initialization in the
+legacy DateTime bridge. No snapshot hashes were forged or output fragments published.
+[Evidence and next gate](experiments/extended-cli-metadata/native-release-gate-2026-10-05.md).
+
+The full extracted-source optimized runtime test run subsequently completed with
+1,782 passes and two stale test failures. The assistant corrected only those
+expectations and verified all ten affected tests. Runtime behavior was unchanged;
+the canonical source snapshot audit remains failed.

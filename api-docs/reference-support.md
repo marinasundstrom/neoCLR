@@ -49,3 +49,11 @@ These are rendering limitations, not application-type exclusions. All other publ
 types, except the explicitly excluded scaffolds above, have generated reference
 pages. The existing String and ThreadPool scaffold
 constructor exclusions remain explicit; they are not supported application constructors.
+
+## CLI union carrier details
+
+The CLI reference assembly used by this website represents unions through generated
+carriers. Its IUnion contract exposes the boxed active case; default carriers are
+inactive. These are details of the documentation/CLI representation, not an additional
+interface requirement for native NeoCLR unions. Ordinary source should use named cases,
+patterns and propagation, including explicit None construction for absence.

@@ -32,6 +32,12 @@ and completion prose, sidecar-only refresh and member-level fallback.
 The author explicitly includes website/API rendering through RavenDoc in the next
 release gate, alongside matched package installation.
 
+The matched SDK/installed VSIX now passes 19 checks on macOS arm64, including native
+Option/Result API help. RavenDoc union-case summaries, all 1,803 generated pages and
+18 website tests pass. Publication remains blocked by reproducible bootstrap snapshots
+and a complete runtime/dependency distribution, not editor API prose.
+[Release gate and remaining work](experiments/extended-cli-metadata/native-release-gate-2026-10-05.md).
+
 ## Shared host snapshots prepare editor integration (2026-10-05)
 
 Raven's native driver now uses a reusable explicit reference catalog. Core identity,

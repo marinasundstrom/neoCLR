@@ -7,7 +7,10 @@ import shutil
 import xml.etree.ElementTree as X
 
 p = argparse.ArgumentParser(description=__doc__)
-for name in ('raven', 'core', 'seed', 'ownership', 'runtime', 'output'):
+tooling = p.add_mutually_exclusive_group(required=True)
+tooling.add_argument('--raven', type=Path, help='Development Raven checkout')
+tooling.add_argument('--sdk', type=Path, help='Extracted native-enabled Raven SDK')
+for name in ('core', 'seed', 'ownership', 'runtime', 'output'):
     p.add_argument('--' + name, type=Path, required=True)
 p.add_argument('--reference', type=Path, action='append', required=True)
 a = p.parse_args()
@@ -20,6 +23,12 @@ for source, name in [(a.core, 'Core.dll'), (a.seed, 'System.neox'), (a.ownership
     shutil.copyfile(source, refs / name)
 for source in a.reference:
     shutil.copyfile(source, refs / source.name)
+    xml = source.with_suffix('.xml')
+    markdown = source.with_suffix('.docs')
+    if xml.is_file():
+        shutil.copyfile(xml, refs / xml.name)
+    if markdown.is_dir():
+        shutil.copytree(markdown, refs / markdown.name)
 shutil.copyfile(root / 'docs/experiments/raven-target/samples/application-order-collections.rvn', out / 'Main.rvn')
 shutil.copyfile(root / 'docs/experiments/raven-target/samples/application-order-collections.expected.txt', out / 'expected.txt')
 project = X.Element('Project', Sdk='Microsoft.NET.Sdk')
@@ -35,8 +44,12 @@ for ref in a.reference:
     X.SubElement(X.SubElement(items, 'Reference', Include=ref.stem), 'HintPath').text = 'references/' + ref.name
 X.indent(project)
 X.ElementTree(project).write(out / 'App.rvnproj', encoding='unicode')
-server = a.raven.resolve() / 'src/Raven.LanguageServer/bin/Debug/net10.0/Raven.LanguageServer.dll'
-compiler = a.raven.resolve() / 'src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll'
+if a.sdk:
+    server = a.sdk.resolve() / 'tools/language-server/Raven.LanguageServer.dll'
+    compiler = a.sdk.resolve() / 'tools/rvnc/rvnc.dll'
+else:
+    server = a.raven.resolve() / 'src/Raven.LanguageServer/bin/Debug/net10.0/Raven.LanguageServer.dll'
+    compiler = a.raven.resolve() / 'src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll'
 vscode = out / '.vscode'
 vscode.mkdir()
 (vscode / 'settings.json').write_text(json.dumps({'raven.languageServerPath': str(server),

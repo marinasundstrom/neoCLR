@@ -12,6 +12,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   reflection setter and current native-service rejection diagnostic. The full runtime
   run exposed these assertions; all ten affected tests pass after correction.
 
+- Label generated website/API pages as a development snapshot while retaining links
+  to published Preview 11. Record release qualification of documentation rendering;
+  no new release or website deployment is claimed. Update pinned RavenDoc to the
+  independently tested Raven-main union-case documentation fix, restoring authored
+  case summaries. Extend editor preparation to extracted SDKs and adjacent sidecars;
+  qualify the matched SDK and installed VSIX with 19 checks, including Option/Result
+  API help. Record the remaining source-bootstrap/distribution blockers explicitly.
+
 - Repair the source release notice inventory for fifteen locked metadata/CBOR and
   hashing dependencies, preserving their shipped license texts and checksums.
   This clears the first extracted-source release audit blocker; it is not release

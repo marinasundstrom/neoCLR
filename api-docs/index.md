@@ -7,7 +7,8 @@ toc: false
 [Experimental runtime hosting](runtime-hosting.md) covers explicit Object-root load contexts.
 
 [Experimental .NET metadata tooling](experimental-metadata.md) documents the
-feature-branch host library for future Raven adapters; it is not a guest API or release.
+host library used by the development Raven native importer and emitter; it is not
+a guest API or published release.
 
 [Cloning with Self](cloning.md) documents the development nongeneric Clonable contract.
 
