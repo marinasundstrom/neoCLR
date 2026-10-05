@@ -7,6 +7,14 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Native async binding is connected (2026-10-05)
+
+Explicit native Task/builder ownership now lets the five async/HTTP POC samples pass
+binding. Native state-machine emission is still rejected before publication. Next expose
+Raven's existing synthesized heap state-machine declarations and bodies to the portable
+backend, then prove completed/pending awaits and entry completion. This is compiler
+integration, not runtime suspension or green threads. [Scope and evidence](experiments/extended-cli-metadata/native-async-binding-2026-10-05.md).
+
 ## POC sample gate and next blocker (2026-10-05)
 
 Three of ten selected unchanged samples compile through the native driver and execute

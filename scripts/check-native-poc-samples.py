@@ -24,6 +24,8 @@ def main():
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--reference', type=Path, action='append', required=True)
     parser.add_argument('--runtime', type=Path, help='Execute the three established non-network controls after successful compilation')
+    parser.add_argument('--async-library', help='Explicit native Task/builder assembly identity')
+    parser.add_argument('--case', choices=SAMPLES, action='append', help='Limit the inventory to selected cases')
     args = parser.parse_args()
     paths = {name: getattr(args, name).resolve() for name in ('compiler', 'core', 'seed', 'ownership', 'output')}
     refs = [p.resolve() for p in args.reference]
@@ -45,9 +47,12 @@ def main():
               'inputs': {str(p): sha(p) for p in inputs}, 'cases': []}
     common = ['dotnet', str(paths['compiler']), 'neoclr', '--core-reference', str(paths['core']),
               '--runtime-seed', str(paths['seed']), '--bootstrap-intrinsics', '--bootstrap-ownership', str(paths['ownership'])]
+    if args.async_library:
+        common += ['--async-library', args.async_library]
     for reference in refs:
         common += ['--reference', str(reference)]
-    for name, sources in SAMPLES.items():
+    selected_samples = {name: SAMPLES[name] for name in args.case} if args.case else SAMPLES
+    for name, sources in selected_samples.items():
         source_paths = [ROOT / 'docs/experiments' / p for p in sources]
         artifact = paths['output'] / (name + '.dll')
         command = common + ['-o', str(artifact)] + [str(p) for p in source_paths]
@@ -75,7 +80,7 @@ def main():
         report['cases'].append(case)
         (paths['output'] / 'inventory.json').write_text(json.dumps(report, indent=2) + '\n')
         print(name + ': ' + ('compiled' if case['compiled'] else 'blocked'), flush=True)
-    print(f"Compiled {sum(c['compiled'] for c in report['cases'])}/{len(SAMPLES)}; inventory: {paths['output'] / 'inventory.json'}")
+    print(f"Compiled {sum(c['compiled'] for c in report['cases'])}/{len(selected_samples)}; inventory: {paths['output'] / 'inventory.json'}")
     # This is an inventory command, not a green acceptance gate. Failures are in the report.
 
 

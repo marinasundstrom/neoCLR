@@ -13,7 +13,10 @@ Task describes whether an operation produced a value. It does not imply a thread
 The development metadata/compiler branch now compiles the six Tasks/Concurrency source
 files as a separate native library. Artifact-only consumers execute continuations,
 cancellation, worker results and queue draining. This is a bounded integration gate;
-full async compiler lowering and the complete System library remain in progress.
+full async compiler lowering remains in progress. Explicit native Task/builder selection
+now supports async/await semantic binding, but the native emitter still rejects generated
+state machines. The direct native async samples are not yet runnable through this path.
+The current POC prioritizes working samples; complete System coverage is later work.
 
 ## Starting and awaiting a worker
 

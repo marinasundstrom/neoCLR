@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Record Raven's explicit native Task/builder provider selection: all five selected
+  async/HTTP samples now bind, while native state-machine emission remains rejected
+  without output. Add focused inventory selection and async-provider arguments, retain
+  the .NET/metadata format contracts, and prioritize synthesized state-machine emission.
+
 - Inventory ten unchanged POC samples through the native compiler driver. Order
   collections, interfaces and JSON object mapping compile and execute with exact output;
   five samples fail native Task recognition, with constructor and inheritance gaps in

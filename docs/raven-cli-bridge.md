@@ -6057,3 +6057,16 @@ selection; it is useful for bootstrap experiments but requires an explicit compa
 seed and library catalog. No new metadata encoding or public library API is introduced.
 
 See [the driver reproduction](experiments/extended-cli-metadata/source-object-driver-2026-10-05.md).
+
+## Native Task declaration selection (2026-10-05)
+
+Raven's `rvnc neoclr --async-library <assembly-name>` selects Task and generic builder
+symbols from a registered native reference, independent of the primitive core. The
+public compiler option is `MetadataImportOptions.WithAsyncAssemblyName`. This keeps
+nominal generic signatures and assigns compiler special identities only within the
+selected artifact; it adds no bridge encoding or metadata schema. Missing/incompatible
+providers cannot fall back to CLI declarations. The native importer supplies facts;
+Raven still owns async inference, awaiter binding and lowering. The .NET path is unchanged.
+
+All five selected async/HTTP samples now bind; native state-machine emission remains
+explicitly rejected before publication. [Validation and next slice](experiments/extended-cli-metadata/native-async-binding-2026-10-05.md).
