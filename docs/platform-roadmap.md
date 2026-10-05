@@ -11,6 +11,14 @@ now passes: unchanged source library, separate artifact-only consumers, nested o
 Boolean/string/int properties, arrays, shared mutation and validation before side effects.
 The earlier prerequisite notes below describe the path to this checkpoint.
 
+## Source primitive lookup resolved (2026-10-05)
+
+The [source-member fix and execution gate](experiments/extended-cli-metadata/source-primitive-members-2026-10-05.md)
+now compile the cumulative 109-file library and execute both JSON consumers against
+that single artifact. Adding Tasks/Concurrency passes binding and reaches the metadata
+writer's 256-type cap; reconcile that bounded authoring/reader limit next, then the
+storage/network service families. Full-System source ownership is still incomplete.
+
 ## Post-JSON compilation reassessment (2026-10-05)
 
 The [fresh compilation audit](experiments/extended-cli-metadata/system-post-json-assessment-2026-10-05.md)

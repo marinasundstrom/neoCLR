@@ -5830,3 +5830,11 @@ primitive core and retained seed remain bootstrap dependencies, with no CLI fall
 for application libraries. Compiler commit 8f015386e and metadata df6d8e51 are required.
 The linked record includes commands, hashes, .NET controls and the explicit execution
 budget; it supersedes the earlier statements that production mapping remains open.
+
+### Source primitive member binding (2026-10-05)
+
+The explicit current-output primitive set now selects source member declarations while
+retaining bootstrap scalar signatures. This fixes String.SliceUtf8 lookup without
+adding source members to the CLI bootstrap or changing ordinary .NET lookup.
+Raven de5645e96 passes 25 focused tests. The cumulative 109-file source library and two
+artifact-only native JSON executions pass; [evidence and limits](experiments/extended-cli-metadata/source-primitive-members-2026-10-05.md).

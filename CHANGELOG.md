@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Verify Raven's explicit source primitive member selection: cumulative encoding,
+  streams and JSON now compile into one 109-file library, and both artifact-only JSON
+  consumers execute against it. Record the next exposed 256-type metadata authoring
+  limit when Tasks/Concurrency are added; storage/network service gaps remain open.
+
 - Reassess full-System compilation after JSON mapping with a reproducible source/import
   audit. The 75-file baseline and imported Tasks compile; cumulative encoding/streams/
   JSON isolate a source String.SliceUtf8 lookup failure. Record storage/network service
