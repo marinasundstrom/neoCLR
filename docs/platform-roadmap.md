@@ -4,6 +4,16 @@ The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
 
+## Explicit runtime Object-root selection executes (2026-10-05)
+
+The [host selection gate](experiments/extended-cli-metadata/explicit-object-root-2026-10-05.md)
+now loads a separately authored root and executes boxed Object slots and rootless
+overrides. Exact identity/slot validation and seed dependency/access checks preserve
+the existing lookalike rejection. Selection is transient host configuration, with no
+format extension. 86 focused regressions pass. Next connect source-root ownership to
+Raven binding and metadata authoring, then ordinary CLI loading; source Object and
+full-System compilation are still incomplete.
+
 ## Object root ownership contract isolated (2026-10-05)
 
 The [root investigation](experiments/extended-cli-metadata/object-root-ownership-2026-10-05.md)

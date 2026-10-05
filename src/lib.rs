@@ -44,6 +44,7 @@ pub mod metadata;
 mod native;
 mod numeric_parse;
 mod object_identity;
+mod object_root;
 mod program;
 mod reachability;
 mod references;

@@ -43,6 +43,25 @@ pub enum ModuleInput<'a> {
 /// First input is the root; remaining inputs are dependencies. Returned source
 /// artifacts retain their identities and scopes, including absent legacy rows.
 pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<Module>, Fault> {
+    read_modules_core(inputs, library, None)
+}
+
+/// Parse a mixed load set with an explicitly selected Object root definition.
+/// The selection is host configuration, not part of returned/serialized artifacts.
+/// See `LoadedProgram::with_modules_and_object_root` for validation requirements.
+pub fn read_modules_with_object_root(
+    inputs: &[ModuleInput<'_>],
+    library: &Module,
+    object_root: &crate::metadata::TypeDefId,
+) -> Result<Vec<Module>, Fault> {
+    read_modules_core(inputs, library, Some(object_root))
+}
+
+fn read_modules_core(
+    inputs: &[ModuleInput<'_>],
+    library: &Module,
+    object_root: Option<&crate::metadata::TypeDefId>,
+) -> Result<Vec<Module>, Fault> {
     if inputs.is_empty() {
         return Err(Fault::new("expected at least one module input"));
     }
@@ -71,7 +90,12 @@ pub fn read_modules(inputs: &[ModuleInput<'_>], library: &Module) -> Result<Vec<
         resolve_fields(&mut module, &context, fixups)?;
         modules.push(module);
     }
-    crate::library::link_modules(&modules[0], library, &modules[1..])?;
+    crate::library::link_modules_with_object_root(
+        &modules[0],
+        library,
+        &modules[1..],
+        object_root,
+    )?;
     Ok(modules)
 }
 
@@ -86,6 +110,7 @@ pub(crate) fn parse_module(source: &str) -> Result<Module, Fault> {
 
 fn parse_parts(source: &str) -> Result<(Module, Vec<FieldFixup>), Fault> {
     let mut module = Module {
+        object_root: None,
         assemblies: vec![],
         format: 5,
         name: String::new(),

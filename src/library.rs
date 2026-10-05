@@ -24,16 +24,37 @@ pub(crate) fn link_modules(
     library: &Module,
     dependencies: &[Module],
 ) -> Result<Module, Fault> {
+    link_modules_with_object_root(application, library, dependencies, None)
+}
+
+pub(crate) fn link_modules_with_object_root(
+    application: &Module,
+    library: &Module,
+    dependencies: &[Module],
+    object_root: Option<&crate::metadata::TypeDefId>,
+) -> Result<Module, Fault> {
     if library.name != "System" || !library.entry.is_empty() {
         return Err(Fault::new(
             "expected a System library module without an entry point",
         ));
     }
+    if library.format != 5 {
+        return Err(Fault::new("unsupported module format (expected 5)"));
+    }
+    if object_root.is_some_and(|root| root.module == application.name) {
+        return Err(Fault::new("runtime Object root must belong to a library"));
+    }
     let mut library = library.clone();
+    library.object_root = None;
     library.normalize_definition_ids()?;
-    let library = crate::scope::normalize_module(&library, &library)?;
-    crate::vm::validate_linked(&library)?;
-    crate::references::validate_list(&library, &[&library])?;
+    let library = if object_root.is_none() {
+        let normalized = crate::scope::normalize_module(&library, &library)?;
+        crate::vm::validate_linked(&normalized)?;
+        crate::references::validate_list(&normalized, &[&normalized])?;
+        normalized
+    } else {
+        library
+    };
     let mut names = std::collections::HashSet::from([library.name.as_str()]);
     for (index, module) in std::iter::once(application).chain(dependencies).enumerate() {
         if module.name.is_empty() || !names.insert(module.name.as_str()) {
@@ -55,7 +76,11 @@ pub(crate) fn link_modules(
     for module in std::iter::once(application).chain(dependencies) {
         crate::references::validate_list(module, &supplied)?;
     }
+    if object_root.is_some() {
+        crate::references::validate_list(&library, &supplied)?;
+    }
     let mut linked = application.clone();
+    linked.object_root = object_root.cloned();
     linked.normalize_definition_ids()?;
     crate::metadata_origin::merge(&mut linked, &library)?;
     linked.types.extend(library.types.iter().cloned());
@@ -71,7 +96,10 @@ pub(crate) fn link_modules(
     bind_local_internal_references(&mut linked)?;
     crate::vm::validate_linked(&linked)?;
     bind_member_references(&mut linked)?;
-    for source in std::iter::once(application).chain(dependencies) {
+    for source in std::iter::once(application)
+        .chain(dependencies)
+        .chain(object_root.map(|_| &library))
+    {
         let normalized = crate::scope::normalize_module(&linked, source)?;
         crate::references::validate_uses(&linked, &normalized)?;
     }

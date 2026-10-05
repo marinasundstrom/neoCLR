@@ -5956,3 +5956,13 @@ loaded System.Object grants application lookalikes intrinsic behavior. That atte
 relaxation was reverted; retained seed ownership and compiler configuration remain
 unchanged. Runtime controls now cover binary seed/application loading and invalid
 ownership. Source Object binding/emission remains an open prerequisite.
+
+### Explicit runtime root host selection (2026-10-05)
+
+The [runtime host gate](experiments/extended-cli-metadata/explicit-object-root-2026-10-05.md)
+selects the Object root by exact library TypeDefId and validates its shape/slots.
+The retained seed may depend on the supplied root library, with normal reference and
+access checks. Default loading retains System ownership and lookalike rejection.
+This is transient load context, not new CLI/native encoding. Raven binding, root
+writer authoring and ordinary driver/CLI configuration are still pending; no seed
+or source-ownership manifest changes are implied by the runtime-only gate.

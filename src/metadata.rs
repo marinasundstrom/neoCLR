@@ -210,6 +210,9 @@ impl Type {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Module {
+    // Host-selected load context, never authored or trusted from serialized metadata.
+    #[serde(skip)]
+    pub(crate) object_root: Option<TypeDefId>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub assemblies: Vec<crate::metadata_origin::AssemblyMetadata>,
     pub format: u32,

@@ -62,3 +62,12 @@ generic Box type into three neoIL sources. `cargo run --example modules` assembl
 set, verifies it, and prints `42`. The [CLI](cli-module-sets.md) also supports explicit
 sets through repeatable `--module` arguments and an optional `--system` input, including
 mixed sources and JSON artifacts.
+
+## Explicit root selection (development, 2026-10-05)
+
+The default self-contained System rule above remains in force. The optional
+[Object-root host API](../api-docs/runtime-hosting.md) validates System alongside the
+supplied dependencies, allowing a retained seed to reference a separately authored
+root library. Exact module/revision/type-row selection is required. Applications and
+serialized artifacts cannot implicitly select a root. This is a host API prerequisite;
+the ordinary compiler/CLI workflow has not yet switched to source Object ownership.

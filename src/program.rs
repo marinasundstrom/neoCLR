@@ -49,6 +49,32 @@ impl LoadedProgram {
         })
     }
 
+    /// Prepare a load set with a host-selected runtime Object root.
+    ///
+    /// `object_root` is an exact module/revision/type-row identity in System or an
+    /// explicitly supplied dependency, never the application. It must identify a
+    /// public, abstract, fieldless, nongeneric root class named System.Object with
+    /// public concrete virtual ToString, Equals and GetHashCode slots. Duplicate
+    /// roots, wrong identities and incomplete/incompatible slots fail loading.
+    /// Selection is not serialized and does not mutate the input artifacts. System
+    /// may depend on supplied modules in this mode; all its uses are validated.
+    /// This does not perform typed verification or execute the program.
+    pub fn with_modules_and_object_root(
+        module: &Module,
+        library: &Module,
+        dependencies: &[Module],
+        object_root: &crate::metadata::TypeDefId,
+    ) -> Result<Self, Fault> {
+        Ok(Self {
+            module: crate::library::link_modules_with_object_root(
+                module,
+                library,
+                dependencies,
+                Some(object_root),
+            )?,
+        })
+    }
+
     /// Analyze the already-bound metadata without executing code.
     pub fn verify(&self) -> Result<Verification, Fault> {
         crate::verifier::analyze(&self.module)

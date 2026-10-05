@@ -8,10 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
-- Lock Object root ownership with focused runtime and binary load-set controls.
-  Record why relaxing assembly-name checks without explicit root selection admits
-  application lookalikes; that experiment was reverted. Source Object ownership
-  remains planned, with no runtime behavior or metadata format change in this slice.
+- Add explicit host selection of an Object root by library module/revision/type row,
+  with slot validation, binary round trips and checked retained-seed dependencies.
+  Default loading still rejects application lookalikes. Selection is transient;
+  no metadata format changes. Rust Module literals must migrate to readers because
+  Module now has private context. Source Object binding/writer/CLI integration remains
+  pending; 86 runtime regressions and all-target compilation pass.
 
 - Preserve assembly identities for matching runtime-service InternalCall declarations,
   binding symbolic calls locally while retaining signature and access validation.

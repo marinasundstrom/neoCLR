@@ -1,0 +1,40 @@
+{
+  "date": "2026-10-05",
+  "runtimeBaseRevision": "4c7882e6",
+  "ravenRevision": "ee4ddba20",
+  "scope": "Runtime host selection only; source Object compiler/writer/CLI integration remains open",
+  "sourceSha256": {
+    "src/assembler.rs": "8260031e2654baecc710087535a26af30a6c7f32e5438acaae86051ac567e66e",
+    "src/library.rs": "095f67fd9fb83808af90950c82e4edb7d765bb67139a2e59c82f4a1b3ae4a29a",
+    "src/metadata.rs": "de77d7c2bf0fe0c29ef591bca24f5dd3aa13a53c3e328f4d1cac25cbc42874c4",
+    "src/program.rs": "25ba68585d388e161451c9695663f449a3f4485f0b680ffff613c7d2f0409637",
+    "src/object_root.rs": "ca7b37df0d57aba808fa30e9c8294aa51ec5e8e8821ba625cdc3a78e6a3b3581",
+    "src/inheritance.rs": "9ecec838287d9ecf6dff7fecf8ad1990e57303c3dbe5efe27c1ba03c1b608fd2",
+    "src/intrinsic_objects.rs": "df82c55b289cf35b97e32669cf2a34df5556b423adec462bd53a1cb3ab03cb06",
+    "src/vm.rs": "951ebd583f373888b771a11903980ea188f099e9178527e94f8976db05baf0be",
+    "src/lib.rs": "93fd3bf429a8b4300a4aac2226ff09601aba5429e22e484b8b08805bb6d086e1",
+    "tests/object_root_identity.rs": "f53c3620ec562a1efb5b5810b8d3511b0788cbde4847e9bbe18ffa2c9ec46425"
+  },
+  "validation": [
+    {
+      "command": "cargo test --release --test object_root_identity --test object_display --test object_equality --test loaded_program --test modules --test library_references --test scoped_types --test revisions",
+      "exitCode": 0,
+      "passed": 86
+    },
+    {
+      "command": "cargo test --release --test object_root_identity",
+      "exitCode": 0,
+      "passed": 12,
+      "note": "Rerun after tightening rejection of override-marked root slots"
+    },
+    {
+      "command": "cargo check --release --all-targets",
+      "exitCode": 0
+    },
+    {
+      "command": "python3 scripts/build-api-docs.py --check",
+      "outcome": "pre-existing stale guest API snapshot; Rust host APIs documented manually"
+    }
+  ],
+  "artifactEvidence": "Tests generate and reload NEOX artifacts in memory; explicit root selection is not serialized. No production seed or ownership manifest is replaced."
+}

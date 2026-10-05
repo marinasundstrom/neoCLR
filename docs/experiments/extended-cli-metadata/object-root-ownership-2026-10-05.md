@@ -1,5 +1,8 @@
 # Source Object ownership investigation — 2026-10-05
 
+Follow-up: [explicit runtime host selection now executes](explicit-object-root-2026-10-05.md).
+The compiler/writer source-root work below remains open.
+
 Source Object remains blocked. This slice establishes executable root-identity
 controls; it does not replace the retained seed or enable source Object compilation.
 Compiler baseline: Raven `485b364fc` (implementation `1ac78fdfa`). Runtime baseline:

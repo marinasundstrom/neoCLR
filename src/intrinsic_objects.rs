@@ -26,10 +26,7 @@ pub(crate) fn dispatch(
         .type_definition(&object.concrete_type())
         .is_none_or(|definition| definition.enum_info.is_none())
         || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
-        || contract
-            .definition
-            .as_ref()
-            .is_none_or(|id| id.module != "System")
+        || !crate::object_root::owns_slot(module, contract)
         || !contract.instance
         || !contract.is_virtual
         || contract.is_abstract

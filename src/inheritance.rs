@@ -231,9 +231,7 @@ fn implicit_object_contract(
         return Ok(None);
     }
     Ok(declared_method(module, &object, method)?.filter(|f| {
-        f.definition
-            .as_ref()
-            .is_some_and(|id| id.module == "System")
+        crate::object_root::owns_slot(module, f)
             && f.is_virtual
             && !f.receiver_byref
             && f.generic_parameters.is_empty()

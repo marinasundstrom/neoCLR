@@ -1037,3 +1037,10 @@ primitive designation now accepts the fieldless handle declaration. XML and the 
 experimental metadata manual document it; no guest API signature or RavenDoc selection
 changes. The required snapshot check still reports the previously recorded stale guest
 snapshot. It was not replaced with a partial library snapshot.
+
+2026-10-05: `LoadedProgram::with_modules_and_object_root` and
+`assembler::read_modules_with_object_root` are covered by
+[runtime hosting](runtime-hosting.md), linked from the API landing page. These are
+Rust host APIs and cannot be extracted from the guest CLI reference by RavenDoc;
+no guest type is excluded or added to the type selection. The API snapshot check
+still reports the pre-existing stale guest reference; no partial replacement was made.

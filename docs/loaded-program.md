@@ -83,3 +83,14 @@ lookup. Matching methods retain every existing resolution check. This is a local
 allocation reduction in linear lookup, not a prepared-call cache or verification
 shortcut. The focused runner reports assembly/loading/verification/execution timings
 separately; these diagnostic measurements are not API performance guarantees.
+
+## Explicit source-root hosting (development, 2026-10-05)
+
+`with_modules_and_object_root` selects an exact library TypeDefId as the runtime
+Object root. It validates the root and its three Object slots before admission, and
+permits the retained System seed to depend on the explicit load set. Read mixed
+artifacts with `assembler::read_modules_with_object_root` using the same selection.
+Selection stays in the immutable runtime snapshot, is not serialized, and is never
+inferred from a declaration's name. Default APIs retain their existing behavior.
+See the [host API reference](../api-docs/runtime-hosting.md) for signatures, errors,
+Rust Module construction migration and current compiler/CLI limitations.

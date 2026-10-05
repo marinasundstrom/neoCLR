@@ -4,6 +4,8 @@ toc: false
 ---
 # API documentation
 
+[Experimental runtime hosting](runtime-hosting.md) covers explicit Object-root load contexts.
+
 [Experimental .NET metadata tooling](experimental-metadata.md) documents the
 feature-branch host library for future Raven adapters; it is not a guest API or release.
 
