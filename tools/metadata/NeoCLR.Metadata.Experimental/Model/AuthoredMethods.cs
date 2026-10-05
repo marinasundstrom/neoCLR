@@ -65,7 +65,7 @@ public sealed partial class MethodDefinition
     }
     /// <summary>Creates a detached type method, constructor, bounded Object override or abstract interface contract with CLI attributes.</summary>
     /// <param name="name">Nonempty name or .ctor; .cctor is unsupported. Unique by signature on attachment.</param>
-    /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. Public Object overrides use Virtual without Abstract or NewSlot.</param>
+    /// <param name="attributes">Public, Assembly, Private or constructor-only Family; optional Static and HideBySig. Constructors may use SpecialName and RTSpecialName together; Public instance or static interface contracts require Abstract, Virtual and NewSlot together. Public Object overrides use Virtual without Abstract or NewSlot. Native Object root slots use Virtual and NewSlot without Abstract.</param>
     /// <param name="signature">Supported signature validated against the destination type on attachment.</param>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported attributes or invalid name.</exception>
@@ -76,8 +76,10 @@ public sealed partial class MethodDefinition
         if (string.IsNullOrEmpty(name) || name.Length > 1024 || name == ".cctor" ||
             (attributes & ~0x1dd7) != 0 || (attributes & 7) is not (1 or 3 or 4 or 6))
             throw new ArgumentException("invalid type-method declaration");
+        bool rootSlot = (attributes & 0x557) == 0x146;
+        if (rootSlot && !IsNativeObjectSlot(name, signature)) throw new ArgumentException("unsupported native Object slot signature");
         bool valueOverride = (attributes & 0x540) == 0x40;
-        bool contract = !valueOverride && (attributes & 0x540) != 0;
+        bool contract = !rootSlot && !valueOverride && (attributes & 0x540) != 0;
         if (valueOverride && ((attributes & 0x17) != 6 || !IsObjectOverride(name, signature)))
             throw new ArgumentException("unsupported Object override signature");
         if (contract && ((attributes & 0x540) != 0x540 || (attributes & 7) != 6 || signature.GenericParameterNames.Count != 0 || name == ".ctor"))
@@ -117,6 +119,7 @@ public sealed partial class MethodBuilder
     internal MethodBuilder(AssemblyBuilder assembly, MethodDefinition definition, TypeBuilder? owner = null)
     { Assembly = assembly; DeclaringType = owner; Definition = definition; definition.Producer = this; definition.Module = assembly.Definition.MainModule; }
     // Keep access flags and context-derived CLI flags in one place for inspection and writing.
+    internal bool IsNativeObjectSlot => (Definition.DeclarationAttributes & 0x540) == 0x140;
     internal bool IsOverride => (Definition.DeclarationAttributes & 0x140) == 0x40;
     internal ushort GetAttributes(bool? accessor = null)
     {
@@ -166,6 +169,8 @@ public sealed partial class TypeBuilder
         if (!definition.IsTypeDeclaration || definition.AuthoredSignature is not { } signature ||
             definition.Producer is { } producer && !ReferenceEquals(producer.DeclaringType, this))
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
+        if ((definition.DeclarationAttributes & 0x540) == 0x140 && (!IsNativeObjectRoot || !MethodDefinition.IsNativeObjectSlot(definition.Name, signature, this)))
+            throw new InvalidOperationException("new Object slots require the explicit native root and its exact signature");
         if ((definition.DeclarationAttributes & 0x540) == 0x40 && (IsInterface || IsStatic || !IsValueType && GenericParameterNames.Count != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary)))
             throw new InvalidOperationException("Object overrides require a class/value owner and the exact core slot signature");
         if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))

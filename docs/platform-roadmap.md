@@ -3,6 +3,18 @@
 The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
+Working samples, including Tasks and `await` through the native compiler path, are
+also required; runtime suspension and green threads are explicitly deferred.
+
+## API-authored Object slots execute (2026-10-05)
+
+The metadata API now declares Object's three concrete virtual new slots and preserves
+those facts through native readers, introspection and CLI reference projection. An
+API-produced PE loads through explicit host root selection and executes all three slots
+plus boxed Int32 display. 157 C# metadata groups and 13 runtime identity tests pass.
+Next connect root signatures/boxing/overrides to Raven emission and dependency selection,
+then the shared CLI/VS Code project gate. Production source Object is not yet emitted.
+See [reproduction and scope](experiments/extended-cli-metadata/object-root-slots-2026-10-05.md).
 
 ## Object root declaration authoring passes (2026-10-05)
 
@@ -2011,3 +2023,21 @@ type/member signatures and flags, tokens and decoded instruction bodies/branch t
 using the existing metadata reader. Source reconstruction/decompilation is a separate
 scope. Decide whether the diagnostic benefit and implementation cost justify inclusion;
 no implementation, release commitment or editor integration is asserted for it yet.
+
+### Author-directed release gate: samples, Tasks and await (2026-10-05)
+
+The author requires release samples to execute successfully, explicitly including Tasks
+and `await`. Existing Tasks library/callback consumer evidence and older translated
+async experiments do not complete the native compiler/emitter gate. After source-root
+ownership wiring, assess the checked-in samples through ordinary native compiler
+commands and prioritize async lowering/emission gaps that block them. Preserve the
+working .NET path and use the current runtime execution model; do not make runtime
+suspension or green threads prerequisites. Those are future exploration, not this release.
+
+Record a concrete sample inventory with expected output and termination. Native coverage
+must include async entry points, result-bearing and completion-only await, composition
+and the actual scheduling/error/cancellation behavior exercised by those samples.
+Distinguish an already-completed task from work that completes later when validating
+continuations. CLI and editor build/run must use the same target artifacts and settings.
+Compared with .NET, share Raven's established async semantics/lowering where applicable
+and adapt representation at the target boundary; do not introduce new scheduling promises.

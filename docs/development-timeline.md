@@ -10901,3 +10901,13 @@ The current root-authoring prerequisite remains active; the editor must share th
 compiler importer/emitter and dependency catalog. Declaration authoring now passes
 156 C# metadata groups, but root-slot/compiler wiring and editor execution remain open.
 This clarification does not claim that a VS Code workflow has been implemented.
+
+### 2026-10-05 — Samples require Tasks and await for release
+
+The author said, “Also for the release, samples must work, so tasks and await must work.
+In the future we might implement runtime suspension, and green threads, but not now.”
+The assistant accepted native Tasks/await sample execution as a release gate, using the
+current execution model, and kept runtime suspension/green threads deferred. Existing
+callback Tasks and translated async evidence must not be mistaken for native compiler
+async completion. The roadmap now directs a sample inventory and native async gap work
+after the active root-ownership prerequisite. No async implementation is claimed here.

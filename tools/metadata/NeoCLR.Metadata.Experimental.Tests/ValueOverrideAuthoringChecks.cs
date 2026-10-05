@@ -52,8 +52,10 @@ internal static class ValueOverrideAuthoringChecks
         try { graph.WriteNativeAssembly(); throw new Exception("native override silently encoded as an ordinary method"); }
         catch (InvalidDataException error) when (error.Message.Contains("runtime slot binding")) { }
 
-        foreach (var attributes in new ushort[] { 0x41, 0x43, 0x56, 0x146, 0x446 })
+        foreach (var attributes in new ushort[] { 0x41, 0x43, 0x56, 0x446 })
             Reject<ArgumentException>(() => new MethodDefinition("ToString", attributes, signature));
+        // Virtual NewSlot is now a valid detached native-root declaration, but never a value override.
+        Reject<InvalidOperationException>(() => owner.Definition.Methods.Add(new MethodDefinition("ToString", 0x146, signature)));
         Reject<ArgumentException>(() => owner.AddOverride("DifferentSlot", signature));
         Reject<ArgumentException>(() => owner.AddOverride("ToString", new(PrimitiveType.Int32, [])));
         Reject<ArgumentException>(() => owner.AddOverride("ToString", new(PrimitiveType.String, [PrimitiveType.Int32])));

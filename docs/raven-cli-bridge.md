@@ -5994,3 +5994,14 @@ CLI projection does not prove execution. The API reference documents the current
 its manual .NET metadata section is updated, while the existing guest snapshot check
 still reports stale generated inputs. The end-to-end acceptance includes language-server
 and VS Code editing/build/run against the same catalog, not a separate editor backend.
+
+### Object slots execute from API-produced PE (2026-10-05)
+
+The metadata library can now author the three concrete root virtual new slots; native
+readers/introspection and the CLI reference projection preserve their flags and Equals
+root identity. The explicit runtime host loads the resulting PE and executes all three
+slots plus boxed display. See [evidence](experiments/extended-cli-metadata/object-root-slots-2026-10-05.md).
+Raven's source-root emitter guard remains: root references/boxing/overrides and driver
+selection still require wiring. The native format is unchanged; .NET defaults are unchanged.
+Working native Tasks/await samples now explicitly belong to the release gate alongside
+VS Code/LSP integration; runtime suspension and green threads remain future work.

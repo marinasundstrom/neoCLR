@@ -56,3 +56,37 @@ public sealed partial class TypeBuilder
     /// <exception cref="ArgumentException">The declaration's shape or base is incompatible.</exception>
     public void SetNativeObjectRoot() => Definition.SetNativeObjectRoot();
 }
+
+public sealed partial class MethodDefinition
+{
+    internal static bool IsNativeObjectSlot(string name, MethodSignature signature, TypeBuilder? root = null)
+    {
+        if (signature.GenericParameterNames.Count != 0 || signature.OutParameters.Count != 0) return false;
+        return name switch
+        {
+            "ToString" => signature.ReturnType == PrimitiveType.String && signature.ParameterTypes.Count == 0,
+            "GetHashCode" => signature.ReturnType == PrimitiveType.Int32 && signature.ParameterTypes.Count == 0,
+            "Equals" => signature.ReturnType == PrimitiveType.Boolean && signature.ParameterTypes.Count == 1 &&
+                signature.ParameterTypes[0].ClassType is { IsNativeObjectRoot: true } owner && (root is null || ReferenceEquals(owner, root)),
+            _ => false
+        };
+    }
+}
+
+public sealed partial class TypeBuilder
+{
+    /// <summary>Adds a concrete public virtual new slot to the explicit native Object root.</summary>
+    /// <param name="name">ToString, Equals or GetHashCode.</param>
+    /// <param name="signature">String ToString(), Boolean Equals(this root), or Int32 GetHashCode().</param>
+    /// <returns>The method builder; use GetILGenerator to supply its body.</returns>
+    /// <exception cref="ArgumentException">Invalid signature, duplicate method or declaration limit.</exception>
+    /// <exception cref="InvalidOperationException">The owner is not the designated root.</exception>
+    /// <remarks>Equivalent to attaching a MethodDefinition with Public, Virtual and NewSlot flags.
+    /// These are declarations of slots, not overrides. Runtime admission still validates the complete root.</remarks>
+    public MethodBuilder AddNativeObjectSlot(string name, MethodSignature signature)
+    {
+        var definition = new MethodDefinition(name, 0x146, signature);
+        Definition.Methods.Add(definition);
+        return MethodBuilder.ForDefinition(definition);
+    }
+}

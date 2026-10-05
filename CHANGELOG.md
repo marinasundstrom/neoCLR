@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Add concrete native Object virtual-slot authoring with definition/builder parity,
+  exact Equals root identity and preserved CLI Virtual/NewSlot flags. API-produced
+  metadata loads and executes all three Object slots plus boxed display in NeoCLR.
+  157 C# metadata groups and 13 runtime root-identity tests pass. Production source-root
+  compiler wiring and the CLI/VS Code gate remain pending; no native format change.
+  Record working Tasks/await samples as a release requirement; runtime suspension and
+  green threads remain deferred.
+
 - Add explicit native Object-root declaration authoring through definitions and builders,
   with a baseless CLI reference projection and standard Object signature encoding.
   Native readers preserve canonical declaration facts without granting runtime admission.

@@ -7314,9 +7314,33 @@ The benefit is explicit root identity without a competing bootstrap base; the co
 that this artifact needs NeoCLR host admission and cannot be executed by the CLR.
 
 This is declaration support, not complete core-library production: callers still need
-Object-slot authoring, boxing/root reference selection and compiler/driver wiring.
+boxing/root reference selection and compiler/driver wiring. Root-slot authoring is
+provided below.
 `CoreObjectType` continues to mean the explicit bootstrap reference. No implicit bases
 or bootstrap references are retargeted by designation. The runtime host must separately
 select the exact root identity and validate its required slots. Ordinary names do not
 claim root ownership. See `ObjectRootChecks.cs` for builder/definition parity, native
 round trips, CLI signatures, mutation rejection and ordinary lookalike controls.
+
+### Native Object virtual slots
+
+`TypeBuilder.AddNativeObjectSlot(string name, MethodSignature signature) : MethodBuilder`
+adds a concrete public virtual **new slot** to the designated root. Supported signatures
+are `String ToString()`, `Int32 GetHashCode()` and `Boolean Equals(root)`, where the last
+parameter is the exact authored root, not `CoreObjectType` or another output's root.
+Use `GetILGenerator()` on the returned builder for the body. Manual definitions use
+`new MethodDefinition(name, 0x146, signature)` followed by attachment to root.Methods.
+Signature/name errors throw `ArgumentException`; an incompatible owner or foreign root
+throws `InvalidOperationException` during attachment. Duplicate signatures are rejected.
+
+Readers, introspection and CLI reference projections retain Virtual and NewSlot without
+Abstract or override semantics. Native encoding uses existing `is_virtual`/`is_override`
+fields; no format revision. `CallVirtual`/raw `Callvirt` accept owned root slots.
+An ordinary class or value type cannot claim these new root slots. The existing Object
+override API continues to reuse inherited slots. As on CLR, declaring a virtual slot is
+distinct from overriding one; NeoCLR's explicit root admission remains host configuration.
+
+Validation: `ObjectSlotChecks` covers manual/builder parity, native and CLI round trips,
+introspection flags and exact Equals identity, malformed declarations and wrong owners.
+The generated fixture is loaded and executed by Rust `object_root_identity`; production
+source Object/compiler integration is still pending.

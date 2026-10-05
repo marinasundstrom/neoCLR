@@ -21,7 +21,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -605,7 +605,10 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!instance || ownerIndex >= 0 && !types[ownerIndex].IsStatic, "instance method requires a nonstatic owner");
                 Require(receiverByRef == (instance && types[ownerIndex].IsValueType), "value instance receiver must be byref");
                 var interfaceOwner = ownerIndex >= 0 && types[ownerIndex].IsInterface;
-                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner && instance || isOverride), "interface method flags mismatch");
+                bool objectSlot = ownerIndex >= 0 && types[ownerIndex].IsObjectRoot && isVirtual && !isOverride;
+                Require(!objectSlot || instance && !isAbstract && visibility == MethodVisibility.Public &&
+                    MethodDefinition.IsNativeObjectSlot(name, new(resultType, parameterTypes, genericNames), signatureGraph.Types[ownerIndex]), "invalid native Object slot");
+                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner && instance || isOverride || objectSlot), "interface method flags mismatch");
                 Require(!interfaceOwner || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
                     method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract interface method");
                 Require(!isOverride || !interfaceOwner && instance && (types[ownerIndex].IsValueType || types[ownerIndex].GenericNames.Length == 0) &&
@@ -685,7 +688,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -829,6 +832,7 @@ public sealed partial class NativeAssemblyDefinition
             var output = method.Owner < 0 ? graph.AddFunction(method.Namespace, method.Name, signature, method.Visibility)
                 : owners[method.Owner].IsInterface ? owners[method.Owner].AddInterfaceMethod(method.Name, signature, !method.Instance)
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
+                : method.ObjectSlot ? owners[method.Owner].AddNativeObjectSlot(method.Name, signature)
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);

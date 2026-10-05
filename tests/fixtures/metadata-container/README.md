@@ -36,3 +36,17 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
 
 Rust compares exact decoded operand bits, verifies the methods and rejects a schema-2
 downgrade. This tests metadata preservation, not NaN arithmetic canonicalization.
+
+`object-root-slots.pe` contains a baseless abstract native System.Object with concrete
+ToString/Equals/GetHashCode new virtual slots, authored by `ObjectSlotChecks.Create`.
+Regenerate with:
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --object-root-slots-image tests/fixtures/metadata-container/object-root-slots.pe
+```
+
+`object_root_identity` selects its exact library identity in the runtime host, then
+executes all three slots on ordinary objects and display on a boxed Int32. The fixture's
+constant slot bodies are test implementations, not replacements for production Object.
+The reference projection has a fresh MVID on regeneration; native content is stable.
