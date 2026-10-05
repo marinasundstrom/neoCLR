@@ -1,0 +1,197 @@
+{
+  "scope": "selected unchanged POC samples; only cases with an execution record claim runtime validation",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "cd218b72abdfd24ba048abafe87181c2f221fd37",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0": "25cc609776e36095352b9546419c14d203d20dc3"
+  },
+  "inputs": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "68248a500d596621e6b2af844268ee56c32f1ee11e5e6e47b660814df25dbcfd",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "4f698f5b6d015b9b9bcf3b32a71eb7b3e88b1dd2071f021d12e3da7b0a1cadad",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "d2113d7ab614dd2c71da9a31b3702582355c1dcd4e4072274b69f474652bf052",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "5dc592c7d0cba2610826ec88a8f27e666d1fc5c50ef5f325d6fdd96861c77e5a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+  },
+  "cases": [
+    {
+      "name": "native-async-propagation",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-propagation41005/native-async-propagation.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-async-propagation.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/extended-cli-metadata/bootstrap/native-async-propagation.rvn": "a3fd204d7c8f637131946c87f5b8753894d2a3095d530be91829c21eb5158cea"
+      },
+      "published": true,
+      "artifactSha256": "7e4fa8afb123ad1abe9b40e1af378cdd0e310d688a518075d2c2b6a6db138582",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-async-propagation41005/native-async-propagation.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Native async propagation checks passed\n",
+        "stderr": "",
+        "expectedStdout": "Native async propagation checks passed\n",
+        "passed": true
+      }
+    },
+    {
+      "name": "native-async-state",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-propagation41005/native-async-state.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2706: This async method 'Completed' has no 'await' and will run synchronously.\nwarning RAV2706: This async method 'Completed' has no 'await' and will run synchronously.\n",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn": "991dd80b7b416bd7cea25621745d19a4836529494659238997f6c6d73590ae19"
+      },
+      "published": true,
+      "artifactSha256": "e33c8bc85d53048364960c6999f0896967331ffca1b39c1297b87f6d0983e4d5",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-async-propagation41005/native-async-state.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Native async state checks passed\n",
+        "stderr": "",
+        "expectedStdout": "Native async state checks passed\n",
+        "passed": true
+      }
+    },
+    {
+      "name": "http-json-server",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-propagation41005/http-json-server.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+        "docs/experiments/json-object-mapping/HttpServer.rvn": "9c157bc5fcdfdf96401300feccbcd46d02bf0fa7db8f7c4c1f4233c73f589084"
+      },
+      "published": true,
+      "artifactSha256": "e45417d55b09da82e072b2887178e907712bab5fe582ea1e2861d61c9f1cfd37"
+    },
+    {
+      "name": "http-json-client",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-propagation41005/http-json-client.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpClient.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\nwarning RAV0162: Unreachable code\n",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+        "docs/experiments/json-object-mapping/HttpClient.rvn": "bf129bcbd1768157ff3fb482dfc84fe686f56129c6c7b177bdcb0eadf51a1619"
+      },
+      "published": true,
+      "artifactSha256": "590f3cfa7e60d03460cf4263e6fd1780a20cd1e6005889d7cb8a807d6850f83f"
+    }
+  ]
+}

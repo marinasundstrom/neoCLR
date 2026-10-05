@@ -14,10 +14,13 @@ A native driver/runtime regression verifies completed/pending awaits, hoisted lo
 preservation and cancellation with exact output. The unchanged cancellation sample also
 executes. Immutable hoisted closure captures now preserve Promise identity; both async
 samples reach the entry completion blocker. Nongeneric class async methods now preserve
-receiver identity and private access through metadata nesting. Both HTTP samples reach a
-portable value-block control-flow rejection; fix that and async entry completion next. This does
-not introduce runtime suspension or green threads.
-[Scope and evidence](experiments/extended-cli-metadata/native-async-emission-2026-10-05.md).
+receiver identity and private access through metadata nesting. Both unchanged HTTP samples
+now compile and execute together over localhost, including JSON error responses and
+GET/POST mapping. Async Result propagation success/error paths have a focused execution
+regression. Next complete async entry semantics for the remaining two async samples.
+This does not introduce runtime suspension or green threads.
+[Async scope](experiments/extended-cli-metadata/native-async-emission-2026-10-05.md) and
+[native HTTP execution evidence](experiments/extended-cli-metadata/native-http-execution-2026-10-05.md).
 
 ## POC sample gate and next blocker (2026-10-05)
 

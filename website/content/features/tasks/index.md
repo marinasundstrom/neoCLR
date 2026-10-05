@@ -18,8 +18,9 @@ now supports top-level nongeneric async functions, including completed/pending a
 hoisted locals and cancellation. A synchronous entry drives the queue in the tested case.
 The unchanged cancellation sample also compiles and runs. Immutable callbacks preserve
 hoisted Promise identity. Nongeneric class async methods preserve receiver identity and
-private access. Entry completion and propagation control flow remain blockers for the
-other async/HTTP samples.
+private access. Async Result propagation now executes, and the unchanged HTTP JSON
+client/server samples compile to native assemblies and pass a localhost round trip.
+Async entry completion remains a blocker for the two async Main samples.
 The current POC prioritizes working samples; complete System coverage is later work.
 
 ## Starting and awaiting a worker

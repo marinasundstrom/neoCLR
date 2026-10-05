@@ -1,0 +1,47 @@
+import System.*
+import System.Tasks.*
+import System.Result.*
+
+func Forward(input: Task<Result<int, string>>) -> Task<Result<int, string>> => input
+
+class Reader {
+    private var resumed: int = 0
+
+    async func Read(input: Task<Result<int, string>>) -> Task<Result<int, string>> {
+        let value = await Forward(input)?
+        resumed = resumed + 1
+        return Ok(value + 1)
+    }
+
+    val Resumed: int => resumed
+}
+
+func Main() {
+    let reader = Reader()
+    let source = Promise<Result<int, string>>()
+    let pending = reader.Read(source.Task)
+    if pending.IsCompleted {
+        System.Fail("Propagation completed before await")
+    }
+    _ = source.Complete(Ok(41))
+    TaskQueue.Default.Drain()
+    if pending.GetResult() is Ok(let value) {
+        if value != 42 || reader.Resumed != 1 {
+            System.Fail("Successful await propagation lost its value")
+        }
+    } else {
+        System.Fail("Successful await propagated an error")
+    }
+    let failed = Promise<Result<int, string>>()
+    let error = reader.Read(failed.Task)
+    _ = failed.Complete(Error("expected"))
+    TaskQueue.Default.Drain()
+    if error.GetResult() is Error(let message) {
+        if message != "expected" || reader.Resumed != 1 {
+            System.Fail("Error propagation continued past the return")
+        }
+    } else {
+        System.Fail("Await error was lost")
+    }
+    Console.WriteLine("Native async propagation checks passed")
+}

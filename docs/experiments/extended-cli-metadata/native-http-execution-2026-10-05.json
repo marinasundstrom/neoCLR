@@ -1,0 +1,114 @@
+{
+  "inputs": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd",
+    "/private/tmp/native-async-propagation41005/http-json-server.dll": "e45417d55b09da82e072b2887178e907712bab5fe582ea1e2861d61c9f1cfd37",
+    "/private/tmp/native-async-propagation41005/http-json-client.dll": "590f3cfa7e60d03460cf4263e6fd1780a20cd1e6005889d7cb8a807d6850f83f",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62"
+  },
+  "runs": [
+    {
+      "serverCommand": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/native-async-propagation41005/http-json-server.dll",
+        "--system",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--module",
+        "/private/tmp/http-final1005/Http.dll",
+        "--",
+        "4"
+      ],
+      "requests": [
+        {
+          "method": "GET",
+          "path": "/report",
+          "status": 200,
+          "body": {
+            "station": "Caf\u00e9"
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 201,
+          "body": {
+            "accepted": true
+          }
+        },
+        {
+          "method": "POST",
+          "path": "/reports",
+          "status": 400,
+          "body": {
+            "error": "Invalid report"
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/missing",
+          "status": 404,
+          "body": {
+            "error": "Not found"
+          }
+        }
+      ],
+      "port": "52784",
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    },
+    {
+      "serverCommand": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/native-async-propagation41005/http-json-server.dll",
+        "--system",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--module",
+        "/private/tmp/http-final1005/Http.dll",
+        "--",
+        "2"
+      ],
+      "requests": [],
+      "port": "52789",
+      "clientCommand": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/native-async-propagation41005/http-json-client.dll",
+        "--system",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--instructions",
+        "100000000",
+        "--module",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--module",
+        "/private/tmp/http-final1005/Http.dll",
+        "--",
+        "http://127.0.0.1:52789/"
+      ],
+      "client": {
+        "exitCode": 0,
+        "stdout": "{\"accepted\":true}\n",
+        "stderr": ""
+      },
+      "server": {
+        "exitCode": 0,
+        "stdout": "Reports served\n",
+        "stderr": ""
+      }
+    }
+  ],
+  "passed": true
+}

@@ -8,6 +8,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES = {
+    'native-async-propagation': ['extended-cli-metadata/bootstrap/native-async-propagation.rvn'],
     'native-async-state': ['extended-cli-metadata/bootstrap/native-async-state.rvn'],
     **{name: [f'raven-target/samples/{name}.rvn'] for name in (
         'application-order-collections', 'application-types', 'application-interfaces',
@@ -38,6 +39,7 @@ def main():
     if runtime:
         inputs.append(runtime)
     expected = {
+        'native-async-propagation': 'Native async propagation checks passed\n',
         'native-async-state': 'Native async state checks passed\n',
         'library-async-cancellation': 'Cancelled\n',
         'application-order-collections': (ROOT / 'docs/experiments/raven-target/samples/application-order-collections.expected.txt').read_text(),
