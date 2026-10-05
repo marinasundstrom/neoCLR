@@ -8,10 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
-- Record Raven's explicit native Task/builder provider selection: all five selected
-  async/HTTP samples now bind, while native state-machine emission remains rejected
-  without output. Add focused inventory selection and async-provider arguments, retain
-  the .NET/metadata format contracts, and prioritize synthesized state-machine emission.
+- Record Raven's explicit native Task/builder/state-machine provider and first native
+  async emission gate. Add a driver/runtime regression for completed/pending awaits,
+  hoisted local preservation and cancellation; the unchanged cancellation sample also
+  compiles and runs with exact output. Top-level nongeneric async functions
+  execute; class/generic methods and async entry completion remain pending. Reuse
+  existing runtime and metadata encodings, preserving the default .NET backend.
 
 - Inventory ten unchanged POC samples through the native compiler driver. Order
   collections, interfaces and JSON object mapping compile and execute with exact output;

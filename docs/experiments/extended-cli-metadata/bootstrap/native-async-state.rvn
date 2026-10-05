@@ -1,0 +1,41 @@
+import System.*
+import System.Tasks.*
+
+async func Completed() -> Task<int> {
+    return 42
+}
+
+async func AddLater(value: Task<int>) -> Task<int> {
+    let seed = 40
+    let received = await value
+    return seed + received
+}
+
+func Main() {
+    if Completed().GetResult() != 42 {
+        System.Fail("Completed async result was lost")
+    }
+    let completed = Promise<int>()
+    _ = completed.Complete(2)
+    if AddLater(completed.Task).GetResult() != 42 {
+        System.Fail("Completed await result was lost")
+    }
+    let source = Promise<int>()
+    let pending = AddLater(source.Task)
+    if pending.IsCompleted {
+        System.Fail("Pending await completed too early")
+    }
+    _ = source.Complete(2)
+    TaskQueue.Default.Drain()
+    if !pending.IsCompleted || pending.GetResult() != 42 {
+        System.Fail("Pending await lost its local or result")
+    }
+    let cancelled = Promise<int>()
+    let cancellation = AddLater(cancelled.Task)
+    _ = cancelled.Cancel()
+    TaskQueue.Default.Drain()
+    if !cancellation.IsCancelled {
+        System.Fail("Await cancellation was not propagated")
+    }
+    Console.WriteLine("Native async state checks passed")
+}

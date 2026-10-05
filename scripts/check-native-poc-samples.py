@@ -8,6 +8,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES = {
+    'native-async-state': ['extended-cli-metadata/bootstrap/native-async-state.rvn'],
     **{name: [f'raven-target/samples/{name}.rvn'] for name in (
         'application-order-collections', 'application-types', 'application-interfaces',
         'application-inheritance', 'library-async', 'library-async-default-queue',
@@ -23,7 +24,7 @@ def main():
     for name in ('compiler', 'core', 'seed', 'ownership', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--reference', type=Path, action='append', required=True)
-    parser.add_argument('--runtime', type=Path, help='Execute the three established non-network controls after successful compilation')
+    parser.add_argument('--runtime', type=Path, help='Execute the established non-network controls after successful compilation')
     parser.add_argument('--async-library', help='Explicit native Task/builder assembly identity')
     parser.add_argument('--case', choices=SAMPLES, action='append', help='Limit the inventory to selected cases')
     args = parser.parse_args()
@@ -37,6 +38,8 @@ def main():
     if runtime:
         inputs.append(runtime)
     expected = {
+        'native-async-state': 'Native async state checks passed\n',
+        'library-async-cancellation': 'Cancelled\n',
         'application-order-collections': (ROOT / 'docs/experiments/raven-target/samples/application-order-collections.expected.txt').read_text(),
         'application-interfaces': '42\n99\n',
         'json-object-mapping': 'JSON object mapping checks passed\n',
