@@ -2208,3 +2208,15 @@ Distinguish an already-completed task from work that completes later when valida
 continuations. CLI and editor build/run must use the same target artifacts and settings.
 Compared with .NET, share Raven's established async semantics/lowering where applicable
 and adapt representation at the target boundary; do not introduce new scheduling promises.
+
+
+#### Initial native semantic editor gate (2026-10-05)
+
+Explicit native `.rvnproj` references now reach the language server through an optional
+metadata provider. A separately emitted library supplies completion, hover and
+missing-member diagnostics over real stdio; twelve ordinary project checks pass.
+[Evidence and reproduction](experiments/extended-cli-metadata/native-project-editor-2026-10-05.md).
+This advances the author-directed editor gate only. Next: native reference refresh
+without CLI substitution, declaration navigation, source-built System/async ownership
+configuration, then shared native project build/run and VS Code acceptance. None of
+those remaining gates is implied by the small library fixture.

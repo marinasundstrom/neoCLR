@@ -7449,3 +7449,14 @@ no runtime reflection, implicit dependency search or editor file watcher. The na
 CLI uses it; project/LSP wiring remains pending. See the
 [Raven host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#shared-native-reference-catalog-2026-10-05)
 for signatures, input limits, failures and snapshot lifetime. No guest API snapshot changes.
+
+
+### Raven native project provider (development, 2026-10-05)
+
+Raven's optional `NeoClrProjectMetadataProvider` adapts the native catalog to evaluated
+projects through the target-neutral `IProjectMetadataProvider` and immutable
+`ProjectMetadataConfiguration` host contracts. These are .NET compiler-host APIs,
+not guest System.Introspection APIs, so the RavenDoc guest snapshot is unchanged.
+Their selection, parameters/results, errors and limits are documented in the
+[public host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#explicit-native-project-metadata-2026-10-05).
+The metadata reader/writer and importer/emitter boundaries remain independent.

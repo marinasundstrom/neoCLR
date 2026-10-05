@@ -6070,3 +6070,28 @@ Raven still owns async inference, awaiter binding and lowering. The .NET path is
 
 All five selected async/HTTP samples now bind; native state-machine emission remains
 explicitly rejected before publication. [Validation and next slice](experiments/extended-cli-metadata/native-async-binding-2026-10-05.md).
+
+
+### Native semantic project loading (2026-10-05)
+
+Native projects now opt in through `RavenMetadataFormat=NeoCLR` as well as
+`RavenTargetPlatform=NeoCLR`. The second property alone continues to select the
+existing bridge-compatible target contracts. The optional host provider uses the
+same explicit reference catalog as `rvnc neoclr`: primitive bootstrap from
+`RavenNeoClrCoreReference`, optional `RavenNeoClrRuntimeSeed`, and native artifact
+`Reference` HintPaths. Existing Runtime Contract mapping properties still apply.
+No native application reference is projected into CLI metadata.
+
+The shared workspace depends only on `IProjectMetadataProvider`; the optional
+NeoCLR adapter owns catalog construction and core identity validation. Native
+selection without an adapter fails. This bounded slice rejects project/package/
+framework dependencies and avoids injecting host references/generated attributes.
+It supplies semantic options, not an emission backend. Full source ownership and
+async configuration must still be connected to the project host.
+
+See [native editor evidence](experiments/extended-cli-metadata/native-project-editor-2026-10-05.md)
+and the [host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#explicit-native-project-metadata-2026-10-05).
+Compared with .NET project loading, this uses the same semantic/editor pipeline but
+requires explicit native artifacts and an optional host adapter. Normal .NET and
+legacy bridge project loading retain their existing path. Automatic reference
+refresh, metadata navigation and unified VS Code native build/run remain release work.

@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Connect explicit native Raven project references to adapter-enabled language-server
+  builds. Verify imported-method completion, hover and semantic diagnostics over stdio,
+  with C# project-loading checks and twelve ordinary project regressions. Native
+  reference refresh, declaration navigation and VS Code build/run remain pending.
+
 - Prepare native editor integration by moving Raven's explicit dependency loading
   into a reusable reference catalog. Validate immutable snapshots across artifact
   replacement, matching importer/emitter identities and failure-before-publication.

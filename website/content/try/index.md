@@ -118,3 +118,13 @@ applications and libraries after changing tools. Preview APIs and artifact forma
 remain experimental.
 
 The [feature pages](../#feature-pages) show tested examples and current limits. The [proposal overview](../proposals/) explains the open questions and possible future additions. Tell us what works for your programs and where these contracts should improve.
+
+
+### Native editor integration in development
+
+Adapter-enabled Raven Language Server builds can now load explicit native assembly
+references from projects and provide completion, hover and semantic diagnostics for
+imported members. This has been checked with a separately emitted library over the
+LSP connection. Native reference refresh, declaration navigation and VS Code build/run
+qualification are still pending. This development evidence does not change the
+published Preview 11 setup above.

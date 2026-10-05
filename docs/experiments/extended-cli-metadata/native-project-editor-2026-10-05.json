@@ -1,0 +1,290 @@
+{
+  "passed": true,
+  "checks": [
+    "native hover",
+    "native completion",
+    "missing-member diagnostics"
+  ],
+  "artifacts": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/Raven.LanguageServer.dll": "40de7126c3d1e5db72aa81075ec1a33d466089fd3d5ffb2be696badb4f93fdcc",
+    "/private/tmp/native-project-verified1005/project/App.rvnproj": "a50bd5755a07de7a3fa13dd5f7e97672c97db0909e2a35a4bf16deb228507d63",
+    "/private/tmp/native-project-verified1005/project/Main.rvn": "b4ed87c02b3bd1a88d4b3505d04b025f14dfb2008e8584e41155a3af59012554",
+    "/private/tmp/native-project-verified1005/dependencies/Library.dll": "6bae03559906f9341d58c026eccdcf55153211f23c84fee408edbe7ba5a60b3d",
+    "/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc"
+  },
+  "transcript": [
+    {
+      "jsonrpc": "2.0",
+      "method": "initialize",
+      "params": {
+        "processId": null,
+        "rootUri": "file:///private/tmp/native-project-verified1005/project",
+        "capabilities": {},
+        "workspaceFolders": [
+          {
+            "uri": "file:///private/tmp/native-project-verified1005/project",
+            "name": "native project"
+          }
+        ]
+      },
+      "id": 1
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "result": {
+        "capabilities": {
+          "textDocumentSync": 2,
+          "experimental": {},
+          "workspace": {
+            "workspaceFolders": {
+              "changeNotifications": false
+            },
+            "fileOperations": {}
+          }
+        },
+        "serverInfo": {
+          "name": "Raven.LanguageServer",
+          "version": "1.0.0+42b74468679c5ffa50205c49f5139639b6534967"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "initialized",
+      "params": {}
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didOpen",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+          "version": 1,
+          "languageId": "raven",
+          "text": "func Main() -> int => Library.Api.Updated()\n"
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/hover",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn"
+        },
+        "position": {
+          "line": 0,
+          "character": 36
+        }
+      },
+      "id": 2
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+        "version": 1,
+        "diagnostics": []
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 2,
+      "result": {
+        "contents": {
+          "kind": "markdown",
+          "value": "```raven\nstatic func Updated() -> int\n```\n\nMethod in `class Api`"
+        },
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 34
+          },
+          "end": {
+            "line": 0,
+            "character": 41
+          }
+        }
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didChange",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+          "version": 2
+        },
+        "contentChanges": [
+          {
+            "text": "func Main() -> int => Library.Api."
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/completion",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn"
+        },
+        "position": {
+          "line": 0,
+          "character": 34
+        },
+        "context": {
+          "triggerKind": 1
+        }
+      },
+      "id": 3
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 3,
+      "result": [
+        {
+          "label": "Updated",
+          "labelDetails": {
+            "description": "Library.Api"
+          },
+          "kind": 2,
+          "detail": "static func Updated() -> int",
+          "sortText": "00_Updated",
+          "filterText": "Updated",
+          "insertText": "Updated($0)",
+          "insertTextFormat": 2,
+          "textEdit": {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 34
+              },
+              "end": {
+                "line": 0,
+                "character": 34
+              }
+            },
+            "newText": "Updated($0)"
+          },
+          "commitCharacters": [
+            ".",
+            "(",
+            ")",
+            ",",
+            ";"
+          ],
+          "data": {}
+        }
+      ]
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didChange",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+          "version": 3
+        },
+        "contentChanges": [
+          {
+            "text": "func Main() -> int => Library.Api.Missing()\n"
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+        "version": 3,
+        "diagnostics": []
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "workspace/inlayHint/refresh",
+      "params": {}
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/publishDiagnostics",
+      "params": {
+        "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+        "version": 3,
+        "diagnostics": [
+          {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 34
+              },
+              "end": {
+                "line": 0,
+                "character": 41
+              }
+            },
+            "severity": 1,
+            "code": "RAV0117",
+            "source": "raven",
+            "message": "'Api' has no member 'Missing'.",
+            "data": {
+              "version": 1,
+              "messageFormat": "'{0}' has no member '{1}'.",
+              "messageArguments": [
+                "Api",
+                "Missing"
+              ],
+              "properties": {}
+            }
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "textDocument/didChange",
+      "params": {
+        "textDocument": {
+          "uri": "file:///private/tmp/native-project-verified1005/project/Main.rvn",
+          "version": 4
+        },
+        "contentChanges": [
+          {
+            "text": "func Main() -> int => Library.Api.Updated()\n"
+          }
+        ]
+      }
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "shutdown",
+      "params": null,
+      "id": 4
+    },
+    {
+      "jsonrpc": "2.0",
+      "id": 4,
+      "result": null
+    },
+    {
+      "jsonrpc": "2.0",
+      "method": "exit",
+      "params": null
+    }
+  ],
+  "date": "2026-10-05",
+  "raven_revision": "d1f68ea126cff3ea5f289217004ed5078b763026",
+  "neoclr_base_revision": "8f41114bbf0320e7748660329847eef825a4fd15",
+  "runtime_execution": "Not exercised by this editor slice; prior sample evidence reused.",
+  "project_tests": {
+    "suite": "ProjectFileCompilationOptionTests",
+    "passed": 12,
+    "failed": 0
+  },
+  "native_project_probe": "passed catalog, native binding, missing adapter/artifact, wrong target/core, unsupported project reference and transactional failure checks"
+}
