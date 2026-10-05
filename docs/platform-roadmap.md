@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+## Combined source library and array dispatch (2026-10-05)
+
+The [post-HTTP assessment](experiments/extended-cli-metadata/post-http-compilation-2026-10-05.md)
+compiles 139 production sources plus nine adapters into one library; two JSON consumers
+and the Tasks consumer execute against that artifact. Array/Object dispatch now retains
+the Array<T> element argument. The full 166-source attempt still fails before publication.
+Next reconcile source Object/RuntimeTypeHandle ownership and complete core native service
+contracts, then the time-zone family. Native async and full .NET library parity remain open.
+
 ## Native source HTTP gate passes (2026-10-05)
 
 The [HTTP execution gate](experiments/extended-cli-metadata/source-http-2026-10-05.md)

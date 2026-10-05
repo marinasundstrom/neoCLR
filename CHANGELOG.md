@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve System.Array<T> element arguments during inheritance and Object member
+  dispatch, fixing default array display, identity equality and stable hashing.
+  Reassess the post-HTTP compilation frontier: 139 production sources plus nine
+  adapters compile together; separate JSON/Tasks consumers execute against the artifact.
+  The full 166-source build still rejects core ownership/service gaps before publication.
+
 - Establish the native source HTTP execution gate: compile the complete HTTP source
   group and run seven artifact-only consumers plus cancellation, status/server and
   eleven stream-upload cases. Add native modes to existing harnesses and record

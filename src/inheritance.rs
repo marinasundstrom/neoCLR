@@ -11,10 +11,7 @@ pub(crate) fn base(module: &Module, ty: &Type) -> Result<Option<Type>, Fault> {
     let Some(definition) = module.type_definition(ty) else {
         return Ok(None);
     };
-    let arguments = match ty {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
+    let arguments = ty.generic_arguments();
     definition
         .base
         .as_ref()
@@ -50,10 +47,7 @@ pub(crate) fn fields(module: &Module, ty: &Type) -> Result<Vec<Field>, Fault> {
     let mut fields = Vec::new();
     for owner in lineage(module, ty)?.into_iter().rev() {
         let definition = module.type_definition(&owner).unwrap();
-        let arguments = match &owner {
-            Type::Constructed { arguments, .. } => arguments.as_slice(),
-            _ => &[],
-        };
+        let arguments = owner.generic_arguments();
         for field in &definition.fields {
             if fields.iter().any(|f: &Field| f.name == field.name) {
                 return Err(Fault::new(
@@ -156,10 +150,7 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         }
         let concrete = definition.open_type();
         for owner in lineage(module, &concrete)? {
-            let args = match &owner {
-                Type::Constructed { arguments, .. } => arguments.as_slice(),
-                _ => &[],
-            };
+            let args = owner.generic_arguments();
             for method in &module.functions {
                 if method.is_abstract
                     && method
@@ -201,10 +192,8 @@ fn declared_method(
     let definition = module
         .type_definition(owner)
         .ok_or_else(|| Fault::new("unknown method owner"))?;
-    let arguments = match owner {
-        Type::Constructed { arguments, .. } => arguments.as_slice(),
-        _ => &[],
-    };
+    // CLI array storage carries the nominal System.Array<T> element argument too.
+    let arguments = owner.generic_arguments();
     for method in &module.functions {
         if method.instance
             && method.interface_implementations.is_empty()
