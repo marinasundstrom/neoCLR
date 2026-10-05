@@ -1,0 +1,46 @@
+{
+  "version": "v0.1.0-preview.12",
+  "publishedAt": "2026-10-05T18:43:27Z",
+  "release": "https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12",
+  "tagCommit": "476d61af8049631afd14c502796c16684c6549e6",
+  "mainIntegration": "fast-forward; pushed to origin/main",
+  "asset": "neoclr-preview12-osx-arm64.tar.gz",
+  "downloadSha256": "516c435c41a3cf64a0da7c2454c9bb8ce16306e19e65da871c8ba114905b36d6",
+  "downloadVerified": true,
+  "websiteWorkflow": "https://github.com/marinasundstrom/neoCLR/actions/runs/37358100162",
+  "websiteConclusion": "success",
+  "publicPages": {
+    "https://marinasundstrom.github.io/neoCLR/": {
+      "status": 200,
+      "assertions": [
+        "Preview 12"
+      ]
+    },
+    "https://marinasundstrom.github.io/neoCLR/try/": {
+      "status": 200,
+      "assertions": [
+        "neoclr-preview12-osx-arm64.tar.gz",
+        "verify-native-bundle.py"
+      ]
+    },
+    "https://marinasundstrom.github.io/neoCLR/docs/api/System/Tasks/Task/index.html": {
+      "status": 200,
+      "assertions": [
+        "Run(callback: () -> void) -> Task<void>"
+      ]
+    },
+    "https://marinasundstrom.github.io/neoCLR/docs/api/System/Tasks/Task/method_Run.html": {
+      "status": 200,
+      "assertions": [
+        "() -> void",
+        "Work to invoke at most once"
+      ]
+    },
+    "https://marinasundstrom.github.io/neoCLR/docs/api/System/String/index.html": {
+      "status": 200,
+      "assertions": [
+        "char -> Iterable<U>"
+      ]
+    }
+  }
+}

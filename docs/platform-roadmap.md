@@ -23,7 +23,8 @@ execution, live HTTP/JSON checks and 19 installed VSIX checks.
 Preview 12 is selected for macOS arm64. Both retained bootstrap inputs now reproduce
 byte-for-byte from recorded sources. Local candidate qualification passes 1,784 runtime
 tests, extracted native consumers and the website gate. Hosted canonical, OS boundary
-and minimum-Rust validation pass; the candidate is ready for main integration and publication. [Candidate evidence](preview-12-validation.json).
+and minimum-Rust validation pass. The work is integrated into main; Preview 12 and
+the website are published. [Publication evidence](preview-12-publication.json). [Candidate evidence](preview-12-validation.json).
 The primitive CLI core and retained seed remain explicit temporary bootstrap inputs;
 complete replacement and full System source ownership remain open.
 
@@ -39,11 +40,11 @@ the recorded source-built library artifacts; a .NET editor control remains green
 
 This supersedes the editor wiring/qualification next steps in the historical slices
 below. The matched local bundle and installation acceptance are now recorded above.
-Bootstrap provenance is recorded; remaining release work is publication after CI. Initial
+Bootstrap provenance, main integration and Preview 12 publication are recorded. Initial
 project-open failures still use existing logs; workspace-external file watchers,
 full decompilation, general native project/package dependency builds and other OS
 qualification remain beyond this POC. Full class-library source bootstrap remains a
-separate roadmap gate. No release or website publication has occurred.
+separate roadmap gate. Preview 12 publishes the bounded macOS arm64 native POC.
 
 Native API documentation now also passes real editor acceptance: XML/Markdown hover
 and completion prose, sidecar-only refresh and member-level fallback.
@@ -54,7 +55,7 @@ release gate, alongside matched package installation.
 The matched SDK/installed VSIX now passes 19 checks on macOS arm64, including native
 Option/Result API help. RavenDoc union-case summaries, all 1,803 generated pages and
 18 website tests pass. Bootstrap reproduction and the local runtime/dependency bundle are now qualified;
-publication follows the final candidate CI gate.
+Preview 12 publication followed the passing candidate CI gate.
 [Release gate and remaining work](experiments/extended-cli-metadata/native-release-gate-2026-10-05.md).
 
 ## Shared host snapshots prepare editor integration (2026-10-05)

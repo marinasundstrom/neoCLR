@@ -11102,3 +11102,12 @@ passed canonical full source/runtime validation, both OS boundary jobs and all t
 minimum-Rust jobs. This clears the candidate gate for the authorized main integration
 and Preview 12 publication. The packaged runtime's executable sources differ only by
 subsequent compatibility annotations; later release commits document evidence.
+
+
+**Publication outcome:** Fast-forwarded NeoCLR main to `476d61af`, pushed main and
+published [Preview 12](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12)
+on 2026-10-05. Downloaded the published macOS arm64 archive and verified its SHA256
+against the accepted candidate. The manual Pages deployment passed; public homepage,
+installation instructions, Task.Run member/parameter signatures and String.FlatMap
+function signatures were checked. [Publication evidence](preview-12-publication.json).
+Full native System bootstrap and broader platform qualification remain future work.
