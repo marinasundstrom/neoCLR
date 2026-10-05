@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Add an executable separate-library guard consumer covering the mapper's null-return
+  guard, boxed int/bool patterns and Result match-return control flow. Native verification
+  and execution pass; production JSON object mapping remains in progress.
+
 - Preserve final vector parameter arrays through definitions/builders, CLI ParamArrayAttribute,
   native parameter-target attributes and introspection. Native writing requires an explicit
   core marker binding; separate consumers execute empty, expanded and existing-array calls.

@@ -5787,3 +5787,14 @@ Final by-value array parameters now preserve ParamArrayAttribute across native i
 and emission. Runtime Contract core/seed selection must provide the canonical marker;
 CLI is the primitive bootstrap only, not a fallback for application references.
 [Implementation and executable evidence](experiments/extended-cli-metadata/parameter-arrays-2026-10-05.md).
+
+### Native mapper control-flow gates (2026-10-05)
+
+Raven's portable adapter now emits the existing reference null test/unbox operations for
+null-coalescing guards and boxed primitive patterns. A coalescing return fallback is
+bounded to a local initializer with an empty evaluation stack. Terminal return wrappers
+in match lowering are normalized without applying unreachable conversions. Runtime
+Contract configuration is unchanged; the ordinary .NET backend is untouched.
+`bootstrap/verify_mapping_guards.py` in the metadata experiments compiles a library and
+artifact-only consumer and verifies/runs to 42, including both Result match branches.
+Eight focused .NET pattern checks also pass. This is a prerequisite, not the JSON gate.

@@ -1,0 +1,31 @@
+import System.Result.*
+
+namespace Guards
+
+public class Operations {
+    static func NullGuard() -> int => Guard(null)
+    static func Guard(value: object?) -> int {
+        let present: object = value ?? return 7
+        if present is int number { return number }
+        if present is bool flag {
+            if flag { return 11 }
+            return 12
+        }
+        return 13
+    }
+}
+
+public class TerminalGuard {
+    private static func Input(fail: bool) -> System.Result<object, string> {
+        if fail { return System.Result<object, string>.Error("failed") }
+        return System.Result<object, string>.Ok(42)
+    }
+    static func Read(fail: bool) -> System.Result<object, string> {
+        let input = Input(fail)
+        let result = match input {
+            Ok(let value) => value
+            Error(let reason) => return System.Result<object, string>.Error(reason)
+        }
+        return System.Result<object, string>.Ok(result)
+    }
+}
