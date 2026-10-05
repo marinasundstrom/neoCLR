@@ -1,0 +1,87 @@
+namespace System.Runtime.CompilerServices
+
+internal extension NetworkRuntimeServices for RuntimeServices {
+    static func DnsLookup(hostName: string, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.DnsLookup(hostName, callback)
+    }
+
+    static func DnsResult(operation: long) -> System.Value {
+        return neoCLR.Runtime.DnsResult(operation)
+    }
+
+    static func DnsAddresses(payload: System.Value) -> string[] {
+        return neoCLR.Runtime.DnsAddresses(payload)
+    }
+
+    static func DnsLookupUntil(hostName: string, deadline: long, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.DnsLookupUntil(hostName, deadline, callback)
+    }
+
+    static func DnsCancel(operation: long) -> bool {
+        return neoCLR.Runtime.DnsCancel(operation)
+    }
+
+    static func SocketConnect(address: string, port: int, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketConnect(address, port, callback)
+    }
+
+    static func SocketConnectResult(operation: long) -> System.Value {
+        return neoCLR.Runtime.SocketConnectResult(operation)
+    }
+
+    static func SocketReceive(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketReceive(socket, buffer, offset, count, callback)
+    }
+
+    static func SocketTransferResult(operation: long) -> System.Value {
+        return neoCLR.Runtime.SocketTransferResult(operation)
+    }
+
+    static func SocketClose(socket: long) -> System.Value {
+        return neoCLR.Runtime.SocketClose(socket)
+    }
+
+    static func SocketSend(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketSend(socket, buffer, offset, count, callback)
+    }
+
+    static func SocketListen(address: string, port: int, backlog: int) -> System.Value {
+        return neoCLR.Runtime.SocketListen(address, port, backlog)
+    }
+
+    static func SocketAccept(listener: long, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketAccept(listener, callback)
+    }
+
+    static func SocketLocalPort(socket: long) -> System.Value {
+        return neoCLR.Runtime.SocketLocalPort(socket)
+    }
+
+    static func SocketConnectAddresses(addresses: string[], port: int, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketConnectAddresses(addresses, port, callback)
+    }
+
+    static func SocketDeadlineAfter(milliseconds: int) -> long {
+        return neoCLR.Runtime.SocketDeadlineAfter(milliseconds)
+    }
+
+    static func SocketDeadlineExpired(deadline: long) -> bool {
+        return neoCLR.Runtime.SocketDeadlineExpired(deadline)
+    }
+
+    static func SocketConnectAddressesUntil(addresses: string[], port: int, deadline: long, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketConnectAddressesUntil(addresses, port, deadline, callback)
+    }
+
+    static func SocketReceiveUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketReceiveUntil(socket, buffer, offset, count, deadline, callback)
+    }
+
+    static func SocketSendUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value {
+        return neoCLR.Runtime.SocketSendUntil(socket, buffer, offset, count, deadline, callback)
+    }
+
+    static func SocketCancel(operation: long) -> bool {
+        return neoCLR.Runtime.SocketCancel(operation)
+    }
+}

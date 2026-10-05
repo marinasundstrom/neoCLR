@@ -88,7 +88,7 @@ pub(crate) enum Binding {
     StringEndsWithOrdinal,
     StringSliceUtf8,
     FileResource(crate::file_streams::Operation),
-    StorageNames,
+    StringSnapshot,
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
@@ -740,8 +740,8 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::FileResource(crate::file_streams::Operation::Seek),
             Type::Value,
         ),
-        ("neoCLR.Runtime.StorageNames", [Type::Value]) => (
-            Binding::StorageNames,
+        ("neoCLR.Runtime.StorageNames" | "neoCLR.Runtime.DnsAddresses", [Type::Value]) => (
+            Binding::StringSnapshot,
             Type::ArrayRef(Box::new(Type::String)),
         ),
         ("neoCLR.Runtime.StorageList", [Type::String, Type::Int32]) => (
@@ -1448,7 +1448,10 @@ mod storage_snapshot_tests {
         ] {
             function.parameters = vec![parameter];
             function.returns = result;
-            assert_eq!(super::bind(function).is_ok(), accepted);
+            for name in ["neoCLR.Runtime.StorageNames", "neoCLR.Runtime.DnsAddresses"] {
+                function.name = name.into();
+                assert_eq!(super::bind(function).is_ok(), accepted, "{name}");
+            }
         }
     }
 }

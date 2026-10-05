@@ -5865,3 +5865,20 @@ DNS/socket service contracts and their imported Error identities, followed by fu
 source/bootstrap ownership. No complete-System or dual-target gate is claimed.
 See `docs/experiments/extended-cli-metadata/source-storage-2026-10-05.md` for exact
 artifacts, commands, source hashes and validation.
+
+### Source DNS/socket execution (2026-10-05)
+
+Six production DNS/IPAddress/socket sources now compile into a separate native library
+with explicit service adapters. The unchanged network-cancellation sample executes
+against that artifact and the cumulative source library: localhost DNS, pre/pending
+cancellation, loopback accept/connect, transfer buffers and resource reuse all pass.
+Raven admits converted temporary value receivers and immutable by-value parameter
+captures through its existing adapters; 59 focused .NET checks pass. There is no new
+Runtime Contract switch, instruction encoding or nominal delegate representation.
+
+The apparent imported Error-to-Error diagnostics disappear once service declarations
+are present; no union identity workaround was added. The full networking/web source
+group now reaches an unlowered BoundPropagateExpression. Prioritize Result propagation
+in HTTP next, then reassess full-source/bootstrap ownership. This is native execution
+evidence, not .NET class-library or full-System completion. See
+`docs/experiments/extended-cli-metadata/source-network-2026-10-05.md`.

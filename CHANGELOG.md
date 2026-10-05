@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Compile the unchanged DNS/socket sources into a native library using 21 explicit
+  service declarations. Execute the existing loopback cancellation fixture through
+  artifact-only references, including DNS, cancellation, transfer mutation and resource
+  reuse. DnsAddresses now shares bounded managed-array snapshot materialization with
+  StorageNames; existing legacy neoil helpers remain compatible. HTTP propagation is
+  the next demonstrated emission blocker, not complete networking/web support.
+
 - Compile the remaining eleven storage sources with explicit native adapters and
   execute the unchanged storage sample from emitted artifact references. Materialize
   directory-name snapshots into managed Array<String> storage with array/heap limits.

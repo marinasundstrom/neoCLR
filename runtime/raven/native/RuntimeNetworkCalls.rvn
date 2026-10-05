@@ -1,0 +1,66 @@
+namespace neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DnsLookup(hostName: string, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DnsResult(operation: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DnsAddresses(payload: System.Value) -> string[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DnsLookupUntil(hostName: string, deadline: long, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func DnsCancel(operation: long) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketConnect(address: string, port: int, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketConnectResult(operation: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketReceive(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketTransferResult(operation: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketClose(socket: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketSend(socket: long, buffer: byte[], offset: int, count: int, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketListen(address: string, port: int, backlog: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketAccept(listener: long, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketLocalPort(socket: long) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketConnectAddresses(addresses: string[], port: int, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketDeadlineAfter(milliseconds: int) -> long;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketDeadlineExpired(deadline: long) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketConnectAddressesUntil(addresses: string[], port: int, deadline: long, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketReceiveUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketSendUntil(socket: long, buffer: byte[], offset: int, count: int, deadline: long, callback: () -> System.Void) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func SocketCancel(operation: long) -> bool;

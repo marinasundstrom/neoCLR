@@ -1,0 +1,118 @@
+{
+  "runtimeRevision": "75b54766a34ea226f49d0cc2b5ec0d4ddbda9992",
+  "compilerRevision": "8b8856b1dff697acc5bc792b35706d65226576c6",
+  "instructionBudget": 100000000,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/network-recorded1005/Sockets.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Dns.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/DnsError.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/IPAddressError.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Sockets/Socket.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNetworkCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNetworkServices.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/network-recorded1005/Sockets.dll",
+        "-o",
+        "/private/tmp/network-recorded1005/NetworkCancellation.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/network-cancellation/Main.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/network-recorded1005/NetworkCancellation.dll",
+        "--system",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--module",
+        "/private/tmp/network-recorded1005/Sockets.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_82BA85744F976C8F46091A24D16107670E628CEED1EA1840FF81DEE0E0487D65: typed-stack/control-flow verification passed (1705 IL functions; maximum stack 8; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/network-recorded1005/NetworkCancellation.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--module",
+        "/private/tmp/network-recorded1005/Sockets.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Network token cancellation checks passed\n",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "835a21a648dd6e46d3bb139f4c07d34ccbc05969608b2d9c369c01b23c9de9c4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "99db0aaa45be1f0e3e923d74da05214bd151d559c355499f7bfdfa997df10455",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_network.py": "1365b3e47344709705d3b8b09cc6a0abc5da051e488aed88030374021386d2df",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/network-cancellation/Main.rvn": "b659c171e19a48246bbc30adf438704543d767558296c15ffb0119be30afe732",
+    "/private/tmp/network-recorded1005/Sockets.dll": "9772c64a61f9d6afb07eaede274418bd05a4c6e1dd930bb052cf4a4a31c3615e",
+    "/private/tmp/network-recorded1005/NetworkCancellation.dll": "d7abdb1d29b21c08b7c57868589d441d96b1ada04e1b0eb838c2871ed9e6e2b6",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Dns.rvn": "b0c53c8216522d8601d98365dd2fa4f88fad8a845b7b557cbe377b42b8fee9fe",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/DnsError.rvn": "3d29e8b2008d54270cb35a581f4ba38e6d0672f4576b334100fc72d8f729a7bd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/IPAddress.rvn": "6e52cb1cb054215aa89c27caf87dac2c52e6e7c449e663012a3d31ac25523997",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/IPAddressError.rvn": "ff7036e74bf83a7f5fc62cd2cf194bf27d4d4255c996f9d1d45437dc51f3dce9",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Sockets/Socket.rvn": "b2bd301271fe168b6ed48cb70e7c580d3f62db7252978e129165906ed296cbb4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Networking/Sockets/SocketError.rvn": "15f9d2bb496458f8f4077c3a0b4f7606c4f4c35feff62c277d76e324c0c4d4ef",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNetworkCalls.rvn": "21d36d1023de9b1938cbb413cab1aaadc4387cb43c38d0f8bcad851180e8a487",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNetworkServices.rvn": "2d38c2aee19b79267c775cc963a2a2bf0eb9c55a8685d5b8a142061cd868dba7",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "67f60aebb1ab67c22e67baffd07f12ec522b054abdd01434d0e95ef206ba94a2",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "04e9306b30e71bed74edd0291aeb8f255936ba572aff87b943b75af403722d6a",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "83f24efaeb2a92d44c3e075805086e0414a7bc082b3456faeb69b6524f1078ba"
+  }
+}

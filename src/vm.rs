@@ -3630,7 +3630,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::ExecutingAssembly
                                 | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
-                                | crate::native::Binding::StorageNames
+                                | crate::native::Binding::StringSnapshot
                         ) {
                             *arrays_used = true;
                         }
@@ -3786,7 +3786,7 @@ fn interpret_instructions_with_dispatch(
                             scheduler.sockets.invoke(operation, &args, heap)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             scheduler.workers.start(module, args, options, pooled)?
-                        } else if matches!(binding, crate::native::Binding::StorageNames) {
+                        } else if matches!(binding, crate::native::Binding::StringSnapshot) {
                             crate::arrays::string_snapshot(args.into_iter().next().unwrap(), heap, &limits)?
                         } else if let crate::native::Binding::Reflection(query) = binding {
                             query.invoke_profile(
