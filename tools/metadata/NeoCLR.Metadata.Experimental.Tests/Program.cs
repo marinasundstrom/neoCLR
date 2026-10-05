@@ -357,9 +357,12 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
     return 0;
 }
 
+if (args is ["--object-root"]) { ObjectRootChecks.Run(); Console.WriteLine("PASS native Object root authoring"); return 0; }
+
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Native Object root authoring", ObjectRootChecks.Run),
     ("Method visibility and reference projection", MethodVisibilityChecks.Run),
     ("Integer shifts and count width validation", ShiftChecks.Run),
     ("Integer bitwise operations and operand validation", BitOperationChecks.Run),

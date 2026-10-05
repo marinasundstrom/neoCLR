@@ -11,6 +11,7 @@ public sealed partial class NativeAssemblyDefinition
 {
     private sealed record TypeRow(string Namespace, string Name, string NativeName, TypeVisibility Visibility, bool IsStatic, bool IsInterface, bool IsValueType, JsonElement[] BaseInterfaces, FieldRow[] Fields, string[] GenericNames, (int Parameter, string Bound)[] Constraints, Dictionary<int, TypeParameterConstraints> SpecialConstraints, int DeclaringType) { internal (string Name, int Value)[]? EnumMembers { get; init; }
         internal bool IsClosedHierarchy { get; init; }
+        internal bool IsObjectRoot { get; init; }
         internal bool IsSealedClass { get; init; }
         internal bool IsFlagsEnum { get; init; }
         internal string? BaseName { get; init; }
@@ -217,7 +218,12 @@ public sealed partial class NativeAssemblyDefinition
                     Require(enumMembers.Select(m => m.Name).Distinct().Count() == enumMembers.Length && typeNames.Length == 0 && declaringType < 0 && baseInterfaces.Length == 0, "unsupported enum relationships or duplicate members");
                 }
                 Shape(type, typeFields.ToArray());
-                var isStatic = !isInterface && type.GetProperty("is_abstract").GetBoolean() && !closedHierarchy;
+                var isObjectRoot = Text(type, "name") == "System.Object";
+                Require(!isObjectRoot || !isInterface && !isPrimitive && !closedHierarchy && visibility == TypeVisibility.Public &&
+                    typeNames.Length == 0 && declaringType < 0 && type.GetProperty("is_reference_type").GetBoolean() &&
+                    type.GetProperty("is_abstract").GetBoolean() && !type.GetProperty("is_sealed").GetBoolean() &&
+                    Array(type, "fields", 256).Length == 0 && !type.TryGetProperty("base", out _), "invalid native Object root declaration");
+                var isStatic = !isObjectRoot && !isInterface && type.GetProperty("is_abstract").GetBoolean() && !closedHierarchy;
                 Require(!closedHierarchy || !isPrimitive && typeNames.Length == 0 && declaringType < 0 &&
                     (isInterface || type.GetProperty("is_reference_type").GetBoolean() && type.GetProperty("is_abstract").GetBoolean()) && !type.GetProperty("is_sealed").GetBoolean(), "unsupported closed family");
                 var isRuntimeString = isPrimitive && Text(type, "name") == "System.String";
@@ -248,10 +254,11 @@ public sealed partial class NativeAssemblyDefinition
                 Require(!isStatic || fieldRows.Count == 0, "static type cannot have instance fields");
                 Require(nextFieldToken + fieldRows.Count + (enumMembers?.Length ?? 0) <= 0x04001001, "too many fields");
                 var nativeName = Text(type, "name"); var prefix = moduleName + ".T_";
-                Require(isPrimitive || nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
+                Require(isObjectRoot || isPrimitive || nativeName.StartsWith(prefix, StringComparison.Ordinal), "native type scope mismatch");
                 string ns, name;
                 PrimitiveType? primitive = null;
-                if (isPrimitive)
+                if (isObjectRoot) { ns = "System"; name = "Object"; }
+                else if (isPrimitive)
                 {
                     Require(nativeName.StartsWith("System.", StringComparison.Ordinal), "primitive requires canonical identity");
                     primitive = nativeName == "System.Char" ? null : ReadPrimitive(nativeName[7..], false);
@@ -308,7 +315,7 @@ public sealed partial class NativeAssemblyDefinition
                 nextFieldToken += fieldRows.Count + (enumMembers?.Length ?? 0);
                 Origin(origin, identityText, identity, ns.Length == 0 ? name : ns + "." + name, 0x02000002 + types.Count);
                 Require(origin.GetProperty("publicly_visible").GetBoolean() == (visibility == TypeVisibility.Public), "native type visibility mismatch");
-                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
+                types.Add(new(ns, name, nativeName, visibility, isStatic, isInterface, isValueType, baseInterfaces, fieldRows.ToArray(), typeNames, constraints.ToArray(), specialConstraints, declaringType) { IsObjectRoot = isObjectRoot, IsSealedClass = !isStatic && !isValueType && !isInterface && type.GetProperty("is_sealed").GetBoolean(), IsClosedHierarchy = closedHierarchy, BaseName = type.TryGetProperty("base", out var baseNode) ? ReadBaseName(baseNode) : null, NativePrimitive = primitive, NativeGrapheme = isPrimitive && name == "Char", EnumMembers = enumMembers, IsFlagsEnum = enumFlags, RawAttributes = type.TryGetProperty("custom_attributes", out _) ? Array(type, "custom_attributes", 256).Select(a => a.Clone()).ToArray() : [] });
             }
             for (int i = 0; i < types.Count; i++)
             {
@@ -607,7 +614,7 @@ public sealed partial class NativeAssemblyDefinition
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
                 var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
-                Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
+                Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].IsObjectRoot || types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
                     Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
                 Require(Text(origin, "member_access") == (visibility == MethodVisibility.Internal ? "Assembly" : visibility == MethodVisibility.Protected ? "Family" : visibility.ToString()), "native method visibility mismatch");
@@ -863,6 +870,7 @@ public sealed partial class NativeAssemblyDefinition
     }
     private static TypeBuilder DefineType(AssemblyBuilder graph, TypeRow type)
     {
+        if (type.IsObjectRoot) return graph.AddNativeObjectRoot();
         if (type.IsClosedHierarchy) return type.IsInterface ? graph.AddClosedInterface(type.Namespace, type.Name, type.Visibility) : graph.AddClosedClass(type.Namespace, type.Name, type.Visibility);
         if (type.NativeGrapheme)
         {

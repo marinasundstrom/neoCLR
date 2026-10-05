@@ -5977,3 +5977,20 @@ until the metadata library supports root authoring. The [binding evidence](exper
 covers semantic identity, configuration diagnostics, snapshot isolation and unchanged
 output on failure. Source-root consumer import, manifest/driver configuration and the
 runtime load-context connection remain later work.
+
+### Explicit Object declaration authoring (2026-10-05)
+
+The metadata library now exposes `AddNativeObjectRoot` and definition/builder
+`SetNativeObjectRoot`, retaining a baseless canonical native declaration and CLI Object
+signature encoding in the reference-only PE projection. There is no new native format
+category. Declaration and malformed-shape tests pass in all 156 metadata test groups.
+Runtime admission remains explicit host configuration. Ordinary CLI executable output
+rejects this native declaration; ordinary .NET output is unchanged.
+
+Raven `e748b089f` still rejects source-root emission (matching integration documentation
+is recorded at `4969bf16f`). Slot authoring, boxing and imported
+root identity must be connected before removing that guard or removing seed Object.
+CLI projection does not prove execution. The API reference documents the current limits;
+its manual .NET metadata section is updated, while the existing guest snapshot check
+still reports stale generated inputs. The end-to-end acceptance includes language-server
+and VS Code editing/build/run against the same catalog, not a separate editor backend.

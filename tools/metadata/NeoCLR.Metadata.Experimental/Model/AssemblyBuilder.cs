@@ -99,6 +99,7 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types)
             {
                 type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
+                if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
                 if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
@@ -303,6 +304,8 @@ public sealed partial class AssemblyBuilder
     private byte[] WriteImage(bool referenceOnly)
     {
         var methods = ValidateGraph(validateBodies: !referenceOnly);
+        if (!referenceOnly && types.Any(t => t.Definition.IsNativeObjectRoot))
+            throw new InvalidDataException("native Object root requires native emission; CLI projection is reference-only");
         if (!referenceOnly && types.Any(t => t.IsClosedHierarchy))
             throw new InvalidDataException("closed class families require native emission; CLI closed-family attributes are not authored");
         if (!referenceOnly && (authoredPrimitiveOwners.Count != 0 || externalGrapheme is not null || types.Any(t => t.NativePrimitive is not null || t.NativeGrapheme) ||
@@ -446,7 +449,12 @@ public sealed partial class AssemblyBuilder
             if (type.TypeParameterIndex is { } ordinal) { encoder.GenericTypeParameter(ordinal); return; }
             if (type.MethodParameterIndex is { } index) { encoder.GenericMethodTypeParameter(index); return; }
             if (type.ArrayElement is { } element) { EncodeType(encoder.SZArray(), element); return; }
-            if (type.ClassType is { } owner) { encoder.Type(typeHandles[owner], owner.IsValueType); return; }
+            if (type.ClassType is { } owner)
+            {
+                if (owner.Definition.IsNativeObjectRoot) encoder.Object();
+                else encoder.Type(typeHandles[owner], owner.IsValueType);
+                return;
+            }
             switch (type.Primitive)
             {
                 case PrimitiveType.Int32: encoder.Int32(); break;
@@ -777,7 +785,7 @@ public sealed partial class AssemblyBuilder
         foreach (var type in types)
         {
             var typeHandle = metadata.AddTypeDefinition((TypeAttributes)type.Definition.Attributes,
-                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
+                metadata.GetOrAddString(type.Namespace), metadata.GetOrAddString(type.Name), type.IsInterface || type.Definition.IsNativeObjectRoot ? default(EntityHandle) : type.IsEnum ? enumBase : type.IsValueType ? valueBase : type.LocalBase is { } parentType ? typeHandles[parentType] : objectType,
                 MetadataTokens.FieldDefinitionHandle(nextField), MetadataTokens.MethodDefinitionHandle(nextMethod));
             if (type.Definition.DeclaringType is { } parent)
                 metadata.AddNestedType(typeHandle, MetadataTokens.TypeDefinitionHandle(types.IndexOf(parent.Producer!) + 2));

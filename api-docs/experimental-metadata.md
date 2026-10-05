@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Native Object root authoring](#native-object-root-authoring-development-2026-10-05).
+
 - [Function signature views](#function-signature-views-development-2026-10-03): native callback signatures and substitution.
 
 - [Parameter names and authored value references](#parameter-names-and-authored-value-references-development-2026-10-03).
@@ -7286,3 +7288,35 @@ checks. Duplicate declarations within one module, incompatible service signature
 ambiguous unqualified calls without a local declaration still reject. Registry validation
 is unchanged: a matching name alone never grants a native service. See the
 [Object service integration gate](../docs/experiments/extended-cli-metadata/object-services-2026-10-05.md).
+
+## Native Object root authoring (development, 2026-10-05)
+
+`AssemblyBuilder.AddNativeObjectRoot() : TypeBuilder` attaches a public abstract,
+nongeneric, baseless `System.Object`. For manual authoring, construct
+`new TypeDefinition("System", "Object", 0x81, null)`, call
+`TypeDefinition.SetNativeObjectRoot() : void`, then add it to the module's `Types`.
+`TypeBuilder.SetNativeObjectRoot() : void` uses the same validation.
+`TypeDefinition.IsNativeObjectRoot : bool` and `TypeBuilder.IsNativeObjectRoot : bool`
+report the authoring designation. Loaded snapshots return false: this flag is not
+runtime selection. Readers preserve the declaration's name, abstract flags and base.
+
+Designation rejects incompatible names, visibility, generic/nested/value/static/closed
+shapes and record fields with `ArgumentException`; loaded definitions reject mutation
+with `InvalidOperationException`. Attachment rejects duplicates. Writers revalidate
+shape and reject later invalid mutations with `InvalidDataException`.
+
+Native output uses canonical `System.Object` in the existing format, with no base and
+no new representation category. Its reference-only CLI projection uses a nil `Extends`
+and `ELEMENT_TYPE_OBJECT` for signatures referring to the authored root. Executable
+CLI `Write()` rejects the native designation. Unlike ordinary .NET Object, the current
+NeoCLR source root is abstract; this API preserves that existing platform contract.
+The benefit is explicit root identity without a competing bootstrap base; the cost is
+that this artifact needs NeoCLR host admission and cannot be executed by the CLR.
+
+This is declaration support, not complete core-library production: callers still need
+Object-slot authoring, boxing/root reference selection and compiler/driver wiring.
+`CoreObjectType` continues to mean the explicit bootstrap reference. No implicit bases
+or bootstrap references are retargeted by designation. The runtime host must separately
+select the exact root identity and validate its required slots. Ordinary names do not
+claim root ownership. See `ObjectRootChecks.cs` for builder/definition parity, native
+round trips, CLI signatures, mutation rejection and ordinary lookalike controls.

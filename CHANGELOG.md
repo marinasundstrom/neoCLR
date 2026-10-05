@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Add explicit native Object-root declaration authoring through definitions and builders,
+  with a baseless CLI reference projection and standard Object signature encoding.
+  Native readers preserve canonical declaration facts without granting runtime admission.
+  All 156 C# metadata groups pass; root slots, compiler wiring and production ownership
+  remain pending. Clarify that the end-to-end gate includes language server and VS Code.
+
 - Record Raven's opt-in source Object semantic binding: one baseless root supplies
   named/keyword signatures, implicit bases and overrides. 75 focused compiler tests
   and the native emission-boundary probe pass. Root metadata authoring remains open;

@@ -4,6 +4,15 @@ The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
 
+## Object root declaration authoring passes (2026-10-05)
+
+The metadata API now authors an explicit baseless canonical Object through definitions
+or builders, preserving CLI Object signatures in the reference projection. All 156 C#
+metadata groups pass. This is declaration support only: native virtual slots, boxing
+root selection, imported root selection and compiler/driver wiring remain before the
+production seed can be replaced. The editor gate includes VS Code and must share that
+same compiler configuration; no language-server integration is claimed by this slice.
+
 ## Source Object producer binding passes (2026-10-05)
 
 Raven `e748b089f` [selects the source Object semantic root](experiments/extended-cli-metadata/source-object-binding-2026-10-05.md)
@@ -1978,7 +1987,7 @@ Evidence: `docs/experiments/extended-cli-metadata/condition-propagation-2026-10-
 ### Author-directed release gate: editor and native metadata (2026-10-05)
 
 The author added a working editor experience to the release objective: language-server
-support consuming and emitting NeoCLR metadata. This is a release requirement alongside
+support consuming and emitting NeoCLR metadata, including VS Code. This is a release requirement alongside
 class-library bootstrapping and the recorded .NET comparison benchmark gate. It does not
 replace the current core ownership prerequisite work. Implementation is not claimed yet.
 

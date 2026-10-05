@@ -10891,3 +10891,13 @@ for editor builds, preserving .NET behavior. The disassembler remains a candidat
 the author expressed it provisionally. The roadmap records acceptance expectations and
 keeps current Object ownership work active. No editor or disassembler implementation is
 claimed by this documentation action.
+
+### 2026-10-05 — End-to-end includes VS Code
+
+The author clarified, “Our goal is to get the end to end scenarip working with lang
+server and VS Code support.” The assistant accepted editing against native metadata,
+then compiling and running from the same project configuration, as the end-to-end gate.
+The current root-authoring prerequisite remains active; the editor must share the
+compiler importer/emitter and dependency catalog. Declaration authoring now passes
+156 C# metadata groups, but root-slot/compiler wiring and editor execution remain open.
+This clarification does not claim that a VS Code workflow has been implemented.
