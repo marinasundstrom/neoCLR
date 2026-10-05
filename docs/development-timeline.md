@@ -10854,3 +10854,13 @@ and `verify` checks loaded assemblies, but neither displays an assembly's decode
 A bounded metadata/body dump is the proposed first tool; source reconstruction is a
 larger follow-up. No decompiler implementation or author selection between those scopes
 is recorded. Storage work continued and its unchanged sample executed successfully.
+
+### 2026-10-05 — Benchmark against .NET after full class-library compilation
+
+The author directed that, once bootstrapping allows the entire class library to
+compile, equivalent neoCLR and .NET programs should be benchmarked, with benchmarking
+included on the website when this work is released. The assistant accepted this as
+a post-bootstrap release gate and recorded reproducibility, equivalent behavior,
+startup versus warmed execution and transparent limitations in the platform roadmap.
+No benchmark measurements or website publication have been performed for this request;
+ongoing HTTP propagation fixes retain their current priority.

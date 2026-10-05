@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Record the author-directed post-bootstrap release plan: benchmark equivalent
+  neoCLR/.NET programs and publish reproducible methodology and results on the website
+  with the release. No performance results or publication are claimed yet.
+
 - Compile the unchanged DNS/socket sources into a native library using 21 explicit
   service declarations. Execute the existing loopback cancellation fixture through
   artifact-only references, including DNS, cancellation, transfer mutation and resource

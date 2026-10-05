@@ -1875,3 +1875,21 @@ group now reaches an unlowered BoundPropagateExpression. Prioritize Result propa
 in HTTP next, then reassess full-source/bootstrap ownership. This is native execution
 evidence, not .NET class-library or full-System completion. See
 `docs/experiments/extended-cli-metadata/source-network-2026-10-05.md`.
+
+### Author-directed release gate: .NET comparison after bootstrapping (2026-10-05)
+
+After the entire runtime class library compiles, benchmark representative neoCLR
+programs against equivalent .NET programs before releasing this integration. Publish
+the methodology, reproducible sources/commands, measured results and limitations on
+the website with the release. This is a future release requirement, not current
+performance evidence or a diversion from completing bootstrapping.
+
+Compare observable workloads and outputs, accounting explicitly for text-model and
+other intentional semantic differences. Record compiler/runtime revisions, release
+build configurations, hardware/OS and dependency artifacts. Separate startup/assembly
+loading from warmed execution; report warmup/JIT policy, repeated measurements and
+variation. Include memory/allocation measurements where comparable, and distinguish
+host/native resources from managed allocations. Retain raw data and correctness checks;
+choose representative computation, collections/text/JSON and I/O workloads after the
+full-library gate rather than selecting only favorable cases. Do not infer runtime
+speedups from assembly size alone. Website publication remains a release action.
