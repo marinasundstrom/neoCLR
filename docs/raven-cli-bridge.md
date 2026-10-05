@@ -5904,3 +5904,19 @@ its established emitter. Complete HTTP/network sources emit with the source-netw
 bootstrap and adapters; artifact-only header and base-address consumers execute.
 The C# metadata suite passes 154 groups, including generic callback execution/readback.
 This is not full-System bootstrap completion.
+
+### Captured receivers and lexical access (2026-10-05)
+
+Raven's native closure frames now capture reference-type self and retain lexical nesting
+through existing NestedClass metadata. Implicit fields and explicit self calls load that
+capture, preserving object identity. Runtime private-access checks walk resolved enclosing
+definitions with a depth bound; unrelated peers do not gain access. No member visibility
+is widened, no new Runtime Contract or metadata version is needed. This follows the
+.NET nested-type access model ([Microsoft documentation](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/nested-types)).
+Value-type self, mutable-local capture and generic closure owners remain unsupported.
+
+The native status Server.rvn consumer executes ten loopback requests: eight valid
+status responses and rejection of two invalid responses. A minimal self-capture consumer
+checks deferred execution, private field mutation and a private method call on the same
+object. Runtime nesting/accessibility tests also reject unrelated callers. Main's .NET
+closure implementation is unchanged; portable-only compiler changes need no main backport.

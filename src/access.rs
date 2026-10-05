@@ -40,9 +40,8 @@ pub(crate) fn check_call(
         match callee.visibility {
             Visibility::Public | Visibility::Internal => true,
             Visibility::Protected => unreachable!("handled above"),
-            Visibility::Private => declaring_type(module, caller)
-                .zip(declaring_type(module, callee))
-                .is_some_and(|(a, b)| a == b),
+            Visibility::Private => declaring_type(module, callee)
+                .is_some_and(|owner| within_owner(module, caller, owner)),
         }
     });
     if permitted {
@@ -72,6 +71,25 @@ fn declaring_type<'a>(module: &'a Module, function: &Function) -> Option<&'a Typ
     let owner = function.owner.as_ref()?;
     let definition = module.type_definition(owner)?;
     definition.definition.as_ref()
+}
+
+// Nested code has the private access of its enclosing declaration. Follow resolved
+// identities, never name prefixes; unrelated or enclosing callers gain no privilege.
+fn within_owner(module: &Module, caller: &Function, owner: &TypeDefId) -> bool {
+    let mut current = caller
+        .owner
+        .as_ref()
+        .and_then(|ty| module.type_definition(ty));
+    for _ in 0..32 {
+        let Some(definition) = current else {
+            return false;
+        };
+        if definition.definition.as_ref() == Some(owner) {
+            return true;
+        }
+        current = crate::type_identity::declaring_definition(module, definition);
+    }
+    false
 }
 
 fn record_definition<'a>(
@@ -107,9 +125,10 @@ pub(crate) fn check_field(
         Visibility::Protected => false,
         Visibility::Private => {
             same_module
-                && declaring_type(module, caller)
-                    .zip(definition.definition.as_ref())
-                    .is_some_and(|(a, b)| a == b)
+                && definition
+                    .definition
+                    .as_ref()
+                    .is_some_and(|owner| within_owner(module, caller, owner))
         }
     };
     if allowed {

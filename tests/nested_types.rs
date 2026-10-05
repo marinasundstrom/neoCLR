@@ -134,3 +134,54 @@ fn malformed_ownership_and_unsupported_contexts_are_rejected() {
         assert!(assemble(source).is_err());
     }
 }
+
+#[test]
+fn nested_callers_access_enclosing_private_members_without_opening_them_to_peers() {
+    let source = r#"
+.module NestedAccess
+.entry Main
+.type Outer
+.field private Value Int32
+.method private static Secret() -> Int32
+ldc.i4 2
+ret
+.end
+.method static Create() -> Outer
+ldc.i4 40
+newobj Outer
+ret
+.end
+.type Inner
+.method static Read(Outer) -> Int32
+ldarg 0
+ldfld 0
+call Outer::Secret()
+add
+ret
+.end
+.end
+.end
+.function Main() -> Int32
+call Outer::Create()
+call Outer.Inner::Read(Outer)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::Int32(42)
+    );
+    let unrelated = source
+        .replace(".type Inner", ".end\n.type OuterLookalike")
+        .replace(".end\n.end\n.function", ".end\n.function")
+        .replace("Outer.Inner::Read", "OuterLookalike::Read");
+    assert!(
+        assemble(&unrelated)
+            .unwrap_err()
+            .message
+            .contains("access denied")
+    );
+}

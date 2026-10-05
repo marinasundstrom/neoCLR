@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve lexical nesting for native closures capturing their enclosing reference
+  object. Resolve private member access through enclosing type identities; unrelated
+  types gain no access. The existing HTTP server serves eight valid status cases and
+  rejects two invalid responses; a receiver-identity consumer and access tests pass.
+
 - Bind instantiated generic methods as native function values and CLI delegates using
   existing generic call identities. Validate substituted signatures, scopes and
   constraints; C# tests cover CLI execution, native reading and incompatible targets.

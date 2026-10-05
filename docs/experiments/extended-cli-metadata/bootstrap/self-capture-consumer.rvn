@@ -1,0 +1,31 @@
+import System.*
+import System.Tasks.*
+
+class Counter {
+    private var count: int = 0
+    val Count: int => count
+
+    func Start() {
+        TaskQueue.Default.Post(() => {
+            count += 1
+            self.Advance()
+        })
+    }
+
+    private func Advance() {
+        count += 41
+    }
+}
+
+func Main() {
+    let counter = Counter()
+    counter.Start()
+    if counter.Count != 0 {
+        System.Fail("Callback ran before draining")
+    }
+    TaskQueue.Default.Drain()
+    if counter.Count != 42 {
+        System.Fail("Callback lost receiver identity")
+    }
+    Console.WriteLine("Captured self identity passed")
+}
