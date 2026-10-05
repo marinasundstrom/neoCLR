@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Record Raven's opt-in source Object semantic binding: one baseless root supplies
+  named/keyword signatures, implicit bases and overrides. 75 focused compiler tests
+  and the native emission-boundary probe pass. Root metadata authoring remains open;
+  both current emitters reject the option before publication. No runtime behavior or
+  production seed changes in this integration record.
+
 - Add explicit host selection of an Object root by library module/revision/type row,
   with slot validation, binary round trips and checked retained-seed dependencies.
   Default loading still rejects application lookalikes. Selection is transient;

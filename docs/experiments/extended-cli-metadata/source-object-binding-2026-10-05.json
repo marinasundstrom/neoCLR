@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-05",
+  "ravenRevision": "e748b089f",
+  "runtimeRevision": "4e9e4045",
+  "sourceSha256": {
+    "src/Raven.CodeAnalysis/Compilation.SourceObjectRoot.cs": "09c974232e9e6d016fca90583ec9099189fdf843e4b975b5d05fcacb0c0585cb",
+    "src/Raven.CodeAnalysis/Compilation.cs": "c50e5337a12e437aef25e6b3258717f3f1caf80f8b8c4abf24c4a272a63788bb",
+    "src/Raven.CodeAnalysis/Compilation.SemanticModel.cs": "962c9c904ac6108aced36273fd7ba54638a788949c2b3aef36eb9a8b726b6667",
+    "src/Raven.CodeAnalysis/MetadataImportOptions.cs": "aa01a1573436f6ea3ac6c57be79c76a96cbdf36c607e8369527dcbd562636d8f",
+    "src/Raven.CodeAnalysis/SemanticModel.Binding.cs": "ed481e7cddd04b2c07ef64f43ea45eb90b007902860b9e7452994cf4035f4ea8",
+    "src/Raven.CodeAnalysis/Symbols/Source/SourceNamedTypeSymbol.cs": "318a8b6f7e76259146511836ca755b0279f61036fbca43cfe30f48fe2e121d62",
+    "src/Raven.CodeAnalysis/Targets/CliRuntimeContract.cs": "2085c8ee9b86d7421e3a732eba173e9644e200b84ed10feea16da096d63e30f2",
+    "src/Raven.CodeAnalysis/Targets/NeoClrCliRuntimeContract.cs": "cca494d9032ebae5f00b8aad64326f6ec485406155820121fb744a92129d71af",
+    "src/Raven.CodeAnalysis/Targets/DotNetCompilationEmitter.cs": "fa36cb5c76aa1c88df3d63a0f2ab456d285bdee0f2a69bbc42a32a6b590841a0",
+    "src/Raven.CodeAnalysis.NeoClr/NeoClrBindingContract.cs": "ea86d10a394fe3f1dca0ebe38b1919a8dd1d13e1a15663b0f7362b593de9d1d5",
+    "test/Raven.CodeAnalysis.Tests/Utilities/Framework/SourceObjectRootTests.cs": "d23a842feb61630046974cc73e7389e0c384c576bb4dae3a3307f5ce84f69e8d",
+    "tools/NeoClrMetadataProbe/SourceObjectRootChecks.cs": "03fbc032d046c642b6389c03e42f4c35d973ead7a4b762218e7e554dfb8d3f0a"
+  },
+  "bootstrap": {
+    "path": "/tmp/IntrospectionCoreParams1005.dll",
+    "sha256": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc"
+  },
+  "validation": [
+    {
+      "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj --filter \"FullyQualifiedName~MetadataImportOptionsTests|FullyQualifiedName~RuntimeTypeOfContractTests\" /property:WarningLevel=0",
+      "phase": "pre-change baseline",
+      "passed": 36
+    },
+    {
+      "command": "dotnet test test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj --no-build --filter \"FullyQualifiedName~SourceObjectRootTests|FullyQualifiedName~MetadataImportOptionsTests|FullyQualifiedName~RuntimeTypeOfContractTests|FullyQualifiedName~VirtualMemberTests|FullyQualifiedName~ClassInheritanceTests|FullyQualifiedName~BaseConstructorTests|FullyQualifiedName~ConstructorChainingTests\" /property:WarningLevel=0",
+      "passed": 75
+    },
+    {
+      "command": "dotnet build tools/NeoClrMetadataProbe/NeoClrMetadataProbe.csproj -p:WarningLevel=0 -p:NeoClrMetadataProject=/path/to/NeoCLR.Metadata.Experimental.csproj",
+      "exitCode": 0
+    },
+    {
+      "command": "dotnet tools/NeoClrMetadataProbe/bin/Debug/net10.0/NeoClrMetadataProbe.dll --source-object-root /tmp/IntrospectionCoreParams1005.dll",
+      "exitCode": 0,
+      "stdout": "PASS source Object root semantic identity and native emission boundary\n"
+    }
+  ],
+  "completion": "Semantic producer binding only. Both current emitters reject the selected source root before publication; ordinary driver wiring and full-System execution remain open."
+}

@@ -4,6 +4,15 @@ The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
 
+## Source Object producer binding passes (2026-10-05)
+
+Raven `e748b089f` [selects the source Object semantic root](experiments/extended-cli-metadata/source-object-binding-2026-10-05.md)
+before member signatures. Named/keyword types, implicit bases and overrides agree;
+75 focused compiler regressions and the native no-publication probe pass. Both emitters
+still reject this opt-in configuration. Next implement metadata definition/builder root
+authoring, then imported root selection and driver/runtime wiring. The production root
+has not replaced the retained seed, and full-System compilation remains incomplete.
+
 ## Explicit runtime Object-root selection executes (2026-10-05)
 
 The [host selection gate](experiments/extended-cli-metadata/explicit-object-root-2026-10-05.md)

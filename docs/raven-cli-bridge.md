@@ -5966,3 +5966,14 @@ access checks. Default loading retains System ownership and lookalike rejection.
 This is transient load context, not new CLI/native encoding. Raven binding, root
 writer authoring and ordinary driver/CLI configuration are still pending; no seed
 or source-ownership manifest changes are implied by the runtime-only gate.
+
+### Source Object semantic producer (2026-10-05)
+
+Raven `e748b089f` adds opt-in `MetadataImportOptions.UseSourceObjectRoot` for producer
+analysis. Source declarations select one baseless root before member signatures;
+ordinary .NET and unselected NeoCLR behavior remain unchanged. The intended native
+root has no temporary CLI carrier: Reflection.Emit and native emission both reject
+until the metadata library supports root authoring. The [binding evidence](experiments/extended-cli-metadata/source-object-binding-2026-10-05.md)
+covers semantic identity, configuration diagnostics, snapshot isolation and unchanged
+output on failure. Source-root consumer import, manifest/driver configuration and the
+runtime load-context connection remain later work.
