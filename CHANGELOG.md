@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Preserve ordinary final reference classes with the CLI Sealed flag in manual
+  definitions, builders, native readers and introspection; reject derived classes
+  with sealed bases. Admit explicit canonical Boolean scalar ownership alongside
+  numeric primitives. These contracts support source JSON descriptor validation.
+
 - Resolve local inherited public methods as interface implementations on derived classes.
   Mark only selected implementation slots virtual for CLI interoperability, preserving
   unrelated method flags. CLR and native interface dispatch execute to 42; 152 metadata

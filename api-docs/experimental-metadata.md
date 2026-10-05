@@ -7193,3 +7193,19 @@ flags; unrelated methods retain their existing attributes. Existing exact parame
 matching and visibility validation apply. Missing implementations reject before writing.
 Inherited explicit reimplementation is rejected rather than authoring an invalid MethodImpl
 whose body is outside the declaring type. External class inheritance remains unsupported.
+
+## Final classes and Boolean storage (development, 2026-10-05)
+
+`TypeDefinition.SetSealedClass()` and `TypeBuilder.SetSealedClass()` set the ordinary
+CLI Sealed flag on an attached concrete reference class. They are idempotent and return
+void. Loaded, detached, static, abstract, value and closed-family definitions reject
+with InvalidOperationException. Manual `TypeDefinition` attributes may use the same
+`0x100` flag; the writer validates both paths. CLI and native readers preserve the
+flag, and `Introspection.NominalTypeInfo.IsSealed` reports it. Deriving from a sealed
+local class rejects before writing. This is finality, distinct from a closed hierarchy.
+
+`SetNativePrimitive(PrimitiveType.Boolean)` now supports the canonical fieldless
+`System.Boolean` value declaration. It follows numeric primitive validation and
+ldobj/stobj scalar storage; native import and introspection preserve NativePrimitive.
+A name alone does not claim ownership. Executable CLI writing of runtime-owned
+primitive implementations still rejects; explicit host ownership selects the provider.

@@ -345,7 +345,7 @@ public sealed partial class AssemblyBuilder
             entry = EntryPoint is null ? "" : FunctionName(EntryPoint),
             assemblies = new[] { manifest },
             types = types.Select((type, index) => new NativeTypeRow(
-                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType && type.NativePrimitive is null, !type.IsInterface && type.IsAbstract, type.IsStatic || type.IsValueType, type.IsClosedHierarchy,
+                TypeName(type), type.Fields.Select(f => (object)new { name = f.Name, ty = SignatureValue(f.FieldType), visibility = type.IsEnum ? "private" : f.Visibility.ToString().ToLowerInvariant() }).ToArray(), !type.IsInterface && !type.IsValueType && type.NativePrimitive is null, !type.IsInterface && type.IsAbstract, (type.Definition.Attributes & 0x100) != 0, type.IsClosedHierarchy,
                 TypeOrigin(type, index), type.LocalBase is { } baseType ? SignatureValue(baseType.OpenSignature) : null, type.IsInterface ? "Interface" : (type.NativePrimitive is not null || type.NativeGrapheme) ? "Runtime" : null,
                 !type.InterfaceSignatures.Any() ? null : type.InterfaceSignatures.Select(SignatureValue).ToArray(),
                 type.Visibility == TypeVisibility.Internal ? "internal" : null,

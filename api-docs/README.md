@@ -1010,3 +1010,10 @@ The temporary CLI bootstrap's MethodImplAttribute/MethodImplOptions are compiler
 markers consumed into implementation flags, not new executable guest APIs. They are
 excluded from RavenDoc with the other bootstrap-only declarations; see the
 [source-service contract](../docs/experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
+
+2026-10-05 final-class/Boolean host metadata update: SetSealedClass and canonical
+Boolean storage are covered in the manual experimental metadata reference. These
+C# host APIs are outside the guest RavenDoc selection; new runtime snapshot/service
+adapters are internal. The API snapshot check was run and still reports the previously
+recorded stale guest snapshot. Do not replace that full reference with the incremental
+JsonIntrospection library.

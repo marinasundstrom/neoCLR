@@ -101,7 +101,7 @@ public sealed partial class AssemblyBuilder
                 type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
-                if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent)))
+                if (type.LocalBase is { } parent && (!IsOrdinaryBase(type) || !IsOrdinaryBase(parent) || (parent.Definition.Attributes & 0x100) != 0))
                     throw new InvalidDataException("derived classes require ordinary nongeneric reference owners");
             }
             ValidateValueLayouts();

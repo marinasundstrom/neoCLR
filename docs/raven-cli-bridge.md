@@ -5808,3 +5808,12 @@ supports this relationship; no new runtime instruction or Runtime Contract mappi
 152 C# contract groups pass; `--inherited-interface-image <path>` writes the focused native
 consumer, which verifies and executes to 42. CLI execution also returns 42. Source descriptor
 materialization and the production JSON mapping gate remain open.
+
+### Final reference classes and Boolean ownership (2026-10-05)
+
+Metadata now preserves ordinary CLI Sealed flags on authored reference classes and
+rejects sealed base inheritance. Raven must retain finality when emitting source models:
+JSON validation distinguishes these from open and abstract classes. Explicit Boolean
+primitive ownership uses the existing scalar representation; it neither adds a new
+element code nor changes the .NET backend. C# contract tests cover builder/manual
+parity, CLR finality, native facade round trips and invalid bases.

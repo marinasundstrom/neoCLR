@@ -515,7 +515,7 @@ public sealed partial class TypeDefinition
     internal bool CanImportReference { get; }
     internal AssemblyIdentity? ValueTypeCore { get; }
     /// <summary>Gets the CLI-shaped TypeAttributes flags.</summary>
-    public uint Attributes { get; }
+    public uint Attributes { get; private set; }
     /// <summary>Gets properties declared directly by this type.</summary>
     public IList<PropertyDefinition> Properties => authoredProperties ?? (IList<PropertyDefinition>)Module.GetDeclaredProperties(MetadataToken);
     /// <summary>Gets fields declared directly by this type.</summary>

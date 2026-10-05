@@ -466,6 +466,7 @@ var tests = new (string Name, Action Body)[]
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Bodyless runtime internal-call authoring", InternalCallChecks.Run),
+    ("Sealed class definitions, CLI and native facade", SealedClassChecks.Run),
     ("Inherited public interface implementation dispatch", InheritedInterfaceChecks.Run),
     ("Parameter array definitions, builders and CLI execution", ParameterArrayChecks.Run),
     ("Reference Object override authoring and CLI execution", ReferenceOverrideChecks.Run),

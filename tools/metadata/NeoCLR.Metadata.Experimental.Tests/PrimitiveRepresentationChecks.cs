@@ -8,6 +8,10 @@ internal static class PrimitiveRepresentationChecks
     internal static void Run()
     {
         var graph = new AssemblyBuilder(new("PrimitiveImplementations", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
+        var boolean = graph.AddValueType("System", "Boolean");
+        boolean.SetNativePrimitive(PrimitiveType.Boolean);
+        var boolIdentity = boolean.AddInstanceMethod("Identity", new(PrimitiveType.Boolean, []));
+        boolIdentity.GetILGenerator().LoadArgument(0); boolIdentity.GetILGenerator().LoadObject(PrimitiveType.Boolean); boolIdentity.GetILGenerator().Return();
         var contract = graph.AddInterface("Example", "Scalar");
         var zeroContract = contract.AddInterfaceMethod("get_Zero", new(SignatureType.Self, []), true);
         contract.AddProperty("Zero", SignatureType.Self, zeroContract, null);
@@ -54,7 +58,8 @@ internal static class PrimitiveRepresentationChecks
         graph.EntryPoint = null;
         var native = RuntimeAssemblyContainer.WriteBinary(graph);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(native);
-        if (snapshot.MainModule.Types.Single(t => t.Name == "Double").NativePrimitive != PrimitiveType.Double ||
+        if (snapshot.MainModule.Types.Single(t => t.Name == "Boolean").NativePrimitive != PrimitiveType.Boolean ||
+            snapshot.MainModule.Types.Single(t => t.Name == "Double").NativePrimitive != PrimitiveType.Double ||
             snapshot.MainModule.Types.Single(t => t.Name == "Single").NativePrimitive != PrimitiveType.Single)
             throw new Exception("native scalar declaration lost");
         var view = new MetadataLoadContext([snapshot]).Resolve(snapshot.Identity).GetTypes().Single(t => t.Name == "Double");
@@ -96,10 +101,10 @@ internal static class PrimitiveRepresentationChecks
         Reject<ArgumentException>(() => ordinary.SetNativePrimitive(PrimitiveType.Void));
         Reject<ArgumentException>(() => graph.AddValueType("Other", "Double").SetNativePrimitive(PrimitiveType.Double));
         foreach (var edit in new Action<JsonNode>[] {
-            root => root["types"]![1]!["name"] = "Other.Double",
-            root => root["types"]![1]!["representation"] = "Record",
-            root => root["types"]![1]!["fields"] = new JsonArray(JsonNode.Parse("{\"name\":\"m_value\",\"ty\":\"Double\",\"visibility\":\"private\"}")),
-            root => root["functions"]![3]!["owner"] = "Single"
+            root => root["types"]!.AsArray().Single(t => t!["name"]!.GetValue<string>() == "System.Double")!["name"] = "Other.Double",
+            root => root["types"]!.AsArray().Single(t => t!["name"]!.GetValue<string>() == "System.Double")!["representation"] = "Record",
+            root => root["types"]!.AsArray().Single(t => t!["name"]!.GetValue<string>() == "System.Double")!["fields"] = new JsonArray(JsonNode.Parse("{\"name\":\"m_value\",\"ty\":\"Double\",\"visibility\":\"private\"}")),
+            root => root["functions"]!.AsArray().Single(f => f!["name"]!.GetValue<string>() == "System.Double.Identity")!["owner"] = "Single"
         })
         {
             var root = JsonNode.Parse(json)!; edit(root);
