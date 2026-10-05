@@ -6,7 +6,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
-No changes yet.
+### 2026-10-05
+
+- Point repository entry guides to Preview 12 native installation and distinguish
+  the preserved older bridge walkthroughs.
 
 ## 0.1.0-preview.12 — 2026-10-05
 

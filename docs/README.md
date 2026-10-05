@@ -6,7 +6,10 @@ sample products. The [HTTP tracker](http-capabilities.md) owns the first milesto
 The [theme trackers](platform-roadmap.md#theme-trackers) group current work across
 HTTP/networking, runtime/language, library/data and tooling/release.
 
-Start with the [build instructions](../README.md#build-and-run-a-sample),
+For the native macOS arm64 bundle, start with [Preview 12](preview-12-release-notes.md)
+and its [bootstrap/package procedure](native-poc-bundle.md).
+
+For source and older workflows, see the [build instructions](../README.md#build-and-run-a-sample),
 [website build](../README.md#build-the-website), or
 [runtime and Raven walkthrough](runtime-raven-preview.md).
 The [changelog](../CHANGELOG.md) records implemented changes; proposals and plans
