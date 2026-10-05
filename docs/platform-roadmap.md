@@ -7,6 +7,21 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Async entry completion and remaining sample gate (2026-10-05)
+
+Native Task<unit>/Task<int> entries now drain registered work before observing the result;
+arguments, integer exit status, cancellation and unresolved-task faults are verified.
+Both unchanged async Main samples execute. Eight of the ten original POC samples now
+compile, and all eleven non-network controls pass (including five focused regressions).
+The HTTP pair retains its recorded localhost execution evidence.
+
+Next unblock `application-types` (Point constructor receiver validation), then
+`application-inheritance` (native declaration capability), with focused regressions and
+ordinary .NET controls. The separately recorded .NET field-return candidate still needs
+main reproduction and isolated repair. Keep editor/LSP release checks visible after the
+sample gate; full System completion is not a prerequisite.
+[Entry contract and inventory](experiments/extended-cli-metadata/native-async-entry-2026-10-05.md).
+
 ## Native async state machines execute (2026-10-05)
 
 Top-level nongeneric async functions now emit through Raven's existing heap lowering.

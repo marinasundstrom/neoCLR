@@ -1,0 +1,13 @@
+import System.*
+import System.Tasks.*
+
+async func Main(arguments: string[]) -> Task<int> {
+    if arguments.Length != 1 || arguments[0] != "argument" {
+        return 99
+    }
+    let result = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        _ = result.Complete(23)
+    })
+    return await result.Task
+}

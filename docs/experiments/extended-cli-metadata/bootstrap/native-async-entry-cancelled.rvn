@@ -1,0 +1,7 @@
+import System.Tasks.*
+
+async func Main() -> Task<int> {
+    let result = Promise<int>()
+    _ = result.Cancel()
+    return await result.Task
+}

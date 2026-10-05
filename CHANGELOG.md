@@ -19,7 +19,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   signature blocker instead of failing local storage emission. Native async Result
   propagation now preserves control flow and receiver storage across suspension; unchanged
   HTTP JSON client/server samples compile and execute together over localhost. Add an
-  executable propagation regression and native HTTP runner with hashed evidence.
+  executable propagation regression and native HTTP runner with hashed evidence. Native
+  Task<unit>/Task<int> entry completion now forwards arguments and preserves exit status
+  and faults. Eight of ten original POC samples compile; all eleven non-network execution
+  controls pass. Remaining sample blockers are value constructors and inheritance.
 
 - Inventory ten unchanged POC samples through the native compiler driver. Order
   collections, interfaces and JSON object mapping compile and execute with exact output;

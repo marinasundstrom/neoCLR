@@ -8,6 +8,8 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 SAMPLES = {
+    **{f'native-async-entry-{kind}': [f'extended-cli-metadata/bootstrap/native-async-entry-{kind}.rvn']
+       for kind in ('int', 'cancelled', 'pending')},
     'native-async-propagation': ['extended-cli-metadata/bootstrap/native-async-propagation.rvn'],
     'native-async-state': ['extended-cli-metadata/bootstrap/native-async-state.rvn'],
     **{name: [f'raven-target/samples/{name}.rvn'] for name in (
@@ -39,6 +41,11 @@ def main():
     if runtime:
         inputs.append(runtime)
     expected = {
+        'library-async': 'Suspended\n42\n',
+        'library-async-default-queue': 'Hello on a worker\n',
+        'native-async-entry-int': '',
+        'native-async-entry-cancelled': '',
+        'native-async-entry-pending': '',
         'native-async-propagation': 'Native async propagation checks passed\n',
         'native-async-state': 'Native async state checks passed\n',
         'library-async-cancellation': 'Cancelled\n',
@@ -46,6 +53,9 @@ def main():
         'application-interfaces': '42\n99\n',
         'json-object-mapping': 'JSON object mapping checks passed\n',
     }
+    expected_codes = {'native-async-entry-int': 23, 'native-async-entry-cancelled': 1, 'native-async-entry-pending': 1}
+    expected_faults = {'native-async-entry-cancelled': 'Task is cancelled; consume its Outcome',
+                       'native-async-entry-pending': 'Task is still pending'}
     report = {'scope': 'selected unchanged POC samples; only cases with an execution record claim runtime validation',
               'revisions': {str(p): subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=p, text=True).strip()
                             for p in (ROOT, paths['compiler'].parent)},
@@ -75,11 +85,17 @@ def main():
             command = [str(runtime), 'run', str(artifact), '--system', str(paths['seed']), '--instructions', '100000000']
             for reference in refs:
                 command += ['--module', str(reference)]
+            if name == 'native-async-entry-int':
+                command += ['--', 'argument']
+            expected_code = expected_codes.get(name, 0)
+            expected_fault = expected_faults.get(name)
             try:
                 execution = subprocess.run(command, capture_output=True, text=True, timeout=120)
                 case['execution'] = dict(command=command, exitCode=execution.returncode,
                                          stdout=execution.stdout, stderr=execution.stderr, expectedStdout=expected[name],
-                                         passed=execution.returncode == 0 and execution.stdout == expected[name] and not execution.stderr)
+                                         expectedExitCode=expected_code, expectedFault=expected_fault,
+                                         passed=execution.returncode == expected_code and execution.stdout == expected[name] and
+                                         (expected_fault in execution.stderr if expected_fault else not execution.stderr))
             except subprocess.TimeoutExpired:
                 case['execution'] = dict(command=command, passed=False, timeoutSeconds=120)
         report['cases'].append(case)

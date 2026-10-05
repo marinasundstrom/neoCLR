@@ -1,0 +1,6 @@
+import System.Tasks.*
+
+async func Main() -> Task<int> {
+    let result = Promise<int>()
+    return await result.Task
+}
