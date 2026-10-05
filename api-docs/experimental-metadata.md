@@ -7358,8 +7358,29 @@ authored root validates all three concrete root slots instead of demanding a sep
 legacy System binding. An incomplete root or a body expecting the unrelated bootstrap
 Object fails with `InvalidDataException` before bytes are returned. Without an authored
 root, the existing explicit System binding requirement is unchanged. Root signature
-selection does not yet implement imported root selection or local Object overrides.
+selection does not yet implement imported root selection. Local overrides are supported
+as described below.
 
 The API-produced fixture's `BoxedDisplay()` now emits boxing and virtual dispatch and
 executes with result `"42"` under explicit runtime root selection. This tests executable
 instructions from the API, in addition to the existing source-assembled runtime callers.
+
+### Overrides of an authored Object root
+
+`TypeBuilder.AddOverride(name, signature)` and manually attached
+`MethodDefinition(name, 0x46, signature)` now support the selected local Object root.
+Equals must take the exact `AssemblyBuilder.ObjectType`; a bootstrap or foreign root
+argument throws `InvalidOperationException` on attachment. The root itself cannot
+claim an override of its own slot. Signature selection is revalidated on write, so
+adding a root after authoring bootstrap-based Equals fails with `InvalidDataException`.
+
+Native emission requires a complete local root slot contract, or the existing explicit
+legacy System binding when no root is authored. Overrides preserve CLI Virtual without
+NewSlot or Abstract. Native readers and introspection retain the Equals parameter's
+canonical local identity. No new native format fields or runtime dispatch rules are used.
+
+The supported direct builder-to-PE path executes constructors and all three overrides
+through root slots. Regenerating a CLI projection from a native snapshot with class
+inheritance remains explicitly unsupported (`NotSupportedException`); use the original
+authored graph for PE emission. The normal .NET override execution controls still pass.
+Raven's source-root planner, virtual declarations and special-type mapping remain pending.

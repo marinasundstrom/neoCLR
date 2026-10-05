@@ -125,6 +125,8 @@ public sealed partial class AssemblyBuilder
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
+                if (method.IsOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot))
+                    throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var bound in method.InterfaceConstraints)
                 {

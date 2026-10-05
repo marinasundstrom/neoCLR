@@ -6,6 +6,17 @@ A disassembler remains a release candidate, not yet a required deliverable.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## API-authored local Object overrides execute (2026-10-05)
+
+A derived class emitted by the metadata API now constructs through its protected root
+constructor and dispatches all three overrides through the selected root. Native readers
+and introspection preserve exact Equals identity and reused-slot flags; 158 C# groups and
+14 runtime identity tests pass. [Evidence and reproduction](experiments/extended-cli-metadata/owned-object-overrides-2026-10-05.md).
+The next compiler slice must explicitly admit the baseless source root and its concrete
+virtual declarations, map special Object to that source owner, and wire the metadata
+adapter. Keep emission guarded until these contracts and the executable probe agree.
+VS Code/LSP and working native Tasks/await samples remain release gates.
+
 ## API-authored root boxing executes (2026-10-05)
 
 `AssemblyBuilder.ObjectType` now selects the owned root for boxing/value-test results.

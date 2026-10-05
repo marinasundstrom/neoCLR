@@ -54,3 +54,13 @@ The reference projection has a fresh MVID on regeneration; native content is sta
 The Object-root fixture also includes API-authored `BoxedDisplay()`: it boxes Int32 42, applies value-type isinst,
 and calls the local root's ToString slot. The runtime test invokes that emitted function,
 so its boxing/dispatch body is tested independently of source-assembled instructions.
+
+`owned-object-overrides.pe` is produced by `OwnedObjectOverrideChecks.Create`. It
+contains the explicit root plus a derived class with a protected base constructor and
+ToString/Equals/GetHashCode overrides. Three emitted assembly functions construct the
+class and invoke the root slots; Rust checks the resulting String, Boolean and Int32.
+
+```sh
+dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
+  --owned-object-overrides-image tests/fixtures/metadata-container/owned-object-overrides.pe
+```

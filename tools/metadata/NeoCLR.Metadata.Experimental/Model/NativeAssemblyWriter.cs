@@ -80,10 +80,14 @@ public sealed partial class AssemblyBuilder
         var dependencies = new Dictionary<AssemblyIdentity, AssemblyBuilder>();
         if (methods.Any(method => method.IsOverride))
         {
-            var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
-            if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
-            foreach (var name in methods.Where(m => m.IsOverride).Select(m => m.Name).Distinct()) bindings[0].Value.ValidateObjectOverride(name);
-            dependencies.Add(bindings[0].Key, importedGraphs[bindings[0].Key].Graph);
+            if (NativeObjectRoot is not null) ValidateNativeObjectSlots();
+            else
+            {
+                var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
+                if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
+                foreach (var name in methods.Where(m => m.IsOverride).Select(m => m.Name).Distinct()) bindings[0].Value.ValidateObjectOverride(name);
+                dependencies.Add(bindings[0].Key, importedGraphs[bindings[0].Key].Graph);
+            }
         }
         foreach (var method in methods)
         {

@@ -467,3 +467,49 @@ fn metadata_api_authored_root_slots_load_and_execute() {
         assert_eq!(program.run(Limits::default()).unwrap().value, expected);
     }
 }
+
+#[test]
+fn metadata_api_owned_root_overrides_execute() {
+    let image = include_bytes!("fixtures/metadata-container/owned-object-overrides.pe");
+    let library = neoclr::metadata_container::decode(image).unwrap();
+    let selected = neoclr::metadata::TypeDefId {
+        module: library.name.clone(),
+        revision: library.revision.clone(),
+        index: 0,
+    };
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    for (name, result, expected) in [
+        (
+            "OverrideToString",
+            "String",
+            Value::String("derived override".into()),
+        ),
+        ("OverrideGetHashCode", "Int32", Value::Int32(93)),
+        ("OverrideEquals", "Boolean", Value::Boolean(true)),
+    ] {
+        let method = library
+            .functions
+            .iter()
+            .find(|f| f.origin.as_ref().is_some_and(|o| o.name == name))
+            .unwrap();
+        let source = format!(
+            ".module App\n.references ({})\n.entry Main\n.function Main() -> {result}\ncall {}()\nret\n.end",
+            library.name, method.name
+        );
+        let modules = neoclr::assembler::read_modules_with_object_root(
+            &[ModuleInput::Source(&source), ModuleInput::MetadataPe(image)],
+            &seed,
+            &selected,
+        )
+        .unwrap();
+        let program = LoadedProgram::with_modules_and_object_root(
+            &modules[0],
+            &seed,
+            &modules[1..],
+            &selected,
+        )
+        .unwrap();
+        program.verify().unwrap();
+        assert_eq!(program.run(Limits::default()).unwrap().value, expected);
+    }
+}

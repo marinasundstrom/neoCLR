@@ -50,7 +50,7 @@ public sealed partial class MethodDefinition
         declarationAttributes = (ushort)((visibility == MethodVisibility.Public ? 6 : 3) | 0x10);
         this.signature = [];
     }
-    internal static bool IsObjectOverride(string name, MethodSignature signature, AssemblyIdentity? core = null)
+    internal static bool IsObjectOverride(string name, MethodSignature signature, AssemblyIdentity? core = null, TypeBuilder? root = null)
     {
         if (signature.GenericParameterNames.Count != 0) return false;
         return name switch
@@ -58,8 +58,10 @@ public sealed partial class MethodDefinition
             "ToString" => signature.ReturnType == PrimitiveType.String && signature.ParameterTypes.Count == 0,
             "GetHashCode" => signature.ReturnType == PrimitiveType.Int32 && signature.ParameterTypes.Count == 0,
             "Equals" => signature.ReturnType == PrimitiveType.Boolean && signature.ParameterTypes.Count == 1 &&
-                signature.ParameterTypes[0].ImportedType is { Namespace: "System", Name: "Object", GenericArity: 0, DeclaringType: null, IsValueType: false } owner &&
-                (core is null || owner.AssemblyIdentity.Equals(core)),
+                (signature.ParameterTypes[0].ClassType is { IsNativeObjectRoot: true } localRoot &&
+                    (core is null || ReferenceEquals(localRoot, root)) ||
+                root is null && signature.ParameterTypes[0].ImportedType is { Namespace: "System", Name: "Object", GenericArity: 0, DeclaringType: null, IsValueType: false } owner &&
+                (core is null || owner.AssemblyIdentity.Equals(core))),
             _ => false
         };
     }
@@ -151,12 +153,12 @@ public sealed partial class TypeBuilder
 {
     /// <summary>Adds a public instance override using the same validation as a detached method definition.</summary>
     /// <param name="name">ToString, GetHashCode or Equals.</param>
-    /// <param name="signature">Nongeneric String ToString(), Int32 GetHashCode(), or Boolean Equals(CoreObjectType).</param>
+    /// <param name="signature">Nongeneric String ToString(), Int32 GetHashCode(), or Boolean Equals(ObjectType).</param>
     /// <returns>An owned method with a class receiver or managed value receiver and a body generator.</returns>
     /// <exception cref="ArgumentNullException">Signature is null.</exception>
     /// <exception cref="ArgumentException">Unsupported override contract, duplicate signature or method limit.</exception>
     /// <exception cref="InvalidOperationException">Owner is static, an interface, or the Equals argument has the wrong core identity.</exception>
-    /// <remarks>CLI emission reuses the corresponding inherited Object slot. Native encoding requires one explicit BindNativeLibrary System binding with a matching Object slot. Generic value owners are supported; generic override methods are not.</remarks>
+    /// <remarks>CLI emission reuses the corresponding inherited Object slot. Native encoding uses a complete explicitly authored Object root, or requires one explicit BindNativeLibrary System binding with a matching Object slot. Equals must use the selected ObjectType identity. Generic value owners are supported; generic override methods are not.</remarks>
     public MethodBuilder AddOverride(string name, MethodSignature signature)
     {
         var definition = new MethodDefinition(name, (ushort)(MethodAttributes.Public | MethodAttributes.Virtual), signature);
@@ -171,7 +173,7 @@ public sealed partial class TypeBuilder
             throw new ArgumentException("method must belong to this type or be a detached authored type method");
         if ((definition.DeclarationAttributes & 0x540) == 0x140 && (!IsNativeObjectRoot || !MethodDefinition.IsNativeObjectSlot(definition.Name, signature, this)))
             throw new InvalidOperationException("new Object slots require the explicit native root and its exact signature");
-        if ((definition.DeclarationAttributes & 0x540) == 0x40 && (IsInterface || IsStatic || !IsValueType && GenericParameterNames.Count != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary)))
+        if ((definition.DeclarationAttributes & 0x540) == 0x40 && (IsNativeObjectRoot || IsInterface || IsStatic || !IsValueType && GenericParameterNames.Count != 0 || !MethodDefinition.IsObjectOverride(definition.Name, signature, Assembly.CoreLibrary, Assembly.NativeObjectRoot)))
             throw new InvalidOperationException("Object overrides require a class/value owner and the exact core slot signature");
         if (definition.Producer is null && IsInterface != ((definition.DeclarationAttributes & 0x400) != 0))
             throw new InvalidOperationException("abstract contracts require interface owners; concrete methods require class owners");

@@ -6015,3 +6015,15 @@ API-authored boxing/virtual dispatch now executes under explicit runtime root se
 Raven source-root emission remains guarded pending local override identity, declaration
 capabilities and driver catalogs. No importer objects are reused by this authoring API.
 See [validation and limitations](experiments/extended-cli-metadata/object-root-boxing-2026-10-05.md).
+
+### Local root overrides execute (2026-10-05)
+
+The metadata API now validates Equals against the selected owned Object and emits local
+root overrides without a legacy System binding. Native readers/introspection preserve
+exact identity; API-produced constructors and all three virtual calls execute in NeoCLR.
+See [the executable gate](experiments/extended-cli-metadata/owned-object-overrides-2026-10-05.md).
+Raven emission remains guarded: shared source type planning rejects the baseless abstract
+root, callable planning needs an explicit concrete root-slot capability, and special
+Object mapping still assumes an imported reference. These are the next adapter/contracts
+changes; default .NET behavior must remain unchanged. No loader objects should enter
+emission. The source-root production, VS Code and native async gates remain incomplete.

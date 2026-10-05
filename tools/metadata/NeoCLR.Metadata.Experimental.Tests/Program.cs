@@ -357,6 +357,8 @@ if (args.Length == 3 && args[0] == "--emit-runtime-probe")
     return 0;
 }
 
+if (args is ["--owned-object-overrides-image", var overrideImage]) { File.WriteAllBytes(overrideImage, NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(OwnedObjectOverrideChecks.Create())); return 0; }
+if (args is ["--owned-object-overrides"]) { OwnedObjectOverrideChecks.Run(); Console.WriteLine("PASS owned Object overrides"); return 0; }
 if (args is ["--object-root-slots-image", var rootImage]) { File.WriteAllBytes(rootImage, NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(ObjectSlotChecks.Create())); return 0; }
 if (args is ["--object-root-slots"]) { ObjectSlotChecks.Run(); Console.WriteLine("PASS native Object root slots"); return 0; }
 if (args is ["--object-root"]) { ObjectRootChecks.Run(); Console.WriteLine("PASS native Object root authoring"); return 0; }
@@ -364,6 +366,7 @@ if (args is ["--object-root"]) { ObjectRootChecks.Run(); Console.WriteLine("PASS
 // Self-contained executable C# contract tests. No Python, runtime assembly load or external test package.
 var tests = new (string Name, Action Body)[]
 {
+    ("Owned Object overrides", OwnedObjectOverrideChecks.Run),
     ("Native Object root slots", ObjectSlotChecks.Run),
     ("Native Object root authoring", ObjectRootChecks.Run),
     ("Method visibility and reference projection", MethodVisibilityChecks.Run),

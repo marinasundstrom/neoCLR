@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Support Object overrides against an explicitly authored local root, preserving
+  Virtual/reused-slot flags and exact Equals identity through native introspection.
+  Reject bootstrap/foreign root arguments and stale signatures after root selection.
+  API-produced constructors and all three overrides execute in NeoCLR; 158 C# groups
+  and 14 runtime identity tests pass. Raven root declaration/mapping guards remain.
+
 - Select explicitly authored Object roots for metadata boxing/value-test stack results
   through `AssemblyBuilder.ObjectType`, preserving `CoreObjectType` bootstrap semantics.
   API-authored boxing and virtual dispatch execute without a legacy System binding;
