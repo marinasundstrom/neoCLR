@@ -1,0 +1,80 @@
+{
+  "vscode": "1.140.0",
+  "checks": [
+    "native imported hover",
+    "read-only metadata declaration navigation",
+    "native imported completion",
+    "actual file watcher invalidates replaced native library",
+    "unsaved buffer survives native workspace reload",
+    "missing native reference produces a project diagnostic",
+    "native dependency recovery clears the project diagnostic",
+    "unchanged broad sample imports source-built class library",
+    "native Option and Result type hovers retain union kind and constructed arguments",
+    "configured VS Code native build task",
+    "VS Code task executes exact broad-sample output on native runtime",
+    "failed build preserves last successful artifact",
+    "ordinary .NET editor hover and diagnostics",
+    "unchanged Tasks/await sample builds and executes from VS Code"
+  ],
+  "passed": true,
+  "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`",
+  "diagnostics": [],
+  "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`",
+  "completion": [
+    {
+      "label": "VersionOne",
+      "description": "EditorApi"
+    }
+  ],
+  "unionHovers": {
+    "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+    "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+  },
+  "stdout": "Native build output: /private/tmp/native-vscode-qualified1005/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+  "date": "2026-10-05",
+  "ravenRevision": "16ec8e8156a94527d41bbeb5fbbf8fd61b1bcf1f",
+  "neoclrBaseRevision": "aecb75f050b3ae677bac04637fb68c1ce552776f",
+  "sha256": {
+    "/tmp/native-vscode-qualified1005/references/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/tmp/native-vscode-qualified1005/references/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/tmp/native-vscode-qualified1005/references/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/tmp/native-vscode-qualified1005/references/EditorLibrary.dll": "80479e728f884cb56534e566b4a311bde8776f72d89f027f4cf69ecf0a6db50e",
+    "/tmp/native-vscode-qualified1005/references/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/tmp/native-vscode-qualified1005/references/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/tmp/native-vscode-qualified1005/App.rvnproj": "6764034a45d28f44a1a42cc5b29509746cbbaa3d417725635d9e37780d21d82d",
+    "/tmp/native-vscode-qualified1005/Main.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b",
+    "/tmp/native-vscode-qualified1005/Probe.rvn": "462651083beed7466573466772c74c9bddfd42c51d2528d9ff91d3a37268c1f3",
+    "/tmp/native-vscode-qualified1005/bin/neoclr/App.dll": "57de4141b6e21757a58636c41317f7ecb33f3478e3b4b7b87e47174b5e8d877f",
+    "/tmp/native-vscode-qualified1005-async/Main.rvn": "8e225b601fd18c86f5c3b2ec30b47064c4cb37b87bd156e331097eb075cd226c",
+    "/tmp/native-vscode-qualified1005-async/bin/neoclr/Async.dll": "6abfa7f093e351a0268c6e86235216ad604a678f0f6ac1450156aaa218db7637",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "5e6652fcdfa22c051f55bfe2ced4b0599c5353168bf213240c43e0d471cc6ca8",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/Raven.LanguageServer.dll": "ed2c0bbb3f80e7ea5ed26b7a7145a3c201b0bab4b60e0cb4374e39ffa432d1f2",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "784c68a0f442037a72b03c6c78da0f55ddac04e3a311febe9e5a88255d906248",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "454da86aa2acd5506c624f15cc73854d26cee0951935df6ae37c776c4aff2643",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "c9a4737bb450fcfa6b04f1a89573edff01b458fd3ee221c066ac2f4bd3933bce",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "eead2c42fb3d212ac2be8cb9971ee02f46f7e215e78aa99c35cb997ed005e35f",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.VSCode/dist/extension.js": "8724327408b639f48afb82c34cbf844ae96dfb5d382b69d73f495306c4415208"
+  },
+  "focusedChecks": {
+    "projectOptions": 12,
+    "declarationNavigation": 8,
+    "watchedFileBaseline": 3,
+    "nativeProjectCatalogProbe": "passed"
+  },
+  "clientLogExcerpts": [
+    "Using isolated language server: /tmp/native-vscode-user1005qualified/User/globalStorage/raven.raven-vscode/language-server/d08154084652/Raven.LanguageServer.dll",
+    "[lifecycle 2026-10-05T16:35:26.007Z] Language client state changed: Stopped -> Starting",
+    "[lifecycle 2026-10-05T16:35:29.896Z] Language client state changed: Starting -> Running",
+    "[lifecycle 2026-10-05T16:35:30.351Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Probe.rvn 0:41 in 250ms.",
+    "[lifecycle 2026-10-05T16:35:37.120Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Probe.rvn 0:41 in 68ms.",
+    "[lifecycle 2026-10-05T16:35:37.627Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Probe.rvn 0:41 in 2ms.",
+    "[lifecycle 2026-10-05T16:35:44.030Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Main.rvn 25:55 in 814ms.",
+    "[lifecycle 2026-10-05T16:35:44.054Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Main.rvn 33:60 in 23ms.",
+    "[lifecycle 2026-10-05T16:35:44.064Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005/Main.rvn 41:47 in 3ms.",
+    "[lifecycle 2026-10-05T16:35:56.399Z] Request completed: textDocument/hover file:///private/tmp/native-vscode-qualified1005-dotnet/Main.rvn 0:35 in 572ms.",
+    "[lifecycle 2026-10-05T16:36:01.095Z] Language client state changed: Running -> Stopped"
+  ],
+  "serverLogExcerpts": [
+    "2026-10-05T16:35:26.0935380+00:00 [Information] Raven.LanguageServer.Startup: Starting Raven language server. pid=15223 cwd=/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven baseDirectory=/private/tmp/native-vscode-user1005qualified/User/globalStorage/raven.raven-vscode/language-server/d08154084652/ processPath=/usr/local/share/dotnet/dotnet logPath=/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/logs/raven-lsp.log args=<none> commandLine=/private/tmp/native-vscode-user1005qualified/User/globalStorage/raven.raven-vscode/language-server/d08154084652/Raven.LanguageServer.dll"
+  ]
+}

@@ -7446,7 +7446,7 @@ explicit primitive core, native PE references and optional retained runtime seed
 This is a compiler-host API, not a member of the metadata library or guest System API.
 It shares immutable reference instances between semantic import and emission and owns
 no runtime reflection, implicit dependency search or editor file watcher. The native
-CLI uses it; project/LSP wiring remains pending. See the
+CLI uses it; the subsequent native project/editor slices below also consume it. See the
 [Raven host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#shared-native-reference-catalog-2026-10-05)
 for signatures, input limits, failures and snapshot lifetime. No guest API snapshot changes.
 
@@ -7460,3 +7460,18 @@ not guest System.Introspection APIs, so the RavenDoc guest snapshot is unchanged
 Their selection, parameters/results, errors and limits are documented in the
 [public host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#explicit-native-project-metadata-2026-10-05).
 The metadata reader/writer and importer/emitter boundaries remain independent.
+
+
+### Native project emission and editor lifetime (development, 2026-10-05)
+
+The host provider's `GetConfiguration(projectFilePath)` returns a successfully loaded
+`NeoClrProjectConfiguration` with `Catalog`, `ReferencePaths`, `RuntimeSeedPath`,
+`Validate(compilation)` and `CreateEmissionBackend(assemblyName)`. Target-neutral
+project/provider interfaces expose explicit metadata input paths for host file watching.
+Ownership and async contracts are evaluated once per load; emission uses host artifact
+identities and compiler symbols. Invalid reloads retain the last successful editor
+snapshot and report failure; builds independently revalidate before atomic publication.
+
+See the [complete host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#native-vs-code-poc-acceptance-2026-10-05)
+for signatures, exceptions, limits and commands. These are compiler-host APIs, not guest
+System APIs; no RavenDoc guest snapshot or native metadata encoding changes are needed.

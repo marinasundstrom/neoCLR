@@ -8,6 +8,24 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Native VS Code POC accepted (2026-10-05)
+
+The author requested continued work until VS Code acceptance. Real VS Code 1.140.0
+on macOS arm64 now passes the bounded native editor gate: native artifact-only import,
+completion/hover, read-only declaration navigation, reference replacement with unsaved
+buffers, missing dependency diagnostics/recovery, and build/run through the same
+project configuration. Unchanged collections and Tasks/await samples execute against
+the recorded source-built library artifacts; a .NET editor control remains green.
+[Acceptance evidence and reproduction](experiments/extended-cli-metadata/native-vscode-acceptance-2026-10-05.md).
+
+This supersedes the editor wiring/qualification next steps in the historical slices
+below. Next release work is a matched distributable compiler/server/extension/runtime
+bundle, refreshed downloads/setup instructions and installation acceptance. Initial
+project-open failures still use existing logs; workspace-external file watchers,
+full decompilation, general native project/package dependency builds and other OS
+qualification remain beyond this POC. Full class-library source bootstrap remains a
+separate roadmap gate. No release or website publication has occurred.
+
 ## Shared host snapshots prepare editor integration (2026-10-05)
 
 Raven's native driver now uses a reusable explicit reference catalog. Core identity,

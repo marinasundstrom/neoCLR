@@ -122,9 +122,16 @@ The [feature pages](../#feature-pages) show tested examples and current limits. 
 
 ### Native editor integration in development
 
-Adapter-enabled Raven Language Server builds can now load explicit native assembly
-references from projects and provide completion, hover and semantic diagnostics for
-imported members. This has been checked with a separately emitted library over the
-LSP connection. Native reference refresh, declaration navigation and VS Code build/run
-qualification are still pending. This development evidence does not change the
-published Preview 11 setup above.
+The native development workflow has passed a real VS Code acceptance test on macOS
+arm64. Projects import native libraries for completion, hover and read-only declaration
+navigation; replacing a reference refreshes symbols while preserving unsaved text.
+Missing references produce project diagnostics and recover when restored.
+
+VS Code tasks build and run the unchanged collections and Tasks/await samples against
+source-built libraries. The compiler and language server use the same evaluated project
+references and bootstrap configuration. Ordinary .NET editor behavior is checked too.
+
+This is development POC evidence, not a replacement download for Preview 11. Matching
+compiler/server/extension/runtime packaging and installation qualification are still
+required before publishing the native workflow. The setup above remains the published
+bridge workflow.

@@ -6095,3 +6095,25 @@ Compared with .NET project loading, this uses the same semantic/editor pipeline 
 requires explicit native artifacts and an optional host adapter. Normal .NET and
 legacy bridge project loading retain their existing path. Automatic reference
 refresh, metadata navigation and unified VS Code native build/run remain release work.
+
+
+### Native VS Code POC accepted (2026-10-05)
+
+The native project provider now supplies shared ownership/async configuration to the
+language server and `rvnc neoclr --project`. `--run /path/to/neoclr` executes the emitted
+assembly with exactly the project's explicit seed and native modules. Build publication
+is atomic after successful binding/encoding; a failed build does not execute a previous
+artifact. This replaces hand-maintained parallel editor/compiler argument lists for
+the tested native projects. The published CLI bridge and ordinary .NET paths remain.
+
+VS Code refreshes explicit native artifacts while retaining unsaved buffers, reports
+failed reloads on the project and clears errors after recovery. Imported declaration
+navigation renders read-only symbol signatures; it is not source decompilation.
+The metadata format and runtime instruction set do not change. Compared with .NET,
+the semantic editor pipeline is shared; native runtime launch and explicit bootstrap
+ownership are target configuration, not reflection-based metadata projection.
+
+[Reproduction and observed results](experiments/extended-cli-metadata/native-vscode-acceptance-2026-10-05.md)
+include broad collections, actual Tasks/await execution and an ordinary .NET editor
+control. The new development path is qualified on macOS arm64 only. Packaging and
+publication remain separate; no Preview 11 artifact has been replaced.

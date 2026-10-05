@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Qualify the native development workflow in real VS Code on macOS arm64: project
+  import, completion/hover, read-only declarations, artifact refresh, missing-dependency
+  recovery, build failure safety and native execution. The unchanged collections and
+  Tasks/await applications run against source-built libraries, with a .NET editor
+  control. Add reproducible workspace preparation and extension-host acceptance tools.
+  This is POC acceptance; packaging, matched downloads and publication remain pending.
+
 - Connect explicit native Raven project references to adapter-enabled language-server
   builds. Verify imported-method completion, hover and semantic diagnostics over stdio,
   with C# project-loading checks and twelve ordinary project regressions. Native

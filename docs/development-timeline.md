@@ -10976,3 +10976,28 @@ validated and integrated the general fix there independently. The repaired integ
 compiler produces the same reference bytes as main; 190 main and 196 integration checks
 pass, along with separate union-library consumers on both targets.
 [Compiler and runtime evidence](experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).
+
+
+### 2026-10-05 — Continue through actual VS Code acceptance
+
+The author directed: “Continue untill you have VS Code acceptance.” The assistant
+proposed closing native reference refresh, declaration navigation and shared project
+build/run, then testing the real extension host instead of counting a stdio-only check.
+Implementation reused evaluated project configuration and the explicit metadata catalog;
+source-built library references remained native. The assistant observed 14 passing
+VS Code checks, including actual broad-sample and Tasks/await execution, artifact
+replacement, missing-dependency recovery and a .NET editor control.
+[Evidence](experiments/extended-cli-metadata/native-vscode-acceptance-2026-10-05.md).
+
+During validation the author reported an inconsistent union hover, specifying
+`Option<T>(Some<T> | None)`, then clarified: “It's technically correct though”.
+The assistant corrected its initial suggestion that this necessarily exposed a carrier
+constructor: expanded union case notation is valid. No display-format change was made.
+Native type-position hovers were checked for union kind and constructed arguments;
+runtime-specific interface signatures remain visible. The first VS Code test timeout
+was traced to the test serializing MarkdownString as an empty object, not a product
+hover failure; the test now reads its value property.
+
+This completes the bounded native editor POC on the tested development toolchain,
+not release packaging, publication, full decompilation or the entire source-library
+bootstrap. Those distinctions remain explicit in the roadmap and website.
