@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Bind instantiated generic methods as native function values and CLI delegates using
+  existing generic call identities. Validate substituted signatures, scopes and
+  constraints; C# tests cover CLI execution, native reading and incompatible targets.
+  The complete HTTP source group now emits and artifact-only header/base consumers run.
+
 - Advance HTTP source compilation past Result propagation by fixing shared Raven
   nested visitor dispatch and short-circuit condition lowering. A native artifact-only
   consumer executes eight skip/success/error cases; .NET regressions pass. HTTP next

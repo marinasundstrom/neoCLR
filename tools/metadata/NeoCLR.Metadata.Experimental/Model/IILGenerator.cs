@@ -146,6 +146,8 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Invalid target, shape, foreign owner or scope.</exception>
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void BindFunction(SignatureType functionType, MethodBuilder target);
+    /// <summary>Binds an instantiated generic method to an exact structural signature.</summary>
+    void BindFunction(SignatureType functionType, GenericMethodInstance target);
     /// <summary>Binds an exact target on a constructed owned generic reference type or interface.</summary>
     /// <param name="functionType">The exact substituted structural signature.</param>
     /// <param name="target">The owned constructed target; consumes its receiver for an instance method.</param>

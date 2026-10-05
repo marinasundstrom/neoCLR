@@ -4084,7 +4084,11 @@ shape. The overload `FunctionBinding(SignatureType, ConstructedMethodReference)`
 an owned constructed generic class/interface method after exact signature substitution.
 `ConstructedTarget` returns that reference (null for the MethodBuilder overload);
 `FunctionType` and `Target` expose the shape and method definition. Constructors,
-generic methods, nonfinal virtual class methods and value receivers are rejected.
+uninstantiated generic methods, nonfinal virtual class methods and value receivers are rejected.
+`FunctionBinding(SignatureType, GenericMethodInstance)` accepts an owned generic method
+with all method arguments supplied. `GenericTarget` returns that instance, or null.
+Constructed owner references may also supply method arguments. Both forms validate
+the substituted shape, caller scopes and generic constraints before writing.
 Null arguments throw ArgumentNullException; incompatible signatures throw ArgumentException.
 Emission additionally validates output ownership and caller generic scopes.
 `MethodBuilder.BindFunction(functionType, target)` and
@@ -4100,7 +4104,7 @@ and external binding targets remain future work; ordinary imported methods can a
 Function values.
 
 Native output uses the runtime's structural Function shape, function.bind and ordinary
-instance Invoke. `GetILGenerator().BindFunction` supports both target overloads;
+instance Invoke. `GetILGenerator().BindFunction` supports definition, constructed-owner and generic-method target overloads;
 interface binding selects dispatch from the retained receiver. CLI output uses
 core-scoped Func/Action carriers with ldftn (ldvirtftn for interfaces)/newobj and
 callvirt, including generic signature variables on Invoke MemberRefs. This is a bridge
@@ -5063,6 +5067,7 @@ void CallVirtual(ConstructedMethodReference method);
 void Emit(OpCode opCode, ConstructedMethodReference operand);
 void BindFunction(SignatureType functionType, MethodBuilder target);
 void BindFunction(SignatureType functionType, ConstructedMethodReference target);
+void BindFunction(SignatureType functionType, GenericMethodInstance target);
 void Emit(OpCode opCode, FunctionBinding operand);
 void InvokeFunction(SignatureType functionType);
 void Call(GenericMethodInstance method);

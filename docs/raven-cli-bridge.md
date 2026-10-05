@@ -5892,3 +5892,15 @@ shared-emitter/runtime-contract tests. No runtime, metadata format or ownership 
 is needed. Full HTTP source compilation advances to callback emission admission; that
 is the next bounded task before HTTP execution. Full-System bootstrapping remains open.
 Evidence: `docs/experiments/extended-cli-metadata/condition-propagation-2026-10-05.md`.
+
+### Generic HTTP callbacks (2026-10-05)
+
+The native adapter now retains method arguments when binding owned generic callbacks,
+including HttpClientJsonExtensions.Convert<T>. Metadata authoring uses existing
+GenericMethodInstance/ConstructedMethodReference identities: native function.bind keeps
+generic_arguments; CLI ldftn uses MethodSpec. No new format version or Runtime Contract
+switch is required. Imported callback targets remain unsupported. Ordinary .NET retains
+its established emitter. Complete HTTP/network sources emit with the source-network
+bootstrap and adapters; artifact-only header and base-address consumers execute.
+The C# metadata suite passes 154 groups, including generic callback execution/readback.
+This is not full-System bootstrap completion.

@@ -49,25 +49,30 @@ public sealed class FunctionBinding
     /// <param name="target">A nongeneric static, final/nonvirtual reference-instance or interface target with the exact parameter/result signature.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">Shape, target kind or signatures do not match.</exception>
-    public FunctionBinding(SignatureType functionType, MethodBuilder target) : this(functionType, target, null) { }
+    public FunctionBinding(SignatureType functionType, MethodBuilder target) : this(functionType, target, null, null) { }
     /// <summary>Binds an exact nongeneric method on a constructed owned generic class or interface.</summary>
     /// <param name="functionType">The structural signature after owner argument substitution.</param>
     /// <param name="target">An owned constructed method reference; instance binding consumes its receiver.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">The target kind or substituted signature is incompatible.</exception>
     public FunctionBinding(SignatureType functionType, ConstructedMethodReference target) : this(functionType,
-        target?.Definition ?? throw new ArgumentNullException(nameof(target)), target) { }
-    private FunctionBinding(SignatureType functionType, MethodBuilder target, ConstructedMethodReference? constructed)
+        target?.Definition ?? throw new ArgumentNullException(nameof(target)), target, null) { }
+    /// <summary>Binds an instantiated generic method to its substituted structural signature.</summary>
+    public FunctionBinding(SignatureType functionType, GenericMethodInstance target) : this(functionType,
+        target?.Definition ?? throw new ArgumentNullException(nameof(target)), null, target) { }
+    private FunctionBinding(SignatureType functionType, MethodBuilder target, ConstructedMethodReference? constructed, GenericMethodInstance? generic)
     {
         ArgumentNullException.ThrowIfNull(functionType); ArgumentNullException.ThrowIfNull(target);
         bool contract = target.DeclaringType?.IsInterface == true && target.IsAbstract;
         if (functionType.FunctionSignature is not { } shape || (!target.IsStatic && (target.DeclaringType is not { IsValueType: false } || (target.Definition.Attributes & 0x60) == 0x40 && !contract)) || target.IsAbstract && !contract || target.IsConstructor ||
-            target.Signature.GenericParameterNames.Count != 0 || constructed is null && target.DeclaringType?.GenericParameterNames.Count > 0 || !shape.Signature.Matches(constructed?.Signature ?? target.Signature))
+            constructed is null && generic is null && target.Signature.GenericParameterNames.Count != 0 || constructed is null && target.DeclaringType?.GenericParameterNames.Count > 0 || !shape.Signature.Matches(constructed?.Signature ?? generic?.Signature ?? target.Signature))
             throw new ArgumentException("function binding requires an exact static, reference-instance or interface target");
-        FunctionType = functionType; Target = target; ConstructedTarget = constructed;
+        FunctionType = functionType; Target = target; ConstructedTarget = constructed; GenericTarget = generic;
     }
     /// <summary>Gets the substituted owner reference, or null for an unconstructed target.</summary>
     public ConstructedMethodReference? ConstructedTarget { get; }
+    /// <summary>Gets the instantiated generic method, or null.</summary>
+    public GenericMethodInstance? GenericTarget { get; }
     /// <summary>Gets the structural type of the bound value.</summary>
     public SignatureType FunctionType { get; }
     /// <summary>Gets the method selected for invocation.</summary>

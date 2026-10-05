@@ -27,7 +27,16 @@ internal static class ConstructedFunctionBindingChecks
         var instance = il.DeclareLocal(box.MakeGenericInstance(PrimitiveType.Int32));
         var first = il.DeclareLocal(PrimitiveType.Int32);
         var closedShape = SignatureType.Function(new MethodSignature(PrimitiveType.Int32, []));
-        il.LoadConstant(21); il.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); il.StoreLocal(instance);
+        var methodParameter = SignatureType.MethodParameter(0);
+        var identity = graph.AddFunction("Identity", new MethodSignature(methodParameter, [methodParameter], ["T"]));
+        var identityIl = identity.GetILGenerator(); identityIl.LoadArgument(0); identityIl.Return();
+        var openShape = SignatureType.Function(new MethodSignature(methodParameter, [methodParameter]));
+        var factory = graph.AddFunction("BindIdentity", new MethodSignature(openShape, [], ["T"]));
+        var factoryIl = factory.GetILGenerator();
+        factoryIl.BindFunction(openShape, identity.MakeGenericInstance(methodParameter)); factoryIl.Return();
+        il.Call(factory.MakeGenericInstance(PrimitiveType.Int32));
+        il.LoadConstant(21);
+        il.InvokeFunction(SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [PrimitiveType.Int32]))); il.NewObject(ctor.MakeConstructedReference([PrimitiveType.Int32])); il.StoreLocal(instance);
         il.LoadLocal(instance); il.Call(bind.MakeConstructedReference([PrimitiveType.Int32])); il.InvokeFunction(closedShape); il.StoreLocal(first);
         il.LoadLocal(instance); il.CastReference(contract.MakeGenericInstance(PrimitiveType.Int32));
         il.Emit(OpCode.BindFunction, new FunctionBinding(closedShape, readContract.MakeConstructedReference([PrimitiveType.Int32])));
@@ -40,6 +49,12 @@ internal static class ConstructedFunctionBindingChecks
         var graph = Create();
         if (!Equals(42, Assembly.Load(graph.Write()).EntryPoint!.Invoke(null, null))) throw new Exception("constructed/interface callback execution");
         _ = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(graph));
+        var identity = graph.Functions.Single(m => m.Name == "Identity");
+        var closedShape = SignatureType.Function(new MethodSignature(PrimitiveType.Int32, [PrimitiveType.Int32]));
+        try { _ = new FunctionBinding(closedShape, identity); throw new Exception("open generic callback accepted"); }
+        catch (ArgumentException) { }
+        try { _ = new FunctionBinding(closedShape, identity.MakeGenericInstance(PrimitiveType.String)); throw new Exception("wrong generic callback signature accepted"); }
+        catch (ArgumentException) { }
         var read = graph.Types.Single(t => t.Name == "Box`1").Methods.Single(m => m.Name == "Read");
         var wrong = SignatureType.Function(new MethodSignature(PrimitiveType.String, []));
         try { _ = new FunctionBinding(wrong, read.MakeConstructedReference([PrimitiveType.Int32])); }

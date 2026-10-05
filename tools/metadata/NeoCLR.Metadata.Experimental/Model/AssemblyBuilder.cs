@@ -746,7 +746,7 @@ public sealed partial class AssemblyBuilder
                         if (instruction.Target!.IsStatic) code.WriteByte(0x14);
                         if (instruction.Target.IsAbstract) code.WriteByte(0x25);
                         code.WriteByte(0xfe); code.WriteByte(instruction.Target.IsAbstract ? (byte)0x07 : (byte)0x06);
-                        code.WriteInt32(instruction.ConstructedTarget is { } binding ? ConstructedCallToken(binding) : ImportMethod(instruction.Target!));
+                        code.WriteInt32(instruction.ConstructedTarget is { } binding ? ConstructedCallToken(binding) : instruction.GenericTarget is { } genericBinding ? GenericCallToken(genericBinding) : ImportMethod(instruction.Target!));
                         code.WriteByte(0x73); code.WriteInt32(FunctionMember(instruction.Type!, true)); break;
                     case "function.invoke":
                         code.WriteByte(0x6f); code.WriteInt32(FunctionMember(instruction.Type!, false)); break;

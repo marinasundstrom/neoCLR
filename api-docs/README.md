@@ -1023,3 +1023,6 @@ now record 4,095 authored/native declarations within the existing 4,096 CLI Type
 budget. Boundary tests cover manual/builder attachment and CLI/native/facade round trips.
 No guest public signature or RavenDoc selection changes. The full guest snapshot remains
 the previously recorded stale input; a subset library is not an appropriate replacement.
+
+2026-10-05: Host metadata generic FunctionBinding/ILGenerator overloads are documented
+in experimental-metadata.md. These C# APIs are outside the guest RavenDoc selection.
