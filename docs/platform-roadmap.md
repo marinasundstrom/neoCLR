@@ -1,5 +1,9 @@
 # neoCLR platform roadmap
 
+The release also requires an editor/LSP workflow using native NeoCLR metadata;
+see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
+A disassembler remains a release candidate, not yet a required deliverable.
+
 ## Source-owned runtime handle executes (2026-10-05)
 
 The [source handle gate](experiments/extended-cli-metadata/source-handle-ownership-2026-10-05.md)
@@ -1932,3 +1936,31 @@ shared-emitter/runtime-contract tests. No runtime, metadata format or ownership 
 is needed. Full HTTP source compilation advances to callback emission admission; that
 is the next bounded task before HTTP execution. Full-System bootstrapping remains open.
 Evidence: `docs/experiments/extended-cli-metadata/condition-propagation-2026-10-05.md`.
+
+### Author-directed release gate: editor and native metadata (2026-10-05)
+
+The author added a working editor experience to the release objective: language-server
+support consuming and emitting NeoCLR metadata. This is a release requirement alongside
+class-library bootstrapping and the recorded .NET comparison benchmark gate. It does not
+replace the current core ownership prerequisite work. Implementation is not claimed yet.
+
+The editor/LSP should use Raven's existing semantic pipeline and native metadata importer.
+Editor build/run commands should use the ordinary compiler's NeoCLR emitter and dependency
+catalog; do not build a separate metadata writer inside the language server. Preserve the
+.NET target's existing editor behavior and the independent importer/emitter boundaries.
+
+Acceptance should cover an ordinary NeoCLR project referencing source-built System and a
+separately compiled library with its sources absent: diagnostics, completion, hover and
+symbol/declaration navigation expose imported signatures and members; reference updates
+invalidate affected semantic state; missing or conflicting dependencies produce useful
+project diagnostics. Build from that editor/project configuration emits native assemblies
+that the runtime loads and executes. CLI and editor must agree on target, bootstrap,
+reference identities and artifact revisions, with no silent CLI metadata projection.
+Run a focused .NET editor regression alongside the native integration case.
+
+The author also suggested “perhaps also having the disassembler.” Keep a bounded read-only
+command-line disassembler as a release candidate to assess: assembly identity/dependencies,
+type/member signatures and flags, tokens and decoded instruction bodies/branch targets,
+using the existing metadata reader. Source reconstruction/decompilation is a separate
+scope. Decide whether the diagnostic benefit and implementation cost justify inclusion;
+no implementation, release commitment or editor integration is asserted for it yet.

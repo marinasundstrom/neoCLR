@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Record the author-directed release requirement for native metadata-backed editor/LSP
+  support and compiler emission from editor builds, with .NET regression coverage.
+  A read-only disassembler remains a release candidate; neither tooling feature is
+  claimed implemented by this planning update.
+
 - Support an explicitly source-owned, fieldless RuntimeTypeHandle declaration through
   metadata definitions/builders, native reading and introspection. Raven preserves
   canonical handle signatures and rejects duplicate seed ownership. The combined

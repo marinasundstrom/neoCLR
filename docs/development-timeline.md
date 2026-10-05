@@ -10880,3 +10880,14 @@ The assistant records callback HTTP as working and native async state-machine em
 full-System ownership and a preexisting Array/Object generic dispatch failure as open.
 This does not complete the later benchmark/release milestone. See the
 [HTTP evidence and limitations](experiments/extended-cli-metadata/source-http-2026-10-05.md).
+
+### 2026-10-05 — Editor experience becomes a release requirement
+
+The author said, “The goal for the release is to also have the editor experience working.
+Language server support consuming and emitting neoClr metadata. Perhaps also having the
+disassembler.” The assistant accepted native metadata-backed editor/LSP support as a
+release gate and proposed using the shared semantic importer and ordinary compiler emitter
+for editor builds, preserving .NET behavior. The disassembler remains a candidate because
+the author expressed it provisionally. The roadmap records acceptance expectations and
+keeps current Object ownership work active. No editor or disassembler implementation is
+claimed by this documentation action.
