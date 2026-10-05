@@ -5,6 +5,11 @@ rendering pass on macOS arm64. A reproducible runtime/bootstrap/library distribu
 is still required. No release, tag or website deployment was performed.
 [Machine-readable evidence and artifact hashes](native-release-gate-2026-10-05.json).
 
+The author's subsequent direction supersedes the legacy-bridge repair priority below:
+[the native source release path](native-source-release-2026-10-05.md) now rebuilds the
+selected libraries and executes consumers without invoking that bridge. The legacy
+source/archive audit still fails; native bootstrap dependency packaging remains open.
+
 ## Qualified tooling and documentation
 
 - Raven integration `5f6298c1237ecc34d8f00d0ee3c681e9316b9a5b` builds a native-enabled

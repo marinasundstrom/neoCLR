@@ -97,3 +97,18 @@ The pinned publisher now includes the shared compiler fix from Raven main
 logical documentation ID, then falls back to its physical CLI carrier type ID.
 This restores the already-authored Option/Result case summaries without changing
 the documented union shape or adding duplicate public carrier pages.
+
+## Callback contract presentation (2026-10-05)
+
+Publisher `8ddd73c3187f1c31e60816f8598fd1da59c6d4fa` uses Raven function syntax in
+member-list type uses and framework Func/Action contract tables. Named delegate
+declarations keep their names; function return type links are retained recursively.
+This corrects presentation of the CLI documentation reference without changing native
+function semantics or introducing a Func identity into NeoCLR.
+
+Validation: 20 source/metadata RavenDoc generation checks, all 18 neoCLR website
+checks, a checked 1,803-page site build and browser inspection of Task.Run's parameter
+table and String.FlatMap. The actual pages show `() -> void`, `() -> Task<T>` and
+`char -> Iterable<U>`. Parameter names no longer wrap mid-identifier. The correction
+was independently integrated/pushed to Raven main and cherry-picked into the native
+integration branch (`2554322c4`).

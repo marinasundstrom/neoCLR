@@ -11045,3 +11045,21 @@ both HTTP/JSON loopback rounds passed. The primitive core and retained seed are 
 explicit bootstrap inputs; full removal is not claimed. The failed legacy source audit
 remains recorded but is not a rationale for further bridge feature expansion.
 [Evidence](experiments/extended-cli-metadata/native-source-release-2026-10-05.md).
+
+## 2026-10-05 — Callback signatures in API lists and tables
+
+**Author:** Supplied screenshots of `Run(callback: Func<Void>) -> Task<void>`, the
+same representation in its parameter table, and `FlatMap` showing `Func<Char,
+Iterable<U>>`. Suggested `ToDisplayString` and clarified that the member list was
+affected. Requested function signatures such as `() -> Task<void>`.
+
+**Assistant investigation/action:** Found that member lists explicitly selected
+nominal delegate names and parameter tables separately rebuilt named generic types,
+bypassing normal function display. Corrected both RavenDoc paths, preserving nominal
+delegate declarations and links inside generic return types. Also prevented parameter
+names splitting across lines. Twenty generation tests cover source/imported metadata;
+the actual 1,803-page site and 18 checks pass. Browser inspection confirmed Task.Run
+and String.FlatMap. The screenshot's completion-only overload correctly displays
+`() -> void`; the task-producing overload displays `() -> Task<T>`. No callback or
+runtime API contract changed. The shared fix is on Raven main `8ddd73c31`, and the
+publisher is pinned to it; no website deployment was performed.

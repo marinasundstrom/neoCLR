@@ -128,12 +128,18 @@ class RavenDocPages(unittest.TestCase):
         self.assertIn('id="member-grouping"', case)
         string_page = (output / 'api/System/String/index.html').read_text()
         self.assertIn('Any() -&gt; bool', string_page)
-        self.assertIn('Any(predicate: Func&lt;Char, Boolean&gt;)', string_page)
+        self.assertIn('Any(predicate: char -&gt; bool)', string_page)
         self.assertNotIn('Any&lt;T&gt;', string_page)
-        self.assertIn('Map&lt;U&gt;(selector: Func&lt;Char, U&gt;)', string_page)
+        self.assertIn('Map&lt;U&gt;(selector: char -&gt; U)', string_page)
         factory = (output / 'api/System/Tasks/Task/index.html').read_text()
         self.assertNotIn('data-member-inherited="true"', factory)
-        self.assertIn('Run', factory)
+        self.assertIn('Run(callback: () -&gt; void) -&gt; Task&lt;void&gt;', factory)
+        self.assertIn('Run&lt;T&gt;(callback: () -&gt; Task&lt;T&gt;)', factory)
+        self.assertIn('FlatMap&lt;U&gt;(selector: char -&gt; Iterable&lt;U&gt;)', string_page)
+        run_page = (output / 'api/System/Tasks/Task/method_Run.html').read_text()
+        self.assertNotIn('Func&lt;', run_page)
+        self.assertIn('api-parameter-name', run_page)
+        self.assertIn('() -&gt; void', run_page)
         for receiver, container, methods in (
                 ('System/Tasks/Task`1', 'TaskOperators', ('Map', 'Then')),
                 ('System/Result`2', 'ResultOperators', ('Map', 'Then', 'MapError')),

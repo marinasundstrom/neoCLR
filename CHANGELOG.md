@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Update RavenDoc so callback types use function signatures in member lists and
+  parameter tables, including Task.Run and String's FlatMap extension. Preserve
+  nested type links and keep parameter identifiers on one line. The pinned shared
+  fix passes 20 RavenDoc tests and 18 website checks; publication remains separate.
+
 - Rebuild the POC class-library subset directly from Raven into native metadata,
   with checked-in ownership and explicit bootstrap inputs. Qualify artifact-only
   consumers using the extracted SDK: 15 compile, 13 non-network executions and
