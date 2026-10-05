@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Execute a Raven-emitted source Object root and derived override in NeoCLR using
+  explicit host selection. Record Raven `246e8a5db`, bootstrap/artifact hashes, 47 focused
+  compiler checks and 15 runtime identity checks. Driver/consumer ownership and generic
+  reference bases remain pending. The author selects metadata disassembly as the next
+  task before resuming broader end-to-end integration.
+
 - Support Object overrides against an explicitly authored local root, preserving
   Virtual/reused-slot flags and exact Equals identity through native introspection.
   Reject bootstrap/foreign root arguments and stale signatures after root selection.

@@ -64,3 +64,9 @@ class and invoke the root slots; Rust checks the resulting String, Boolean and I
 dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
   --owned-object-overrides-image tests/fixtures/metadata-container/owned-object-overrides.pe
 ```
+
+`raven-source-object-root.pe` is emitted by Raven's SourceObjectRootChecks probe at
+`246e8a5db`, using the explicit bootstrap recorded in source-object-emission-2026-10-05.json.
+It contains source Object, source Item overrides and Display. Rust validates and executes
+that actual compiler output under explicit root selection. Regeneration and limitations:
+[compiler/runtime evidence](../../../docs/experiments/extended-cli-metadata/source-object-emission-2026-10-05.md).

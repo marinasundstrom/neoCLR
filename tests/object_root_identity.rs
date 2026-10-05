@@ -513,3 +513,44 @@ fn metadata_api_owned_root_overrides_execute() {
         assert_eq!(program.run(Limits::default()).unwrap().value, expected);
     }
 }
+
+#[test]
+fn raven_source_object_root_and_override_execute() {
+    let image = include_bytes!("fixtures/metadata-container/raven-source-object-root.pe");
+    let library = neoclr::metadata_container::decode(image).unwrap();
+    let selected = neoclr::metadata::TypeDefId {
+        module: library.name.clone(),
+        revision: library.revision.clone(),
+        index: library
+            .types
+            .iter()
+            .position(|t| t.name == "System.Object")
+            .unwrap()
+            .try_into()
+            .unwrap(),
+    };
+    let display = library
+        .functions
+        .iter()
+        .find(|f| f.origin.as_ref().is_some_and(|o| o.name == "Display"))
+        .unwrap();
+    let source = format!(
+        ".module App\n.references ({})\n.entry Main\n.function Main() -> String\ncall {}()\nret\n.end",
+        library.name, display.name
+    );
+    let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let modules = neoclr::assembler::read_modules_with_object_root(
+        &[ModuleInput::Source(&source), ModuleInput::MetadataPe(image)],
+        &seed,
+        &selected,
+    )
+    .unwrap();
+    let program =
+        LoadedProgram::with_modules_and_object_root(&modules[0], &seed, &modules[1..], &selected)
+            .unwrap();
+    program.verify().unwrap();
+    assert_eq!(
+        program.run(Limits::default()).unwrap().value,
+        Value::String("source root override".into())
+    );
+}

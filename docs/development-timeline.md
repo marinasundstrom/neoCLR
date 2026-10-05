@@ -10911,3 +10911,12 @@ current execution model, and kept runtime suspension/green threads deferred. Exi
 callback Tasks and translated async evidence must not be mistaken for native compiler
 async completion. The roadmap now directs a sample inventory and native async gap work
 after the active root-ownership prerequisite. No async implementation is claimed here.
+
+### 2026-10-05 — Disassembler follows source-root execution
+
+The author said, “If this is successful, then we should start building a disassembler
+for neoclr metadata files. We will need that. Then we can resume the end-to-end work.”
+The assistant accepted that sequencing. Source-root compiler emission now executes in
+NeoCLR, with 47 focused compiler and 15 runtime checks passing. The metadata disassembler
+is now the next bounded task, rather than merely a release candidate. Broader integration
+resumes afterward; production System, editor support and Tasks/await remain open.

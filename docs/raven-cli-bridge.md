@@ -6027,3 +6027,13 @@ root, callable planning needs an explicit concrete root-slot capability, and spe
 Object mapping still assumes an imported reference. These are the next adapter/contracts
 changes; default .NET behavior must remain unchanged. No loader objects should enter
 emission. The source-root production, VS Code and native async gates remain incomplete.
+
+### Source root compiler execution (2026-10-05)
+
+Raven `246e8a5db` replaces the blanket native source-root guard with explicit declaration
+capabilities, output-owned root/slot authoring and exact bootstrap assembly validation.
+The source-root probe emits PE that NeoCLR loads and executes; 47 focused compiler and
+15 runtime identity checks pass. The .NET guard stays; generic reference owners and extra
+virtual slots reject explicitly. Driver/consumer ownership and production System remain
+open. See [source-root execution evidence](experiments/extended-cli-metadata/source-object-emission-2026-10-05.md).
+The next author-directed task is the metadata disassembler, followed by broader integration.

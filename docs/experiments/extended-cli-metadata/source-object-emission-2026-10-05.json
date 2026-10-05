@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-05",
+  "ravenRevision": "246e8a5db",
+  "metadataRevision": "9d880af0",
+  "runtimeImplementationRevision": "4e9e4045",
+  "bootstrap": {
+    "path": "/tmp/IntrospectionCoreParams1005.dll",
+    "sha256": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc"
+  },
+  "artifact": {
+    "path": "tests/fixtures/metadata-container/raven-source-object-root.pe",
+    "sha256": "7dbe07793042713dcaf489d2757732e5036550f208f75b1c63013ae6a56117da"
+  },
+  "sourceProbeSha256": "69bb2012e543e046d44d0ad97a757a7dd1a46b5aaeaa687241b5e16ad7651d4e",
+  "validation": {
+    "compilerBaselinePassed": 31,
+    "compilerFinalPassed": 47,
+    "runtimeRootIdentityPassed": 15,
+    "result": "source root override"
+  },
+  "limitations": [
+    "compiler API probe, not ordinary driver integration",
+    "explicit host root selection",
+    "production System and native consumer root import incomplete",
+    "generic reference owners under source root explicitly unsupported"
+  ]
+}
