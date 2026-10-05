@@ -5935,3 +5935,14 @@ as e33591945, independently validated with 31 tests; the temporary branch was de
 Focused enum display/equality/hash tests pass. An existing Object-array-display test
 fails with "type parameter index outside arguments" both before and after this change;
 record it as separate nominal Array<T>/Object dispatch debt, not an enum regression.
+
+### String-array entry points (2026-10-05)
+
+The ordinary native compiler already authored Main(string[]) from symbols; metadata
+validation now admits that CLI-shaped signature. Native startup supplies a managed
+String array of user arguments using existing bounded array storage. Environment argv
+retains the input path; Main excludes it. No wrapper, new internal call, metadata version
+or Runtime Contract configuration was added. C# tests and a produced native image pass;
+the unchanged eleven-case stream-upload source now compiles and executes with URL/mode
+arguments. Native name-based entry ambiguity rejects explicitly. Ordinary .NET startup
+remains unchanged.

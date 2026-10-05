@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--entry-arguments-image")
+{
+    File.WriteAllBytes(args[1], NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(EntryArgumentChecks.Create())); return 0;
+}
 if (args.Length == 2 && args[0] == "--inherited-interface-image")
 {
     File.WriteAllBytes(args[1], NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(InheritedInterfaceChecks.Create())); return 0;
@@ -385,6 +389,7 @@ var tests = new (string Name, Action Body)[]
     ("Structural Function signatures and binding", FunctionSignatureChecks.Run),
     ("Instance callback receiver identity", InstanceFunctionBindingChecks.Run),
     ("Constructed and interface callback bindings", ConstructedFunctionBindingChecks.Run),
+    ("String vector entry arguments", EntryArgumentChecks.Run),
     ("Concrete value overrides retain direct dispatch", ValueOverrideChecks.Run),
     ("Reference nullness and runtime type tests", ReferenceOperationChecks.Run),
     ("Mutable owned field addresses", FieldAddressChecks.Run),

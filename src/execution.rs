@@ -44,7 +44,8 @@ impl CancellationToken {
 /// Existing calls may pass Limits directly; this is an experimental Rust API.
 #[derive(Debug, Clone, Default)]
 pub struct ExecutionOptions {
-    /// Guest-visible arguments; CLI includes the input path first. Empty by default.
+    /// Guest-visible argv; CLI includes the input path first. Empty by default.
+    /// String-array entry points receive elements after argv[0]; Environment retains all.
     pub arguments: Vec<String>,
     pub debugger: Option<crate::debugger::Debugger>,
     pub limits: Limits,

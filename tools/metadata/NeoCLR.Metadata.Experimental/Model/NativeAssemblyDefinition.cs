@@ -737,7 +737,7 @@ public sealed partial class NativeAssemblyDefinition
             uint entryPointToken = 0;
             if (entry.Length != 0)
             {
-                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].ImplementationAttributes == 0 && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && methods[p.index].Signature.ParameterTypes.Count == 0 && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
+                var candidates = methodNames.Select((name, index) => (name, index)).Where(p => p.name == entry && methods[p.index].ImplementationAttributes == 0 && !methods[p.index].Instance && (methods[p.index].Owner < 0 || types[methods[p.index].Owner].GenericNames.Length == 0) && methods[p.index].Signature.GenericParameterNames.Count == 0 && (methods[p.index].Signature.ParameterTypes.Count == 0 || methods[p.index].Signature.ParameterTypes is [{ ArrayElement.Primitive: PrimitiveType.String }]) && methods[p.index].Signature.ReturnType.Primitive is PrimitiveType.Int32 or PrimitiveType.Void).ToArray();
                 Require(candidates.Length == 1, "invalid native entry point");
                 entryPointToken = 0x06000001u + (uint)candidates[0].index;
             }

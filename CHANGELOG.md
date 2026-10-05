@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Accept a single String vector on metadata entry points and materialize managed
+  user arguments at native startup, excluding argv[0] while Environment retains it.
+  Enforce array/heap limits and reject ambiguous/unsupported entry signatures.
+  C# CLI/native round trips and runtime argument tests pass; all eleven unchanged
+  stream-upload cases execute through native artifacts.
+
 - Dispatch boxed Int32-backed enums through Object formatting, equality and hashing.
   Formatting uses existing metadata names/flags/numeric fallback; equality retains
   nominal enum identity. Native HTTP status checks and focused enum regressions pass.

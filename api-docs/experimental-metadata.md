@@ -1093,12 +1093,13 @@ functions. Do not mutate participating graphs during either write operation.
 AddType adds a public abstract sealed class with a unique namespace/name pair. Namespace
 may be empty; name must be nonempty and not `<Module>`. Combined length is at most 1024
 characters and the assembly admits at most 4,095 declared types (plus the CLI module row). Invalid/duplicate inputs raise
-ArgumentException. EntryPoint may be null for a library or a local parameterless
-Int32-returning or no-result method; it is checked at Write/WriteNativeAssembly.
+ArgumentException. EntryPoint may be null for a library or a local static
+Int32-returning or no-result method with no parameters or one String vector; it is checked at Write/WriteNativeAssembly.
 A no-result entry uses CLI void for ordinary PE output and native `Void` with
 `no_result: true` for format 5. Reference-only projections still have no CLI entry.
-The native declaration reader accepts both supported results. Parameterized/foreign
-entries remain invalid, and no-result bodies must return with an empty stack.
+The native declaration reader accepts both supported results and the optional String
+vector. Other parameter shapes, generic/foreign entries and ambiguous native entry names
+remain invalid, and no-result bodies must return with an empty stack.
 `EntryPointChecks.cs` verifies both global and type-owned entries, CLI invocation,
 native container roundtrips and failures; Raven's consumer also verifies native zero exit.
 
@@ -7238,3 +7239,23 @@ formatter (named values, flags composition and numeric fallback); equality also 
 the same nominal enum type, and hashing uses the Int32 payload. This adds no metadata
 category or guest member signature. The existing enum alias choice remains unspecified
 for .NET parity; the current formatter prefers the first declared exact alias.
+
+### Managed entry arguments (development, 2026-10-05)
+
+AssemblyBuilder.EntryPoint and authored AssemblyDefinition.EntryPoint admit an optional
+single `SignatureType.ArrayOf(PrimitiveType.String)` parameter. Writer and native reader
+validate the same contract; CLI output retains the normal String[] signature and entry
+MethodDef token. The native runtime supplies a bounded managed String array at startup.
+No additional instruction, metadata version, runtime service or compiler-generated
+wrapper is introduced. Current native name-based entry selection rejects ambiguity
+between parameterless and String[] overloads.
+
+Rust `ExecutionOptions.arguments` and Environment retain argv[0]; String[] entry points
+receive the remaining elements. Hosts should include the program name/path first.
+Empty options produce an empty array. CLI `--` arguments retain their order and Unicode
+text. Allocation respects array and heap limits and can fail before the entry body.
+Direct host method invocation continues to use the explicitly supplied arguments.
+C# EntryArgumentChecks covers CLI invocation and native readback; runtime tests cover
+empty/nonempty vectors, limits, unsupported shapes and ambiguity. The emitted C# test
+image executes under neoCLR with two arguments, and the Raven upload sample consumes
+its URL/mode parameters unchanged.

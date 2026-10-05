@@ -1026,3 +1026,8 @@ the previously recorded stale input; a subset library is not an appropriate repl
 
 2026-10-05: Host metadata generic FunctionBinding/ILGenerator overloads are documented
 in experimental-metadata.md. These C# APIs are outside the guest RavenDoc selection.
+
+2026-10-05: Optional String[] entry-point behavior and host argv semantics are covered
+in experimental-metadata.md. These host APIs are outside the guest RavenDoc selection.
+The API snapshot check still reports the pre-existing stale guest snapshot; this change
+does not replace it with a subset assembly.

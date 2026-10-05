@@ -140,7 +140,9 @@ pub(crate) fn validate_uses(linked: &Module, source: &Module) -> Result<(), Faul
         let entry = linked
             .functions
             .iter()
-            .find(|f| f.name == source.entry && f.parameters.is_empty() && !f.instance)
+            .find(|f| {
+                f.name == source.entry && crate::vm::entry_parameters(&f.parameters) && !f.instance
+            })
             .and_then(|f| f.definition.as_ref())
             .ok_or_else(|| Fault::new("missing entry definition"))?;
         check_module(source, &entry.module)?;

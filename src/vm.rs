@@ -1279,21 +1279,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
     }
     crate::access::validate_types(module)?;
-    if let Some(entry) = module.functions.iter().find(|f| {
-        f.name == module.entry
-            && f.generic_parameters.is_empty()
-            && f.parameters.is_empty()
-            && !f.instance
-    }) {
-        crate::access::check_entry(module, entry)?;
-    }
     crate::inheritance::validate(module)?;
     crate::interfaces::validate(module)?;
-    if !module.entry.is_empty()
-        && !module.functions.iter().any(|f| {
+    if !module.entry.is_empty() {
+        let mut candidates = module.functions.iter().filter(|f| {
             f.name == module.entry
                 && f.generic_parameters.is_empty()
-                && f.parameters.is_empty()
+                && entry_parameters(&f.parameters)
                 && !f.is_internal_call()
                 && f.pinvoke.is_none()
                 && !f.instance
@@ -1301,9 +1293,12 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     .as_ref()
                     .and_then(|o| module.type_definition(o))
                     .is_none_or(|d| d.generic_parameters.is_empty())
-        })
-    {
-        return Err(Fault::new("parameterless entry function not found"));
+        });
+        let entry = candidates.next().ok_or_else(|| Fault::new("entry function with no parameters or one String array not found"))?;
+        if candidates.next().is_some() {
+            return Err(Fault::new("ambiguous entry function"));
+        }
+        crate::access::check_entry(module, entry)?;
     }
     Ok(())
 }
@@ -1641,6 +1636,10 @@ pub unsafe fn run_with_native(
     unsafe { crate::LoadedProgram::with_library(module, library)?.run_with_native(options) }
 }
 
+pub(crate) fn entry_parameters(parameters: &[Type]) -> bool {
+    parameters.is_empty() || matches!(parameters, [Type::ArrayRef(element)] if **element == Type::String)
+}
+
 pub(crate) fn interpret(
     module: &Module,
     options: ExecutionOptions,
@@ -1652,17 +1651,18 @@ pub(crate) fn interpret(
         .position(|f| {
             f.name == module.entry
                 && f.generic_parameters.is_empty()
-                && f.parameters.is_empty()
+                && entry_parameters(&f.parameters)
                 && !f.instance
         })
         .ok_or_else(|| Fault::new("missing entry"))?;
     crate::access::check_entry(module, &module.functions[entry])?;
-    interpret_function(
+    interpret_function_core(
         module,
         module.functions[entry].clone(),
         vec![],
         options,
         native_libraries,
+        !module.functions[entry].parameters.is_empty(),
     )
 }
 
@@ -1672,6 +1672,17 @@ pub(crate) fn interpret_function(
     arguments: Vec<Value>,
     options: ExecutionOptions,
     native_libraries: Option<crate::interop::NativeLibraries>,
+) -> Result<Execution, Fault> {
+    interpret_function_core(module, function, arguments, options, native_libraries, false)
+}
+
+fn interpret_function_core(
+    module: &Module,
+    function: crate::metadata::Function,
+    arguments: Vec<Value>,
+    options: ExecutionOptions,
+    native_libraries: Option<crate::interop::NativeLibraries>,
+    entry_arguments: bool,
 ) -> Result<Execution, Fault> {
     let debugger = options.debugger.clone();
     if let Some(debugger) = &debugger {
@@ -1692,7 +1703,9 @@ pub(crate) fn interpret_function(
             )));
         }
         let mut frames = vec![Frame::new(function, arguments)?];
-        let result = interpret_frames(module, &mut frames, options, native_libraries);
+        let result = interpret_frames(
+            module, &mut frames, options, native_libraries, entry_arguments,
+        );
         result.map_err(|fault: Fault| {
             fault.with_stack_trace(crate::StackTrace::capture(
                 frames
@@ -1715,6 +1728,7 @@ fn interpret_frames(
     frames: &mut Vec<Frame>,
     options: ExecutionOptions,
     mut native_libraries: Option<crate::interop::NativeLibraries>,
+    entry_arguments: bool,
 ) -> Result<Execution, Fault> {
     let owner = crate::shared_heap::Owner::new(options.limits.frames.saturating_add(1));
     let mut participant = owner.participant()?;
@@ -1725,6 +1739,19 @@ fn interpret_frames(
         options.cancellation.clone().unwrap_or_default(),
     );
     let mut state = InstructionState::with_invocation(invocation);
+    if entry_arguments {
+        // ExecutionOptions retains argv[0] for Environment; Main receives only user arguments.
+        let payload = Value::Array {
+            element: Type::String,
+            elements: options.arguments.iter().skip(1)
+                .map(|text| Value::String(text.clone().into())).collect(),
+        };
+        let value = crate::arrays::string_snapshot(
+            Value::Erased(Box::new(payload)), &mut participant.enter(), &options.limits,
+        )?;
+        frames[0].args.push(crate::slots::Slot::cell(value.ty(), Some(value)));
+        state.arrays_used = true;
+    }
     let work_scope = crate::invocation_work::Scope(state.invocation.clone());
     let mut memory = state.invocation.memory.clone();
     let libraries = state.invocation.native_libraries.clone();

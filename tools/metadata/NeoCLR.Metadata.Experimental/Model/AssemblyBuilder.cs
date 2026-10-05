@@ -88,8 +88,8 @@ public sealed partial class AssemblyBuilder
         if (types.Sum(type => type.Properties.Count) > 4096) throw new InvalidDataException("too many properties");
         if (types.Sum(type => type.MetadataFields.Count()) > 4096) throw new InvalidDataException("too many fields");
         if (methods.Length > 4096) throw new InvalidDataException("too many methods");
-        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || EntryPoint.ParameterCount != 0 || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
-            throw new InvalidDataException("entry point must be a local parameterless Int32 or no-result method");
+        if (EntryPoint is not null && (!methods.Contains(EntryPoint) || EntryPoint.Definition.ImplementationAttributes != 0 || !EntryPoint.IsStatic || EntryPoint.Signature.GenericParameterNames.Count != 0 || EntryPoint.DeclaringType?.GenericParameterNames.Count > 0 || (EntryPoint.ParameterCount != 0 && EntryPoint.Signature.ParameterTypes is not [{ ArrayElement.Primitive: PrimitiveType.String }]) || EntryPoint.Signature.ReturnType.Primitive is not (PrimitiveType.Int32 or PrimitiveType.Void)))
+            throw new InvalidDataException("entry point must be a local Int32 or no-result method with no parameters or one String vector");
         var importedTargets = importedReferences.Values.Concat(authoredCallableReferences).Select(reference => reference.Target).ToHashSet();
         foreach (var target in methods.SelectMany(m => m.Instructions).Select(i => i.Target).OfType<MethodBuilder>())
             if (!ReferenceEquals(target.Assembly, this) && !importedTargets.Contains(target) && target.Signature.ParameterTypes.Append(target.Signature.ReturnType).Any(t => t.Primitive is null && t.ArrayElement?.Primitive is null && t.MethodParameterIndex is null && t.ArrayElement?.MethodParameterIndex is null))
@@ -186,7 +186,7 @@ public sealed partial class AssemblyBuilder
         catch (ArgumentException error) { throw new InvalidDataException("invalid generic argument contract", error); }
         return methods;
     }
-    /// <summary>Gets or sets a local parameterless Int32 or no-result entry point; null writes a library.</summary>
+    /// <summary>Gets or sets a local Int32 or no-result entry point with no parameters or one String vector; null writes a library.</summary>
     public MethodBuilder? EntryPoint { get; set; }
     /// <summary>Adds a unique public static class.</summary>
     /// <param name="namespace">Namespace, possibly empty.</param>
