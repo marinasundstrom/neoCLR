@@ -147,3 +147,12 @@ fn boxed_primitive_display_preserves_full_integer_widths() {
     let result = run(&body, "").unwrap();
     assert_eq!(result.value, Value::String("passed".into()));
 }
+
+#[test]
+fn boxed_enum_display_uses_metadata_names_and_numeric_fallback() {
+    let declaration = ".type Status\n.enum Int32\n.field private Bits Int32\n.literal NotFound 404\n.method static FromValue(Int32) -> Status\nldarg 0\nnewobj Status\nret\n.end\n.end";
+    for (bits, expected) in [(404, "NotFound"), (599, "599")] {
+        let result = run(&format!("ldc.i4 {bits}\ncall Status::FromValue(Int32)\nbox Status\ncallvirt instance System.Object::ToString()"), declaration).unwrap();
+        assert_eq!(result.value, Value::String(expected.into()));
+    }
+}

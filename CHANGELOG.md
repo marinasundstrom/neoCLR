@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Dispatch boxed Int32-backed enums through Object formatting, equality and hashing.
+  Formatting uses existing metadata names/flags/numeric fallback; equality retains
+  nominal enum identity. Native HTTP status checks and focused enum regressions pass.
+
 - Preserve lexical nesting for native closures capturing their enclosing reference
   object. Resolve private member access through enclosing type identities; unrelated
   types gain no access. The existing HTTP server serves eight valid status cases and

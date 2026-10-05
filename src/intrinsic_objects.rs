@@ -1,6 +1,6 @@
 //! Bounded Object value dispatch for intrinsic strings and boxed values.
 use crate::{
-    Fault, Value,
+    Fault, Module, Value,
     metadata::{Function, Type},
     value::ObjectReference,
 };
@@ -8,6 +8,7 @@ use crate::{
 /// Strings and supported boxed primitives have intrinsic content/value contracts.
 /// Other types still require their own validated equality/hash implementation.
 pub(crate) fn dispatch(
+    module: &Module,
     object: &ObjectReference,
     contract: &Function,
     arguments: &[Value],
@@ -21,7 +22,10 @@ pub(crate) fn dispatch(
             | Type::Double
             | Type::Char
             | Type::String
-    ) || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
+    ) && module
+        .type_definition(&object.concrete_type())
+        .is_none_or(|definition| definition.enum_info.is_none())
+        || contract.owner.as_ref() != Some(&Type::from_name("System.Object"))
         || contract
             .definition
             .as_ref()
@@ -48,8 +52,16 @@ pub(crate) fn dispatch(
     if !equality && !hashing && !display {
         return Ok(None);
     }
-    let value = intrinsic_value(object)?;
+    let value = intrinsic_value(module, object)?;
     if display {
+        if let Some(info) = module
+            .type_definition(&object.concrete_type())
+            .and_then(|definition| definition.enum_info.as_ref())
+        {
+            if let IntrinsicValue::Int32(bits) = value {
+                return Ok(Some(Value::String(crate::enums::format(info, bits).into())));
+            }
+        }
         return Ok(value.display().map(Value::String));
     }
     if hashing {
@@ -65,7 +77,7 @@ pub(crate) fn dispatch(
         Value::ObjectReference(other) => {
             other.reference.assigned()?;
             if other.concrete_type() == object.concrete_type() {
-                value.equals(&intrinsic_value(other)?)
+                value.equals(&intrinsic_value(module, other)?)
             } else {
                 false
             }
@@ -152,7 +164,18 @@ impl IntrinsicValue {
     }
 }
 
-fn intrinsic_value(object: &ObjectReference) -> Result<IntrinsicValue, Fault> {
+fn intrinsic_value(module: &Module, object: &ObjectReference) -> Result<IntrinsicValue, Fault> {
+    if module
+        .type_definition(&object.concrete_type())
+        .is_some_and(|definition| definition.enum_info.is_some())
+    {
+        if let Value::Object { fields, .. } = object.reference.read()? {
+            if let [Value::Int32(bits)] = fields.as_slice() {
+                return Ok(IntrinsicValue::Int32(*bits));
+            }
+        }
+        return Err(Fault::new("invalid boxed enum storage"));
+    }
     match (object.concrete_type(), object.reference.read()?) {
         (Type::Int32, Value::Int32(value)) => Ok(IntrinsicValue::Int32(value)),
         (Type::Int64, Value::Int64(value)) => Ok(IntrinsicValue::Int64(value)),

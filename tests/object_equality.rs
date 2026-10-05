@@ -781,3 +781,27 @@ fn box_reference_preserves_null_and_string_identity() {
         Value::Boolean(true)
     );
 }
+
+#[test]
+fn boxed_enum_equality_retains_nominal_identity_and_hashes_underlying_bits() {
+    let definition = |name: &str| {
+        format!(
+            ".type {name}\n.enum Int32\n.field private Bits Int32\n.literal Answer 42\n.method static FromValue(Int32) -> {name}\nldarg 0\nnewobj {name}\nret\n.end\n.end\n"
+        )
+    };
+    let declarations = definition("First") + &definition("Second");
+    for (other, expected) in [("First", true), ("Second", false)] {
+        let body = format!(
+            "ldc.i4 42\ncall First::FromValue(Int32)\nbox First\nldc.i4 42\ncall {other}::FromValue(Int32)\nbox {other}\n{EQUALS}"
+        );
+        assert_eq!(
+            run(&body, &declarations, "Boolean", 4).unwrap().value,
+            Value::Boolean(expected)
+        );
+    }
+    let body = format!("ldc.i4 42\ncall First::FromValue(Int32)\nbox First\n{HASH}");
+    assert_eq!(
+        run(&body, &declarations, "Int32", 4).unwrap().value,
+        Value::Int32(42)
+    );
+}

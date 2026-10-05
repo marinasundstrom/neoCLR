@@ -2873,7 +2873,7 @@ fn interpret_instructions_with_dispatch(
                             };
                             object.reference.assigned()?;
                             if let Some(value) =
-                                crate::intrinsic_objects::dispatch(&object, &contract, &args)?
+                                crate::intrinsic_objects::dispatch(module, &object, &contract, &args)?
                             {
                                 frame.stack.push(value);
                                 return Ok(None);

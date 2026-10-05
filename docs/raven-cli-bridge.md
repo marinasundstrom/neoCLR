@@ -5920,3 +5920,18 @@ status responses and rejection of two invalid responses. A minimal self-capture 
 checks deferred execution, private field mutation and a private method call on the same
 object. Runtime nesting/accessibility tests also reject unrelated callers. Main's .NET
 closure implementation is unchanged; portable-only compiler changes need no main backport.
+
+### HTTP property patterns and enum Object calls (2026-10-05)
+
+Reference property patterns now evaluate each getter once, short-circuit in source
+order, reject null and bind payloads. Integer/Boolean/enum constants are supported.
+Value receivers of inherited Object calls box explicitly; the runtime recognizes
+Int32-backed enum metadata for formatting/equality/hash behavior. No representation
+extension or new Runtime Contract is introduced. The native property-pattern consumer
+and HTTP status consumer execute; 59 existing shared-body .NET tests and one focused
+property-pattern control pass. The shared propagation fix is also on local Raven main
+as e33591945, independently validated with 31 tests; the temporary branch was deleted.
+
+Focused enum display/equality/hash tests pass. An existing Object-array-display test
+fails with "type parameter index outside arguments" both before and after this change;
+record it as separate nominal Array<T>/Object dispatch debt, not an enum regression.

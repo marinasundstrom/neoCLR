@@ -7229,3 +7229,12 @@ All byte, field, method, property and dependency limits still apply. Large libra
 may need RuntimeAssemblyContainer.WriteLibraryBinary rather than the smaller application
 profile. The limit is a bounded host-library policy, not a CLI format maximum. Older
 host library versions retain their lower native/authoring cap and reject larger inputs.
+
+### Native enum Object behavior (development, 2026-10-05)
+
+Int32-backed native enums now participate in inherited Object.ToString, Equals and
+GetHashCode calls through ordinary boxing. ToString uses the existing enum metadata
+formatter (named values, flags composition and numeric fallback); equality also requires
+the same nominal enum type, and hashing uses the Int32 payload. This adds no metadata
+category or guest member signature. The existing enum alias choice remains unspecified
+for .NET parity; the current formatter prefers the first declared exact alias.
