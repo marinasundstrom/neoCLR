@@ -11,6 +11,21 @@ windows-link, even though it was not compiled in the local macOS validation.
 
 | Package | Locked version | Declared license expression | Preserved texts |
 | --- | --- | --- | --- |
+| block-buffer | 0.10.4 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/block-buffer-0.10.4/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/block-buffer-0.10.4/LICENSE-MIT) |
+| ciborium | 0.2.2 | Apache-2.0 | [LICENSE](third-party/licenses/ciborium-0.2.2/LICENSE) |
+| ciborium-io | 0.2.2 | Apache-2.0 | [LICENSE](third-party/licenses/ciborium-io-0.2.2/LICENSE) |
+| ciborium-ll | 0.2.2 | Apache-2.0 | [LICENSE](third-party/licenses/ciborium-ll-0.2.2/LICENSE) |
+| cpufeatures | 0.2.17 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/cpufeatures-0.2.17/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/cpufeatures-0.2.17/LICENSE-MIT) |
+| crunchy | 0.2.4 | MIT | [LICENSE](third-party/licenses/crunchy-0.2.4/LICENSE) |
+| crypto-common | 0.1.7 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/crypto-common-0.1.7/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/crypto-common-0.1.7/LICENSE-MIT) |
+| digest | 0.10.7 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/digest-0.10.7/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/digest-0.10.7/LICENSE-MIT) |
+| generic-array | 0.14.7 | MIT | [LICENSE](third-party/licenses/generic-array-0.14.7/LICENSE) |
+| half | 2.7.1 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/half-2.7.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/half-2.7.1/LICENSE-MIT) |
+| sha2 | 0.10.9 | MIT OR Apache-2.0 | [LICENSE-APACHE](third-party/licenses/sha2-0.10.9/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/sha2-0.10.9/LICENSE-MIT) |
+| typenum | 1.20.1 | MIT OR Apache-2.0 | [LICENSE](third-party/licenses/typenum-1.20.1/LICENSE), [LICENSE-APACHE](third-party/licenses/typenum-1.20.1/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/typenum-1.20.1/LICENSE-MIT) |
+| version_check | 0.9.5 | MIT/Apache-2.0 | [LICENSE-APACHE](third-party/licenses/version_check-0.9.5/LICENSE-APACHE), [LICENSE-MIT](third-party/licenses/version_check-0.9.5/LICENSE-MIT) |
+| zerocopy | 0.8.59 | BSD-2-Clause OR Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/zerocopy-0.8.59/LICENSE-APACHE), [LICENSE-BSD](third-party/licenses/zerocopy-0.8.59/LICENSE-BSD), [LICENSE-MIT](third-party/licenses/zerocopy-0.8.59/LICENSE-MIT) |
+| zerocopy-derive | 0.8.59 | BSD-2-Clause OR Apache-2.0 OR MIT | [LICENSE-APACHE](third-party/licenses/zerocopy-derive-0.8.59/LICENSE-APACHE), [LICENSE-BSD](third-party/licenses/zerocopy-derive-0.8.59/LICENSE-BSD), [LICENSE-MIT](third-party/licenses/zerocopy-derive-0.8.59/LICENSE-MIT) |
 | chrono-tz | 0.10.4 | MIT OR Apache-2.0 | [LICENSE](third-party/licenses/chrono-tz-0.10.4/LICENSE), [LICENSE](third-party/licenses/chrono-tz-0.10.4/tz/LICENSE) |
 | phf | 0.12.1 | MIT | [LICENSE](third-party/licenses/phf-0.12.1/LICENSE) |
 | phf_shared | 0.12.1 | MIT | [LICENSE](third-party/licenses/phf_shared-0.12.1/LICENSE) |

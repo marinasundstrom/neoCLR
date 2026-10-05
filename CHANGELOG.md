@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Repair the source release notice inventory for fifteen locked metadata/CBOR and
+  hashing dependencies, preserving their shipped license texts and checksums.
+  This clears the first extracted-source release audit blocker; it is not release
+  publication or full candidate qualification.
+
 - Extend native editor acceptance to imported API documentation: generated Raven
   Markdown/XML sidecars, hover prose, documentation-only refresh and XML fallback.
   Document the distinction between concise IDE API help and website-only guides;
