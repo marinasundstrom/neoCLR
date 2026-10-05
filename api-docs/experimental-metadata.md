@@ -64,7 +64,7 @@ and guest Introspection assembly loading remain pending.
 - [Imported type signatures](#imported-type-signatures-development-2026-10-01): external nominal and constructed reference types.
 - [Model namespace](#model-namespace): Cecil-inspired assembly/module/type definitions and scoped references.
 - [Integer shifts](#integer-shifts-development-2026-10-01): Shl/Shr with Int32 counts.
-- [Integer bitwise operations](#integer-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
+- [Integer bitwise operations](#integer-and-boolean-bitwise-operations-development-2026-10-01): And/Or/Xor and helpers.
 - [Signed remainder](#signed-remainder-development-2026-10-01): dividend-signed Int32/Int64 remainder.
 - [Signed division](#signed-division-development-2026-10-01): typed Int32/Int64 quotient and execution faults.
 - [MethodVisibility](#methodvisibility-development-2026-10-01): public/internal/private static method declarations.
@@ -82,7 +82,7 @@ and guest Introspection assembly loading remain pending.
 - [Primitive property associations](#primitive-property-associations): static/instance getter and setter metadata.
 - [Root construction and instance bodies](#root-construction-and-instance-bodies): constructors, receiver calls and field operations.
 - [Root classes and primitive instance fields](#root-classes-and-primitive-instance-fields): mutable layouts and field snapshots.
-- [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilderemit): bounded opcode/typed-operand construction.
+- [OpCode and MethodBuilder.Emit](#opcode-and-methodbuilder.emit): bounded opcode/typed-operand construction.
 - [NativeLibraryDefinition and NativeFunctionDefinition](#nativelibrarydefinition-and-nativefunctiondefinition): native inventory and explicit partial callable views.
 - [NativeModuleContainer](#nativemodulecontainer): existing native JSON translation without a CLI projection.
 - [RuntimeAssemblyContainer](#runtimeassemblycontainer): direct PE/#Neo native execution transport.
@@ -1464,7 +1464,7 @@ extraction and `metadata_container::load(&[u8]) -> Result<Module, Fault>` for le
 explicit module sets; `LoadedProgram` remains responsible for linking and execution.
 There is no guest loader API yet. CLI bodies are throwing reference stubs, never
 executed by neoCLR. The payload still uses JSON; direct loading does not yet eliminate
-text parsing or establish a speedup. See the [profile/design](../docs/design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
+text parsing or establish a speedup. See the [profile/design](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/design/extended-cli-metadata.md#direct-runtime-container-checkpoint--2026-09-30).
 
 ### Native console literal output
 
@@ -1516,7 +1516,7 @@ Schema 2 is deserialized directly to the runtime model, with no JSON roundtrip.
 `native_json` remains a borrowed schema-1-only extractor and faults for schema 2.
 The CLI and ModuleInput::MetadataPe use decode/load and accept both encodings.
 Binary containers have no embedded text for the debugger's source pane.
-See the [binary profile and tradeoffs](../docs/design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).
+See the [binary profile and tradeoffs](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/design/extended-cli-metadata.md#binary-native-execution-profile--2026-09-30).
 
 
 ## NativeModuleContainer
@@ -2332,7 +2332,7 @@ indexed properties and external instance snapshot imports remain outside this bo
 producer. Owned nominal parameters/results/locals, fields and properties are supported. The C# fixture constructs an Order,
 mutates it through one alias and reads through another; both targets return 42.
 The separate Raven Order integration now compiles the unchanged declaration; see the
-[bridge evidence](../docs/raven-cli-bridge.md).
+[bridge evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/raven-cli-bridge.md).
 
 ## Primitive property associations
 
@@ -2390,7 +2390,7 @@ IReadOnlyList<PropertyDefinition> TypeDefinition.Properties { get; }
 The module lists physical Property rows in metadata order; types list their declared
 properties. Lookup returns null for absent/wrong-kind tokens. PropertyDefinition
 exposes Module, MetadataToken, DeclaringType, Name, ushort Attributes (PropertyAttributes),
-nullable GetMethod/SetMethod and IReadOnlyList<MethodDefinition> OtherMethods. Accessors
+nullable GetMethod/SetMethod and `IReadOnlyList<MethodDefinition>` OtherMethods. Accessors
 are the same owned objects returned by Module.GetMethodDefinition, with no assembly
 loading or resolution. OtherMethods preserves ordinary Other associations.
 
@@ -2436,7 +2436,7 @@ existing Named type contract. The bounded native reader validates local class ow
 and shape, then omits implementation locals from reference projections as before.
 A matching reader is required for these new bodies. API C# tests and direct binary
 neoCLR execution validate local aliasing/mutation to 42. The subsequent Raven
-consumer validates source-level aliasing too; see the [integration record](../docs/raven-cli-bridge.md#raven-object-locals-and-aliasing--2026-10-01).
+consumer validates source-level aliasing too; see the [integration record](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/raven-cli-bridge.md#raven-object-locals-and-aliasing--2026-10-01).
 
 
 ## Nominal signatures
@@ -2882,7 +2882,7 @@ ValueType and DefaultConstructor constraint kinds. The declaration reader reject
 unknown, duplicate or conflicting flags and preserves accepted flags in reference
 projections. Native execution needs the matching feature-branch runtime; old runtimes
 cannot decode these new kinds. Native notvoid/notreference keep their prior meaning.
-See the [integration assessment](../docs/experiments/extended-cli-metadata/state-assessment-2026-10-01.md).
+See the [integration assessment](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/state-assessment-2026-10-01.md).
 
 
 ### Interface declarations (development)
@@ -3048,7 +3048,7 @@ Vectors retain .NET CLI `SZARRAY` signatures; no extension or semantic divergenc
 introduced. Imported nominal and generic signatures still need a separate identity
 contract. The C# vector checks execute ordinary CLR library/application images and
 check exact overload resolution, native declaration projection and malformed encodings.
-The Raven [runtime probe](../docs/experiments/extended-cli-metadata/vector-library-validation.json)
+The Raven [runtime probe](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/vector-library-validation.json)
 executes independently emitted native library/application images with the neoCLR profile.
 
 
@@ -3096,7 +3096,7 @@ uses the existing generic_arguments call contract; there is no format or opcode 
 
 For example, import `First<T>(T[]) -> T`, instantiate with PrimitiveType.Int32, then
 pass an Int32 vector to Call. The C# tests execute the resulting separate library and
-application on the CLR. Raven's native-profile [generic library probe](../docs/experiments/extended-cli-metadata/generic-library-validation.json)
+application on the CLR. Raven's native-profile [generic library probe](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/generic-library-validation.json)
 verifies and runs the equivalent binary boundary in neoCLR, including consumer-owned
 nominal arguments, alias mutation, external constructions and caller method/owner
 parameter forwarding. Imported generic declaring types, cross-dependency nominal types in the imported
@@ -3164,7 +3164,7 @@ only. No mutable dependency TypeBuilder is exposed. Imported constructions are a
 through SignatureType.ImportedType, while GenericInstance still describes owned types.
 LocalDefinition.SignatureType also carries these types; ClassType remains null for them.
 
-Example: import a dependency's Box<T> TypeDefinition, create an Order class in the
+Example: import a dependency's `Box<T>` TypeDefinition, create an Order class in the
 consumer, and call `box.MakeGenericInstance(order)`. Use the resulting reference in
 MethodSignature, fields, locals, vectors and default-value initialization. Standard CLI
 output uses AssemblyRef/TypeRef and CLASS/GENERICINST signatures (TypeSpec for typed IL
@@ -3186,7 +3186,7 @@ Validation: C# tests inspect actual CLR generic scopes and execute the output, t
 check native declaration projection and malformed dependency rejection. The
 `--imported-type-integration <neoclr> <fresh-output>` test mode loads a separate native
 library/application, verifies and returns 42, including external interface and
-Box<consumer Order> fields/defaults and generic forwarding.
+`Box<consumer Order>` fields/defaults and generic forwarding.
 
 ## Imported nominal method signatures (development, 2026-10-01)
 
@@ -3217,7 +3217,7 @@ consumer-owned payload aliases, interface-vector overload matching and missing-m
 rejection. Nullable annotations are not retained by the current declaration projection;
 these cross-assembly factory contracts use nonnullable references. Imported value/union
 contracts, constructors/instance calls and translated-System native identities remain
-unsupported. [Native evidence](../docs/experiments/extended-cli-metadata/nominal-method-validation.json).
+unsupported. [Native evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/nominal-method-validation.json).
 
 ## Owned value types (development, 2026-10-01)
 
@@ -3270,7 +3270,7 @@ permanent neoCLR rules; runtime value types already exist beyond this subset.
 The C# checks execute defaults, field reads, static/generic forwarding and vector
 storage on CLR and native neoCLR, both returning 42. They also test CLR reflection,
 read snapshots, native projection, constraints and invalid shape/storage rejection.
-[Evidence](../docs/experiments/extended-cli-metadata/value-type-validation.json).
+[Evidence](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/value-type-validation.json).
 This is a prerequisite for Raven union emission, not a completed collections gate.
 Generic payload storage and addressed local field mutation are now tested: value
 payloads and arrays retain copies, while reference payloads retain their aliases.
@@ -3409,7 +3409,7 @@ Validation: `AuthoredDefinitionChecks` covers exact facade identity, direct decl
 renaming, ownership rejection, CLR shape/execution and native verify/run (42).
 `--authored-definition-integration <runtime> <fresh-directory>` reproduces the native
 case. The 76 C# contract groups and Raven external-signature/generic-library runtime
-probes pass. The broader collections Option<Order> gate remains unchanged.
+probes pass. The broader collections `Option<Order>` gate remains unchanged.
 
 
 ### Shared method declarations
@@ -3519,7 +3519,7 @@ body.Return();
 Validation extends the manual executable to call a directly declared static type method
 through an assembly-level helper. CLR and neoCLR return 42. C# contracts cover shared
 identity, access flags, duplicate/foreign attachment, detached-owner rejection and
-unsupported method categories. The broader collections Option<Order> gate is unchanged.
+unsupported method categories. The broader collections `Option<Order>` gate is unchanged.
 
 
 ### Direct instance methods and constructors
@@ -3560,7 +3560,7 @@ its private readonly Int32 field in a manual constructor, calls a manual instanc
 and carries the result through the function/type-method/struct path. CLR and neoCLR
 return 42. Tests also compare emitted constructor/instance flags and reject invalid
 constructor signatures and owner categories. Canonical body definitions, direct interface
-contracts and loaded editing remain pending; the collections Option<Order> gate is unchanged.
+contracts and loaded editing remain pending; the collections `Option<Order>` gate is unchanged.
 
 
 ### Direct interface declarations and dispatch
@@ -3597,7 +3597,7 @@ through the existing helper and calls it with CallVirtual. CLR and neoCLR return
 All 76 C# groups pass, including existing multi-implementation/inherited interface tests
 and new invalid-owner/flags/interface-storage checks. Raven's rebuilt external-signature
 probe also passes. Canonical bodies, relationship definitions and loaded editing remain
-pending; this does not resolve the collections Option<Order> import gap.
+pending; this does not resolve the collections `Option<Order>` import gap.
 
 
 ### Authored interface relationships
@@ -3657,7 +3657,7 @@ branch label and locals, CLR execution (42), and rejection of loaded Body access
 The native manual object/interface/struct case replaces a body through the definition
 API before emission and returns 42. All 76 contract groups and the rebuilt Raven
 external-signature probe pass. Property/generic-definition migration and loaded editing
-remain open, as does the collections Option<Order> target gap.
+remain open, as does the collections `Option<Order>` target gap.
 
 
 ### Shared authored property declarations
@@ -3730,8 +3730,8 @@ helpers validate and update that storage. Nominal constraints retain their exist
 GenericTypeConstraint builder bound handles; independent generic-parameter/constraint
 reference objects and loaded constraint editing are future work.
 
-The manual executable declares Identity<T> directly, adds Pass(T):T directly, constrains T
-to a value type through the helper, and calls Identity<Int32>.Pass. CLR reflection confirms
+The manual executable declares `Identity<T>` directly, adds Pass(T):T directly, constrains T
+to a value type through the helper, and calls `Identity<Int32>`.Pass. CLR reflection confirms
 the parameter name and special constraint; CLR/native execution returns 42. A String
 instantiation rejects. All 76 C# groups and Raven's rebuilt native probe pass. Existing
 GenericParam/GenericParamConstraint and native encodings are unchanged.
@@ -3760,7 +3760,7 @@ Author direction, 2026-10-01: the current API is good enough to resume the worki
 Raven/native case. Further object-model migration, builder naming and encoding/PE
 separation are deferred unless required by an observed integration blocker. This
 supersedes the earlier migration-first sequencing, not the architectural direction.
-The current blocker remains imported Option<Order> value-category support; the
+The current blocker remains imported `Option<Order>` value-category support; the
 reference-only import contract must not be widened by treating it as a class.
 
 
@@ -4258,7 +4258,7 @@ CLI output uses standard InterfaceImpl TypeSpecs and callvirt, and native metada
 retains the same owner arguments for its existing runtime dispatch. No opcode changed.
 
 C# tests execute `Implementation<Unused,T> : Middle<T> : Root<T>` with an Int32 Echo
-through Root<int> on CLR and neoCLR (42), reproject native metadata to CLI, and reject
+through `Root<int>` on CLR and neoCLR (42), reproject native metadata to CLI, and reject
 missing/mismatched implementations and out-of-scope type/method parameters. Raven's
 unchanged collection interfaces additionally execute with generic provider and iterator
 implementations, including constructor fields and inherited property/indexer calls.
@@ -4280,7 +4280,7 @@ This is a native-only extension. Native writing encodes existing `array.reserve`
 PE/#Neo loading retains checked uninitialized slots. Stores publish typed values; direct
 or addressed reads before publication fault in the runtime. Negative lengths and runtime
 allocation limits retain the existing array-reservation checks. `NewArray`/`Newarr` keep
-ordinary default initialization. See [the storage contract](../docs/reserved-array-capacity.md).
+ordinary default initialization. See [the storage contract](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/reserved-array-capacity.md).
 
 `AssemblyBuilder.Write()` (and executable CLI writing through definitions) rejects a
 body containing reservation with `InvalidDataException`: CLI newarr is not an equivalent
@@ -4700,7 +4700,7 @@ inheritance/root-class implementation relationships. TypeDefinition.Attributes r
 CLI Interface/Abstract flags; interface methods retain Abstract/Virtual/NewSlot flags.
 Existing property/accessor and primitive/nominal/vector signature APIs apply.
 
-TypeDefinition.Interfaces returns a cached, read-only IList<InterfaceImplementation>
+TypeDefinition.Interfaces returns a cached, read-only `IList<InterfaceImplementation>`
 for native snapshots, including an empty list for owners with no contracts. Each
 relationship has the exact DeclaringType and a reference resolving to the canonical
 local interface definition; TypeArguments is empty in this profile. Mutations throw
@@ -4771,7 +4771,7 @@ The bounded profile does not yet materialize constructed nominal signatures such
 `Box<int>` in a declaration, generic interface/static owners or generic inheritance.
 Native generic constraints, nested/value owners and instance generic methods still
 reject. Direct imported fields on constructed owners remain unsupported; use supported
-methods/properties. Both container schemas execute Box<int> construction, Set and Get
+methods/properties. Both container schemas execute `Box<int>` construction, Set and Get
 on neoCLR; the equivalent CLI consumer executes on CLR (42).
 
 ### ReferencedGenericType (development 2026-10-02)
@@ -5139,7 +5139,7 @@ for both CLR and native consumers, without passing reader definitions.
 
 
 Closed generic field validation (development, 2026-10-02):
-NativeGenericOwnerChecks authors scalar/vector fields containing an imported Box<Int32>,
+NativeGenericOwnerChecks authors scalar/vector fields containing an imported `Box<Int32>`,
 loads and stores them, and executes the resulting CLI assembly on .NET and native
 assembly on both containers. AuthoredFunctionReferenceChecks rejects open parameters,
 unconstructed generic definitions and foreign references. This extends storage
@@ -5284,7 +5284,7 @@ owner's !0 returns that parameter unchanged rather than substituting it again.
 
 GetFields decodes through the current reader profile and throws InvalidDataException
 for unavailable signatures/dependencies. Broader CLI signatures retain reader limitations.
-For a recursive Box<T>.Next: Box<T>, projecting Box<Int32> returns the existing constructed
+For a recursive `Box<T>`.Next: `Box<T>`, projecting `Box<Int32>` returns the existing constructed
 view without expanding its fields recursively. No runtime objects are inspected or mutated.
 
 The names follow the runtime model; this prototype distinguishes nominal definitions
@@ -5302,7 +5302,7 @@ Namespace `NeoCLR.Metadata.Experimental.Introspection`:
 | MetadataLoadContext | `Resolve(MethodDefinition): MethodInfo`; `ResolveSignature(SignatureType, IReadOnlyList<TypeInfo>? typeArguments, IReadOnlyList<TypeInfo>? methodArguments): TypeInfo` |
 | ModuleInfo | `GetFunctions(): IReadOnlyList<MethodInfo>` |
 | NominalTypeInfo / ConstructedTypeInfo | `GetMethods(): IReadOnlyList<MethodInfo>` |
-| MethodInfo | `Name`, `Namespace` (strings), `MetadataToken` (uint), `Module` (ModuleInfo), nullable `DeclaringType` (TypeInfo), `ReturnType` (TypeInfo), `GenericParameterNames` (IReadOnlyList<string>), `IsStatic`, `IsAbstract`, `IsVirtual` (bool); `GetParameters(): IReadOnlyList<ParameterInfo>`; `GetGenericArguments(): IReadOnlyList<TypeInfo>` |
+| MethodInfo | `Name`, `Namespace` (strings), `MetadataToken` (uint), `Module` (ModuleInfo), nullable `DeclaringType` (TypeInfo), `ReturnType` (TypeInfo), `GenericParameterNames` (`IReadOnlyList<string>`), `IsStatic`, `IsAbstract`, `IsVirtual` (bool); `GetParameters(): IReadOnlyList<ParameterInfo>`; `GetGenericArguments(): IReadOnlyList<TypeInfo>` |
 | ParameterInfo | `DeclaringMethod` (MethodInfo), `Position` (int), `ParameterType` (TypeInfo) |
 | MethodGenericParameterTypeInfo | `DeclaringMethod` (MethodInfo), `Position` (int), DisplayName (`!!ordinal`), IsNominalType=false |
 
@@ -6068,7 +6068,7 @@ Its storage field aliases vector identity; replacing/addressing that field and a
 the descriptor as a nominal object are unsupported. Older readers reject this optional
 format-5 field. NativeAssemblyDefinition.ReadAssembly validates its identity and storage
 shape and retains it in the immutable native snapshot. See the integration documentation
-for source Array<T>, iteration configuration and executable validation.
+for source `Array<T>`, iteration configuration and executable validation.
 
 ### Imported value overrides and slot facts
 
@@ -6714,7 +6714,7 @@ The constructed reference overload accepts a completed constructed interface con
 with no method arguments, using Call for static methods and Callvirt for instance methods.
 Instance calls consume a managed receiver address followed by their explicit arguments.
 The caller's method bounds must entail the target interface. Traversal substitutes Self
-with the implementing parameter, so Number's ComparableTo<Self> relationship admits
+with the implementing parameter, so Number's `ComparableTo<Self>` relationship admits
 CompareTo on ComparableTo<!!0>. Contract identities, declaring arguments and methods
 remain output-owned. No importer or runtime reflection object is retained.
 
@@ -6991,8 +6991,8 @@ nonsealed reference class. Direct children must share the root's defining assemb
 and revision. Descendants through an open local child may be external. The existing
 false default is unchanged; source permits lists remain Raven validation. These
 checks do not add closed-interface or general sealed-leaf enforcement. See the
-[runtime access contract](../docs/accessibility.md) and
-[executable scope](../docs/experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
+[runtime access contract](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/accessibility.md) and
+[executable scope](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/class-hierarchy-foundation-2026-10-04.md).
 
 ### Native closed-class authoring and facade (2026-10-04)
 
@@ -7036,7 +7036,7 @@ throw InvalidDataException. Runtime verification still checks the actual depende
 definitions; hosts must supply truthful symbol facts. It does not enable authoring a
 new class that derives from a dependency.
 
-See [the executable compiler gate](../docs/experiments/extended-cli-metadata/closed-family-2026-10-04.md).
+See [the executable compiler gate](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/closed-family-2026-10-04.md).
 
 ## Runtime type handles (development, 2026-10-04)
 
@@ -7103,13 +7103,13 @@ query.SetInternalCall();
 C# tests cover definitions/builders, CLI/native/reference-projection flags, output-owned
 nominal result signatures and invalid graphs. Generated native PE executes with an
 explicit empty test seed, both directly and through a separate native metadata consumer.
-Unknown runtime services reject. See the [integration record](../docs/experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md).
+Unknown runtime services reject. See the [integration record](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md).
 
 
 Runtime execution checkpoint (2026-10-05): native internal-call declarations can now
 return an output-owned System.Introspection.ModuleInfo interface through TypeModule.
 The runtime validates and materializes its source-owned provider; see the
-[scope, layout and executable contract](../docs/experiments/extended-cli-metadata/source-module-descriptors-2026-10-05.md).
+[scope, layout and executable contract](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/source-module-descriptors-2026-10-05.md).
 No new C# authoring member is required. This bounded runtime capability does not imply
 that arbitrary descriptor-returning services or the full production descriptor library
 are supported.
@@ -7287,7 +7287,7 @@ declaration bind locally; explicit external identities remain exact, including a
 checks. Duplicate declarations within one module, incompatible service signatures and
 ambiguous unqualified calls without a local declaration still reject. Registry validation
 is unchanged: a matching name alone never grants a native service. See the
-[Object service integration gate](../docs/experiments/extended-cli-metadata/object-services-2026-10-05.md).
+[Object service integration gate](https://github.com/marinasundstrom/neoCLR/blob/codex/extended-cli-metadata/docs/experiments/extended-cli-metadata/object-services-2026-10-05.md).
 
 ## Native Object root authoring (development, 2026-10-05)
 

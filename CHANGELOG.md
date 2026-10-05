@@ -8,6 +8,19 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Refresh the website's native Raven target status and homepage development milestone.
+  Replace superseded integration notes with current sample evidence and explicit native
+  limits; retain published bridge entry-point guidance. Record website, setup and sample
+  download review as release requirements. Regenerate the API snapshot with Raven main,
+  document the parameter-array marker, repair the Fail link, generic-signature markup
+  and metadata-reference routes. Record the integration branch's Option projection
+  regression separately. No release or site publication is implied.
+
+- Record the independently reproduced and repaired Raven main field-return regression
+  discovered during native HTTP work. Preserve receiver order and original object
+  identity across RHS control flow; integrate the compiler fix and retire its temporary
+  branch. Native inheritance and editor/LSP acceptance remain release gates.
+
 - Validate native value auto-property construction through the unchanged types sample:
   reference identity, struct mutation and collection copies produce the expected output.
   Keep constructor receiver checks intact; Raven initializes only owned auto-property

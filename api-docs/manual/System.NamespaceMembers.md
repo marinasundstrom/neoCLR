@@ -4,7 +4,7 @@
 inside this public metadata type. Call these functions through `System`; applications
 do not construct a NamespaceMembers instance.
 
-[Fault](xref:System.NamespaceMembers.Fault) terminates the current invocation with
+[Fail](xref:System.NamespaceMembers.Fail) terminates the current invocation with
 the supplied message. It represents a runtime failure, not an expected error value.
 See [fault behavior](/docs/faults.html).
 

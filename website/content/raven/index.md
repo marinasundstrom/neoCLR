@@ -48,7 +48,7 @@ For properties, `val` expresses read-only access. Explicit mutability helps read
 
 ## The .NET and neoCLR targets
 
-Raven normally targets .NET and can use its libraries. The Raven compiler and Raven Language Server run on .NET; the VS Code extension uses that server for editor features. neoCLR itself and programs running on it do not depend on .NET. In the neoCLR integration, Raven emits CLI metadata and IL; a bounded importer translates supported programs for execution on neoCLR’s independent runtime.
+Raven normally targets .NET and can use its libraries. The Raven compiler and Raven Language Server run on .NET; the VS Code extension uses that server for editor features. neoCLR itself and programs running on it do not depend on .NET. The published integration uses a bounded CLI importer. The development native target emits NeoCLR PE assemblies directly and imports native library metadata into Raven symbols; it still needs an explicit primitive bootstrap and compatible runtime seed.
 
 This gives us a source language for applications and for the Raven-authored System.Runtime library. It also makes language and runtime gaps visible through real programs. It is not a promise that arbitrary .NET libraries or every Raven feature already run on neoCLR.
 
@@ -120,106 +120,44 @@ queues remain caller-driven. Ordinary `Task.GetResult()` stays nonblocking.
 Existing scripts that previously ignored a nonzero integer result should account
 for that status.
 
-Development native emission now includes bounded top-level source structs with generic
-inline payloads, constructors, accessors and value-copy behavior checked against .NET.
-Source-union emission and separate native value-library consumption remain in progress.
+<a id="native-target"></a>
 
-The development native emitter also handles bounded nested source class/value declarations
-under nongeneric owners. Paired .NET/native execution checks constructor and copy behavior;
-Byte discriminator signatures, storage and conversions now execute on both targets;
-generated union declarations remain work in progress.
+## Native target: development status
 
-The development metadata API supports value-type interface relationships and bounded
-constrained calls through its IL generator. Mutation/copy checks execute on CLR and
-neoCLR. Raven admits the declarations and concrete calls; broader constrained lowering,
-boxing and complete source-union emission remain in progress.
+**Development only; not a new downloadable release.** Raven's `rvnc neoclr` command
+emits assemblies that neoCLR loads and executes directly. Native library references
+supply compiler symbols without translating those libraries back to .NET metadata.
+The explicit primitive bootstrap, retained runtime seed and matching dependency
+artifacts remain required. The ordinary .NET target keeps its existing backend.
 
-The development metadata API can now author value-type `ToString` overrides for CLI
-output, with boxed and interface dispatch verified in C#. Native writing now validates
-an explicit retained System binding and preserves the override slot. A native API-produced
-library executes imported direct calls and boxed ordinary/generic Object dispatch.
-Raven now emits local ordinary/generic value overrides using an explicit runtime seed.
-Source-union declarations pass override admission; generated display conversions and union
-metadata remain in progress. The existing .NET/native bootstrap return-nullability
-difference is recorded separately from native execution evidence.
+Nine of the ten selected POC samples now compile and execute with checked output.
+They cover collections and queries, interface calls, class identity and struct copies,
+JSON object mapping, Tasks/await, cancellation, and an HTTP client/server pair tested
+over localhost. This is a bounded sample gate, not a claim that every Raven program
+or the entire System class library compiles natively.
 
-Development continuation: explicit core-bound boxing is now available in the metadata
-IL generator and Raven's native target. Focused generated assemblies execute, but union
-core virtual dispatch and union metadata preservation still block native source unions.
-Focused null/type tests now execute through both targets.
-Owned mutable field addresses now preserve nested value mutation and object aliases in
-focused .NET/NeoCLR executions. Imported and readonly field addresses remain outside this profile.
+Selected source-library assemblies are also compiled and consumed separately, including
+Unicode String/Char, encoding, text streams and JSON work. The text model distinguishes
+grapheme clusters, Unicode scalars and bytes; native UTF-8 storage does not change the
+ordinary .NET target's Char semantics. Support and limitations remain target-specific.
 
-Development update (2026-10-03): core Object.ToString dispatch now executes for boxed
-values through the metadata API and ordinary Raven commands. Union preflight next
-requires synthesized null literal emission; native union execution is still pending.
+Native nongeneric async functions and class methods use the existing heap state-machine
+lowering. `Task<unit>` and `Task<int>` entries drain registered work before obtaining their
+result; cancellation and unresolved tasks fail explicitly. Generic async methods and
+native `Task<Result<…>>` entry points remain unsupported. The Preview 11 entry-point table
+above describes the published bridge path, not blanket native-target support. Runtime
+suspension and green threads are future work.
 
-Development continuation (2026-10-03): unchanged Option now passes native source-body
-preflight. Preserving union/case attributes through metadata and native semantic import
-remains required before native union output or execution can be claimed.
+The remaining original sample, `application-inheritance`, needs coordinated support for
+abstract base declarations and ordinary virtual/override slots. Existing local base,
+protected-constructor and closed-family cases do not establish that broader support.
+A release also requires the native metadata workflow to pass through the language
+server and VS Code, with matching setup instructions and sample downloads.
 
-Development native callback coverage now includes immutable reference and supported
-primitive local captures (Int32, Int64, Boolean and Byte). Separate-library execution
-checks shared object mutation and distinct captured loop values. Mutable local captures
-and general closure support remain outside this bounded native profile; ordinary Raven
-.NET closure support follows its existing compiler path.
+The development `neoclr disassemble` command inspects native metadata and instructions
+without loading dependencies or executing the assembly. Its output is a diagnostic
+listing, not reassemblable neoIL.
 
-Development source-library coverage now includes separately compiled StringComparer
-with explicit primitive/runtime bootstrap bindings. Native consumers exercise ordinal
-and case-folded equality, hashing and ordering. The unchanged comparer sample now also compiles and runs with bounded signed integer
-range support. This is integration evidence, not full-library support.
-
-
-Development integration now supports explicit interface property accessors across native
-assemblies, using the existing metadata relationships. This is not full class-library
-completion.
-
-The development native compiler builds source-owned String and Char together and imports
-that library into separate consumers. Checked cases cover grapheme literals/patterns,
-Unicode casing and comparison, iteration, UTF-8 slices and String construction from a
-character sequence with independent copying. Metadata constructors keep CLI shape;
-runtime-owned storage preserves Unicode text in UTF-8. Ordinary .NET Char remains a
-UTF-16 code unit. This is development integration evidence, not full class-library support
-or a new published bundle.
-
-Development encoding coverage now includes seven unchanged source-library files emitted
-as a separate native assembly. An artifact-only consumer incrementally encodes and
-decodes UTF-8, including split scalar boundaries, and checks ASCII and malformed-input
-errors. Text-stream integration and the broader JSON library gate remain in progress.
-
-The development text-stream layer also compiles separately against those native
-libraries. Executable checks cover Unicode line/whole-stream reads and writes, EOF,
-byte limits, malformed UTF-8 and leave-open behavior over source-built MemoryStream.
-The JSON document layer next exposes native class-hierarchy support still to complete.
-
-Development hierarchy work now preserves local nongeneric native bases in the metadata
-reader/introspection facade. A three-binary-assembly runtime control verifies base
-construction, inherited mutation, dispatch and identity. Raven and metadata-builder
-inheritance emission remain in progress; this is not yet JSON compilation support.
-
-Development class-base authoring now supports ordinary local nongeneric inheritance
-and direct base-constructor calls in the host metadata library. Generated assemblies
-execute with separate base and derived fields on .NET and neoCLR. This bounded
-checkpoint does not yet complete JSON's closed hierarchy or external class import.
-
-The Raven driver now executes a local inheritance and base-typed alias mutation case
-on both .NET and neoCLR. The source-built text-stream gate remains passing. JSON still
-requires closed-family and protected-constructor metadata support; broader external
-inheritance is not implied by this development checkpoint.
-
-Development runtime checks now enforce protected base-constructor access by resolved
-family identity, including binary dependencies, and prevent external direct extension
-of a closed class family. Protected constructor authoring and reader/facade round trips
-also execute through generated native PE. Closed-family metadata and Raven admission
-remain open; this does not yet make the JSON source library compile.
-
-The development closed-family/protected-constructor case now runs on both .NET and
-NeoCLR, including a separate consumer that references only the emitted library.
-External direct children of the closed root reject before output. The next JSON
-blocker is propagation lowering. Local assignment propagation now executes in a
-focused native success/failure consumer and the shared fix is integrated into Raven
-main. Conditional propagation now also lowers: the five-source JSON library compiles and
-a separate native DOM consumer runs successfully, checking parsing and alias mutation.
-The public serializer and object mapper still require introspection dependencies;
-internal document round trips now pass a test-only entry point, including Unicode,
-mutation and invalid-input rejection. Public serializer execution remains pending.
+[Tasks and their runtime limits →](../features/tasks/) ·
+[HTTP application case →](../cases/http-server/) ·
+[Published toolchain setup →](../try/)

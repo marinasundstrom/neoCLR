@@ -1,11 +1,32 @@
 # neoCLR platform roadmap
 
-The release also requires an editor/LSP workflow using native NeoCLR metadata;
+The release also requires updated website content, matching sample downloads and setup
+instructions, and an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 The author-requested initial metadata disassembler is implemented; broader integration
 now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
+
+## Website release preparation (2026-10-05)
+
+Homepage and Raven integration content now distinguish published bridge behavior from
+native development. The API snapshot is regenerated using Raven main `08f34891b` and
+current bridge sources. The same producer on integration `9a4f74884` fails Option's
+`None` binding; repair this compiler-line difference before final qualification.
+See [the reference producer record](../api-docs/README.md#release-preparation-snapshot-2026-10-05).
+Matching downloads, release-specific instructions, editor evidence and manual publication
+remain pending; a successful local website build does not release the platform.
+
+## Ordinary .NET field-return regression repaired (2026-10-05)
+
+The separate .NET field-return candidate reproduces on Raven main and is repaired on
+that shared line, preserving receiver order, object identity and early-return behavior.
+The integrated fix branch has been deleted. This closes a compiler quality issue found
+through native HTTP work; it does not advance the native sample count beyond nine of ten.
+[Validation and release follow-up](experiments/extended-cli-metadata/dotnet-field-return-2026-10-05.md).
+The next sample gate remains `application-inheritance`, followed by the native editor/LSP
+release workflow. Full System completion remains outside the POC gate.
 
 ## Value construction clears the ninth sample (2026-10-05)
 

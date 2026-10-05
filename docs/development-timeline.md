@@ -10949,3 +10949,23 @@ changes the next bounded priority to native async identity/lowering. Full Object
 replacement is not required by the already-executing retained-seed samples. This is
 assistant-observed evidence and a proposed implementation sequence, not a new author
 requirement or a claim that all release samples are covered.
+
+
+### 2026-10-05 — Website is part of release readiness
+
+The author said, “For a release we also have to update the website.” The assistant
+accepted this as part of the release gate and updated the homepage and Raven page to
+distinguish the published bridge from current native development. Superseded native
+progress notes were consolidated into current capabilities and limits: nine of ten
+original samples have execution evidence; inheritance and native editor/LSP acceptance
+remain open. Matching downloads, setup instructions and API reference must be reviewed
+against the eventual release artifacts. This is documentation preparation, not release
+creation or website publication.
+
+The assistant regenerated the CLI API reference using Raven main `08f34891b`, corrected
+stale Fail links, generic-signature markup and metadata-document routes, then verified
+all 1,803 generated pages and 18 website tests. Browser inspection confirmed the changed
+homepage and native-target content. Reference generation against integration `9a4f74884`
+exposed an unresolved Option/None binding regression; the same current bridge succeeds
+on main. This difference is recorded for compiler repair, not treated as solved by the
+website refresh.

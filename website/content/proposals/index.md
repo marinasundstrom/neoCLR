@@ -313,7 +313,7 @@ with Raven consumers verified on both runtimes.
 The ordinary native compiler driver now explicitly enables checked-storage reservation
 from the selected bootstrap. Separately compiled helper consumers exercise alias mutation
 and uninitialized-read faults. The full source-built class library remains incomplete;
-see the [experimental metadata API](/docs/experimental-metadata/).
+see the [experimental metadata API](/docs/experimental-metadata.html).
 
 Development producer metadata also supports constructed generic field references with
 exact receiver/value checks; external assembly fields remain outside the current API.
@@ -340,12 +340,12 @@ The experimental producer and Raven target now also preserve invariant comparer
 interface declarations through native assembly loading and CLI reference projection.
 Interface dispatch and full collection compilation are not covered by that checkpoint.
 
-That declaration coverage now includes unchanged Disposable and Iterator<T> sources,
+That declaration coverage now includes unchanged Disposable and `Iterator<T>` sources,
 with inherited nongeneric interfaces and abstract property metadata. Execution through
 an interface remains a separate acceptance gate.
 
 The development producer also supports owned interface signatures and constructions.
-Unchanged Iterable<T> loads, and nullable interface references pass through parameters,
+Unchanged `Iterable<T>` loads, and nullable interface references pass through parameters,
 results and array storage on both targets. Interface dispatch remains the next gate.
 
 Owned nongeneric interface method/property dispatch now executes through two concrete
@@ -365,24 +365,24 @@ imports remain open; this does not yet provide general collection-library import
 
 The independent metadata producer now retains external class/interface signatures and
 constructed generic references across CLI and native binary output. A separate library
-and consumer verify/run with Box<consumer Order>. Raven now consumes those external
+and consumer verify/run with `Box<consumer Order>`. Raven now consumes those external
 type signatures, with a separately emitted Raven library/consumer pair executing in
 neoCLR. Imported member calls and value/union signatures remain open; the unchanged
-collections sample now reaches its Option<Order> signature boundary.
+collections sample now reaches its `Option<Order>` signature boundary.
 
 Imported static generic calls now also accept consumer-owned reference types, external
 constructions and caller generic parameters. Raven binaries verify and execute this
 boundary in neoCLR; value/union contracts and full collection imports remain open.
 
 Development static imports now include dependency-local nominal method signatures.
-A Raven library factory returns Box<consumer Order> and preserves the payload alias
+A Raven library factory returns `Box<consumer Order>` and preserves the payload alias
 through native execution. Value-type unions and instance/generic-owner member imports
 remain open; this is not yet full collection-library compilation.
 
 The development metadata producer now preserves owned value-type categories in CLI
 and native binaries. Defaults, primitive fields, generic forwarding and arrays execute
 on both runtimes. Generic payload storage and imported union/value types remain open;
-Raven's collections sample is still blocked at Option<Order>.
+Raven's collections sample is still blocked at `Option<Order>`.
 
 Producer value types also support generic payload storage and initialized local-address
 field mutation. CLR and native tests retain value copies and reference payload aliases;
@@ -486,7 +486,7 @@ semantic importing and complete class-library source emission remain open. The h
 metadata API and its restrictions are documented in the [API reference](/docs/).
 
 The next source-emission checkpoint compiles the unchanged collection interface sources
-through Sequence<T>, including constructed interface bases and its indexer. An inherited
+through `Sequence<T>`, including constructed interface bases and its indexer. An inherited
 property/indexer consumer runs on CLR and neoCLR with both source orders; the real
 neoCLR target profile also passes, including generic provider and iterator classes.
 The unchanged ArrayList source now compiles to native PE and executes growth, independent
@@ -593,16 +593,16 @@ aliases; all seven native consumers pass (42). Generic owners and constraints re
 pending. This is not full generic import.
 
 Development checkpoint (2026-10-02): direct native generic root classes now preserve
-owner parameters. Raven constructs and uses Box<int>/Box<Item> through shared generic
+owner parameters. Raven constructs and uses `Box<int>`/`Box<Item>` through shared generic
 substitution; all seven native consumers return 42. Constructed signature types,
 constraints and full native class-library bootstrap remain under development.
 
-Development checkpoint (2026-10-02): local closed generic signatures such as Box<int>
+Development checkpoint (2026-10-02): local closed generic signatures such as `Box<int>`
 now read directly into immutable metadata definitions and Raven symbols. Native
 factory/identity calls execute successfully; open/external constructions and constraints
 remain future import work.
 
-Development checkpoint (2026-10-02): scoped local constructions such as Box<T> and their
+Development checkpoint (2026-10-02): scoped local constructions such as `Box<T>` and their
 vectors now retain method/owner parameter identity through direct native import. Raven
 inferred calls execute successfully. External generic constructions and constraints
 remain pending.
@@ -627,7 +627,7 @@ not a new metadata format or complete reader/emitter independence.
 
 
 Native namespace-function signatures now also reconstruct root-class constructions
-and vectors from Raven symbols, including cross-dependency Box<T> forwarding. Member
+and vectors from Raven symbols, including cross-dependency `Box<T>` forwarding. Member
 references and richer type profiles remain on the earlier reader-backed route.
 
 

@@ -1044,3 +1044,25 @@ snapshot. It was not replaced with a partial library snapshot.
 Rust host APIs and cannot be extracted from the guest CLI reference by RavenDoc;
 no guest type is excluded or added to the type selection. The API snapshot check
 still reports the pre-existing stale guest reference; no partial replacement was made.
+
+
+### Release preparation snapshot (2026-10-05)
+
+The current snapshot was regenerated from the repository bridge using Raven main
+`08f34891b` (.NET 11), not copied from an older reference. It includes the existing
+`System.ParamArrayAttribute` compiler marker with type/constructor documentation and
+corrects the manual namespace-function link to `System.Fail`. The bridge now names the
+source owner in projection errors. Source fingerprints and the assembly checksum are
+recorded in `snapshot.json`.
+
+The same bridge built against native integration `9a4f74884` currently fails reference
+regeneration in `System.Option<T>` with RAV0103 (`None` is not in scope). This is an open
+compiler-line compatibility regression; main succeeds. The website's CLI reference
+producer uses the validated main compiler. Native source-library/sample evidence is a
+separate workflow and does not prove this bridge regeneration works on that branch.
+Keep this regression visible for integration repair before release qualification.
+
+Validation: the complete website builds and checks 1,803 pages and local links; all
+18 website publisher tests pass. The homepage and native-target page were inspected
+in the browser. Existing missing-summary reports remain documentation coverage debt;
+this refresh does not claim they are all resolved. No publication was performed.

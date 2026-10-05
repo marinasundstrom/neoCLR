@@ -52,7 +52,7 @@ static class SourceUnionReferences
                 using (var output = File.Create(source))
                 {
                     var result = compilation.Emit(output, null, new EmitOptions(AssemblyName.GetAssemblyName(seed)));
-                    if (!result.Success) throw new InvalidDataException(string.Join("\n", result.Diagnostics));
+                    if (!result.Success) throw new InvalidDataException(Owners[index] + ": " + string.Join("\n", result.Diagnostics));
                 }
                 var projected = Path.Combine(directory, Owners[index] + ".dll");
                 StandardUnionReference.WriteReference(source, input, Owners[index], projected);

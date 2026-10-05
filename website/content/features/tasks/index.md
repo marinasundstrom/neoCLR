@@ -20,10 +20,10 @@ The unchanged cancellation sample also compiles and runs. Immutable callbacks pr
 hoisted Promise identity. Nongeneric class async methods preserve receiver identity and
 private access. Async Result propagation now executes, and the unchanged HTTP JSON
 client/server samples compile to native assemblies and pass a localhost round trip.
-Native Task<unit> and Task<int> entry points now complete registered work before reading
+Native `Task<unit>` and `Task<int>` entry points now complete registered work before reading
 the result. Both async Main samples execute; arguments and integer exit status are
 preserved, while cancellation and unresolved tasks fault. Generic async methods and
-Task<Result<...>> entry adaptation remain outside this bounded development gate.
+`Task<Result<...>>` entry adaptation remain outside this bounded development gate.
 The current POC prioritizes working samples; complete System coverage is later work.
 
 ## Starting and awaiting a worker

@@ -288,7 +288,7 @@ and the transitional bound-target Function property.
 The development .NET host metadata facade also preserves interface-scoped native Self
 signatures in declared member views. This is separate from guest introspection and does
 not yet provide Raven native Self dispatch. See the
-[experimental metadata API](/docs/experimental-metadata/#native-self-signatures-development-2026-10-03)
+[experimental metadata API](/docs/experimental-metadata.html#native-self-signatures-development-2026-10-03)
 for supported signatures and remaining limits.
 
 The development host facade preserves writable `ref`/`out` parameter modes separately
@@ -297,7 +297,7 @@ unsupported; this does not add runtime invocation to introspection.
 
 Development metadata work now retains top-level native value declarations and generic
 inline payload signatures in the C# host facade. Raven source-union emission remains
-in progress; see the [development API reference](/docs/experimental-metadata/).
+in progress; see the [development API reference](/docs/experimental-metadata.html).
 
 The development host reader also preserves nested native case ownership and scoped
 external references below nongeneric owners. Same-named cases remain distinct in the

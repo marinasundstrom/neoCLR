@@ -204,6 +204,7 @@
   "System.OptionOperators",
   "System.Option`1",
   "System.OverflowError",
+  "System.ParamArrayAttribute",
   "System.Propagatable`3",
   "System.Result",
   "System.Result.Error`1",

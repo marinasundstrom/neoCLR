@@ -27,8 +27,8 @@ which state is copied or shared and how resource ownership is handled. The teste
 Cell/Box consumer copies its integer field and verifies that mutating the original
 Box leaves its clone unchanged; this is not proof of arbitrary object-graph cloning.
 
-This development change replaces Clonable<T>. Remove its type argument, return
+This development change replaces `Clonable<T>`. Remove its type argument, return
 Self (or the concrete implementing type), and rebuild reference, library and
-application artifacts together. A former Clonable<OtherType> relationship cannot
+application artifacts together. A former `Clonable<OtherType>` relationship cannot
 be expressed by this contract; model that operation as a conversion or factory.
 Published releases and the archived Neo bootstrap profile are unchanged.

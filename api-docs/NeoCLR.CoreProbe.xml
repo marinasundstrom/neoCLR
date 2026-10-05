@@ -4,6 +4,8 @@
     <name>NeoCLR.CoreProbe</name>
   </assembly>
   <members>
+    <member name="T:System.ParamArrayAttribute"><summary>Marks a parameter that accepts a variable number of arguments.</summary><remarks>Development compiler-reference metadata marker, using the CLI parameter-array convention. It is not an executable runtime service.</remarks></member>
+    <member name="M:System.ParamArrayAttribute.#ctor"><summary>Creates the parameter-array metadata marker.</summary></member>
     <member name="T:System.Runtime.CompilerServices.IsExternalInit"><summary>Metadata marker identifying an init-only property setter.</summary><remarks>Development compiler contract. It is not an executable service or a runtime initialization lock. Raven checks initialization-only assignment; the importer recognizes this exact core marker on setter return signatures.</remarks></member>
     <member name="T:System.HashCode"><summary>A mutable value accumulator for combining integer and string components into an execution-local hash.</summary><remarks>Development API. Copies have independent state. This bounded implementation has no generic Add or comparer overloads, no randomized seed, and no persistent or cryptographic guarantee. It does not reproduce .NET hash values. Equal component sequences produce equal hashes; collisions are possible.</remarks></member>
     <member name="M:System.HashCode.#ctor"><summary>Creates an empty accumulator.</summary></member>
