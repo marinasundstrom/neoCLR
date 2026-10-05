@@ -4,6 +4,13 @@ Sequence provides count and indexed read access. MutableSequence adds replacemen
 
 **Preview 11 API.** Use matching runtime, SDK and library artifacts. See [setup](../../try/#development) for package availability.
 
+## Native compiler integration (development)
+
+The native types sample now constructs structs with auto-properties and verifies their
+copy behavior through ArrayList: later changes to the original struct do not change the
+stored copy. Class elements retain shared object identity. This is verified on the
+metadata/compiler development branches; it does not change the published collection API.
+
 <a id="example"></a>
 
 [Arrays: shared storage, generic shape and the .NET comparison →](../arrays/)

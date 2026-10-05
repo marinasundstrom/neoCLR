@@ -1,0 +1,131 @@
+{
+  "scope": "selected unchanged POC samples; only cases with an execution record claim runtime validation",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "7fd8e603dd46469787b74af4dfa6257e068d3f53",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0": "2595422174bd8fcbbde583ea30e3301dda09ef07"
+  },
+  "inputs": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "bd105eb4434bc07ca8f3b89e9127b2bb8c93ba63c7e9f5fed3bc51d0eabb67be",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "a163ba8b971c294cc2c75fbf05629494ac4e8d681796b5ee6e0ea250ee51f2aa",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "da268201dcb6c0d62a039c21a34519c6180dd524fa7ccc491398c1eb12f42722",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "46f61be5b2c3124282fae0d9b19420d448ee6f28c8aa5ff2fd8f6a1ebe4a9727",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+  },
+  "cases": [
+    {
+      "name": "application-types",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-point-verified1005/application-types.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-types.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/raven-target/samples/application-types.rvn": "99b0c95011238b848004ea9f9eaa7c1d0b09b7d844a31615f16fbaf909538f44"
+      },
+      "published": true,
+      "artifactSha256": "1b9654beb43fcf14c95a489be04bc2016b9b44305475b312c1bad6df09dd454f",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-point-verified1005/application-types.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "42\n99\n7\n42\n7\n",
+        "stderr": "",
+        "expectedStdout": "42\n99\n7\n42\n7\n",
+        "expectedExitCode": 0,
+        "expectedFault": null,
+        "passed": true
+      }
+    },
+    {
+      "name": "application-order-collections",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-point-verified1005/application-order-collections.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/raven-target/samples/application-order-collections.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b"
+      },
+      "published": true,
+      "artifactSha256": "e37ec1e6611a04b5395635ff3f99d6cef1226ce3293b9ac68997977739ac279f",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-point-verified1005/application-order-collections.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": "",
+        "expectedStdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "expectedExitCode": 0,
+        "expectedFault": null,
+        "passed": true
+      }
+    }
+  ]
+}

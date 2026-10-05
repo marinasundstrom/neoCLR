@@ -7,6 +7,19 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Value construction clears the ninth sample (2026-10-05)
+
+The unchanged `application-types` sample now compiles and executes with expected class
+identity and struct-copy behavior. Raven initializes value auto-properties through their
+owned backing fields, retaining the existing constructor verifier. The dual-target
+source-value probe validates initialization and copies on .NET and NeoCLR.
+
+Nine of ten original samples now have native compilation and runtime evidence. Next
+unblock `application-inheritance`: abstract base declarations, virtual/override slots and
+interface dispatch through that hierarchy. Keep the separately recorded ordinary .NET
+field-return candidate and editor/LSP release acceptance visible.
+[Value construction evidence](experiments/extended-cli-metadata/native-value-properties-2026-10-05.md).
+
 ## Async entry completion and remaining sample gate (2026-10-05)
 
 Native Task<unit>/Task<int> entries now drain registered work before observing the result;

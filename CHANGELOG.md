@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Validate native value auto-property construction through the unchanged types sample:
+  reference identity, struct mutation and collection copies produce the expected output.
+  Keep constructor receiver checks intact; Raven initializes only owned auto-property
+  backing fields directly. Nine of ten original POC samples now compile and execute;
+  inheritance remains the sample blocker. Record dual-target source-value evidence.
+
 - Record Raven's explicit native Task/builder/state-machine provider and first native
   async emission gate. Add a driver/runtime regression for completed/pending awaits,
   hoisted local preservation and cancellation; the unchanged cancellation sample also

@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "scope": "Ordinary-driver source value declarations, inline payloads, constructors, accessors, mutation and self copies. Not separate library import or source union emission.",
+  "driverSha256": "BD105EB4434BC07CA8F3B89E9127B2BB8C93BA63C7E9F5FED3BC51D0EABB67BE",
+  "runtimeSha256": "44AA42A38DFEB7AC66A5F1BCE4085FCD9DC3D0604E03C605072D46495CC8ACFD",
+  "coreSha256": "F85826C88FD3617FC357E6261A73B2BC745550E635D8130166AE09B61A72D1AD",
+  "results": [
+    {
+      "target": "dotnet",
+      "passed": true,
+      "assemblySha256": "06D5BB1F20FCEA48657CF34F12A5EAF48AEC869C49A901B6CB224615D6620C17",
+      "sourceSha256": "5E4AECE13E4DFC03DDB30D1337536E1ECFA71A67FADD36E6F51849E10F76F4C5"
+    },
+    {
+      "target": "neoclr",
+      "passed": true,
+      "assemblySha256": "59EFFD5BE72A0DBFDFC3A65012B7682C6C78C2005AA3DAE6A32AE62035711A3C",
+      "sourceSha256": "5E4AECE13E4DFC03DDB30D1337536E1ECFA71A67FADD36E6F51849E10F76F4C5"
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/point-driver-final1005/dotnet.dll",
+        "/tmp/point-driver-final1005/dotnet.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/point-driver-final1005/dotnet.rvn(16,17): warning RAV9006: \u0027number\u0027 needs an initial value. Set it in an initializer or on every normal constructor path.\n\n../../../../../../tmp/point-driver-final1005/dotnet.rvn(20,5): warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n\nBuild succeeded with 2 warning(s) in 1,4s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/point-driver-final1005/dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/point-driver-final1005/neoclr.dll",
+        "/tmp/point-driver-final1005/neoclr.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0908: Modifier \u0027public\u0027 is redundant because type members are public by default.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/point-driver-final1005/neoclr.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AFAA8F4253B1CB34FF6CBD4B453F9C3A4DCFB31A288EB8B03A77C6898F60F130: typed-stack/control-flow verification passed (658 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/point-driver-final1005/neoclr.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "-o",
+        "/tmp/point-driver-final1005/Rejected.dll",
+        "/tmp/point-driver-final1005/Rejected.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA003: Native metadata encoding failed: native boxing/value type tests require an explicit System core binding.\n"
+    }
+  ]
+}
