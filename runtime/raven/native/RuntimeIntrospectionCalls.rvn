@@ -1,0 +1,128 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func AssemblyMetadataToken(arg0: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func AssemblyModules(arg0: string) -> System.Introspection.ModuleInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func AssemblyName(arg0: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func AssemblyReferences(arg0: string) -> System.Introspection.AssemblyInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func AssemblyTypes(arg0: string) -> System.Introspection.TypeInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ExecutingAssembly() -> System.Introspection.AssemblyInfo;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func MemberCustomAttributes(arg0: System.Introspection.TypeInfo, arg1: int) -> System.Introspection.CustomAttributeData[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ModuleAssembly(arg0: string, arg1: string) -> System.Introspection.AssemblyInfo;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ModuleMetadataToken(arg0: string, arg1: string) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ModuleTypes(arg0: string, arg1: string) -> System.Introspection.TypeInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionArrayCreate(arg0: System.Introspection.TypeInfo, arg1: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionArrayGet(arg0: System.Object, arg1: int) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionArrayLength(arg0: System.Object) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionAssignable(arg0: System.RuntimeTypeHandle, arg1: System.RuntimeTypeHandle) -> bool;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionConstructArgs(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionConstructArgsCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionConstructorInvoke(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionConstructorInvokeCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionFieldGet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionFieldGetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionFieldSet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionFieldSetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionInvoke(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionInvokeCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionPropertyGet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?) -> System.Object;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionPropertyGetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionPropertySet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?) -> unit;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReflectionPropertySetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeBaseType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeConstructors(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.ConstructorInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeDeclaringType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeElementType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo>;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeEnumNames(arg0: System.RuntimeTypeHandle) -> string[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeEnumUnderlying(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeEnumValues(arg0: System.RuntimeTypeHandle) -> System.Object[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeFields(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.FieldInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeGenericArguments(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeInterfaces(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeMethods(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.MethodInfo[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeModule(arg0: System.RuntimeTypeHandle) -> System.Introspection.ModuleInfo;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func TypeProperties(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.PropertyInfo[];

@@ -151,8 +151,10 @@ pub(crate) fn adapter(
     }
     body.push(Op::CallVirtual(accessor.target));
     if setter {
-        if accessor.no_result {
+        if accessor.no_result && !service.no_result {
             body.push(Op::Void);
+        } else if !accessor.no_result && service.no_result {
+            body.push(Op::Pop);
         }
     } else {
         body.push(if reference_value {

@@ -1,0 +1,83 @@
+import System.*
+import System.Data.Json.*
+import System.Result.*
+
+public class Model {
+    private var name: string = ""
+    private var writes: int = 0
+    init() {
+        Console.WriteLine("Model constructed")
+    }
+    var Name: string {
+        get => name
+        set {
+            name = value
+            writes += 1
+            Console.WriteLine("Name assigned")
+        }
+    }
+    var Count: int { get; set; } = 0
+    var Active: bool { get; set; } = false
+    func Writes() -> int => writes
+}
+
+public class Batch {
+    init() { }
+    var Child: Model { get; set; } = Model()
+    var Values: int[] { get; set; } = []
+}
+
+func Main() -> int {
+    let text = "{\"Child\":{\"Name\":\"Café\",\"Count\":42,\"Active\":true},\"Values\":[1,2]}"
+    if let Ok(value) = JsonSerializer.Deserialize<Batch>(text) {
+        if value.Child.Name != "Café" || value.Child.Count != 42 || !value.Child.Active || value.Child.Writes() != 1 {
+            return 2
+        }
+        if value.Values.Length != 2 || value.Values[1] != 2 {
+            return 3
+        }
+        let same = value.Child
+        same.Count = 43
+        if value.Child.Count != 43 {
+            return 4
+        }
+        value.Values[0] = 9
+        if let Ok(encoded) = JsonSerializer.Serialize(value) {
+            if encoded != "{\"Child\":{\"Name\":\"Café\",\"Count\":43,\"Active\":true},\"Values\":[9,2]}" {
+                return 5
+            }
+        } else {
+            return 6
+        }
+        Console.WriteLine("Invalid input begins")
+        if JsonSerializer.Deserialize<Batch>("{\"Child\":{\"Name\":\"valid\",\"Count\":1,\"Active\":true},\"Values\":[\"bad\"]}") is Ok(_) {
+            return 12
+        }
+        Console.WriteLine("Invalid input ends")
+        if let Ok(jagged) = JsonSerializer.Deserialize<int[][]>("[[1,2],[]]") {
+            if jagged[0][1] != 2 || jagged[1].Length != 0 {
+                return 13
+            }
+            if let Ok(encoded) = JsonSerializer.Serialize(jagged) {
+                if encoded != "[[1,2],[]]" {
+                    return 14
+                }
+            } else {
+                return 15
+            }
+        } else {
+            return 16
+        }
+        if JsonSerializer.Deserialize<Batch>("{}") is Error(_) {
+            if JsonSerializer.Deserialize<int[]>("[1,\"bad\"]") is Error(_) {
+                Console.WriteLine("Native JSON object mapping passed")
+                return 42
+            }
+        }
+        return 7
+    }
+    if let Error(error) = JsonSerializer.Deserialize<Batch>(text) {
+        Console.WriteLine(error.ToString())
+    }
+    return 1
+}

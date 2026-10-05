@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Complete the source-built native JSON object-mapping gate: scoped introspection
+  descriptor materialization, managed snapshot arrays and real property setter calls
+  now execute through separate native libraries. Unchanged production mapping sources
+  and the existing sample pass, alongside nested objects, Boolean/int/string properties,
+  jagged arrays, shared mutation and pre-construction validation. Bootstrap dependencies
+  and the explicit 100-million-instruction acceptance budget are recorded; full-System
+  and HTTP integration remain separate milestones.
+
 - Preserve ordinary final reference classes with the CLI Sealed flag in manual
   definitions, builders, native readers and introspection; reject derived classes
   with sealed bases. Admit explicit canonical Boolean scalar ownership alongside

@@ -1,5 +1,12 @@
 # Strategy: compile the entire Raven-authored System library
 
+Latest checkpoint (2026-10-05): the [source-built native JSON mapping gate](source-json-mapping-2026-10-05.md)
+passes through separate artifacts, including production descriptors and real reflection
+construction/property execution. Capability batch 3 now has its selected executable
+proof point. Next reassess the cumulative source inventory and the HTTP/socket sample;
+full-System and .NET source-library parity remain open. Earlier frontier notes below
+are historical where superseded by this checkpoint.
+
 Author-directed reprioritization, 2026-10-04. This supersedes the API-by-API
 time-zone continuation in earlier roadmap entries. Individual APIs are acceptance
 consumers of shared capabilities, not the unit of prioritization.

@@ -10810,3 +10810,19 @@ identity properties now fail with RAV0330, independently of writer validation.
   no additional descriptor types were needed for this bounded gate. The compiler-facing
   marker remains bootstrap metadata until source-built core ownership is integrated.
   [Source declaration evidence](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
+
+### 2026-10-05 — Source-built native JSON mapping gate
+
+The author directed: “Continue work until you have solved JSON object mapping” and
+previously authorized necessary runtime library types. The assistant continued through
+metadata finality/Boolean ownership, portable conversion and accessor emission, then
+scoped runtime descriptor materialization and internal snapshot/service adapters.
+Production mapper/serializer/introspection sources and the earlier mapping sample were
+kept unchanged. Two artifact-only consumers now verify and execute with exact output;
+nested/jagged-array mapping, mutation/shared identity and rejection before model side
+effects are checked. [Commands, hashes, dependencies and scope](experiments/extended-cli-metadata/source-json-mapping-2026-10-05.md).
+
+This is an implemented native integration checkpoint, not a claim of full reflection,
+full-System, .NET library parity or HTTP completion. The assistant recorded the explicit
+bootstrap and instruction budget and proposed inventory/network reassessment next;
+no new author decision about that subsequent work is recorded here.

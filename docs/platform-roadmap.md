@@ -6,7 +6,10 @@ Source descriptor Object overrides also execute across separate native assemblie
 see [slot authoring and dispatch evidence](experiments/extended-cli-metadata/reference-object-overrides-2026-10-05.md).
 The unchanged BindingFlags source also compiles and executes through an artifact-only
 consumer; [flags evidence](experiments/extended-cli-metadata/flags-enums-2026-10-05.md).
-The production JSON mapping gate remains open.
+The [production JSON mapping gate](experiments/extended-cli-metadata/source-json-mapping-2026-10-05.md)
+now passes: unchanged source library, separate artifact-only consumers, nested objects,
+Boolean/string/int properties, arrays, shared mutation and validation before side effects.
+The earlier prerequisite notes below describe the path to this checkpoint.
 
 ## Active priority: full-System capability batches (2026-10-04)
 
@@ -71,23 +74,23 @@ The consumer returns 42, including number parsing, duplicate rejection and alias
 mutation. General lowering fixes are integrated into Raven main at `e1df355a2`.
 The [internal document codec gate](experiments/extended-cli-metadata/source-json-codec-2026-10-04.md)
 now also executes Unicode round trips, alias mutation and invalid-input/cycle rejection
-through unchanged source bodies. The public serializer/object mapper next needs an
-explicit introspection dependency and runtime-service catalog; follow the
+through unchanged source bodies. The public serializer/object mapper subsequently gained an
+explicit introspection dependency and runtime-service catalog through the
 [handle-first dependency sequence](experiments/extended-cli-metadata/introspection-native-next-2026-10-04.md).
 The [native typeof boundary](experiments/extended-cli-metadata/native-typeof-2026-10-04.md)
 now executes generic and external nominal tokens through a separately compiled test
-provider backed by the real TypeName service. Production descriptors/member reflection
-and public JSON object mapping are still open.
+provider backed by the real TypeName service. That earlier gate did not yet cover production descriptors/member reflection
+or public JSON object mapping; the new mapping checkpoint above now does.
 The [handle/reflection service gate](experiments/extended-cli-metadata/native-handle-reflection-2026-10-04.md)
 also proves identity, generic arguments, object-type lookup and real parameterless
-construction across native assemblies. Descriptor-returning service ownership remains
-the next dependency boundary. The metadata API now
+construction across native assemblies. That gate left descriptor-returning service
+ownership as its next dependency boundary. The metadata API now
 [authors bodyless runtime-service functions](experiments/extended-cli-metadata/internal-call-authoring-2026-10-05.md),
 including output-owned result types. Raven now admits explicit internal declarations
 and executes the [source-owned handle-service gate](experiments/extended-cli-metadata/source-internal-calls-2026-10-05.md).
 The first [source-owned module descriptor factory](experiments/extended-cli-metadata/source-module-descriptors-2026-10-05.md)
 also executes with assembly/module-scoped provider resolution. TypeInfo/member factories,
-production descriptor compilation and snapshot/vector ownership remain the next steps. The author reaffirmed on 2026-10-05 that reflection
+production descriptor compilation and owned snapshot arrays now execute in the JSON gate. The author reaffirmed on 2026-10-05 that reflection
 and JSON object mapping are the current proof point before expanding into sockets and
 HTTP. Reuse the internal-call/type-ownership foundation there, while validating network
 error, resource-lifetime and async contracts separately.
@@ -97,8 +100,8 @@ The focused JSON DocumentReader/JsonValue source group also requires the standal
 ReflectionError union in its explicit source dependencies; it does not yet require
 runtime introspection services.
 
-Next expand the verified text-service foundation into stream, storage and JSON sources, ordinary cross-assembly class inheritance,
-and the metadata-handle/introspection cluster. Expand remaining service families and
+Next reassess the cumulative source-library inventory after the native JSON mapping gate,
+then expand toward the existing socket/HTTP sample with explicit service ownership. Expand remaining service families and
 callback/storage/generic support from demonstrated failures. See the strategy's
 [current reassessment](experiments/extended-cli-metadata/system-compilation-strategy.md#current-reassessment-after-number-2026-10-04)
 for bounded gates and ordering.

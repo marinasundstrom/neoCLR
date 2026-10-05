@@ -5,6 +5,17 @@ use crate::{
     metadata_origin::{SourceAccess, member_access},
 };
 
+struct QueryContext<'a> {
+    module: &'a Module,
+    source: bool,
+}
+impl std::ops::Deref for QueryContext<'_> {
+    type Target = Module;
+    fn deref(&self) -> &Module {
+        self.module
+    }
+}
+
 #[derive(Clone, Copy)]
 pub(crate) enum Query {
     CustomAttributes,
@@ -85,6 +96,18 @@ impl Query {
         args: &[Value],
         limits: &Limits,
     ) -> Result<Value, Fault> {
+        self.invoke_profile(module, args, limits, false)
+    }
+
+    pub(crate) fn invoke_profile(
+        self,
+        module: &Module,
+        args: &[Value],
+        limits: &Limits,
+        source: bool,
+    ) -> Result<Value, Fault> {
+        let context = QueryContext { module, source };
+        let module = &context;
         let snapshot;
         let descriptor = if matches!(self, Self::CustomAttributes) {
             let Some(Value::ObjectReference(reference)) = args.first() else {
@@ -94,7 +117,8 @@ impl Query {
             let Value::Object { ty, fields } = &snapshot else {
                 return Err(Fault::new("invalid TypeInfo snapshot"));
             };
-            if ty.definition_name() != Some("System.Introspection.RuntimeNominalTypeInfo")
+            if crate::reflection_source::name(module, ty)
+                != Some("System.Introspection.RuntimeNominalTypeInfo")
                 || fields.len() != 1
             {
                 return Err(Fault::new("invalid TypeInfo provider"));
@@ -191,7 +215,7 @@ impl Query {
                     parent
                         .map(|d| {
                             crate::type_identity::describe_definition(module, d)
-                                .map(|v| wrap_type(module, v))
+                                .map(|v| snapshot_type(module, v))
                         })
                         .transpose()?,
                 )
@@ -373,7 +397,7 @@ impl Query {
                 handle
                     .generic_arguments
                     .iter()
-                    .map(|d| Ok(wrap_type(module, d.clone()))),
+                    .map(|d| Ok(snapshot_type(module, d.clone()))),
                 limits,
             ),
             Self::Interfaces => {
@@ -423,7 +447,7 @@ impl Query {
                                 "System.Introspection.FieldInfo",
                                 vec![
                                     Value::String(f.name.clone().into()),
-                                    wrap_type(module, (**handle).clone()),
+                                    snapshot_type(module, (**handle).clone()),
                                     type_value(
                                         module,
                                         &f.ty.substitute_type_parameters(arguments)?,
@@ -606,7 +630,7 @@ impl Query {
                                     "System.Introspection.PropertyInfo",
                                     vec![
                                         Value::String(p.name.into()),
-                                        wrap_type(module, (**handle).clone()),
+                                        snapshot_type(module, (**handle).clone()),
                                         type_value(module, &p.ty)?,
                                         Value::Boolean(!p.instance),
                                         Value::Boolean(getter.is_some()),
@@ -663,7 +687,7 @@ fn record(name: &str, fields: Vec<Value>) -> Value {
     }
 }
 fn attribute_data(
-    module: &Module,
+    module: &QueryContext,
     attribute: &crate::metadata::CustomAttribute,
     limits: &Limits,
 ) -> Result<Value, Fault> {
@@ -707,7 +731,7 @@ fn attribute_data(
 }
 
 fn member_record(
-    module: &Module,
+    module: &QueryContext,
     token: i32,
     name: &str,
     mut fields: Vec<Value>,
@@ -718,10 +742,11 @@ fn member_record(
     }
     Ok(record(name, fields))
 }
-fn type_contract(module: &Module) -> &'static str {
-    if module
-        .type_definition(&Type::from_name("System.Introspection.TypeInfo"))
-        .is_some_and(|d| d.representation == Representation::Interface)
+fn type_contract(module: &QueryContext) -> &'static str {
+    if module.source
+        || module
+            .type_definition(&Type::from_name("System.Introspection.TypeInfo"))
+            .is_some_and(|d| d.representation == Representation::Interface)
     {
         "System.Introspection.TypeInfo"
     } else {
@@ -729,18 +754,38 @@ fn type_contract(module: &Module) -> &'static str {
     }
 }
 pub(crate) fn wrap_type(module: &Module, descriptor: TypeDescriptor) -> Value {
+    snapshot_type(
+        &QueryContext {
+            module,
+            source: false,
+        },
+        descriptor,
+    )
+}
+fn snapshot_type(module: &QueryContext, descriptor: TypeDescriptor) -> Value {
     record(
         type_contract(module),
         vec![Value::RuntimeTypeHandle(Box::new(descriptor))],
     )
 }
-fn type_value(module: &Module, ty: &Type) -> Result<Value, Fault> {
-    Ok(wrap_type(
+fn type_value(module: &QueryContext, ty: &Type) -> Result<Value, Fault> {
+    Ok(snapshot_type(
         module,
         crate::type_identity::describe_loaded(module, ty)?,
     ))
 }
-fn option(module: &Module, name: &str, value: Option<Value>) -> Result<Value, Fault> {
+fn option(module: &QueryContext, name: &str, value: Option<Value>) -> Result<Value, Fault> {
+    if module.source {
+        // A private snapshot recipe, consumed before any value reaches guest code.
+        // The expected signature supplies the scoped Option/case identities.
+        return Ok(record(
+            "$ReflectionSnapshot.Option",
+            match value {
+                Some(value) => vec![Value::Boolean(true), value],
+                None => vec![Value::Boolean(false)],
+            },
+        ));
+    }
     let element = crate::assembler::parse_type(name)?;
     let ty = Type::Constructed {
         definition: "System.Option".into(),
@@ -824,7 +869,7 @@ fn has_method_metadata(module: &Module, f: &Function) -> bool {
 // Keep the independent CLI parameter tables explicit at this metadata boundary.
 #[allow(clippy::too_many_arguments)]
 fn parameters(
-    module: &Module,
+    module: &QueryContext,
     function: Option<&Function>,
     declaring_type: &Type,
     member_kind: i32,
@@ -901,7 +946,7 @@ fn parameters(
     )
 }
 fn method(
-    module: &Module,
+    module: &QueryContext,
     owner: &Type,
     f: &Function,
     arguments: &[Type],
@@ -1025,6 +1070,11 @@ pub(crate) fn bound_function(
     target: &Function,
     limits: &Limits,
 ) -> Result<Value, Fault> {
+    let context = QueryContext {
+        module,
+        source: false,
+    };
+    let module = &context;
     let owner = target.owner.as_ref().unwrap_or(&binding.ty);
     // A module function has no nominal owner. Use the shape only as the internal
     // parameter identity key, and clear the public declaring type below.
@@ -1155,6 +1205,9 @@ pub(crate) fn materialize_result(
     value: Value,
     expected: &Type,
 ) -> Result<Value, Fault> {
+    if crate::reflection_source::uses_source(module, expected) {
+        return crate::reflection_source::materialize(module, heap, limits, value, expected);
+    }
     if expected != &Type::from_name("System.Introspection.ModuleInfo")
         && matches!(&value, Value::Object { ty, .. } if ty == &Type::from_name("System.Introspection.ModuleInfo"))
     {

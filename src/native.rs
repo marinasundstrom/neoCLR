@@ -102,8 +102,60 @@ pub(crate) fn bind_in(module: &crate::Module, function: &Function) -> Result<Bin
         && function.returns != Type::from_name("System.Introspection.ModuleInfo")
     {
         crate::reflection::source_module_provider(module, &function.returns)?;
+    }
+    // Normalize only the descriptive service ABI, using the identities named in
+    // this declaration. The actual function signature remains scoped and is used
+    // when materializing its result; this never aliases the loaded type catalog.
+    fn descriptive(module: &crate::Module, ty: &Type) -> Type {
+        match ty {
+            Type::Array(element) => Type::Array(Box::new(descriptive(module, element))),
+            Type::ArrayRef(element) => Type::ArrayRef(Box::new(descriptive(module, element))),
+            Type::Named(_) | Type::Constructed { .. } => {
+                let Some(origin) = module.type_definition(ty).and_then(|d| d.origin.as_ref())
+                else {
+                    return ty.clone();
+                };
+                let name = origin.name.trim_end_matches("`1");
+                if !(name.starts_with("System.Introspection.") || name == "System.Option") {
+                    return ty.clone();
+                }
+                if ty.generic_arguments().is_empty() {
+                    Type::from_name(name)
+                } else {
+                    Type::Constructed {
+                        definition: name.into(),
+                        arguments: ty
+                            .generic_arguments()
+                            .iter()
+                            .map(|t| descriptive(module, t))
+                            .collect(),
+                    }
+                }
+            }
+            _ => ty.clone(),
+        }
+    }
+    let reflection = crate::reflection::Query::binding(&function.name).is_some();
+    let assembly = crate::assembly_info::Query::binding(&function.name).is_some();
+    let relevant = reflection
+        || assembly
+        || matches!(
+            function.name.as_str(),
+            "neoCLR.Runtime.ExecutingAssembly" | "neoCLR.Runtime.ReflectionArrayCreate"
+        );
+    if relevant {
         let mut contract = function.clone();
-        contract.returns = Type::from_name("System.Introspection.ModuleInfo");
+        contract.parameters = function
+            .parameters
+            .iter()
+            .map(|t| descriptive(module, t))
+            .collect();
+        contract.returns = descriptive(module, &function.returns);
+        if reflection || assembly {
+            if let Type::ArrayRef(element) = contract.returns {
+                contract.returns = Type::Array(element);
+            }
+        }
         bind(&contract)
     } else {
         bind(function)
@@ -114,22 +166,43 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
     if !function.is_internal_call() || function.instance || function.owner.is_some() {
         return Err(Fault::new("native binding requires InternalCall metadata"));
     }
-    if matches!(function.name.as_str(), "neoCLR.Runtime.GetDefaultTaskQueue" | "neoCLR.Runtime.GetCurrentTaskQueue" | "neoCLR.Runtime.RegisterTaskQueue") {
+    if matches!(
+        function.name.as_str(),
+        "neoCLR.Runtime.GetDefaultTaskQueue"
+            | "neoCLR.Runtime.GetCurrentTaskQueue"
+            | "neoCLR.Runtime.RegisterTaskQueue"
+    ) {
         let parameter = match function.generic_arguments.as_slice() {
             [] => Type::MethodTypeParameter(0),
             [argument] => argument.clone(),
             _ => return Err(Fault::new("task queue service requires one type argument")),
         };
         let register = function.name == "neoCLR.Runtime.RegisterTaskQueue";
-        if function.generic_parameters.len() != 1 || !function.generic_constraints.is_empty()
-            || function.no_result || function.parameters != if register { vec![parameter.clone()] } else { vec![] }
+        if function.generic_parameters.len() != 1
+            || !function.generic_constraints.is_empty()
+            || function.no_result
+            || function.parameters
+                != if register {
+                    vec![parameter.clone()]
+                } else {
+                    vec![]
+                }
             || function.returns != if register { Type::Void } else { parameter }
         {
             return Err(Fault::new("invalid generic task queue service signature"));
         }
-        return Ok(if register { Binding::GenericRegisterTaskQueue }
-            else if function.name == "neoCLR.Runtime.GetDefaultTaskQueue" { Binding::GenericDefaultTaskQueue }
-            else { Binding::GenericCurrentTaskQueue });
+        return Ok(if register {
+            Binding::GenericRegisterTaskQueue
+        } else if function.name == "neoCLR.Runtime.GetDefaultTaskQueue" {
+            Binding::GenericDefaultTaskQueue
+        } else {
+            Binding::GenericCurrentTaskQueue
+        });
+    }
+    if function.no_result && function.name != "neoCLR.Runtime.ReflectionPropertySet" {
+        return Err(Fault::new(
+            "native service does not support no-result execution",
+        ));
     }
     if let Some((operation, arity)) = crate::math::Operation::binding(&function.name) {
         if function.parameters != vec![Type::Double; arity] || function.returns != Type::Double {
@@ -265,7 +338,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             Type::from_name("System.Object")
         };
-        if function.parameters != expected || function.returns != returns || function.no_result {
+        if function.parameters != expected
+            || function.returns != returns
+            || (function.no_result && (!setter || check))
+        {
             return Err(Fault::new("reflection property binding signature mismatch"));
         }
         return Ok(if check {
@@ -1298,7 +1374,9 @@ mod task_callback_tests {
             ("RegisterTaskQueue<T>(Int32 queue) -> Void", false),
             ("RegisterTaskQueue<T>(T queue) -> noresult", false),
         ] {
-            let module = crate::assemble(&format!(".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"));
+            let module = crate::assemble(&format!(
+                ".module Test\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+            ));
             assert_eq!(module.is_ok(), accepted, "{signature}");
         }
     }
@@ -1315,6 +1393,33 @@ mod task_callback_tests {
                 ".module Test\n.function neoCLR.Runtime.ScheduleTask({callback} callback) -> Void\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(module.is_ok(), accepted, "{callback}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod reflection_signature_tests {
+    #[test]
+    fn only_property_setter_admits_no_result_service_execution() {
+        for (signature, accepted) in [
+            (
+                "ReflectionPropertySet(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
+                true,
+            ),
+            (
+                "ReflectionPropertySetCheck(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
+                false,
+            ),
+            (
+                "ReflectionPropertyGet(RuntimeTypeHandle owner, Int32 token, System.Object receiver) -> noresult",
+                false,
+            ),
+            ("WriteLine(String text) -> noresult", false),
+        ] {
+            let result = crate::assemble(&format!(
+                ".module Test\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+            ));
+            assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
         }
     }
 }

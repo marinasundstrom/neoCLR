@@ -15,7 +15,9 @@ pub(crate) fn adapter(
         let Value::ObjectReference(info) = &args[0] else {
             return Err(Fault::new("array construction requires runtime TypeInfo"));
         };
-        if info.concrete_type() != Type::from_name("System.Introspection.RuntimeTypeInfo") {
+        if crate::reflection_source::name(module, &info.concrete_type())
+            != Some("System.Introspection.RuntimeTypeInfo")
+        {
             return Err(Fault::new("array construction requires runtime TypeInfo"));
         }
         let Value::Object { fields, .. } = info.reference.read()? else {

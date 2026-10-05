@@ -1,0 +1,177 @@
+import System.*
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+namespace System.Runtime.CompilerServices
+
+// Native adapter additions; seed-owned primitives remain on the selected bootstrap.
+internal extension IntrospectionRuntimeServices for RuntimeServices {
+    static func AssemblyMetadataToken(arg0: string) -> int {
+        return neoCLR.Runtime.AssemblyMetadataToken(arg0)
+    }
+
+    static func AssemblyModules(arg0: string) -> System.Introspection.ModuleInfo[] {
+        return neoCLR.Runtime.AssemblyModules(arg0)
+    }
+
+    static func AssemblyName(arg0: string) -> string {
+        return neoCLR.Runtime.AssemblyName(arg0)
+    }
+
+    static func AssemblyReferences(arg0: string) -> System.Introspection.AssemblyInfo[] {
+        return neoCLR.Runtime.AssemblyReferences(arg0)
+    }
+
+    static func AssemblyTypes(arg0: string) -> System.Introspection.TypeInfo[] {
+        return neoCLR.Runtime.AssemblyTypes(arg0)
+    }
+
+    static func ExecutingAssembly() -> System.Introspection.AssemblyInfo {
+        return neoCLR.Runtime.ExecutingAssembly()
+    }
+
+    static func MemberCustomAttributes(arg0: System.Introspection.TypeInfo, arg1: int) -> System.Introspection.CustomAttributeData[] {
+        return neoCLR.Runtime.MemberCustomAttributes(arg0, arg1)
+    }
+
+    static func ModuleAssembly(arg0: string, arg1: string) -> System.Introspection.AssemblyInfo {
+        return neoCLR.Runtime.ModuleAssembly(arg0, arg1)
+    }
+
+    static func ModuleMetadataToken(arg0: string, arg1: string) -> int {
+        return neoCLR.Runtime.ModuleMetadataToken(arg0, arg1)
+    }
+
+    static func ModuleTypes(arg0: string, arg1: string) -> System.Introspection.TypeInfo[] {
+        return neoCLR.Runtime.ModuleTypes(arg0, arg1)
+    }
+
+    static func ReflectionArrayCreate(arg0: System.Introspection.TypeInfo, arg1: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionArrayCreate(arg0, arg1)
+    }
+
+    static func ReflectionArrayGet(arg0: System.Object, arg1: int) -> System.Object {
+        return neoCLR.Runtime.ReflectionArrayGet(arg0, arg1)
+    }
+
+    static func ReflectionArrayLength(arg0: System.Object) -> int {
+        return neoCLR.Runtime.ReflectionArrayLength(arg0)
+    }
+
+    static func ReflectionAssignable(arg0: System.RuntimeTypeHandle, arg1: System.RuntimeTypeHandle) -> bool {
+        return neoCLR.Runtime.ReflectionAssignable(arg0, arg1)
+    }
+
+    static func ReflectionConstructArgs(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionConstructArgs(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionConstructArgsCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int {
+        return neoCLR.Runtime.ReflectionConstructArgsCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionConstructorInvoke(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionConstructorInvoke(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionConstructorInvokeCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int {
+        return neoCLR.Runtime.ReflectionConstructorInvokeCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionFieldGet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionFieldGet(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionFieldGetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int {
+        return neoCLR.Runtime.ReflectionFieldGetCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionFieldSet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionFieldSet(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionFieldSetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int {
+        return neoCLR.Runtime.ReflectionFieldSetCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionInvoke(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> System.Object {
+        return neoCLR.Runtime.ReflectionInvoke(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionInvokeCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?[]) -> int {
+        return neoCLR.Runtime.ReflectionInvokeCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionPropertyGet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?) -> System.Object {
+        return neoCLR.Runtime.ReflectionPropertyGet(arg0, arg1, arg2)
+    }
+
+    static func ReflectionPropertyGetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?) -> int {
+        return neoCLR.Runtime.ReflectionPropertyGetCheck(arg0, arg1, arg2)
+    }
+
+    static func ReflectionPropertySet(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?) -> unit {
+        neoCLR.Runtime.ReflectionPropertySet(arg0, arg1, arg2, arg3)
+    }
+
+    static func ReflectionPropertySetCheck(arg0: System.RuntimeTypeHandle, arg1: int, arg2: Object?, arg3: Object?) -> int {
+        return neoCLR.Runtime.ReflectionPropertySetCheck(arg0, arg1, arg2, arg3)
+    }
+
+    static func TypeBaseType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo> {
+        return neoCLR.Runtime.TypeBaseType(arg0)
+    }
+
+    static func TypeConstructors(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.ConstructorInfo[] {
+        return neoCLR.Runtime.TypeConstructors(arg0, arg1)
+    }
+
+    static func TypeDeclaringType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo> {
+        return neoCLR.Runtime.TypeDeclaringType(arg0)
+    }
+
+    static func TypeElementType(arg0: System.RuntimeTypeHandle) -> System.Option<System.Introspection.TypeInfo> {
+        return neoCLR.Runtime.TypeElementType(arg0)
+    }
+
+    static func TypeEnumNames(arg0: System.RuntimeTypeHandle) -> string[] {
+        return neoCLR.Runtime.TypeEnumNames(arg0)
+    }
+
+    static func TypeEnumUnderlying(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo {
+        return neoCLR.Runtime.TypeEnumUnderlying(arg0)
+    }
+
+    static func TypeEnumValues(arg0: System.RuntimeTypeHandle) -> System.Object[] {
+        return neoCLR.Runtime.TypeEnumValues(arg0)
+    }
+
+    static func TypeFields(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.FieldInfo[] {
+        return neoCLR.Runtime.TypeFields(arg0, arg1)
+    }
+
+    static func TypeGenericArguments(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[] {
+        return neoCLR.Runtime.TypeGenericArguments(arg0)
+    }
+
+    static func TypeInfo(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo {
+        return System.Introspection.RuntimeTypeInfo.FromHandle(arg0)
+    }
+
+    static func TypeInterfaces(arg0: System.RuntimeTypeHandle) -> System.Introspection.TypeInfo[] {
+        return neoCLR.Runtime.TypeInterfaces(arg0)
+    }
+
+    static func TypeMethods(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.MethodInfo[] {
+        return neoCLR.Runtime.TypeMethods(arg0, arg1)
+    }
+
+    static func TypeModule(arg0: System.RuntimeTypeHandle) -> System.Introspection.ModuleInfo {
+        return neoCLR.Runtime.TypeModule(arg0)
+    }
+
+    static func TypeProperties(arg0: System.RuntimeTypeHandle, arg1: int) -> System.Introspection.PropertyInfo[] {
+        return neoCLR.Runtime.TypeProperties(arg0, arg1)
+    }
+
+}

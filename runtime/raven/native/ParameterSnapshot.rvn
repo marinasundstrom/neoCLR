@@ -1,0 +1,17 @@
+namespace System.Runtime.CompilerServices
+
+import System.Introspection.*
+
+// Immutable native metadata snapshot. The runtime factory owns its backing array;
+// no API exposes the array or permits mutation of its slots.
+internal class ParameterSnapshot {
+    private val items: ParameterInfo[]
+
+    private init(items: ParameterInfo[]) {
+        self.items = items
+    }
+
+    val Length: int => items.Length
+
+    func Get(index: int) -> ParameterInfo => items[index]
+}

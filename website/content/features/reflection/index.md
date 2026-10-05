@@ -84,3 +84,14 @@ with preparation, repeated construction and rejection checks. The [attributed HT
 combines this execution support with startup schema validation and cached route bindings.
 See [constructor execution](xref:System.Runtime.Reflection.ConstructorReflectionExtensions)
 for signatures and limitations.
+
+## Native source-library integration (development)
+
+The development Raven/NeoCLR integration now compiles the production JSON mapper and
+introspection sources into a native library and executes separately compiled consumers.
+The checked gate covers nested object construction, real property setters, Boolean, text and
+integer values, arrays, shared-object mutation and validation before model side effects.
+Source-owned descriptors resolve within their selected assembly/module; bootstrap and
+runtime-service dependencies remain explicit. This is development integration evidence,
+not full-System, .NET library parity or HTTP-stack completion. The existing public API
+contracts above remain unchanged.

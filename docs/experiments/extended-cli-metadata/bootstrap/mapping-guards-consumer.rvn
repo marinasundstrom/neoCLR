@@ -3,6 +3,11 @@ import System.Result.*
 import Guards.*
 
 func Main() -> int {
+    if Operations.Combined(20, 22) != 42 { return 8 }
+    if Operations.Combined("bad", 22) != 7 { return 9 }
+    if Operations.Combined(20, "bad") != 7 { return 10 }
+    let text = "same"
+    if Operations.Hash(text) != Operations.Hash(text) { return 11 }
     if Operations.NullGuard() != 7 { return 1 }
     if Operations.Guard(true) != 11 { return 2 }
     if Operations.Guard(false) != 12 { return 3 }

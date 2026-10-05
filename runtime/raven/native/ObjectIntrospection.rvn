@@ -1,0 +1,10 @@
+namespace System
+
+import System.Introspection.*
+import System.Runtime.CompilerServices.*
+
+internal extension ObjectIntrospection for Object {
+    func GetType() -> TypeInfo {
+        return RuntimeTypeInfo.FromHandle(RuntimeServices.ObjectTypeHandle(self))
+    }
+}

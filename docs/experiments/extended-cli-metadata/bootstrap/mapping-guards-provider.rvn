@@ -3,6 +3,11 @@ import System.Result.*
 namespace Guards
 
 public class Operations {
+    static func Combined(value: object, other: object) -> int {
+        if value is int first && other is int second { return first + second }
+        return 7
+    }
+    static func Hash(value: string) -> int => value.GetHashCode()
     static func NullGuard() -> int => Guard(null)
     static func Guard(value: object?) -> int {
         let present: object = value ?? return 7

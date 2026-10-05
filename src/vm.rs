@@ -614,14 +614,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     && !value_receiver)
                 || (function.is_override && !class_owner && !value_receiver)
                 || (function.is_abstract && !nominal_interface_contract && !class_owner)
-                || function.is_internal_call()
                 || function.pinvoke.is_some()
                 || (!value_receiver
                     && !class_owner
                     && !function.interface_implementations.is_empty()))
         {
             return Err(Fault::new(
-                "no-result methods require IL bodies with Void metadata and static, class or by-reference value receivers",
+                "no-result methods require Void metadata and static, class or by-reference value receivers",
             ));
         }
         if !function.namespace.is_empty()
@@ -3786,6 +3785,13 @@ fn interpret_instructions_with_dispatch(
                             scheduler.sockets.invoke(operation, &args, heap)?
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             scheduler.workers.start(module, args, options, pooled)?
+                        } else if let crate::native::Binding::Reflection(query) = binding {
+                            query.invoke_profile(
+                                module,
+                                &args,
+                                &limits,
+                                crate::reflection_source::uses_source(module, &callee.returns),
+                            )?
                         } else if matches!(binding, crate::native::Binding::NotifyWorker) {
                             if default_task_queue.is_none() {
                                 return Err(Fault::new(
@@ -3820,7 +3826,9 @@ fn interpret_instructions_with_dispatch(
                             value
                         };
                         expect(&value, &callee.returns)?;
-                        frame.stack.push(value);
+                        if !callee.no_result {
+                            frame.stack.push(value);
+                        }
                     } else {
                         if frames.len() >= limits.frames {
                             return Err(Fault::coded(

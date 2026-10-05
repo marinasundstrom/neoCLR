@@ -48,6 +48,7 @@ mod program;
 mod reachability;
 mod references;
 mod reflection;
+mod reflection_source;
 mod reflection_arrays;
 mod reflection_execution;
 mod reflection_members;

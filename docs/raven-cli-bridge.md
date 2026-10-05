@@ -5817,3 +5817,16 @@ JSON validation distinguishes these from open and abstract classes. Explicit Boo
 primitive ownership uses the existing scalar representation; it neither adds a new
 element code nor changes the .NET backend. C# contract tests cover builder/manual
 parity, CLR finality, native facade round trips and invalid bases.
+
+### Source-built JSON mapping execution (2026-10-05)
+
+The [artifact-only JSON gate](experiments/extended-cli-metadata/source-json-mapping-2026-10-05.md)
+now passes using production sources and source-owned descriptors. Runtime snapshots are
+materialized against scoped service result signatures, including owned arrays and the
+internal ParameterSnapshot adapter; property setters execute through exact InternalCall
+contracts. Raven preserves finality, explicit auto-accessors and bound conversion calls.
+Boolean and typeof ownership are explicitly selected in the generated manifest. The
+primitive core and retained seed remain bootstrap dependencies, with no CLI fallback
+for application libraries. Compiler commit 8f015386e and metadata df6d8e51 are required.
+The linked record includes commands, hashes, .NET controls and the explicit execution
+budget; it supersedes the earlier statements that production mapping remains open.

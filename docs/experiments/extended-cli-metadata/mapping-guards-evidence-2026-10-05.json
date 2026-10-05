@@ -1,22 +1,22 @@
 {
-  "runtimeRevision": "d2c022463e67a7e2d3dd1c8c4cd71b17817803fe",
-  "compilerRevision": "b549637f3681573e00902c1c65feb81591373d75",
+  "runtimeRevision": "3232172257082069b24bc870ba51f15b3f694750",
+  "compilerRevision": "f8ce3f5136500cdfb78f505aa58dbe57e3fda435",
   "scope": "Native mapping-guards import: empty/expanded calls and an existing array return 42. JSON mapping remains open.",
   "hashes": {
     "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/verify_mapping_guards.py": "84559ef78aeeaa392209eaaabafe3727c4791fa8f93e908d9dc6323b5687c5da",
-    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "1cf34f04d532a4dbbf593e26ee760866cce07f5af18f46b2e87519b57cbf78d9",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "cbcee328bc1c45e3c3ccee11d3c9f5048f8545cdd4c82cfbf555a97e96a605e8",
     "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "ac2e463c4fe0b616b73f704bfcdf9d7584b8d6cc071dc7c7eae909f1545ec48f",
     "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
     "/private/tmp/introspection-seed-params1005.neox": "5e41c860b23faec997f9ca2b108295b1fc8b346c1b76ca9b917e05f8517447da",
     "/private/tmp/source-text-committed1004/ownership.json": "dd0e0595e07dbcc4c8c24aed370f0b17617424388e63782a9ddf5bdc30db8cf0",
     "/private/tmp/source-text-committed1004/Numbers.dll": "a553e44550f9e8f90d60900cc43c94e7519de76e46dde07f3036f5daf90a6a7e",
-    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-provider.rvn": "e2f0cd17c65398685c8c5ff7f3286dab492573cd77dadb6ec8690c257ff2d18c",
-    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-consumer.rvn": "ac476e794c8105aecc453d31c4c5ce8c01abb138477877140adbc165bc207b75",
-    "/private/tmp/guards-gate1005d/MappingGuards.dll": "a17f6679cc4adfecb3b45ebbcdf5677953567346c5c5bf5b3781cbfa62d9db11",
-    "/private/tmp/guards-gate1005d/Consumer.dll": "c020a1694a937392530234bd2dc13c95b09e71f0da5a81dcaa8643d20abe2e47",
-    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "89032fa177a2872be1312b486f2559df5989fb38c799dd8ec6627f376d0a3509",
-    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "8363ee68b26eddc6c026015b31845de845056bffc8dcc946dab292f4a1c62d0b",
-    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "70709178982d761dda7f62c009b0c6fe0d0b2abfd03e8bd7d67dc4f30d99a101"
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-provider.rvn": "a805335d0f907d96dbbc6974e525cf9adcbb06e4aa6cffe2b8838a373f745f96",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-consumer.rvn": "84840b11a19c70871df2463e14b9678869782bf83a87b0803afcbc6cdfd635d3",
+    "/private/tmp/guards-gate1005e/MappingGuards.dll": "ad414b5723c6fd5d1a562a3600eb60f4ad5b90c7d305ebaf0bcd80f8b628df4e",
+    "/private/tmp/guards-gate1005e/Consumer.dll": "d314874c5b98641561ed109baacafd39b035c11f31eb72e21ae35f925d5cbc09",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "8a6a0217f76c9b2e0d352cd9d1d1836f12cc526cb571217ac17eb2737f327c01",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "cb21587221b98a3156c89c194ccac7965d86b8774dd065a85b821cb73bb56948",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "f88b834b12aa2a5a707cb8b2c2b40008be32cea31d78a1cbc7a6291a012c6b27"
   },
   "commands": [
     {
@@ -35,7 +35,7 @@
         "/private/tmp/source-text-committed1004/Numbers.dll",
         "--library",
         "-o",
-        "/private/tmp/guards-gate1005d/MappingGuards.dll",
+        "/private/tmp/guards-gate1005e/MappingGuards.dll",
         "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-provider.rvn"
       ],
       "exitCode": 0,
@@ -57,9 +57,9 @@
         "--reference",
         "/private/tmp/source-text-committed1004/Numbers.dll",
         "--reference",
-        "/private/tmp/guards-gate1005d/MappingGuards.dll",
+        "/private/tmp/guards-gate1005e/MappingGuards.dll",
         "-o",
-        "/private/tmp/guards-gate1005d/Consumer.dll",
+        "/private/tmp/guards-gate1005e/Consumer.dll",
         "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/mapping-guards-consumer.rvn"
       ],
       "exitCode": 0,
@@ -70,25 +70,25 @@
       "command": [
         "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
         "verify",
-        "/private/tmp/guards-gate1005d/Consumer.dll",
+        "/private/tmp/guards-gate1005e/Consumer.dll",
         "--module",
-        "/private/tmp/guards-gate1005d/MappingGuards.dll",
+        "/private/tmp/guards-gate1005e/MappingGuards.dll",
         "--module",
         "/private/tmp/source-text-committed1004/Numbers.dll",
         "--system",
         "/private/tmp/introspection-seed-params1005.neox"
       ],
       "exitCode": 0,
-      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (678 IL functions; maximum stack 6; runtime value checks remain)\n",
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (680 IL functions; maximum stack 6; runtime value checks remain)\n",
       "stderr": ""
     },
     {
       "command": [
         "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
         "run",
-        "/private/tmp/guards-gate1005d/Consumer.dll",
+        "/private/tmp/guards-gate1005e/Consumer.dll",
         "--module",
-        "/private/tmp/guards-gate1005d/MappingGuards.dll",
+        "/private/tmp/guards-gate1005e/MappingGuards.dll",
         "--module",
         "/private/tmp/source-text-committed1004/Numbers.dll",
         "--system",

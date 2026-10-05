@@ -285,7 +285,8 @@ fn member(
             // validated declaration origin supplies the corresponding member name.
             if matches!(
                 owner,
-                Type::SByte
+                Type::Boolean
+                    | Type::SByte
                     | Type::Byte
                     | Type::Int16
                     | Type::UInt16
@@ -560,9 +561,10 @@ fn select(module: &Module, concrete: &Type, contract: &Function) -> Result<Funct
             .type_definition(concrete)
             .is_some_and(|d| d.is_abstract)
     {
-        return Err(Fault::new(
-            "interface implementation member not found or reabstracted",
-        ));
+        return Err(Fault::new(format!(
+            "interface implementation member not found or reabstracted: {concrete:?} -> {}",
+            contract.name
+        )));
     }
     // Existing abstract records must still supply an explicit abstract class contract
     // when no interface default or replacement participates.
@@ -697,10 +699,17 @@ pub(crate) fn validate(module: &Module) -> Result<(), Fault> {
         for interface in &definition.implements {
             let parent = interface_definition(module, interface)?;
             if parent.is_closed_hierarchy
-                && !definition.definition.as_ref().zip(parent.definition.as_ref())
-                    .is_some_and(|(child, root)| child.module == root.module && child.revision == root.revision)
+                && !definition
+                    .definition
+                    .as_ref()
+                    .zip(parent.definition.as_ref())
+                    .is_some_and(|(child, root)| {
+                        child.module == root.module && child.revision == root.revision
+                    })
             {
-                return Err(Fault::new("closed interface hierarchy cannot be extended outside its defining assembly"));
+                return Err(Fault::new(
+                    "closed interface hierarchy cannot be extended outside its defining assembly",
+                ));
             }
             if !seen.insert(interface) {
                 return Err(Fault::new("duplicate interface implementation"));
