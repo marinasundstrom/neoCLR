@@ -32,11 +32,31 @@ internal static class ObjectSlotChecks
             else il.Emit(OpCode.Ldc_Bool, false);
             il.Return();
         }
+        var boxed = graph.AddFunction("BoxedDisplay", new MethodSignature(PrimitiveType.String, []));
+        var body = boxed.GetILGenerator();
+        body.LoadConstant(42);
+        body.Box(PrimitiveType.Int32);
+        body.Emit(OpCode.Isinst, (SignatureType)PrimitiveType.Int32);
+        body.CallVirtual(root.Methods.Single(m => m.Name == "ToString"));
+        body.Return();
         return graph;
     }
 
     internal static void Run()
     {
+        var incomplete = new AssemblyBuilder(new("IncompleteRoot", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
+        if (incomplete.ObjectType.ImportedType != incomplete.CoreObjectType)
+            throw new Exception("default Object identity changed");
+        var incompleteRoot = incomplete.AddNativeObjectRoot();
+        if (incomplete.ObjectType.ClassType != incompleteRoot)
+            throw new Exception("authored root was not selected for Object signatures");
+        var box = incomplete.AddFunction("Box", new MethodSignature(incomplete.ObjectType, []));
+        box.GetILGenerator().LoadConstant(1); box.GetILGenerator().Box(PrimitiveType.Int32); box.GetILGenerator().Return();
+        Reject<InvalidDataException>(() => incomplete.WriteNativeAssembly());
+        var mixed = Create();
+        var wrongBox = mixed.AddFunction("WrongBox", new MethodSignature(mixed.CoreObjectType, []));
+        wrongBox.GetILGenerator().LoadConstant(1); wrongBox.GetILGenerator().Box(PrimitiveType.Int32); wrongBox.GetILGenerator().Return();
+        Reject<InvalidDataException>(() => mixed.WriteNativeAssembly());
         var calls = Create();
         var root = calls.Types[0];
         var display = calls.AddFunction("Display", new MethodSignature(PrimitiveType.String, [root]));
@@ -58,7 +78,7 @@ internal static class ObjectSlotChecks
                 if ((method.Attributes & 0x540) != 0x140) throw new Exception("native root slot lost Virtual/NewSlot flags");
             using var pe = new PEReader(new MemoryStream(image));
             var reader = pe.GetMetadataReader();
-            foreach (var handle in reader.MethodDefinitions)
+            foreach (var handle in reader.TypeDefinitions.Select(reader.GetTypeDefinition).Single(t => reader.GetString(t.Name) == "Object").GetMethods())
                 if (((int)reader.GetMethodDefinition(handle).Attributes & 0x540) != 0x140)
                     throw new Exception("CLI projection changed root slots into overrides or abstract methods");
             // Exercise the native-reader-to-projection path as well as graph emission.
@@ -70,7 +90,7 @@ internal static class ObjectSlotChecks
             var foreign = Create().Types[0];
             Reject<InvalidOperationException>(() => graph.Types[0].AddNativeObjectSlot("Equals", new(PrimitiveType.Boolean, [foreign])));
             var malformed = JsonNode.Parse(graph.WriteNativeAssembly())!;
-            malformed["functions"]![0]!["is_abstract"] = true;
+            malformed["functions"]![1]!["is_abstract"] = true;
             Reject<InvalidDataException>(() => NativeAssemblyDefinition.ReadAssembly(System.Text.Encoding.UTF8.GetBytes(malformed.ToJsonString())));
         }
     }

@@ -34,6 +34,21 @@ public sealed partial class TypeDefinition
 
 public sealed partial class AssemblyBuilder
 {
+    /// <summary>Gets the output's designated native Object root signature, or its explicit bootstrap Object reference.</summary>
+    /// <remarks>Declare a native root before constructing signatures. CoreObjectType always retains its bootstrap meaning.
+    /// This selects authoring identity only; runtime admission still requires explicit host configuration.</remarks>
+    public SignatureType ObjectType => NativeObjectRoot is { } root ? root : CoreObjectType;
+
+    internal TypeBuilder? NativeObjectRoot => types.SingleOrDefault(t => t.IsNativeObjectRoot);
+
+    internal void ValidateNativeObjectSlots()
+    {
+        var root = NativeObjectRoot ?? throw new InvalidDataException("no authored native Object root");
+        foreach (var name in new[] { "ToString", "Equals", "GetHashCode" })
+            if (!root.Methods.Any(m => m.IsNativeObjectSlot && m.Name == name && MethodDefinition.IsNativeObjectSlot(name, m.Signature, root)))
+                throw new InvalidDataException("native Object operation requires a complete root slot contract: " + name);
+    }
+
     /// <summary>Adds the explicit baseless native System.Object declaration to this output.</summary>
     /// <returns>The attached abstract root builder; methods must be supplied by the caller.</returns>
     /// <exception cref="ArgumentException">The output already declares System.Object or exceeds declaration limits.</exception>

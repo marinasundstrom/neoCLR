@@ -102,7 +102,7 @@ public enum OpCode
     ReserveArray,
     /// <summary>Truncates an integer to unsigned 8-bit, leaving an Int32 evaluation value.</summary>
     Conv_U1,
-    /// <summary>Boxes a value or scoped generic parameter as the explicit core System.Object.</summary>
+    /// <summary>Boxes a value or scoped generic parameter as the selected ObjectType.</summary>
     Box,
     /// <summary>Loads a managed address of an owned mutable instance field.</summary>
     Ldflda,

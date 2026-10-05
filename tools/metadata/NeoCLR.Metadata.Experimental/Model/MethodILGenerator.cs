@@ -236,7 +236,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
                 throw new ArgumentException("Isinst requires a storage type or scoped generic parameter", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-            if (!IsReferenceSignature(elementType)) _ = Assembly.CoreObjectType;
+            if (!IsReferenceSignature(elementType)) _ = Assembly.ObjectType;
             Append(new("reference.test", Type: elementType)); return;
         }
         if (opCode == OpCode.Box)
@@ -244,7 +244,7 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
             if (elementType.Primitive is PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.IsSelf || elementType.FunctionSignature is not null)
                 throw new ArgumentException("Box requires a storage value or scoped generic parameter", nameof(elementType));
             elementType.ValidateOwner(Assembly, Signature.GenericParameterNames.Count, DeclaringType?.GenericParameterNames.Count ?? 0);
-            _ = Assembly.CoreObjectType;
+            _ = Assembly.ObjectType;
             Append(new("object.box", Type: elementType)); return;
         }
         if (opCode == OpCode.UnboxAny)

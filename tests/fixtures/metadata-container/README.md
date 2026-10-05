@@ -50,3 +50,7 @@ dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests -- \
 executes all three slots on ordinary objects and display on a boxed Int32. The fixture's
 constant slot bodies are test implementations, not replacements for production Object.
 The reference projection has a fresh MVID on regeneration; native content is stable.
+
+The Object-root fixture also includes API-authored `BoxedDisplay()`: it boxes Int32 42, applies value-type isinst,
+and calls the local root's ToString slot. The runtime test invokes that emitted function,
+so its boxing/dispatch body is tested independently of source-assembled instructions.

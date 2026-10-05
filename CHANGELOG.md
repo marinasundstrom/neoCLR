@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Select explicitly authored Object roots for metadata boxing/value-test stack results
+  through `AssemblyBuilder.ObjectType`, preserving `CoreObjectType` bootstrap semantics.
+  API-authored boxing and virtual dispatch execute without a legacy System binding;
+  incomplete roots and mixed bootstrap return signatures reject. 157 C# groups pass.
+  Raven source-root emission remains guarded; no runtime format or .NET default change.
+
 - Add concrete native Object virtual-slot authoring with definition/builder parity,
   exact Equals root identity and preserved CLI Virtual/NewSlot flags. API-produced
   metadata loads and executes all three Object slots plus boxed display in NeoCLR.

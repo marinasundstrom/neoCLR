@@ -6,6 +6,16 @@ A disassembler remains a release candidate, not yet a required deliverable.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## API-authored root boxing executes (2026-10-05)
+
+`AssemblyBuilder.ObjectType` now selects the owned root for boxing/value-test results.
+An API-authored BoxedDisplay function executes in NeoCLR without a legacy System binding;
+incomplete roots and mixed bootstrap return signatures reject. All 157 C# groups pass.
+This closes an emitter prerequisite exposed during the Raven adapter review. Local
+Object overrides, compiler declaration capabilities and selected-root driver wiring
+remain next; production source Object and editor/Tasks-await release gates remain open.
+See [root-boxing evidence](experiments/extended-cli-metadata/object-root-boxing-2026-10-05.md).
+
 ## API-authored Object slots execute (2026-10-05)
 
 The metadata API now declares Object's three concrete virtual new slots and preserves

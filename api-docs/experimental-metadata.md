@@ -7344,3 +7344,22 @@ Validation: `ObjectSlotChecks` covers manual/builder parity, native and CLI roun
 introspection flags and exact Equals identity, malformed declarations and wrong owners.
 The generated fixture is loaded and executed by Rust `object_root_identity`; production
 source Object/compiler integration is still pending.
+
+### Selected Object signatures and boxing
+
+`AssemblyBuilder.ObjectType : SignatureType` returns the explicitly authored native
+root when present, otherwise the existing imported bootstrap Object signature.
+`CoreObjectType : ImportedTypeReference` keeps its original bootstrap meaning.
+Declare the root before creating signatures; existing signatures are not rewritten.
+No dependency is loaded and this property does not select runtime host ownership.
+
+`Box` and value-type `Isinst` stack results use `ObjectType`. Native emission with an
+authored root validates all three concrete root slots instead of demanding a separate
+legacy System binding. An incomplete root or a body expecting the unrelated bootstrap
+Object fails with `InvalidDataException` before bytes are returned. Without an authored
+root, the existing explicit System binding requirement is unchanged. Root signature
+selection does not yet implement imported root selection or local Object overrides.
+
+The API-produced fixture's `BoxedDisplay()` now emits boxing and virtual dispatch and
+executes with result `"42"` under explicit runtime root selection. This tests executable
+instructions from the API, in addition to the existing source-assembled runtime callers.

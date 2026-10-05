@@ -415,6 +415,11 @@ fn metadata_api_authored_root_slots_load_and_execute() {
         index: 0,
     };
     let seed = neoclr::assemble(".module System\n.references ()\n").unwrap();
+    let boxed = root
+        .functions
+        .iter()
+        .find(|f| f.origin.as_ref().is_some_and(|o| o.name == "BoxedDisplay"))
+        .unwrap();
     for (body, result, expected) in [
         (
             "newobj Named\ncallvirt instance [{module}]System.Object::ToString()",
@@ -436,8 +441,11 @@ fn metadata_api_authored_root_slots_load_and_execute() {
             "Boolean",
             Value::Boolean(false),
         ),
+        ("call {boxed}()", "String", Value::String("42".into())),
     ] {
-        let body = body.replace("{module}", &root.name);
+        let body = body
+            .replace("{module}", &root.name)
+            .replace("{boxed}", &boxed.name);
         let source = format!(
             ".module App\n.references ({})\n.entry Main\n.type class Named\n.end\n.function Main() -> {result}\n{body}\nret\n.end",
             root.name

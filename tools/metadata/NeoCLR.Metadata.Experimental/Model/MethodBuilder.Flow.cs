@@ -309,7 +309,7 @@ public sealed partial class MethodBuilder
                         throw new InvalidDataException("equality requires numeric or Boolean operands");
                     var equalityType = stack[^1]; Pop(equalityType); Pop(equalityType); stack.Add(PrimitiveType.Boolean); break;
                 case "object.box":
-                    Pop(instruction.Type!); stack.Add((SignatureType)Assembly.CoreObjectType); break;
+                    Pop(instruction.Type!); stack.Add((SignatureType)Assembly.ObjectType); break;
                 case "reference.test":
                 case "reference.isnull":
                 case "reference.cast":
@@ -320,7 +320,7 @@ public sealed partial class MethodBuilder
                     if (instruction.Op == "reference.isnull") MaxStack = Math.Max(MaxStack, stack.Count + 1);
                     stack.RemoveAt(stack.Count - 1);
                     stack.Add(instruction.Op == "reference.isnull" ? (SignatureType)PrimitiveType.Boolean
-                        : instruction.Op == "reference.test" && !IsReferenceSignature(instruction.Type!) ? (SignatureType)Assembly.CoreObjectType : instruction.Type!);
+                        : instruction.Op == "reference.test" && !IsReferenceSignature(instruction.Type!) ? (SignatureType)Assembly.ObjectType : instruction.Type!);
                     break;
                 case "function.bind":
                     if (!instruction.Target!.IsStatic) Pop(instruction.ConstructedTarget is { } binding ? (SignatureType)binding.Definition.DeclaringType!.MakeGenericInstance(binding.DeclaringTypeArguments.ToArray()) : instruction.Target.DeclaringType!.OpenSignature);

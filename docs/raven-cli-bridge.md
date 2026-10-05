@@ -6005,3 +6005,13 @@ Raven's source-root emitter guard remains: root references/boxing/overrides and 
 selection still require wiring. The native format is unchanged; .NET defaults are unchanged.
 Working native Tasks/await samples now explicitly belong to the release gate alongside
 VS Code/LSP integration; runtime suspension and green threads remain future work.
+
+### Owned Object boxing identity (2026-10-05)
+
+The metadata API's `ObjectType` selects an authored root for boxing and value-test
+stack results; `CoreObjectType` still explicitly means the bootstrap. The native writer
+validates complete local root slots instead of requiring legacy System for this path.
+API-authored boxing/virtual dispatch now executes under explicit runtime root selection.
+Raven source-root emission remains guarded pending local override identity, declaration
+capabilities and driver catalogs. No importer objects are reused by this authoring API.
+See [validation and limitations](experiments/extended-cli-metadata/object-root-boxing-2026-10-05.md).
