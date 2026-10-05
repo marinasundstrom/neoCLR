@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-preview.12",
   "date": "2026-10-05",
-  "status": "local candidate qualified; hosted canonical validation pending",
+  "status": "qualified release candidate",
   "platforms": [
     "osx-arm64"
   ],
@@ -1405,5 +1405,51 @@
   },
   "runtimeSourceComparison": "After runtime build 30fbd6bf, source changes are narrowly scoped deprecated-API allowances and comments for newer Rust while retaining 1.85 support; no executable behavior changes. Later commits update validator sample selection and release evidence.",
   "clippy": "Local --all-targets -D warnings passed; hosted newer-toolchain Clippy passed at 67e7f9ad.",
-  "ci": "https://github.com/marinasundstrom/neoCLR/actions/runs/37355774315"
+  "ci": "https://github.com/marinasundstrom/neoCLR/actions/runs/37355774315",
+  "hostedValidation": {
+    "status": "passed",
+    "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+    "toolchain": "stable",
+    "distribution": "native",
+    "full_tests": true,
+    "smoke_programs": [
+      "counter",
+      "collections",
+      "outputs",
+      "reflection",
+      "reference-identity",
+      "interfaces",
+      "arrays",
+      "control-flow",
+      "typeof",
+      "ordinal-text",
+      "character-classification",
+      "math",
+      "date-time",
+      "common-interfaces",
+      "predicate-search",
+      "reflection-hierarchy",
+      "constructor-chaining",
+      "default-interfaces",
+      "explicit-interfaces",
+      "generic-functions",
+      "function-objects",
+      "closures",
+      "readonly",
+      "environment",
+      "file-report"
+    ],
+    "build_profile": "release",
+    "validator_sha256": "950c0611ee03edf59f8d2f0089a82f40223f7f5598f955de339d6eb07f4f82c6",
+    "commit": "67e7f9ad0e351fb85e33f312b768ffbd59226a06",
+    "archive_sha256": "d9d9f4240ee292648552ce4bdf4af18ddc79fb88126e6e7edb0a338995e8ef5c",
+    "tracked_files": 4095,
+    "registry_packages": 79,
+    "notice_files": 156,
+    "raven_library_snapshot": "not qualified by native distribution profile",
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1",
+    "native_seed_sha256": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "elapsed_seconds": 896.967
+  },
+  "hostedCiConclusion": "success"
 }

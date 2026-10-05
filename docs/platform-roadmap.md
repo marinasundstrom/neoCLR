@@ -22,8 +22,8 @@ execution, live HTTP/JSON checks and 19 installed VSIX checks.
 [qualification evidence](experiments/extended-cli-metadata/native-bundle-2026-10-05.md).
 Preview 12 is selected for macOS arm64. Both retained bootstrap inputs now reproduce
 byte-for-byte from recorded sources. Local candidate qualification passes 1,784 runtime
-tests, extracted native consumers and the website gate; hosted canonical validation
-and publication are the final release steps. [Candidate evidence](preview-12-validation.json).
+tests, extracted native consumers and the website gate. Hosted canonical, OS boundary
+and minimum-Rust validation pass; the candidate is ready for main integration and publication. [Candidate evidence](preview-12-validation.json).
 The primitive CLI core and retained seed remain explicit temporary bootstrap inputs;
 complete replacement and full System source ownership remain open.
 

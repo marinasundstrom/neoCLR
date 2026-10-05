@@ -9,7 +9,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 ### 2026-10-05
 
 - Point repository entry guides to Preview 12 native installation and distinguish
-  the preserved older bridge walkthroughs.
+  the preserved older bridge walkthroughs. Record the passing hosted Preview 12
+  canonical, OS boundary and minimum-Rust gates before main integration.
 
 ## 0.1.0-preview.12 — 2026-10-05
 

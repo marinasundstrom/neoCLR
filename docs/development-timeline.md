@@ -11095,3 +11095,10 @@ The native source profile retains full runtime tests and source smoke checks whi
 the legacy bridge snapshot audit remains explicitly separate. A stale deleted
 sample path and newer-Rust deprecation diagnostics were corrected. Main integration
 and publication await the final hosted outcome.
+
+
+**Hosted outcome:** Run [37355774315](https://github.com/marinasundstrom/neoCLR/actions/runs/37355774315)
+passed canonical full source/runtime validation, both OS boundary jobs and all three
+minimum-Rust jobs. This clears the candidate gate for the authorized main integration
+and Preview 12 publication. The packaged runtime's executable sources differ only by
+subsequent compatibility annotations; later release commits document evidence.
