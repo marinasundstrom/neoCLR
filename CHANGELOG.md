@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Correct two stale release-test expectations for the already-supported no-result
+  reflection setter and current native-service rejection diagnostic. The full runtime
+  run exposed these assertions; all ten affected tests pass after correction.
+
 - Repair the source release notice inventory for fifteen locked metadata/CBOR and
   hashing dependencies, preserving their shipped license texts and checksums.
   This clears the first extracted-source release audit blocker; it is not release

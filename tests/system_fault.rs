@@ -53,7 +53,10 @@ fn fault_binding_requires_void_return_and_string_argument() {
         ("(Int32 message) -> Void", "no runtime binding"),
         ("(String message,Int32 code) -> Void", "no runtime binding"),
         ("(String message) -> Int32", "return type mismatch"),
-        ("(String message) -> void", "no-result methods"),
+        (
+            "(String message) -> void",
+            "native service does not support no-result execution",
+        ),
     ] {
         let source = format!(
             ".module System\n.function neoCLR.Runtime.Fault{signature}\n.methodimpl InternalCall\n.end"

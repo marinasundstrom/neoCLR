@@ -266,13 +266,29 @@ fn accessor_faults_and_frame_limit_remain_terminal() {
 }
 
 #[test]
-fn signature_checks_reject_wrong_types_and_noresult_setter_service() {
-    for signature in [
-        "ReflectionPropertyGet(System.RuntimeTypeHandle,Int32,System.Object) -> Int32",
-        "ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult",
-        "ReflectionPropertySetCheck(System.RuntimeTypeHandle,Int32,System.Object,Int32) -> Int32",
+fn signature_checks_preserve_setter_noresult_support_and_reject_wrong_types() {
+    for (signature, accepted) in [
+        (
+            "ReflectionPropertyGet(System.RuntimeTypeHandle,Int32,System.Object) -> Int32",
+            false,
+        ),
+        (
+            "ReflectionPropertySet(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult",
+            true,
+        ),
+        (
+            "ReflectionPropertySetCheck(System.RuntimeTypeHandle,Int32,System.Object,Int32) -> Int32",
+            false,
+        ),
+        (
+            "ReflectionPropertySetCheck(System.RuntimeTypeHandle,Int32,System.Object,System.Object) -> noresult",
+            false,
+        ),
     ] {
-        assert!(assemble(&format!(".module Invalid\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end")).is_err());
+        let result = assemble(&format!(
+            ".module Invalid\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end"
+        ));
+        assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
     }
 }
 
