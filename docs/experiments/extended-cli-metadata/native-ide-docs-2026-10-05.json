@@ -1,0 +1,58 @@
+{
+  "vscode": "1.140.0",
+  "checks": [
+    "native imported hover",
+    "native imported Markdown documentation hover",
+    "native Markdown sidecar edit refreshes hover",
+    "native XML fallback after Markdown member deletion",
+    "read-only metadata declaration navigation",
+    "native imported completion",
+    "native imported completion documentation",
+    "actual file watcher invalidates replaced native library",
+    "unsaved buffer survives native workspace reload",
+    "missing native reference produces a project diagnostic",
+    "native dependency recovery clears the project diagnostic",
+    "unchanged broad sample imports source-built class library",
+    "native Option and Result type hovers retain union kind and constructed arguments",
+    "configured VS Code native build task",
+    "VS Code task executes exact broad-sample output on native runtime",
+    "failed build preserves last successful artifact",
+    "ordinary .NET editor hover and diagnostics",
+    "unchanged Tasks/await sample builds and executes from VS Code"
+  ],
+  "passed": true,
+  "lastHover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "diagnostics": [],
+  "hover": "```raven\nstatic func VersionOne() -> int\n```\n\nMethod in `class EditorApi`\n\n---\n\nReturns the **documented answer**.",
+  "completion": [
+    {
+      "label": "VersionOne",
+      "description": "EditorApi"
+    }
+  ],
+  "unionHovers": {
+    "Option<Order>": "```raven\nunion struct Option<Order>: Propagatable<Option<Order>, Order, void>\n```\n\nType in `System`",
+    "Result<Order, SingleError>": "```raven\nunion struct Result<Order, SingleError>: Propagatable<Result<Order, SingleError>, Order, SingleError>\n```\n\nType in `System`"
+  },
+  "stdout": "Native build output: /private/tmp/native-editor-docs-final1005/bin/neoclr/App.dll\nDuplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+  "ravenRevision": "416d185bbff42d4d01d1578a75f07d40c01c216b",
+  "neoClrBaseRevision": "f6326737e491e255125a02d7b8648c490c329e8a",
+  "artifactHashes": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "485053237561be6bd16f9619f497e70b37f84fec875d7de6d636fbcdd36b5725",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.LanguageServer/bin/Debug/net10.0/Raven.LanguageServer.dll": "e639687904ccb31a9fdc47f17de426961959b5e4b3728b53103ffe7e2f2558c0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "5e6652fcdfa22c051f55bfe2ced4b0599c5353168bf213240c43e0d471cc6ca8",
+    "/tmp/native-editor-docs-final1005/references/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/tmp/native-editor-docs-final1005/references/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/tmp/native-editor-docs-final1005/references/EditorLibrary.xml": "ed7d20bdfc4a2ea768329f5412fed0e870379f54158430bad5f13ac98f253b97",
+    "/tmp/native-editor-docs-final1005/references/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/tmp/native-editor-docs-final1005/references/EditorLibrary.dll": "4d721bf15c1b9bac549e80d5c01f4d01b2602735662c9b39e277f6a20dc7706b",
+    "/tmp/native-editor-docs-final1005/references/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/tmp/native-editor-docs-final1005/references/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59"
+  },
+  "clientLog": "/tmp/native-editor-docs-final-profile1005/logs/20261005T185344/window1/exthost/output_logging_20261005T185346/1-Raven.log",
+  "serverLog": "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/logs/raven-lsp.log",
+  "catalogChecks": [
+    "PASS native XML type/member documentation and malformed optional sidecar",
+    "PASS reference catalog snapshot reuse, replacement, native semantic import/emission, invalid inputs and seed ownership"
+  ]
+}

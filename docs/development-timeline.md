@@ -11001,3 +11001,18 @@ hover failure; the test now reads its value property.
 This completes the bounded native editor POC on the tested development toolchain,
 not release packaging, publication, full decompilation or the entire source-library
 bootstrap. Those distinctions remain explicit in the roadmap and website.
+
+## 2026-10-05 — API help in the editor and release readiness
+
+**Author:** Asked whether the POC was ready for release, requested an updated website
+if so, and asked to enable documentation in the IDE. Clarified that XML or Raven
+Markdown can serve API descriptions, while website guides need not all be inline
+comments: “What I basically meant was that the user should get some documentation
+displayed in VS Code”.
+
+**Assistant action:** Kept release publication pending matched-package/install
+qualification, reused Raven's existing Markdown-first/XML-fallback documentation
+model for native references, added native project sidecar generation and checked
+documentation in the actual VS Code extension host. Updated development website
+instructions without changing published Preview 11 claims. This does not assert
+that every runtime API already has bundled documentation.

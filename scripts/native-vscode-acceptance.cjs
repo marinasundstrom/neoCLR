@@ -48,6 +48,19 @@ exports.run = async function () {
       return hoverText(result).includes('VersionOne') && result;
     }, 'native hover');
     report.hover = hoverText(hover); record('native imported hover');
+    assert(report.hover.includes('documented answer'), 'imported API documentation is visible');
+    record('native imported Markdown documentation hover');
+    const docsRoot = path.join(root, 'references', 'EditorLibrary.docs');
+    const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(e =>
+      e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]);
+    const memberDoc = walk(docsRoot).find(f => f.endsWith('.md') && fs.readFileSync(f, 'utf8').includes('documented answer'));
+    assert(memberDoc);
+    fs.writeFileSync(memberDoc, fs.readFileSync(memberDoc, 'utf8').replace('documented answer', 'refreshed answer'));
+    await until(async () => hoverText(await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position)).includes('refreshed answer'), 'documentation-only refresh');
+    record('native Markdown sidecar edit refreshes hover');
+    fs.unlinkSync(memberDoc);
+    await until(async () => hoverText(await vscode.commands.executeCommand('vscode.executeHoverProvider', uri, position)).includes('documented answer'), 'XML fallback after Markdown deletion');
+    record('native XML fallback after Markdown member deletion');
     const definitions = await until(async () => {
       const result = await vscode.commands.executeCommand('vscode.executeDefinitionProvider', uri, position);
       return result?.length && result;
@@ -69,6 +82,9 @@ exports.run = async function () {
       return result?.items?.some(i => JSON.stringify(i.label).includes('VersionOne')) && result;
     }, 'native completion');
     report.completion = completion.items.map(i => i.label); record('native imported completion');
+    const documentedCompletion = completion.items.find(i => JSON.stringify(i.label).includes('VersionOne'));
+    assert((documentedCompletion.documentation?.value || documentedCompletion.documentation || '').includes('documented answer'));
+    record('native imported completion documentation');
     await edit('func EditorProbe() -> int => EditorApi.VersionOne()\n');
     fs.copyFileSync(config.replacementLibrary, path.join(root, 'references/EditorLibrary.dll'));
     await until(() => vscode.languages.getDiagnostics(uri).some(d => d.severity === vscode.DiagnosticSeverity.Error && d.message.includes('VersionOne')), 'library replacement diagnostic');

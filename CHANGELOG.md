@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Extend native editor acceptance to imported API documentation: generated Raven
+  Markdown/XML sidecars, hover prose, documentation-only refresh and XML fallback.
+  Document the distinction between concise IDE API help and website-only guides;
+  matched release packaging and installation qualification remain pending.
+
 - Qualify the native development workflow in real VS Code on macOS arm64: project
   import, completion/hover, read-only declarations, artifact refresh, missing-dependency
   recovery, build failure safety and native execution. The unchanged collections and

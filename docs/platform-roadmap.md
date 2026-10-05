@@ -26,6 +26,12 @@ full decompilation, general native project/package dependency builds and other O
 qualification remain beyond this POC. Full class-library source bootstrap remains a
 separate roadmap gate. No release or website publication has occurred.
 
+Native API documentation now also passes real editor acceptance: XML/Markdown hover
+and completion prose, sidecar-only refresh and member-level fallback.
+[Documentation evidence](experiments/extended-cli-metadata/native-ide-docs-2026-10-05.md).
+The author explicitly includes website/API rendering through RavenDoc in the next
+release gate, alongside matched package installation.
+
 ## Shared host snapshots prepare editor integration (2026-10-05)
 
 Raven's native driver now uses a reusable explicit reference catalog. Core identity,

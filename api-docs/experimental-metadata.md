@@ -7475,3 +7475,12 @@ snapshot and report failure; builds independently revalidate before atomic publi
 See the [complete host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#native-vs-code-poc-acceptance-2026-10-05)
 for signatures, exceptions, limits and commands. These are compiler-host APIs, not guest
 System APIs; no RavenDoc guest snapshot or native metadata encoding changes are needed.
+
+### Native compiler-host documentation sidecars (development, 2026-10-05)
+
+File-backed native catalog references expose existing Raven XML/Markdown sidecars
+through symbol documentation, without changing native metadata or guest APIs.
+Markdown member help takes precedence over XML; absent/malformed optional sidecars
+do not invalidate an assembly. Image-only references have no implicit sidecar search.
+See [host options, output rules and editor lifetime](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#native-ide-documentation-2026-10-05).
+The guest RavenDoc snapshot is unchanged. Website guides are separate content.

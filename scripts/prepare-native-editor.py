@@ -57,7 +57,7 @@ library_root = out.with_name(out.name + '-library')
 for version in ('One', 'Two'):
     lib = library_root / version
     lib.mkdir(parents=True, exist_ok=False)
-    (lib / 'Library.rvn').write_text('public class EditorApi {\n    static func Version' + version + '() -> int => 42\n}\n')
+    (lib / 'Library.rvn').write_text('/// API documentation for the editor fixture.\npublic class EditorApi {\n    /// Returns the **documented answer**.\n    static func Version' + version + '() -> int => 42\n}\n')
     library = X.Element('Project', Sdk='Microsoft.NET.Sdk')
     group = X.SubElement(library, 'PropertyGroup')
     for key, value in dict(TargetFramework='net10.0', OutputType='Library', RavenTargetPlatform='NeoCLR',
@@ -67,6 +67,8 @@ for version in ('One', 'Two'):
     X.ElementTree(library).write(lib / 'EditorLibrary.rvnproj', encoding='unicode')
     subprocess.run(['dotnet', str(compiler), 'neoclr', '--project', str(lib / 'EditorLibrary.rvnproj')], check=True)
 shutil.copyfile(library_root / 'One/bin/neoclr/EditorLibrary.dll', refs / 'EditorLibrary.dll')
+shutil.copyfile(library_root / 'One/bin/neoclr/EditorLibrary.xml', refs / 'EditorLibrary.xml')
+shutil.copytree(library_root / 'One/bin/neoclr/EditorLibrary.docs', refs / 'EditorLibrary.docs')
 X.SubElement(X.SubElement(items, 'Reference', Include='EditorLibrary'), 'HintPath').text = 'references/EditorLibrary.dll'
 X.indent(project)
 X.ElementTree(project).write(out / 'App.rvnproj', encoding='unicode')

@@ -135,3 +135,15 @@ This is development POC evidence, not a replacement download for Preview 11. Mat
 compiler/server/extension/runtime packaging and installation qualification are still
 required before publishing the native workflow. The setup above remains the published
 bridge workflow.
+
+### API documentation in the development editor
+
+The native development compiler and language server can display API descriptions
+alongside signatures in VS Code hovers and completion details. Keep a library's
+matching `.xml` file and/or Raven `.docs` directory beside its assembly. Markdown
+member documentation takes precedence, with XML fallback. Native library project
+builds can generate both from documentation comments.
+
+This is development work for the next matched tool bundle, not a change to the
+Preview 11 downloads above. APIs without supplied descriptions still show signatures.
+Longer tutorials and guides stay on this website; they need not be inline comments.
