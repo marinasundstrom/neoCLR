@@ -103,3 +103,6 @@ handling and successful emission of a program that would fault if executed.
 Disassembly tests cover the executed Raven source-root PE, generic library facts,
 equivalent PE/NEOX/JSON listings, unresolved exact dependencies and invalid bodies,
 malformed/unsupported inputs, stdout/file equivalence and no-overwrite behavior.
+
+For bootstrap execution after inspection, see [explicit Object-root loading](raven-cli-bridge.md#explicit-object-root-cli-loading-development-2026-10-05).
+Disassembly itself still needs no root selection or dependencies.

@@ -1,0 +1,16 @@
+namespace System
+
+public abstract class Object {
+    protected init() { }
+    virtual func ToString() -> string => "root"
+    virtual func Equals(other: Object?) -> bool => false
+    virtual func GetHashCode() -> int => 0
+}
+
+public class Item {
+    override func Equals(other: object?) -> bool => true
+    override func ToString() -> string => "source root override"
+    override func GetHashCode() -> int => 93
+    static func Display() -> string => Item().ToString()
+    static func Echo(value: object) -> System.Object => value
+}

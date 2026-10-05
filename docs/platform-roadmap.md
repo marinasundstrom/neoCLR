@@ -7,6 +7,19 @@ resumes with source-root driver/consumer wiring.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Author scope clarification: end-to-end POC (2026-10-05)
+
+The author clarified that the goal is an end-to-end NeoCLR POC, not solving every
+platform feature for release. **Samples must compile.** Keep the existing editor and
+execution objectives visible, but do not make complete System or exhaustive feature
+coverage prerequisites for the POC. After the bounded root driver slice, inventory the
+samples through ordinary compiler commands and prioritize shared compilation/execution
+blockers by how many samples they unlock. Do not broaden scope merely to complete APIs.
+
+The source-root library now compiles through `rvnc neoclr --source-object-root` and
+executes through `neoclr --object-root` with an explicit seed. The caller remains neoIL;
+Raven imported-root consumers are still pending. [Reproduction](experiments/extended-cli-metadata/source-object-driver-2026-10-05.md).
+
 ## Native metadata disassembly is available (2026-10-05)
 
 `neoclr disassemble` inspects PE/#Neo, NEOX and format-5 JSON without dependencies or

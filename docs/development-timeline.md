@@ -10927,3 +10927,17 @@ or executing; it is explicitly a diagnostic listing, not reassemblable neoIL. Si
 checks and nine existing CLI/source-emission checks pass, including the Raven-emitted
 source-root PE. [Usage and scope](il-inspection.md). Broader end-to-end work resumes with
 source-root driver/consumer ownership and constructed local bases still open.
+
+### 2026-10-05 — POC scope and required sample compilation
+
+The author said, “Our goal is end-to-end POC for neoCLR. Not everything has to be solved
+for the release. Samples however need to be compiled.” The assistant accepted this
+scope correction: sample compilation is required; full class-library/platform feature
+completion must not become a prerequisite for the POC. The assistant proposed a normal-
+compiler sample inventory after committing the active driver slice, prioritizing shared
+blockers rather than API completeness. That inventory is pending, not a reported result.
+
+The active slice now compiles a root library through `rvnc neoclr` and executes it with
+explicit root selection through the NeoCLR CLI. The caller is neoIL, so a separately
+compiled Raven root consumer remains open. Thirty runtime/CLI checks and the driver
+acceptance controls pass. See [the reproduction](experiments/extended-cli-metadata/source-object-driver-2026-10-05.md).

@@ -6037,3 +6037,23 @@ The source-root probe emits PE that NeoCLR loads and executes; 47 focused compil
 virtual slots reject explicitly. Driver/consumer ownership and production System remain
 open. See [source-root execution evidence](experiments/extended-cli-metadata/source-object-emission-2026-10-05.md).
 The next author-directed task is the metadata disassembler, followed by broader integration.
+
+## Explicit Object-root CLI loading (development, 2026-10-05)
+
+`--object-root <module-input>` selects the unique System.Object declaration from one
+explicit `--module` artifact; it requires an explicit `--system` seed. The path is
+matched canonically to one supplied dependency, never selected implicitly from an
+application declaration. The CLI derives the exact module/revision/type-row identity
+from the already read artifact and passes it to the existing runtime load-context APIs.
+Those APIs retain shape, concrete slot, identity and dependency validation. PE/#Neo,
+NEOX and native JSON root artifacts are supported; source root inputs are not.
+
+The option applies to run, check, verify, debug and assemble. Root selection is not
+serialized by assemble: use the explicit option again when loading the output. Metadata
+seeds are decoded before linked validation so dependencies on the selected root can
+resolve. The bundled seed is not automatically trimmed or substituted. Default loads
+are unchanged. This is a deliberate host configuration beyond the ordinary CLR core
+selection; it is useful for bootstrap experiments but requires an explicit compatible
+seed and library catalog. No new metadata encoding or public library API is introduced.
+
+See [the driver reproduction](experiments/extended-cli-metadata/source-object-driver-2026-10-05.md).

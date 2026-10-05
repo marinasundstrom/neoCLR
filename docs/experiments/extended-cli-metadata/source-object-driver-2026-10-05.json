@@ -1,0 +1,214 @@
+{
+  "passed": true,
+  "scope": "driver-produced root library with neoIL host; Raven imported-root consumer remains pending",
+  "inputs": [
+    {
+      "path": "/tmp/IntrospectionCoreParams1005.dll",
+      "sha256": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc"
+    },
+    {
+      "path": "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "sha256": "2f9adab03f547d0ed071e828b3bbb00b8173c267c36e97e9f16d73d23c1d0be5"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "sha256": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+    },
+    {
+      "path": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn",
+      "sha256": "9d4ac383f59d0bf29aa8926c8dc402b905e17393c9f65c903bc15f0ab950d4f6"
+    }
+  ],
+  "artifactSha256": "53c7dd1bf0a22692fcdd9fc5e7843141a5d3d4cdacffc49baa1e076a7175623f",
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--library",
+        "--source-object-root",
+        "--bootstrap-intrinsics",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "-o",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/root-driver-evidence1005/App.neoil",
+        "--module",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "--system",
+        "/tmp/root-driver-evidence1005/System.neoil",
+        "--object-root",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "--show-result"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "=> String(\"source root override\")\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/root-driver-evidence1005/App.neoil",
+        "--module",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "--system",
+        "/tmp/root-driver-evidence1005/System.neoil",
+        "--object-root",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "App: typed-stack/control-flow verification passed (11 IL functions; maximum stack 1; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "disassemble",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "/tmp/root-driver-evidence1005/RootLibrary.disassembly.txt"
+      ],
+      "exitCode": 0,
+      "stdout": "Disassembled /tmp/root-driver-evidence1005/RootLibrary.dll -> /tmp/root-driver-evidence1005/RootLibrary.disassembly.txt\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--library",
+        "--source-object-root",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "-o",
+        "/tmp/root-driver-evidence1005/RootLibrary.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Output already exists: /tmp/root-driver-evidence1005/RootLibrary.dll\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/missing-core.dll",
+        "--library",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: --source-object-root requires --library, --core-reference and no legacy --system-symbols selection.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/missing-library.dll",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--bootstrap-intrinsics",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: --source-object-root requires --library, --core-reference and no legacy --system-symbols selection.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/duplicate-option.dll",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "--source-object-root",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/source-object-root.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Specify --source-object-root once.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/missing-root.dll",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "/tmp/root-driver-evidence1005/missing-root.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAVT003: Target core configuration cannot be used: source Object ownership requires a public abstract fieldless nongeneric System.Object class without a base.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/generic-owner.dll",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "/tmp/root-driver-evidence1005/generic-owner.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support supported public/internal static classes, root classes or unconstrained value types.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--source-object-root",
+        "-o",
+        "/tmp/root-driver-evidence1005/extra-slot.dll",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--bootstrap-intrinsics",
+        "--library",
+        "/tmp/root-driver-evidence1005/extra-slot.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA001: Native emission does not support callable declaration: virtual func Extra() -> int.\n"
+    }
+  ],
+  "revisions": {
+    "raven": "ac702d7c0",
+    "neoclrBase": "e8689418",
+    "neoclrState": "runtime CLI source-root changes committed with this evidence"
+  }
+}

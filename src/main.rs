@@ -15,6 +15,7 @@ const USAGE: &str = "Usage:
   neoclr debug <input> [--module <input>]... [--system <input>] [-- <guest-argument>...]
   neoclr check <input> [--module <input>]... [--system <input>]
   neoclr verify <input> [--module <input>]... [--system <input>]
+Object ownership (development): --object-root <module-input> selects System.Object from an explicit --module; requires --system.
 Inputs: .neo is the high-level subset, .neoil is IL source, PE/#Neo and standalone NEOX containers carry native metadata; otherwise JSON artifacts.";
 
 enum Input {
@@ -28,6 +29,17 @@ impl Input {
             Self::Text(text) => Ok(text),
             Self::NativeEnvelope(_) => Err("expected source text, found native envelope".into()),
             Self::MetadataPe(_) => Err("expected source text, found metadata PE".into()),
+        }
+    }
+    fn decode(&self) -> Result<neoclr::Module, String> {
+        match self {
+            Self::Text(text) => serde_json::from_str(text).map_err(|e| e.to_string()),
+            Self::MetadataPe(image) => {
+                neoclr::metadata_container::decode(image).map_err(|e| e.to_string())
+            }
+            Self::NativeEnvelope(image) => {
+                neoclr::metadata_container::decode_envelope(image).map_err(|e| e.to_string())
+            }
         }
     }
     fn load(&self) -> Result<neoclr::Module, neoclr::Fault> {
@@ -117,6 +129,7 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
     let mut guest_arguments = vec![args[1].clone()];
     let mut paths = vec![args[1].as_str()];
     let mut system_path = None;
+    let mut object_root_path = None;
     let mut gc_stats = false;
     let mut gc_events = false;
     let mut show_result = false;
@@ -152,6 +165,14 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
             "--show-result" if command == "run" && !show_result => show_result = true,
             "--gc-stats" if command == "run" && !gc_stats => gc_stats = true,
             "--gc-events" if command == "run" && !gc_events => gc_events = true,
+            "--object-root" if object_root_path.is_none() => {
+                object_root_path = Some(
+                    options
+                        .next()
+                        .filter(|path| !path.starts_with("--"))
+                        .ok_or("Missing module input for --object-root")?,
+                );
+            }
             "--module" | "--system" => {
                 let path = options
                     .next()
@@ -170,6 +191,27 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         }
     }
 
+    let root_input_index = if let Some(root_path) = object_root_path {
+        if system_path.is_none() {
+            return Err("--object-root requires an explicit --system seed".into());
+        }
+        let selected = fs::canonicalize(root_path)
+            .map_err(|e| format!("Cannot read Object root input: {e}"))?;
+        let matches = paths
+            .iter()
+            .enumerate()
+            .skip(1)
+            .filter(|(_, path)| fs::canonicalize(path).is_ok_and(|path| path == selected))
+            .map(|(index, _)| index)
+            .collect::<Vec<_>>();
+        if matches.len() != 1 {
+            return Err("--object-root must identify exactly one explicit --module input, never the application".into());
+        }
+        Some(matches[0])
+    } else {
+        None
+    };
+
     if paths[0].ends_with(".neo") && (paths.len() != 1 || system_path.is_some()) {
         return Err(
             "high-level source currently supports only bundled System and one input file".into(),
@@ -179,6 +221,32 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         .iter()
         .map(|path| read(path))
         .collect::<Result<Vec<_>, _>>()?;
+    let object_root = root_input_index
+        .map(|index| {
+            if paths[index].ends_with(".neoil") {
+                return Err("--object-root requires a compiled metadata artifact".to_owned());
+            }
+            let module = texts[index].decode()?;
+            let roots = module
+                .types
+                .iter()
+                .enumerate()
+                .filter(|(_, ty)| ty.name == "System.Object")
+                .collect::<Vec<_>>();
+            if roots.len() != 1 {
+                return Err(
+                    "Object root artifact must contain exactly one System.Object declaration"
+                        .to_owned(),
+                );
+            }
+            Ok(neoclr::metadata::TypeDefId {
+                module: module.name,
+                revision: module.revision,
+                index: u32::try_from(roots[0].0)
+                    .map_err(|_| "Object root type index exceeds supported range".to_owned())?,
+            })
+        })
+        .transpose()?;
     let (modules, program) = if paths.len() == 1 && system_path.is_none() {
         // Preserve standalone System assembly/analysis and existing single-input behavior.
         let module = if paths[0].ends_with(".neo") {
@@ -195,11 +263,12 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
         let system = if let Some(path) = system_path {
             let text = read(path)?;
             if path.ends_with(".neoil") {
-                assemble(text.text()?)
+                assemble(text.text()?).map_err(|e| e.to_string())
+            } else if object_root.is_some() {
+                text.decode()
             } else {
-                text.load()
-            }
-            .map_err(|e| e.to_string())?
+                text.load().map_err(|e| e.to_string())
+            }?
         } else {
             neoclr::library::system()
                 .map_err(|e| e.to_string())?
@@ -214,10 +283,23 @@ fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String
                 )
             })
             .collect::<Result<Vec<_>, _>>()?;
-        let modules =
-            neoclr::assembler::read_modules(&inputs, &system).map_err(|e| e.to_string())?;
-        let program = neoclr::LoadedProgram::with_modules(&modules[0], &system, &modules[1..])
-            .map_err(|e| e.to_string())?;
+        let modules = if let Some(root) = &object_root {
+            neoclr::assembler::read_modules_with_object_root(&inputs, &system, root)
+        } else {
+            neoclr::assembler::read_modules(&inputs, &system)
+        }
+        .map_err(|e| e.to_string())?;
+        let program = if let Some(root) = &object_root {
+            neoclr::LoadedProgram::with_modules_and_object_root(
+                &modules[0],
+                &system,
+                &modules[1..],
+                root,
+            )
+        } else {
+            neoclr::LoadedProgram::with_modules(&modules[0], &system, &modules[1..])
+        }
+        .map_err(|e| e.to_string())?;
         (modules, program)
     };
     let module = &modules[0];

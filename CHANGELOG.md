@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Expose explicit Object-root loading through `--object-root <module-input>` with an
+  explicit `--system` seed. Reuse exact module/revision/type-row validation, reject
+  unregistered or incompatible roots before assembly publication, and keep default
+  loading unchanged. An ordinary Raven driver-produced root library executes through
+  the runtime CLI; 30 focused runtime/CLI checks pass. Raven consumer import is pending.
+  Clarify release scope: an end-to-end NeoCLR POC with sample compilation, not exhaustive
+  platform or class-library completion.
+
 - Add development `neoclr disassemble <metadata-input> [output]` for PE/#Neo,
   NEOX and format-5 JSON. Show declaration metadata and indexed instructions without
   resolving dependencies or executing. Preserve existing files and reject malformed
