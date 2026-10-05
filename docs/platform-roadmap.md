@@ -8,6 +8,15 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Abstract class metadata prerequisite (2026-10-05)
+
+Ordinary abstract classes now retain CLI Abstract independently of static and closed
+families through definitions, builders, native readers and introspection. Concrete
+subclasses execute constructor chaining and inherited-field reads on both runtimes.
+The unchanged inheritance sample remains blocked: ordinary virtual/abstract method
+slots, Raven admission and dispatch still need coordinated completion. The sample
+count remains nine of ten. [Focused evidence](experiments/extended-cli-metadata/abstract-classes-2026-10-05.md).
+
 ## Union reference-producer regression closed (2026-10-05)
 
 Raven's lexical union case repair is integrated independently on main and the native

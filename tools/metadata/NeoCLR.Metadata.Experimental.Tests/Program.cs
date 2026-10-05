@@ -4,6 +4,11 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--class-base-checks")
+{
+    ClassBaseAuthoringChecks.Run(); SealedClassChecks.Run(); ClosedClassChecks.Run();
+    Console.WriteLine("PASS class base, abstract, sealed and closed-family contracts"); return 0;
+}
 if (args.Length == 2 && args[0] == "--entry-arguments-image")
 {
     File.WriteAllBytes(args[1], NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(EntryArgumentChecks.Create())); return 0;

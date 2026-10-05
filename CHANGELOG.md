@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Add ordinary abstract class authoring through definitions and builders. Preserve
+  CLI Abstract independently of Sealed/static and native closed-family metadata in
+  native readers and introspection. Validate concrete subclass construction and
+  inherited fields on CLR and neoCLR; reject direct abstract instantiation. This is
+  an inheritance prerequisite, not yet general abstract/virtual method support.
+
 - Close the release reference-producer Option binding regression through Raven's lexical
   union case lookup repair, independently integrated on main. Validate cold semantic
   queries and separately compiled union factories on both targets. The repaired native

@@ -7384,3 +7384,27 @@ through root slots. Regenerating a CLI projection from a native snapshot with cl
 inheritance remains explicitly unsupported (`NotSupportedException`); use the original
 authored graph for PE emission. The normal .NET override execution controls still pass.
 Raven's source-root planner, virtual declarations and special-type mapping remain pending.
+
+
+### Ordinary abstract classes (development, 2026-10-05)
+
+`TypeDefinition.SetAbstractClass()` and `TypeBuilder.SetAbstractClass()` mark an
+attached, nongeneric, top-level ordinary reference class with CLI `Abstract` (0x80).
+The builder delegates to its canonical definition. Repeated calls are idempotent.
+They return void and throw `InvalidOperationException` for detached or loaded
+snapshots, value/interface/static/sealed classes, nested or generic owners, native
+Object roots and closed families. Rejected calls leave attributes unchanged.
+
+Manual authoring accepts `new TypeDefinition(ns, name, 0x81, baseReference)` through
+the same attachment validation. The base must be the explicitly selected core Object
+or an attached supported local class. Public/internal visibility is supported.
+Concrete methods, fields and public/protected constructors retain existing contracts.
+Direct construction of an abstract owner fails writer validation with
+`InvalidDataException`; a concrete subclass can call its base constructor normally.
+
+Native reads preserve Abstract without inventing Sealed, static classification or
+closed-family semantics. Introspection exposes `IsAbstract == true`, `IsStatic ==
+false`, `IsSealed == false`, and `IsClosedHierarchy == false`. Static classes continue
+to require both Abstract and Sealed. The existing payload fields and CLI flags suffice;
+there is no format-version change. General virtual/abstract method authoring remains
+unsupported pending the next inheritance slice. No guest class-library API changed.

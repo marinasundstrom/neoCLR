@@ -176,8 +176,8 @@ public sealed partial class AssemblyBuilder
                 throw new ArgumentException("visibility does not match lexical ownership");
             var category = attributes & ~7u;
             if (definition.GenericArity == 0 && definition.Name.Contains('`') || definition.GenericArity > 0 && category == 0x180 || category is not (0 or 0x80 or 0x180 or 0x108 or 0xa0 or 0x100)) throw new ArgumentException("unsupported manual type shape");
-            if (category == 0x80 && !definition.IsClosedHierarchy && !definition.IsNativeObjectRoot || definition.IsClosedHierarchy && (category is not (0x80 or 0xa0) || definition.GenericArity != 0 || definition.DeclaringType is not null))
-                throw new ArgumentException("closed hierarchy requires a nongeneric top-level abstract class or interface");
+            if (category == 0x80 && (definition.GenericArity != 0 || definition.DeclaringType is not null) || definition.IsClosedHierarchy && (category is not (0x80 or 0xa0) || definition.GenericArity != 0 || definition.DeclaringType is not null))
+                throw new ArgumentException("abstract classes and closed families require supported nongeneric top-level owners");
             if (category == 0xa0)
             {
                 if (definition.BaseType is not null) throw new ArgumentException("interfaces have no class base");

@@ -1,0 +1,27 @@
+{
+  "baseRevision": "1dd5b0901a3f0f48c6c436f979731ee5d76949f9",
+  "compilerRevision": "2b683df67",
+  "validation": "CLI construction and native verify/run; four native programs return 42 with empty stderr",
+  "artifacts": [
+    {
+      "path": "target/release/neoclr",
+      "sha256": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+    },
+    {
+      "path": "/tmp/abstract-class-runtime1005-final/AbstractAuthoredBases.dll",
+      "sha256": "d9e81b51cc58e0e3b3d973829276ab0f83d4ea03c38dc446d9856e899fcd97e2"
+    },
+    {
+      "path": "/tmp/abstract-class-runtime1005-final/AbstractProtectedBases.dll",
+      "sha256": "24823349b4030b9022b38368471a936ea10c22f131b6bbf26ea30464421a2771"
+    },
+    {
+      "path": "/tmp/abstract-class-runtime1005-final/ConcreteAuthoredBases.dll",
+      "sha256": "3c2ff67d0941163dc52942bd46ec908d2deea832643fab3ae8163cad30efbd5d"
+    },
+    {
+      "path": "/tmp/abstract-class-runtime1005-final/ConcreteProtectedBases.dll",
+      "sha256": "78fa8aa7f6bb383370a74f6794d406efef6af02a612e934233b63109ab893a69"
+    }
+  ]
+}

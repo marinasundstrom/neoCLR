@@ -5,12 +5,23 @@ using NeoCLR.Metadata.Experimental.Introspection;
 
 internal static class ClassBaseAuthoringChecks
 {
-    private static AssemblyBuilder Create(bool manual = false, bool missingChain = false, bool duplicateChain = false, bool protectedConstructor = false)
+    private static AssemblyBuilder Create(bool manual = false, bool missingChain = false, bool duplicateChain = false, bool protectedConstructor = false, bool abstractBase = false)
     {
         var host = typeof(object).Assembly.GetName();
         var core = new AssemblyIdentity(host.Name!, host.Version!, host.CultureName ?? "", Convert.ToHexString(host.GetPublicKeyToken() ?? []));
         var graph = new AssemblyBuilder(new("AuthoredBases" + Guid.NewGuid().ToString("N"), new(1, 0, 0, 0)), core);
-        var parent = graph.AddClass("Example", "Base");
+        TypeBuilder parent;
+        if (manual && abstractBase)
+        {
+            var definition = new TypeDefinition("Example", "Base", 0x81, graph.Definition.MainModule.ImportReference(core, "System", "Object"));
+            graph.Definition.MainModule.Types.Add(definition);
+            parent = graph.Types.Single();
+        }
+        else
+        {
+            parent = graph.AddClass("Example", "Base");
+            if (abstractBase) { parent.SetAbstractClass(); parent.SetAbstractClass(); }
+        }
         var number = parent.AddField("Number", PrimitiveType.Int32, FieldVisibility.Public);
         MethodBuilder initialize;
         if (manual && protectedConstructor)
@@ -46,11 +57,13 @@ internal static class ClassBaseAuthoringChecks
     {
         foreach (var manual in new[] { false, true })
         foreach (var family in new[] { false, true })
+        foreach (var abstractBase in new[] { false, true })
         {
-            var graph = Create(manual, protectedConstructor: family);
+            var graph = Create(manual, protectedConstructor: family, abstractBase: abstractBase);
             var assembly = System.Reflection.Assembly.Load(graph.Write());
             var parent = assembly.GetType("Example.Base")!;
             var child = assembly.GetType("Example.Derived")!;
+            if (parent.IsAbstract != abstractBase || parent.IsSealed) throw new Exception("CLI abstract class flags lost");
             var value = Activator.CreateInstance(child, 42)!;
             if (child.BaseType != parent || (int)parent.GetField("Number")!.GetValue(value)! != 42)
                 throw new Exception("CLI base constructor/field initialization failed");
@@ -60,7 +73,10 @@ internal static class ClassBaseAuthoringChecks
             if (native.MainModule.Types.Single(t => t.Name == "Derived").BaseType!.Resolve().Name != "Base")
                 throw new Exception("native authored base round trip failed");
             var context = new MetadataLoadContext([native]);
-            var callable = context.Assemblies.Single().GetTypes().Single(t => t.Name == "Base").GetConstructors().Single();
+            var baseView = context.Assemblies.Single().GetTypes().Single(t => t.Name == "Base");
+            if (baseView.IsAbstract != abstractBase || baseView.IsStatic || baseView.IsSealed || baseView.IsClosedHierarchy)
+                throw new Exception("native abstract class classification lost");
+            var callable = baseView.GetConstructors().Single();
             if (callable.Accessibility != (family ? MetadataAccessibility.Family : MetadataAccessibility.Public))
                 throw new Exception("native facade constructor visibility lost");
         }
@@ -80,11 +96,34 @@ internal static class ClassBaseAuthoringChecks
         if (denied.Types[0].Methods.Count != beforeMethods) throw new Exception("invalid protected declaration mutated owner");
         try { _ = new MethodDefinition("Bad", 4, new(PrimitiveType.Void, [])); throw new Exception("manual protected method accepted"); }
         catch (ArgumentException) { }
+        var abstractGraph = Create(abstractBase: true);
+        var illegal = abstractGraph.AddFunction("Illegal").GetILGenerator();
+        illegal.LoadConstant(1); illegal.NewObject(abstractGraph.Types[0].Methods.Single(m => m.IsConstructor));
+        illegal.Emit(OpCode.Pop); illegal.LoadConstant(0); illegal.Return();
+        Reject(() => abstractGraph.Write()); Reject(() => abstractGraph.WriteNativeAssembly());
+        var shapes = Create();
+        foreach (var invalidType in new[] { shapes.AddValueType("Example", "Value"), shapes.AddInterface("Example", "Contract"), shapes.AddType("Example", "Static"), shapes.AddClosedClass("Example", "Closed") })
+        {
+            var attributes = invalidType.Definition.Attributes;
+            RejectAbstract(() => invalidType.SetAbstractClass());
+            if (attributes != invalidType.Definition.Attributes) throw new Exception("rejected abstract mutation changed flags");
+        }
+        var sealedType = shapes.AddClass("Example", "Sealed"); sealedType.SetSealedClass();
+        RejectAbstract(() => sealedType.SetAbstractClass());
+        RejectAbstract(() => new TypeDefinition("Example", "Detached", 1, null).SetAbstractClass());
+        var loaded = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(Create(abstractBase: true)));
+        RejectAbstract(() => loaded.MainModule.Types.Single(t => t.Name == "Base").SetAbstractClass());
         var graph2 = Create();
         var before = graph2.Types.Count;
         try { graph2.AddClass("Example", "Foreign", Create().Types[0]); throw new Exception("foreign base accepted"); }
         catch (ArgumentException) { }
         if (graph2.Types.Count != before) throw new Exception("failed declaration mutated ownership");
+    }
+
+    private static void RejectAbstract(Action action)
+    {
+        try { action(); } catch (InvalidOperationException) { return; }
+        throw new Exception("unsupported abstract mutation accepted");
     }
 
     private static void Reject(Action action)
@@ -98,9 +137,10 @@ internal static class ClassBaseAuthoringChecks
         Run();
         Directory.CreateDirectory(directory);
         foreach (var family in new[] { false, true })
+        foreach (var abstractBase in new[] { false, true })
         {
-        var path = Path.Combine(directory, family ? "ProtectedBases.dll" : "AuthoredBases.dll");
-        File.WriteAllBytes(path, RuntimeAssemblyContainer.WriteBinary(Create(protectedConstructor: family)));
+        var path = Path.Combine(directory, (abstractBase ? "Abstract" : "Concrete") + (family ? "ProtectedBases.dll" : "AuthoredBases.dll"));
+        File.WriteAllBytes(path, RuntimeAssemblyContainer.WriteBinary(Create(protectedConstructor: family, abstractBase: abstractBase)));
         foreach (var command in new[] { "verify", "run" })
         {
             var start = new ProcessStartInfo(runtime) { RedirectStandardOutput = true, RedirectStandardError = true };
@@ -114,6 +154,6 @@ internal static class ClassBaseAuthoringChecks
                 throw new Exception(output + error);
         }
         }
-        Console.WriteLine("PASS public/protected authored derived constructor and inherited field: CLI execution and native PE verify/run return 42");
+        Console.WriteLine("PASS concrete/abstract bases with public/protected constructors and inherited fields: CLI execution and native PE verify/run return 42");
     }
 }
