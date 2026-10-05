@@ -12,7 +12,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   async emission gate. Add a driver/runtime regression for completed/pending awaits,
   hoisted local preservation and cancellation; the unchanged cancellation sample also
   compiles and runs with exact output. Top-level nongeneric async functions
-  execute; class/generic methods and async entry completion remain pending. Reuse
+  execute, including nongeneric class methods with preserved nested ownership and
+  private receiver mutation. Generic methods and async entry completion remain pending. Reuse
   existing runtime and metadata encodings, preserving the default .NET backend. Prove
   immutable hoisted Promise capture identity; the async sample now reaches the entry
   signature blocker instead of failing local storage emission.

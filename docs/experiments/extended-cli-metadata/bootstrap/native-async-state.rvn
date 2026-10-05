@@ -20,6 +20,22 @@ async func CapturedPromise() -> Task<int> {
     return value + 1
 }
 
+class AsyncCounter {
+    private var total: int = 40
+
+    async func Add(value: Task<int>) -> Task<int> {
+        let received = await value
+        total = total + received
+        return total
+    }
+
+    static async func Completed() -> Task<int> {
+        return 42
+    }
+
+    val Total: int => total
+}
+
 func Main() {
     if Completed().GetResult() != 42 {
         System.Fail("Completed async result was lost")
@@ -46,6 +62,17 @@ func Main() {
     TaskQueue.Default.Drain()
     if !captured.IsCompleted || captured.GetResult() != 42 {
         System.Fail("Callback did not retain the hoisted promise identity")
+    }
+    let counter = AsyncCounter()
+    let increment = Promise<int>()
+    let changed = counter.Add(increment.Task)
+    if changed.IsCompleted || counter.Total != 40 {
+        System.Fail("Instance async method mutated before completion")
+    }
+    _ = increment.Complete(2)
+    TaskQueue.Default.Drain()
+    if changed.GetResult() != 42 || counter.Total != 42 || AsyncCounter.Completed().GetResult() != 42 {
+        System.Fail("Instance async method lost receiver identity")
     }
     let cancelled = Promise<int>()
     let cancellation = AddLater(cancelled.Task)

@@ -13,8 +13,9 @@ Top-level nongeneric async functions now emit through Raven's existing heap lowe
 A native driver/runtime regression verifies completed/pending awaits, hoisted local
 preservation and cancellation with exact output. The unchanged cancellation sample also
 executes. Immutable hoisted closure captures now preserve Promise identity; both async
-samples reach the entry completion blocker. Class async methods remain guarded in the
-two HTTP samples. This does
+samples reach the entry completion blocker. Nongeneric class async methods now preserve
+receiver identity and private access through metadata nesting. Both HTTP samples reach a
+portable value-block control-flow rejection; fix that and async entry completion next. This does
 not introduce runtime suspension or green threads.
 [Scope and evidence](experiments/extended-cli-metadata/native-async-emission-2026-10-05.md).
 

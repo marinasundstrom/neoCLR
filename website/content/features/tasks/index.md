@@ -17,7 +17,8 @@ full async compiler integration remains in progress. Explicit native Task/builde
 now supports top-level nongeneric async functions, including completed/pending awaits,
 hoisted locals and cancellation. A synchronous entry drives the queue in the tested case.
 The unchanged cancellation sample also compiles and runs. Immutable callbacks preserve
-hoisted Promise identity. Entry completion and class methods remain blockers for the
+hoisted Promise identity. Nongeneric class async methods preserve receiver identity and
+private access. Entry completion and propagation control flow remain blockers for the
 other async/HTTP samples.
 The current POC prioritizes working samples; complete System coverage is later work.
 

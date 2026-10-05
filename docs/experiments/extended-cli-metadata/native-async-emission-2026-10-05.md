@@ -82,3 +82,23 @@ base revision plus the capture fix described here; artifact hashes identify the 
 binaries. The original emission JSON remains the evidence for the prior slice.
 
 The capture fix is Raven `70c111b25`. All 37 focused .NET async/portable-body tests pass.
+
+## Follow-up: class async methods and metadata ownership
+
+Nongeneric static/instance class async methods now emit through the same pipeline. Their
+machines are nested under their source class instead of flattened; existing runtime access
+rules then permit private receiver storage. The focused AsyncCounter case awaits a pending
+promise, mutates its original private field from 40 to 42 and proves receiver identity
+through its property. Its static async method also returns 42. No field visibility was
+widened; there is no runtime access bypass or metadata format change.
+
+C# reader checks retain the Worker declaring type and reject generic methods/owners
+before publication. Extensions and async entry completion remain guarded. Both unchanged
+HTTP samples advance to a portable value-block control-flow rejection. The next bounded
+work is handling the async propagation block at its owning layer and completing async
+entry semantics without discarding result/failure handling.
+
+The class-method implementation is Raven `25cc60977`; 38 focused .NET async/declaration
+tests pass. [Final class/sample evidence](native-async-class-2026-10-05.json) records
+exact input hashes and command outcomes. No independently useful .NET behavior fix
+requires backporting from this native declaration adapter change.

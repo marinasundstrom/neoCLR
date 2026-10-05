@@ -1,0 +1,259 @@
+{
+  "scope": "selected unchanged POC samples; only cases with an execution record claim runtime validation",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "57b4cc80f08190ad84bd948c59bb4f21430a00b4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0": "25cc609776e36095352b9546419c14d203d20dc3"
+  },
+  "inputs": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "f0e877f033aa419d4e7b86315d2d9c8ead73f437e51109afb59857e3e6257377",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "d1bc068d2be84fd120a9eabf3ef834856cc08887d4d149407b140d4b2e6951e7",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "ce1e1d05a32ff3a923bed8bf663243644b6ea398d1793dbfc2d942107a3b14ff",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "9947391f0377b4c4666418d8b0302e88b04fe82acdc4df0bbcb2e49c7ff79264",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+  },
+  "cases": [
+    {
+      "name": "native-async-state",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/native-async-state.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2706: This async method 'Completed' has no 'await' and will run synchronously.\nwarning RAV2706: This async method 'Completed' has no 'await' and will run synchronously.\n",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn": "991dd80b7b416bd7cea25621745d19a4836529494659238997f6c6d73590ae19"
+      },
+      "published": true,
+      "artifactSha256": "a415b50fbae0f2f57a6668fc97a7ddd4a4c5cac089f6d4f2e2cbdca01cc521df",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-async-class-final1005/native-async-state.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Native async state checks passed\n",
+        "stderr": "",
+        "expectedStdout": "Native async state checks passed\n",
+        "passed": true
+      }
+    },
+    {
+      "name": "library-async",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/library-async.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-async.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA003: Native metadata encoding failed: entry point must be a local Int32 or no-result method with no parameters or one String vector.\n",
+      "compiled": false,
+      "sources": {
+        "docs/experiments/raven-target/samples/library-async.rvn": "8e225b601fd18c86f5c3b2ec30b47064c4cb37b87bd156e331097eb075cd226c"
+      },
+      "published": false
+    },
+    {
+      "name": "library-async-default-queue",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/library-async-default-queue.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-async-default-queue.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA003: Native metadata encoding failed: entry point must be a local Int32 or no-result method with no parameters or one String vector.\n",
+      "compiled": false,
+      "sources": {
+        "docs/experiments/raven-target/samples/library-async-default-queue.rvn": "ff15929a00d48462332c863be3f6381aaf58869f904d89f8ecbcfd9c7a9a178d"
+      },
+      "published": false
+    },
+    {
+      "name": "library-async-cancellation",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/library-async-cancellation.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-async-cancellation.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/raven-target/samples/library-async-cancellation.rvn": "e28cb42e2c13528e9784402e3122777f28ed4b1a906b2274a3c4d87f7c15d19a"
+      },
+      "published": true,
+      "artifactSha256": "052bf50c465c5b132ebe8614f72875003439d17bc43db0fac69b37064f3c5ce1",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-async-class-final1005/library-async-cancellation.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Cancelled\n",
+        "stderr": "",
+        "expectedStdout": "Cancelled\n",
+        "passed": true
+      }
+    },
+    {
+      "name": "http-json-server",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/http-json-server.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpServer.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nerror NEOMETA001: Native emission does not support value block cannot exit its enclosing expression.\n",
+      "compiled": false,
+      "sources": {
+        "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+        "docs/experiments/json-object-mapping/HttpServer.rvn": "9c157bc5fcdfdf96401300feccbcd46d02bf0fa7db8f7c4c1f4233c73f589084"
+      },
+      "published": false
+    },
+    {
+      "name": "http-json-client",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-class-final1005/http-json-client.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpApplication.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/HttpClient.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'AppError' via implicit conversion 'static func implicit(error: JsonError) -> AppError'.\ninfo RAV1506: Result propagation converts errors from 'HttpJsonError' to 'AppError' via implicit conversion 'static func implicit(error: HttpJsonError) -> AppError'.\nwarning RAV0162: Unreachable code\nerror NEOMETA001: Native emission does not support value block cannot exit its enclosing expression.\n",
+      "compiled": false,
+      "sources": {
+        "docs/experiments/json-object-mapping/HttpApplication.rvn": "76f5e0ec5cd523b424d7f76794e2894fcf3802f96ee9a290e18d732932df25bd",
+        "docs/experiments/json-object-mapping/HttpClient.rvn": "bf129bcbd1768157ff3fb482dfc84fe686f56129c6c7b177bdcb0eadf51a1619"
+      },
+      "published": false
+    }
+  ]
+}
