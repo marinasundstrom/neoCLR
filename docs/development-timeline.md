@@ -10864,3 +10864,19 @@ a post-bootstrap release gate and recorded reproducibility, equivalent behavior,
 startup versus warmed execution and transparent limitations in the platform roadmap.
 No benchmark measurements or website publication have been performed for this request;
 ongoing HTTP propagation fixes retain their current priority.
+
+### 2026-10-05 — Complete the native HTTP integration gate
+
+The author directed, “Continue until you have solved Http API.” The assistant worked
+through generic callbacks, propagation in call arguments, captured self/private access,
+property patterns, boxed enum behavior and managed entry arguments. The complete HTTP
+source group now emits and separate artifact-only consumers and loopback harnesses pass
+all 25 gate commands, including eleven stream-upload cases. Production HTTP sources
+were preserved; two stale sample expectations were corrected with explicit checks.
+The generally useful propagation fix was independently tested and integrated into local
+Raven main. No remote push is recorded.
+
+The assistant records callback HTTP as working and native async state-machine emission,
+full-System ownership and a preexisting Array/Object generic dispatch failure as open.
+This does not complete the later benchmark/release milestone. See the
+[HTTP evidence and limitations](experiments/extended-cli-metadata/source-http-2026-10-05.md).

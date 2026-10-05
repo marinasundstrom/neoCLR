@@ -81,3 +81,10 @@ prerequisites. Current headers and isolated-body runs pass with strict cancellat
 connection-close and independent-request assertions (885/957 allocations respectively,
 zero live objects). An overlapping body run still timed out; serial validation avoids
 our own competing workload but is not proof of a runtime timing/performance fix.
+
+Native-metadata validation (2026-10-05) uses the same sources and independent peers
+through `../extended-cli-metadata/verify_source_http.py`. The verifier accepts native
+compiler/core/seed/ownership/library arguments alongside its existing bundle mode.
+The source fixture now explicitly accepts EOF-delimited content, which the decoder
+already supports, and uses conflicting Content-Length headers for the malformed case.
+This corrects an obsolete test expectation; it does not relax response validation.

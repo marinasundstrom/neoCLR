@@ -8,6 +8,14 @@ response through neoCLR TCP sockets, with DNS on the client. HttpClient, HttpSer
 content and handlers are experimental APIs in System.Web.Http. Use the matching
 Preview 11 toolchain.
 
+## Native metadata integration in development
+
+The development compiler can build the HTTP library and consume its emitted native
+assembly in separate applications. Verified callback-based cases cover headers, JSON,
+routing, cancellation, client/server status handling and stream uploads. This is separate
+from the published Preview 11 toolchain above; native `async` state-machine compilation
+and full-System bootstrapping are still pending. Existing protocol limits remain.
+
 ## HttpClient: call an HTTP service
 
 Use HttpClient on its own to call a service. This example sets a base address and

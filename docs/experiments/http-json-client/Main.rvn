@@ -102,8 +102,21 @@ func JsonVerbs() {
     Check(malformed.GetResult() is Error(HttpJsonError.Json(JsonError.Syntax(_))))
     Check(transportResult.GetResult() is Error(HttpJsonError.Http(HttpError.TimedOut)))
 
+    let scalarHandler = ReplyHandler(200, "{}", false)
+    let scalar = HttpClient(scalarHandler).PostAsJson("http://example.test/", 42)
+    TaskQueue.Default.Drain()
+    Check(scalar.GetResult() is Ok(_))
+    Check(scalarHandler.Calls == 1)
+    let Some(scalarRequest) = scalarHandler.Response.Request else {
+        System.Fail("Scalar POST origin missing")
+    }
+    let Ok(scalarValue) = JsonContent.Read<int>(scalarRequest.Content) else {
+        System.Fail("Scalar POST body invalid")
+    }
+    Check(scalarValue == 42)
+
     let unsupported = ReplyHandler(200, "{}", false)
-    let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", 42)
+    let badModel = HttpClient(unsupported).PostAsJson("http://example.test/", (byte)42)
     Check(badModel.GetResult() is Error(HttpJsonError.Json(JsonError.UnsupportedMapping(_))))
     Check(unsupported.Calls == 0)
 

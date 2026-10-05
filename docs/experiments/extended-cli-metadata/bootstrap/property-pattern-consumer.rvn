@@ -1,0 +1,42 @@
+import System.*
+
+class Reply {
+    var Reads: int = 0
+    var Code: int = 0
+    val Status: int {
+        get {
+            Reads += 1
+            return Code
+        }
+    }
+    val Payload: int {
+        get {
+            Reads += 10
+            return 42
+        }
+    }
+}
+
+func Main() {
+    let reply = Reply()
+    reply.Code = 404
+    if reply is Reply { Status: 200, Payload: _ } {
+        System.Fail("Wrong constant matched")
+    }
+    if reply.Reads != 1 {
+        System.Fail("Pattern did not short circuit")
+    }
+    reply.Code = 200
+    if let Reply { Status: 200, Payload: payload } = reply {
+        if payload != 42 || reply.Reads != 12 {
+            System.Fail("Pattern reread a property or lost its payload")
+        }
+    } else {
+        System.Fail("Matching property pattern rejected")
+    }
+    let absent: Reply? = null
+    if absent is Reply { Status: 200 } {
+        System.Fail("Null matched a property pattern")
+    }
+    Console.WriteLine("Property pattern checks passed")
+}

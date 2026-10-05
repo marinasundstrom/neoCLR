@@ -10,24 +10,41 @@ import tempfile
 import threading
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--toolchain-root', type=Path, required=True)
+parser.add_argument('--toolchain-root', type=Path)
+for name in ('compiler', 'core', 'seed', 'ownership'):
+    parser.add_argument('--' + name, type=Path)
+parser.add_argument('--native-library', type=Path, action='append', default=[])
 parser.add_argument('--runner', type=Path, required=True)
 parser.add_argument('--sdk', type=Path, help='Separate extracted Raven SDK; defaults to TOOLCHAIN_ROOT/raven-sdk')
 cases = ('success', 'borrowed', 'empty', 'eof', 'read-error', 'overread',
          'cancel', 'precancel', 'disposed', 'invalid-header', 'refused')
 parser.add_argument('--case', choices=cases, help='Run one case instead of the full focused matrix')
 args = parser.parse_args()
-bundle, runner = args.toolchain_root.resolve(), args.runner.resolve()
+native = args.compiler is not None
+if native:
+    assert args.core and args.seed and args.ownership and args.native_library
+else:
+    assert args.toolchain_root
+bundle = args.toolchain_root.resolve() if args.toolchain_root else Path('.')
+runner = args.runner.resolve()
 here = Path(__file__).resolve().parent
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(args.sdk.resolve() if args.sdk else bundle / 'raven-sdk'))
 with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
     root = Path(folder)
     for name in ('Main.rvn', 'Upload.rvnproj'):
         shutil.copyfile(here / name, root / name)
-    built = subprocess.run(['dotnet', 'msbuild', str(root / 'Upload.rvnproj'), '-nologo', '-v:minimal'],
+    command = ['dotnet', 'msbuild', str(root / 'Upload.rvnproj'), '-nologo', '-v:minimal']
+    if native:
+        command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()),
+                   '--runtime-seed', str(args.seed.resolve()), '--bootstrap-intrinsics',
+                   '--bootstrap-ownership', str(args.ownership.resolve())]
+        for library in args.native_library:
+            command += ['--reference', str(library.resolve())]
+        command += ['-o', str(root / 'App.dll'), str(root / 'Main.rvn')]
+    built = subprocess.run(command,
                            env=env, capture_output=True, text=True, timeout=240)
     assert built.returncode == 0, built.stdout + built.stderr
-    app = root / 'bin/neoclr/Debug/App.neoil'
+    app = root / ('App.dll' if native else 'bin/neoclr/Debug/App.neoil')
     for mode in ([args.case] if args.case else cases):
         with socket.socket() as listener:
             listener.bind(('127.0.0.1', 0))
@@ -68,8 +85,13 @@ with tempfile.TemporaryDirectory(prefix='neoclr-stream-upload-') as folder:
             thread = threading.Thread(target=peer, daemon=True) if network else None
             if thread:
                 thread.start()
-            result = subprocess.run([str(runner), str(app), str(bundle / 'lib/System.neoil'),
-                                     '256', '100000000', '--', f'http://127.0.0.1:{port}/upload', mode],
+            command = [str(runner), str(app), str(bundle / 'lib/System.neoil'), '256', '100000000']
+            if native:
+                command = [str(runner), 'run', str(app), '--system', str(args.seed.resolve()), '--gc-stats', '--instructions', '100000000']
+                for library in args.native_library:
+                    command += ['--module', str(library.resolve())]
+            command += ['--', f'http://127.0.0.1:{port}/upload', mode]
+            result = subprocess.run(command,
                                     capture_output=True, text=True, timeout=120)
             if thread:
                 thread.join(timeout=35)

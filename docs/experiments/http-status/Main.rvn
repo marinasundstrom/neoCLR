@@ -98,9 +98,21 @@ class StatusProbe {
         })
     }
 
+    func EofDelimited() {
+        let pending = client.Get("http://127.0.0.1:19091/eof")
+        pending.OnCompleted(() => {
+            let Ok(response) = pending.GetResult() else {
+                System.Fail("EOF-delimited response failed")
+                return
+            }
+            Check((int)response.StatusCode == 201 && response.Content.Bytes.Count == 4)
+            Console.WriteLine("HTTP status and conversion checks passed")
+        })
+    }
+
     func Invalid() {
         if failures == 6 {
-            Console.WriteLine("HTTP status and conversion checks passed")
+            EofDelimited()
             return
         }
         let failureNumber = failures
@@ -116,6 +128,9 @@ class StatusProbe {
                 if let Error(HttpError.Protocol(_)) = pending.GetResult() {
                     Check(true)
                 } else {
+                    if let Error(reason) = pending.GetResult() {
+                        System.Fail("Malformed response returned " + reason.ToString())
+                    }
                     System.Fail("Malformed response was accepted")
                 }
             }

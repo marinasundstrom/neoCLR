@@ -10,10 +10,18 @@ import tempfile
 import threading
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--toolchain-root', type=Path, required=True)
+parser.add_argument('--toolchain-root', type=Path)
+for name in ('compiler', 'core', 'seed', 'ownership'):
+    parser.add_argument('--' + name, type=Path)
+parser.add_argument('--native-library', type=Path, action='append', default=[])
 parser.add_argument('--runner', type=Path, required=True)
 args = parser.parse_args()
-bundle = args.toolchain_root.resolve()
+native = args.compiler is not None
+if native:
+    assert args.core and args.seed and args.ownership and args.native_library
+else:
+    assert args.toolchain_root
+bundle = args.toolchain_root.resolve() if args.toolchain_root else Path('.')
 runner = args.runner.resolve()
 here = Path(__file__).resolve().parent
 env = dict(os.environ, NeoCLRRoot=str(bundle), RavenSdkRoot=str(bundle / 'raven-sdk'))
@@ -23,17 +31,30 @@ invalid = [b'HTTP/1.1 20A Bad\r\nContent-Length: 0\r\n\r\n',
            b'HTTP/1.1 100 Continue\r\n\r\n',
            b'HTTP/1.1 204 No Content\r\nContent-Length: 0\r\n\r\n',
            b'HTTP/1.1 205 Reset Content\r\nContent-Length: 1\r\n\r\nx',
-           b'HTTP/1.1 201 Created\r\n\r\n']
+           b'HTTP/1.1 201 Created\r\nContent-Length: 1\r\nContent-Length: 2\r\n\r\n']
 
 def build(root, source):
     root.mkdir()
     (root / 'Main.rvn').write_text(source)
     shutil.copyfile(here / 'HttpStatus.rvnproj', root / 'HttpStatus.rvnproj')
-    result = subprocess.run(['dotnet', 'msbuild', str(root / 'HttpStatus.rvnproj'), '-nologo', '-v:minimal'], env=env, capture_output=True, text=True, timeout=240)
+    compile_command = ['dotnet', 'msbuild', str(root / 'HttpStatus.rvnproj'), '-nologo', '-v:minimal']
+    if native:
+        compile_command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()),
+                           '--runtime-seed', str(args.seed.resolve()), '--bootstrap-intrinsics',
+                           '--bootstrap-ownership', str(args.ownership.resolve())]
+        for library in args.native_library:
+            compile_command += ['--reference', str(library.resolve())]
+        compile_command += ['-o', str(root / 'App.dll'), str(root / 'Main.rvn')]
+    result = subprocess.run(compile_command, env=env, capture_output=True, text=True, timeout=240)
     assert result.returncode == 0, result.stdout + result.stderr
-    return root / 'bin/neoclr/Debug/App.neoil'
+    return root / ('App.dll' if native else 'bin/neoclr/Debug/App.neoil')
 
 def command(app, live=False):
+    if native:
+        result = [str(runner), 'run', str(app), '--system', str(args.seed.resolve()), '--gc-stats', '--instructions', '100000000']
+        for library in args.native_library:
+            result += ['--module', str(library.resolve())]
+        return result
     return [str(runner), str(app), str(bundle / 'lib/System.neoil'), '256', '100000000'] + (['--live-output'] if live else [])
 
 with tempfile.TemporaryDirectory(prefix='neoclr-http-status-') as folder, socket.socket() as listener:
@@ -55,7 +76,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-status-') as folder, socket
         errors = []
         def peer():
             try:
-                targets = [str(code) for code in codes for _ in range(2)] + (['invalid-' + str(i) for i in range(len(invalid))] if include_invalid else [])
+                targets = [str(code) for code in codes for _ in range(2)] + (['invalid-' + str(i) for i in range(len(invalid))] + ['eof'] if include_invalid else [])
                 for target in targets:
                     with listener.accept()[0] as stream:
                         stream.settimeout(30)
@@ -66,13 +87,17 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-status-') as folder, socket
                             request.extend(part)
                             assert len(request) < 2048
                         assert request.startswith(f'GET /{target} HTTP/1.1\r\n'.encode()), request
-                        if target.startswith('invalid-'):
+                        if target == 'eof':
+                            wire = b'HTTP/1.1 201 Created\r\nConnection: close\r\n\r\nbody'
+                        elif target.startswith('invalid-'):
                             wire = invalid[int(target[8:])]
                         else:
                             code = int(target)
                             length = b'' if code == 204 else b'Content-Length: 65536\r\n' if code == 304 else b'Content-Length: 0\r\n' if code == 205 else b'Content-Length: 4\r\n'
                             wire = f'HTTP/1.1 {code} \r\n'.encode() + length + b'Connection: close\r\n\r\n' + (b'' if code in (204,205,304) else b'body')
                         stream.sendall(wire)
+                        if target == 'eof':
+                            stream.shutdown(socket.SHUT_WR)
                         try:
                             assert stream.recv(1) == b'', 'Client did not complete before EOF'
                         except ConnectionResetError:
@@ -82,7 +107,7 @@ with tempfile.TemporaryDirectory(prefix='neoclr-http-status-') as folder, socket
         worker = threading.Thread(target=peer, daemon=True)
         worker.start()
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
-        assert result.returncode == 0, result.stdout + result.stderr
+        assert result.returncode == 0, (errors, result.stdout, result.stderr)
         worker.join(35)
         assert not worker.is_alive() and not errors, (errors, result.stdout, result.stderr)
         return result

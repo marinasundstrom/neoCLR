@@ -84,3 +84,9 @@ server cases and buffered POST client checks pass with zero final live objects.
 An additional consumer checks maximum declared length, JSON rejection and Disposable
 interface dispatch; the importer needed explicit admission of that conversion. No full runtime suite or
 publication is part of this feature slice.
+
+Native metadata checkpoint (2026-10-05): all eleven cases execute with the unchanged
+Raven source and a String[] entry point. The verifier accepts `--compiler`, `--core`,
+`--seed`, `--ownership`, repeated `--native-library` and `--runner` for native execution.
+The consolidated `../extended-cli-metadata/verify_source_http.py` gate records artifact
+hashes and invokes these cases with the same peer, disposal and zero-live-object checks.

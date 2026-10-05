@@ -1,5 +1,16 @@
 # neoCLR platform roadmap
 
+## Native source HTTP gate passes (2026-10-05)
+
+The [HTTP execution gate](experiments/extended-cli-metadata/source-http-2026-10-05.md)
+passes all 25 commands: the complete HTTP source group emits, seven artifact-only
+consumers execute, and cancellation, client/server status and eleven upload cases pass.
+This supersedes the historical storage/network next-step notes below. Callback HTTP
+is supported in this development integration; native async emission remains open.
+Next reassess full-System source/bootstrap ownership and generic Array/Object dispatch
+before expanding the combined library. Full-System compilation, dual-target library
+parity and the post-bootstrap benchmark/release gate are not complete.
+
 Native descriptor prerequisites now include closed interface authoring/linking and
 source static extensions with generic type tokens; see [focused evidence](experiments/extended-cli-metadata/introspection-prerequisites-2026-10-05.md).
 Source descriptor Object overrides also execute across separate native assemblies;

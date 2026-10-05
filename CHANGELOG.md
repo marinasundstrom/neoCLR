@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Establish the native source HTTP execution gate: compile the complete HTTP source
+  group and run seven artifact-only consumers plus cancellation, status/server and
+  eleven stream-upload cases. Add native modes to existing harnesses and record
+  command/hash evidence. Correct stale scalar-JSON and EOF-body fixture expectations.
+  Native async emission and full-System bootstrap remain open; no performance or
+  release completion is claimed.
+
 - Accept a single String vector on metadata entry points and materialize managed
   user arguments at native startup, excluding argv[0] while Environment retains it.
   Enforce array/heap limits and reject ambiguous/unsupported entry signatures.

@@ -50,7 +50,7 @@ public sealed class FunctionBinding
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
     /// <exception cref="ArgumentException">Shape, target kind or signatures do not match.</exception>
     public FunctionBinding(SignatureType functionType, MethodBuilder target) : this(functionType, target, null, null) { }
-    /// <summary>Binds an exact nongeneric method on a constructed owned generic class or interface.</summary>
+    /// <summary>Binds an exact method on a constructed owned generic class or interface, including supplied method arguments.</summary>
     /// <param name="functionType">The structural signature after owner argument substitution.</param>
     /// <param name="target">An owned constructed method reference; instance binding consumes its receiver.</param>
     /// <exception cref="ArgumentNullException">Either operand is null.</exception>
@@ -58,6 +58,10 @@ public sealed class FunctionBinding
     public FunctionBinding(SignatureType functionType, ConstructedMethodReference target) : this(functionType,
         target?.Definition ?? throw new ArgumentNullException(nameof(target)), target, null) { }
     /// <summary>Binds an instantiated generic method to its substituted structural signature.</summary>
+    /// <param name="functionType">The exact structural signature after method argument substitution.</param>
+    /// <param name="target">An owned generic method instance with all arguments supplied.</param>
+    /// <exception cref="ArgumentNullException">Either operand is null.</exception>
+    /// <exception cref="ArgumentException">The target kind or substituted signature is incompatible.</exception>
     public FunctionBinding(SignatureType functionType, GenericMethodInstance target) : this(functionType,
         target?.Definition ?? throw new ArgumentNullException(nameof(target)), null, target) { }
     private FunctionBinding(SignatureType functionType, MethodBuilder target, ConstructedMethodReference? constructed, GenericMethodInstance? generic)

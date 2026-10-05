@@ -27,3 +27,8 @@ live objects on a 256-object heap. API bridge signature validation passes 609 ch
 
 Matching API and library snapshots validate, including explicit dependency hashes
 for all JSON helper source files. Website build and full suites are skipped.
+
+The native-metadata gate also executes this consumer. Its former unsupported-Int32
+assertion was stale after scalar object mapping landed: it now verifies an Int32 POST
+and round-trip, and uses an unsupported Byte model for the no-handler-side-effect check.
+All other JSON/client assertions remain. See the source HTTP metadata gate.

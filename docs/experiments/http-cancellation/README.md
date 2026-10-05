@@ -66,3 +66,9 @@ also passes. A body run overlapping another local verification workload still re
 TimedOut before the control signal. Run these wall-clock-sensitive checks serially;
 the fixture change removes unnecessary ordering, not deadline sensitivity or a proven
 runtime performance cause. Retain this limitation for release validation.
+
+Native-metadata execution is also exercised by
+`../extended-cli-metadata/verify_source_http.py`. The verifier accepts `--compiler`,
+`--core`, `--seed`, `--ownership`, repeated `--native-library`, and `--runner` in place
+of `--toolchain-root`. It keeps the same peer-controlled cases and zero-live-object
+assertions. Use a release runtime for the existing real-time exchange deadlines.

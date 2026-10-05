@@ -147,6 +147,11 @@ public interface IILGenerator
     /// <exception cref="ArgumentNullException">An operand is null.</exception>
     void BindFunction(SignatureType functionType, MethodBuilder target);
     /// <summary>Binds an instantiated generic method to an exact structural signature.</summary>
+    /// <param name="functionType">The exact substituted Function shape.</param>
+    /// <param name="target">The output-owned instantiated method.</param>
+    /// <exception cref="ArgumentNullException">An operand is null.</exception>
+    /// <exception cref="ArgumentException">Invalid signature, ownership or caller generic scope.</exception>
+    /// <exception cref="InvalidDataException">Instruction limit exceeded; stack validity is checked on write.</exception>
     void BindFunction(SignatureType functionType, GenericMethodInstance target);
     /// <summary>Binds an exact target on a constructed owned generic reference type or interface.</summary>
     /// <param name="functionType">The exact substituted structural signature.</param>
