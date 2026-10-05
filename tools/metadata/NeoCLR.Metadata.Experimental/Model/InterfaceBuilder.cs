@@ -129,7 +129,7 @@ public sealed partial class TypeBuilder
             foreach (var parent in owner.InterfaceSignatures)
                 foreach (var inherited in Visit(Substitute(parent))) yield return inherited;
         }
-        return InterfaceSignatures.SelectMany(Visit);
+        return InterfaceSignatures.Concat(LocalBase?.InheritedContracts() ?? []).SelectMany(Visit);
     }
     internal IEnumerable<(string Name, MethodSignature Signature, bool IsStatic, MethodBuilder Declaration, SignatureType Owner)> RequiredInterfaceMethods =>
         InheritedContracts().SelectMany(owner =>
@@ -233,13 +233,13 @@ public sealed partial class TypeBuilder
 
 public sealed partial class MethodBuilder
 {
-    /// <summary>Appends virtual dispatch to an owned nongeneric interface method.</summary>
-    /// <param name="target">A public abstract interface instance method.</param>
+    /// <summary>Appends virtual dispatch to an owned nongeneric interface method or reference-class virtual slot.</summary>
+    /// <param name="target">A supported public interface or reference-class virtual instance method.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
-    /// <exception cref="ArgumentException">Foreign, generic or noninterface target.</exception>
+    /// <exception cref="ArgumentException">Foreign, generic or nonvirtual target.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     public void CallVirtual(MethodBuilder target) => GetILGenerator().CallVirtual(target);
 
-    /// <summary>Gets whether this is a bodyless abstract interface method.</summary>
-    public bool IsAbstract => DeclaringType?.IsInterface == true;
+    /// <summary>Gets whether this is a bodyless abstract class or interface method.</summary>
+    public bool IsAbstract => DeclaringType?.IsInterface == true || (Definition.DeclarationAttributes & 0x400) != 0;
 }

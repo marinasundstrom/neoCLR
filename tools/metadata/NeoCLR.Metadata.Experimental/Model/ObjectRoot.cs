@@ -100,6 +100,8 @@ public sealed partial class TypeBuilder
     /// These are declarations of slots, not overrides. Runtime admission still validates the complete root.</remarks>
     public MethodBuilder AddNativeObjectSlot(string name, MethodSignature signature)
     {
+        if (!IsNativeObjectRoot) throw new InvalidOperationException("Object slots require the explicit native root");
+        if (!MethodDefinition.IsNativeObjectSlot(name, signature)) throw new ArgumentException("unsupported native Object slot signature");
         var definition = new MethodDefinition(name, 0x146, signature);
         Definition.Methods.Add(definition);
         return MethodBuilder.ForDefinition(definition);

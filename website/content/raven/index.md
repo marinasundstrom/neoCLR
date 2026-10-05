@@ -130,8 +130,8 @@ supply compiler symbols without translating those libraries back to .NET metadat
 The explicit primitive bootstrap, retained runtime seed and matching dependency
 artifacts remain required. The ordinary .NET target keeps its existing backend.
 
-Nine of the ten selected POC samples now compile and execute with checked output.
-They cover collections and queries, interface calls, class identity and struct copies,
+All ten selected POC samples now have compilation and checked execution evidence.
+They cover collections and queries, interface and virtual calls, class identity and struct copies,
 JSON object mapping, Tasks/await, cancellation, and an HTTP client/server pair tested
 over localhost. This is a bounded sample gate, not a claim that every Raven program
 or the entire System class library compiles natively.
@@ -148,10 +148,11 @@ native `Task<Result<…>>` entry points remain unsupported. The Preview 11 entry
 above describes the published bridge path, not blanket native-target support. Runtime
 suspension and green threads are future work.
 
-The remaining original sample, `application-inheritance`, needs coordinated support for
-abstract base declarations and ordinary virtual/override slots. Existing local base,
-protected-constructor and closed-family cases do not establish that broader support.
-A release also requires the native metadata workflow to pass through the language
+The unchanged `application-inheritance` sample now executes abstract base, interface,
+virtual/override and direct base-call behavior with the same output as the .NET target.
+Support is bounded to local nongeneric class slots; external class overrides, generic
+virtual classes and new-slot hiding remain outside this native slice.
+A release still requires the native metadata workflow to pass through the language
 server and VS Code, with matching setup instructions and sample downloads.
 
 The development `neoclr disassemble` command inspects native metadata and instructions

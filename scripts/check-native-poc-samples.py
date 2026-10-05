@@ -41,6 +41,7 @@ def main():
     if runtime:
         inputs.append(runtime)
     expected = {
+        'application-inheritance': '7\n42\n',
         'application-types': '42\n99\n7\n42\n7\n',
         'library-async': 'Suspended\n42\n',
         'library-async-default-queue': 'Hello on a worker\n',

@@ -7408,3 +7408,32 @@ false`, `IsSealed == false`, and `IsClosedHierarchy == false`. Static classes co
 to require both Abstract and Sealed. The existing payload fields and CLI flags suffice;
 there is no format-version change. General virtual/abstract method authoring remains
 unsupported pending the next inheritance slice. No guest class-library API changed.
+
+
+### Local class virtual slots (development, 2026-10-05)
+
+`TypeBuilder.AddVirtualMethod(string name, MethodSignature signature)` introduces a
+public, nongeneric instance slot on a nongeneric reference class. It returns the
+canonical `MethodBuilder`; emit its body through `GetILGenerator()`.
+`AddAbstractMethod(string name, MethodSignature signature)` introduces the same slot
+without a body and requires an abstract owner. Manual definitions use CLI attributes
+`0x146` (Public | Virtual | NewSlot) and `0x546` (also Abstract), respectively.
+Invalid names/signatures or duplicates throw `ArgumentException`; incompatible owners
+throw `InvalidOperationException`. Abstract methods reject bodies/locals on write.
+
+`AddOverride` and manual `MethodDefinition(name, 0x46, signature)` also support exact
+local inherited class slots. Writer validation requires matching return/parameter
+signatures and parameter modes; concrete classes must implement inherited abstract
+members. Incompatible overrides, hiding an inherited member, or missing implementations
+throw `InvalidDataException` before output. General new-slot hiding, generic class
+slots, re-abstraction, nonpublic virtual slots and external class overrides remain
+unsupported. Existing value/Object overrides retain their root identity checks.
+
+`IILGenerator.Emit(OpCode.Callvirt, method)` / `CallVirtual(method)` dispatch these
+reference-class slots. `Call(method)` invokes a concrete base body directly; direct
+abstract calls are rejected. Reader/introspection flags preserve Virtual, Abstract and
+NewSlot. Interface conformance includes the local base chain. Explicit virtual slots
+implementing interfaces are not marked Final. Runtime resolution uses validated
+metadata member origins to bridge encoded interface names and native slot spellings,
+while retaining exact owner/signature matching. Existing CLI flags and native payload
+fields suffice; no version change or implicit dependency loading is introduced.

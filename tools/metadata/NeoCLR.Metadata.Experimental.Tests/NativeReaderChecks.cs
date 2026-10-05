@@ -53,7 +53,7 @@ internal static class NativeReaderChecks
             n => n["revision"] = "9.0.0.0",
             n => n["extra"] = true,
             n => n["types"]![0]!["fields"]!.AsArray().Add("unsupported"),
-            n => n["types"]![0]!["is_sealed"] = false,
+            n => n["types"]![0]!["is_reference_type"] = false,
             n => n["types"]![0]!["origin"]!["token"] = 1,
             n => n["functions"]![1]!["owner"]!["Named"] = "Missing",
             n => n["functions"]![1]!["parameters"]![0] = "Object",

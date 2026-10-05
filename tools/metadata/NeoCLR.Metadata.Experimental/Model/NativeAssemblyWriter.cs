@@ -78,14 +78,14 @@ public sealed partial class AssemblyBuilder
         }
         CheckText(Identity.Name);
         var dependencies = new Dictionary<AssemblyIdentity, AssemblyBuilder>();
-        if (methods.Any(method => method.IsOverride))
+        if (methods.Any(method => method.IsImplicitObjectOverride))
         {
             if (NativeObjectRoot is not null) ValidateNativeObjectSlots();
             else
             {
                 var bindings = nativeBindings.Where(pair => pair.Value.Library.ModuleName == "System").ToArray();
                 if (bindings.Length != 1) throw new InvalidDataException("native Object overrides require one explicit runtime slot binding for System");
-                foreach (var name in methods.Where(m => m.IsOverride).Select(m => m.Name).Distinct()) bindings[0].Value.ValidateObjectOverride(name);
+                foreach (var name in methods.Where(m => m.IsImplicitObjectOverride).Select(m => m.Name).Distinct()) bindings[0].Value.ValidateObjectOverride(name);
                 dependencies.Add(bindings[0].Key, importedGraphs[bindings[0].Key].Graph);
             }
         }
@@ -115,7 +115,7 @@ public sealed partial class AssemblyBuilder
         static string ModuleIdentity(AssemblyIdentity identity) => "NeoMetadata_" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(IdentityText(identity))));
         static string Encoded(string value) => Convert.ToHexString(Encoding.UTF8.GetBytes(value));
         static string TypeName(TypeBuilder type) => type.Definition.IsNativeObjectRoot ? "System.Object" : type.NativeGrapheme ? "System.Char" : type.NativePrimitive is { } primitive ? "System." + primitive : type.Assembly.NativeBinding is { } binding ? binding.TypeName(type.Definition) : type.Definition.DeclaringType is { } parent ? TypeName(parent.Producer!) + ".N_" + Encoded(type.Name) : ModuleName(type.Assembly) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
-        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.Definition.ImplementationAttributes == 0x1000 ? (method.Namespace.Length == 0 ? method.Name : method.Namespace + "." + method.Name) : ((method.IsOverride || method.NativeValueOverride || method.DeclaringType?.NativePrimitive is not null || method.DeclaringType?.NativeGrapheme == true || method.DeclaringType?.Definition.IsNativeObjectRoot == true) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName)));
+        static string FunctionName(MethodBuilder method) => method.NativeImportName ?? (method.Definition.ImplementationAttributes == 0x1000 ? (method.Namespace.Length == 0 ? method.Name : method.Namespace + "." + method.Name) : ((method.IsVirtual && method.DeclaringType?.IsInterface == false || method.NativeValueOverride || method.DeclaringType?.NativePrimitive is not null || method.DeclaringType?.NativeGrapheme == true || method.DeclaringType?.Definition.IsNativeObjectRoot == true) ? TypeName(method.DeclaringType!) + "." + method.Name : method.IsConstructor ? TypeName(method.DeclaringType!) + "..ctor" : (method.DeclaringType is { } type ? TypeName(type) + ".M_" : ModuleName(method.Assembly) + ".F_") + Encoded(method.CliName)));
         static object? Owner(MethodBuilder method) => method.NativeImportCharOwner ? "Char" : method.NativeImportPrimitiveOwner is { } primitive ? primitive.ToString() : method.NativeImportIsNamespaceFunction ? null : method.DeclaringType is { } type ? TypeOwner(type, type.GenericParameterNames.Select((_, i) => SignatureType.TypeParameter(i)).ToArray()) : null;
         static object TypeOwner(TypeBuilder type, IReadOnlyList<SignatureType> arguments) => type.NativeGrapheme ? "Char" : type.NativePrimitive is { } primitive ? primitive.ToString() : arguments.Count == 0 ? new { Named = TypeName(type) } : new { Constructed = new { definition = TypeName(type), arguments = arguments.Select(SignatureValue).ToArray() } };
         static string ExternalName(ImportedTypeReference type) => type.Owner.IsNativeGrapheme(type) ? "System.Char" : type.Owner.NativeBindingFor(type.AssemblyIdentity) is { } binding ? binding.TypeName(type) : type.DeclaringType is { } parent ? ExternalName(parent) + ".N_" + Encoded(type.Name) : ModuleIdentity(type.AssemblyIdentity) + ".T_" + Encoded(type.Namespace) + "_" + Encoded(type.Name);
@@ -361,7 +361,7 @@ public sealed partial class AssemblyBuilder
                 FunctionName(method), Owner(method), Parameters(method),
                 method.Locals.Select(local => SignatureValue(local.SignatureType)).ToArray(),
                 SignatureValue(method.Signature.ReturnType), !method.ReturnsValue,
-                Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsAbstract && !method.IsStatic || method.IsOverride || method.IsNativeObjectSlot ? true : null, method.IsOverride ? true : null,
+                Origin(method.Name, 0x06000001 + index, method), method.IsAbstract ? [] : NativeBody(method), method.IsAbstract ? true : null, method.IsVirtual && !method.IsStatic ? true : null, method.IsOverride ? true : null,
                 method.Visibility == MethodVisibility.Public ? null : method.Visibility.ToString().ToLowerInvariant(),
                 method.DeclaringType is null && method.Namespace.Length != 0 ? method.Namespace : null,
                 method.IsStatic ? null : true, method.Signature.GenericParameterNames.Count == 0 ? null : method.Signature.GenericParameterNames.ToArray(), method.Signature.OutParameters.Count == 0 ? null : method.Signature.OutParameters.ToArray(), !method.IsStatic && method.DeclaringType!.IsValueType ? true : null,

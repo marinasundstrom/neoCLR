@@ -22,7 +22,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -611,16 +611,16 @@ public sealed partial class NativeAssemblyDefinition
                 bool objectSlot = ownerIndex >= 0 && types[ownerIndex].IsObjectRoot && isVirtual && !isOverride;
                 Require(!objectSlot || instance && !isAbstract && visibility == MethodVisibility.Public &&
                     MethodDefinition.IsNativeObjectSlot(name, new(resultType, parameterTypes, genericNames), signatureGraph.Types[ownerIndex]), "invalid native Object slot");
-                Require(isAbstract == interfaceOwner && isVirtual == (interfaceOwner && instance || isOverride || objectSlot), "interface method flags mismatch");
-                Require(!interfaceOwner || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
-                    method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract interface method");
-                Require(!isOverride || !interfaceOwner && instance && !types[ownerIndex].IsObjectRoot && (types[ownerIndex].IsValueType || types[ownerIndex].GenericNames.Length == 0) &&
-                    visibility == MethodVisibility.Public && MethodDefinition.IsObjectOverride(name, new(resultType, parameterTypes, genericNames), signatureGraph.NativeObjectRoot is null ? null : identity, signatureGraph.NativeObjectRoot) &&
-                    (signatureGraph.NativeObjectRoot is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1),
-                    "unsupported or unbound native Object override");
+                Require(!interfaceOwner || isAbstract && isVirtual == instance, "interface method flags mismatch");
+                Require(!isAbstract || interfaceOwner || instance && types[ownerIndex].IsAbstractClass && isVirtual && !isOverride, "abstract method requires an abstract owner");
+                Require(!isAbstract || visibility == MethodVisibility.Public && name != ".ctor" && genericArity == 0 &&
+                    method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var interfaceLocals) || interfaceLocals.GetArrayLength() == 0), "invalid abstract method");
+                Require(!isVirtual || instance && visibility == MethodVisibility.Public && genericArity == 0 && name != ".ctor" &&
+                    (interfaceOwner || types[ownerIndex].GenericNames.Length == 0 && !types[ownerIndex].IsValueType || isOverride && types[ownerIndex].IsValueType), "unsupported virtual method");
+                Require(!isOverride || isVirtual && !interfaceOwner && !types[ownerIndex].IsObjectRoot && !isAbstract, "invalid override flags");
                 var constructor = instance && name == ".ctor";
                 Require(!constructor || resultType == PrimitiveType.Void && genericArity == 0, "constructor must be nongeneric with no result");
-                var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isOverride ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
+                var expectedName = implementationAttributes == 0x1000 ? (ns.Length == 0 ? name : ns + "." + name) : isVirtual && !interfaceOwner ? types[ownerIndex].NativeName + "." + name : constructor ? types[ownerIndex].NativeName + "..ctor" : (ownerIndex < 0 ? moduleName + ".F_" : types[ownerIndex].NativeName + ".M_") + Convert.ToHexString(Encoding.UTF8.GetBytes(ownerIndex < 0 ? FunctionNamespaceEncoding.Encode(ns, name) : name));
                 Require(Text(method, "name") == expectedName || ownerIndex >= 0 && (types[ownerIndex].IsObjectRoot || types[ownerIndex].NativePrimitive is not null || types[ownerIndex].NativeGrapheme) &&
                     Text(method, "name") == types[ownerIndex].NativeName + "." + name, "native callable name mismatch");
                 Origin(origin, identityText, identity, name, 0x06000001 + methods.Count);
@@ -692,7 +692,20 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+            }
+            foreach (var method in methods.Where(m => m.Override))
+            {
+                MethodRow? inherited = null;
+                for (int parent = types[method.Owner].BaseIndex; parent >= 0; parent = types[parent].BaseIndex)
+                {
+                    inherited = methods.SingleOrDefault(m => m.Owner == parent && m.Instance && m.Name == method.Name &&
+                        m.Signature.ParameterTypes.SequenceEqual(method.Signature.ParameterTypes));
+                    if (inherited is not null) break;
+                }
+                Require(inherited is not null ? inherited.Virtual && inherited.Signature.Matches(method.Signature) :
+                    MethodDefinition.IsObjectOverride(method.Name, method.Signature, signatureGraph.NativeObjectRoot is null ? null : identity, signatureGraph.NativeObjectRoot) &&
+                    (signatureGraph.NativeObjectRoot is not null || nativeModuleAliases.Values.Count(m => m.Module == "System") == 1), "unsupported or incompatible native override");
             }
             genericArity = 0; typeArity = 0;
             var properties = new List<PropertyRow>();
@@ -838,6 +851,8 @@ public sealed partial class NativeAssemblyDefinition
                 : !method.Instance ? owners[method.Owner].AddMethod(method.Name, signature, method.Visibility)
                 : method.ObjectSlot ? owners[method.Owner].AddNativeObjectSlot(method.Name, signature)
                 : method.Override ? owners[method.Owner].AddOverride(method.Name, signature)
+                : method.Abstract ? owners[method.Owner].AddAbstractMethod(method.Name, signature)
+                : method.Virtual ? owners[method.Owner].AddVirtualMethod(method.Name, signature)
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();

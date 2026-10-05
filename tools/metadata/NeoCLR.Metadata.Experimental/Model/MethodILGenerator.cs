@@ -484,8 +484,8 @@ internal sealed class MethodILGenerator(MethodBuilder bodyBuilder) : IILGenerato
         if (operand.Signature.GenericParameterNames.Count != 0 || operand.DeclaringType?.GenericParameterNames.Count > 0) throw new ArgumentException("generic calls require an instantiation", nameof(operand));
         if (opCode == OpCode.Callvirt)
         {
-            if (!(operand.IsAbstract || operand.IsNativeObjectSlot || operand.IsOverride && operand.DeclaringType?.IsValueType == false) || !ReferenceEquals(operand.Assembly, Assembly))
-                throw new ArgumentException("callvirt requires an owned interface method or reference-class Object override", nameof(operand));
+            if (!(operand.IsAbstract || operand.IsVirtual && operand.DeclaringType?.IsValueType == false) || !ReferenceEquals(operand.Assembly, Assembly))
+                throw new ArgumentException("callvirt requires an owned interface method or reference-class virtual slot", nameof(operand));
             Append(new("call.virtual", Target: operand));
         }
         else if (opCode == OpCode.Newobj)

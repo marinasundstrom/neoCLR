@@ -242,7 +242,7 @@ public interface IILGenerator
     /// <exception cref="ArgumentException">Wrong opcode, consuming owner or caller generic scope.</exception>
     /// <exception cref="InvalidDataException">Instruction limit exceeded.</exception>
     void Emit(OpCode opCode, ImportedGenericMethodReference operand);
-    /// <summary>Appends virtual dispatch to an owned nongeneric interface method or reference-class Object override.</summary>
+    /// <summary>Appends virtual dispatch to an owned nongeneric interface method or reference-class virtual slot.</summary>
     /// <param name="target">A public abstract interface instance method or supported reference-class Object override.</param>
     /// <exception cref="ArgumentNullException">Target is null.</exception>
     /// <exception cref="ArgumentException">Foreign, generic or unsupported virtual target.</exception>

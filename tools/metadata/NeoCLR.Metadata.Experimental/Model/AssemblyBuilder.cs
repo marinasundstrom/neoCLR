@@ -98,7 +98,7 @@ public sealed partial class AssemblyBuilder
         {
             foreach (var type in types)
             {
-                type.ValidateEnum(); type.ValidatePrimitiveRepresentation();
+                type.ValidateEnum(); type.ValidatePrimitiveRepresentation(); type.ValidateClassSlots();
                 if (type.Definition.IsNativeObjectRoot) type.Definition.ValidateNativeObjectRoot();
                 if (type.IsClosedHierarchy && (!(IsOrdinaryBase(type) || type.IsInterface && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null) || !type.IsAbstract))
                     throw new InvalidDataException("closed families require nongeneric top-level abstract class or interface owners");
@@ -125,7 +125,7 @@ public sealed partial class AssemblyBuilder
             foreach (var method in methods)
             {
                 int arity = method.DeclaringType?.GenericParameterNames.Count ?? 0;
-                if (method.IsOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot))
+                if (method.IsImplicitObjectOverride && !MethodDefinition.IsObjectOverride(method.Name, method.Signature, CoreLibrary, NativeObjectRoot))
                     throw new InvalidDataException("Object override does not match the selected root signature");
                 method.Signature.ValidateOwner(this, arity, complete: true, allowSelf: method.DeclaringType?.IsInterface == true);
                 foreach (var bound in method.InterfaceConstraints)

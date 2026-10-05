@@ -280,31 +280,13 @@ fn member(
             parameters: contract.parameters.clone(),
         };
         let resolved = crate::vm::resolve(module, &target).or_else(|original| {
-            // Native scalar and text declarations retain the canonical runtime member spelling.
-            // A metadata-produced interface may use an encoded executable name; its
-            // validated declaration origin supplies the corresponding member name.
-            if matches!(
-                owner,
-                Type::Boolean
-                    | Type::SByte
-                    | Type::Byte
-                    | Type::Int16
-                    | Type::UInt16
-                    | Type::Int32
-                    | Type::UInt32
-                    | Type::Int64
-                    | Type::UInt64
-                    | Type::Single
-                    | Type::Double
-                    | Type::String
-                    | Type::Char
-            ) {
-                if let Some(origin) = &contract.origin {
-                    let mut canonical = target.clone();
-                    canonical.name =
-                        format!("{}.{}", owner.definition_name().unwrap(), origin.name);
-                    return crate::vm::resolve(module, &canonical);
-                }
+            // Metadata contracts can use encoded executable names while virtual
+            // class slots retain the runtime member spelling. Both carry a
+            // validated origin; resolve the same member and exact signature.
+            if let Some(origin) = &contract.origin {
+                let mut canonical = target.clone();
+                canonical.name = format!("{}.{}", owner.definition_name().unwrap(), origin.name);
+                return crate::vm::resolve(module, &canonical);
             }
             Err(original)
         });

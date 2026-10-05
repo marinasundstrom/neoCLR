@@ -8,6 +8,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Complete the unchanged native inheritance sample with ordinary abstract/virtual
+  class slots, exact local overrides, direct base calls and inherited interface
+  conformance. Preserve CLI slot flags and resolve encoded interface contracts to
+  runtime virtual members through validated origins. Definition/builder C# tests and
+  CLR/native execution pass; all ten original POC samples now have execution evidence.
+  General external/generic virtual hierarchies remain unsupported. Editor release
+  qualification and publication remain pending.
+
 - Add ordinary abstract class authoring through definitions and builders. Preserve
   CLI Abstract independently of Sealed/static and native closed-family metadata in
   native readers and introspection. Validate concrete subclass construction and

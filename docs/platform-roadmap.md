@@ -8,6 +8,17 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Inheritance completes the original sample gate (2026-10-05)
+
+The unchanged inheritance sample now compiles and executes on both targets with
+stdout `7` then `42`, exit 0 and empty stderr. Native abstract slots, exact local
+overrides, direct base calls and inherited interface conformance use existing CLI
+flags/native runtime contracts. Collections and interface controls still execute.
+All ten original POC samples now have execution evidence across the linked slices;
+this is not a new full-library or release claim. Next qualify the native metadata
+language-server/VS Code workflow and matching setup/download instructions.
+[Evidence and limits](experiments/extended-cli-metadata/native-inheritance-2026-10-05.md).
+
 ## Abstract class metadata prerequisite (2026-10-05)
 
 Ordinary abstract classes now retain CLI Abstract independently of static and closed
