@@ -8,6 +8,16 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Shared host snapshots prepare editor integration (2026-10-05)
+
+Raven's native driver now uses a reusable explicit reference catalog. Core identity,
+semantic references and emission bindings come from matching snapshots; reloading a
+replaced library exposes new members while old compilations retain old symbols.
+Native and .NET execution controls pass. This is a prerequisite, not LSP completion.
+Next connect evaluated native project configuration to this catalog, then qualify
+semantic refresh, imported-member navigation and editor build/run with the same inputs.
+[Scope and evidence](experiments/extended-cli-metadata/native-editor-catalog-2026-10-05.md).
+
 ## Inheritance completes the original sample gate (2026-10-05)
 
 The unchanged inheritance sample now compiles and executes on both targets with

@@ -7437,3 +7437,15 @@ implementing interfaces are not marked Final. Runtime resolution uses validated
 metadata member origins to bridge encoded interface names and native slot spellings,
 while retaining exact owner/signature matching. Existing CLI flags and native payload
 fields suffice; no version change or implicit dependency loading is introduced.
+
+
+### Raven host catalog boundary (development, 2026-10-05)
+
+Raven's separate compiler adapter now provides `NeoClrReferenceCatalog` to read an
+explicit primitive core, native PE references and optional retained runtime seed.
+This is a compiler-host API, not a member of the metadata library or guest System API.
+It shares immutable reference instances between semantic import and emission and owns
+no runtime reflection, implicit dependency search or editor file watcher. The native
+CLI uses it; project/LSP wiring remains pending. See the
+[Raven host API contract](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#shared-native-reference-catalog-2026-10-05)
+for signatures, input limits, failures and snapshot lifetime. No guest API snapshot changes.

@@ -1,0 +1,161 @@
+{
+  "scope": "selected unchanged POC samples; only cases with an execution record claim runtime validation",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "42d7a4b23a4c3698d26c7fdda639783523eb9127",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0": "448f25dfdf269611773245257eb0923488b45722"
+  },
+  "inputs": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "700cf182aeed53b0c8bc1f92df5fbe980aa5bb14fb03afd930eec123fdabf4cd",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "5ac82d5668a3a4d27f6b0e2157b0c799815437c57a367eaac245500b9359748a",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "a883b2c148e933b423edd8beaabf1b7e8d36cb0ab2caaf2d0e42c17ee585ba56",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "e96864552a4794a87137bce4172aa28eb2c9378443f7e4486dd61d356a847ce5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "5e6652fcdfa22c051f55bfe2ced4b0599c5353168bf213240c43e0d471cc6ca8"
+  },
+  "cases": [
+    {
+      "name": "application-inheritance",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/editor-catalog-driver1005/application-inheritance.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-inheritance.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/raven-target/samples/application-inheritance.rvn": "f9f305a0df804b150d37530c80600ff6992e5f7ff4d8701f2590a26587e404c1"
+      },
+      "published": true,
+      "artifactSha256": "5310a35b447ed9910fb1ca8f9ac88b17f5acfc00c98a3f465d6bf267c97f5060",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/editor-catalog-driver1005/application-inheritance.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "7\n42\n",
+        "stderr": "",
+        "expectedStdout": "7\n42\n",
+        "expectedExitCode": 0,
+        "expectedFault": null,
+        "passed": true
+      }
+    },
+    {
+      "name": "application-order-collections",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/editor-catalog-driver1005/application-order-collections.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/raven-target/samples/application-order-collections.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b"
+      },
+      "published": true,
+      "artifactSha256": "b5044aadb5a4a1053194f677142453578514db7db607f8e62259b9eda85bb0f6",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/editor-catalog-driver1005/application-order-collections.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "stderr": "",
+        "expectedStdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+        "expectedExitCode": 0,
+        "expectedFault": null,
+        "passed": true
+      }
+    }
+  ],
+  "validationState": "Executed working changes on recorded base revisions; commits are identified in the companion note.",
+  "catalogFixture": {
+    "command": [
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "run",
+      "/tmp/reference-catalog1005-final/Consumer.dll",
+      "--system",
+      "/tmp/json-mapping-recorded1005/System.neox",
+      "--module",
+      "/tmp/reference-catalog1005-final/Library.dll"
+    ],
+    "exitCode": 42,
+    "stdout": "",
+    "stderr": "",
+    "artifacts": {
+      "/tmp/reference-catalog1005-final/Consumer.dll": "707c16f2a3dbaef1729726b0084f1b6f4f8dd0694de98a4e756d66196dae927e",
+      "/tmp/reference-catalog1005-final/Library.dll": "63ca2910942b8de1753d71f3034e580727067f2f3abf75e107677c1ee3e10a23"
+    }
+  },
+  "invalidInput": {
+    "exitCode": 1,
+    "stderr": "neoCLR: invalid DOS signature\n",
+    "published": false
+  },
+  "dotnetControl": {
+    "compileExit": 0,
+    "exitCode": 0,
+    "stdout": "7\n42\n",
+    "stderr": ""
+  }
+}

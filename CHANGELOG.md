@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Prepare native editor integration by moving Raven's explicit dependency loading
+  into a reusable reference catalog. Validate immutable snapshots across artifact
+  replacement, matching importer/emitter identities and failure-before-publication.
+  Native inheritance/collections and ordinary .NET controls remain green. This does
+  not yet connect native project files, the language server or VS Code build/run.
+
 - Complete the unchanged native inheritance sample with ordinary abstract/virtual
   class slots, exact local overrides, direct base calls and inherited interface
   conformance. Preserve CLI slot flags and resolve encoded interface contracts to
