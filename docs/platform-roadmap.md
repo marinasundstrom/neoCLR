@@ -20,7 +20,10 @@ The local extracted bundle now passes five project compilations, collections/Tas
 execution, live HTTP/JSON checks and 19 installed VSIX checks.
 [Bundle procedure](native-poc-bundle.md) and
 [qualification evidence](experiments/extended-cli-metadata/native-bundle-2026-10-05.md).
-Next resolve release provenance for retained bootstrap inputs and select publication metadata.
+Preview 12 is selected for macOS arm64. Both retained bootstrap inputs now reproduce
+byte-for-byte from recorded sources. Local candidate qualification passes 1,784 runtime
+tests, extracted native consumers and the website gate; hosted canonical validation
+and publication are the final release steps. [Candidate evidence](preview-12-validation.json).
 The primitive CLI core and retained seed remain explicit temporary bootstrap inputs;
 complete replacement and full System source ownership remain open.
 
@@ -36,7 +39,7 @@ the recorded source-built library artifacts; a .NET editor control remains green
 
 This supersedes the editor wiring/qualification next steps in the historical slices
 below. The matched local bundle and installation acceptance are now recorded above.
-Remaining release work includes bootstrap provenance and published downloads. Initial
+Bootstrap provenance is recorded; remaining release work is publication after CI. Initial
 project-open failures still use existing logs; workspace-external file watchers,
 full decompilation, general native project/package dependency builds and other OS
 qualification remain beyond this POC. Full class-library source bootstrap remains a
@@ -50,8 +53,8 @@ release gate, alongside matched package installation.
 
 The matched SDK/installed VSIX now passes 19 checks on macOS arm64, including native
 Option/Result API help. RavenDoc union-case summaries, all 1,803 generated pages and
-18 website tests pass. Publication remains blocked by reproducible bootstrap snapshots
-rather than editor API prose; the local runtime/dependency bundle is now qualified.
+18 website tests pass. Bootstrap reproduction and the local runtime/dependency bundle are now qualified;
+publication follows the final candidate CI gate.
 [Release gate and remaining work](experiments/extended-cli-metadata/native-release-gate-2026-10-05.md).
 
 ## Shared host snapshots prepare editor integration (2026-10-05)

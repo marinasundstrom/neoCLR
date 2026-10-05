@@ -6,6 +6,16 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.0-preview.12 — 2026-10-05
+
+Native Raven metadata POC for macOS arm64. Selected source-built libraries and
+artifact-only applications, Tasks, JSON/HTTP and installed VS Code API help are
+qualified; this is not full System bootstrap. See [release notes](docs/preview-12-release-notes.md)
+and [validation](docs/preview-12-validation.json). Historical development entries
+below preserve their original scope and remaining limitations.
+
 ### 2026-10-05
 
 - Prepare author-selected Preview 12 for macOS arm64, preserving the bounded native

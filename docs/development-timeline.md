@@ -11085,3 +11085,13 @@ when done; selected Preview 12 with macOS arm64 as the qualified native toolchai
 **Assistant action:** Reproduced the primitive core and retained runtime seed with
 identical hashes, pinned seed source for release reproduction, and prepared the
 version update. Merge/publication outcomes are recorded separately after execution.
+
+
+**Release qualification follow-up:** Both bootstrap bytes reproduce from source.
+The clean candidate archive passes extracted execution; all 1,784 local runtime tests
+pass across 236 targets. Website build/checks pass (1,803 pages, 18 tests). Hosted
+minimum-Rust and OS boundary checks pass; canonical validation is still running.
+The native source profile retains full runtime tests and source smoke checks while
+the legacy bridge snapshot audit remains explicitly separate. A stale deleted
+sample path and newer-Rust deprecation diagnostics were corrected. Main integration
+and publication await the final hosted outcome.
