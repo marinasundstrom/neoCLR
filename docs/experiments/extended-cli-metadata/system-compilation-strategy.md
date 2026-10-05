@@ -2,7 +2,9 @@
 
 Latest checkpoint (2026-10-05): the [source-built native JSON mapping gate](source-json-mapping-2026-10-05.md)
 passes through separate artifacts, including production descriptors and real reflection
-construction/property execution. Capability batch 3 now has its selected executable
+construction/property execution. The [post-JSON compilation reassessment](system-post-json-assessment-2026-10-05.md)
+now prioritizes the isolated source String member-lookup defect, storage/network service
+contract families, and remaining source/bootstrap core ownership. Capability batch 3 now has its selected executable
 proof point. Next reassess the cumulative source inventory and the HTTP/socket sample;
 full-System and .NET source-library parity remain open. Earlier frontier notes below
 are historical where superseded by this checkpoint.

@@ -1,0 +1,3 @@
+func Check(text: string) {
+    let result = text.SliceUtf8(0, 0)
+}

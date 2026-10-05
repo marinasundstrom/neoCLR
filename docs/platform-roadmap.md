@@ -11,6 +11,18 @@ now passes: unchanged source library, separate artifact-only consumers, nested o
 Boolean/string/int properties, arrays, shared mutation and validation before side effects.
 The earlier prerequisite notes below describe the path to this checkpoint.
 
+## Post-JSON compilation reassessment (2026-10-05)
+
+The [fresh compilation audit](experiments/extended-cli-metadata/system-post-json-assessment-2026-10-05.md)
+keeps the 75-source baseline compiling, but isolates a source/import member-lookup
+discrepancy: String.SliceUtf8 fails alongside source String and succeeds through its
+native artifact. This blocks the cumulative encoding/streams/JSON library. Fix that
+first, then complete the storage and DNS/socket service-contract families (7 and 21
+missing names respectively). Tasks compile against emitted libraries. The complete
+166-file System attempt still fails binding and publishes no assembly; source/bootstrap
+core ownership remains a later prerequisite. These findings supersede older frontier
+counts and do not reopen the completed separate-library JSON execution gate.
+
 ## Active priority: full-System capability batches (2026-10-04)
 
 The author directed a strategic assessment of blockers that unlock the most library

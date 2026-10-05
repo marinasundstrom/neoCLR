@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Reassess full-System compilation after JSON mapping with a reproducible source/import
+  audit. The 75-file baseline and imported Tasks compile; cumulative encoding/streams/
+  JSON isolate a source String.SliceUtf8 lookup failure. Record storage/network service
+  contract gaps and full-source ownership blockers; no compiler/runtime behavior changes.
+
 - Complete the source-built native JSON object-mapping gate: scoped introspection
   descriptor materialization, managed snapshot arrays and real property setter calls
   now execute through separate native libraries. Unchanged production mapping sources
