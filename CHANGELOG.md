@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Resolve local inherited public methods as interface implementations on derived classes.
+  Mark only selected implementation slots virtual for CLI interoperability, preserving
+  unrelated method flags. CLR and native interface dispatch execute to 42; 152 metadata
+  contract groups pass. Inherited explicit reimplementation remains unsupported.
+
 - Add an executable separate-library guard consumer covering the mapper's null-return
   guard, boxed int/bool patterns and Result match-return control flow. Native verification
   and execution pass; production JSON object mapping remains in progress.

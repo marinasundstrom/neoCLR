@@ -7182,3 +7182,14 @@ The bootstrap marker constructor is executable but is not invoked during metadat
 This marker is recognized by its qualified standard name in CLI metadata; native dependency
 resolution additionally checks the explicit System alias. Other method attribute categories
 remain explicitly unsupported in this reader profile.
+
+## Inherited interface implementations (development, 2026-10-05)
+
+`TypeBuilder.AddInterfaceImplementation` and manually authored `TypeDefinition.Interfaces`
+now accept exact public implementations inherited from a local nongeneric base class.
+Search selects the nearest matching declaration, after an explicitly mapped local method.
+Only methods actually selected for interface implementation receive CLI virtual/final/newslot
+flags; unrelated methods retain their existing attributes. Existing exact parameter/return
+matching and visibility validation apply. Missing implementations reject before writing.
+Inherited explicit reimplementation is rejected rather than authoring an invalid MethodImpl
+whose body is outside the declaring type. External class inheritance remains unsupported.

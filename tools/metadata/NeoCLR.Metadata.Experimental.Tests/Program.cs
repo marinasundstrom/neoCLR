@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 2 && args[0] == "--inherited-interface-image")
+{
+    File.WriteAllBytes(args[1], NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(InheritedInterfaceChecks.Create())); return 0;
+}
 if (args.Length == 3 && args[0] == "--parameter-arrays")
 {
     ParameterArrayChecks.RunNative(args[1], args[2]); return 0;
@@ -462,6 +466,7 @@ var tests = new (string Name, Action Body)[]
     ("Native dependency identity and snapshot ownership", NativeReaderChecks.References),
     ("Native declaration reader and reference-only projection", NativeReaderChecks.Run),
     ("Bodyless runtime internal-call authoring", InternalCallChecks.Run),
+    ("Inherited public interface implementation dispatch", InheritedInterfaceChecks.Run),
     ("Parameter array definitions, builders and CLI execution", ParameterArrayChecks.Run),
     ("Reference Object override authoring and CLI execution", ReferenceOverrideChecks.Run),
     ("Source-owned module descriptor contract", SourceModuleInfoChecks.Run),

@@ -5798,3 +5798,13 @@ Contract configuration is unchanged; the ordinary .NET backend is untouched.
 `bootstrap/verify_mapping_guards.py` in the metadata experiments compiles a library and
 artifact-only consumer and verifies/runs to 42, including both Result match branches.
 Eight focused .NET pattern checks also pass. This is a prerequisite, not the JSON gate.
+
+### Inherited descriptor interface methods (2026-10-05)
+
+The metadata writer searches local base classes for exact public interface methods.
+This admits RuntimeMemberInfo's inherited methods on concrete source descriptor providers.
+CLI virtual flags cover only selected implementations. Native hierarchy dispatch already
+supports this relationship; no new runtime instruction or Runtime Contract mapping is added.
+152 C# contract groups pass; `--inherited-interface-image <path>` writes the focused native
+consumer, which verifies and executes to 42. CLI execution also returns 42. Source descriptor
+materialization and the production JSON mapping gate remain open.

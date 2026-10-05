@@ -173,7 +173,9 @@ public sealed partial class TypeBuilder
     internal bool ConformsTo(TypeBuilder contract) => ReferenceEquals(this, contract) || InheritedContracts().Any(t => ReferenceEquals(t.ClassType, contract));
     internal IEnumerable<MethodBuilder> InterfaceMethods => InterfaceContracts.SelectMany(i => i.Methods.Concat(i.InterfaceMethods)).Distinct();
     internal bool Implements(MethodBuilder method) => !method.IsStatic && method.Visibility == MethodVisibility.Public &&
-        RequiredInterfaceMethods.Any(c => !c.IsStatic && c.Name == method.Name && c.Signature.Matches(method.Signature));
+        Assembly.Types.Where(t => ReferenceEquals(t, this) || t.DerivesFrom(this)).Any(t =>
+            t.RequiredInterfaceMethods.Any(c => !c.IsStatic && c.Name == method.Name && c.Signature.Matches(method.Signature) &&
+                ReferenceEquals(t.FindInterfaceImplementation(c.Name, c.Signature, c.IsStatic, c.Owner), method)));
 
     /// <summary>Declares implicit public implementation of an owned nongeneric interface.</summary>
     /// <param name="contract">An interface from this assembly, including its inherited contracts.</param>

@@ -112,7 +112,7 @@ public sealed partial class AssemblyBuilder
             foreach (var type in types.Where(t => !t.IsInterface))
                 foreach (var contract in type.RequiredInterfaceMethods)
                     if (type.FindInterfaceImplementation(contract.Name, contract.Signature, contract.IsStatic, contract.Owner) is null)
-                        throw new InvalidDataException("missing public interface implementation: " + contract.Name);
+                        throw new InvalidDataException("missing public interface implementation: " + type.Namespace + "." + type.Name + "." + contract.Name);
             foreach (var type in types) type.ValidateExplicitImplementations();
             foreach (var type in types)
                 foreach (var contract in type.InterfaceSignatures)

@@ -84,8 +84,13 @@ public sealed partial class TypeBuilder
             if (isStatic || !body.Signature.Matches(signature)) throw new InvalidDataException("incompatible explicit interface implementation");
             return body;
         }
-        return Methods.SingleOrDefault(m => m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public &&
+        var declared = Methods.SingleOrDefault(m => m.IsStatic == isStatic && m.Visibility == MethodVisibility.Public &&
             m.Name == name && m.Signature.GenericParameterNames.Count == 0 && m.Signature.Matches(signature));
+        if (declared is not null) return declared;
+        var inherited = LocalBase?.FindInterfaceImplementation(name, signature, isStatic, owner);
+        if (inherited?.Definition.ExplicitInterfaceImplementations.Count > 0)
+            throw new InvalidDataException("inherited explicit interface reimplementation is not supported");
+        return inherited;
     }
     internal void ValidateExplicitImplementations()
     {
