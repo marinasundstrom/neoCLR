@@ -45,6 +45,18 @@ internal static class AuthoredFunctionReferenceChecks
         var foreign = new AssemblyBuilder(new("Foreign", new Version(1, 0, 0, 0)), core);
         SignatureType foreignType = foreign.CreateTypeReference(dependency, core, hash, "Example", "Item");
         Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "Foreign", new MethodSignature(foreignType, [])));
+        var valueContract = app.CreateValueTypeReference(dependency, core, hash, "Example", "Result`1", 1);
+        SignatureType valueResult = valueContract.MakeGenericInstance(PrimitiveType.Int32);
+        var valueCall = app.CreateFunctionReference(dependency, core, hash, "Example", "EchoValue", new MethodSignature(valueResult, [valueResult]));
+        var valueForward = app.AddFunction("ForwardValue", new MethodSignature(valueResult, [valueResult]));
+        var valueIl = valueForward.GetILGenerator();
+        valueIl.LoadArgument(0); valueIl.Call(valueCall); valueIl.Return();
+        var nativeRead = AssemblyDefinition.ReadNativeAssembly(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(app));
+        var readForward = nativeRead.MainModule.Functions.Single(f => f.Name == "ForwardValue");
+        if (!readForward.TryGetSignature(out var valueSignature) || valueSignature!.ReturnType.ReferencedGenericInstance is not { Definition.Namespace: "Example", Definition.Name: "Result`1", TypeArguments: [var argument] } || argument.Primitive != PrimitiveType.Int32 || !valueSignature.ReturnType.Equals(valueSignature.ParameterTypes[0]))
+            throw new Exception("external constructed value function signature roundtrip");
+        Reject<ArgumentException>(() => app.CreateFunctionReference(dependency, core, hash, "Example", "WrongValueScope",
+            new MethodSignature(valueContract.MakeGenericInstance(SignatureType.MethodParameter(1)), [], ["T"])));
         var item = app.CreateTypeReference(dependency, core, hash, "Example", "Item");
         var valueField = app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2);
         if (!ReferenceEquals(valueField, app.CreateFieldReference(item, "Value", PrimitiveType.Int32, 2))) throw new Exception("field interning");

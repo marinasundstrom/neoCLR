@@ -319,3 +319,93 @@ mod tests {
         }
     }
 }
+
+/// Converts a native service's erased immutable string vector to an owned managed array.
+/// The public storage API observes ordinary Array<T> semantics, not a legacy value vector.
+pub(crate) fn string_snapshot(
+    value: Value,
+    heap: &mut crate::ManagedHeap,
+    limits: &Limits,
+) -> Result<Value, Fault> {
+    let Value::Erased(payload) = value else {
+        return Err(Fault::new("string snapshot requires an erased payload"));
+    };
+    let Value::Array {
+        element: Type::String,
+        ref elements,
+    } = *payload
+    else {
+        return Err(Fault::new("string snapshot requires a String vector"));
+    };
+    if elements
+        .iter()
+        .any(|value| !matches!(value, Value::String(_)))
+    {
+        return Err(Fault::new("string snapshot contains a non-String element"));
+    }
+    measure(&payload, &mut Usage::default(), limits)?;
+    if heap.len() >= limits.heap_objects {
+        return Err(Fault::coded(
+            crate::FaultCode::HeapLimitExceeded,
+            "heap object limit exceeded",
+        ));
+    }
+    let index = heap.allocate(*payload)?;
+    Ok(Value::ObjectReference(crate::value::ObjectReference {
+        reference: heap.address(index)?,
+        view: Some(Type::ArrayRef(Box::new(Type::String))),
+    }))
+}
+
+#[cfg(test)]
+mod string_snapshot_tests {
+    use super::*;
+    fn payload(element: Value) -> Value {
+        Value::Erased(Box::new(Value::Array {
+            element: Type::String,
+            elements: vec![element],
+        }))
+    }
+    #[test]
+    fn native_string_vectors_produce_independent_managed_arrays() {
+        let mut heap = crate::ManagedHeap::default();
+        let data = payload(Value::String("file.txt".into()));
+        let first = string_snapshot(data.clone(), &mut heap, &Limits::default()).unwrap();
+        let second = string_snapshot(data, &mut heap, &Limits::default()).unwrap();
+        assert_eq!(heap.len(), 2);
+        assert_eq!(first.ty(), Type::ArrayRef(Box::new(Type::String)));
+        assert!(!crate::object_identity::reference_equals(&first, &second).unwrap());
+    }
+    #[test]
+    fn invalid_payloads_and_budgets_reject_before_allocation() {
+        let mut heap = crate::ManagedHeap::default();
+        let limits = Limits::default();
+        for invalid in [
+            Value::Int32(0),
+            Value::Erased(Box::new(Value::Byte(1))),
+            payload(Value::Int32(42)),
+        ] {
+            assert!(string_snapshot(invalid, &mut heap, &limits).is_err());
+        }
+        let data = payload(Value::String("file.txt".into()));
+        assert!(string_snapshot(
+            data.clone(),
+            &mut heap,
+            &Limits {
+                array_elements: 0,
+                ..limits
+            }
+        )
+        .is_err());
+        assert!(string_snapshot(
+            data,
+            &mut heap,
+            &Limits {
+                heap_objects: 0,
+                ..limits
+            }
+        )
+        .is_err());
+        assert_eq!(heap.len(), 0);
+    }
+}

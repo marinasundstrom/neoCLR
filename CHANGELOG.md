@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Compile the remaining eleven storage sources with explicit native adapters and
+  execute the unchanged storage sample from emitted artifact references. Materialize
+  directory-name snapshots into managed Array<String> storage with array/heap limits.
+  Permit external top-level value types in authored module-function signatures,
+  enabling imported FileText Result returns. Exact stdout, file bytes, bounded I/O
+  and errors are checked; full-System and dual-target completion remain open.
+
 - Align metadata authoring and native reading with the existing 4,096-row CLI
   TypeDef budget: permit 4,095 declared types, reserving the module row. Manual
   definitions and builders share the bound; existing byte/member/signature budgets

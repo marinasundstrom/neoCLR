@@ -88,6 +88,7 @@ pub(crate) enum Binding {
     StringEndsWithOrdinal,
     StringSliceUtf8,
     FileResource(crate::file_streams::Operation),
+    StorageNames,
     ReadAllText,
     WriteAllText,
     ConsoleReadByte,
@@ -738,6 +739,10 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.FileSeek", [Type::Int32, Type::Int64]) => (
             Binding::FileResource(crate::file_streams::Operation::Seek),
             Type::Value,
+        ),
+        ("neoCLR.Runtime.StorageNames", [Type::Value]) => (
+            Binding::StorageNames,
+            Type::ArrayRef(Box::new(Type::String)),
         ),
         ("neoCLR.Runtime.StorageList", [Type::String, Type::Int32]) => (
             Binding::FileResource(crate::file_streams::Operation::List),
@@ -1420,6 +1425,30 @@ mod reflection_signature_tests {
                 ".module Test\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod storage_snapshot_tests {
+    use crate::metadata::Type;
+
+    #[test]
+    fn storage_names_requires_an_erased_payload_and_managed_string_array() {
+        let mut module = crate::assemble(
+            ".module Test\n.function neoCLR.Runtime.StorageKind(String path) -> Value\n.methodimpl InternalCall\n.end\n",
+        ).unwrap();
+        let function = &mut module.functions[0];
+        function.name = "neoCLR.Runtime.StorageNames".into();
+        for (parameter, result, accepted) in [
+            (Type::Value, Type::ArrayRef(Box::new(Type::String)), true),
+            (Type::Value, Type::Array(Box::new(Type::String)), false),
+            (Type::String, Type::ArrayRef(Box::new(Type::String)), false),
+            (Type::Value, Type::ArrayRef(Box::new(Type::Int32)), false),
+        ] {
+            function.parameters = vec![parameter];
+            function.returns = result;
+            assert_eq!(super::bind(function).is_ok(), accepted);
         }
     }
 }

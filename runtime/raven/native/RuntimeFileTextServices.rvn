@@ -1,0 +1,13 @@
+namespace System.Storage.FileText
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension FileTextRuntimeServices for RuntimeServices {
+    static func WriteAllText(path: string, text: string, maxBytes: int) -> int {
+        return neoCLR.Runtime.WriteAllText(path, text, maxBytes)
+    }
+
+    static func ReadAllText(path: string, maxBytes: int) -> System.Value {
+        return neoCLR.Runtime.ReadAllText(path, maxBytes)
+    }
+}

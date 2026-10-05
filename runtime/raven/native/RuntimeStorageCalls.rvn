@@ -1,0 +1,24 @@
+namespace neoCLR.Runtime
+
+import System.Runtime.CompilerServices.*
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StorageList(path: string, maxItems: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StorageNames(payload: System.Value) -> string[];
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func StorageKind(path: string) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func WriteAllText(path: string, text: string, maxBytes: int) -> int;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func ReadAllText(path: string, maxBytes: int) -> System.Value;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func PathCombine(left: string, right: string) -> string;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func PathGetFileName(path: string) -> string;

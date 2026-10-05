@@ -107,7 +107,9 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::UnixTimeToLocal => RuntimeService::LocalClock,
             crate::native::Binding::UnixTimeTicks => RuntimeService::WallClock,
             crate::native::Binding::Math(_) => RuntimeService::MathOperations,
-            crate::native::Binding::ReflectionArray(_) => RuntimeService::ManagedArrays,
+            crate::native::Binding::ReflectionArray(_) | crate::native::Binding::StorageNames => {
+                RuntimeService::ManagedArrays
+            }
             crate::native::Binding::ReflectionConstruct
             | crate::native::Binding::ReflectionMember(_)
             | crate::native::Binding::ReflectionProperty(_) => RuntimeService::ReflectionExecution,

@@ -10,7 +10,7 @@ public sealed partial class AssemblyBuilder
     /// <param name="artifactSha256">64 hexadecimal digits identifying the selected native dependency image.</param>
     /// <param name="namespace">Function namespace; empty for global functions.</param>
     /// <param name="name">Simple function name.</param>
-    /// <param name="signature">Primitive, method-parameter, external top-level reference-class construction and single-vector signature; no byrefs.</param>
+    /// <param name="signature">Primitive, method-parameter, external top-level nominal construction and single-vector signature; no byrefs.</param>
     /// <returns>An interned output-owned callable reference.</returns>
     /// <exception cref="ArgumentNullException">An argument is null.</exception>
     /// <exception cref="ArgumentException">Invalid name, namespace, digest or signature scope.</exception>
@@ -61,7 +61,7 @@ public sealed partial class AssemblyBuilder
 
         static bool Supported(SignatureType type, bool result) =>
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :
-            type.ImportedType is { IsValueType: false, DeclaringType: null } nominal
+            type.ImportedType is { DeclaringType: null } nominal
                 ? nominal.TypeArguments.All(argument => Supported(argument, false)) :
             type.MethodParameterIndex is not null || type.ArrayElement is { ArrayElement: null } element && Supported(element, false);
     }

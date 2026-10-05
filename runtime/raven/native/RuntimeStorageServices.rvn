@@ -1,0 +1,26 @@
+namespace System.Storage
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+// Explicit native storage adapters; production library sources use this service boundary.
+internal extension StorageRuntimeServices for RuntimeServices {
+    static func StorageList(path: string, maxItems: int) -> System.Value {
+        return neoCLR.Runtime.StorageList(path, maxItems)
+    }
+
+    static func StorageNames(payload: System.Value) -> string[] {
+        return neoCLR.Runtime.StorageNames(payload)
+    }
+
+    static func StorageKind(path: string) -> System.Value {
+        return neoCLR.Runtime.StorageKind(path)
+    }
+
+    static func PathCombine(left: string, right: string) -> string {
+        return neoCLR.Runtime.PathCombine(left, right)
+    }
+
+    static func PathGetFileName(path: string) -> string {
+        return neoCLR.Runtime.PathGetFileName(path)
+    }
+}

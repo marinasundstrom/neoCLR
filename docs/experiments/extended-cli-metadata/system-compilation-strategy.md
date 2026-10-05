@@ -782,3 +782,21 @@ passes binding and rejects callable admission for DocumentReader.Value's
 Result<JsonValue, JsonError> signature. Work next on nominal class hierarchy admission
 and representation; do not expand all introspection services based on the old broad
 JSON family's missing-service diagnostics. JSON execution and full System remain open.
+
+### Source storage execution (2026-10-05)
+
+The remaining eleven production storage sources now compile against the cumulative
+115-input library using explicit native service adapters. The unchanged storage-poc
+sample executes from emitted references: creation, UTF-8 reads, seek/re-read,
+listing, child lookup and error cases. An additional FileText consumer checks bounded
+writes/reads and preservation of file contents on rejected writes. This closes the
+seven missing storage service declarations from the post-JSON audit.
+
+Raven's portable emitter preserves empty-stack context through value-block wrappers;
+the metadata writer admits external value types in module-function references using
+existing encoding. Neither change alters Runtime Contract configuration, ordinary
+.NET semantics or primitive/source ownership. The next high-unlock family remains
+DNS/socket service contracts and their imported Error identities, followed by full
+source/bootstrap ownership. No complete-System or dual-target gate is claimed.
+See `docs/experiments/extended-cli-metadata/source-storage-2026-10-05.md` for exact
+artifacts, commands, source hashes and validation.

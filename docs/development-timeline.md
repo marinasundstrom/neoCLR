@@ -10843,3 +10843,14 @@ reader admitted the 115-input library. Both JSON consumers and the task consumer
 against it. [Recorded evidence and remaining scope](experiments/extended-cli-metadata/cumulative-library-type-budget-2026-10-05.md).
 Storage/network contract families and source/bootstrap ownership remain open; this is
 not recorded as full-System or dual-target class-library completion.
+
+### 2026-10-05 — Assembly inspection for integration debugging
+
+During storage integration the author suggested, “Perhaps we should build a
+command-line decompiler for neoCLR assemblies. If that speeds up debugging.”
+The assistant proposed first investigating a read-only disassembler showing signatures,
+scoped references and instruction bodies. Inspection found that `emit-il` lowers source
+and `verify` checks loaded assemblies, but neither displays an assembly's decoded bodies.
+A bounded metadata/body dump is the proposed first tool; source reconstruction is a
+larger follow-up. No decompiler implementation or author selection between those scopes
+is recorded. Storage work continued and its unchanged sample executed successfully.
