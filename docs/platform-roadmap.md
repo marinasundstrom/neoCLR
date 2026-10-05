@@ -8,6 +8,18 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Native source release direction (2026-10-05)
+
+The author explicitly reaffirmed that native metadata replaces the CLI translation
+bridge and that APIs must execute correctly. Do not expand the legacy bridge to clear
+its snapshot audit as the next native-release task. The selected libraries now rebuild
+directly from 115 cumulative and 19 HTTP source/adaptor files; 15 consumers compile,
+13 non-network executions and both live HTTP/JSON rounds pass using those new assemblies.
+[Native source gate and explicit bootstrap limits](experiments/extended-cli-metadata/native-source-release-2026-10-05.md).
+Next qualify a distributable native library/dependency bundle with the matched tooling.
+The primitive CLI core and retained seed remain explicit temporary bootstrap inputs;
+complete replacement and full System source ownership remain open.
+
 ## Native VS Code POC accepted (2026-10-05)
 
 The author requested continued work until VS Code acceptance. Real VS Code 1.140.0

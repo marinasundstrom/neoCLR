@@ -11032,3 +11032,16 @@ The full extracted-source optimized runtime test run subsequently completed with
 1,782 passes and two stale test failures. The assistant corrected only those
 expectations and verified all ten affected tests. Runtime behavior was unchanged;
 the canonical source snapshot audit remains failed.
+
+## 2026-10-05 — Native metadata is the release path
+
+**Author:** Emphasized that the APIs must work, then corrected the assistant's focus:
+“The aim is to get rid of the bridge and use neoclr metadata sources for neoclr.”
+**Assistant:** Stopped the legacy bootstrap regeneration, discarded the uncommitted
+DateTime bridge changes, and replaced that work with a reproducible native library
+build and executable artifact-only consumers. Rebuilt 115-source Numbers and 19-source
+Http with the extracted SDK; 15 sample compilations, 13 non-network executions and
+both HTTP/JSON loopback rounds passed. The primitive core and retained seed are still
+explicit bootstrap inputs; full removal is not claimed. The failed legacy source audit
+remains recorded but is not a rationale for further bridge feature expansion.
+[Evidence](experiments/extended-cli-metadata/native-source-release-2026-10-05.md).

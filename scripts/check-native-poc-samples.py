@@ -29,6 +29,7 @@ def main():
     parser.add_argument('--reference', type=Path, action='append', required=True)
     parser.add_argument('--runtime', type=Path, help='Execute the established non-network controls after successful compilation')
     parser.add_argument('--async-library', help='Explicit native Task/builder assembly identity')
+    parser.add_argument('--compiler-revision', help='Declared source revision for an extracted SDK; artifact hashes remain authoritative')
     parser.add_argument('--case', choices=SAMPLES, action='append', help='Limit the inventory to selected cases')
     args = parser.parse_args()
     paths = {name: getattr(args, name).resolve() for name in ('compiler', 'core', 'seed', 'ownership', 'output')}
@@ -58,9 +59,13 @@ def main():
     expected_codes = {'native-async-entry-int': 23, 'native-async-entry-cancelled': 1, 'native-async-entry-pending': 1}
     expected_faults = {'native-async-entry-cancelled': 'Task is cancelled; consume its Outcome',
                        'native-async-entry-pending': 'Task is still pending'}
+    def revision(path):
+        result = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=path, capture_output=True, text=True)
+        return result.stdout.strip() if result.returncode == 0 else None
+
     report = {'scope': 'selected unchanged POC samples; only cases with an execution record claim runtime validation',
-              'revisions': {str(p): subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=p, text=True).strip()
-                            for p in (ROOT, paths['compiler'].parent)},
+              'revisions': {str(p): revision(p) for p in (ROOT, paths['compiler'].parent)},
+              'declaredCompilerRevision': args.compiler_revision,
               'inputs': {str(p): sha(p) for p in inputs}, 'cases': []}
     common = ['dotnet', str(paths['compiler']), 'neoclr', '--core-reference', str(paths['core']),
               '--runtime-seed', str(paths['seed']), '--bootstrap-intrinsics', '--bootstrap-ownership', str(paths['ownership'])]

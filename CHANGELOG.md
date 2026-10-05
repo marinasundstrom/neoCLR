@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Rebuild the POC class-library subset directly from Raven into native metadata,
+  with checked-in ownership and explicit bootstrap inputs. Qualify artifact-only
+  consumers using the extracted SDK: 15 compile, 13 non-network executions and
+  both live HTTP/JSON rounds pass. Keep legacy bridge snapshot failures separate;
+  full native bootstrap and release packaging remain open.
+
 - Correct two stale release-test expectations for the already-supported no-result
   reflection setter and current native-service rejection diagnostic. The full runtime
   run exposed these assertions; all ten affected tests pass after correction.
