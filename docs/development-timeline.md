@@ -11063,3 +11063,15 @@ and String.FlatMap. The screenshot's completion-only overload correctly displays
 `() -> void`; the task-producing overload displays `() -> Task<T>`. No callback or
 runtime API contract changed. The shared fix is on Raven main `8ddd73c31`, and the
 publisher is pinned to it; no website deployment was performed.
+
+## 2026-10-05 — Native bundle installation gate
+
+**Author direction carried forward:** Continue toward release, using native metadata
+sources and ensuring APIs execute correctly.
+
+**Assistant action/outcome:** Added explicit-input packaging and an extracted-bundle
+verifier. Five artifact-only projects compile; collections, Tasks, JSON and live HTTP
+execute. Installed VSIX acceptance passes 19 checks. Website development status now
+reflects this local gate. Primitive core/retained seed provenance and publication
+remain open; neither a released download nor complete System bootstrap is claimed.
+See [evidence](experiments/extended-cli-metadata/native-bundle-2026-10-05.md).

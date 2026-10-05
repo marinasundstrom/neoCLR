@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Package the native POC tooling, source-built libraries and explicit bootstrap
+  dependencies with relative consumer projects and hash verification. Extracted
+  compilation/execution and installed VSIX acceptance pass on macOS arm64. Record
+  local candidate setup and provenance limits; no release publication is claimed.
+
 - Update RavenDoc so callback types use function signatures in member lists and
   parameter tables, including Task.Run and String's FlatMap extension. Preserve
   nested type links and keep parameter identifiers on one line. The pinned shared

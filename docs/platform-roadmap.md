@@ -16,7 +16,11 @@ its snapshot audit as the next native-release task. The selected libraries now r
 directly from 115 cumulative and 19 HTTP source/adaptor files; 15 consumers compile,
 13 non-network executions and both live HTTP/JSON rounds pass using those new assemblies.
 [Native source gate and explicit bootstrap limits](experiments/extended-cli-metadata/native-source-release-2026-10-05.md).
-Next qualify a distributable native library/dependency bundle with the matched tooling.
+The local extracted bundle now passes five project compilations, collections/Tasks/JSON
+execution, live HTTP/JSON checks and 19 installed VSIX checks.
+[Bundle procedure](native-poc-bundle.md) and
+[qualification evidence](experiments/extended-cli-metadata/native-bundle-2026-10-05.md).
+Next resolve release provenance for retained bootstrap inputs and select publication metadata.
 The primitive CLI core and retained seed remain explicit temporary bootstrap inputs;
 complete replacement and full System source ownership remain open.
 
@@ -31,8 +35,8 @@ the recorded source-built library artifacts; a .NET editor control remains green
 [Acceptance evidence and reproduction](experiments/extended-cli-metadata/native-vscode-acceptance-2026-10-05.md).
 
 This supersedes the editor wiring/qualification next steps in the historical slices
-below. Next release work is a matched distributable compiler/server/extension/runtime
-bundle, refreshed downloads/setup instructions and installation acceptance. Initial
+below. The matched local bundle and installation acceptance are now recorded above.
+Remaining release work includes bootstrap provenance and published downloads. Initial
 project-open failures still use existing logs; workspace-external file watchers,
 full decompilation, general native project/package dependency builds and other OS
 qualification remain beyond this POC. Full class-library source bootstrap remains a
@@ -47,7 +51,7 @@ release gate, alongside matched package installation.
 The matched SDK/installed VSIX now passes 19 checks on macOS arm64, including native
 Option/Result API help. RavenDoc union-case summaries, all 1,803 generated pages and
 18 website tests pass. Publication remains blocked by reproducible bootstrap snapshots
-and a complete runtime/dependency distribution, not editor API prose.
+rather than editor API prose; the local runtime/dependency bundle is now qualified.
 [Release gate and remaining work](experiments/extended-cli-metadata/native-release-gate-2026-10-05.md).
 
 ## Shared host snapshots prepare editor integration (2026-10-05)

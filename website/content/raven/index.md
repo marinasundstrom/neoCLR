@@ -152,8 +152,11 @@ The unchanged `application-inheritance` sample now executes abstract base, inter
 virtual/override and direct base-call behavior with the same output as the .NET target.
 Support is bounded to local nongeneric class slots; external class overrides, generic
 virtual classes and new-slot hiding remain outside this native slice.
-A release still requires the native metadata workflow to pass through the language
-server and VS Code, with matching setup instructions and sample downloads.
+A local matched compiler/server/extension/runtime bundle now passes extracted
+compilation and execution, plus 19 installed VS Code checks on macOS arm64, including
+API help and native reference refresh. Primitive bootstrap and retained runtime seed
+remain explicit dependencies. Published native downloads and bootstrap provenance
+are still release work.
 
 The development `neoclr disassemble` command inspects native metadata and instructions
 without loading dependencies or executing the assembly. Its output is a diagnostic

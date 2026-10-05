@@ -131,10 +131,11 @@ VS Code tasks build and run the unchanged collections and Tasks/await samples ag
 source-built libraries. The compiler and language server use the same evaluated project
 references and bootstrap configuration. Ordinary .NET editor behavior is checked too.
 
-This is development POC evidence, not a replacement download for Preview 11. Matching
-compiler/server/extension/runtime packaging and installation qualification are still
-required before publishing the native workflow. The setup above remains the published
-bridge workflow.
+This is development POC evidence, not a replacement download for Preview 11. The local matched
+compiler/server/extension/runtime bundle has passed installation qualification,
+including 19 VS Code checks and extracted collections, Tasks, JSON and live HTTP
+execution. Native downloads are not published yet; bootstrap provenance remains
+release work. The setup above remains the published bridge workflow.
 
 ### API documentation in the development editor
 
