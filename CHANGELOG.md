@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Support an explicitly source-owned, fieldless RuntimeTypeHandle declaration through
+  metadata definitions/builders, native reading and introspection. Raven preserves
+  canonical handle signatures and rejects duplicate seed ownership. The combined
+  140-production-source library compiles and separate JSON/Tasks consumers execute;
+  source Object ownership and remaining core service contracts are still open.
+
 - Preserve System.Array<T> element arguments during inheritance and Object member
   dispatch, fixing default array display, identity equality and stable hashing.
   Reassess the post-HTTP compilation frontier: 139 production sources plus nine

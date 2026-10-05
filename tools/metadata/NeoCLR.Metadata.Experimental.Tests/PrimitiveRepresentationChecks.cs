@@ -7,7 +7,21 @@ internal static class PrimitiveRepresentationChecks
 {
     internal static void Run()
     {
+        var detachedGraph = new AssemblyBuilder(new("HandleDefinitions", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
+        var detachedHandle = new TypeDefinition("System", "RuntimeTypeHandle", 0x109,
+            detachedGraph.Definition.MainModule.ImportReference(detachedGraph.CoreLibrary, "System", "ValueType"));
+        detachedHandle.SetNativePrimitive(PrimitiveType.RuntimeTypeHandle);
+        detachedGraph.Definition.MainModule.Types.Add(detachedHandle);
+        var handleSnapshot = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(detachedGraph));
+        var handleView = new MetadataLoadContext([handleSnapshot]).Resolve(handleSnapshot.Identity).GetTypes().Single();
+        if (handleView.NativePrimitive != PrimitiveType.RuntimeTypeHandle)
+            throw new Exception("manual handle designation lost through introspection");
+        Reject<ArgumentException>(() => detachedGraph.AddClass("Other", "RuntimeTypeHandle").SetNativePrimitive(PrimitiveType.RuntimeTypeHandle));
+        detachedHandle.Fields.Add(new FieldDefinition("payload", 1, PrimitiveType.Int32));
+        Reject<ArgumentException>(() => detachedHandle.SetNativePrimitive(PrimitiveType.RuntimeTypeHandle));
         var graph = new AssemblyBuilder(new("PrimitiveImplementations", new Version(1, 0, 0, 0)), new("System.Runtime", new Version(10, 0, 0, 0)));
+        var handle = graph.AddValueType("System", "RuntimeTypeHandle");
+        handle.SetNativePrimitive(PrimitiveType.RuntimeTypeHandle);
         var boolean = graph.AddValueType("System", "Boolean");
         boolean.SetNativePrimitive(PrimitiveType.Boolean);
         var boolIdentity = boolean.AddInstanceMethod("Identity", new(PrimitiveType.Boolean, []));
@@ -58,7 +72,8 @@ internal static class PrimitiveRepresentationChecks
         graph.EntryPoint = null;
         var native = RuntimeAssemblyContainer.WriteBinary(graph);
         var snapshot = AssemblyDefinition.ReadNativeAssembly(native);
-        if (snapshot.MainModule.Types.Single(t => t.Name == "Boolean").NativePrimitive != PrimitiveType.Boolean ||
+        if (snapshot.MainModule.Types.Single(t => t.Name == "RuntimeTypeHandle").NativePrimitive != PrimitiveType.RuntimeTypeHandle ||
+            snapshot.MainModule.Types.Single(t => t.Name == "Boolean").NativePrimitive != PrimitiveType.Boolean ||
             snapshot.MainModule.Types.Single(t => t.Name == "Double").NativePrimitive != PrimitiveType.Double ||
             snapshot.MainModule.Types.Single(t => t.Name == "Single").NativePrimitive != PrimitiveType.Single)
             throw new Exception("native scalar declaration lost");

@@ -1,5 +1,14 @@
 # neoCLR platform roadmap
 
+## Source-owned runtime handle executes (2026-10-05)
+
+The [source handle gate](experiments/extended-cli-metadata/source-handle-ownership-2026-10-05.md)
+adds RuntimeTypeHandle to the combined library (140 production sources plus nine native
+adapters), removes its competing seed declaration and executes separate JSON/Tasks
+consumers through native import. Source Object ownership is the next core blocker,
+followed by missing service families. This supersedes the handle blocker below;
+full-System bootstrap and native async remain open.
+
 ## Combined source library and array dispatch (2026-10-05)
 
 The [post-HTTP assessment](experiments/extended-cli-metadata/post-http-compilation-2026-10-05.md)

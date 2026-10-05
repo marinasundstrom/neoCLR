@@ -1031,3 +1031,9 @@ in experimental-metadata.md. These C# APIs are outside the guest RavenDoc select
 in experimental-metadata.md. These host APIs are outside the guest RavenDoc selection.
 The API snapshot check still reports the pre-existing stale guest snapshot; this change
 does not replace it with a subset assembly.
+
+Development validation (2026-10-05, source-owned RuntimeTypeHandle): the host metadata
+primitive designation now accepts the fieldless handle declaration. XML and the linked
+experimental metadata manual document it; no guest API signature or RavenDoc selection
+changes. The required snapshot check still reports the previously recorded stale guest
+snapshot. It was not replaced with a partial library snapshot.

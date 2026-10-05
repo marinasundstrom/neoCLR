@@ -6,8 +6,8 @@ public sealed partial class TypeDefinition
     /// <remarks>CLI snapshots do not imply native primitive ownership merely from a System name.</remarks>
     public PrimitiveType? NativePrimitive { get; private set; }
 
-    /// <summary>Designates a canonical System numeric/Boolean value or String reference declaration as native runtime-owned scalar storage.</summary>
-    /// <param name="primitive">A fixed-width numeric primitive, Boolean or String.</param>
+    /// <summary>Designates a canonical System numeric/Boolean/RuntimeTypeHandle value or String reference declaration as native runtime-owned scalar storage.</summary>
+    /// <param name="primitive">A fixed-width numeric primitive, Boolean, RuntimeTypeHandle or String.</param>
     /// <exception cref="InvalidOperationException">The declaration is a loaded snapshot.</exception>
     /// <exception cref="ArgumentException">The identity/category/storage is incompatible or the designation conflicts.</exception>
     /// <remarks>No record fields, static constructors, nesting or generic parameters are allowed. Only String admits instance constructors. Numeric/Boolean bodies access scalar storage through ldobj/stobj; String bodies use the reference receiver directly. This does not authorize duplicate primitive ownership across dependencies.
@@ -22,7 +22,7 @@ public sealed partial class TypeDefinition
         NativePrimitive = primitive;
     }
 
-    internal static bool IsSupportedNativePrimitive(PrimitiveType primitive) => primitive is PrimitiveType.String or PrimitiveType.Boolean || IsNumericPrimitive(primitive);
+    internal static bool IsSupportedNativePrimitive(PrimitiveType primitive) => primitive is PrimitiveType.String or PrimitiveType.Boolean or PrimitiveType.RuntimeTypeHandle || IsNumericPrimitive(primitive);
 
     internal static bool IsNumericPrimitive(PrimitiveType primitive) => primitive is PrimitiveType.SByte or PrimitiveType.Byte or
         PrimitiveType.Int16 or PrimitiveType.UInt16 or PrimitiveType.Int32 or PrimitiveType.UInt32 or PrimitiveType.Int64 or

@@ -1,0 +1,183 @@
+{
+  "runtimeRevision": "151ecbf14b8074fc65d2bb5f4e89d646ee5270d8",
+  "compilerRevision": "48ff05319673443c11bf01737bfa0c09ea9ce6eb",
+  "instructionBudget": 100000000,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-recorded1005/ownership.json",
+        "--reference",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "-o",
+        "/private/tmp/handle-recorded1005/consumers/NativeMapping.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/json-object-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/handle-recorded1005/consumers/NativeMapping.dll",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C992A842DCBE018F8CA8F33FBC04E22C344DF4C89BFFB7954091EAA36D89206C: typed-stack/control-flow verification passed (2199 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/handle-recorded1005/consumers/NativeMapping.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "Model constructed\nName assigned\nModel constructed\nInvalid input begins\nInvalid input ends\nNative JSON object mapping passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-recorded1005/ownership.json",
+        "--reference",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "-o",
+        "/private/tmp/handle-recorded1005/consumers/ExistingMapping.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/Mapping.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/Main.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "info RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'ReflectionError' to 'MappingError' via implicit conversion 'static func implicit(error: ReflectionError) -> MappingError'.\ninfo RAV1506: Result propagation converts errors from 'JsonError' to 'MappingError' via implicit conversion 'static func implicit(error: JsonError) -> MappingError'.\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/handle-recorded1005/consumers/ExistingMapping.dll",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_C99FCDCDA14332DC9DE2E34FC606AA6E2E1CB8A29F4B7A353DF52DB577626C24: typed-stack/control-flow verification passed (2227 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/handle-recorded1005/consumers/ExistingMapping.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "JSON object mapping checks passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/handle-recorded1005/ownership.json",
+        "--reference",
+        "/private/tmp/handle-recorded1005/Numbers.dll",
+        "-o",
+        "/private/tmp/handle-recorded1005/consumers/Tasks.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/tasks-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "verify",
+        "/private/tmp/handle-recorded1005/consumers/Tasks.dll",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_A087DD6435118E2AFC03062016C68D18008A9C92623079E15B7E45790BB086A9: typed-stack/control-flow verification passed (2197 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+        "run",
+        "/private/tmp/handle-recorded1005/consumers/Tasks.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/handle-recorded1005/System.neox",
+        "--module",
+        "/private/tmp/handle-recorded1005/Numbers.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/private/tmp/handle-recorded1005/Numbers.dll": "e5ee22e22c59b5aa42789ed7f30b472290c5b306e3eeb17138d8b8cb60f1e4be",
+    "/private/tmp/handle-recorded1005/ownership.json": "5a2d54d347e8800bbed7a5b8496a0c14363b8209c4c463f87c59d703690bbc9d",
+    "/private/tmp/handle-recorded1005/System.neox": "95fd92733fecf3432f2712ebce26e52fd83b4aac377e51c667de7bcaba6883a2",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "572788c153c1740b75f435b3b3ef8167633f62c3153206dc8f61a311d326938f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "a56af0c72248cc7ac7caa883721959ffc2035d1271521177bfa1c0157354fc35",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_cumulative_json.py": "7b4dbff4592c85163494f5646ec7ca205852d944d3c8157383b80c8ff623e1a8",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "42ef68b07dc3736ade2636761b53274cf55ff9f4d2cc0681bd3b887066487404",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "e8019abcf6220490687d77c198d65b70b31422545d089cfa2ad221205b0f3762",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "ff12b26c0022008fd16d53c765a85de990d6fb417034289ed7153e7b9a4fa015",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/json-object-consumer.rvn": "be8eceec260ed27e2dd7ae31f4358871ebfc94bbe1088e46599f0e77df2d1f43",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/Mapping.rvn": "b2fca0297552655c7a619c2c36dbc7c8673bfaf7917ef56593ea0792792158a2",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/json-object-mapping/Main.rvn": "6bc9e529c269ada89a25d3537ced814595fb91b1c13fb99ee2576c04aa4c6d01",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/tasks-consumer.rvn": "a234c90da14adc0ae41e2ea14a29ee00eb45d3cf129dfb5aca61f9bfeb4bece7",
+    "/private/tmp/handle-recorded1005/consumers/NativeMapping.dll": "884d0b4a818f5ffed0076d616eadc61a9991dfd5f88e14c8d8b76cb0fe1d91b7",
+    "/private/tmp/handle-recorded1005/consumers/ExistingMapping.dll": "9b8f8b10d4f56106e19f7849fc1c760e406d5c4ac0851e0152215a495fea06ac",
+    "/private/tmp/handle-recorded1005/consumers/Tasks.dll": "1b8a7ef71a00ee8d498c133e564b3cdbc50ab7afeba406cabb422a41ef63fe3c"
+  }
+}

@@ -7259,3 +7259,20 @@ C# EntryArgumentChecks covers CLI invocation and native readback; runtime tests 
 empty/nonempty vectors, limits, unsupported shapes and ambiguity. The emitted C# test
 image executes under neoCLR with two arguments, and the Raven upload sample consumes
 its URL/mode parameters unchanged.
+
+### Source-owned runtime handles (development, 2026-10-05)
+
+`TypeDefinition.SetNativePrimitive(PrimitiveType.RuntimeTypeHandle)` and the matching
+builder method now accept the canonical `System.RuntimeTypeHandle` declaration: sealed,
+sequential, nongeneric, top-level value type without fields or constructors. The runtime
+owns handle storage; do not author an IntPtr payload or an m_value field. Wrong names,
+reference categories, storage or constructors reject with ArgumentException. Writers
+revalidate edits. Native reader and `NominalTypeInfo.NativePrimitive` preserve the
+RuntimeTypeHandle designation; loaded definitions remain immutable.
+
+This extends the existing primitive contract rather than adding a new signature category.
+Signatures still use PrimitiveType.RuntimeTypeHandle, encoded as the ordinary CLI core
+handle reference and the existing native RuntimeTypeHandle category. Executable CLI
+output of native primitive implementations remains unsupported. Dependency catalogs must
+select one owner; a source handle cannot compete with a retained seed handle. C# tests
+cover definition/builder authoring, native round trip, introspection and invalid storage.
