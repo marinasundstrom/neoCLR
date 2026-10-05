@@ -125,7 +125,7 @@ def main():
                      "ordinal-text", "character-classification", "math", "date-time",
                      "common-interfaces", "predicate-search", "reflection-hierarchy",
                      "constructor-chaining", "default-interfaces", "explicit-interfaces",
-                     "generic-functions", "delegates", "closures", "readonly"]:
+                     "generic-functions", "function-objects", "closures", "readonly"]:
             program = source / "examples/source" / (name + ".neo")
             artifact = output / (name + ".neo.json")
             run([executable, "verify", program], source)
