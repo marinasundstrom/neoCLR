@@ -1066,3 +1066,10 @@ Validation: the complete website builds and checks 1,803 pages and local links; 
 18 website publisher tests pass. The homepage and native-target page were inspected
 in the browser. Existing missing-summary reports remain documentation coverage debt;
 this refresh does not claim they are all resolved. No publication was performed.
+
+
+The reference-producer compatibility regression above is resolved by Raven integration
+`2b683df67` (general fix on main `edff20273`). The rebuilt current bridge successfully
+projects unchanged Option source and generates a reference byte-for-byte identical to
+the snapshot. No snapshot refresh or new public API is needed. See the
+[dual-target execution evidence](../docs/experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).

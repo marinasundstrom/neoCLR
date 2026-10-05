@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Close the release reference-producer Option binding regression through Raven's lexical
+  union case lookup repair, independently integrated on main. Validate cold semantic
+  queries and separately compiled union factories on both targets. The repaired native
+  compiler line regenerates the website reference byte-for-byte; no metadata/runtime
+  changes or snapshot refresh are needed. Record matching dependency evidence.
+
 - Refresh the website's native Raven target status and homepage development milestone.
   Replace superseded integration notes with current sample evidence and explicit native
   limits; retain published bridge entry-point guidance. Record website, setup and sample

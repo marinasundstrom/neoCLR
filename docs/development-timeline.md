@@ -10969,3 +10969,10 @@ homepage and native-target content. Reference generation against integration `9a
 exposed an unresolved Option/None binding regression; the same current bridge succeeds
 on main. This difference is recorded for compiler repair, not treated as solved by the
 website refresh.
+
+The subsequent compiler investigation resolved the Option/None regression at lexical
+case lookup. It also reproduced a cold semantic-query defect on main, so the assistant
+validated and integrated the general fix there independently. The repaired integration
+compiler produces the same reference bytes as main; 190 main and 196 integration checks
+pass, along with separate union-library consumers on both targets.
+[Compiler and runtime evidence](experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).

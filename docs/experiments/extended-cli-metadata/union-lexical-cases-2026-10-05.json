@@ -1,0 +1,459 @@
+{
+  "scope": "Owned and separately compiled union execution, native semantic import and attribute preservation.",
+  "driverSha256": "8FE258EACA3A6A021EFDCFF8BC57F86802392DAB93C6C027F62532848C1BFF97",
+  "runtimeSha256": "44AA42A38DFEB7AC66A5F1BCE4085FCD9DC3D0604E03C605072D46495CC8ACFD",
+  "coreSha256": "300EC80DEDFE40CA416FDEA2BF195D26E4BD628E8876C701628448AD35EDA7D4",
+  "seedSha256": "7EA8985D7CB804EBD3D4094D0531658C9FF53353CAC1AA4FC7EE32BF06AD2E90",
+  "evidence": [
+    {
+      "name": "Plain",
+      "target": "dotnet",
+      "librarySourceSha256": "5241FE4B165812A6DD079EE12762390968AB7DE49B00CBEB8A1DD74E8B2DA44C",
+      "consumerSourceSha256": "0D9730813D176860413C8A263336CB7799B32F431F7D253F17651C8E5AB72850",
+      "librarySha256": "334AC12CE97784C77E9941A916FB8C413846E1A2F02F79BEB466CCF2DCCB3C17",
+      "consumerSha256": "1DBC2B91CED29B5B1ABCCA080E62FA65418FEF2C7CE15D40281CB585F7EB445F",
+      "separateLibraryExecuted": true
+    },
+    {
+      "name": "Plain",
+      "target": "native",
+      "librarySourceSha256": "5241FE4B165812A6DD079EE12762390968AB7DE49B00CBEB8A1DD74E8B2DA44C",
+      "consumerSourceSha256": "0D9730813D176860413C8A263336CB7799B32F431F7D253F17651C8E5AB72850",
+      "librarySha256": "F342E3096B11818ACAC1F44DCC9DA1F81047375DC0A6132FD326FCC0C9EA65C2",
+      "consumerSha256": "5773C10B0AF84F6E2A50372E5504AE3D5FC040255CB471E5BFA3519DABDD1ED4",
+      "separateLibraryExecuted": true
+    },
+    {
+      "name": "Plain",
+      "sourceSha256": "48BDBAD80C9B48CACADB9F535B7DD3C9DE43D686931E4768C247CA394F2E587C",
+      "dotnetAssemblySha256": "D512F1C864045DB1E04AF595D88482585E2E27AC8148FA03ECED1AF1803E514D",
+      "nativeAssemblySha256": "CB2B769501E346A51DC4C483900E77253BC399D98AB11A07FB11572A87CCA211",
+      "dotnetExecuted": true,
+      "nativeExecuted": true
+    },
+    {
+      "name": "Generic",
+      "target": "dotnet",
+      "librarySourceSha256": "E3727DF73F0C98533E55782379B6144B2AD29C92A69BD8323C1D19BBBCAED218",
+      "consumerSourceSha256": "9EF6C8EF4572C0255AFCA2DAEC21599C6C967A2BB8FC83809A43060FBBA5C0A5",
+      "librarySha256": "9CF99E99B2DA971566964A04CF7AAC2C95034AF9D9F3E5AA70D4E9102C446F7C",
+      "consumerSha256": "09A137B27236FB00027B93862D55000A33A0B88B9923654F6E00C0E16CC4B6C2",
+      "separateLibraryExecuted": true
+    },
+    {
+      "name": "Generic",
+      "target": "native",
+      "librarySourceSha256": "E3727DF73F0C98533E55782379B6144B2AD29C92A69BD8323C1D19BBBCAED218",
+      "consumerSourceSha256": "9EF6C8EF4572C0255AFCA2DAEC21599C6C967A2BB8FC83809A43060FBBA5C0A5",
+      "librarySha256": "5EAE084EC0709188EB49761B4FF72B775B088AC7DA29B85FE89B219E3E2133E0",
+      "consumerSha256": "CE89CAD5A9BADB463C96F317CFF0BA125ABC8D8C14FFB2C4634A868D2DCEFE3B",
+      "separateLibraryExecuted": true
+    },
+    {
+      "name": "Generic",
+      "sourceSha256": "D525EF1FBAD32B3021351801862CC026F7A2EA7A2FDE7CF3E2C26572E569BAE3",
+      "dotnetAssemblySha256": "5387AD7C5D26FECAFF91B7CD82E2074C07BC372615FEAB142D06EDF946A9EEDC",
+      "nativeAssemblySha256": "30500E8C1149F015187A0ECBCE9F8ABFAC08B190DD2BDEDF6E479F0AE06F3169",
+      "dotnetExecuted": true,
+      "nativeExecuted": true
+    }
+  ],
+  "commands": [
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-lexical-driver-final1005/Plain.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,9s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-lexical-driver-final1005/Plain.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "Choice.Some(42)\nChoice.None\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.native.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/union-lexical-driver-final1005/Plain.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_AE48B2E8346C5650DDCC30933BA7637875F4C2FD033F31F46466754E6C365FE6: typed-stack/control-flow verification passed (3858 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/union-lexical-driver-final1005/Plain.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "Choice.Some(42)\nChoice.None\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.dotnet.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.dotnet.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.dotnet.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-lexical-driver-final1005/Plain.Consumer.rvn(5,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,1s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--library",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.native.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--reference",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.native.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.native.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.native.dll",
+        "--module",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_B6B2D055D0248B0C8CCB7100414A91AAC3E018513C3022E3D43B19C28766A3F2: typed-stack/control-flow verification passed (3858 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.native.dll",
+        "--module",
+        "/tmp/union-lexical-driver-final1005/Plain.Library.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--reference",
+        "/tmp/union-lexical-driver-final1005/Plain.InvalidCases.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Plain.Rejected.dll",
+        "/tmp/union-lexical-driver-final1005/Plain.Consumer.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAVT003: Target core configuration cannot be used: invalid native metadata contract: missing or conflicting native union cases.\n"
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-lexical-driver-final1005/Generic.rvn(10,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,7s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-lexical-driver-final1005/Generic.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "Choice.Some(42)\nChoice.None\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.native.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/union-lexical-driver-final1005/Generic.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_BF97E0CB727A85225F10CD36DBBD08BA6E767553F804518F1662C6C8614CC1AB: typed-stack/control-flow verification passed (3858 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/union-lexical-driver-final1005/Generic.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "Choice.Some(42)\nChoice.None\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--output-type",
+        "classlib",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.dotnet.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "Build succeeded in 1,2s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "--framework",
+        "net10.0",
+        "--emit-core-types-only",
+        "--refs",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.dotnet.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.dotnet.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "../../../../../../tmp/union-lexical-driver-final1005/Generic.Consumer.rvn(5,9): warning RAV2103: This catch-all never matches.\n\nBuild succeeded with 1 warning(s) in 1,1s\n",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "exec",
+        "--runtimeconfig",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.runtimeconfig.json",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.dotnet.dll"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--library",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.native.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--reference",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.native.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.native.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2103: This catch-all never matches.\n"
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "verify",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.native.dll",
+        "--module",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_42DDFD98D4A3D3F5BE80AA4C0DA4132BE23D82CD87B49C435DA7649F5CE2BFF2: typed-stack/control-flow verification passed (3858 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "executable": "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+      "arguments": [
+        "run",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.native.dll",
+        "--module",
+        "/tmp/union-lexical-driver-final1005/Generic.Library.native.dll",
+        "--system",
+        "/tmp/override-System.neox"
+      ],
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "dotnet",
+      "arguments": [
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/union-reference-fixed.dll",
+        "--runtime-seed",
+        "/tmp/override-System.neox",
+        "--reference",
+        "/tmp/union-lexical-driver-final1005/Generic.InvalidCases.dll",
+        "-o",
+        "/tmp/union-lexical-driver-final1005/Generic.Rejected.dll",
+        "/tmp/union-lexical-driver-final1005/Generic.Consumer.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAVT003: Target core configuration cannot be used: invalid native metadata contract: missing or conflicting native union cases.\n"
+    }
+  ]
+}

@@ -8,12 +8,22 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Union reference-producer regression closed (2026-10-05)
+
+Raven's lexical union case repair is integrated independently on main and the native
+line. Cold semantic queries and emission agree even with legacy bootstrap declarations;
+190 main checks and 196 integration checks pass. Plain/generic union factory libraries
+and consumers execute on both targets. The current native-line compiler regenerates
+the website CLI reference byte-for-byte identically to the checked-in snapshot.
+[Evidence and reproduction](experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).
+Resume the remaining inheritance sample, then native editor/LSP release qualification.
+
 ## Website release preparation (2026-10-05)
 
 Homepage and Raven integration content now distinguish published bridge behavior from
 native development. The API snapshot is regenerated using Raven main `08f34891b` and
-current bridge sources. The same producer on integration `9a4f74884` fails Option's
-`None` binding; repair this compiler-line difference before final qualification.
+current bridge sources. The Option/None failure recorded on integration `9a4f74884`
+is resolved by the lexical case repair above.
 See [the reference producer record](../api-docs/README.md#release-preparation-snapshot-2026-10-05).
 Matching downloads, release-specific instructions, editor evidence and manual publication
 remain pending; a successful local website build does not release the platform.
