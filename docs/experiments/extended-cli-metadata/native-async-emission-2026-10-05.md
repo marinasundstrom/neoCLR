@@ -67,3 +67,18 @@ Remaining observed failures, with no output publication:
 
 Prioritize the shared async lowering/body and entry integration gaps, then class methods;
 retain the new cancellation sample as a regression while extending support.
+
+## Follow-up: closure capture of hoisted locals
+
+The native portable capture path now reads immutable suspension locals from their
+state-machine fields. The added CapturedPromise regression schedules a callback over
+its Promise, suspends, and proves the callback and await retain the same object identity.
+It returns 42 after draining; all prior assertions and exact stdout remain unchanged.
+`library-async` now reaches the same entry signature failure as the default-queue sample.
+Mutable captures remain unsupported. Reflection.Emit closure storage is unchanged.
+
+[Capture follow-up evidence](native-async-capture-2026-10-05.json) records the compiler
+base revision plus the capture fix described here; artifact hashes identify the tested
+binaries. The original emission JSON remains the evidence for the prior slice.
+
+The capture fix is Raven `70c111b25`. All 37 focused .NET async/portable-body tests pass.

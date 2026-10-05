@@ -16,8 +16,9 @@ cancellation, worker results and queue draining. This is a bounded integration g
 full async compiler integration remains in progress. Explicit native Task/builder selection
 now supports top-level nongeneric async functions, including completed/pending awaits,
 hoisted locals and cancellation. A synchronous entry drives the queue in the tested case.
-The unchanged cancellation sample also compiles and runs. Async local handling, entry
-completion and class methods remain blockers for the other async/HTTP samples.
+The unchanged cancellation sample also compiles and runs. Immutable callbacks preserve
+hoisted Promise identity. Entry completion and class methods remain blockers for the
+other async/HTTP samples.
 The current POC prioritizes working samples; complete System coverage is later work.
 
 ## Starting and awaiting a worker

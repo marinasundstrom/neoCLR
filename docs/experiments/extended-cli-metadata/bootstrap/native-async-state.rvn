@@ -11,6 +11,15 @@ async func AddLater(value: Task<int>) -> Task<int> {
     return seed + received
 }
 
+async func CapturedPromise() -> Task<int> {
+    let source = Promise<int>()
+    TaskQueue.Default.Post(() => {
+        _ = source.Complete(41)
+    })
+    let value = await source.Task
+    return value + 1
+}
+
 func Main() {
     if Completed().GetResult() != 42 {
         System.Fail("Completed async result was lost")
@@ -29,6 +38,14 @@ func Main() {
     TaskQueue.Default.Drain()
     if !pending.IsCompleted || pending.GetResult() != 42 {
         System.Fail("Pending await lost its local or result")
+    }
+    let captured = CapturedPromise()
+    if captured.IsCompleted {
+        System.Fail("Captured promise completed before its callback")
+    }
+    TaskQueue.Default.Drain()
+    if !captured.IsCompleted || captured.GetResult() != 42 {
+        System.Fail("Callback did not retain the hoisted promise identity")
     }
     let cancelled = Promise<int>()
     let cancellation = AddLater(cancelled.Task)

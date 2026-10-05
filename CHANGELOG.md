@@ -13,7 +13,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   hoisted local preservation and cancellation; the unchanged cancellation sample also
   compiles and runs with exact output. Top-level nongeneric async functions
   execute; class/generic methods and async entry completion remain pending. Reuse
-  existing runtime and metadata encodings, preserving the default .NET backend.
+  existing runtime and metadata encodings, preserving the default .NET backend. Prove
+  immutable hoisted Promise capture identity; the async sample now reaches the entry
+  signature blocker instead of failing local storage emission.
 
 - Inventory ten unchanged POC samples through the native compiler driver. Order
   collections, interfaces and JSON object mapping compile and execute with exact output;

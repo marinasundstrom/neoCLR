@@ -12,8 +12,9 @@ also required; runtime suspension and green threads are explicitly deferred.
 Top-level nongeneric async functions now emit through Raven's existing heap lowering.
 A native driver/runtime regression verifies completed/pending awaits, hoisted local
 preservation and cancellation with exact output. The unchanged cancellation sample also
-executes. The next blockers are an undeclared async local, async entry completion and
-class methods in the remaining four async/HTTP samples. This does
+executes. Immutable hoisted closure captures now preserve Promise identity; both async
+samples reach the entry completion blocker. Class async methods remain guarded in the
+two HTTP samples. This does
 not introduce runtime suspension or green threads.
 [Scope and evidence](experiments/extended-cli-metadata/native-async-emission-2026-10-05.md).
 

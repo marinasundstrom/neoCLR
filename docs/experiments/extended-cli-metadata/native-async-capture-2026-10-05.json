@@ -1,0 +1,106 @@
+{
+  "scope": "selected unchanged POC samples; only cases with an execution record claim runtime validation",
+  "revisions": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr": "b3bc20a59a6ccaa58de31d8a149fee98632098a4",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0": "ddd154db194b3610459cd222ca9a164f762b09db"
+  },
+  "inputs": {
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "7db1970dcef1ae519af378c25386ae78abc39df30877f8966673ed6eb2dfe136",
+    "/private/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/private/tmp/http-final1005/Http.dll": "a656e90689c5155a239d44c25e9129ffb491c9e70ad117450b11ba09b8bc4c62",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "f0677c763815e05470ca2105a2074116db135c13f78d434f0bca50c42491ae5b",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "a2824da1e5d3be1d2e8e875e60bc1a2e5afc5b148214cfeebf705483edfdbfda",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "f33975bfa7781958082af1893febfd3c9524a67054ea31ab521b888a0e2e5214",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "44aa42a38dfeb7ac66a5f1bce4085fcd9dc3d0604e03c605072d46495cc8acfd"
+  },
+  "cases": [
+    {
+      "name": "native-async-state",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-capture1005/native-async-state.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV2706: This async method 'Completed' has no 'await' and will run synchronously.\n",
+      "compiled": true,
+      "sources": {
+        "docs/experiments/extended-cli-metadata/bootstrap/native-async-state.rvn": "79ea16e2c82858df8c2993528f8aa3c054011c8ea7305bdba51455ccc99454ef"
+      },
+      "published": true,
+      "artifactSha256": "2aea34c803a055e88920e247051dc873f9bab066b580981fa6a22a4f9bf3a9d0",
+      "execution": {
+        "command": [
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr",
+          "run",
+          "/private/tmp/native-async-capture1005/native-async-state.dll",
+          "--system",
+          "/private/tmp/json-mapping-recorded1005/System.neox",
+          "--instructions",
+          "100000000",
+          "--module",
+          "/private/tmp/system-type-limit1005/Numbers.dll",
+          "--module",
+          "/private/tmp/http-final1005/Http.dll"
+        ],
+        "exitCode": 0,
+        "stdout": "Native async state checks passed\n",
+        "stderr": "",
+        "expectedStdout": "Native async state checks passed\n",
+        "passed": true
+      }
+    },
+    {
+      "name": "library-async",
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/private/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/private/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--async-library",
+        "Numbers",
+        "--reference",
+        "/private/tmp/system-type-limit1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/http-final1005/Http.dll",
+        "-o",
+        "/private/tmp/native-async-capture1005/library-async.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/library-async.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error NEOMETA003: Native metadata encoding failed: entry point must be a local Int32 or no-result method with no parameters or one String vector.\n",
+      "compiled": false,
+      "sources": {
+        "docs/experiments/raven-target/samples/library-async.rvn": "8e225b601fd18c86f5c3b2ec30b47064c4cb37b87bd156e331097eb075cd226c"
+      },
+      "published": false
+    }
+  ]
+}
