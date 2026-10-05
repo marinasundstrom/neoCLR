@@ -192,14 +192,14 @@ public sealed partial class AssemblyBuilder
     /// <param name="namespace">Namespace, possibly empty.</param>
     /// <param name="name">Nonempty metadata name.</param>
     /// <returns>A type owned by this builder.</returns>
-    /// <exception cref="ArgumentException">Null/invalid names, duplicate type or more than 256 types.</exception>
+    /// <exception cref="ArgumentException">Null/invalid names, duplicate type or more than 4095 declared types.</exception>
     public TypeBuilder AddType(string @namespace, string name) => AddType(@namespace, name, TypeVisibility.Public);
     /// <summary>Adds a unique top-level static class with explicit public or assembly visibility.</summary>
     /// <param name="namespace">Namespace, possibly empty.</param>
     /// <param name="name">Nonempty metadata name.</param>
     /// <param name="visibility">Public or internal visibility.</param>
     /// <returns>A type owned by this builder.</returns>
-    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or more than 256 types.</exception>
+    /// <exception cref="ArgumentException">Invalid visibility/name, duplicate type or more than 4095 declared types.</exception>
     public TypeBuilder AddType(string @namespace, string name, TypeVisibility visibility)
         => AddTypeCore(@namespace, name, visibility, isStatic: true);
     /// <summary>Adds a root reference class with mutable primitive instance fields.</summary>
@@ -289,7 +289,7 @@ public sealed partial class AssemblyBuilder
     {
         if (visibility is not (TypeVisibility.Public or TypeVisibility.Internal)) throw new ArgumentOutOfRangeException(nameof(visibility));
         if (@namespace is null || string.IsNullOrEmpty(name) || name == "<Module>" || @namespace.Length + name.Length > 1024 ||
-            types.Count >= 256 || types.Any(t => t.Definition.DeclaringType is null && t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
+            types.Count >= DefinitionLimits.AuthoredTypes || types.Any(t => t.Definition.DeclaringType is null && t.Namespace == @namespace && t.Name == name)) throw new ArgumentException("invalid or duplicate type");
         var type = new TypeBuilder(this, @namespace, name, visibility, isStatic, genericNames, isInterface, isValueType); Definition.MainModule.Types.Add(type.Definition); return type;
     }
     /// <summary>Validates all bodies and emits a fresh unsigned managed PE32 image.</summary>

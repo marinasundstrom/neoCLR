@@ -11,6 +11,15 @@ now passes: unchanged source library, separate artifact-only consumers, nested o
 Boolean/string/int properties, arrays, shared mutation and validation before side effects.
 The earlier prerequisite notes below describe the path to this checkpoint.
 
+## Cumulative library including Tasks executes (2026-10-05)
+
+The [metadata capacity fix and executable gate](experiments/extended-cli-metadata/cumulative-library-type-budget-2026-10-05.md)
+now compile 111 production System sources plus four native adapters into one library.
+Both JSON consumers and the existing Tasks/Concurrency consumer execute against that
+artifact. The source lookup and 256-type authoring blockers below are resolved. Next
+complete storage and DNS/socket service contracts, then remaining core source ownership;
+full-System and .NET source-library parity are still open.
+
 ## Source primitive lookup resolved (2026-10-05)
 
 The [source-member fix and execution gate](experiments/extended-cli-metadata/source-primitive-members-2026-10-05.md)

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Align metadata authoring and native reading with the existing 4,096-row CLI
+  TypeDef budget: permit 4,095 declared types, reserving the module row. Manual
+  definitions and builders share the bound; existing byte/member/signature budgets
+  remain. The 115-file cumulative library with Tasks/Concurrency now emits,
+  and both JSON consumers plus the existing task consumer execute against it.
+
 - Verify Raven's explicit source primitive member selection: cumulative encoding,
   streams and JSON now compile into one 109-file library, and both artifact-only JSON
   consumers execute against it. Record the next exposed 256-type metadata authoring

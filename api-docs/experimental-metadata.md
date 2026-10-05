@@ -1092,7 +1092,7 @@ functions. Do not mutate participating graphs during either write operation.
 
 AddType adds a public abstract sealed class with a unique namespace/name pair. Namespace
 may be empty; name must be nonempty and not `<Module>`. Combined length is at most 1024
-characters and the assembly admits at most 256 types. Invalid/duplicate inputs raise
+characters and the assembly admits at most 4,095 declared types (plus the CLI module row). Invalid/duplicate inputs raise
 ArgumentException. EntryPoint may be null for a library or a local parameterless
 Int32-returning or no-result method; it is checked at Write/WriteNativeAssembly.
 A no-result entry uses CLI void for ordinary PE output and native `Void` with
@@ -1153,7 +1153,7 @@ with the native metadata format.
 visibility. `AssemblyBuilder.AddType(namespace, name)` remains public by default;
 its three-argument overload accepts only these two values and throws
 `ArgumentOutOfRangeException` for other values, before adding a type. Names,
-uniqueness and the 256-type bound retain the existing contract. `TypeBuilder.Visibility`
+uniqueness and the 4,095-type bound retain the existing contract. `TypeBuilder.Visibility`
 is a read-only `TypeVisibility` property set at creation. Methods remain public static.
 
 CLI output uses standard Public/NotPublic TypeDef flags. Native output retains the
@@ -1367,7 +1367,7 @@ and public/internal static classes with no fields. The reader checks canonical i
 encoded module/type/function names, references, origins, tokens, owner order, entry
 point signature, duplicate declarations and unsupported declaration fields. Unknown
 root/declaration fields and duplicate JSON properties are rejected. It accepts at most
-4 MiB of input, depth 64, one manifest/module, 256 references/types, 4096 methods,
+4 MiB of input, depth 64, one manifest/module, 256 references, 4,095 types, 4096 methods,
 256 methods per owner (including global scope), and 256 parameters per method.
 Unsupported, inconsistent or malformed metadata throws `InvalidDataException`.
 These consistency checks are not authentication and do not validate instruction bodies.
@@ -2205,7 +2205,7 @@ public enum FieldVisibility { Public, Internal, Private }
 
 AddClass creates a nonabstract, nonsealed root reference class. CLI base is
 System.Object; native metadata has no explicit base. No constructor is synthesized.
-AddType continues to create static classes. Both share the 256-type limit and
+AddType continues to create static classes. Both share the 4,095-type limit and
 namespace/name uniqueness. Invalid names/visibility/duplicates throw ArgumentException
 (including ArgumentOutOfRangeException for visibility). Namespaces and type names
 retain the existing AddType contract.
@@ -2900,7 +2900,7 @@ public bool MethodBuilder.IsAbstract { get; }
 
 The factories return owned interfaces with public/internal visibility. Generic names
 are copied (1–32 distinct names); CLI arity is appended to the supplied simple name.
-Ordinary type identity/256-type limits apply. Invalid identities, visibility, names or
+Ordinary type identity/4,095-type limits apply. Invalid identities, visibility, names or
 duplicates throw ArgumentException; null generic names throw ArgumentNullException.
 Interfaces are invariant in this API. AddBaseInterface admits directly inherited,
 owned nongeneric interfaces; generic base instantiations are not exposed yet.
@@ -7209,3 +7209,18 @@ local class rejects before writing. This is finality, distinct from a closed hie
 ldobj/stobj scalar storage; native import and introspection preserve NativePrimitive.
 A name alone does not claim ownership. Executable CLI writing of runtime-owned
 primitive implementations still rejects; explicit host ownership selects the provider.
+
+## Authored type-row budget (development, 2026-10-05)
+
+AssemblyBuilder type authoring and manual ModuleDefinition.Types attachment now admit
+4,095 declarations instead of 256. This shares the existing CLI reader budget of 4,096
+TypeDef rows, reserving row one for `<Module>`. Native rows omit that synthetic row and
+admit the same 4,095 declarations. Nested and top-level declarations share the budget.
+Authoring beyond it raises ArgumentException; native reading beyond it raises
+InvalidDataException before materialization. Failed attachment leaves the collection
+unchanged. No signature, token representation or metadata version changes.
+
+All byte, field, method, property and dependency limits still apply. Large libraries
+may need RuntimeAssemblyContainer.WriteLibraryBinary rather than the smaller application
+profile. The limit is a bounded host-library policy, not a CLI format maximum. Older
+host library versions retain their lower native/authoring cap and reject larger inputs.

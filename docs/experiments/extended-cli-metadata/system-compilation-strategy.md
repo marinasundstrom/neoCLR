@@ -1,6 +1,11 @@
 # Strategy: compile the entire Raven-authored System library
 
-Latest checkpoint (2026-10-05): the [source-built native JSON mapping gate](source-json-mapping-2026-10-05.md)
+Latest checkpoint (2026-10-05): the [115-input cumulative library](cumulative-library-type-budget-2026-10-05.md)
+now emits and executes both JSON consumers and Tasks against one artifact. The isolated
+source primitive lookup and metadata type-row cap are fixed. Next prioritize storage and
+DNS/socket service contracts, with remaining source/bootstrap ownership still required.
+
+Earlier checkpoint (2026-10-05): the [source-built native JSON mapping gate](source-json-mapping-2026-10-05.md)
 passes through separate artifacts, including production descriptors and real reflection
 construction/property execution. The [post-JSON compilation reassessment](system-post-json-assessment-2026-10-05.md)
 now prioritizes the isolated source String member-lookup defect, storage/network service

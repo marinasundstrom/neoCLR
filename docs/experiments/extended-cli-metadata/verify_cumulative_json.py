@@ -1,22 +1,63 @@
-"""Artifact-only execution control for the cumulative source-library audit."""
-import argparse, json, subprocess, hashlib
+"""Execute artifact-only JSON (and optional Tasks) consumers against a cumulative library."""
+import argparse
+import hashlib
+import json
 from pathlib import Path
-root = Path(__file__).resolve().parents[3]
-parser = argparse.ArgumentParser(description="Execute two artifact-only JSON consumers against the cumulative source-built library.")
-for name in ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'):
-    parser.add_argument('--' + name, type=Path, required=True)
-args = parser.parse_args()
-compiler, lib, manifest, seed, core, runtime, out = (getattr(args, name).resolve() for name in
-    ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'))
-out.mkdir(parents=True, exist_ok=False)
-common=['dotnet',str(compiler),'neoclr','--core-reference',str(core),'--runtime-seed',str(seed),'--bootstrap-intrinsics','--bootstrap-ownership',str(manifest),'--reference',str(lib)]
-cases=[('NativeMapping',[root/'docs/experiments/extended-cli-metadata/bootstrap/json-object-consumer.rvn'],42,'Model constructed\nName assigned\nModel constructed\nInvalid input begins\nInvalid input ends\nNative JSON object mapping passed\n'),('ExistingMapping',[root/'docs/experiments/json-object-mapping'/name for name in ['Mapping.rvn','Main.rvn']],0,'JSON object mapping checks passed\n')]
-commands=[]
-for name,sources,status,stdout in cases:
- app=out/(name+'.dll')
- for command,expected,output in [(common+['-o',str(app)]+list(map(str,sources)),0,None),([str(runtime),'verify',str(app),'--system',str(seed),'--module',str(lib)],0,None),([str(runtime),'run',str(app),'--instructions','100000000','--system',str(seed),'--module',str(lib)],status,stdout)]:
-  r=subprocess.run(command,cwd=root,capture_output=True,text=True,timeout=180);commands.append(dict(command=command,exitCode=r.returncode,stdout=r.stdout,stderr=r.stderr));(out/'commands.json').write_text(json.dumps(commands,indent=2)+'\n')
-  if r.returncode!=expected or output is not None and r.stdout!=output:raise Exception(commands[-1])
-inputs=[lib,manifest,seed,core,compiler,runtime,Path(__file__)] + [compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]+[p for _,sources,_,_ in cases for p in sources]+list(out.glob('*.dll'))
-(out/'validation.json').write_text(json.dumps(dict(runtimeRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=root,text=True).strip(),compilerRevision=subprocess.check_output(['git','rev-parse','HEAD'],cwd=compiler.parent,text=True).strip(),commands=commands,hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}),indent=2)+'\n')
-print('PASS')
+import subprocess
+
+ROOT = Path(__file__).resolve().parents[3]
+BOOTSTRAP = Path(__file__).resolve().parent / 'bootstrap'
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    for name in ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'):
+        parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--tasks', action='store_true', help='Also execute the existing Tasks/Concurrency consumer.')
+    args = parser.parse_args()
+    compiler, library, ownership, seed, core, runtime, output = (
+        getattr(args, name).resolve() for name in
+        ('compiler', 'library', 'ownership', 'seed', 'core', 'runtime', 'output'))
+    output.mkdir(parents=True, exist_ok=False)
+    common = ['dotnet', compiler, 'neoclr', '--core-reference', core, '--runtime-seed', seed,
+              '--bootstrap-intrinsics', '--bootstrap-ownership', ownership, '--reference', library]
+    cases = [
+        ('NativeMapping', [BOOTSTRAP / 'json-object-consumer.rvn'], 42,
+         'Model constructed\nName assigned\nModel constructed\nInvalid input begins\nInvalid input ends\nNative JSON object mapping passed\n'),
+        ('ExistingMapping', [ROOT / 'docs/experiments/json-object-mapping' / name
+                             for name in ('Mapping.rvn', 'Main.rvn')], 0,
+         'JSON object mapping checks passed\n'),
+    ]
+    if args.tasks:
+        cases.append(('Tasks', [BOOTSTRAP / 'tasks-consumer.rvn'], 42, ''))
+    commands = []
+
+    def run(command, expected=0, stdout=None):
+        command = [str(part) for part in command]
+        result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=180)
+        commands.append(dict(command=command, exitCode=result.returncode,
+                             stdout=result.stdout, stderr=result.stderr))
+        (output / 'commands.json').write_text(json.dumps(commands, indent=2) + '\n')
+        if result.returncode != expected or stdout is not None and result.stdout != stdout:
+            raise RuntimeError(json.dumps(commands[-1], indent=2))
+
+    for name, sources, status, expected in cases:
+        app = output / (name + '.dll')
+        run(common + ['-o', app] + sources)
+        run([runtime, 'verify', app, '--system', seed, '--module', library])
+        run([runtime, 'run', app, '--instructions', '100000000', '--system', seed,
+             '--module', library], status, expected)
+    inputs = [library, ownership, seed, core, compiler, runtime, Path(__file__)]
+    inputs += [compiler.parent / name for name in
+               ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
+    inputs += [path for _, sources, _, _ in cases for path in sources] + list(output.glob('*.dll'))
+    revision = lambda path: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
+    evidence = dict(runtimeRevision=revision(ROOT), compilerRevision=revision(compiler.parent),
+                    instructionBudget=100000000, commands=commands,
+                    hashes={str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs})
+    (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
+    print(output / 'validation.json')
+
+
+if __name__ == '__main__':
+    main()

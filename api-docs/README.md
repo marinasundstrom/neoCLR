@@ -1017,3 +1017,9 @@ C# host APIs are outside the guest RavenDoc selection; new runtime snapshot/serv
 adapters are internal. The API snapshot check was run and still reports the previously
 recorded stale guest snapshot. Do not replace that full reference with the incremental
 JsonIntrospection library.
+
+2026-10-05 cumulative-library row-budget update: the host manual reference and XML
+now record 4,095 authored/native declarations within the existing 4,096 CLI TypeDef-row
+budget. Boundary tests cover manual/builder attachment and CLI/native/facade round trips.
+No guest public signature or RavenDoc selection changes. The full guest snapshot remains
+the previously recorded stale input; a subset library is not an appropriate replacement.

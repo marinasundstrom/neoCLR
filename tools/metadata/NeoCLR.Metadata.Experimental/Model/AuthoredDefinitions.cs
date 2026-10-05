@@ -165,7 +165,7 @@ public sealed partial class AssemblyBuilder
     private static bool IsOrdinaryBase(TypeBuilder type) => !type.IsStatic && !type.IsInterface && !type.IsValueType && type.NativePrimitive is null && !type.NativeGrapheme && type.GenericParameterNames.Count == 0 && type.Definition.DeclaringType is null;
     internal TypeDefinition AttachType(TypeDefinition definition)
     {
-        if (types.Count >= 256 || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
+        if (types.Count >= DefinitionLimits.AuthoredTypes || types.Any(t => t.Namespace == definition.Namespace && t.Name == definition.Name && ReferenceEquals(t.Definition.DeclaringType, definition.DeclaringType)) ||
             definition.MetadataToken != 0 || definition.Producer is { } existing && !ReferenceEquals(existing.Assembly, this))
             throw new ArgumentException("foreign, duplicate or excessive type definition");
         if (definition.Producer is null)

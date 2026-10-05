@@ -5838,3 +5838,12 @@ retaining bootstrap scalar signatures. This fixes String.SliceUtf8 lookup withou
 adding source members to the CLI bootstrap or changing ordinary .NET lookup.
 Raven de5645e96 passes 25 focused tests. The cumulative 109-file source library and two
 artifact-only native JSON executions pass; [evidence and limits](experiments/extended-cli-metadata/source-primitive-members-2026-10-05.md).
+
+### Cumulative library type budget (2026-10-05)
+
+The 115-file cumulative System subset now emits after raising the host authoring/native
+reader bound from 256 to 4,095 declared types, matching the existing CLI reader's 4,096
+rows including the module row. No Runtime Contract, guest instruction or format version
+changes are needed. Other resource budgets remain enforced; use the existing library
+container profile for large outputs. Boundary tests and native execution evidence are
+recorded in the [cumulative-library type-budget integration note](experiments/extended-cli-metadata/cumulative-library-type-budget-2026-10-05.md).

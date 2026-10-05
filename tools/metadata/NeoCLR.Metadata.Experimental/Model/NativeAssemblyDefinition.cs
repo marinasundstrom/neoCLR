@@ -117,7 +117,7 @@ public sealed partial class NativeAssemblyDefinition
                 referenceIdentities.Add(reference);
             }
             Require(nativeModuleAliases.Keys.All(seenReferences.Contains) && nativeTypeAliases.Values.All(a => nativeModuleAliases.ContainsKey(a.Assembly)), "unscoped native binding");
-            var typeElements = Array(root, "types", 256);
+            var typeElements = Array(root, "types", DefinitionLimits.AuthoredTypes);
             if (manifest.TryGetProperty("array_backing", out var arrayBacking))
             {
                 Shape(arrayBacking, "module", "revision", "index");

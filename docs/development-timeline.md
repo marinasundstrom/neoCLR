@@ -10826,3 +10826,20 @@ This is an implemented native integration checkpoint, not a claim of full reflec
 full-System, .NET library parity or HTTP completion. The assistant recorded the explicit
 bootstrap and instruction budget and proposed inventory/network reassessment next;
 no new author decision about that subsequent work is recorded here.
+
+### 2026-10-05 — Compile the library to reassess the next blockers
+
+The author asked, “Re-asses by compiling the library,” then directed, “Continue fixing
+it.” The assistant compiled the full 166-file source inventory, cumulative groups and
+artifact-referenced additions. The 75-file baseline passed; the cumulative build exposed
+String.SliceUtf8 source/import lookup differences, while storage and network groups
+showed missing compiler-facing service contracts. A minimal probe failed with source
+String and passed with the emitted type. The assistant prioritized that shared blocker.
+
+Explicit source primitive member selection fixed the binding discrepancy. The cumulative
+109-file build then emitted and ran JSON consumers. Adding Tasks exposed the metadata
+writer's 256-type cap; aligning authoring/native limits with the existing bounded CLI
+reader admitted the 115-input library. Both JSON consumers and the task consumer execute
+against it. [Recorded evidence and remaining scope](experiments/extended-cli-metadata/cumulative-library-type-budget-2026-10-05.md).
+Storage/network contract families and source/bootstrap ownership remain open; this is
+not recorded as full-System or dual-target class-library completion.

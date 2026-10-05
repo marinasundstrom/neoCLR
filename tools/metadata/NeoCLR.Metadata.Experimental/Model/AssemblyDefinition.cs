@@ -77,7 +77,7 @@ public sealed partial class AssemblyDefinition
             using var pe = new PEReader(stream);
             var reader = pe.GetMetadataReader();
             if (!reader.IsAssembly) throw new InvalidDataException("assembly manifest required");
-            if (reader.TypeDefinitions.Count > 4096) throw new InvalidDataException("too many type definitions");
+            if (reader.TypeDefinitions.Count > DefinitionLimits.TypeRows) throw new InvalidDataException("too many type definitions");
             if (reader.MemberReferences.Count > 4096) throw new InvalidDataException("too many member references");
             if (reader.PropertyDefinitions.Count > 4096) throw new InvalidDataException("too many property definitions");
             if (reader.GetTableRowCount(TableIndex.MethodSemantics) > 16384) throw new InvalidDataException("too many method semantics");
