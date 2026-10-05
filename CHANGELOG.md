@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Advance HTTP source compilation past Result propagation by fixing shared Raven
+  nested visitor dispatch and short-circuit condition lowering. A native artifact-only
+  consumer executes eight skip/success/error cases; .NET regressions pass. HTTP next
+  rejects callback emission; full-library execution is not claimed complete.
+
 - Record the author-directed post-bootstrap release plan: benchmark equivalent
   neoCLR/.NET programs and publish reproducible methodology and results on the website
   with the release. No performance results or publication are claimed yet.

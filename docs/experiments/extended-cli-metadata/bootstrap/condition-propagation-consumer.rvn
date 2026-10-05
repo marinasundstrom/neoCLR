@@ -1,0 +1,60 @@
+import System.*
+import System.Result.*
+
+class Harness {
+    private var count: int = 0
+
+    private func Read(fail: bool) -> Result<int, string> {
+        count += 1
+        if fail {
+            return Error("failed")
+        }
+        return Ok(7)
+    }
+
+    private func Run(skip: bool, fail: bool, conjunction: bool) -> Result<int, string> {
+        if conjunction {
+            if !skip && 7 == Read(fail)? {
+                count += 10
+                return Ok(42)
+            }
+            return Ok(9)
+        }
+        if skip || Read(fail)? != 7 {
+            return Ok(9)
+        }
+        count += 10
+        return Ok(42)
+    }
+
+    func Check(skip: bool, fail: bool, conjunction: bool) {
+        count = 0
+        let result = Run(skip, fail, conjunction)
+        if skip {
+            if count != 0 || !(result is Ok(let skipped) && skipped == 9) {
+                System.Fail("Short circuit evaluated a skipped operand")
+            }
+        } else if fail {
+            if count != 1 || !(result is Error(let error) && error == "failed") {
+                System.Fail("Residual did not return exactly once")
+            }
+        } else {
+            if count != 11 || !(result is Ok(let value) && value == 42) {
+                System.Fail("Successful propagation changed evaluation")
+            }
+        }
+    }
+}
+
+func Main() {
+    let test = Harness()
+    test.Check(false, false, false)
+    test.Check(false, true, false)
+    test.Check(true, false, false)
+    test.Check(true, true, false)
+    test.Check(false, false, true)
+    test.Check(false, true, true)
+    test.Check(true, false, true)
+    test.Check(true, true, true)
+    Console.WriteLine("Native condition propagation passed")
+}

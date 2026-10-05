@@ -1,0 +1,110 @@
+{
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/tmp/IntrospectionCoreParams1005.dll",
+        "--runtime-seed",
+        "/tmp/json-mapping-recorded1005/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+        "--reference",
+        "/tmp/system-type-limit1005/Numbers.dll",
+        "-o",
+        "/tmp/ConditionPropagation1005.dll",
+        "docs/experiments/extended-cli-metadata/bootstrap/condition-propagation-consumer.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "verify",
+        "/tmp/ConditionPropagation1005.dll",
+        "--system",
+        "/tmp/json-mapping-recorded1005/System.neox",
+        "--module",
+        "/tmp/system-type-limit1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_DCA386FF335644F5B0F5D82305FA10F2361905B8DE4A159D42168EF054539184: typed-stack/control-flow verification passed (1460 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "target/debug/neoclr",
+        "run",
+        "/tmp/ConditionPropagation1005.dll",
+        "--system",
+        "/tmp/json-mapping-recorded1005/System.neox",
+        "--module",
+        "/tmp/system-type-limit1005/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Native condition propagation passed\n",
+      "stderr": ""
+    }
+  ],
+  "fullHttpCompilation": {
+    "command": [
+      "dotnet",
+      "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll",
+      "neoclr",
+      "--core-reference",
+      "/tmp/IntrospectionCoreParams1005.dll",
+      "--runtime-seed",
+      "/tmp/json-mapping-recorded1005/System.neox",
+      "--bootstrap-intrinsics",
+      "--bootstrap-ownership",
+      "/tmp/system-source-lookup1005/cumulative-tasks/ownership.json",
+      "--reference",
+      "/tmp/system-type-limit1005/Numbers.dll",
+      "--library",
+      "-o",
+      "/tmp/network-source1005/Network.dll",
+      "runtime/raven/src/System/Networking/Dns.rvn",
+      "runtime/raven/src/System/Networking/DnsError.rvn",
+      "runtime/raven/src/System/Networking/IPAddress.rvn",
+      "runtime/raven/src/System/Networking/IPAddressError.rvn",
+      "runtime/raven/src/System/Networking/Sockets/Socket.rvn",
+      "runtime/raven/src/System/Networking/Sockets/SocketError.rvn",
+      "runtime/raven/src/System/Web/Http/HttpClient.rvn",
+      "runtime/raven/src/System/Web/Http/HttpError.rvn",
+      "runtime/raven/src/System/Web/Http/HttpServer.rvn",
+      "runtime/raven/src/System/Web/Http/HttpStatusCode.rvn",
+      "runtime/raven/src/System/Web/Http/Json/HttpClientJsonExtensions.rvn",
+      "runtime/raven/src/System/Web/Http/Json/HttpJsonError.rvn",
+      "runtime/raven/src/System/Web/Http/Json/JsonClientOperations.rvn",
+      "runtime/raven/src/System/Web/Http/Json/JsonContent.rvn",
+      "runtime/raven/src/System/Web/Http/Routes.rvn",
+      "runtime/raven/src/System/Uri.rvn",
+      "runtime/raven/src/System/UriError.rvn",
+      "runtime/raven/native/RuntimeNetworkCalls.rvn",
+      "runtime/raven/native/RuntimeNetworkServices.rvn"
+    ],
+    "exitCode": 1,
+    "stdout": "",
+    "stderr": "warning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\nwarning RAV0162: Unreachable code\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nwarning RAV0168: 'reason' shadows a previous declaration.\nwarning RAV2103: This catch-all never matches.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0168: 'active' shadows a previous declaration.\nwarning RAV0162: Unreachable code\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\ninfo RAV1508: Explicit cast from 'byte' to 'int' is unnecessary because an implicit conversion exists.\nerror NEOMETA001: Native emission does not support lowered expression BoundDelegateCreationExpression.\n"
+  },
+  "runtimeRevision": "7fc3de920774de0fa2302706f622639d5a1c77f0",
+  "compilerBaseRevision": "a59df56353921a4759aedcc4a74b3c668afe1ca6",
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/condition-propagation-consumer.rvn": "23e91d4b76d2f06714272bf532ab237705ba0963a10b3b27bf5efb4b263a840e",
+    "/tmp/ConditionPropagation1005.dll": "1d8380baffd5b6472c5bedef7ddcd4ab4fba8bdf74b813579609aa37cf1c2db2",
+    "/tmp/system-type-limit1005/Numbers.dll": "632f4261eac616ebfe6718e83c5b8a10aaa5326a880bd9a06d8405fa530b0c59",
+    "/tmp/IntrospectionCoreParams1005.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/tmp/json-mapping-recorded1005/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/tmp/system-source-lookup1005/cumulative-tasks/ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "99db0aaa45be1f0e3e923d74da05214bd151d559c355499f7bfdfa997df10455",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/rvnc.dll": "23e6e9a8e528f21d2f32a7345c2900adbad661eca26c776e0182fe8a9b78da63",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.dll": "6a7fef766bb8c89df6dcd116f953ea6cf53551c7469e481bde467fc1181e4725",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/Raven.CodeAnalysis.NeoClr.dll": "04e9306b30e71bed74edd0291aeb8f255936ba572aff87b943b75af403722d6a",
+    "/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/src/Raven.Compiler/bin/Debug/net10.0/NeoCLR.Metadata.Experimental.dll": "cc00a7930155abeda5776c122f0d51904f48acc1a308b431e030eec8f8119359"
+  }
+}

@@ -1893,3 +1893,13 @@ host/native resources from managed allocations. Retain raw data and correctness 
 choose representative computation, collections/text/JSON and I/O workloads after the
 full-library gate rather than selecting only favorable cases. Do not infer runtime
 speedups from assembly size alone. Website publication remains a release action.
+
+### HTTP condition propagation (2026-10-05)
+
+Shared Raven lowering now handles nested propagation in HTTP's short-circuit conditions.
+A native artifact-only consumer executes skip/success/error paths for AND/OR, including
+one-time side effects. Integration validation passes 21 propagation tests and 65 focused
+shared-emitter/runtime-contract tests. No runtime, metadata format or ownership change
+is needed. Full HTTP source compilation advances to callback emission admission; that
+is the next bounded task before HTTP execution. Full-System bootstrapping remains open.
+Evidence: `docs/experiments/extended-cli-metadata/condition-propagation-2026-10-05.md`.

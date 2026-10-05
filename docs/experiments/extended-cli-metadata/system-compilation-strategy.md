@@ -817,3 +817,13 @@ group now reaches an unlowered BoundPropagateExpression. Prioritize Result propa
 in HTTP next, then reassess full-source/bootstrap ownership. This is native execution
 evidence, not .NET class-library or full-System completion. See
 `docs/experiments/extended-cli-metadata/source-network-2026-10-05.md`.
+
+### HTTP condition propagation (2026-10-05)
+
+Shared Raven lowering now handles nested propagation in HTTP's short-circuit conditions.
+A native artifact-only consumer executes skip/success/error paths for AND/OR, including
+one-time side effects. Integration validation passes 21 propagation tests and 65 focused
+shared-emitter/runtime-contract tests. No runtime, metadata format or ownership change
+is needed. Full HTTP source compilation advances to callback emission admission; that
+is the next bounded task before HTTP execution. Full-System bootstrapping remains open.
+Evidence: `docs/experiments/extended-cli-metadata/condition-propagation-2026-10-05.md`.
