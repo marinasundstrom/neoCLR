@@ -71,7 +71,7 @@ fn frame_capture_is_rejected_without_verifier() {
 
 #[test]
 fn incompatible_signature_is_rejected() {
-    assert!(assemble(&format!(".module Bad\n.function Wrong(Int32) -> Boolean\nldc.bool true\nret\n.end\n.function Main() -> Void\nfunction.bind fn<Int32,Int32> = Wrong(Int32)\nret\n.end")).unwrap_err().message.contains("signature"));
+    assert!(assemble(".module Bad\n.function Wrong(Int32) -> Boolean\nldc.bool true\nret\n.end\n.function Main() -> Void\nfunction.bind fn<Int32,Int32> = Wrong(Int32)\nret\n.end").unwrap_err().message.contains("signature"));
 }
 
 fn neo(source: &str) -> LoadedProgram {
@@ -408,8 +408,8 @@ fn class_constructor_cannot_read_a_function_field_before_assignment() {
 
 #[test]
 fn default_function_payload_is_null_and_cannot_be_invoked() {
-    let source = format!(
-        ".module Test\n.entry Main\n.type Holder\n.field Callback fn<Int32,Int32>\n.end\n.function Main() -> fn<Int32,Int32>\n.local Holder holder\nldloca holder\ninitobj Holder\nldloc holder\nldfld Holder::Callback\nret\n.end"
+    let source = String::from(
+        ".module Test\n.entry Main\n.type Holder\n.field Callback fn<Int32,Int32>\n.end\n.function Main() -> fn<Int32,Int32>\n.local Holder holder\nldloca holder\ninitobj Holder\nldloc holder\nldfld Holder::Callback\nret\n.end",
     );
     let m = assemble(&source).unwrap();
     verify(&m).unwrap();

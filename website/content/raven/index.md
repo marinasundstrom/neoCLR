@@ -122,9 +122,9 @@ for that status.
 
 <a id="native-target"></a>
 
-## Native target: development status
+## Native target: Preview 12 POC
 
-**Development only; not a new downloadable release.** Raven's `rvnc neoclr` command
+**Preview 12, macOS arm64.** Raven's `rvnc neoclr` command
 emits assemblies that neoCLR loads and executes directly. Native library references
 supply compiler symbols without translating those libraries back to .NET metadata.
 The explicit primitive bootstrap, retained runtime seed and matching dependency
@@ -155,8 +155,7 @@ virtual classes and new-slot hiding remain outside this native slice.
 A local matched compiler/server/extension/runtime bundle now passes extracted
 compilation and execution, plus 19 installed VS Code checks on macOS arm64, including
 API help and native reference refresh. Primitive bootstrap and retained runtime seed
-remain explicit dependencies. Published native downloads and bootstrap provenance
-are still release work.
+remain explicit dependencies. The matched download includes bootstrap dependencies with recorded source provenance.
 
 The development `neoclr disassemble` command inspects native metadata and instructions
 without loading dependencies or executing the assembly. Its output is a diagnostic

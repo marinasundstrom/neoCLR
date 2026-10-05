@@ -11075,3 +11075,13 @@ execute. Installed VSIX acceptance passes 19 checks. Website development status 
 reflects this local gate. Primitive core/retained seed provenance and publication
 remain open; neither a released download nor complete System bootstrap is claimed.
 See [evidence](experiments/extended-cli-metadata/native-bundle-2026-10-05.md).
+
+
+## 2026-10-05 — Preview 12 and main integration authorized
+
+**Author:** Asked to continue release and merge the NeoCLR repository work into main
+when done; selected Preview 12 with macOS arm64 as the qualified native toolchain.
+
+**Assistant action:** Reproduced the primitive core and retained runtime seed with
+identical hashes, pinned seed source for release reproduction, and prepared the
+version update. Merge/publication outcomes are recorded separately after execution.

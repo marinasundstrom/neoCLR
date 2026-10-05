@@ -208,11 +208,16 @@ fn constants_lower_from_metadata_and_private_payload_stays_private() {
 #[test]
 fn enum_conv_i4_preserves_the_entire_underlying_domain() {
     for value in [i32::MIN, -1, 0, 42, i32::MAX] {
-        let source = format!(".module App\n.entry Main\n.type State\n.enum Int32\n.field private Bits Int32\n.literal Ready 1\n.end\n.function Main() -> Int32\nldc.i4 {value}\nnewobj State\nconv.i4\nret\n.end\n");
+        let source = format!(
+            ".module App\n.entry Main\n.type State\n.enum Int32\n.field private Bits Int32\n.literal Ready 1\n.end\n.function Main() -> Int32\nldc.i4 {value}\nnewobj State\nconv.i4\nret\n.end\n"
+        );
         let module = neoclr::assembler::assemble(&source).unwrap();
         let program = LoadedProgram::new(&module).unwrap();
         program.verify().unwrap();
-        assert_eq!(program.run(Limits::default()).unwrap().value, Value::Int32(value));
+        assert_eq!(
+            program.run(Limits::default()).unwrap().value,
+            Value::Int32(value)
+        );
     }
     let source = ".module App\n.entry Main\n.type Record\n.field public Bits Int32\n.end\n.function Main() -> Int32\nldc.i4 42\nnewobj Record\nconv.i4\nret\n.end\n";
     let module = neoclr::assembler::assemble(source).unwrap();

@@ -51,6 +51,8 @@ def audit_notices(source):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--revision", default="HEAD")
+    parser.add_argument("--distribution", choices=("legacy", "native"), default="legacy",
+                        help="Native checks the pinned seed; legacy checks bridge snapshots")
     parser.add_argument("--toolchain", default="stable")
     parser.add_argument("--output", type=Path, help="new directory for archive, extraction and report")
     parser.add_argument("--release", action="store_true", help="Validate optimized release binaries and tests")
@@ -61,7 +63,7 @@ def main():
     if args.output:
         output.mkdir(parents=True, exist_ok=False)
     report = {"status": "running", "platform": platform.platform(), "toolchain": args.toolchain,
-              "full_tests": False, "smoke_programs": [], "build_profile": "release" if args.release else "debug",
+              "distribution": args.distribution, "full_tests": False, "smoke_programs": [], "build_profile": "release" if args.release else "debug",
               "validator_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     started = time.monotonic()
     print("Validation output: " + str(output), flush=True)
@@ -96,8 +98,11 @@ def main():
             if not (source / name).is_file():
                 raise RuntimeError("required source member missing: " + name)
         report["registry_packages"], report["notice_files"] = audit_notices(source)
-        run([sys.executable, "docs/experiments/raven-target/build_runtime_library.py", "--check-snapshot"], source)
-        report["raven_library_snapshot"] = True
+        if args.distribution == "legacy":
+            run([sys.executable, "docs/experiments/raven-target/build_runtime_library.py", "--check-snapshot"], source)
+            report["raven_library_snapshot"] = True
+        else:
+            report["raven_library_snapshot"] = "not qualified by native distribution profile"
         env = dict(os.environ)
         env["CARGO_TARGET_DIR"] = str(output / "target")
         report["rustc"] = run(["rustc", "+" + args.toolchain, "-Vv"], source, True, env).strip()
@@ -108,6 +113,13 @@ def main():
             report["full_tests"] = True
         run(cargo + ["build", "--locked"] + profile, source, env=env)
         executable = output / "target" / ("release" if args.release else "debug") / ("neoclr.exe" if os.name == "nt" else "neoclr")
+        if args.distribution == "native":
+            seed = output / "System.neox"
+            run([executable, "assemble", source / "runtime/raven/native/poc-seed.neoil", seed, "--format", "neox"], source)
+            digest = hashlib.sha256(seed.read_bytes()).hexdigest()
+            if digest != "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc":
+                raise RuntimeError("native bootstrap seed differs from qualified artifact")
+            report["native_seed_sha256"] = digest
         for name in ["counter", "collections", "outputs", "reflection", "reference-identity",
                      "interfaces", "arrays", "control-flow", "typeof",
                      "ordinal-text", "character-classification", "math", "date-time",

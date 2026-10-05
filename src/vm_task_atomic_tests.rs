@@ -385,7 +385,7 @@ fn interleave(
                 1,
             )
             .unwrap();
-            assert!(!task_atomic::active(&module, &frames[index]));
+            assert!(!task_atomic::active(module, &frames[index]));
             if let InstructionProgress::Completed(value) = progress {
                 results[index] = Some(value);
             }

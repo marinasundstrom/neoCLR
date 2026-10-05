@@ -90,7 +90,7 @@ fn emit_il(args: &[String]) -> Result<Vec<String>, String> {
     }
     let input = read(&args[1])?;
     let source = input.text()?;
-    let il = neoclr::frontend::lower_to_il_named(&source, &args[1]).map_err(|e| e.to_string())?;
+    let il = neoclr::frontend::lower_to_il_named(source, &args[1]).map_err(|e| e.to_string())?;
     // Match ordinary Neo compilation, but retain the original textual lowering.
     // Validate before writing; emission never runs the guest program.
     let module = assemble(&il).map_err(|e| e.to_string())?;

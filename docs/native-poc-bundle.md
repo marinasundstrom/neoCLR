@@ -59,5 +59,33 @@ set a development-checkout language-server override for installation acceptance.
 Hash verification establishes consistency with the manifest, not a signed trust chain.
 This tooling supplements the still-failing legacy source/archive snapshot audit; it
 does not rewrite that audit's result or assert that legacy bootstrap generation works.
-Publication and clean-source provenance for the remaining bootstrap inputs remain
-explicit release decisions/work, rather than reasons to expand the translation bridge.
+The provenance procedure below closes the retained-input reproduction gap.
+Publication remains separate from local packaging and does not expand the translation bridge.
+
+## Preview 12 bootstrap provenance
+
+The retained seed is now pinned at `runtime/raven/native/poc-seed.neoil`. It is the
+bounded primitive/service selection previously assembled by the source JSON gate,
+not a replacement implementation of application or source-library APIs. Build it:
+
+```sh
+neoclr assemble runtime/raven/native/poc-seed.neoil System.neox --format neox
+```
+
+The primitive CLI reference is reproduced by the existing declaration generator:
+
+```sh
+dotnet build docs/experiments/raven-target/Probe.csproj -p:RavenRoot="$RAVEN_SOURCE"
+dotnet docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll \
+  --reference-comparer-storage-core Core.dll
+```
+
+On 2026-10-05, with Raven integration revision `2554322c4` and NeoCLR `ef9d53ce`,
+these exactly reproduce the previously accepted SHA256 artifacts:
+
+- Core.dll: `64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc`
+- System.neox: `2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc`
+
+The generator reuses the existing bootstrap declarations; no application/native
+library is translated into CLI metadata. Full native primitive bootstrap is later work.
+The author selected `v0.1.0-preview.12`, macOS arm64, and integration into NeoCLR main.

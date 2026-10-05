@@ -179,9 +179,10 @@ fn explicit_translated_library_binding_preserves_runtime_calls() {
         } else {
             manifest.native_module_bindings.clear();
         }
-        let error = LoadedProgram::with_modules(&invalid, system, &libraries)
-            .err()
-            .expect("invalid linkage admitted");
+        let error = match LoadedProgram::with_modules(&invalid, system, &libraries) {
+            Err(error) => error,
+            Ok(_) => panic!("invalid linkage admitted"),
+        };
         assert!(error.message.contains("native type binding"), "{error}");
     }
 }

@@ -84,3 +84,14 @@ release notes unchanged.
 
 See [validation evidence](preview-1-validation.md) for the already tested clean-source
 workflows and the [Preview 1 checklist](preview-1.md) for gates still open.
+
+
+## Preview 12 native distribution profile
+
+Use `--distribution native` for the Preview 12 native distribution. This retains
+archive membership, notice hashes, full Rust tests and executable smoke checks, but
+replaces the legacy CLI bridge snapshot check with assembly of the pinned native
+bootstrap seed and comparison to its qualified SHA256. CI now selects this explicit
+profile. The default remains `legacy`; its recorded snapshot failure is not repaired
+or certified by native validation. Native compiler/VSIX bundle acceptance remains a
+separate macOS arm64 gate, documented in `native-poc-bundle.md`.

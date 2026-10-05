@@ -54,7 +54,7 @@ jobs:
       - run: python -m unittest discover -s scripts -p test_validate_host.py
       - run: cargo fmt --check
       - run: cargo clippy --locked --all-targets -- -D warnings
-      - run: python scripts/validate-release.py --toolchain stable --release --output release-validation
+      - run: python scripts/validate-release.py --distribution native --toolchain stable --release --output release-validation
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -78,7 +78,7 @@ jobs:
       - if: ${{ !inputs.full_matrix }}
         run: python scripts/validate-host.py --toolchain stable --output target/host-validation
       - if: ${{ inputs.full_matrix }}
-        run: python scripts/validate-release.py --toolchain stable --release --output release-validation
+        run: python scripts/validate-release.py --distribution native --toolchain stable --release --output release-validation
       - if: runner.os == 'Windows'
         run: cargo build --locked --release --bin neoclr
       - if: runner.os == 'Windows'

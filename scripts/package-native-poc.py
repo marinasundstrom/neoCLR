@@ -47,6 +47,7 @@ def main():
     (staged / 'bin').mkdir()
     (staged / 'editor').mkdir()
     (staged / 'tools').mkdir()
+    shutil.copy2(ROOT / 'runtime/raven/native/poc-seed.neoil', staged / 'lib/System.neoil')
     shutil.copytree(args.sdk, staged / 'sdk')
     executable = 'neoclr.exe' if platform.system() == 'Windows' else 'neoclr'
     shutil.copy2(args.runtime, staged / 'bin' / executable)
@@ -96,7 +97,7 @@ def main():
                 '--run', '${workspaceFolder}/../../bin/' + executable], problemMatcher=[])]}, indent=2) + '\n')
     (staged / 'README.md').write_text('''# Native neoCLR POC candidate
 
-This is a local development candidate, not a published release. The host needs the
+This is the Preview 12 native POC bundle. The host needs the
 .NET SDK/runtime required by the included Raven SDK (net11 compiler, net10 project
 reference packs), Python 3 and VS Code for editor use. This candidate is host-specific.
 

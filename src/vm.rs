@@ -297,14 +297,12 @@ pub(crate) fn resolve_constructor_body(
         || function.returns != Type::Void
         || function.is_internal_call()
         || function.pinvoke.is_some()
-        || !module
-            .type_definition(owner)
-            .is_some_and(|d| {
-                d.representation == Representation::Record
-                    || *owner == Type::String
-                        && d.representation == Representation::Runtime
-                        && !function.receiver_byref
-            })
+        || !module.type_definition(owner).is_some_and(|d| {
+            d.representation == Representation::Record
+                || *owner == Type::String
+                    && d.representation == Representation::Runtime
+                    && !function.receiver_byref
+        })
     {
         return Err(Fault::new(
             "newobj constructor requires an instance IL .ctor returning Void on a record or runtime String",
@@ -643,7 +641,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
         if class_owner
             && function.name.ends_with("..ctor")
-            && (!function.instance || !function.no_result || !function.generic_parameters.is_empty())
+            && (!function.instance
+                || !function.no_result
+                || !function.generic_parameters.is_empty())
         {
             return Err(Fault::new(
                 "class constructors require instance no-result signatures",
@@ -717,9 +717,7 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
         }
 
         if function.visibility == crate::metadata::Visibility::Protected
-            && !(function.instance
-                && function.owner.is_some()
-                && function.name.ends_with("..ctor"))
+            && !(function.instance && function.owner.is_some() && function.name.ends_with("..ctor"))
         {
             return Err(Fault::new(
                 "protected visibility currently requires an instance constructor",
@@ -758,8 +756,13 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                 || (function.instance && !class_owner)
                 || function.is_virtual
                 || function.is_abstract
-                || (function.is_internal_call() && !matches!(crate::native::bind_in(module, function)?,
-                    crate::native::Binding::GenericDefaultTaskQueue | crate::native::Binding::GenericCurrentTaskQueue | crate::native::Binding::GenericRegisterTaskQueue))
+                || (function.is_internal_call()
+                    && !matches!(
+                        crate::native::bind_in(module, function)?,
+                        crate::native::Binding::GenericDefaultTaskQueue
+                            | crate::native::Binding::GenericCurrentTaskQueue
+                            | crate::native::Binding::GenericRegisterTaskQueue
+                    ))
                 || function.pinvoke.is_some()
                 || !function.interface_implementations.is_empty()
             {
@@ -1355,7 +1358,9 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
                     .and_then(|o| module.type_definition(o))
                     .is_none_or(|d| d.generic_parameters.is_empty())
         });
-        let entry = candidates.next().ok_or_else(|| Fault::new("entry function with no parameters or one String array not found"))?;
+        let entry = candidates.next().ok_or_else(|| {
+            Fault::new("entry function with no parameters or one String array not found")
+        })?;
         if candidates.next().is_some() {
             return Err(Fault::new("ambiguous entry function"));
         }
@@ -1698,7 +1703,8 @@ pub unsafe fn run_with_native(
 }
 
 pub(crate) fn entry_parameters(parameters: &[Type]) -> bool {
-    parameters.is_empty() || matches!(parameters, [Type::ArrayRef(element)] if **element == Type::String)
+    parameters.is_empty()
+        || matches!(parameters, [Type::ArrayRef(element)] if **element == Type::String)
 }
 
 pub(crate) fn interpret(
@@ -1734,7 +1740,14 @@ pub(crate) fn interpret_function(
     options: ExecutionOptions,
     native_libraries: Option<crate::interop::NativeLibraries>,
 ) -> Result<Execution, Fault> {
-    interpret_function_core(module, function, arguments, options, native_libraries, false)
+    interpret_function_core(
+        module,
+        function,
+        arguments,
+        options,
+        native_libraries,
+        false,
+    )
 }
 
 fn interpret_function_core(
@@ -1765,7 +1778,11 @@ fn interpret_function_core(
         }
         let mut frames = vec![Frame::new(function, arguments)?];
         let result = interpret_frames(
-            module, &mut frames, options, native_libraries, entry_arguments,
+            module,
+            &mut frames,
+            options,
+            native_libraries,
+            entry_arguments,
         );
         result.map_err(|fault: Fault| {
             fault.with_stack_trace(crate::StackTrace::capture(
@@ -1804,13 +1821,21 @@ fn interpret_frames(
         // ExecutionOptions retains argv[0] for Environment; Main receives only user arguments.
         let payload = Value::Array {
             element: Type::String,
-            elements: options.arguments.iter().skip(1)
-                .map(|text| Value::String(text.clone().into())).collect(),
+            elements: options
+                .arguments
+                .iter()
+                .skip(1)
+                .map(|text| Value::String(text.clone().into()))
+                .collect(),
         };
         let value = crate::arrays::string_snapshot(
-            Value::Erased(Box::new(payload)), &mut participant.enter(), &options.limits,
+            Value::Erased(Box::new(payload)),
+            &mut participant.enter(),
+            &options.limits,
         )?;
-        frames[0].args.push(crate::slots::Slot::cell(value.ty(), Some(value)));
+        frames[0]
+            .args
+            .push(crate::slots::Slot::cell(value.ty(), Some(value)));
         state.arrays_used = true;
     }
     let work_scope = crate::invocation_work::Scope(state.invocation.clone());
@@ -2357,7 +2382,8 @@ fn interpret_instructions_with_dispatch(
             *owner = std::sync::Weak::new();
             return Ok(InstructionProgress::Completed(value));
         }
-        if (executed >= quantum && !task_atomic::active(module, frames)) || budget.remaining() == 0 {
+        if (executed >= quantum && !task_atomic::active(module, frames)) || budget.remaining() == 0
+        {
             break;
         }
         executed += 1;
@@ -2486,18 +2512,32 @@ fn interpret_instructions_with_dispatch(
         };
 
         let requested_queue = match op {
-            Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue" => Some(Type::from_name("System.Tasks.TaskQueue")),
-            Op::Call(target) if target.name == "neoCLR.Runtime.GetCurrentTaskQueue" => target.generic_arguments.first().cloned(),
+            Op::Call(target) if target.name == "neoCLR.Runtime.CurrentTaskQueue" => {
+                Some(Type::from_name("System.Tasks.TaskQueue"))
+            }
+            Op::Call(target) if target.name == "neoCLR.Runtime.GetCurrentTaskQueue" => {
+                target.generic_arguments.first().cloned()
+            }
             _ => None,
         };
         let current_task_queue = if let Some(owner) = requested_queue {
             task_queue::validate(module, &owner)?;
-            frames.iter().rev().find_map(|frame| {
-                if !frame.function.instance || frame.function.owner.as_ref() != Some(&owner)
-                    || !matches!(task_queue::member(&frame.function), "Run" | "Drain") { return None; }
-                frame.args.first().map(|slot| slot.borrow().get())
-            }).transpose()?
-        } else { None };
+            frames
+                .iter()
+                .rev()
+                .find_map(|frame| {
+                    if !frame.function.instance
+                        || frame.function.owner.as_ref() != Some(&owner)
+                        || !matches!(task_queue::member(&frame.function), "Run" | "Drain")
+                    {
+                        return None;
+                    }
+                    frame.args.first().map(|slot| slot.borrow().get())
+                })
+                .transpose()?
+        } else {
+            None
+        };
 
         // Host Result propagates terminal faults; there is no guest exception machinery.
         let mut host_call = None;
@@ -2960,9 +3000,9 @@ fn interpret_instructions_with_dispatch(
                                 ));
                             };
                             object.reference.assigned()?;
-                            if let Some(value) =
-                                crate::intrinsic_objects::dispatch(module, &object, &contract, &args)?
-                            {
+                            if let Some(value) = crate::intrinsic_objects::dispatch(
+                                module, &object, &contract, &args,
+                            )? {
                                 frame.stack.push(value);
                                 return Ok(None);
                             }
@@ -3053,7 +3093,9 @@ fn interpret_instructions_with_dispatch(
                                 receiver.restrict_readonly();
                             }
                             args.insert(0, Value::SlotReference(receiver));
-                        } else if callee.owner == Some(Type::String) && object.concrete_type() == Type::String {
+                        } else if callee.owner == Some(Type::String)
+                            && object.concrete_type() == Type::String
+                        {
                             // Interface views wrap intrinsic text, while String IL takes
                             // the immutable text reference itself as its receiver.
                             args.insert(0, object.reference.read()?);
@@ -3779,21 +3821,48 @@ fn interpret_instructions_with_dispatch(
                                 limits.heap_objects,
                             ][index as usize];
                             Value::Int64(i64::try_from(count).unwrap_or(i64::MAX))
-                        } else if matches!(binding, crate::native::Binding::GenericDefaultTaskQueue | crate::native::Binding::GenericCurrentTaskQueue | crate::native::Binding::GenericRegisterTaskQueue) {
-                            let ty = callee.generic_arguments.first().ok_or_else(|| Fault::new("Missing TaskQueue type argument"))?;
+                        } else if matches!(
+                            binding,
+                            crate::native::Binding::GenericDefaultTaskQueue
+                                | crate::native::Binding::GenericCurrentTaskQueue
+                                | crate::native::Binding::GenericRegisterTaskQueue
+                        ) {
+                            let ty = callee
+                                .generic_arguments
+                                .first()
+                                .ok_or_else(|| Fault::new("Missing TaskQueue type argument"))?;
                             task_queue::validate(module, ty)?;
-                            if default_task_queue.as_ref().is_some_and(|queue| queue.ty() != *ty) {
-                                return Err(Fault::new("Conflicting TaskQueue ownership in one invocation"));
+                            if default_task_queue
+                                .as_ref()
+                                .is_some_and(|queue| queue.ty() != *ty)
+                            {
+                                return Err(Fault::new(
+                                    "Conflicting TaskQueue ownership in one invocation",
+                                ));
                             }
                             if matches!(binding, crate::native::Binding::GenericRegisterTaskQueue) {
-                                if default_task_queue.is_some() || !matches!(args.as_slice(), [Value::ObjectReference(_)]) || args[0].ty() != *ty {
-                                    return Err(Fault::new("Default TaskQueue must be registered once with a live queue"));
+                                if default_task_queue.is_some()
+                                    || !matches!(args.as_slice(), [Value::ObjectReference(_)])
+                                    || args[0].ty() != *ty
+                                {
+                                    return Err(Fault::new(
+                                        "Default TaskQueue must be registered once with a live queue",
+                                    ));
                                 }
                                 *default_task_queue = Some(args[0].clone());
                                 Value::Void
                             } else {
-                                let current = if matches!(binding, crate::native::Binding::GenericCurrentTaskQueue) { current_task_queue.clone() } else { None };
-                                current.or_else(|| default_task_queue.clone()).unwrap_or_else(|| Value::NullObjectReference(ty.clone()))
+                                let current = if matches!(
+                                    binding,
+                                    crate::native::Binding::GenericCurrentTaskQueue
+                                ) {
+                                    current_task_queue.clone()
+                                } else {
+                                    None
+                                };
+                                current
+                                    .or_else(|| default_task_queue.clone())
+                                    .unwrap_or_else(|| Value::NullObjectReference(ty.clone()))
                             }
                         } else if matches!(binding, crate::native::Binding::CurrentTaskQueue) {
                             current_task_queue
@@ -3875,7 +3944,11 @@ fn interpret_instructions_with_dispatch(
                         } else if let crate::native::Binding::StartWorker(pooled) = binding {
                             scheduler.workers.start(module, args, options, pooled)?
                         } else if matches!(binding, crate::native::Binding::StringSnapshot) {
-                            crate::arrays::string_snapshot(args.into_iter().next().unwrap(), heap, &limits)?
+                            crate::arrays::string_snapshot(
+                                args.into_iter().next().unwrap(),
+                                heap,
+                                &limits,
+                            )?
                         } else if let crate::native::Binding::Reflection(query) = binding {
                             query.invoke_profile(
                                 module,
@@ -3912,7 +3985,13 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::AssemblyInfo(_)
                                 | crate::native::Binding::ExecutingAssembly
                         ) {
-                            crate::reflection::materialize_result(module, heap, &limits, value, &callee.returns)?
+                            crate::reflection::materialize_result(
+                                module,
+                                heap,
+                                &limits,
+                                value,
+                                &callee.returns,
+                            )?
                         } else {
                             value
                         };
@@ -4647,9 +4726,7 @@ fn interpret_instructions_with_dispatch(
                 // Returning from a default-queue callback is a safe point to append
                 // ready notifications: Post has no suspended mutation here. Never
                 // inject into an arbitrary callback, collection operation or queue.
-                if matches!(op, Op::Return)
-                    && task_queue::member(&function) != "Post"
-                {
+                if matches!(op, Op::Return) && task_queue::member(&function) != "Post" {
                     if let (Some(caller), Some(queue)) = (frames.last(), &default_task_queue) {
                         if task_queue::member(&caller.function) == "Drain"
                             && caller.function.instance

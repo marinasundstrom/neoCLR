@@ -1,7 +1,7 @@
 //! Checked single-target objects instantiated from structural Function shapes.
 use crate::{
-    metadata::{Function, FunctionRef, Type},
     Fault, Module, Value,
+    metadata::{Function, FunctionRef, Type},
 };
 
 /// Opaque runtime binding. Guest artifacts cannot manufacture live bindings.

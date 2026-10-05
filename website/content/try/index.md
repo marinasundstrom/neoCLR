@@ -1,5 +1,26 @@
 # Build and run a Raven project
 
+## Preview 12: native Raven POC (macOS arm64)
+
+[Download the matched native bundle](https://github.com/marinasundstrom/neoCLR/releases/download/v0.1.0-preview.12/neoclr-preview12-osx-arm64.tar.gz).
+Install .NET 11 for the compiler, .NET 10 SDK/reference packs, Python 3 and VS Code.
+Extract the archive, then from `neoclr-native-poc` run:
+
+```sh
+python3 tools/verify-native-bundle.py --report ../acceptance.json
+code --install-extension editor/raven-vscode.vsix
+```
+
+Open an individual folder under `samples/` and use the `neoCLR: Run` task. The
+verifier compiles five projects and checks collections, Tasks, JSON and live HTTP.
+Library references use native metadata; the primitive core and retained runtime
+seed are explicit temporary bootstrap dependencies. This is a bounded POC, not full
+System bootstrap. No global Raven SDK is required.
+
+[Release notes and limits](https://github.com/marinasundstrom/neoCLR/releases/tag/v0.1.0-preview.12).
+The older Preview 11 bridge instructions are retained below for that release.
+
+
 Start with a saved .rvnproj project. The same project describes your source files and runtime references for the editor and build tools.
 
 **Published Preview 11.** These instructions use the matching macOS arm64 packages. The feature pages describe current behavior and possible future directions.
@@ -120,7 +141,7 @@ remain experimental.
 The [feature pages](../#feature-pages) show tested examples and current limits. The [proposal overview](../proposals/) explains the open questions and possible future additions. Tell us what works for your programs and where these contracts should improve.
 
 
-### Native editor integration in development
+### Native editor integration in Preview 12
 
 The native development workflow has passed a real VS Code acceptance test on macOS
 arm64. Projects import native libraries for completion, hover and read-only declaration
@@ -131,11 +152,10 @@ VS Code tasks build and run the unchanged collections and Tasks/await samples ag
 source-built libraries. The compiler and language server use the same evaluated project
 references and bootstrap configuration. Ordinary .NET editor behavior is checked too.
 
-This is development POC evidence, not a replacement download for Preview 11. The local matched
+The Preview 12 matched
 compiler/server/extension/runtime bundle has passed installation qualification,
 including 19 VS Code checks and extracted collections, Tasks, JSON and live HTTP
-execution. Native downloads are not published yet; bootstrap provenance remains
-release work. The setup above remains the published bridge workflow.
+execution. The native bundle setup is above; the older bridge workflow remains version-specific.
 
 ### API documentation in the development editor
 
@@ -145,6 +165,5 @@ matching `.xml` file and/or Raven `.docs` directory beside its assembly. Markdow
 member documentation takes precedence, with XML fallback. Native library project
 builds can generate both from documentation comments.
 
-This is development work for the next matched tool bundle, not a change to the
-Preview 11 downloads above. APIs without supplied descriptions still show signatures.
+This support is included in the Preview 12 matched bundle. APIs without supplied descriptions still show signatures.
 Longer tutorials and guides stay on this website; they need not be inline comments.

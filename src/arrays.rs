@@ -388,24 +388,28 @@ mod string_snapshot_tests {
             assert!(string_snapshot(invalid, &mut heap, &limits).is_err());
         }
         let data = payload(Value::String("file.txt".into()));
-        assert!(string_snapshot(
-            data.clone(),
-            &mut heap,
-            &Limits {
-                array_elements: 0,
-                ..limits
-            }
-        )
-        .is_err());
-        assert!(string_snapshot(
-            data,
-            &mut heap,
-            &Limits {
-                heap_objects: 0,
-                ..limits
-            }
-        )
-        .is_err());
+        assert!(
+            string_snapshot(
+                data.clone(),
+                &mut heap,
+                &Limits {
+                    array_elements: 0,
+                    ..limits
+                }
+            )
+            .is_err()
+        );
+        assert!(
+            string_snapshot(
+                data,
+                &mut heap,
+                &Limits {
+                    heap_objects: 0,
+                    ..limits
+                }
+            )
+            .is_err()
+        );
         assert_eq!(heap.len(), 0);
     }
 }

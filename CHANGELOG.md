@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Prepare author-selected Preview 12 for macOS arm64, preserving the bounded native
+  POC scope. Select an explicit native source-validation profile in CI, retaining
+  the default legacy audit separately. Pin the retained bootstrap seed source and reproduce both bootstrap
+  artifacts byte-for-byte. Apply Rust formatting and equivalent Clippy cleanups; publication and main integration are tracked separately.
+
 - Package the native POC tooling, source-built libraries and explicit bootstrap
   dependencies with relative consumer projects and hash verification. Extracted
   compilation/execution and installed VSIX acceptance pass on macOS arm64. Record

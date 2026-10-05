@@ -30,6 +30,8 @@ fn common_phase(mut action: impl FnMut()) -> serde_json::Value {
     let samples: Vec<_> = (0..9).map(|_| measured(1, &mut action)).collect();
     summary(&samples, 1)
 }
+// Keep debug builds compilable; reject only when running the benchmark.
+#[allow(clippy::assertions_on_constants)]
 fn main() {
     assert!(!cfg!(debug_assertions), "use --release");
     let args: Vec<_> = std::env::args().collect();

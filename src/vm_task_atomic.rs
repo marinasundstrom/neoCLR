@@ -1,7 +1,7 @@
 //! Scheduling policy for the closed System.Tasks implementation. These regions
 //! retain graph access across instruction quanta, not across user callbacks or I/O.
 use super::Frame;
-use crate::{metadata::Function, Module};
+use crate::{Module, metadata::Function};
 
 pub(super) fn queue_pump(module: &Module, function: &Function) -> bool {
     trusted_owner(module, function) == Some("System.Tasks.TaskQueue")
@@ -15,7 +15,9 @@ fn trusted_owner<'a>(module: &'a Module, function: &'a Function) -> Option<&'a s
     }
     let definition = module.type_definition(owner)?;
     let origin = definition.origin.as_ref()?;
-    if function.origin.as_ref()?.assembly != origin.assembly { return None; }
+    if function.origin.as_ref()?.assembly != origin.assembly {
+        return None;
+    }
     match origin.name.as_str() {
         "System.Tasks.TaskQueue" => Some("System.Tasks.TaskQueue"),
         "System.Tasks.Promise`1" => Some("System.Tasks.Promise"),

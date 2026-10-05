@@ -130,8 +130,7 @@ fn payload(image: &[u8]) -> Result<(u16, &[u8]), Fault> {
         .get(b"#Neo".as_slice())
         .ok_or_else(|| invalid("required #Neo stream missing"))?;
     let length = u32_at(envelope, 12)?;
-    if length < 16
-        || length > 8 * 1024 * 1024
+    if !(16..=8 * 1024 * 1024).contains(&length)
         || length > envelope.len()
         || envelope.len() - length > 3
         || envelope[length..].iter().any(|v| *v != 0)
