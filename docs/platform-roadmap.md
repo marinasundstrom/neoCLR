@@ -4,6 +4,15 @@ The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
 A disassembler remains a release candidate, not yet a required deliverable.
 
+## Object root ownership contract isolated (2026-10-05)
+
+The [root investigation](experiments/extended-cli-metadata/object-root-ownership-2026-10-05.md)
+locks seed-root dispatch and rejects implicit ownership by an external type's name.
+A proposed assembly-name relaxation broke an existing lookalike rejection and was
+reverted. Next implement explicit root selection across bootstrap configuration,
+binding, metadata authoring and runtime admission as one contract. Source Object and
+full-System compilation remain incomplete; no seed replacement is enabled by this slice.
+
 ## Object service prerequisite executes (2026-10-05)
 
 The [Object service gate](experiments/extended-cli-metadata/object-services-2026-10-05.md)

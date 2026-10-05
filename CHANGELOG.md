@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Lock Object root ownership with focused runtime and binary load-set controls.
+  Record why relaxing assembly-name checks without explicit root selection admits
+  application lookalikes; that experiment was reverted. Source Object ownership
+  remains planned, with no runtime behavior or metadata format change in this slice.
+
 - Preserve assembly identities for matching runtime-service InternalCall declarations,
   binding symbolic calls locally while retaining signature and access validation.
   Add native source Object equality/identity adapters and an artifact-only executable

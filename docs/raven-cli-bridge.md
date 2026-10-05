@@ -5946,3 +5946,13 @@ or Runtime Contract configuration was added. C# tests and a produced native imag
 the unchanged eleven-case stream-upload source now compiles and executes with URL/mode
 arguments. Native name-based entry ambiguity rejects explicitly. Ordinary .NET startup
 remains unchanged.
+
+### Source Object ownership boundary (2026-10-05)
+
+The [root-ownership investigation](experiments/extended-cli-metadata/object-root-ownership-2026-10-05.md)
+identifies a required explicit selection across bootstrap configuration, semantic root
+identity, writer boxing/slot authoring and runtime admission. Merely recognizing any
+loaded System.Object grants application lookalikes intrinsic behavior. That attempted
+relaxation was reverted; retained seed ownership and compiler configuration remain
+unchanged. Runtime controls now cover binary seed/application loading and invalid
+ownership. Source Object binding/emission remains an open prerequisite.
