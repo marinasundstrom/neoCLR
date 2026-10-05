@@ -83,6 +83,8 @@ fn regular(path: &std::path::Path) -> Result<(), Error> {
     }
 }
 impl Files {
+    // The replacement try_update is newer than our Rust 1.85 minimum.
+    #[allow(deprecated)]
     fn open(&mut self, name: &str, mode: Operation) -> Result<i32, Error> {
         let path = path(name)?;
         if self.open.len() >= MAX_OPEN_FILES {

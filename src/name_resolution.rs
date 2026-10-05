@@ -44,6 +44,8 @@ type Lookup = dyn Fn(&str) -> Outcome + Send + Sync;
 // invocation cannot admit unlimited replacement threads while libc is stuck.
 struct Permit(&'static AtomicUsize);
 impl Permit {
+    // The replacement try_update is newer than our Rust 1.85 minimum.
+    #[allow(deprecated)]
     fn acquire(count: &'static AtomicUsize) -> Result<Self, Error> {
         count
             .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| {
@@ -161,6 +163,8 @@ impl Resolver {
     ) -> Result<OperationId, Error> {
         self.submit_until(name, callback, timeout, None)
     }
+    // The replacement try_update is newer than our Rust 1.85 minimum.
+    #[allow(deprecated)]
     pub(crate) fn submit_until(
         &mut self,
         name: &str,

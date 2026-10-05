@@ -12,7 +12,9 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   POC scope. Select an explicit native source-validation profile in CI, retaining
   the default legacy audit separately. Pin the retained bootstrap seed source and reproduce both bootstrap
   artifacts byte-for-byte. Apply Rust formatting and equivalent Clippy cleanups,
-  and update the source audit to the renamed function-object sample. Publication
+  and update the source audit to the renamed function-object sample. Retain the
+  Rust 1.85-compatible atomic update API with narrowly scoped deprecation allowances
+  for newer toolchains. Publication
   and main integration are tracked separately.
 
 - Package the native POC tooling, source-built libraries and explicit bootstrap

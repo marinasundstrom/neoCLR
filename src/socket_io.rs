@@ -16,6 +16,8 @@ const ADDRESS_TIMEOUT: Duration = Duration::from_secs(1);
 const MAX_ADDRESSES: usize = 16;
 
 static NEXT_ID: AtomicU64 = AtomicU64::new(1);
+// The replacement try_update is newer than our Rust 1.85 minimum.
+#[allow(deprecated)]
 fn next_id() -> Result<u64, Error> {
     NEXT_ID
         .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |id| {

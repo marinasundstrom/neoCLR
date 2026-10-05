@@ -35,6 +35,8 @@ impl Budget {
         self.remaining.load(Ordering::Relaxed)
     }
 
+    // The replacement try_update is newer than our Rust 1.85 minimum.
+    #[allow(deprecated)]
     pub(crate) fn charge(&self) -> Result<(), Fault> {
         self.remaining
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |fuel| {
@@ -49,6 +51,8 @@ impl Budget {
             })
     }
 
+    // The replacement try_update is newer than our Rust 1.85 minimum.
+    #[allow(deprecated)]
     pub(crate) fn frame(self: &Arc<Self>) -> Result<FramePermit, Fault> {
         self.frames
             .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |live| {
