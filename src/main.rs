@@ -1,4 +1,5 @@
 mod debug_terminal;
+mod disassembler;
 use neoclr::{ExecutionOptions, StdioConsole, assemble, load};
 use std::{
     env, fs,
@@ -7,6 +8,7 @@ use std::{
 };
 
 const USAGE: &str = "Usage:
+  neoclr disassemble <metadata-input> [output]
   neoclr emit-il <source.neo> [output.neoil]
   neoclr assemble <source.neoil> <output> [--format json|neox] [--module <input>]... [--system <input>]
   neoclr run <input> [System.neo.json] [--module <input>]... [--system <input>] [--gc-stats] [--gc-events] [--show-result] [--instructions <positive-count>] [-- <guest-argument>...]
@@ -99,6 +101,9 @@ fn emit_il(args: &[String]) -> Result<Vec<String>, String> {
 
 fn execute(args: &[String], exit_status: &mut i32) -> Result<Vec<String>, String> {
     let command = args.first().map(String::as_str).ok_or(USAGE)?;
+    if command == "disassemble" {
+        return disassembler::execute(args);
+    }
     if command == "emit-il" {
         return emit_il(args);
     }

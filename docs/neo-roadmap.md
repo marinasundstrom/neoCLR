@@ -282,7 +282,7 @@ The [emit-il command](il-inspection.md) now exposes lower_to_il_named through th
 for inspecting Neo compiler output without execution. It preserves source maps and
 validates before writing a new file. Microsoft's [Ildasm](https://learn.microsoft.com/en-us/dotnet/framework/tools/ildasm-exe-il-disassembler)
 (consulted 2026-09-09) reads compiled artifacts and produces reassemblable IL text.
-Neo currently implements source emission; artifact disassembly still needs a separate
-metadata-to-text writer. This exposes compiler decisions but cannot inspect arbitrary
-artifacts and is not a complete Ildasm equivalent. Binary instruction
-encoding remains a future format decision and is not required for readable IL inspection.
+The development `disassemble` command now reads PE/#Neo, NEOX and native JSON into a
+diagnostic metadata/instruction listing without loading dependencies. It is not yet
+reassemblable and is not a complete Ildasm equivalent. See the linked inspection guide
+for format support, instruction-index labels and validation.

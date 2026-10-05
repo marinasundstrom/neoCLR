@@ -2,17 +2,26 @@
 
 The release also requires an editor/LSP workflow using native NeoCLR metadata;
 see the [author-directed tooling gate](#author-directed-release-gate-editor-and-native-metadata-2026-10-05).
-The author has now requested a metadata disassembler as the next task after source-root
-emission succeeds, before resuming broader integration.
+The author-requested initial metadata disassembler is implemented; broader integration
+resumes with source-root driver/consumer wiring.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
+
+## Native metadata disassembly is available (2026-10-05)
+
+`neoclr disassemble` inspects PE/#Neo, NEOX and format-5 JSON without dependencies or
+execution. Declaration facts and indexed instruction operands are preserved in a
+diagnostic listing; reassembly is not supported. Six focused disassembler checks and
+nine existing CLI/source-emission checks pass. [Usage and limits](il-inspection.md).
+Resume the source-root driver/consumer and constructed-local-base work below; native
+Tasks/await samples and the shared CLI/editor configuration remain release requirements.
 
 ## Raven source Object root executes (2026-10-05)
 
 Raven `246e8a5db` emits a source Object root and derived override; NeoCLR loads the PE
 under explicit host selection and executes it. 47 focused compiler and 15 runtime checks
 pass. [Evidence and remaining limits](experiments/extended-cli-metadata/source-object-emission-2026-10-05.md).
-Next, as explicitly requested by the author, build the metadata disassembler. Then resume
+The author-requested initial metadata disassembler is now implemented. Resume
 source-root driver/consumer wiring and constructed local-base support. Production System,
 VS Code/LSP and native Tasks/await samples remain release gates.
 

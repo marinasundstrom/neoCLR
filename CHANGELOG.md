@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-05
 
+- Add development `neoclr disassemble <metadata-input> [output]` for PE/#Neo,
+  NEOX and format-5 JSON. Show declaration metadata and indexed instructions without
+  resolving dependencies or executing. Preserve existing files and reject malformed
+  input before publication. The diagnostic listing is not reassemblable neoIL and
+  does not inspect ordinary .NET assemblies. Six new checks and nine CLI regressions pass.
+
 - Execute a Raven-emitted source Object root and derived override in NeoCLR using
   explicit host selection. Record Raven `246e8a5db`, bootstrap/artifact hashes, 47 focused
   compiler checks and 15 runtime identity checks. Driver/consumer ownership and generic

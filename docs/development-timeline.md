@@ -10920,3 +10920,10 @@ The assistant accepted that sequencing. Source-root compiler emission now execut
 NeoCLR, with 47 focused compiler and 15 runtime checks passing. The metadata disassembler
 is now the next bounded task, rather than merely a release candidate. Broader integration
 resumes afterward; production System, editor support and Tasks/await remain open.
+
+The assistant subsequently implemented `neoclr disassemble` using the existing native
+container decoders. It displays metadata facts and indexed instructions without linking
+or executing; it is explicitly a diagnostic listing, not reassemblable neoIL. Six new
+checks and nine existing CLI/source-emission checks pass, including the Raven-emitted
+source-root PE. [Usage and scope](il-inspection.md). Broader end-to-end work resumes with
+source-root driver/consumer ownership and constructed local bases still open.
