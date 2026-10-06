@@ -1,0 +1,152 @@
+{
+  "runtimeRevision": "94c2a0f055fc670d190021465cbcce63c78dbff0",
+  "compilerRevision": "5f6298c1237ecc34d8f00d0ee3c681e9316b9a5b",
+  "instructionBudget": 100000000,
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-heap1006d/Heap.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/GC.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapServices.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap1006d",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-heap1006d/Heap.dll",
+        "-o",
+        "/private/tmp/source-heap1006d/HeapConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-retention-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap1006d",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-heap1006d/HeapConsumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap1006d/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap1006d",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_A926138B166F82B73FB3A3CA23AA324A27801DFA8D9EC5D664F8F8581017E791: typed-stack/control-flow verification passed (1476 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-heap1006d/HeapConsumer.dll",
+        "--instructions",
+        "100000000",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-heap1006d/Heap.dll"
+      ],
+      "cwd": "/private/tmp/source-heap1006d",
+      "exitCode": 0,
+      "stdout": "Native source heap passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-intrinsics",
+        "--bootstrap-ownership",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-heap1006d/Heap.dll",
+        "-o",
+        "/private/tmp/source-heap1006d/HeapNullableConsumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-heap1006d",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAV1503: Cannot convert from 'null' to 'object'\nerror RAV1509: Cannot assign null to 'object'\n"
+    }
+  ],
+  "limitation": "KeepAlive(null) rejects: native parameter nullability is not preserved",
+  "hashes": {
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/rvnc.dll": "ea0b65d9eea05964413691fd96bf85e264a5d241448cfd1599287795f1551e16",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "980ea756a50285a5d7a5bf2873dba36ce17e5751c8ec4a4fa71b32222c3bf003",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_heap.py": "0d50e895528aca917f8dc54427e0a4d3a7c26eaba32d90bef54ce1fdfe7abd1b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-retention-consumer.rvn": "347fbfa36bb8cb2857c4ff3749fa360160b14bec11cacc0609b669489e2341ee",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/heap-consumer.rvn": "d64314668fba8ac796ba0aadd955f0525978720b7a53a52d85d0de004bef38c2",
+    "/private/tmp/source-heap1006d/Heap.dll": "d8b6bfa54557f30e206456a6ff3a2647a6a6286e0eb2dcbb932aebc4a52bb503",
+    "/private/tmp/source-heap1006d/HeapConsumer.dll": "6c5ab3b4c908b6c2510669802965689e227832f60d4388865336b0b6d09b06e6",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Runtime/GC.rvn": "1c672a79b8eb146f353d73ec5d075235976dbc68397843d2e1b7ce669dd915d0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapCalls.rvn": "5d6713ef3c5c24c5122301a728732066931ef77be90fcc24891cf8774ef68ba1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeHeapServices.rvn": "c39d3ba0850ce0d4878b5d198a7e475129f9a4590b8d5bf11e4ddd0a7ea5f0b4",
+    "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/Raven.CodeAnalysis.dll": "c434df2c0ccca5868815a9b3785b63791cbd60d06dbb20714ca1a7d0599def00",
+    "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "a501871342031d24b276a2fd2e5acfbcb2b1806fe0bacf16a8340b14417d6442",
+    "/private/tmp/raven-native-matched-extracted1005/raven-sdk-0.1.13-neoclr.dev.20261005-osx-arm64/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "bad3e9d33cce7ee23c2ca1441d8cb75ae620635365c096a702bf35e2c57f3679"
+  },
+  "ravenIntegrationDocumentationCommit": "7221a99ea",
+  "runtimeSourceHashes": {
+    "src/native.rs": "2e2d86103b28ce8ede07aecba1d5f14e6e551c3338fd4b6f9f91d19cd46f8751",
+    "src/vm.rs": "a978bd1ad7d5bdf564bd484cc885f5a8ab1d19108c764d7b1b1059c6b6a24d65",
+    "tests/runtime_gc.rs": "8f57f1f7b1e4f632c7d36b61e2dc75fb43f1cbbf8dab0d6541cfdf0e87c2bbd9"
+  },
+  "tests": {
+    "runtimeGcBaseline": 8,
+    "runtimeGcFinal": 9,
+    "nativeSignature": 1,
+    "apiSnapshot": "passed"
+  },
+  "status": "partial: non-null retention executes; nullable metadata consumer remains rejected"
+}

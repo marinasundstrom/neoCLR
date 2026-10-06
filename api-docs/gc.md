@@ -43,3 +43,15 @@ afterwards. The interpreter may retain local references until their frame return
 modes. neoCLR exposes the supported object counters under the author-selected
 `System.Runtime` namespace. Generations, finalizers, no-GC regions and tuning are
 future collector work. See the [GC reference](xref:System.Runtime.GC).
+
+
+## Native source checkpoint (2026-10-06)
+
+The source-built GC facade now executes counters, collection and non-null KeepAlive
+through a separate native consumer. Both unit and no-result runtime control signatures
+are supported. The native compiler metadata path currently loses the nullable parameter
+annotation, so **KeepAlive(null) is rejected when importing that assembly**, despite the
+runtime accepting null. This remains an open API gate, not a revised public contract.
+See [native source GC evidence](../docs/experiments/extended-cli-metadata/source-heap-2026-10-06.md)
+for the retained failing fixture and the passing retention checks. Published Preview 12
+artifacts have not changed.

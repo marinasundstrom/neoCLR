@@ -23,6 +23,10 @@ and finish the ownership catalog before replacing the CLI primitive reference.
 The Math family now compiles and executes all 20 functions through a separate native
 consumer; its 15 missing services are resolved and full-source diagnostics drop to 59.
 [Gate and bootstrap import limitation](experiments/extended-cli-metadata/source-math-2026-10-06.md).
+The next shared blocker is nullable-reference metadata: the new native GC retention
+consumer executes, but imported KeepAlive(object?) rejects null. Preserve annotations
+through definitions, encoding, introspection and Raven symbols before expanding more
+service facades. [Partial GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

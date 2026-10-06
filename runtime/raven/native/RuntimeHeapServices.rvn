@@ -1,0 +1,38 @@
+namespace System.Runtime
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+// Adapters for the existing execution-local tracing heap services.
+internal extension HeapRuntimeServices for RuntimeServices {
+    static func GCCollectionCount() -> long {
+        return neoCLR.Runtime.GCCollectionCount()
+    }
+
+    static func GCAllocatedObjectCount() -> long {
+        return neoCLR.Runtime.GCAllocatedObjectCount()
+    }
+
+    static func GCHeapObjectCount() -> long {
+        return neoCLR.Runtime.GCHeapObjectCount()
+    }
+
+    static func GCPeakHeapObjectCount() -> long {
+        return neoCLR.Runtime.GCPeakHeapObjectCount()
+    }
+
+    static func GCReclaimedObjectCount() -> long {
+        return neoCLR.Runtime.GCReclaimedObjectCount()
+    }
+
+    static func GCHeapObjectLimit() -> long {
+        return neoCLR.Runtime.GCHeapObjectLimit()
+    }
+
+    static func GCCollect() -> System.Void {
+        return neoCLR.Runtime.GCCollect()
+    }
+
+    static func GCKeepAlive(value: object?) -> System.Void {
+        return neoCLR.Runtime.GCKeepAlive(value)
+    }
+}

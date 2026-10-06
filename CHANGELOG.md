@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Add native source GC adapters and admit no-result Collect/KeepAlive service calls
+  without pushing a unit value. Existing unit callers remain supported. Nine GC
+  tests and an artifact-only retention consumer pass. Preserve KeepAlive(null) as
+  an explicit failing native-import regression: nullable parameter metadata remains
+  unsupported, so the complete GC API gate is still open.
+
 - Compile unchanged Math sources through native adapters for the existing 15 floating
   services. An artifact-only consumer executes all 20 public functions, including
   rounding and Result failures. Record the explicit namespace alias needed with the

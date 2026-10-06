@@ -200,7 +200,14 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Binding::GenericCurrentTaskQueue
         });
     }
-    if function.no_result && function.name != "neoCLR.Runtime.ReflectionPropertySet" {
+    if function.no_result
+        && !matches!(
+            function.name.as_str(),
+            "neoCLR.Runtime.ReflectionPropertySet"
+                | "neoCLR.Runtime.GCCollect"
+                | "neoCLR.Runtime.GCKeepAlive"
+        )
+    {
         return Err(Fault::new(
             "native service does not support no-result execution",
         ));
@@ -359,7 +366,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         } else {
             vec![]
         };
-        if function.parameters != expected || function.no_result || function.returns != Type::Void {
+        if function.parameters != expected || function.returns != Type::Void {
             return Err(Fault::new("GC control service signature mismatch"));
         }
         return Ok(if keep_alive {
@@ -1405,7 +1412,7 @@ mod task_callback_tests {
 #[cfg(test)]
 mod reflection_signature_tests {
     #[test]
-    fn only_property_setter_admits_no_result_service_execution() {
+    fn no_result_service_execution_requires_an_admitted_control_signature() {
         for (signature, accepted) in [
             (
                 "ReflectionPropertySet(RuntimeTypeHandle owner, Int32 token, System.Object receiver, System.Object value) -> noresult",
@@ -1420,6 +1427,8 @@ mod reflection_signature_tests {
                 false,
             ),
             ("WriteLine(String text) -> noresult", false),
+            ("GCCollect() -> noresult", true),
+            ("GCKeepAlive(System.Object value) -> noresult", true),
         ] {
             let result = crate::assemble(&format!(
                 ".module Test\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"

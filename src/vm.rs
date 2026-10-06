@@ -3716,7 +3716,9 @@ fn interpret_instructions_with_dispatch(
                                 .saturating_mul(2)
                                 .max(64)
                                 .min(limits.heap_objects);
-                            frames.last_mut().unwrap().stack.push(Value::Void);
+                            if !callee.no_result {
+                                frames.last_mut().unwrap().stack.push(Value::Void);
+                            }
                             return Ok(None);
                         }
 

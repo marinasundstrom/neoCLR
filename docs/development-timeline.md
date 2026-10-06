@@ -11151,3 +11151,13 @@ The assistant confirmed that independently validated general fixes belong there 
 clarified that the two latest source-Object fixes remain isolated because their regression
 contract is absent on main. Inspection confirms main has the earlier RavenDoc, union-doc,
 lexical-union and reference-assignment fixes; no new main integration is claimed here.
+
+
+**GC continuation:** On the author's continuation, the assistant added source adapters
+for the existing GC services. Executing a separate consumer exposed the no-result
+service mismatch, now fixed with nine GC tests and a focused admission test. The native
+retention consumer executes, but the valid null-call consumer still rejects because
+nullable parameter facts are lost on import. The assistant proposes making nullable
+metadata preservation the next shared blocker rather than expanding isolated API
+facades. The null fixture remains recorded; this is not full GC API or bootstrap
+completion. See [partial gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
