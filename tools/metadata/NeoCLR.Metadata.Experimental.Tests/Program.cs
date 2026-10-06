@@ -445,6 +445,7 @@ var tests = new (string Name, Action Body)[]
     ("Method interface bounds, snapshots and introspection", GenericMethodConstraintChecks.Run),
     ("Floating point signatures and execution", FloatingPointChecks.Run),
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
+    ("Native integer signatures and conversions", NativeIntegerChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),

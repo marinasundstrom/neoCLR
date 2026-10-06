@@ -146,6 +146,10 @@ public enum OpCode
     Conv_R_Un,
     /// <summary>Loads an opaque type handle from an output-owned SignatureType operand.</summary>
     Ldtoken,
+    /// <summary>Converts a supported numeric value to signed native width (conv.i).</summary>
+    Conv_I,
+    /// <summary>Converts a supported numeric value to unsigned native width (conv.u).</summary>
+    Conv_U,
 
 }
 

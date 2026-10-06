@@ -10,6 +10,11 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-06)
 
+Native-width integer metadata is now available: CLI/native signatures, introspection
+and ILGenerator conv.i/conv.u pass C# and native execution checks. Next connect Raven
+mappings and source ownership to unblock Console; the 35-diagnostic baseline is unchanged.
+[Prerequisite](experiments/extended-cli-metadata/native-integers-2026-10-06.md).
+
 The calendar/time-zone group now compiles separately and its native consumer executes
 DST gaps/overlaps, offsets and optional local/zoned union conversions. Native constructor
 union import and managed mapping-array results close the exposed integration gaps.

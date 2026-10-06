@@ -467,6 +467,8 @@ public sealed partial class AssemblyBuilder
                 case PrimitiveType.UInt16: encoder.UInt16(); break;
                 case PrimitiveType.UInt32: encoder.UInt32(); break;
                 case PrimitiveType.UInt64: encoder.UInt64(); break;
+                case PrimitiveType.IntPtr: encoder.IntPtr(); break;
+                case PrimitiveType.UIntPtr: encoder.UIntPtr(); break;
                 case PrimitiveType.RuntimeTypeHandle: encoder.Type(MetadataTokens.EntityHandle(ElementToken(type)), isValueType: true); break;
 
                 case PrimitiveType.Single: encoder.Single(); break;
@@ -731,6 +733,8 @@ public sealed partial class AssemblyBuilder
                     case "convertUInt16": code.WriteByte(0xd1); break;
                     case "convertUInt32": code.WriteByte(0x6d); break;
                     case "convertUInt64": code.WriteByte(0x6e); break;
+                    case "convertIntPtr": code.WriteByte(0xd3); break;
+                    case "convertUIntPtr": code.WriteByte(0xe0); break;
                     case "divide.unsigned": code.WriteByte(0x5c); break;
                     case "remainder.unsigned": code.WriteByte(0x5e); break;
                     case "shift.right.unsigned": code.WriteByte(0x64); break;

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Add host metadata IntPtr/UIntPtr signature categories and ILGenerator Conv_I/Conv_U
+  using standard CLI encodings and existing native runtime types. Method/field/property
+  readers and introspection retain them. All 161 C# groups pass; the generated native
+  consumer verifies and exits 42. Raven mappings and source ownership remain pending;
+  this prerequisite does not yet unblock Console or change the full-System baseline.
+
 - Compile unchanged calendar/time-zone sources through five native service adapters.
   A separately compiled consumer executes DST mappings, offsets, errors and optional
   local/zoned union conversions with Raven befb8c1e1. TimeZoneMapLocal returns managed

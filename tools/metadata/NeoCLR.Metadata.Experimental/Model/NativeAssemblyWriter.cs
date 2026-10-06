@@ -160,6 +160,8 @@ public sealed partial class AssemblyBuilder
             "convertUInt16" => new { op = "conv.u2" },
             "convertUInt32" => new { op = "conv.u4" },
             "convertUInt64" => new { op = "conv.u8" },
+            "convertIntPtr" => new { op = "conv.i" },
+            "convertUIntPtr" => new { op = "conv.u" },
             "divide.unsigned" => new { op = "div.un" },
             "remainder.unsigned" => new { op = "rem.un" },
             "shift.right.unsigned" => new { op = "shr.un" },

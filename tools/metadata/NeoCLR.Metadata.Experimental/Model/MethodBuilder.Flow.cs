@@ -211,12 +211,14 @@ public sealed partial class MethodBuilder
                 case "convertUInt16":
                 case "convertUInt32":
                 case "convertUInt64":
+                case "convertIntPtr":
+                case "convertUIntPtr":
                 case "convertByte":
                 case "convert32":
                 case "convert64":
-                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
-                        throw new InvalidDataException("numeric conversion requires Int32, Int64, Single or Double; array length is supported only by conv.i4");
-                    stack[^1] = instruction.Op switch { "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" or "convertUInt64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
+                    if (stack.Count == 0 || (stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64 or PrimitiveType.IntPtr or PrimitiveType.UIntPtr or PrimitiveType.Single or PrimitiveType.Double) && !(instruction.Op == "convert32" && stack[^1].NativeLength)))
+                        throw new InvalidDataException("numeric conversion requires an integer or floating value; array length is supported only by conv.i4");
+                    stack[^1] = instruction.Op switch { "convertIntPtr" => PrimitiveType.IntPtr, "convertUIntPtr" => PrimitiveType.UIntPtr, "convertSingle" => PrimitiveType.Single, "convertDouble" => PrimitiveType.Double, "convert64" or "convertUInt64" => PrimitiveType.Int64, _ => PrimitiveType.Int32 }; break;
                 case "convertUnsignedDouble":
                     if (stack.Count == 0 || stack[^1].Primitive is not (PrimitiveType.Int32 or PrimitiveType.Int64))
                         throw new InvalidDataException("conv.r.un requires integer operands");

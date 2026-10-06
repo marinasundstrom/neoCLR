@@ -1074,3 +1074,7 @@ The reference-producer compatibility regression above is resolved by Raven integ
 projects unchanged Option source and generates a reference byte-for-byte identical to
 the snapshot. No snapshot refresh or new public API is needed. See the
 [dual-target execution evidence](../docs/experiments/extended-cli-metadata/union-lexical-cases-2026-10-05.md).
+
+Host native-width integer signatures and Conv_I/Conv_U are documented in the
+[manual metadata reference](experimental-metadata.md#native-width-integers-development-2026-10-06).
+They are host-only API additions; the guest reference snapshot is unchanged.

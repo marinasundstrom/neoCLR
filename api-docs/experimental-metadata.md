@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Native-width integers](#native-width-integers-development-2026-10-06).
+
 - [Explicit callable nullable annotations](#explicit-callable-nullable-annotations-development-2026-10-06).
 
 - [Native Object root authoring](#native-object-root-authoring-development-2026-10-05).
@@ -7537,3 +7539,35 @@ Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Te
 CLI round trips, facade exposure, malformed input and .NET `NullabilityInfoContext`
 interpretation. The generated identity methods execute without changing object identity.
 See the [design and integration boundary](../docs/design/callable-nullability.md).
+
+## Native-width integers (development, 2026-10-06)
+
+`PrimitiveType.IntPtr` and `PrimitiveType.UIntPtr` represent signed and unsigned
+native-width integers in method, field, property and local signatures. Use them in
+`MethodSignature`, `SignatureType` and definition/builder APIs just like the fixed-width
+integer categories. CLI writers emit standard ELEMENT_TYPE_I (0x18) and ELEMENT_TYPE_U
+(0x19); readers and introspection preserve the categories. Native metadata uses the
+existing runtime IntPtr/UIntPtr types. These are integer values, not unmanaged pointer
+signatures or new inline-array representations.
+
+`method.GetILGenerator().Emit(OpCode.Conv_I)` and `Emit(OpCode.Conv_U)` emit `conv.i`
+and `conv.u`. Existing numeric conversions accept native-width integer inputs.
+The writer rejects nonnumeric operands before publishing bytes. Target width is
+chosen by the executing runtime; no fixed 64-bit signature is substituted. This slice
+does not add unchecked pointer access, native integer arithmetic validation, or source
+IntPtr/UIntPtr ownership via SetNativePrimitive. Those remain explicit follow-ups.
+
+```csharp
+var identity = owner.AddMethod("Identity", new(PrimitiveType.IntPtr, [PrimitiveType.IntPtr]));
+var il = identity.GetILGenerator();
+il.LoadArgument(0);
+il.Emit(OpCode.Conv_I8);
+il.Emit(OpCode.Conv_I);
+il.Return();
+```
+
+C# tests compile and execute signed/unsigned conversions, locals and signatures on
+.NET; the same native artifact verifies and exits 42 under neoCLR. Definition-authored
+fields, builder-authored methods/properties and introspection retain both categories.
+No metadata format version changes; older host readers may reject these newly admitted
+signatures even though the runtime already implements their native categories.
