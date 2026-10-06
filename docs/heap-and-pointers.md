@@ -338,3 +338,13 @@ signatures and service discovery. All 17 existing pointer tests also pass. These
 runtime tests, not yet Raven source acceptance: the C# metadata writer/introspection and
 Raven emitter still need unmanaged pointer signatures before the NativeMemory sources
 can use these services. Managed arrays remain separate from this unsafe allocation API.
+
+### Source NativeMemory acceptance (2026-10-07)
+
+The native Raven target now compiles the unchanged NativeMemory functions against
+`NativeAllocation` adapters backed by the three services above. A separate consumer
+imports the emitted library without its sources, runs both allocation overloads and
+Free, and verifies double-free and multiplication overflow faults. The adapters remain
+internal implementation details. Metadata uses existing Ptr signatures; ordinary CLI
+representation remains PTR. This does not add nominal pointer targets or native Raven
+pointer arithmetic. See [acceptance evidence](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).

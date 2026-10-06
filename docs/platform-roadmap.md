@@ -10,6 +10,16 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+Source NativeMemory now compiles and is consumed through native metadata. Both Alloc
+forms and Free execute; double-free and checked-size overflow fault, and unsupported
+pointer signatures publish no output. The full-owned-handle audit clears **binding
+across 194 inputs**, then rejects **Array<T>**, the first generic reference type with a
+source-defined Object base. Next extend that shared ownership/metadata relationship
+rather than patch individual Array APIs. Full System still emits no assembly.
+[NativeMemory evidence and limits](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
+
+### Earlier prerequisites
+
 NativeAllocation runtime prerequisites now execute through native containers: exact
 allocation/free/checked-size services share the established pointer heap and limits.
 Five focused service tests and 17 pointer regressions pass. Bounded unmanaged pointer

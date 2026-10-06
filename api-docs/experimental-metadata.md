@@ -46,8 +46,12 @@ il.Return();
 Validation: 162 C# metadata groups pass, including CLI/native round trips, manual
 method definitions, import, canonical introspection, depth/shape rejection and pointer
 target mismatch. An API-authored native assembly calls NativeMultiplyChecked,
-NativeAllocate and NativeFree and exits 42. Raven pointer mapping and source NativeMemory
-compilation remain the next gate; this metadata slice does not claim full System output.
+NativeAllocate and NativeFree and exits 42. Follow-up native module-function references
+also accept these pointer signatures via `CreateFunctionReference`; its explicit
+identity/digest contract remains unchanged. Raven now maps and consumes these callable
+signatures, and separately compiled source NativeMemory consumers execute. Pointer
+arithmetic and nominal pointer targets are still outside this bounded compiler gate;
+full System output remains pending. [Source acceptance](../docs/experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).
 
 ## Namespace and types
 

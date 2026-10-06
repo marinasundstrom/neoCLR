@@ -6247,3 +6247,19 @@ An API-authored consumer executes the three native allocation services with exit
 This is a metadata/runtime prerequisite; Raven's pointer symbol/emission mapping is
 still pending. No CLI projection fallback was added and the four full-System binding
 errors remain. See the [bounded public contract](../api-docs/experimental-metadata.md#unmanaged-pointer-signatures-development-2026-10-07).
+
+### Source NativeMemory now executes (2026-10-07)
+
+Raven's native target maps metadata pointer views to semantic pointer symbols and
+uses an explicit shared pointer capability for emission. External namespace functions
+are authored from those symbols and host identities; no importer object is reused.
+Both Alloc overloads and Free in the unchanged source NativeMemory implementation
+execute through the real NativeAllocation adapter and existing tracked runtime heap.
+The ordinary .NET backend is unchanged. No new Runtime Contract setting is required.
+
+The bounded surface is scalar/Void pointer parameters/results, locals and pass-through;
+nominal pointer targets, pointer arithmetic/dereference in the native compiler, and
+source native-width numeric conversions remain separate work. Acceptance uses
+API-generated UIntPtr inputs explicitly, not application or library projections.
+The four binding errors are gone; full System next rejects Array<T>'s local Object
+base. [Commands and evidence](experiments/extended-cli-metadata/source-native-memory-2026-10-07.md).

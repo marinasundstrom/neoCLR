@@ -29,6 +29,11 @@ internal static class PointerSignatureChecks
         var generic = graph.AddFunction("Generic", new(PrimitiveType.Void, [], ["T"]));
         generic.GetILGenerator().Return();
         Reject(() => generic.MakeGenericInstance(pointer));
+        var caller = new AssemblyBuilder(new("PointerFunctions", new(1, 0, 0, 0)), graph.CoreLibrary);
+        var external = caller.CreateFunctionReference(graph.Identity, graph.CoreLibrary, new string('a', 64), "Example", "Identity", new(pointer, [pointer]));
+        var wrapper = caller.AddFunction("Echo", new(pointer, [pointer]));
+        wrapper.GetILGenerator().LoadArgument(0); wrapper.GetILGenerator().Call(external); wrapper.GetILGenerator().Return();
+        _ = RuntimeAssemblyContainer.WriteLibraryBinary(caller);
         var cli = graph.Write();
         if (Assembly.Load(cli).GetType("Example.Pointers")!.GetMethod("Identity")!.ReturnType != typeof(void).MakePointerType())
             throw new Exception("CLI PTR encoding lost");

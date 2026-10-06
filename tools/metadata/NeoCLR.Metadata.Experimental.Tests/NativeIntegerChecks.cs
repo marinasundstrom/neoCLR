@@ -13,7 +13,9 @@ internal static class NativeIntegerChecks
         var owner = graph.AddType("", "NativeWidthInputs");
         foreach (var (name, kind, opcode, value) in new[] {
             ("Negative", PrimitiveType.IntPtr, OpCode.Conv_I, -42L),
-            ("Maximum", PrimitiveType.UIntPtr, OpCode.Conv_U, -1L) })
+            ("Maximum", PrimitiveType.UIntPtr, OpCode.Conv_U, -1L),
+            ("Six", PrimitiveType.UIntPtr, OpCode.Conv_U, 6L),
+            ("Seven", PrimitiveType.UIntPtr, OpCode.Conv_U, 7L) })
         {
             var method = owner.AddMethod(name, new(kind, []));
             var il = method.GetILGenerator(); il.Emit(OpCode.Ldc_I8, value); il.Emit(opcode); il.Return();

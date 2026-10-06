@@ -1,0 +1,12 @@
+import System.Runtime.CompilerServices.*
+
+namespace neoCLR.Runtime
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal unsafe extern func NativeAllocate(byteCount: nuint) -> *System.Void;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal extern func NativeMultiplyChecked(elementCount: nuint, elementSize: nuint) -> nuint;
+
+[MethodImpl(MethodImplOptions.InternalCall)]
+internal unsafe extern func NativeFree(pointer: *System.Void) -> System.Void;

@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Connect source NativeMemory to exact native allocation services through Raven's
+  native pointer import/emission path. Separately compiled consumers execute both
+  Alloc overloads, Free, typed pointer pass-through, double-free and overflow faults;
+  unsupported string pointers reject before output. Extend metadata module-function
+  reference authoring to pointer signatures. Full System now clears binding across
+  194 inputs, then stops at generic classes inheriting the source Object root.
+
 - Add bounded unmanaged pointer signatures to the .NET metadata API, using ordinary
   CLI PTR encoding and the existing native Ptr category. Callable readers, import,
   canonical introspection and argument/local/call/return validation preserve pointer
