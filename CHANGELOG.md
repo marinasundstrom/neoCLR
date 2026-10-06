@@ -15,6 +15,8 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   with four declaration-order regressions; 206 existing tests remain green. Full-source
   compilation now reports diagnostics instead of crashing. Prioritize handle ownership
   and missing runtime-service declarations; no full System assembly is published.
+  A follow-up reuses the already implemented source-handle contract in the audit,
+  removing its configuration and conversion cascades without a new compiler fix.
 
 ### 2026-10-05
 

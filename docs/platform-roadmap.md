@@ -17,8 +17,9 @@ was a PE-only reflection-loader assumption, now fixed on an isolated Raven integ
 branch with 41 focused tests and unchanged released library compilation controls.
 Union ToString now completes the real source Object signature on demand; declaration
 order regressions pass and the full build reaches diagnostics instead of crashing.
-Next unify source RuntimeTypeHandle ownership, complete missing runtime-service inputs,
-and reduce residual binding failures before replacing the CLI primitive reference.
+The existing source RuntimeTypeHandle contract also works once explicitly selected in
+the audit. Next complete missing runtime-service inputs, reduce residual binding failures,
+and finish the ownership catalog before replacing the CLI primitive reference.
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

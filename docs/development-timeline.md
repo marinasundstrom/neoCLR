@@ -11138,3 +11138,16 @@ error and seven conversion errors; both layouts expose 45 missing service-member
 diagnostics. The next bounded work is canonical handle ownership and coherent runtime
 service inputs, followed by reduced residual failures. No full-bootstrap success or
 change to published Preview 12 is claimed.
+
+
+**Ownership follow-up correction:** The source-handle support had already been implemented
+in the October 5 gate. The new audit omitted its explicit primitive ownership selection.
+Reusing that contract and removing the competing seed handle reaches 74 diagnostics with
+all 178 inputs, matching the retained-handle control. This is an audit correction, not a
+new compiler fix. Missing service families now have priority.
+
+**Author question on main:** Asked whether general fixes are committed to Raven main.
+The assistant confirmed that independently validated general fixes belong there and
+clarified that the two latest source-Object fixes remain isolated because their regression
+contract is absent on main. Inspection confirms main has the earlier RavenDoc, union-doc,
+lexical-union and reference-assignment fixes; no new main integration is claimed here.

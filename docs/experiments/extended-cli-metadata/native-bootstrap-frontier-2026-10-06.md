@@ -70,19 +70,38 @@ cases after ownership and service inputs are coherent; some may be cascades. Ful
 compilation finally provides a diagnostic inventory rather than an initialization crash.
 The existing released library controls are reused from the preceding loader slice.
 
+## Reusing the implemented handle ownership contract
+
+The follow-up found that source-handle ownership was already implemented and executed
+in the [October 5 handle gate](source-handle-ownership-2026-10-05.md). The new audit had
+reused the smaller release manifest without its explicit native primitive selection.
+This was an audit input omission, not a new compiler defect.
+
+`full-owned-handle` now assigns the declaration to Numbers, selects the existing native
+primitive contract, and assembles a retained seed with exactly the empty competing
+handle declaration removed. It includes all 178 inputs and reaches the same 74 binding
+errors as the retained-handle control, without RAVT003. No compiler change was needed.
+The seed transformation, runtime executable, manifest, source hashes and assembler
+command are recorded. This case still publishes no assembly and is a diagnostic layout,
+not a new complete ownership manifest; source Object/seed overlap and other ownership
+checks must still be addressed before successful emission.
+
+Run with `--case full-owned-handle --runtime target/release/neoclr` and the other audit
+arguments. The checked-in POC seed source is used for this case; other cases retain the
+supplied `--seed`. Without `--runtime`, the existing default case selection is unchanged.
+
 ## Priority order from this evidence
 
-1. **Unify source RuntimeTypeHandle with the explicit core contract.** Its source owner
-   currently fails typeof validation; retaining bootstrap ownership removes eight
-   diagnostics. Resolve identity consistently in binding/import/emission, without
-   inventing another competing core type.
-2. **Complete the runtime-service declaration surface.** Group the 45 missing-member
+1. **Complete the runtime-service declaration surface.** Group the 45 missing-member
    diagnostics by existing runtime implementation; provide real native adapters and
    executable family tests. Do not add stubs or treat missing audit inputs as new
    runtime deficiencies. Reuse the existing Storage adapters.
-3. **Reduce residual binding diagnostics with coherent inputs.** Scope, let-else,
+2. **Reduce residual binding diagnostics with coherent inputs.** Scope, let-else,
    generic conversion and constructor diagnostics must be separated from service and
    ownership cascades before assigning compiler fixes.
+3. **Finish the full-source ownership manifest and seed.** Carry forward the existing
+   explicit source-handle contract and remove competing Object/other selected owners
+   when binding succeeds; do not claim the diagnostic manifest is ready for linking.
 4. **Replace the mandatory CLI primitive reference with native core metadata.** Keep
    that work in the target importer/host contracts; the emitter consumes symbols.
 5. **Close the bootstrap loop.** Rebuild against emitted native core/library artifacts,

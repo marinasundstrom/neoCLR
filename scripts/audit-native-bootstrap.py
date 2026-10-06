@@ -15,6 +15,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('compiler', 'core', 'seed', 'libraries', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--runtime', type=Path, help='Assembler used by the explicit full-owned-handle case')
     parser.add_argument('--compiler-revision', required=True, help='Declared compiler source revision; hashes identify actual inputs')
     parser.add_argument('--case', action='append', help='Run selected cases; omitted controls are not revalidated')
     args = parser.parse_args()
@@ -41,14 +42,20 @@ def main():
     cases += [('storage-with-adapters', groups['storage'] + storage_adapters, True)]
     cases += [('full-source', production + adapters, False),
               ('full-bootstrap-handle', [s for s in production + adapters if not s.endswith('/RuntimeTypeHandle.rvn')], False)]
+    if args.runtime or 'full-owned-handle' in (args.case or []):
+        cases.append(('full-owned-handle', production + adapters, False))
     if args.case:
         unknown = set(args.case) - {name for name, _, _ in cases}
         if unknown:
             parser.error('Unknown cases: ' + ', '.join(sorted(unknown)))
         cases = [case for case in cases if case[0] in args.case]
+    if any(name == 'full-owned-handle' for name, _, _ in cases) and not args.runtime:
+        parser.error('full-owned-handle requires --runtime to assemble its retained seed')
     inputs = [args.compiler, args.core, args.seed, args.libraries / 'Numbers.dll', args.libraries / 'Http.dll', Path(__file__), ROOT / 'runtime/raven/native/poc-ownership.json']
     inputs += [args.compiler.parent / name for name in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     inputs += [ROOT / s for s in production + adapters]
+    if args.runtime:
+        inputs += [args.runtime, ROOT / 'runtime/raven/native/poc-seed.neoil']
     report = dict(sourceRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         controlsIncluded=[name for name, _, _ in cases if name in ('baseline', 'network')], declaredCompilerRevision=args.compiler_revision, productionFiles=len(production), selectedProductionFiles=len(set(production) & selected),
         omitted=omitted, groups=groups, scope='Compilation frontier only. Bootstrap inputs retained; full-source owner is diagnostic, not a proposed production layout.',
@@ -59,10 +66,33 @@ def main():
         manifest = json.loads(json.dumps(original))
         if not imported:
             manifest['libraries'][0]['sources'] = sources
+        seed = args.seed.resolve()
+        if name == 'full-owned-handle':
+            library = manifest['libraries'][0]
+            library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle'})
+            manifest['nativePrimitives']['System.RuntimeTypeHandle'] = library['assemblyName']
+            # Reuse the already implemented source-handle ownership contract. The
+            # exact empty seed declaration must disappear when this owner is selected.
+            seed_text = (ROOT / 'runtime/raven/native/poc-seed.neoil').read_text()
+            declaration = '.type System.RuntimeTypeHandle\n.sealed\n.end\n'
+            if seed_text.count(declaration) != 1:
+                raise ValueError('Expected exactly one retained handle declaration')
+            seed_source = directory / 'System.neoil'
+            seed_source.write_text(seed_text.replace(declaration, ''))
+            seed = directory / 'System.neox'
+            assembled = subprocess.run([str(args.runtime.resolve()), 'assemble', str(seed_source), str(seed), '--format', 'neox'],
+                                       cwd=ROOT, capture_output=True, text=True, timeout=60)
+            if assembled.returncode:
+                raise RuntimeError(assembled.stdout + assembled.stderr)
+            report['handleSeedAssembly'] = dict(command=assembled.args, exitCode=assembled.returncode,
+                                               stdout=assembled.stdout, stderr=assembled.stderr)
+            for path in (seed_source, seed):
+                report['hashes'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         ownership = directory / 'ownership.json'
         ownership.write_text(json.dumps(manifest, indent=2) + '\n')
+        report['hashes'][str(ownership)] = hashlib.sha256(ownership.read_bytes()).hexdigest()
         artifact = directory / ('Additional.dll' if imported else 'Numbers.dll')
-        command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()), '--runtime-seed', str(args.seed.resolve()),
+        command = ['dotnet', str(args.compiler.resolve()), 'neoclr', '--core-reference', str(args.core.resolve()), '--runtime-seed', str(seed),
             '--bootstrap-ownership', str(ownership), '--bootstrap-intrinsics', '--library', '-o', str(artifact)]
         if imported:
             command += ['--reference', str((args.libraries / 'Numbers.dll').resolve())]
