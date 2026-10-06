@@ -53,3 +53,33 @@ explicitly pending rather than defaulting missing data to non-null.
 Completion remains the existing artifact-only GC consumer compiling and executing its
 `KeepAlive(null)` call. The current CLI contract tests do not satisfy that gate and the
 primitive bootstrap/retained seed stay unchanged.
+
+
+## Native transport slice (2026-10-06)
+
+Native format-5 callable origins now optionally carry `nullable_annotations`, an array
+of `{ position, flags, uniform }` records. Position -1 identifies the result; other
+positions exclude the instance receiver. Payloads retain the explicit .NET transform
+semantics described above. The native declaration reader and introspection expose the
+same immutable model; the CLI projection emits standard NullableAttribute payloads.
+
+This deliberately extends the native declaration schema, not the CLI signature encoding.
+It mirrors existing normalized parameter declaration facts. The alternative of a native
+custom attribute would currently require executable constructor declarations in the seed
+and expand supported fixed-argument categories solely for compiler facts. This transport
+avoids that dependency, at the cost of a native-specific normalized representation that
+must be maintained alongside CLI custom attributes. No new null checks or type identity
+are introduced. Annotations are not executable runtime attributes.
+
+Older format-5 inputs omit the field and remain valid. Older readers reject annotated
+artifacts as an unknown field; producers and consumers must use the matching development
+revision. No envelope version change is needed for this additive optional declaration
+field. Annotation-free output omits it. Malformed positions, duplicate positions, invalid
+flags and oversize vectors reject at both host and runtime boundaries; type origins may
+not carry callable annotations.
+
+Validation: all 160 C# contract groups pass; nine metadata-origin Rust tests pass. A
+C#-generated binary PE with array parameter/result annotations loads and passes native
+typed-stack verification. The tests also cover native round trips and malformed payloads.
+Raven emission/import and the GC null-call consumer are the next gate, not yet qualified
+by these metadata tests.

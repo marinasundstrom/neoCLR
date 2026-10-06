@@ -69,8 +69,29 @@ internal static class NullableAnnotationChecks
         Reject(() => new NullableAnnotation([1, 2], isUniform: true));
         Reject(() => new NullableAnnotation(Enumerable.Repeat((byte)2, 4097)));
         Reject(() => owner.Methods.First().SetNullableAnnotation(-2, new([2])));
-        try { graph.WriteNativeAssembly(); throw new Exception("native annotation was discarded"); }
-        catch (NotSupportedException error) when (error.Message.Contains("nullable annotations")) { }
+        var native = graph.WriteNativeAssembly();
+        var binary = NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(native, core);
+        var nativeSnapshot = AssemblyDefinition.ReadNativeAssembly(binary);
+        var nativeView = new NeoCLR.Metadata.Experimental.Introspection.MetadataLoadContext([nativeSnapshot]).Resolve(nativeSnapshot.Identity)
+            .GetTypes().Single(t => t.Name == "Operations").GetMethods().Single(m => m.Name == "Nested");
+        Check(nativeView.GetParameters()[0].NullableAnnotation!.Flags.SequenceEqual(new byte[] { 1, 2 }), "native facade parameter flags lost");
+        Check(nativeView.ReturnNullableAnnotation!.Flags.SequenceEqual(new byte[] { 1, 2 }), "native facade return flags lost");
+        var projected = NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.ReadCliProjection(binary);
+        Check(projected.MainModule.Types.Single(t => t.Name == "Operations").Methods.Single(m => m.Name == "Uniform").NullableAnnotations[0].IsUniform, "projection lost uniform flag");
+        foreach (var invalid in new[] { "position", "flags", "uniform", "duplicate" })
+        {
+            var root = System.Text.Json.Nodes.JsonNode.Parse(native)!;
+            var annotations = root["functions"]![0]!["origin"]!["nullable_annotations"]!.AsArray();
+            if (invalid == "position") annotations[0]!["position"] = 1;
+            if (invalid == "flags") annotations[0]!["flags"]![0] = 3;
+            if (invalid == "uniform") annotations[0]!["uniform"] = true;
+            if (invalid == "duplicate") annotations.Add(annotations[0]!.DeepClone());
+            var malformed = System.Text.Encoding.UTF8.GetBytes(root.ToJsonString());
+            try { AssemblyDefinition.ReadNativeAssembly(NeoCLR.Metadata.Experimental.RuntimeAssemblyContainer.WriteBinary(malformed, core)); throw new Exception("invalid native annotation accepted"); }
+            catch (InvalidDataException) { }
+        }
+        var output = Environment.GetEnvironmentVariable("NEOCLR_NULLABLE_TEST_ARTIFACT");
+        if (!string.IsNullOrEmpty(output)) File.WriteAllBytes(output, binary);
         using var pe = new PEReader(new MemoryStream(image));
         var metadata = pe.GetMetadataReader();
         var scalar = metadata.CustomAttributes.Select(metadata.GetCustomAttribute)

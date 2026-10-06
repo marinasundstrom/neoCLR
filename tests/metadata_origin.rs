@@ -144,3 +144,38 @@ fn reflection_access_metadata_roundtrips_and_is_scoped_to_definition_kind() {
     json["functions"][0]["origin"]["member_access"] = serde_json::json!("Unknown");
     assert!(load(&json.to_string()).is_err());
 }
+
+#[test]
+fn callable_nullable_annotations_roundtrip_without_runtime_semantics() {
+    let annotated = source().replace(
+        "\"parameter_tokens\":[134217729]",
+        "\"parameter_tokens\":[134217729],\"nullable_annotations\":[{\"position\":0,\"flags\":[2],\"uniform\":true},{\"position\":-1,\"flags\":[0],\"uniform\":false}]",
+    );
+    let module = assemble(&annotated).unwrap();
+    let json = serde_json::to_string(&module).unwrap();
+    let loaded = load(&json).unwrap();
+    assert_eq!(loaded.functions[0].origin, module.functions[0].origin);
+    assert_eq!(
+        loaded.functions[0]
+            .origin
+            .as_ref()
+            .unwrap()
+            .nullable_annotations
+            .len(),
+        2
+    );
+    LoadedProgram::new(&loaded).unwrap().verify().unwrap();
+    for invalid in [
+        annotated.replace("\"position\":0", "\"position\":1"),
+        annotated.replace("\"position\":-1", "\"position\":0"),
+        annotated.replace("\"flags\":[2]", "\"flags\":[3]"),
+        annotated.replace("\"flags\":[2]", "\"flags\":[]"),
+        annotated.replace("\"flags\":[2]", "\"flags\":[1,2]"),
+    ] {
+        assert!(
+            assemble(&invalid)
+                .and_then(|m| LoadedProgram::new(&m).map(|_| ()))
+                .is_err()
+        );
+    }
+}

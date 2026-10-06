@@ -15,7 +15,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Preserve explicit callable nullable annotations in the host metadata definitions,
   builders, CLI writer/reader and introspection facade. C# tests check .NET interpretation,
   execution identity and malformed payloads. Native encoding rejects these annotations
-  until its matching support exists; this does not yet fix native KeepAlive(null) import.
+  until its matching support exists; this first step did not fix native KeepAlive(null).
+  Follow-up: native callable origins now preserve and validate the same explicit facts,
+  including binary/introspection round trips and CLI projection. Older readers reject
+  annotated artifacts; matching development tools are required. Raven integration remains.
 
 - Document companion Raven synchronous `use` support through a shared disposal
   contract: reverse-order cleanup on block completion, return, propagation and loop

@@ -22,7 +22,7 @@ public sealed partial class NativeAssemblyDefinition
         internal List<SignatureType> InterfaceSignatures { get; } = []; internal JsonElement[] RawAttributes { get; init; } = []; internal List<AttributeRow> Attributes { get; } = []; }
     private sealed record AttributeRow(SignatureType Owner, CustomAttributeArgument[] Arguments);
     private sealed record FieldRow(string Name, JsonElement Type, FieldVisibility Visibility, bool IsReadOnly = false, SignatureType? Signature = null);
-    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
+    private sealed record MethodRow(string Namespace, string Name, int Owner, MethodSignature Signature, MethodVisibility Visibility, bool Instance, bool Override) { internal bool ObjectSlot { get; init; } internal bool Virtual { get; init; } internal bool Abstract { get; init; } internal ushort ImplementationAttributes { get; init; } internal int? ParameterArrayIndex { get; init; } internal Dictionary<int, NullableAnnotation> NullableAnnotations { get; init; } = []; internal (SignatureType Owner, string Name)[] ExplicitInterfaces { get; init; } = []; internal Dictionary<int, string> ParameterNames { get; init; } = []; internal (int Parameter, SignatureType Type, int Owner)[] InterfaceConstraints { get; init; } = []; }
     private sealed record PropertyRow(int Owner, string Name, SignatureType Type, int Getter, int Setter, SignatureType[] Parameters);
     private sealed record NativeTypeAlias(string NativeName, AssemblyIdentity Assembly, string Namespace, string Name, int Arity, bool ValueType, string? Declaring);
     private readonly Dictionary<(string Name, int Arity), NativeTypeAlias> nativeTypeAliases;
@@ -556,7 +556,10 @@ public sealed partial class NativeAssemblyDefinition
                     Require(implementationAttributes is 0 or 0x1000, "unsupported method implementation flags");
                 }
                 Shape(method, fields.ToArray());
-                var origin = method.GetProperty("origin"); Shape(origin, "assembly", "module", "name", "token", "member_access", "parameter_tokens");
+                var origin = method.GetProperty("origin");
+                var originFields = new List<string> { "assembly", "module", "name", "token", "member_access", "parameter_tokens" };
+                if (origin.TryGetProperty("nullable_annotations", out _)) originFields.Add("nullable_annotations");
+                Shape(origin, originFields.ToArray());
                 var name = Text(origin, "name"); Require(name.Length is > 0 and <= 1024, "invalid native method name"); CheckName(name);
                 var owner = method.GetProperty("owner"); int ownerIndex = -1;
                 if (owner.ValueKind != JsonValueKind.Null)
@@ -630,6 +633,17 @@ public sealed partial class NativeAssemblyDefinition
                 var tokens = Array(origin, "parameter_tokens", 256);
                 Require(tokens.Length == parameters.Length && tokens.All(t => t.GetInt32() == 0 ||
                     (t.GetInt32() >> 24 == 8 && (t.GetInt32() & 0xffffff) > 0 && parameterTokens.Add(t.GetInt32()))), "invalid or duplicate native parameter token");
+                var nullableAnnotations = new Dictionary<int, NullableAnnotation>();
+                if (origin.TryGetProperty("nullable_annotations", out _))
+                    foreach (var annotation in Array(origin, "nullable_annotations", 257))
+                    {
+                        Shape(annotation, "position", "flags", "uniform");
+                        int position = annotation.GetProperty("position").GetInt32();
+                        var flags = Array(annotation, "flags", 4096).Select(f => f.GetInt32()).ToArray();
+                        bool uniform = annotation.GetProperty("uniform").GetBoolean();
+                        Require(position >= -1 && position < parameters.Length && flags.Length > 0 && flags.All(f => f is >= 0 and <= 2) && (!uniform || flags.Length == 1), "invalid native nullable annotation");
+                        Require(nullableAnnotations.TryAdd(position, new NullableAnnotation(flags.Select(f => (byte)f), uniform)), "duplicate native nullable annotation");
+                    }
                 int? parameterArray = null;
                 if (method.TryGetProperty("custom_attributes", out _))
                 {
@@ -692,7 +706,7 @@ public sealed partial class NativeAssemblyDefinition
                     Require(ownerIndex < 0 && !instance && !isAbstract && !isVirtual && !isOverride && genericNames.Length == 0 &&
                         method.GetProperty("body").GetArrayLength() == 0 && (!method.TryGetProperty("locals", out var internalLocals) || internalLocals.GetArrayLength() == 0),
                         "internal calls require bodyless nongeneric assembly functions");
-                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
+                methods.Add(new(ns, name, ownerIndex, new(resultType, parameterTypes, genericNames, method.TryGetProperty("out_parameters", out _) ? Array(method, "out_parameters", 256).Select(p => p.GetInt32()) : []), visibility, instance, isOverride) { Virtual = isVirtual, Abstract = isAbstract, ObjectSlot = objectSlot, ImplementationAttributes = implementationAttributes, ParameterArrayIndex = parameterArray, NullableAnnotations = nullableAnnotations, ParameterNames = parameterNames, InterfaceConstraints = methodConstraints.ToArray(), ExplicitInterfaces = explicitMappings.ToArray() }); methodNames.Add(Text(method, "name"));
             }
             foreach (var method in methods.Where(m => m.Override))
             {
@@ -856,6 +870,7 @@ public sealed partial class NativeAssemblyDefinition
                 : method.Name == ".ctor" ? owners[method.Owner].AddConstructor(signature, method.Visibility)
                 : owners[method.Owner].AddInstanceMethod(method.Name, signature, method.Visibility);
             if (method.ImplementationAttributes == 0x1000) output.SetInternalCall();
+            foreach (var pair in method.NullableAnnotations) output.SetNullableAnnotation(pair.Key, pair.Value);
             foreach (var pair in method.ParameterNames) output.SetParameterName(pair.Key, pair.Value);
             // Reference emission supplies throwing bodies; do not invent executable native behavior.
             foreach (var bound in method.InterfaceConstraints)

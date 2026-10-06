@@ -7525,9 +7525,10 @@ Absent metadata is not a non-null assertion.
 
 This is raw explicit annotation preservation, not a completed nullable type system.
 `NullableContextAttribute`, field/property annotations, signature-shape validation,
-native encoding and Raven symbol reconstruction remain pending. Native writing
-rejects annotated methods explicitly with `NotSupportedException`; it does not drop
-the metadata. Loaded-assembly rewriting remains subject to the library's existing
+Raven symbol reconstruction remain pending. Native writing preserves these facts in
+`origin.nullable_annotations`; native readers and the compatibility CLI projection
+retain both scalar and vector forms. Runtime metadata validation checks position,
+uniqueness and payload bounds without executing an attribute constructor. Loaded-assembly rewriting remains subject to the library's existing
 limits. There is no new runtime check, layout change or GC policy.
 
 Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests

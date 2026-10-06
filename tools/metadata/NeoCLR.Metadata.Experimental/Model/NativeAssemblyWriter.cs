@@ -35,8 +35,6 @@ public sealed partial class AssemblyBuilder
             parameterTokens.Add(method, tokens);
         }
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
-        if (methods.Any(m => m.Definition.NullableAnnotations.Count != 0))
-            throw new NotSupportedException("native callable nullable annotations are not encoded yet");
         var parameterAttributes = new Dictionary<MethodBuilder, CustomAttributeDefinition>();
         if (methods.Any(m => m.Definition.ParameterArrayIndex is not null))
         {
@@ -124,9 +122,19 @@ public sealed partial class AssemblyBuilder
         static object ExternalValue(ImportedTypeReference type) => type.Owner.AuthoredPrimitiveOwner(type) is { } primitive ? primitive.ToString() : NativeImportBinding.IsInhabitedVoid(type) ? "Void" : NativeImportBinding.IsIntrinsicChar(type) ? "Char" : NativeImportBinding.IsErasedValue(type) ? "Value" : type.TypeArguments.Count == 0 ? new { Named = ExternalName(type) } : new { Constructed = new { definition = ExternalName(type), arguments = type.TypeArguments.Select(SignatureValue).ToArray() } };
         static object SignatureValue(SignatureType type) => type.IsSelf ? "SelfType" : type.FunctionSignature is { } function ? new { Function = new { parameters = function.ParameterTypes.Select(SignatureValue).ToArray(), returns = SignatureValue(function.ReturnType), no_result = function.NoResult } } : type.ByReferenceElement is { } target ? new { ByRef = SignatureValue(target) } : type.ImportedType is { } imported ? ExternalValue(imported) : type.GenericInstance is { } instance ? TypeOwner(instance.Definition, instance.TypeArguments) : type.TypeParameterIndex is { } ordinal ? new { TypeParameter = ordinal } : type.MethodParameterIndex is { } index ? new { MethodTypeParameter = index } : type.ArrayElement is { } element ? new { ArrayRef = SignatureValue(element) } : type.ClassType is { NativeGrapheme: true } ? (object)"Char" : type.ClassType is { } c ? new { Named = TypeName(c) } : type.Primitive!.Value.ToString();
         static object[] Parameters(MethodBuilder method) => method.Signature.ParameterTypes.Select(SignatureValue).ToArray();
-        object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true) => method is null
-            ? new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, publicly_visible = publiclyVisible }
-            : new { assembly = IdentityText(Identity), module = Identity.Name + ".dll", name, token, member_access = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString(), parameter_tokens = parameterTokens[method] };
+        object Origin(string name, int token, MethodBuilder? method = null, bool publiclyVisible = true)
+        {
+            var origin = new Dictionary<string, object> { ["assembly"] = IdentityText(Identity), ["module"] = Identity.Name + ".dll", ["name"] = name, ["token"] = token };
+            if (method is null) origin["publicly_visible"] = publiclyVisible;
+            else
+            {
+                origin["member_access"] = method.Visibility == MethodVisibility.Internal ? "Assembly" : method.Visibility == MethodVisibility.Protected ? "Family" : method.Visibility.ToString();
+                origin["parameter_tokens"] = parameterTokens[method];
+                if (method.Definition.NullableAnnotations.Count != 0)
+                    origin["nullable_annotations"] = method.Definition.NullableAnnotations.OrderBy(p => p.Key).Select(p => new { position = p.Key, flags = p.Value.Flags.Select(f => (int)f).ToArray(), uniform = p.Value.IsUniform }).ToArray();
+            }
+            return origin;
+        }
         object Instruction(MethodBuilder.Operation instruction) => instruction.Op switch
         {
             "function.bind" => new { op = "function.bind", arg = new { function_type = SignatureValue(instruction.Type!), target = new { name = FunctionName(instruction.Target!), owner = instruction.ConstructedTarget is { } binding ? TypeOwner(binding.Definition.DeclaringType!, binding.DeclaringTypeArguments) : Owner(instruction.Target!), instance = !instruction.Target!.IsStatic, generic_arguments = (instruction.ConstructedTarget?.MethodArguments ?? instruction.GenericTarget?.TypeArguments ?? []).Select(SignatureValue).ToArray(), parameters = (instruction.ConstructedTarget?.Signature ?? instruction.GenericTarget?.Signature ?? instruction.Target!.Signature).ParameterTypes.Select(SignatureValue).ToArray() } } },
