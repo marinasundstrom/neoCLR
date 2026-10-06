@@ -8,6 +8,17 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
+## Source-built System bootstrap frontier (2026-10-06)
+
+The author requested continuation toward full bootstrap after Preview 12. A fresh
+inventory confirms that Storage's existing adapters and six omitted contracts compile;
+release omission does not mean missing compiler support. The first full-source crash
+was a PE-only reflection-loader assumption, now fixed on an isolated Raven integration
+branch with 41 focused tests and unchanged released library compilation controls.
+Next resolve source Object member completion before union ToString synthesis, then
+reassess core ownership and replace the mandatory CLI primitive reference. Full System
+still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
+
 ## Native source release direction (2026-10-05)
 
 The author explicitly reaffirmed that native metadata replaces the CLI translation

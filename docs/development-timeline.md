@@ -11111,3 +11111,20 @@ against the accepted candidate. The manual Pages deployment passed; public homep
 installation instructions, Task.Run member/parameter signatures and String.FlatMap
 function signatures were checked. [Publication evidence](preview-12-publication.json).
 Full native System bootstrap and broader platform qualification remain future work.
+
+
+## 2026-10-06 — Full bootstrap inventory and first source-core fix
+
+**Author:** Asked what full bootstrap requires, then directed continuation.
+
+**Assistant proposal/action:** Distinguished source-built System from later compiler
+self-hosting; prioritized a fresh inventory and source core ownership. The audit found
+that existing Storage adapters and six omitted contract files already compile. The
+all-source mode exposed a PE-only reflection-loader cast; isolated Raven fix
+`6b31997a9` removes it and unifies imported Object signatures with the selected source
+root. All 41 focused tests pass; released library compilation controls remain green.
+
+**Remaining:** Union ToString synthesis currently requests source Object members too
+early and aborts the full build. Declaration ordering is the next priority before
+interpreting wider core/service diagnostics. No full-bootstrap completion or new
+execution support is claimed. See [frontier](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).

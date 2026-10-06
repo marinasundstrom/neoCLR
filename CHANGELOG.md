@@ -6,6 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-06
+
+- Add a reproducible post-release System bootstrap inventory, distinguishing omitted
+  build inputs from compiler failures. Existing Storage adapters and six omitted
+  contract files compile. Isolate and fix Raven's PE-only metadata assumption for a
+  source Object root (41 focused tests); record the next union declaration-order
+  blocker. The full library still fails and publishes no assembly.
+
 ### 2026-10-05
 
 - Point repository entry guides to Preview 12 native installation and distinguish
