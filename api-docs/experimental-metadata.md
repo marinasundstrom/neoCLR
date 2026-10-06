@@ -15,6 +15,8 @@ and guest Introspection assembly loading remain pending.
 
 ## Namespace and types
 
+- [Explicit callable nullable annotations](#explicit-callable-nullable-annotations-development-2026-10-06).
+
 - [Native Object root authoring](#native-object-root-authoring-development-2026-10-05).
 
 - [Function signature views](#function-signature-views-development-2026-10-03): native callback signatures and substitution.
@@ -7484,3 +7486,52 @@ Markdown member help takes precedence over XML; absent/malformed optional sideca
 do not invalidate an assembly. Image-only references have no implicit sidecar search.
 See [host options, output rules and editor lifetime](https://github.com/marinasundstrom/raven/blob/codex/metadata-consumer/docs/compiler/neoclr-cli-bridge.md#native-ide-documentation-2026-10-05).
 The guest RavenDoc snapshot is unchanged. Website guides are separate content.
+
+
+### Explicit callable nullable annotations (development, 2026-10-06)
+
+`Model.NullableAnnotation(IEnumerable<byte> flags, bool isUniform = false)` copies
+1–4096 flags into immutable `Flags`. Values are 0 (oblivious), 1 (non-null) and
+2 (nullable), in .NET nullable transform order. `IsUniform` distinguishes the
+scalar-byte `NullableAttribute` constructor, which repeats its flag, from a
+positional byte-array payload. Uniform annotations require exactly one flag.
+Null input throws `ArgumentNullException`; invalid values or lengths throw
+`ArgumentException`.
+
+`MethodDefinition.SetNullableAnnotation(int position, NullableAnnotation? annotation)`
+and the matching `MethodBuilder` convenience method share one implementation.
+Position -1 identifies the return; nonnegative positions identify parameters.
+Passing null removes the annotation. Invalid positions throw
+`ArgumentOutOfRangeException`; detached or loaded definitions cannot be mutated
+and throw `InvalidOperationException`. `NullableAnnotations` exposes the explicit
+annotations as a read-only dictionary. Attach manually created definitions before
+setting annotations, just as for parameter metadata.
+
+```csharp
+method.GetILGenerator().LoadArgument(0);
+method.GetILGenerator().Return();
+method.SetNullableAnnotation(0, new NullableAnnotation([1, 2]));
+method.Definition.SetNullableAnnotation(-1, new NullableAnnotation([1, 2]));
+// For a string[] signature: a non-null array with nullable string elements.
+```
+
+CLI writing emits ordinary parameter/return custom attributes referencing
+`System.Runtime.CompilerServices.NullableAttribute` in the configured core assembly.
+That core must supply the appropriate byte/byte[] constructors. The CLI reader
+preserves these explicit payloads; malformed, duplicate or oversized payloads
+reject. `Introspection.MethodInfo.ReturnNullableAnnotation` and
+`ParameterInfo.NullableAnnotation` expose them without changing physical type views.
+Absent metadata is not a non-null assertion.
+
+This is raw explicit annotation preservation, not a completed nullable type system.
+`NullableContextAttribute`, field/property annotations, signature-shape validation,
+native encoding and Raven symbol reconstruction remain pending. Native writing
+rejects annotated methods explicitly with `NotSupportedException`; it does not drop
+the metadata. Loaded-assembly rewriting remains subject to the library's existing
+limits. There is no new runtime check, layout change or GC policy.
+
+Validation: `dotnet run --project tools/metadata/NeoCLR.Metadata.Experimental.Tests
+-- --nullable-annotations` checks authored-definition/builder parity, defensive copying,
+CLI round trips, facade exposure, malformed input and .NET `NullabilityInfoContext`
+interpretation. The generated identity methods execute without changing object identity.
+See the [design and integration boundary](../docs/design/callable-nullability.md).

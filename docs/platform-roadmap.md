@@ -26,7 +26,9 @@ consumer; its 15 missing services are resolved and full-source diagnostics drop 
 The next shared blocker is nullable-reference metadata: the new native GC retention
 consumer executes, but imported KeepAlive(object?) rejects null. Preserve annotations
 through definitions, encoding, introspection and Raven symbols before expanding more
-service facades. [Partial GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+service facades. The first bounded slice now preserves explicit callable annotations in
+CLI metadata and introspection; native encoding and Raven reconstruction remain pending.
+[Annotation direction](design/callable-nullability.md). [Partial GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

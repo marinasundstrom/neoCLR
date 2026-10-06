@@ -617,10 +617,26 @@ public sealed partial class AssemblyBuilder
         void EmitMethod(MethodBuilder method)
         {
             var firstParameter = MetadataTokens.ParameterHandle(nextParameter);
-            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null)
+            void AnnotateNullable(ParameterHandle parameter, NullableAnnotation annotation)
+            {
+                var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System.Runtime.CompilerServices"), metadata.GetOrAddString("NullableAttribute"));
+                var constructor = metadata.AddMemberReference(marker, metadata.GetOrAddString(".ctor"), metadata.GetOrAddBlob(annotation.IsUniform ? new byte[] { 0x20, 1, 1, 5 } : new byte[] { 0x20, 1, 1, 0x1d, 5 }));
+                var blob = new BlobBuilder(); blob.WriteUInt16(1);
+                if (!annotation.IsUniform) blob.WriteInt32(annotation.Flags.Count);
+                foreach (var flag in annotation.Flags) blob.WriteByte(flag);
+                blob.WriteUInt16(0);
+                metadata.AddCustomAttribute(parameter, constructor, metadata.GetOrAddBlob(blob));
+            }
+            if (method.Definition.NullableAnnotations.TryGetValue(-1, out var returnFlags))
+            {
+                AnnotateNullable(metadata.AddParameter(ParameterAttributes.None, default, 0), returnFlags);
+                nextParameter++;
+            }
+            if (method.Signature.OutParameters.Count > 0 || method.Definition.ParameterNames.Count > 0 || method.Definition.ParameterArrayIndex is not null || method.Definition.NullableAnnotations.Keys.Any(i => i >= 0))
                 for (int i = 0; i < method.ParameterCount; i++)
                 {
                     var parameter = metadata.AddParameter(method.Signature.OutParameters.Contains(i) ? ParameterAttributes.Out : ParameterAttributes.None, method.Definition.ParameterNames.TryGetValue(i, out var parameterName) ? metadata.GetOrAddString(parameterName) : default, i + 1);
+                    if (method.Definition.NullableAnnotations.TryGetValue(i, out var flags)) AnnotateNullable(parameter, flags);
                     if (method.Definition.ParameterArrayIndex == i)
                     {
                         var marker = metadata.AddTypeReference(ImportAssembly(CoreLibrary), metadata.GetOrAddString("System"), metadata.GetOrAddString("ParamArrayAttribute"));

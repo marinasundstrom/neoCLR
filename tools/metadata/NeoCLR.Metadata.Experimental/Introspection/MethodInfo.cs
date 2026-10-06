@@ -45,6 +45,8 @@ public sealed class MethodInfo
     public TypeInfo? DeclaringType { get; }
     /// <summary>Gets the return signature projected in both generic scopes.</summary>
     public TypeInfo ReturnType => returns.Value;
+    /// <summary>Gets an explicit CLI nullable return annotation, or null when absent. Does not infer a context default.</summary>
+    public NullableAnnotation? ReturnNullableAnnotation => Definition.NullableAnnotations.GetValueOrDefault(-1);
     /// <summary>Gets declared parameters in order. Unsupported signatures/dependencies throw InvalidDataException on access.</summary>
     public IReadOnlyList<ParameterInfo> GetParameters() => parameters.Value;
     /// <summary>Gets copied metadata generic parameter names.</summary>
@@ -101,6 +103,8 @@ public sealed class ParameterInfo
     public int Position { get; }
     /// <summary>Gets the declared value, ref or out passing convention.</summary>
     public ParameterPassingMode PassingMode { get; }
+    /// <summary>Gets explicit CLI nullable parameter flags, or null when absent. Physical ParameterType is unchanged.</summary>
+    public NullableAnnotation? NullableAnnotation => DeclaringMethod.Definition.NullableAnnotations.GetValueOrDefault(Position);
     /// <summary>Gets whether this final vector parameter carries the parameter-array expansion contract.</summary>
     public bool IsParameterArray => DeclaringMethod.Definition.ParameterArrayIndex == Position;
     /// <summary>Gets the projected value type, or the referenced element type for ref/out parameters.</summary>

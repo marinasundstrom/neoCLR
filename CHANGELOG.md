@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Preserve explicit callable nullable annotations in the host metadata definitions,
+  builders, CLI writer/reader and introspection facade. C# tests check .NET interpretation,
+  execution identity and malformed payloads. Native encoding rejects these annotations
+  until its matching support exists; this does not yet fix native KeepAlive(null) import.
+
 - Add native source GC adapters and admit no-result Collect/KeepAlive service calls
   without pushing a unit value. Existing unit callers remain supported. Nine GC
   tests and an artifact-only retention consumer pass. Preserve KeepAlive(null) as

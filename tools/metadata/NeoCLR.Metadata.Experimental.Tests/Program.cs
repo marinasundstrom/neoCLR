@@ -4,6 +4,11 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args.Length == 1 && args[0] == "--nullable-annotations")
+{
+    NullableAnnotationChecks.Run();
+    Console.WriteLine("PASS nullable annotation definitions, CLI round trip and CLR interpretation"); return 0;
+}
 if (args.Length == 3 && args[0] == "--class-virtual-runtime")
 {
     await ClassVirtualChecks.RunRuntime(args[1], args[2]); return 0;
@@ -493,6 +498,7 @@ var tests = new (string Name, Action Body)[]
     ("Consistent authored and reader type-row limits", DefinitionLimitChecks.Run),
     ("Inherited public interface implementation dispatch", InheritedInterfaceChecks.Run),
     ("Parameter array definitions, builders and CLI execution", ParameterArrayChecks.Run),
+    ("Nullable annotation definitions and CLI execution", NullableAnnotationChecks.Run),
     ("Reference Object override authoring and CLI execution", ReferenceOverrideChecks.Run),
     ("Source-owned module descriptor contract", SourceModuleInfoChecks.Run),
     ("Opaque runtime type handles and type-token authoring", TypeHandleChecks.Run),

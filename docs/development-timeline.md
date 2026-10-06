@@ -11161,3 +11161,12 @@ nullable parameter facts are lost on import. The assistant proposes making nulla
 metadata preservation the next shared blocker rather than expanding isolated API
 facades. The null fixture remains recorded; this is not full GC API or bootstrap
 completion. See [partial gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+
+
+**Nullability direction (2026-10-06):** The author asked, “Can we add nullability another
+way? Or should we defer?” The assistant proposed preserving declaration annotations
+using the existing .NET nullable-attribute convention while deferring new native runtime
+semantics. On continuation, the first slice implements explicit callable annotations in
+the host metadata API and CLI PE path, with .NET interpretation and execution tests.
+Native transport and Raven reconstruction remain open; KeepAlive(null) is not fixed by
+this first slice. See [scope, alternatives and next gate](design/callable-nullability.md).

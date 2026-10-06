@@ -35,6 +35,8 @@ public sealed partial class AssemblyBuilder
             parameterTokens.Add(method, tokens);
         }
         var attributeOwners = new Dictionary<CustomAttributeDefinition, SignatureType>();
+        if (methods.Any(m => m.Definition.NullableAnnotations.Count != 0))
+            throw new NotSupportedException("native callable nullable annotations are not encoded yet");
         var parameterAttributes = new Dictionary<MethodBuilder, CustomAttributeDefinition>();
         if (methods.Any(m => m.Definition.ParameterArrayIndex is not null))
         {
