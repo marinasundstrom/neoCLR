@@ -10,6 +10,13 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-06)
 
+The source System.Fail helper now compiles and its native consumer reports the expected
+UserFault without returning. Full-owned-handle binding is down to **12 diagnostics across
+192 inputs**. Next make terminal-call recognition use an explicit source/native owner
+contract instead of the legacy core identity; then resolve NativeAllocation. Six let-else
+and two HTTP Task return errors still need isolation. No full System assembly is emitted.
+[Failure gate and remaining boundary](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
 Source Console now compiles and executes through native metadata with its own explicit
 bootstrap profile: no Console declaration in the primitive core or retained seed.
 UTF-8 input/output, EOF, overloads and non-owning wrappers pass an artifact-only consumer.

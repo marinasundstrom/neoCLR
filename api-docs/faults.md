@@ -20,6 +20,11 @@ Use Result for expected errors that callers can handle. A stream's Closed result
 or a Task's cancelled state is not a terminal Fault. These codes do not introduce
 exceptions, catch/finally behavior or a new guest error hierarchy.
 
+Development bootstrap (2026-10-06): independently emitted source System.Fail now raises
+this same UserFault through native metadata import. Its primitive profile removes the
+competing bridge declaration. Source-owned terminal-flow recognition in Raven remains
+open, so this execution gate does not yet qualify let-else uses of that source library.
+
 ## Reading faults in an embedding host
 
 Rust hosts receive `Result<Execution, neoclr::Fault>`. The `Fault` fields are:

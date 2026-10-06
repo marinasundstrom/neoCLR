@@ -191,3 +191,22 @@ fn symbolic_code_serialization_is_stable_and_has_no_numeric_ordinal_contract() {
         assert_eq!(serde_json::to_value(code).unwrap(), spelling);
     }
 }
+
+#[test]
+fn source_fail_and_legacy_fault_are_both_terminal() {
+    use neoclr::assembler::parse_function_ref;
+    for (name, result, discard) in [("Fail", "noresult", ""), ("Fault", "Void", "pop")] {
+        let module = assemble(&format!(
+            ".module System\n.function neoCLR.Runtime.{name}(String message) -> {result}\n.methodimpl InternalCall\n.end\n.function Stop() -> Int32\nldstr \"source failure\"\ncall neoCLR.Runtime.{name}(String)\n{discard}\nldc.i4 42\nret\n.end"
+        )).unwrap();
+        let program = LoadedProgram::new(&module).unwrap();
+        program.verify().unwrap();
+        let fault = program
+            .resolve_function(&parse_function_ref("Stop()").unwrap())
+            .unwrap()
+            .invoke(vec![], Limits::default())
+            .unwrap_err();
+        assert_eq!(fault.code, FaultCode::UserFault);
+        assert_eq!(fault.message, "source failure");
+    }
+}

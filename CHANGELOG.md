@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Compile unchanged System.Fail with a native RuntimeFailure adapter and execute it
+  from a separate metadata consumer. The exact no-result neoCLR.Runtime.Fail service
+  raises UserFault; legacy inhabited-unit Fault remains available for existing seeds.
+  An explicit primitive profile omits the competing Fail declaration. Five fault tests,
+  signature controls and the source gate pass. Full-System binding now has 12 errors;
+  source-owned terminal-flow recognition and NativeAllocation remain open.
+
 - Execute unchanged source-built Console from a separate native metadata consumer,
   using an explicit primitive core and seed without competing Console declarations.
   Preserve both legacy unit and source no-result WriteLine conventions; blocking host

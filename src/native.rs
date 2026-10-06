@@ -208,6 +208,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 | "neoCLR.Runtime.GCCollect"
                 | "neoCLR.Runtime.GCKeepAlive"
                 | "neoCLR.Runtime.WriteLine"
+                | "neoCLR.Runtime.Fail"
         )
     {
         return Err(Fault::new(
@@ -502,6 +503,9 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             (Binding::IntegerToString, Type::String)
         }
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
+        ("neoCLR.Runtime.Fail", [Type::String]) if function.no_result => {
+            (Binding::Fault, Type::Void)
+        }
         ("neoCLR.Runtime.WriteLine", [Type::String]) => (Binding::WriteLine, Type::Void),
         ("neoCLR.Runtime.CharCategory", [Type::UInt32]) => (Binding::CharCategory, Type::Int32),
         ("neoCLR.Runtime.Utf8Encode", [Type::String]) => {
@@ -1447,6 +1451,9 @@ mod reflection_signature_tests {
                 false,
             ),
             ("WriteLine(String text) -> noresult", true),
+            ("Fail(String message) -> noresult", true),
+            ("Fail(String message) -> Void", false),
+            ("Fail(Int32 message) -> noresult", false),
             ("GCCollect() -> noresult", true),
             ("GCKeepAlive(System.Object value) -> noresult", true),
         ] {

@@ -1,0 +1,125 @@
+{
+  "runtimeRevision": "896728a9d53e943f842ceb2650b48ec2a2ea3406",
+  "compilerRevision": "a6ee91610",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+        "--reference-source-failure-core",
+        "/private/tmp/source-failure1006-recorded/Core.dll"
+      ],
+      "cwd": "/private/tmp/source-failure1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/width-final-compiler1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure1006-recorded/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure1006-recorded/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-failure1006-recorded/Failure.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Functions.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailure.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/width-final-compiler1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure1006-recorded/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure1006-recorded/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-failure1006-recorded/Failure.dll",
+        "-o",
+        "/private/tmp/source-failure1006-recorded/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-failure1006-recorded/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure1006-recorded/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure1006-recorded",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (1458 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-failure1006-recorded/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure1006-recorded/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure1006-recorded",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: source failure [code=UserFault] at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465:1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465(String) owner=Named(\"NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265\") [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:2] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD.F_4D61696E() [NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD#1.0.0.0:0] IL instruction 1\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Functions.rvn": "fe9a0920f8d2108025f69871a904e212b42cec709fe29053001a628ed55d620d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailure.rvn": "f37e08a8d4be0b74bde89bfacde5fcf080e98cac5cdbfab2106584338eff24f5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn": "bc1adc397bc118a45a1c4edc78f91b12e3dc06496b2cfea4be91f55da379759a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_failure.py": "dff2ed08731a9d5106352f7a3560225714fc2999751a8f30614ec0a78fdce58f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-consumer.rvn": "482b87247adeff2ba9bb3367c7b49140919624d57365bdba87cf0241f48cfa9a",
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/source-failure1006-recorded/ownership.json": "559e3df078afc80e6592fa4faa781fd284693d62839405a5eec2d2e53d6ac067",
+    "/private/tmp/source-failure1006-recorded/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/source-failure1006-recorded/Failure.dll": "cadfe468834c367aa2aec69184ab6551be7cede79da539cd6d24104925bdde77",
+    "/private/tmp/source-failure1006-recorded/Consumer.dll": "bcc98f3324ded025554af7ee08a5d2053af3f49f9c8eaf5e6afa5246066492bf",
+    "/private/tmp/width-final-compiler1006/rvnc.dll": "b718bed76cf31d5ef6a70829d87c490f1f61b586c52143c16c31521549b8c6dc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "bc67f1182cba38216274d155981469568573b499d9271d4501938e2d616c98d1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "8b17193473094c71b97c282b7009ad57d52d00403dae3539e8cab577c415ec31",
+    "/private/tmp/width-final-compiler1006/Raven.CodeAnalysis.dll": "6e62d20addb52e623c0524dbbd844b8e7e92c6602977d95953d00953d37f06a1",
+    "/private/tmp/width-final-compiler1006/Raven.CodeAnalysis.NeoClr.dll": "a82630782966bfc8d1c679ee1523d11352cd685c6ece061fa1148b7dad47376c",
+    "/private/tmp/width-final-compiler1006/NeoCLR.Metadata.Experimental.dll": "d61344f4d9a1364dddb4415af48a6ecbf675301d1595ca0c06d83896340de2d5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/native.rs": "eee1afaf5fa01af4e476b8b146ff76c9b48e37e177e1295bf8c9d7e62c792785",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tests/fault_codes.rs": "75fb0119b049241338b5b1fe32c05f3e6518dab765489841433478d26d59a5a4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/CoreDeclarations.cs": "ff5f7bf550325d68294f93dd5036f050113ea96d668ec22ce847b46607909a03",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/Program.cs": "c4963733ac18e842a9a5428769ee6ccae2fb0d007e014b27fa4246d475485081"
+  }
+}

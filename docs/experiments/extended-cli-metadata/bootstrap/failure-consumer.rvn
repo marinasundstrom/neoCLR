@@ -1,0 +1,4 @@
+func Main() -> int {
+ System.Fail("source failure")
+ return 42
+}

@@ -7,13 +7,14 @@ using Microsoft.CodeAnalysis.CSharp;
 static class CoreDeclarations
 {
     public const string Identity = "NeoCLR.CoreProbe";
-    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false, bool comparerStorage = false)
+    public static void Write(string path, bool includeConsole = true, bool stringParameter = true, bool unionProbe = false, bool collectionProbe = false, bool libraryBootstrap = false, bool checkedStorage = false, bool collectionStorage = false, bool comparerStorage = false, bool includeFail = true)
     {
         collectionStorage |= comparerStorage;
         var declarations = TargetSurface.Declarations(includeConsole, stringParameter);
         if (comparerStorage) declarations += "public struct RuntimeTypeHandle { } namespace Runtime.CompilerServices { public struct Self { } public enum MethodImplOptions { NoInlining = 8, InternalCall = 4096 } public sealed class MethodImplAttribute : System.Attribute { public MethodImplAttribute(MethodImplOptions options) { } } }";
         if (checkedStorage || collectionStorage) declarations += CheckedStorageBindings.Declarations;
-        if (collectionStorage) declarations += FunctionBindings.Declarations + "public static class FailFunctions { public static void Fail(string message) { } }";
+        if (collectionStorage) declarations += FunctionBindings.Declarations
+            + (includeFail ? "public static class FailFunctions { public static void Fail(string message) { } }" : "");
         if (unionProbe)
             declarations = declarations.Replace("public static class Console {", "public static class Console { " + ProcessBindings.ConsoleDeclaration).Replace("public static class Math {",
                 "public static class Math { " + DoubleBindings.MathDeclarations + " public static Result<int, OverflowError> Abs(int value) => default; public static Result<int, InvalidRangeError> Clamp(int value, int min, int max) => default;")
@@ -127,7 +128,7 @@ static class CoreDeclarations
         else if (collectionStorage)
         {
             using var image = Mono.Cecil.AssemblyDefinition.ReadAssembly(stream);
-            NamespaceFunctions.ProjectFault(image.MainModule);
+            if (includeFail) NamespaceFunctions.ProjectFault(image.MainModule);
             image.Write(path);
         }
         else File.WriteAllBytes(path, stream.ToArray());

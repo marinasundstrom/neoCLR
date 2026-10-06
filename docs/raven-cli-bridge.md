@@ -6188,3 +6188,18 @@ now observes the selected callee convention. Only the explicit source profile re
 legacy declarations; mixing both owners is not supported. The primitive core remains a
 temporary binding input, while application and library references use native metadata.
 [Reproduction and executed coverage](experiments/extended-cli-metadata/source-console-2026-10-06.md).
+
+
+### Source terminal failure service (2026-10-06)
+
+The `--reference-source-failure-core` profile omits the projected Fail declaration.
+Unchanged System/Functions.rvn plus internal RuntimeFailure adapters emit Failure.dll;
+an artifact-only consumer resolves its namespace function through native metadata.
+`neoCLR.Runtime.Fail(String) -> noresult` is the new exact runtime service, while the
+legacy seed's inhabited `Fault` service remains intact for existing Numbers bodies.
+Both raise UserFault and never return. Wrong new-service signatures reject.
+
+Raven a6ee91610 remains unchanged: the native runtime path works, but its legacy-core
+terminal-flow test still excludes source/native Fail ownership. Replacing that check
+with an explicit target contract is the next compiler slice, not a new language rule.
+[Commands, hashes and scope](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
