@@ -31,7 +31,7 @@ public sealed partial class NativeAssemblyDefinition
     {
         static bool SupportedArgument(SignatureType type) => type.MethodParameterIndex is not null ||
             (type.ArrayElement is { } element ? SupportedArgument(element) : SupportedScalar(type));
-        static bool SupportedScalar(SignatureType type) => type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
+        static bool SupportedScalar(SignatureType type) => type.PointerElement is not null || type.FunctionSignature is { } function && SupportedArgument(function.ReturnType) && function.ParameterTypes.All(SupportedArgument) || type.IsSelf || type.GenericInstance is { } instance && instance.TypeArguments.All(SupportedArgument) || type.Primitive is not null || type.TypeParameterIndex is not null ||
             type.ClassType is { IsStatic: false } ||
             type.ImportedType is { } imported &&
             imported.GenericArity == imported.TypeArguments.Count && imported.TypeArguments.All(SupportedArgument);
@@ -54,6 +54,7 @@ public sealed partial class NativeAssemblyDefinition
         AssemblyDefinition.NativeSignatureTypeRow Copy(SignatureType type)
         {
             if (type.FunctionSignature is { } function) return new(null, 0, Function: new(Copy(function.ReturnType), function.ParameterTypes.Select(Copy).ToArray()));
+            if (type.PointerElement is { } pointer) return new(null, 0, Copy(pointer), IsPointer: true);
             if (type.ByReferenceElement is { } target) return new(null, 0, Copy(target), IsByReference: true);
             if (type.IsSelf) return new(null, 0, IsSelf: true);
             if (type.GenericInstance is { } instance) return new(null, LocalToken(instance.Definition), Arguments: instance.TypeArguments.Select(Copy).ToArray());

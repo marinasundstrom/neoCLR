@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-07",
+  "runtimeRevision": "709b23225a83dbc78675889a53467fa875b336cc",
+  "metadataRevision": "runtimeRevision plus pointer-signature slice in this commit",
+  "runtimeSha256": "a2d79f933a7ccfe95fb0f4be86c8e00c496cc6f28c21d84dd74ada335a0acb49",
+  "artifactSha256": "3643d6494a8b237b5659bdab52c6270753fcf593f913eea2bf871ac8f284a3e4",
+  "verificationExit": 0,
+  "executionExit": 42,
+  "stdout": "",
+  "stderr": "",
+  "scope": "API-authored NativeMultiplyChecked/NativeAllocate/NativeFree consumer; not source NativeMemory"
+}

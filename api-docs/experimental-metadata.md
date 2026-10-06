@@ -13,6 +13,42 @@ format-5 assemblies, including native top-level functions. Direct PE/#Neo runtim
 with a reference-only CLI projection. A bounded binary native payload now avoids JSON parsing at runtime. General rewriting
 and guest Introspection assembly loading remain pending.
 
+## Unmanaged pointer signatures (development, 2026-10-07)
+
+`SignatureType.PointerTo(elementType)` creates an immutable unmanaged pointer signature.
+`PointerElement` exposes its target. Supported targets are scalar primitives (including
+Void), and nested pointers, up to sixteen pointer levels. String, RuntimeTypeHandle,
+nominal types, generic parameters, managed references and structural targets reject with
+`ArgumentException`; a null target throws `ArgumentNullException`. Pointer vectors,
+pointer generic arguments and pointer-bearing Function shapes are currently rejected.
+These bounds are library limitations, not changes to the CLI type system.
+
+Use pointer signatures for callable parameters/results and local slots. Definition
+attachment and builder convenience methods share validation. `GetILGenerator()` preserves
+exact pointer target identity through arguments, locals, calls and returns; returning a
+different pointer target rejects during writing. This does not provide allocation,
+ownership, pointer arithmetic or dereference operations in the C# instruction API.
+
+CLI output uses standard `ELEMENT_TYPE_PTR` (including `PTR VOID`), and native output
+uses the existing `Ptr` category without a format-version change. Both readers preserve
+callable signatures and import them into new builders. `MetadataLoadContext` projects a
+canonical `PointerTypeInfo`, exposing `ElementType`, `DisplayName` and
+`IsNominalType == false`. No dependency loading or runtime reflection is required.
+
+```csharp
+var pointer = SignatureType.PointerTo(PrimitiveType.Void);
+var identity = owner.AddMethod("Identity", new MethodSignature(pointer, [pointer]));
+var il = identity.GetILGenerator();
+il.LoadArgument(0);
+il.Return();
+```
+
+Validation: 162 C# metadata groups pass, including CLI/native round trips, manual
+method definitions, import, canonical introspection, depth/shape rejection and pointer
+target mismatch. An API-authored native assembly calls NativeMultiplyChecked,
+NativeAllocate and NativeFree and exits 42. Raven pointer mapping and source NativeMemory
+compilation remain the next gate; this metadata slice does not claim full System output.
+
 ## Namespace and types
 
 - [Native-width integers](#native-width-integers-development-2026-10-06).

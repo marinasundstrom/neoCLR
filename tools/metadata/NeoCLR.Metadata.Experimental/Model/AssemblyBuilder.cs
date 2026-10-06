@@ -405,6 +405,12 @@ public sealed partial class AssemblyBuilder
         TypeReferenceHandle selfMarker = default;
         void EncodeType(SignatureTypeEncoder encoder, SignatureType type)
         {
+            if (type.PointerElement is { } pointer)
+            {
+                if (pointer.Primitive == PrimitiveType.Void) encoder.VoidPointer();
+                else EncodeType(encoder.Pointer(), pointer);
+                return;
+            }
             if (type.IsSelf)
             {
                 if (!referenceOnly) throw new InvalidDataException("Self requires native emission; CLI projection is reference-only");

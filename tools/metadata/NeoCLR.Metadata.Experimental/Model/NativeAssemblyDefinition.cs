@@ -422,6 +422,11 @@ public sealed partial class NativeAssemblyDefinition
                     Require(noResult == (returns.Primitive == PrimitiveType.Void), "function result convention mismatch");
                     return SignatureType.Function(new MethodSignature(returns, Array(function, "parameters", 16).Select(p => ReadType(p, false))));
                 }
+                if (element.TryGetProperty("Ptr", out var pointer))
+                {
+                    Shape(element, "Ptr");
+                    return SignatureType.PointerTo(ReadType(pointer, true));
+                }
                 if (element.TryGetProperty("ByRef", out var target))
                 {
                     Require(allowByReference, "byref only supported in method parameters");
@@ -819,6 +824,7 @@ public sealed partial class NativeAssemblyDefinition
             : type.TryGetProperty("Function", out var function) ? SignatureType.Function(new MethodSignature(function.GetProperty("no_result").GetBoolean() ? PrimitiveType.Void : ProjectType(function.GetProperty("returns")), Array(function, "parameters", 16).Select(ProjectType)))
             : type.TryGetProperty("TypeParameter", out var parameter) ? SignatureType.TypeParameter(parameter.GetInt32())
             : type.TryGetProperty("Constructed", out var instance) ? ProjectConstruction(Text(instance, "definition"), Array(instance, "arguments", 32).Select(ProjectType).ToArray())
+            : type.TryGetProperty("Ptr", out var pointer) ? SignatureType.PointerTo(ProjectType(pointer))
             : type.TryGetProperty("ArrayRef", out var element) ? SignatureType.ArrayOf(ProjectType(element))
             : ProjectNamed(Text(type, "Named"));
         SignatureType ProjectNamed(string name)
@@ -849,7 +855,7 @@ public sealed partial class NativeAssemblyDefinition
                 foreach (var (owner, index) in original.Assembly.Types.Select((owner, index) => (owner, index))) mappedOwners.Add(owner, owners[index]);
             return mappedOwners[original];
         }
-        SignatureType Remap(SignatureType type) => type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
+        SignatureType Remap(SignatureType type) => type.PointerElement is not null ? type : type.FunctionSignature is { } function ? function.Substitute(Remap) : type.ByReferenceElement is { } target ? SignatureType.ByReference(Remap(target)) : type.ImportedType is { } imported ? RemapImported(imported) : type.GenericInstance is { } instance ? RemapOwner(instance.Definition).MakeGenericInstance(instance.TypeArguments.Select(Remap).ToArray()) : type.ArrayElement is { } element ? SignatureType.ArrayOf(Remap(element))
             : type.ClassType is { } c ? RemapOwner(c) : type;
         SignatureType RemapImported(ImportedTypeReference type)
         {

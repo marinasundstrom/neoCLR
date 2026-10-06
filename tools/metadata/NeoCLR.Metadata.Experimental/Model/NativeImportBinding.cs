@@ -180,6 +180,7 @@ internal sealed class NativeImportBinding(AssemblyDefinition reference, NativeLi
     {
         if (type.ClassType is { NativeGrapheme: true }) return "Char";
         if (type.Primitive is { } primitive) return primitive.ToString();
+        if (type.PointerElement is { } pointer) return "Ptr(" + TypeKey(pointer) + ")";
         if (type.ByReferenceElement is { } byref) return "ByRef(" + TypeKey(byref) + ")";
         if (type.ArrayElement is { } element) return "ArrayRef(" + TypeKey(element) + ")";
         if (type.MethodParameterIndex is { } method) return "MethodTypeParameter(" + method + ")";

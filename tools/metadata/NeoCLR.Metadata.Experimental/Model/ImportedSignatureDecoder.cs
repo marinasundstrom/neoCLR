@@ -23,9 +23,10 @@ internal ref struct ImportedSignatureDecoder(ReadOnlySpan<byte> bytes, ModuleDef
 
     private SignatureType Type(bool allowVoid, int depth, bool allowByReference = false)
     {
-        if (depth >= 16) throw new InvalidDataException("imported signature nesting limit");
+        if (depth > 16) throw new InvalidDataException("imported signature nesting limit");
         switch (Byte())
         {
+            case 0x0f: return SignatureType.PointerTo(Type(true, depth + 1));
             case 0x10 when allowByReference: return SignatureType.ByReference(Type(false, depth + 1));
             case 0x01 when allowVoid: return PrimitiveType.Void;
             case 0x02: return PrimitiveType.Boolean;

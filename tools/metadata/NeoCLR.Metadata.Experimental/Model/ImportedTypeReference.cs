@@ -30,7 +30,7 @@ public sealed class ImportedTypeReference : IEquatable<ImportedTypeReference>
     {
         ArgumentNullException.ThrowIfNull(arguments);
         if (GenericArity == 0 || TypeArguments.Count != 0 || arguments.Length != GenericArity ||
-            arguments.Any(t => t is null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16)) throw new ArgumentException("invalid imported type construction", nameof(arguments));
+            arguments.Any(t => t is null || t.PointerElement is not null || t.Primitive == PrimitiveType.Void || t.NestingDepth >= 16)) throw new ArgumentException("invalid imported type construction", nameof(arguments));
         foreach (var argument in arguments) argument.ValidateOwner(Owner, 32, 32, allowSelf: true);
         return new(Owner, AssemblyIdentity, Namespace, Name, GenericArity, (SignatureType[])arguments.Clone(), IsValueType, DeclaringType);
     }
@@ -81,7 +81,7 @@ public sealed partial class AssemblyBuilder
         return nativeInterfaceConversions[(actual, target)] = Visit(actual);
     }
     internal SignatureType ImportNativeSignatureType(SignatureType type, AssemblyIdentity core, IAssemblyResolver? resolver)
-        => type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
+        => type.PointerElement is not null ? type : type.ByReferenceElement is { } target ? SignatureType.ByReference(ImportNativeSignatureType(target, core, resolver))
             : type.ReferencedGenericInstance is { } constructed
             ? ImportReference(constructed.Definition.Resolve(resolver), core).MakeGenericInstance(constructed.TypeArguments.Select(t => ImportNativeSignatureType(t, core, resolver)).ToArray())
             : type.TypeParameterIndex is { } typeParameter ? SignatureType.TypeParameter(typeParameter)

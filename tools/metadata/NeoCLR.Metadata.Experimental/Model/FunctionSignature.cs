@@ -36,7 +36,7 @@ public sealed partial record SignatureType
         ArgumentNullException.ThrowIfNull(signature);
         if (signature.GenericParameterNames.Count != 0 || signature.ParameterTypes.Count > 16 ||
             signature.ParameterTypes.Any(t => t.ByReferenceElement is not null) ||
-            signature.ParameterTypes.Append(signature.ReturnType).Any(t => t.NestingDepth >= 16)) throw new ArgumentException("unsupported function shape", nameof(signature));
+            signature.ParameterTypes.Append(signature.ReturnType).Any(t => t.PointerElement is not null || t.NestingDepth >= 16)) throw new ArgumentException("unsupported function shape", nameof(signature));
         return new(null, null, functionSignature: new FunctionSignature(signature));
     }
 }

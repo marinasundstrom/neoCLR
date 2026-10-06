@@ -41,7 +41,7 @@ public sealed partial class MethodBuilder
             throw new ArgumentException("constructed reference requires matching owner and method arities");
         foreach (var type in owners.Concat(methods))
         {
-            if (type is null || type.Primitive == PrimitiveType.Void) throw new ArgumentException("invalid generic argument");
+            if (type is null || type.PointerElement is not null || type.Primitive == PrimitiveType.Void) throw new ArgumentException("invalid generic argument");
             type.ValidateOwner(Assembly, 32, 32);
         }
         owner.ValidateTypeArguments(owners);

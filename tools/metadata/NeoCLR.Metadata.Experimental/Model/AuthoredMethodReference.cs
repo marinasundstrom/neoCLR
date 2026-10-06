@@ -94,7 +94,7 @@ public sealed partial class AssemblyBuilder
         authoredCallableReferences.Add(reference);
         return reference;
 
-        bool Supported(SignatureType type, bool result) =>
+        bool Supported(SignatureType type, bool result) => type.PointerElement is not null ? true :
             type.IsSelf ? isInterface :
             type.FunctionSignature is { } function ? Supported(function.ReturnType, true) && function.ParameterTypes.All(p => Supported(p, false)) :
             type.Primitive is { } primitive ? primitive != PrimitiveType.Void || result :

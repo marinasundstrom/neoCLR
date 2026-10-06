@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add bounded unmanaged pointer signatures to the .NET metadata API, using ordinary
+  CLI PTR encoding and the existing native Ptr category. Callable readers, import,
+  canonical introspection and argument/local/call/return validation preserve pointer
+  targets. Reject unsupported pointer targets, generic arguments and Function shapes.
+  All 162 C# groups pass; an API-authored allocation/free consumer executes with exit
+  42. Raven mapping and source NativeMemory compilation remain pending.
+
 - Add exact native allocation InternalCalls for the pending source NativeAllocation
   adapter: UIntPtr byte allocation, checked size multiplication and no-result void-pointer
   release. They share the existing pointer heap, initialization tracking and limits;

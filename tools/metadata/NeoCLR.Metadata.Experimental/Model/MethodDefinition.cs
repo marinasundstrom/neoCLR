@@ -104,7 +104,7 @@ public sealed partial class MethodDefinition
     /// <remarks>Void is allowed only as a result. No type resolution, body validation or code loading occurs.</remarks>
     public bool TryGetStaticValueSignature(out MethodSignature? decoded)
     {
-        static bool Value(SignatureType type) => type.Primitive is not null || type.ArrayElement?.Primitive is not null;
+        static bool Value(SignatureType type) => type.PointerElement is not null || type.Primitive is not null || type.ArrayElement?.Primitive is not null;
         decoded = IsStatic && GenericArity == 0 && nativeSignature is { } native && Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
         if (decoded is not null) return true;
         return IsStatic && GenericArity == 0 && TryDecodeStaticValueSignature(signature, out decoded) && ApplyOutputs(ref decoded);
@@ -116,7 +116,7 @@ public sealed partial class MethodDefinition
     /// <remarks>At most 32 method parameters. No nominal types, declaring-type parameters or nested vectors.</remarks>
     public bool TryGetStaticGenericValueSignature(out MethodSignature? decoded)
     {
-        static bool Scalar(SignatureType type) => type.Primitive is not null || type.MethodParameterIndex is not null;
+        static bool Scalar(SignatureType type) => type.PointerElement is not null || type.Primitive is not null || type.MethodParameterIndex is not null;
         static bool Value(SignatureType type) => Scalar(type) || type.ArrayElement is { } element && Scalar(element);
         decoded = IsStatic && GenericArity is > 0 and <= 32 && nativeSignature is { } native &&
             Value(native.ReturnType) && native.ParameterTypes.All(Value) ? native : null;
@@ -184,21 +184,27 @@ public sealed partial class MethodDefinition
         return true;
     }
 
-    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity, bool allowByReference = false)
+    private static bool ReadType(ReadOnlySpan<byte> signature, ref int position, bool allowVoid, out SignatureType? type, int genericArity, bool allowByReference = false, int depth = 0)
     {
         type = null;
-        if (position >= signature.Length) return false;
+        if (depth > 16 || position >= signature.Length) return false;
         var code = signature[position++];
+        if (code == 0x0f)
+        {
+            if (!ReadType(signature, ref position, true, out var target, genericArity, depth: depth + 1) || !SignatureType.IsPointerTarget(target!) || target!.NestingDepth >= 16) return false;
+            type = SignatureType.PointerTo(target);
+            return true;
+        }
         if (code == 0x10 && allowByReference)
         {
-            if (!ReadType(signature, ref position, false, out var target, genericArity)) return false;
+            if (!ReadType(signature, ref position, false, out var target, genericArity, depth: depth + 1)) return false;
             type = SignatureType.ByReference(target!);
             return true;
         }
         var vector = code == 0x1d;
         if (vector)
         {
-            if (position >= signature.Length) return false;
+            if (depth > 16 || position >= signature.Length) return false;
             code = signature[position++];
         }
         if (code == 0x1e)

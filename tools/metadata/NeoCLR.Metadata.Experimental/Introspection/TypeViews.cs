@@ -128,8 +128,22 @@ public sealed class FieldInfo
     public int? Constant { get; }
 }
 
+/// <summary>An unmanaged pointer signature view. It conveys no ownership or dereference capability.</summary>
+public sealed class PointerTypeInfo : TypeInfo
+{
+    internal PointerTypeInfo(MetadataLoadContext context, TypeInfo element) : base(context) { ElementType = element; }
+    /// <summary>Gets the canonical pointed-to scalar or pointer view.</summary>
+    public TypeInfo ElementType { get; }
+    internal override int Depth => 1 + ElementType.Depth;
+    /// <inheritdoc/>
+    public override string DisplayName => ElementType.DisplayName + "*";
+    /// <inheritdoc/>
+    public override bool IsNominalType => false;
+}
+
 public sealed partial class MetadataLoadContext
 {
+    private readonly Dictionary<TypeInfo, PointerTypeInfo> pointers = [];
     private readonly Dictionary<FunctionKey, FunctionTypeInfo> functions = [];
     private readonly Dictionary<TypeInfo, SelfTypeInfo> selfTypes = [];
     private readonly Dictionary<PrimitiveType, PrimitiveTypeInfo> primitives = [];
@@ -192,6 +206,13 @@ public sealed partial class MetadataLoadContext
         if (signature.Primitive is { } primitive)
         {
             if (!primitives.TryGetValue(primitive, out var view)) primitives.Add(primitive, view = new PrimitiveTypeInfo(this, primitive));
+            return view;
+        }
+        if (signature.PointerElement is { } pointer)
+        {
+            var type = Project(pointer, arguments, methods, selfOwner);
+            if (type.Depth >= 16) throw new InvalidDataException("metadata type nesting exceeds limit");
+            if (!pointers.TryGetValue(type, out var view)) pointers.Add(type, view = new PointerTypeInfo(this, type));
             return view;
         }
         if (signature.ArrayElement is { } element)

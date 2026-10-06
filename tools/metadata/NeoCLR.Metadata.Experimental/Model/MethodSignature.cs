@@ -1,9 +1,24 @@
 namespace NeoCLR.Metadata.Experimental.Model;
 
-/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector, interface Self or managed-reference parameter signature type.</summary>
+/// <summary>An immutable primitive, owned nominal/imported reference type, scoped generic parameter, vector, interface Self, unmanaged pointer or managed-reference parameter signature type.</summary>
 public sealed partial record SignatureType
 {
-    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false) { IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    private SignatureType(PrimitiveType? primitive, TypeBuilder? classType, SignatureType? arrayElement = null, int? methodParameter = null, int? typeParameter = null, GenericTypeInstance? genericInstance = null, ImportedTypeReference? importedType = null, SignatureType? byReferenceElement = null, FunctionSignature? functionSignature = null, TypeReference? referencedType = null, ReferencedGenericType? referencedGenericType = null, bool isSelf = false, SignatureType? pointerElement = null) { PointerElement = pointerElement; IsSelf = isSelf; ReferencedGenericInstance = referencedGenericType; ReferencedType = referencedType; FunctionSignature = functionSignature; ByReferenceElement = byReferenceElement; ImportedType = importedType; GenericInstance = genericInstance; Primitive = primitive; ClassType = classType; ArrayElement = arrayElement; MethodParameterIndex = methodParameter; TypeParameterIndex = typeParameter; }
+    /// <summary>Gets the unmanaged pointer target, or null for other signatures.</summary>
+    public SignatureType? PointerElement { get; }
+    /// <summary>Creates an unmanaged pointer to a supported scalar, Void, or another unmanaged pointer.</summary>
+    /// <remarks>Nominal, generic, managed and structural targets remain unsupported. No ownership or allocation is implied.</remarks>
+    /// <exception cref="ArgumentException">Target is unsupported or exceeds the nesting bound.</exception>
+    /// <exception cref="ArgumentNullException">Target is null.</exception>
+    public static SignatureType PointerTo(SignatureType elementType)
+    {
+        ArgumentNullException.ThrowIfNull(elementType);
+        if (!IsPointerTarget(elementType) || elementType.NestingDepth >= 16)
+            throw new ArgumentException("unsupported unmanaged pointer target", nameof(elementType));
+        return new(null, null, pointerElement: elementType);
+    }
+    internal static bool IsPointerTarget(SignatureType type) => type.PointerElement is not null ||
+        type.Primitive is { } primitive && primitive is not (PrimitiveType.String or PrimitiveType.RuntimeTypeHandle);
     /// <summary>Gets the interface-scoped implementing-type signature. It does not consume a generic parameter ordinal.</summary>
     /// <remarks>Valid in bodyless interface member contracts. Native encoding uses SelfType; executable CLI emission rejects it.</remarks>
     public static SignatureType Self { get; } = new(null, null, isSelf: true);
@@ -31,11 +46,11 @@ public sealed partial record SignatureType
     /// <summary>Creates a one-dimensional zero-based vector, including vectors of vectors.</summary>
     /// <param name="elementType">Supported non-Void element signature, including another vector; multidimensional arrays are not admitted.</param>
     /// <exception cref="ArgumentNullException">Element is null.</exception>
-    /// <exception cref="ArgumentException">Element is Void, by-reference, or exceeds the 16-level nesting bound.</exception>
+    /// <exception cref="ArgumentException">Element is Void, an unmanaged pointer, by-reference, or exceeds the 16-level nesting bound.</exception>
     public static SignatureType ArrayOf(SignatureType elementType)
     {
         ArgumentNullException.ThrowIfNull(elementType);
-        if (elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
+        if (elementType.PointerElement is not null || elementType.Primitive == PrimitiveType.Void || elementType.ByReferenceElement is not null || elementType.NestingDepth >= 16)
             throw new ArgumentException("array element must be a supported value type", nameof(elementType));
         return new(null, null, elementType);
     }
@@ -76,7 +91,7 @@ public sealed partial record SignatureType
     public ReferencedGenericType? ReferencedGenericInstance { get; }
     internal static SignatureType FromConstruction(TypeReference definition, IEnumerable<SignatureType> arguments) => new(null, null, referencedGenericType: new(definition, arguments));
     internal static SignatureType FromReference(TypeReference reference) => new(null, null, referencedType: reference);
-    internal int NestingDepth => ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
+    internal int NestingDepth => PointerElement is { } pointer ? 1 + pointer.NestingDepth : ReferencedGenericInstance is { } loaded ? 1 + loaded.TypeArguments.Max(t => t.NestingDepth) : FunctionSignature is { } shape ? 1 + shape.ParameterTypes.Append(shape.ReturnType).Max(t => t.NestingDepth) : ByReferenceElement is { } target ? 1 + target.NestingDepth : ImportedType is { TypeArguments.Count: > 0 } imported ? 1 + imported.TypeArguments.Max(t => t.NestingDepth) : GenericInstance is { } instance ? 1 + instance.TypeArguments.Max(t => t.NestingDepth) : ArrayElement is { } element ? 1 + element.NestingDepth : 0;
     internal void ValidateOwner(AssemblyBuilder assembly, int genericArity = 0, int typeArity = 0, bool complete = false, bool allowByReference = false, bool allowSelf = false)
     {
         if (IsSelf && !allowSelf) throw new ArgumentException("Self requires an interface contract signature");
@@ -115,7 +130,7 @@ public sealed partial record SignatureType
         return type.NativePrimitive is { } primitive ? (SignatureType)primitive : new(null, type);
     }
     /// <summary>Returns a diagnostic name; it is not a serialized type identity.</summary>
-    public override string ToString() => IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
+    public override string ToString() => PointerElement is { } pointer ? pointer + "*" : IsSelf ? "Self" : ReferencedGenericInstance is { } loaded ? loaded.ToString() : ReferencedType is { } reference ? reference.Namespace + "." + reference.Name : FunctionSignature is { } function ? function.ToString() : ByReferenceElement is { } target ? target + "&" : ImportedType is { } imported ? imported.ToString() : GenericInstance is { } instance ? instance.ToString() : ArrayElement is { } element ? element + "[]" : MethodParameterIndex is { } index ? "!!" + index : TypeParameterIndex is { } ordinal ? "!" + ordinal : Primitive?.ToString() ?? ClassType!.Namespace + "." + ClassType.Name;
 }
 
 /// <summary>An immutable signature with supported value types and optional unconstrained method parameters.</summary>

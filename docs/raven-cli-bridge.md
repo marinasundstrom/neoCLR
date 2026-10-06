@@ -6238,3 +6238,12 @@ The native container regression and 17 pointer controls pass. C# SignatureType p
 support, CLI PTR encoding/decoding, native Ptr mapping, introspection and Raven semantic
 operands are the remaining boundary. No compiler behavior changes yet; the full-System
 binding count remains four. [Exact service contract](heap-and-pointers.md#source-nativeallocation-services-2026-10-07).
+
+### Native pointer metadata prerequisite (2026-10-07)
+
+The C# metadata API now preserves scalar/Void pointer signatures through standard CLI
+PTR encoding and existing native Ptr encoding, including import and metadata-only views.
+An API-authored consumer executes the three native allocation services with exit 42.
+This is a metadata/runtime prerequisite; Raven's pointer symbol/emission mapping is
+still pending. No CLI projection fallback was added and the four full-System binding
+errors remain. See the [bounded public contract](../api-docs/experimental-metadata.md#unmanaged-pointer-signatures-development-2026-10-07).

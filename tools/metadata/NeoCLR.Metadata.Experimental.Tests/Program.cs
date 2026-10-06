@@ -4,6 +4,10 @@ using System.Reflection.PortableExecutable;
 using NeoCLR.Metadata.Experimental.Model;
 using AssemblyDefinition = NeoCLR.Metadata.Experimental.Model.AssemblyDefinition;
 
+if (args is ["--pointer-allocation", var pointerOutput])
+{
+    PointerSignatureChecks.WriteRuntime(pointerOutput); return 0;
+}
 if (args.Length == 3 && args[0] == "--native-integer-inputs")
 {
     NativeIntegerChecks.WriteInputs(args[1], args[2]); return 0;
@@ -450,6 +454,7 @@ var tests = new (string Name, Action Body)[]
     ("Floating point signatures and execution", FloatingPointChecks.Run),
     ("Integer widths and unsigned execution", IntegerWidthChecks.Run),
     ("Native integer signatures and conversions", NativeIntegerChecks.Run),
+    ("Pointer signature round trips and introspection", PointerSignatureChecks.Run),
     ("Native primitive declaration representation", PrimitiveRepresentationChecks.Run),
     ("Native String reference representation", StringRepresentationChecks.Run),
     ("Native grapheme declaration representation", GraphemeRepresentationChecks.Run),
