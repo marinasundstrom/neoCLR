@@ -43,19 +43,48 @@ union structural ToString synthesis requests the source Object method before its
 member declaration is available. Both full-source variants publish no assembly.
 This is not yet a successful System build or a complete set of remaining diagnostics.
 
+## Union completion fix
+
+Raven `d29179810` uses the existing lazy source method-signature declaration path
+before synthesizing the Object.ToString override. It resolves the actual source
+method rather than a bootstrap substitute. Four reduced cases initially crashed;
+all now pass and preserve override identity with either file order and either
+same-file declaration order. The 206 existing source-root/union semantic/generic
+tests still pass; the final focused source-root run passes 23 tests. No metadata
+encoding or emitter boundary changes were needed.
+
+Both all-source audit variants now terminate normally with diagnostics and publish
+no assembly. They still do **not** compile:
+
+| Layout | Inputs | Errors | Result |
+| --- | --- | --- | --- |
+| Source RuntimeTypeHandle | 178 | 82 | Exit 1, no output |
+| Retained bootstrap RuntimeTypeHandle | 177 | 74 | Exit 1, no output |
+
+Retaining the bootstrap handle removes the typeof contract configuration error and
+seven conversion diagnostics. This is a diagnostic control, not permission to claim
+source ownership of that handle. Both layouts have 45 missing RuntimeServices member
+diagnostics covering console, environment, math, GC, pointer conversions and time-zone
+services. Remaining scope, conversion, let-else and constructor diagnostics need reduced
+cases after ownership and service inputs are coherent; some may be cascades. Full-source
+compilation finally provides a diagnostic inventory rather than an initialization crash.
+The existing released library controls are reused from the preceding loader slice.
+
 ## Priority order from this evidence
 
-1. **Complete source Object signatures before dependent union synthesis.** Add an
-   order-independent minimal union/root regression. Do not fall back to the old PE
-   root or disable synthesis to hide incomplete source declarations.
-2. **Reassess canonical core identities.** Once declaration binding can finish, separate
-   Object, RuntimeTypeHandle, Value and Void ownership issues from cascades. Preserve
-   the explicit primitive contracts and normal .NET behavior.
-3. **Replace the mandatory CLI primitive reference with native core metadata.** Keep
+1. **Unify source RuntimeTypeHandle with the explicit core contract.** Its source owner
+   currently fails typeof validation; retaining bootstrap ownership removes eight
+   diagnostics. Resolve identity consistently in binding/import/emission, without
+   inventing another competing core type.
+2. **Complete the runtime-service declaration surface.** Group the 45 missing-member
+   diagnostics by existing runtime implementation; provide real native adapters and
+   executable family tests. Do not add stubs or treat missing audit inputs as new
+   runtime deficiencies. Reuse the existing Storage adapters.
+3. **Reduce residual binding diagnostics with coherent inputs.** Scope, let-else,
+   generic conversion and constructor diagnostics must be separated from service and
+   ownership cascades before assigning compiler fixes.
+4. **Replace the mandatory CLI primitive reference with native core metadata.** Keep
    that work in the target importer/host contracts; the emitter consumes symbols.
-4. **Complete service families and source coverage.** Reuse the existing Storage
-   adapters; cover missing Console/Environment/Math/GC/memory and time-zone signatures
-   with real runtime consumers. Group splits above are diagnostic, not final assemblies.
 5. **Close the bootstrap loop.** Rebuild against emitted native core/library artifacts,
    then run artifact-only applications and editor acceptance without the old seed/core.
 

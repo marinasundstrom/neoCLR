@@ -11,8 +11,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 - Add a reproducible post-release System bootstrap inventory, distinguishing omitted
   build inputs from compiler failures. Existing Storage adapters and six omitted
   contract files compile. Isolate and fix Raven's PE-only metadata assumption for a
-  source Object root (41 focused tests); record the next union declaration-order
-  blocker. The full library still fails and publishes no assembly.
+  source Object root (41 focused tests). Fix union source-Object signature completion
+  with four declaration-order regressions; 206 existing tests remain green. Full-source
+  compilation now reports diagnostics instead of crashing. Prioritize handle ownership
+  and missing runtime-service declarations; no full System assembly is published.
 
 ### 2026-10-05
 

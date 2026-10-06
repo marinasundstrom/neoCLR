@@ -11128,3 +11128,13 @@ root. All 41 focused tests pass; released library compilation controls remain gr
 early and aborts the full build. Declaration ordering is the next priority before
 interpreting wider core/service diagnostics. No full-bootstrap completion or new
 execution support is claimed. See [frontier](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
+
+
+**Union follow-up outcome:** Raven `d29179810` completes the source Object.ToString
+signature through the existing lazy declaration path. Four ordering regressions pass,
+206 existing tests remain green, and both full-library layouts now reject normally
+without output. Keeping bootstrap RuntimeTypeHandle removes the typeof configuration
+error and seven conversion errors; both layouts expose 45 missing service-member
+diagnostics. The next bounded work is canonical handle ownership and coherent runtime
+service inputs, followed by reduced residual failures. No full-bootstrap success or
+change to published Preview 12 is claimed.

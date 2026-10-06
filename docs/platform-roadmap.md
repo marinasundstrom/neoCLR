@@ -15,9 +15,11 @@ inventory confirms that Storage's existing adapters and six omitted contracts co
 release omission does not mean missing compiler support. The first full-source crash
 was a PE-only reflection-loader assumption, now fixed on an isolated Raven integration
 branch with 41 focused tests and unchanged released library compilation controls.
-Next resolve source Object member completion before union ToString synthesis, then
-reassess core ownership and replace the mandatory CLI primitive reference. Full System
-still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
+Union ToString now completes the real source Object signature on demand; declaration
+order regressions pass and the full build reaches diagnostics instead of crashing.
+Next unify source RuntimeTypeHandle ownership, complete missing runtime-service inputs,
+and reduce residual binding failures before replacing the CLI primitive reference.
+Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)
 
