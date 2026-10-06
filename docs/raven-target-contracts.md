@@ -164,3 +164,12 @@ Result-returning close failures and terminal-fault behavior remain open. In part
 NeoCLR-specific behavior must be opt-in and must leave Raven's .NET/CLR support unchanged.
 Any .NET cleanup correction is separate work, not a side effect of this experiment.
 No cleanup/defer behavior is implemented here.
+
+## Synchronous disposal implementation update (2026-10-06)
+
+The companion Raven `codex/metadata-consumer` compiler now provides an explicit
+`RuntimeDisposalContract` and synchronous scope-exit lowering. The neoCLR preset
+selects `System.Disposable`; source-owned protocols can override the assembly/type
+through a manifest `Disposal` entry. See [bridge implementation and validation](raven-cli-bridge.md#raven-synchronous-use-cleanup-2026-10-06-development)
+for native evidence, bootstrap interface restrictions, and the remaining async/iterator
+work. The general pass can be integrated into Raven main independently of target policy.

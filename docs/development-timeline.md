@@ -11162,6 +11162,21 @@ metadata preservation the next shared blocker rather than expanding isolated API
 facades. The null fixture remains recorded; this is not full GC API or bootstrap
 completion. See [partial gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
 
+## 2026-10-06 — Raven use cleanup without exception regions
+
+The author proposed `use` support on Raven `codex/metadata-consumer`, requiring
+cleanup on block exit, return and error/None propagation because neoCLR has no
+exception unwinding. The assistant proposed shared scope-exit lowering with explicit
+target contract selection and an initial synchronous slice. The author directed
+implementation, then clarified that general improvements may be added to main.
+
+Implementation stays on the requested Raven branch with general lowering/tests
+separate from neoCLR's protocol selection; no main merge is claimed. Six native
+protocol fixtures verify and execute, while async/iterator use remains diagnosed.
+See [the integration record](raven-cli-bridge.md#raven-synchronous-use-cleanup-2026-10-06-development)
+for contracts, limitations and validation. This entry records the scoped compiler
+work and does not reprioritize the remaining platform roadmap.
+
 
 **Nullability direction (2026-10-06):** The author asked, “Can we add nullability another
 way? Or should we defer?” The assistant proposed preserving declaration annotations

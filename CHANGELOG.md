@@ -13,6 +13,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   execution identity and malformed payloads. Native encoding rejects these annotations
   until its matching support exists; this does not yet fix native KeepAlive(null) import.
 
+- Document companion Raven synchronous `use` support through a shared disposal
+  contract: reverse-order cleanup on block completion, return, propagation and loop
+  exits, with no exception regions. Six authored-protocol native consumers verify
+  and execute; async/iterator cleanup and bare bootstrap-interface implementation
+  remain outside this slice. Runtime instructions and implementation are unchanged.
+
 - Add native source GC adapters and admit no-result Collect/KeepAlive service calls
   without pushing a unit value. Existing unit callers remain supported. Nine GC
   tests and an artifact-only retention consumer pass. Preserve KeepAlive(null) as

@@ -6117,3 +6117,39 @@ ownership are target configuration, not reflection-based metadata projection.
 include broad collections, actual Tasks/await execution and an ordinary .NET editor
 control. The new development path is qualified on macOS arm64 only. Packaging and
 publication remain separate; no Preview 11 artifact has been replaced.
+
+### Raven synchronous use cleanup (2026-10-06 development)
+
+The companion Raven `codex/metadata-consumer` change introduces a shared
+`RuntimeDisposalContract` and scope-exit lowering. The neoCLR profile selects
+`System.Disposable.Dispose` from `NeoCLR.CoreProbe` without exception regions.
+A bootstrap ownership manifest can select an authored interface using its `Disposal`
+entry (`AssemblyName`, `InterfaceTypeName`, `UseExceptionHandling: false`); that
+interface must be listed under its declared library owner. General lowering and
+regressions are suitable for Raven main; neoCLR protocol names remain target policy.
+
+Resources become active only after initialization and are disposed in reverse order
+on block completion, returns, failed error/None propagation and loop exits. Result
+values are evaluated before cleanup. The temporary CLI bridge encodes ordinary calls
+and branches rather than try/finally. Native emission consumes the same bound plan;
+existing native calls, locals and branch metadata already express the behavior. Raven
+owns lifetime semantics; the profile owns protocol selection and the runtime executes
+ordinary calls. No runtime implementation change or new metadata opcode is required.
+
+Async and iterator use remain diagnosed (RAVT006); terminal faults do not unwind.
+Outward/backward gotos clean up; jumps past a use initializer are rejected (RAVT007).
+Ordinary .NET goto restrictions are unchanged. Bare bootstrap interface implementation still
+hits the native adapter's pre-existing authored-interface requirement; source-built
+libraries should configure their actual protocol owner. This is a packaging/admission
+boundary, not a permanent language restriction. Disposal failure has no Result channel;
+Closable is not selected implicitly. Suspension and cancellation cleanup remain work.
+
+Validation: Raven's `ScopeExitCleanupTests` and existing default .NET resource tests,
+and `NeoClrMetadataProbe --scope-exit-cleanup-runtime` with this checkout's runtime.
+Six authored-protocol consumers (return, goto, loop exits, value block, None and error
+propagation) verify and return 42. The probe deliberately uses isolated authored
+protocol/carrier fixtures, not the bootstrap facade implementation path. Raven records
+runtime/core SHA-256 identities in `scope-exit-cleanup-validation.json`. The runtime
+checkout was `codex/native-system-bootstrap`, base `c23a2585`. No .NET Framework or
+NanoFramework execution is claimed, and this is development compiler support, not a
+published runtime release.
