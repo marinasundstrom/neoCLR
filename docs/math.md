@@ -7,6 +7,16 @@ Raven exposes `System.Math` as a namespace, supporting qualified calls and
 `import System.Math.*`. See the [System library authoring workflow](raven-system-library.md)
 for the CLI container contract, bootstrap representation and build instructions.
 
+## Native source development gate (2026-10-06)
+
+Unchanged Math sources now compile to a native library and a separate native consumer
+executes all 20 functions using the existing runtime services. This is development work
+beyond the published Preview 12 library selection. With the retained CLI primitive
+bootstrap, explicitly alias the native namespace (`alias NativeMath = System.Math`);
+`import System.Math.*` currently selects the bootstrap type. The gate uses
+`NativeMath.Sqrt(9.0)` and tests Result failures as well as floating results.
+[Reproduction and limitations](experiments/extended-cli-metadata/source-math-2026-10-06.md).
+
 ## Surface and behavior
 
 - Int32 Min and Max return an operand; Sign returns -1, 0 or 1 without subtracting

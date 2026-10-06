@@ -90,6 +90,14 @@ Run with `--case full-owned-handle --runtime target/release/neoclr` and the othe
 arguments. The checked-in POC seed source is used for this case; other cases retain the
 supplied `--seed`. Without `--runtime`, the existing default case selection is unchanged.
 
+## Math family follow-up
+
+The [native Math gate](source-math-2026-10-06.md) adds two internal adapters and executes
+all 20 unchanged Math functions from a separate native library. The owned-handle audit
+now has 180 inputs and 59 errors; missing RuntimeServices members drop from 45 to 30.
+These later counts supersede the pre-Math inventory above. Full System still rejects
+without output. The remaining service families retain priority.
+
 ## Priority order from this evidence
 
 1. **Complete the runtime-service declaration surface.** Group the 45 missing-member

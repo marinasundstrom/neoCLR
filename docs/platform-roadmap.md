@@ -20,6 +20,9 @@ order regressions pass and the full build reaches diagnostics instead of crashin
 The existing source RuntimeTypeHandle contract also works once explicitly selected in
 the audit. Next complete missing runtime-service inputs, reduce residual binding failures,
 and finish the ownership catalog before replacing the CLI primitive reference.
+The Math family now compiles and executes all 20 functions through a separate native
+consumer; its 15 missing services are resolved and full-source diagnostics drop to 59.
+[Gate and bootstrap import limitation](experiments/extended-cli-metadata/source-math-2026-10-06.md).
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

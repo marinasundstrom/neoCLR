@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Compile unchanged Math sources through native adapters for the existing 15 floating
+  services. An artifact-only consumer executes all 20 public functions, including
+  rounding and Result failures. Record the explicit namespace alias needed with the
+  retained bootstrap Math type; full-System diagnostics drop from 74 to 59.
+
 - Add a reproducible post-release System bootstrap inventory, distinguishing omitted
   build inputs from compiler failures. Existing Storage adapters and six omitted
   contract files compile. Isolate and fix Raven's PE-only metadata assumption for a
