@@ -1,0 +1,17 @@
+namespace System.Environment
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension EnvironmentRuntimeServices for RuntimeServices {
+    static func EnvironmentArguments() -> string[] {
+        return neoCLR.Runtime.EnvironmentArguments()
+    }
+
+    static func EnvironmentCurrentDirectory() -> System.Value {
+        return neoCLR.Runtime.EnvironmentCurrentDirectory()
+    }
+
+    static func EnvironmentVariable(name: string) -> System.Value {
+        return neoCLR.Runtime.EnvironmentVariable(name)
+    }
+}

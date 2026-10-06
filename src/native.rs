@@ -418,7 +418,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.SystemCultureName", []) => (Binding::SystemCultureName, Type::String),
         ("neoCLR.Runtime.EnvironmentArguments", []) => (
             Binding::EnvironmentArguments,
-            Type::Array(Box::new(Type::String)),
+            if function.returns == Type::ArrayRef(Box::new(Type::String)) {
+                function.returns.clone()
+            } else {
+                Type::Array(Box::new(Type::String))
+            },
         ),
         ("neoCLR.Runtime.EnvironmentCurrentDirectory", []) => {
             (Binding::EnvironmentCurrentDirectory, Type::Value)

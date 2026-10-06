@@ -31,6 +31,12 @@ full-System service/binding failures and completing ownership; context/field nul
 annotations remain a bounded follow-up rather than reopening this GC gate.
 [Annotation direction](design/callable-nullability.md).
 [GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+The Environment family now compiles and executes all three APIs through a native
+artifact-only consumer. Managed argument arrays preserve independent snapshots and obey
+allocation limits. The full-owned-handle inventory is now 48 diagnostics (184 inputs).
+Next address Console/native-width service ownership and remaining Calendar services;
+retain public overloads while closing their underlying contracts.
+[Environment gate](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

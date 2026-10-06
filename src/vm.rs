@@ -3981,6 +3981,27 @@ fn interpret_instructions_with_dispatch(
                                 options,
                             )?
                         };
+                        let value =
+                            if matches!(binding, crate::native::Binding::EnvironmentArguments)
+                                && matches!(callee.returns, Type::ArrayRef(_))
+                            {
+                                if options.arguments.len() > limits.array_elements {
+                                    return Err(Fault::new("array element limit exceeded"));
+                                }
+                                if heap.len() >= limits.heap_objects {
+                                    return Err(Fault::coded(
+                                        crate::FaultCode::HeapLimitExceeded,
+                                        "heap object limit exceeded",
+                                    ));
+                                }
+                                let index = heap.allocate(value)?;
+                                Value::ObjectReference(crate::value::ObjectReference {
+                                    reference: heap.address(index)?,
+                                    view: Some(callee.returns.clone()),
+                                })
+                            } else {
+                                value
+                            };
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)

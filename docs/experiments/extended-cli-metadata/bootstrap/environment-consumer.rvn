@@ -1,0 +1,47 @@
+import System.*
+import System.Result.*
+import System.Option.*
+alias HostEnvironment = System.Environment
+
+func Main() -> int {
+    let args = HostEnvironment.GetCommandLineArgs()
+    if args.Length != 3 { return 1 }
+    if args[1] != "first" { return 2 }
+    if args[2] != "räven" { return 3 }
+    args[1] = "changed"
+    let again = HostEnvironment.GetCommandLineArgs()
+    if again[1] != "first" { return 4 }
+    match HostEnvironment.GetCurrentDirectory() {
+        Ok(let path) => {
+            match HostEnvironment.GetEnvironmentVariable("NEOCLR_BOOTSTRAP_DIRECTORY") {
+                Ok(Some(let expected)) => {
+                    if path != expected { return 5 }
+                }
+                _ => { return 13 }
+            }
+        }
+        Error(_) => { return 6 }
+    }
+    match HostEnvironment.GetEnvironmentVariable("NEOCLR_BOOTSTRAP_PRESENT") {
+        Ok(Some(let value)) => {
+            if value != "räven" { return 7 }
+        }
+        _ => { return 8 }
+    }
+    match HostEnvironment.GetEnvironmentVariable("NEOCLR_BOOTSTRAP_EMPTY") {
+        Ok(Some(let value)) => {
+            if value != "" { return 9 }
+        }
+        _ => { return 10 }
+    }
+    match HostEnvironment.GetEnvironmentVariable("NEOCLR_BOOTSTRAP_ABSENT") {
+        Ok(None) => { }
+        _ => { return 11 }
+    }
+    match HostEnvironment.GetEnvironmentVariable("bad=name") {
+        Error(_) => { }
+        _ => { return 12 }
+    }
+    Console.WriteLine("Native source environment passed")
+    return 0
+}

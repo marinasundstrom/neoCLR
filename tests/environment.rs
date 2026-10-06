@@ -140,3 +140,54 @@ func Main() -> int {
         );
     }
 }
+
+#[test]
+fn managed_argument_snapshot_enforces_array_and_heap_limits() {
+    let source = r#".module System
+.function neoCLR.Runtime.EnvironmentArguments() -> arrayref<String>
+.methodimpl InternalCall
+.end
+.function Read() -> Int32
+call neoCLR.Runtime.EnvironmentArguments()
+ldlen
+conv.i4
+ret
+.end
+"#;
+    let module = neoclr::assemble(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let read = program
+        .resolve_function(&parse_function_ref("Read()").unwrap())
+        .unwrap();
+    let options = ExecutionOptions {
+        arguments: vec!["one".into(), "räven".into()],
+        ..Default::default()
+    };
+    assert_eq!(
+        read.invoke(vec![], options.clone()).unwrap().value,
+        Value::Int32(2)
+    );
+    let mut array_limit = options.clone();
+    array_limit.limits.array_elements = 1;
+    assert!(
+        read.invoke(vec![], array_limit)
+            .unwrap_err()
+            .message
+            .contains("array")
+    );
+    let mut heap_limit = options;
+    heap_limit.limits.heap_objects = 0;
+    assert!(
+        read.invoke(vec![], heap_limit)
+            .unwrap_err()
+            .message
+            .contains("heap")
+    );
+    for wrong in ["arrayref<Int32>", "String", "noresult"] {
+        assert!(
+            neoclr::assemble(&source.replace("-> arrayref<String>", &format!("-> {wrong}")))
+                .is_err()
+        );
+    }
+}

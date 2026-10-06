@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Compile unchanged Environment sources with three native adapters and execute an
+  artifact-only consumer covering argument snapshots, Unicode, cwd and variable states.
+  EnvironmentArguments now admits managed string-array results with array/heap limits;
+  the old internal transport remains compatible. Four runtime tests pass. Full-System
+  diagnostics drop from 51 to 48; Console/native-width and other bootstrap work remains.
+
 - Record Raven merge `7bfc6ad27` bringing synchronous use cleanup onto the continuing
   `codex/source-object-metadata-resolution` branch. The merged line passes 92 focused
   .NET checks and six native cleanup executions; native async cleanup stays deferred.

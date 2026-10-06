@@ -11206,3 +11206,14 @@ consumers pass. A shared nullable-generic storage correction is isolated (`7ac1f
 its owning portable layer is absent on main, so no main backport is claimed. A stale
 sealed-class expectation was corrected separately (`d1efc68f6`). Context/field metadata
 and full bootstrap remain open. See [design and gate](design/callable-nullability.md).
+
+
+**Managed array direction (2026-10-06):** During source Environment integration, the
+assistant found that the old runtime service returned a temporary value-array buffer
+where Raven emits a managed reference. The author clarified that managed arrays are the
+supported model and inline value arrays have no current story, apart from possible
+future interop. The assistant retains Array<T> backing and materializes fresh managed
+argument arrays at the native boundary; legacy transport compatibility is an internal
+detail, not a public feature direction. The Environment artifact-only consumer passes,
+including snapshot mutation, and four runtime boundary tests pass. Full-System compilation
+still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
