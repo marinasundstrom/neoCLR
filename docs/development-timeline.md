@@ -11195,3 +11195,14 @@ both source-root fixes. Only documentation conflicts needed resolution. Validati
 54 baseline checks, 92 post-merge checks, and six native consumers verifying and exiting
 42. The old clean checkout remains available; it is superseded for new work, not deleted.
 Native async cleanup and nullable metadata integration remain open.
+
+
+**Nullable API issue resolved (2026-10-06):** The author directed continued work until
+resolution. The assistant extended native callable declaration metadata and then Raven
+import/emission, preserving explicit nullable facts without new runtime null semantics.
+The original KeepAlive(null) fixture now compiles from emitted GC references alone and
+executes successfully. Array/generic symbol checks, 17 .NET checks and seven native
+consumers pass. A shared nullable-generic storage correction is isolated (`7ac1fec4a`);
+its owning portable layer is absent on main, so no main backport is claimed. A stale
+sealed-class expectation was corrected separately (`d1efc68f6`). Context/field metadata
+and full bootstrap remain open. See [design and gate](design/callable-nullability.md).

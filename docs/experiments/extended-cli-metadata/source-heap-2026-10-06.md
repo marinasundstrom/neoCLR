@@ -1,3 +1,8 @@
+> **Follow-up completed:** The nullable import blocker described below is now fixed.
+> Raven `d19c6e4a3` with neoCLR metadata `119d2daf` compiles and executes both consumers,
+> including KeepAlive(null). The earlier checkpoint is retained as historical evidence.
+> [Successful native-nullability gate](source-heap-nullable-2026-10-06.json).
+
 # Native source GC checkpoint — 2026-10-06
 
 **Partial gate:** the unchanged System.Runtime.GC source compiles with two internal
@@ -61,3 +66,18 @@ uses the pinned extracted Preview 12 compiler and a newly built debug runtime; a
 compiler test process was replacing the integration checkout's build outputs, so those
 mutable outputs were not reused. Published Preview 12 runtime artifacts are unchanged.
 The full-source audit was not rerun; no new total diagnostic count is claimed.
+
+
+## Nullable gate closure
+
+The current `verify_source_heap.py` requires both artifact-only consumers to compile,
+verify and execute with exact stdout `Native source heap passed` and exit 0. The earlier
+expected compiler rejection has become a success assertion; no fixture source was
+changed to hide the failure. The fixed compiler snapshot and explicit primitive core,
+Numbers, ownership manifest and retained runtime seed are hashed in the new evidence.
+
+C# native symbol checks validate parameter/results, nested array/generic positions and
+open/constructed generic method substitution. Nonnullable parameters still reject null.
+Seventeen focused .NET checks and all seven native consumer executions pass. General
+nullable context/field support and full-System bootstrap remain unfinished. Published
+Preview 12 is unchanged.

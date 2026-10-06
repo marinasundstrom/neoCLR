@@ -7524,8 +7524,9 @@ reject. `Introspection.MethodInfo.ReturnNullableAnnotation` and
 Absent metadata is not a non-null assertion.
 
 This is raw explicit annotation preservation, not a completed nullable type system.
-`NullableContextAttribute`, field/property annotations, signature-shape validation,
-Raven symbol reconstruction remain pending. Native writing preserves these facts in
+`NullableContextAttribute`, field/property annotations and general signature-shape
+validation remain pending. Raven's native adapter now reconstructs supported callable
+nullable reference, array and generic positions from the facade. Native writing preserves these facts in
 `origin.nullable_annotations`; native readers and the compatibility CLI projection
 retain both scalar and vector forms. Runtime metadata validation checks position,
 uniqueness and payload bounds without executing an attribute constructor. Loaded-assembly rewriting remains subject to the library's existing

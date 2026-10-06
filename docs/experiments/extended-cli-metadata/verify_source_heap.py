@@ -43,20 +43,20 @@ def main():
     run([runtime, 'verify', app] + dependencies)
     run([runtime, 'run', app, '--instructions', '100000000'] + dependencies,
         'Native source heap passed\n')
-    # Preserve the valid null-call case as an explicit known import failure. This
-    # must turn into a passing execution gate when nullable metadata is supported.
+    # Import the emitted nullable signature with library sources absent, then execute.
     nullable_sample = sample.with_name('heap-consumer.rvn')
     nullable_app = output / 'HeapNullableConsumer.dll'
-    run(common + ['--reference', heap, '-o', nullable_app, nullable_sample], expected_exit=1)
-    if 'RAV1503' not in commands[-1]['stderr'] or nullable_app.exists():
-        raise RuntimeError('Expected missing nullable-reference metadata to reject before publication')
-    inputs = [library, ownership, seed, core, compiler, runtime, Path(__file__), sample, nullable_sample, heap, app] + sources
+    run(common + ['--reference', heap, '-o', nullable_app, nullable_sample])
+    run([runtime, 'verify', nullable_app] + dependencies)
+    run([runtime, 'run', nullable_app, '--instructions', '100000000'] + dependencies,
+        'Native source heap passed\n')
+    inputs = [library, ownership, seed, core, compiler, runtime, Path(__file__), sample, nullable_sample, heap, app, nullable_app] + sources
     inputs += [compiler.parent / name for name in
                ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     revision = lambda path: subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=path, text=True).strip()
     evidence = dict(runtimeRevision=revision(ROOT), compilerRevision=args.compiler_revision or revision(compiler.parent),
                     instructionBudget=100000000, commands=commands,
-                    limitation="KeepAlive(null) rejects: native parameter nullability is not preserved",
+                    limitation="Explicit callable annotations only; nullable context and fields remain pending",
                     hashes={str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs})
     (output / 'validation.json').write_text(json.dumps(evidence, indent=2) + '\n')
     print(output / 'validation.json')

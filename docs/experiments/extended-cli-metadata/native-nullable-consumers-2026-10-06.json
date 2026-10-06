@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "runtimeSha256": "34F0D6AE1021C33CD7C42974AC080831E3667F108927D70B2057C98E87CC23F1",
+  "systemSha256": "2175D583A36E6DE17086D25ADC31376D9C3AEA4A0C287F81043D3649DFC5C1DC",
+  "coreSha256": "300EC80DEDFE40CA416FDEA2BF195D26E4BD628E8876C701628448AD35EDA7D4",
+  "results": [
+    {
+      "app": "NativeConsumer",
+      "dependency": "NativeSymbols",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "C3BD367B4CE3439226011E71CA5CDFACF913B9E1C4DC3F75B378067472DAB6DC",
+      "dependencySha256": "9F196EAF4B5A599DDE4FDD1160ACCA71AA8E07A79B7315A686798B7D86B9E438",
+      "additionalDependency": null,
+      "additionalDependencySha256": null
+    },
+    {
+      "app": "RavenNativeConsumer",
+      "dependency": "RavenNativeLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "A5190500CFCDCF3F1510BA100E2D7756C270593B6D55D3C767B9C7F94DB17854",
+      "dependencySha256": "0E5462977E017EFE37C553639C2390AB55EF11F9D609FDF867E5808E94B54112",
+      "additionalDependency": null,
+      "additionalDependencySha256": null
+    },
+    {
+      "app": "NativeTypeConsumer",
+      "dependency": "NativeTypeLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "69BDB812F20B65F64E8B4BE102C8A7D713B9FD4D478818BE6A6925D74FA48C1C",
+      "dependencySha256": "C3D8242278B3025ABC7EF5392A6CF6458B0DDCA72DA89A5704912EBB919DA88D",
+      "additionalDependency": null,
+      "additionalDependencySha256": null
+    },
+    {
+      "app": "NativeFieldConsumer",
+      "dependency": "NativeTypeLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "84F6BEBA22470B10B203BF79DE9E2F1B0AE3E0F28C7EBB3E49B8B48EC84086DE",
+      "dependencySha256": "C3D8242278B3025ABC7EF5392A6CF6458B0DDCA72DA89A5704912EBB919DA88D",
+      "additionalDependency": null,
+      "additionalDependencySha256": null
+    },
+    {
+      "app": "ExternalNativeConsumer",
+      "dependency": "NativeHolderLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "B88C568D51566044EE9F1DA53BBCAC2B9F0F8B01D564C7A86F971EDB7435E750",
+      "dependencySha256": "8E97CD832C4B1F0A19792C0DD9C67F16273998048082D40AFA63608052C4EDC9",
+      "additionalDependency": "NativePayloadLibrary",
+      "additionalDependencySha256": "E8A8652FEF9C80F0F0AB6D17018E8DB5F93FF254730BC090C598B049C1AA776E"
+    },
+    {
+      "app": "NativeInterfaceConsumer",
+      "dependency": "NativeInterfaceLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "BFD6311CCB38DBC8BA8E67955C6DEF17A5E49E91984AE911AD8C99FA7D92068F",
+      "dependencySha256": "D8F24F0CEFF8C7CAF9CA7C5E44EB33057F64A5AEBD3416937EB55AC00ACF703C",
+      "additionalDependency": "NativeInterfaceStorageLibrary",
+      "additionalDependencySha256": "38A8CA2004D517F4C56076DFE8A655366E9C6969A4D18FD803D795690B951E54"
+    },
+    {
+      "app": "NativeGenericConsumer",
+      "dependency": "NativeGenericLibrary",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": "=\u003E Int32(42)\n",
+      "appSha256": "3E574C4B86D5C3A499B759F447AA183B48A8CE0F771881744C3A456BE82FC6C0",
+      "dependencySha256": "F6C0D759B20214CA8B68B0127D91032C52A2676F7109DB25462353618CD3550E",
+      "additionalDependency": "NativeGenericBridge",
+      "additionalDependencySha256": "68210E3E77D13AB36014E2B796FAA144BD94E84C60B899ED732D0DCD2775B739"
+    }
+  ],
+  "scope": "native primitive/nominal signature import and explicit dependency execution; explicit CLI primitive core retained"
+}

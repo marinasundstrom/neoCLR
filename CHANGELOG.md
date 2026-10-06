@@ -18,7 +18,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   until its matching support exists; this first step did not fix native KeepAlive(null).
   Follow-up: native callable origins now preserve and validate the same explicit facts,
   including binary/introspection round trips and CLI projection. Older readers reject
-  annotated artifacts; matching development tools are required. Raven integration remains.
+  annotated artifacts; matching development tools are required. Raven `d19c6e4a3` now
+  preserves these facts through symbols and emission. Both artifact-only GC consumers
+  compile, verify and execute, including KeepAlive(null); 17 .NET checks and seven native
+  consumers pass. Nullable context/field support remains out of scope.
 
 - Document companion Raven synchronous `use` support through a shared disposal
   contract: reverse-order cleanup on block completion, return, propagation and loop

@@ -23,12 +23,14 @@ and finish the ownership catalog before replacing the CLI primitive reference.
 The Math family now compiles and executes all 20 functions through a separate native
 consumer; its 15 missing services are resolved and full-source diagnostics drop to 59.
 [Gate and bootstrap import limitation](experiments/extended-cli-metadata/source-math-2026-10-06.md).
-The next shared blocker is nullable-reference metadata: the new native GC retention
-consumer executes, but imported KeepAlive(object?) rejects null. Preserve annotations
-through definitions, encoding, introspection and Raven symbols before expanding more
-service facades. The first bounded slice now preserves explicit callable annotations in
-CLI and native metadata and introspection; Raven reconstruction remains pending.
-[Annotation direction](design/callable-nullability.md). [Partial GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
+Callable nullable metadata now survives native encoding, introspection and Raven import.
+The independently compiled GC null-call consumer executes, including KeepAlive(null),
+with unchanged runtime semantics. Reference/array/generic symbol controls, 17 focused
+.NET checks and seven existing native consumers pass. Continue reducing the remaining
+full-System service/binding failures and completing ownership; context/field nullable
+annotations remain a bounded follow-up rather than reopening this GC gate.
+[Annotation direction](design/callable-nullability.md).
+[GC gate](experiments/extended-cli-metadata/source-heap-2026-10-06.md).
 Full System still does not compile. [Frontier and evidence](experiments/extended-cli-metadata/native-bootstrap-frontier-2026-10-06.md).
 
 ## Native source release direction (2026-10-05)

@@ -83,3 +83,20 @@ C#-generated binary PE with array parameter/result annotations loads and passes 
 typed-stack verification. The tests also cover native round trips and malformed payloads.
 Raven emission/import and the GC null-call consumer are the next gate, not yet qualified
 by these metadata tests.
+
+
+## Raven integration completed for the GC gate (2026-10-06)
+
+Raven `d19c6e4a3` emits callable annotations from semantic symbols and independently
+reconstructs them from introspection. Physical call references erase annotation-only
+wrappers. Shared fix `7ac1fec4a` also preserves the original generic parameter storage
+for unconstrained T?; it is isolated because its portable signature layer is absent on
+Raven main. No importer definitions are reused by emission and no GC special case exists.
+
+The valid artifact-only KeepAlive(null) consumer now compiles and executes. Both GC
+consumers verify and print the expected line. C# symbol tests cover nullable reference,
+array element, generic argument, open/constructed method scope, and nonnullable rejection.
+All 17 focused .NET nullability checks and seven native consumer executions pass. The
+native sweep needed an independently committed test correction (`d1efc68f6`) to expect
+sealed-by-default ordinary classes. Nullable context, fields, nullable value storage and
+new runtime enforcement remain out of scope. See the updated GC evidence record.
