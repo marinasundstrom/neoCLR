@@ -409,7 +409,11 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         }
         ("neoCLR.Runtime.TimeZoneMapLocal", [Type::String, Type::Int64]) => (
             Binding::TimeZoneMapLocal,
-            Type::Array(Box::new(Type::Int64)),
+            if function.returns == Type::ArrayRef(Box::new(Type::Int64)) {
+                function.returns.clone()
+            } else {
+                Type::Array(Box::new(Type::Int64))
+            },
         ),
         ("neoCLR.Runtime.TimeZoneDatabaseVersion", []) => {
             (Binding::TimeZoneDatabaseVersion, Type::String)

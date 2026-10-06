@@ -10,6 +10,13 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-06)
 
+The calendar/time-zone group now compiles separately and its native consumer executes
+DST gaps/overlaps, offsets and optional local/zoned union conversions. Native constructor
+union import and managed mapping-array results close the exposed integration gaps.
+The latest full-System audit has **35 diagnostics across 186 inputs**, down from 48;
+Console/native-width service inputs and remaining binding failures are next.
+[Calendar evidence](experiments/extended-cli-metadata/source-calendar-2026-10-06.md).
+
 The author requested continuation toward full bootstrap after Preview 12. A fresh
 inventory confirms that Storage's existing adapters and six omitted contracts compile;
 release omission does not mean missing compiler support. The first full-source crash

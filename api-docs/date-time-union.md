@@ -1,4 +1,7 @@
-# DateTime union declaration
+# Optional DateTime union declaration
+
+Prefer the specific LocalDateTime or ZonedDateTime type. Use DateTime only when an
+API intentionally represents either a local or a zoned date and time.
 
 The pinned RavenDoc publisher renders the DateTime heading as `union struct DateTime`
 and generates constructor/extractor pages, but omits the parenthesized alternative

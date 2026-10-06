@@ -3762,6 +3762,7 @@ fn interpret_instructions_with_dispatch(
                                 | crate::native::Binding::ExecutingAssembly
                                 | crate::native::Binding::UnixTimeToLocal
                                 | crate::native::Binding::EnvironmentArguments
+                                | crate::native::Binding::TimeZoneMapLocal
                                 | crate::native::Binding::StringSnapshot
                         ) {
                             *arrays_used = true;
@@ -3981,27 +3982,34 @@ fn interpret_instructions_with_dispatch(
                                 options,
                             )?
                         };
-                        let value =
-                            if matches!(binding, crate::native::Binding::EnvironmentArguments)
-                                && matches!(callee.returns, Type::ArrayRef(_))
-                            {
-                                if options.arguments.len() > limits.array_elements {
-                                    return Err(Fault::new("array element limit exceeded"));
-                                }
-                                if heap.len() >= limits.heap_objects {
-                                    return Err(Fault::coded(
-                                        crate::FaultCode::HeapLimitExceeded,
-                                        "heap object limit exceeded",
-                                    ));
-                                }
-                                let index = heap.allocate(value)?;
-                                Value::ObjectReference(crate::value::ObjectReference {
-                                    reference: heap.address(index)?,
-                                    view: Some(callee.returns.clone()),
-                                })
-                            } else {
-                                value
+                        let value = if matches!(
+                            binding,
+                            crate::native::Binding::EnvironmentArguments
+                                | crate::native::Binding::TimeZoneMapLocal
+                        ) && matches!(callee.returns, Type::ArrayRef(_))
+                        {
+                            let Value::Array { elements, .. } = &value else {
+                                return Err(Fault::new(
+                                    "native array service returned a non-array value",
+                                ));
                             };
+                            if elements.len() > limits.array_elements {
+                                return Err(Fault::new("array element limit exceeded"));
+                            }
+                            if heap.len() >= limits.heap_objects {
+                                return Err(Fault::coded(
+                                    crate::FaultCode::HeapLimitExceeded,
+                                    "heap object limit exceeded",
+                                ));
+                            }
+                            let index = heap.allocate(value)?;
+                            Value::ObjectReference(crate::value::ObjectReference {
+                                reference: heap.address(index)?,
+                                view: Some(callee.returns.clone()),
+                            })
+                        } else {
+                            value
+                        };
                         let value = if matches!(
                             binding,
                             crate::native::Binding::Reflection(_)

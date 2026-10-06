@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Compile unchanged calendar/time-zone sources through five native service adapters.
+  A separately compiled consumer executes DST mappings, offsets, errors and optional
+  local/zoned union conversions with Raven befb8c1e1. TimeZoneMapLocal returns managed
+  Int64 arrays with allocation limits; legacy transport remains compatible. Full-System
+  diagnostics drop from 48 to 35. Prefer specific temporal types in feature/navigation
+  and API guidance; DateTime is an optional local-or-zoned contract, not the main model.
+
 - Compile unchanged Environment sources with three native adapters and execute an
   artifact-only consumer covering argument snapshots, Unicode, cwd and variable states.
   EnvironmentArguments now admits managed string-array results with array/heap limits;

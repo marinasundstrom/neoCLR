@@ -11217,3 +11217,13 @@ argument arrays at the native boundary; legacy transport compatibility is an int
 detail, not a public feature direction. The Environment artifact-only consumer passes,
 including snapshot mutation, and four runtime boundary tests pass. Full-System compilation
 still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/source-environment-2026-10-06.md).
+
+## 2026-10-06: Prefer specific temporal types
+
+- **Author:** Clarified that DateTime should not lead the documentation; it is an
+  option when representing either a local or a zoned date. “Specific date types are preferred”.
+- **Assistant:** Agreed and moved the optional union explanation below the primary
+  time-zone workflow, updating feature navigation and its manual API supplement.
+- **Implementation context:** The calendar bootstrap exposed constructor-union import
+  support as a compiler gap. Testing that representation does not change the public
+  recommendation to use specific temporal types.
