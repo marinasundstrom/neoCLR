@@ -207,6 +207,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             "neoCLR.Runtime.ReflectionPropertySet"
                 | "neoCLR.Runtime.GCCollect"
                 | "neoCLR.Runtime.GCKeepAlive"
+                | "neoCLR.Runtime.WriteLine"
         )
     {
         return Err(Fault::new(
@@ -1445,12 +1446,12 @@ mod reflection_signature_tests {
                 "ReflectionPropertyGet(RuntimeTypeHandle owner, Int32 token, System.Object receiver) -> noresult",
                 false,
             ),
-            ("WriteLine(String text) -> noresult", false),
+            ("WriteLine(String text) -> noresult", true),
             ("GCCollect() -> noresult", true),
             ("GCKeepAlive(System.Object value) -> noresult", true),
         ] {
             let result = crate::assemble(&format!(
-                ".module Test\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
+                ".module System\n.type class System.Object\n.end\n.function neoCLR.Runtime.{signature}\n.methodimpl InternalCall\n.end\n"
             ));
             assert_eq!(result.is_ok(), accepted, "{signature}: {result:?}");
         }

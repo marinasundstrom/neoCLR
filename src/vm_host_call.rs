@@ -145,11 +145,12 @@ impl HostCall {
                 value = Value::Erased(Box::new(Value::Int32(elements.len() as i32)));
             }
         }
-        frames
+        let caller = frames
             .last_mut()
-            .ok_or_else(|| Fault::new("missing host caller"))?
-            .stack
-            .push(value);
+            .ok_or_else(|| Fault::new("missing host caller"))?;
+        if !self.callee.no_result {
+            caller.stack.push(value);
+        }
         Ok(())
     }
 

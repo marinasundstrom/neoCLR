@@ -10,6 +10,14 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-06)
 
+Source Console now compiles and executes through native metadata with its own explicit
+bootstrap profile: no Console declaration in the primitive core or retained seed.
+UTF-8 input/output, EOF, overloads and non-owning wrappers pass an artifact-only consumer.
+The full-owned-handle binding audit is down to **14 diagnostics across 190 inputs**.
+Next address RuntimeFailure/NativeAllocation ownership, let-else termination and HTTP
+Task return binding. Full System still fails binding; its later encoding/linking gate
+has not been reached. [Console evidence](experiments/extended-cli-metadata/source-console-2026-10-06.md).
+
 The source native integer declarations now compile separately with explicit ownership,
 and an artifact-only consumer executes signed/unsigned CompareTo calls. The corresponding
 metadata categories, Raven mappings and runtime widening services are connected. The

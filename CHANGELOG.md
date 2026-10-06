@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Execute unchanged source-built Console from a separate native metadata consumer,
+  using an explicit primitive core and seed without competing Console declarations.
+  Preserve both legacy unit and source no-result WriteLine conventions; blocking host
+  call completion now respects the callee's result convention. Verify UTF-8 input/output,
+  EOF, numeric overloads, stderr and independent wrapper closure. Full-System binding
+  diagnostics drop from 30 to 14; this is not a complete System bootstrap.
+
 - Build unchanged IntPtr/UIntPtr sources with explicit native primitive ownership and
   execute their comparison methods from an artifact-only consumer. Add exact-signature
   signed/unsigned widening services without changing Raven cast rules. Raven a6ee91610

@@ -248,6 +248,12 @@ if (args.Length == 2 && args[0] == "--native-service-catalog")
     return;
 }
 
+if (args.Length == 2 && args[0] == "--reference-source-console-core")
+{
+    CoreDeclarations.Write(args[1], includeConsole: false, comparerStorage: true);
+    return;
+}
+
 if (args.Length == 2 && args[0] == "--reference-comparer-storage-core")
 {
     CoreDeclarations.Write(args[1], comparerStorage: true);

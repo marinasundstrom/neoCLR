@@ -6172,3 +6172,19 @@ runtime/core hashes and merge parents. The runtime was built from the GC-support
 on this line; no new runtime instructions or nullable native encoding are introduced.
 The authored-protocol ownership restriction remains; native async/iterator cleanup
 is still diagnosed and deferred. General .NET/main integration is a separate gate.
+
+
+### Source Console bootstrap (2026-10-06)
+
+The `--reference-source-console-core` probe profile retains comparer-storage primitive
+facts while omitting `System.Console`. The acceptance script removes the exact legacy
+Console type and WriteLine service from the retained seed, assigns Console to its native
+library, and compiles the consumer without library sources. It does not change default
+compiler precedence or add a CLI fallback. Raven a6ee91610 is unchanged.
+
+Source adapters declare WriteLine with CLI-style no-result execution; the legacy
+inhabited Void service remains supported in older seeds. Runtime blocking-call completion
+now observes the selected callee convention. Only the explicit source profile removes
+legacy declarations; mixing both owners is not supported. The primitive core remains a
+temporary binding input, while application and library references use native metadata.
+[Reproduction and executed coverage](experiments/extended-cli-metadata/source-console-2026-10-06.md).

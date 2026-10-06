@@ -4,6 +4,10 @@ Read a line, write text, or work with the standard streams. Recoverable input er
 
 **Preview 11.** Use matching references and runtime libraries. Console remains a static class in System.
 
+Development: the source-built Console now passes a separate native metadata consumer,
+including UTF-8 input/output and independent wrapper closure. Full System source
+bootstrap remains in progress; published toolchains retain their documented inputs.
+
 <a id="input"></a>
 
 ## Reading input with Result and Option
