@@ -1,0 +1,17 @@
+func Main() -> int {
+    let negative = NativeWidthInputs.Negative()
+    let maximum = NativeWidthInputs.Maximum()
+    if negative.CompareTo(default(nint)) != -1 {
+        return 1
+    }
+    if maximum.CompareTo(default(nuint)) != 1 {
+        return 2
+    }
+    if negative.CompareTo(negative) != 0 {
+        return 3
+    }
+    if default(nuint).CompareTo(maximum) != -1 {
+        return 4
+    }
+    return 42
+}

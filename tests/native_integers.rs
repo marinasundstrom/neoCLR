@@ -202,3 +202,59 @@ fn invalid_types_and_native_allocation_limits_fault() {
     }
     assert!(assemble(".module Test\n.function Unused() -> Void\nldc.i4 0\nconv.u\nptr.fromint Missing\npop\nldvoid\nret\n.end").is_err());
 }
+
+#[test]
+fn native_integer_widening_services_preserve_signed_and_unsigned_extremes() {
+    use neoclr::{ExecutionOptions, LoadedProgram, assembler::parse_function_ref};
+    let source = r#".module System
+.function neoCLR.Runtime.IntPtrToInt64(IntPtr) -> Int64
+.methodimpl InternalCall
+.end
+.function neoCLR.Runtime.UIntPtrToUInt64(UIntPtr) -> UInt64
+.methodimpl InternalCall
+.end
+.function Signed(IntPtr) -> Int64
+ldarg 0
+call neoCLR.Runtime.IntPtrToInt64(IntPtr)
+ret
+.end
+.function Unsigned(UIntPtr) -> UInt64
+ldarg 0
+call neoCLR.Runtime.UIntPtrToUInt64(UIntPtr)
+ret
+.end
+"#;
+    let module = assemble(source).unwrap();
+    let program = LoadedProgram::new(&module).unwrap();
+    program.verify().unwrap();
+    let signed = program
+        .resolve_function(&parse_function_ref("Signed(IntPtr)").unwrap())
+        .unwrap();
+    let unsigned = program
+        .resolve_function(&parse_function_ref("Unsigned(UIntPtr)").unwrap())
+        .unwrap();
+    for value in [isize::MIN, -1, 0, isize::MAX] {
+        assert_eq!(
+            signed
+                .invoke(vec![Value::IntPtr(value)], ExecutionOptions::default())
+                .unwrap()
+                .value,
+            Value::Int64(value as i64)
+        );
+    }
+    for value in [0, 1, usize::MAX] {
+        assert_eq!(
+            unsigned
+                .invoke(vec![Value::UIntPtr(value)], ExecutionOptions::default())
+                .unwrap()
+                .value,
+            Value::UInt64(value as u64)
+        );
+    }
+    for invalid in [
+        source.replace("IntPtrToInt64(IntPtr)", "IntPtrToInt64(UIntPtr)"),
+        source.replace("-> UInt64", "-> Int64"),
+    ] {
+        assert!(assemble(&invalid).is_err());
+    }
+}

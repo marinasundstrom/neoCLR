@@ -155,6 +155,7 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             crate::native::Binding::ParseInt32 => RuntimeService::ParseInt32,
             crate::native::Binding::ParseInt64 => RuntimeService::ParseInt64,
             crate::native::Binding::ParseNumber(_) => RuntimeService::ParseNumber,
+            crate::native::Binding::NativeIntegerTo64 => return Ok(vec![]),
             crate::native::Binding::Int32ToString => RuntimeService::FormatInt32,
             crate::native::Binding::IntegerToString | crate::native::Binding::StringCasing(_) => {
                 RuntimeService::StringOperations

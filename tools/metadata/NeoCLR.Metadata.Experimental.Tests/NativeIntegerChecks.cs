@@ -6,6 +6,21 @@ using AssemblyBuilder = NeoCLR.Metadata.Experimental.Model.AssemblyBuilder;
 
 internal static class NativeIntegerChecks
 {
+    internal static void WriteInputs(string corePath, string output)
+    {
+        var core = AssemblyDefinition.ReadAssembly(File.ReadAllBytes(corePath), false);
+        var graph = new AssemblyBuilder(new("NativeWidthInputs", new(1, 0, 0, 0)), core.Identity);
+        var owner = graph.AddType("", "NativeWidthInputs");
+        foreach (var (name, kind, opcode, value) in new[] {
+            ("Negative", PrimitiveType.IntPtr, OpCode.Conv_I, -42L),
+            ("Maximum", PrimitiveType.UIntPtr, OpCode.Conv_U, -1L) })
+        {
+            var method = owner.AddMethod(name, new(kind, []));
+            var il = method.GetILGenerator(); il.Emit(OpCode.Ldc_I8, value); il.Emit(opcode); il.Return();
+        }
+        File.WriteAllBytes(output, RuntimeAssemblyContainer.WriteLibraryBinary(graph));
+    }
+
     internal static void Run()
     {
         var graph = new AssemblyBuilder(new("NativeIntegers", new(1, 0, 0, 0)), new("System.Runtime", new(10, 0, 0, 0)));
@@ -63,6 +78,15 @@ internal static class NativeIntegerChecks
             try { invalid.Write(); throw new Exception("nonnumeric native conversion accepted"); }
             catch (InvalidDataException) { }
         }
+        var owners = new AssemblyBuilder(new("NativeIntegerOwners", new(1, 0, 0, 0)), graph.CoreLibrary);
+        foreach (var kind in new[] { PrimitiveType.IntPtr, PrimitiveType.UIntPtr })
+        {
+            var type = owners.AddValueType("System", kind.ToString());
+            type.SetNativePrimitive(kind);
+        }
+        var owned = AssemblyDefinition.ReadNativeAssembly(RuntimeAssemblyContainer.WriteBinary(owners));
+        if (!owned.MainModule.Types.Select(t => t.NativePrimitive).SequenceEqual(new PrimitiveType?[] { PrimitiveType.IntPtr, PrimitiveType.UIntPtr }))
+            throw new Exception("native integer ownership lost");
         if (Environment.GetEnvironmentVariable("NEOCLR_NATIVE_INTEGER_ARTIFACT") is { } path) File.WriteAllBytes(path, native);
     }
 }

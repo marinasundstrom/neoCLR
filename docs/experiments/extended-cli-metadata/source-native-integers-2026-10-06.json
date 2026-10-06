@@ -1,0 +1,137 @@
+{
+  "runtimeRevision": "051aa759560b10bdca7a7cd104fb19373e6b235c",
+  "compilerRevision": "befb8c1e1+native-widths",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "run",
+        "--project",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests",
+        "--no-build",
+        "--",
+        "--native-integer-inputs",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "/private/tmp/source-width1006-recorded/NativeWidthInputs.dll"
+      ],
+      "cwd": "/private/tmp/source-width1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/width-final-compiler1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-width1006-recorded/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-width1006-recorded/NativeIntegers.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/IntPtr.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/UIntPtr.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeIntegerCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeIntegerServices.rvn"
+      ],
+      "cwd": "/private/tmp/source-width1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/width-final-compiler1006/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/preview12-bootstrap/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-width1006-recorded/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-width1006-recorded/NativeIntegers.dll",
+        "--reference",
+        "/private/tmp/source-width1006-recorded/NativeWidthInputs.dll",
+        "-o",
+        "/private/tmp/source-width1006-recorded/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-integers-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-width1006-recorded",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-width1006-recorded/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-width1006-recorded/NativeIntegers.dll",
+        "--module",
+        "/private/tmp/source-width1006-recorded/NativeWidthInputs.dll"
+      ],
+      "cwd": "/private/tmp/source-width1006-recorded",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (1463 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-width1006-recorded/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-width1006-recorded/NativeIntegers.dll",
+        "--module",
+        "/private/tmp/source-width1006-recorded/NativeWidthInputs.dll"
+      ],
+      "cwd": "/private/tmp/source-width1006-recorded",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "hashes": {
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/source-width1006-recorded/ownership.json": "cecb02b9a7b47f461dedaac4e9b60e17154af0bb483bf1e1efff49964689c6f3",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/preview12-bootstrap/Core.dll": "64aae0e5ef83fe113a38d21c74cabe1bfabbd9de3526d941ea2236b630686bbc",
+    "/private/tmp/width-final-compiler1006/rvnc.dll": "b718bed76cf31d5ef6a70829d87c490f1f61b586c52143c16c31521549b8c6dc",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "7e62531310a1461497d369f3cce7b16de2fa79f5401ce627d648e644d7ff1afe",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_native_integers.py": "77e64350b0b9740cb0f01d0199a86252607425f4dba09b1000f5604a051ebe52",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/native-integers-consumer.rvn": "485a0375fd8bae85213a3b8afede19c443504615cf598cadebbfaa7a7ff03a38",
+    "/private/tmp/source-width1006-recorded/NativeIntegers.dll": "0d89265acac831d3ec4dc4f3cb3df079223d442cdd2fe60a94653923c5cd8ce8",
+    "/private/tmp/source-width1006-recorded/NativeWidthInputs.dll": "b7a792a97d637b03b6982090cb4495658870fab24b42a7e2d2650a28bf62bf42",
+    "/private/tmp/source-width1006-recorded/Consumer.dll": "0a67395d165b1f350385ced6a49f5795226b0c477ed28f1e1d25873f726a4286",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/IntPtr.rvn": "d9d4b9edfc3c6b1e412d8f511189560ce3413f002ea02e60fcfd918d4d181cad",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/UIntPtr.rvn": "acaacf21fe23322691b0a95ea71e8821b22963b6813c9e29e9daa56b42a89bc5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeIntegerCalls.rvn": "68560aecf42aa21db499419e8005f52394ba958e797f954da60b4191695b9a7e",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeNativeIntegerServices.rvn": "680de57a5ddacbb4f0d01e36565df762a71cd420994d572ec11351a3ff91ac16",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tools/metadata/NeoCLR.Metadata.Experimental.Tests/NativeIntegerChecks.cs": "cfcc95ff2a2b183f2dd242c48e722df1ad5b59e6b6446f4141c37914d5d92cde",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/native.rs": "db8024faa33f4f2a2c472bf937ce4680d25cd4ec9e22b9a80aec33eec4bee3e0",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/services.rs": "2c01dec955ee03d949739b3a1c8bf7a9a3ccd7810249abbbecc6c141024f9384",
+    "/private/tmp/width-final-compiler1006/Raven.CodeAnalysis.dll": "6e62d20addb52e623c0524dbbd844b8e7e92c6602977d95953d00953d37f06a1",
+    "/private/tmp/width-final-compiler1006/Raven.CodeAnalysis.NeoClr.dll": "a82630782966bfc8d1c679ee1523d11352cd685c6ece061fa1148b7dad47376c",
+    "/private/tmp/width-final-compiler1006/NeoCLR.Metadata.Experimental.dll": "d61344f4d9a1364dddb4415af48a6ecbf675301d1595ca0c06d83896340de2d5"
+  }
+}

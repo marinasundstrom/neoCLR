@@ -7553,9 +7553,10 @@ signatures or new inline-array representations.
 `method.GetILGenerator().Emit(OpCode.Conv_I)` and `Emit(OpCode.Conv_U)` emit `conv.i`
 and `conv.u`. Existing numeric conversions accept native-width integer inputs.
 The writer rejects nonnumeric operands before publishing bytes. Target width is
-chosen by the executing runtime; no fixed 64-bit signature is substituted. This slice
-does not add unchecked pointer access, native integer arithmetic validation, or source
-IntPtr/UIntPtr ownership via SetNativePrimitive. Those remain explicit follow-ups.
+chosen by the executing runtime; no fixed 64-bit signature is substituted. This support does not add unchecked pointer access or native integer arithmetic
+validation. The source-provider follow-up also admits SetNativePrimitive(IntPtr/UIntPtr)
+for their exact canonical System value declarations, with the same no-record-storage
+validation as other primitive providers.
 
 ```csharp
 var identity = owner.AddMethod("Identity", new(PrimitiveType.IntPtr, [PrimitiveType.IntPtr]));

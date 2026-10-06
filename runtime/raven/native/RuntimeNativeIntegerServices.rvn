@@ -1,0 +1,13 @@
+namespace System
+
+import System.Runtime.CompilerServices.RuntimeServices
+
+internal extension NativeIntegerRuntimeServices for RuntimeServices {
+    static func IntPtrToInt64(value: nint) -> long {
+        return neoCLR.Runtime.IntPtrToInt64(value)
+    }
+
+    static func UIntPtrToUInt64(value: nuint) -> ulong {
+        return neoCLR.Runtime.UIntPtrToUInt64(value)
+    }
+}

@@ -65,6 +65,7 @@ pub(crate) enum Binding {
     StringCasing(bool),
     Int32ToString,
     IntegerToString,
+    NativeIntegerTo64,
     WriteLine,
     Fault,
     CharCategory,
@@ -488,6 +489,12 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
             Type::Value,
         ),
         ("neoCLR.Runtime.ParseInt32", [Type::String]) => (Binding::ParseInt32, Type::Value),
+        ("neoCLR.Runtime.IntPtrToInt64", [Type::IntPtr]) => {
+            (Binding::NativeIntegerTo64, Type::Int64)
+        }
+        ("neoCLR.Runtime.UIntPtrToUInt64", [Type::UIntPtr]) => {
+            (Binding::NativeIntegerTo64, Type::UInt64)
+        }
         ("neoCLR.Runtime.Int32ToString", [Type::Int32]) => (Binding::Int32ToString, Type::String),
         ("neoCLR.Runtime.Int64ToString", [Type::Int64])
         | ("neoCLR.Runtime.UInt64ToString", [Type::UInt64]) => {
@@ -1158,6 +1165,10 @@ impl Binding {
             (Self::StringCasing(uppercase), [Value::String(text)]) => Ok(Value::String(
                 crate::string_casing::convert(text, *uppercase).into(),
             )),
+            (Self::NativeIntegerTo64, [Value::IntPtr(number)]) => Ok(Value::Int64(*number as i64)),
+            (Self::NativeIntegerTo64, [Value::UIntPtr(number)]) => {
+                Ok(Value::UInt64(*number as u64))
+            }
             (Self::Int32ToString, [Value::Int32(number)]) => {
                 Ok(Value::String(number.to_string().into()))
             }

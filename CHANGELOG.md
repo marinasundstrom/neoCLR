@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Build unchanged IntPtr/UIntPtr sources with explicit native primitive ownership and
+  execute their comparison methods from an artifact-only consumer. Add exact-signature
+  signed/unsigned widening services without changing Raven cast rules. Raven a6ee91610
+  connects import/emission; its general default-receiver correction is isolated in
+  24c2c4d40. Nine runtime, 161 metadata and eight focused .NET/portable tests pass.
+  Full-System diagnostics drop from 35 to 30; Console service integration remains open.
+
 - Add host metadata IntPtr/UIntPtr signature categories and ILGenerator Conv_I/Conv_U
   using standard CLI encodings and existing native runtime types. Method/field/property
   readers and introspection retain them. All 161 C# groups pass; the generated native
