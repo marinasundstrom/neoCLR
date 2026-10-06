@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-06
 
+- Record Raven merge `7bfc6ad27` bringing synchronous use cleanup onto the continuing
+  `codex/source-object-metadata-resolution` branch. The merged line passes 92 focused
+  .NET checks and six native cleanup executions; native async cleanup stays deferred.
+
 - Preserve explicit callable nullable annotations in the host metadata definitions,
   builders, CLI writer/reader and introspection facade. C# tests check .NET interpretation,
   execution identity and malformed payloads. Native encoding rejects these annotations

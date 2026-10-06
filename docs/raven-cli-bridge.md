@@ -6153,3 +6153,22 @@ runtime/core SHA-256 identities in `scope-exit-cleanup-validation.json`. The run
 checkout was `codex/native-system-bootstrap`, base `c23a2585`. No .NET Framework or
 NanoFramework execution is claimed, and this is development compiler support, not a
 published runtime release.
+
+
+### Continuing Raven integration branch (2026-10-06)
+
+At the author's direction, Raven now continues on
+`codex/source-object-metadata-resolution`. Merge `7bfc6ad27` includes
+`codex/metadata-consumer` cleanup commit `13b52ca56` and preserves the source-owned
+Object fixes. The old branch is superseded for new work; its clean checkout is retained.
+The runtime stays on `codex/native-system-bootstrap`.
+
+Post-merge evidence: 92 focused .NET checks pass, including source-root, disposal and
+default async lifetime controls. Six native consumers verify and execute with exit 42:
+return, goto, loop exits, value block, None propagation and error propagation. This
+updates the earlier five-consumer record above with the final goto case. Raven's
+`tools/NeoClrMetadataProbe/scope-exit-cleanup-integration-validation.json` records the
+runtime/core hashes and merge parents. The runtime was built from the GC-support code
+on this line; no new runtime instructions or nullable native encoding are introduced.
+The authored-protocol ownership restriction remains; native async/iterator cleanup
+is still diagnosed and deferred. General .NET/main integration is a separate gate.

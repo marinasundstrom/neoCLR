@@ -11185,3 +11185,13 @@ semantics. On continuation, the first slice implements explicit callable annotat
 the host metadata API and CLI PE path, with .NET interpretation and execution tests.
 Native transport and Raven reconstruction remain open; KeepAlive(null) is not fixed by
 this first slice. See [scope, alternatives and next gate](design/callable-nullability.md).
+
+
+**Raven branch consolidation (2026-10-06):** The author requested inclusion of the
+latest `codex/metadata-consumer` work to enable synchronous use cleanup, suggested
+retiring that branch, and explicitly selected `codex/source-object-metadata-resolution`
+for future work. The assistant merged the cleanup commit there as `7bfc6ad27`, retaining
+both source-root fixes. Only documentation conflicts needed resolution. Validation:
+54 baseline checks, 92 post-merge checks, and six native consumers verifying and exiting
+42. The old clean checkout remains available; it is superseded for new work, not deleted.
+Native async cleanup and nullable metadata integration remain open.
