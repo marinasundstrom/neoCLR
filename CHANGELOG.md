@@ -6,6 +6,14 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ## Unreleased
 
+### 2026-10-07
+
+- Select source/native System.Fail ownership through Raven's explicit failure contract.
+  Local and separately imported let-else calls now compile and execute on both present
+  and absent paths; wrong owners reject without publishing an assembly. The full-System
+  audit drops from 12 to four binding errors, all NativeAllocation. No runtime or
+  metadata format change; complete System emission has not yet been reached.
+
 ### 2026-10-06
 
 - Compile unchanged System.Fail with a native RuntimeFailure adapter and execute it

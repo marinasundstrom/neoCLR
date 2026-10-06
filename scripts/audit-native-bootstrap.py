@@ -69,6 +69,7 @@ def main():
         seed = args.seed.resolve()
         if name == 'full-owned-handle':
             library = manifest['libraries'][0]
+            manifest['failure'] = dict(assemblyName=library['assemblyName'], namespaceName='System', functionName='Fail')
             library['types'] = sorted(set(library['types']) | {'System.RuntimeTypeHandle'})
             manifest['nativePrimitives']['System.RuntimeTypeHandle'] = library['assemblyName']
             # Reuse the already implemented source-handle ownership contract. The

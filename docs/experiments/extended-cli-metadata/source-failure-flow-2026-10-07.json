@@ -1,0 +1,309 @@
+{
+  "runtimeRevision": "b933c32b0d7e06f42c00051a7300fefcdb83831b",
+  "compilerRevision": "9b73a7333+failure-contract",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll",
+        "--reference-source-failure-core",
+        "/private/tmp/source-failure-flow1007-final/Core.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--library",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Functions.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailure.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/Consumer.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "warning RAV0162: Unreachable code\n"
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-failure-flow1007-final/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD: typed-stack/control-flow verification passed (1458 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-failure-flow1007-final/Consumer.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: source failure [code=UserFault] at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465:1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465(String) owner=Named(\"NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265\") [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:2] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD.F_4D61696E() [NeoMetadata_54186E4C105BB824C561118FE16C23F42866854437F1FF444F19661C877C90FD#1.0.0.0:0] IL instruction 1\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/Flow.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-flow-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-failure-flow1007-final/Flow.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_4D686C47D973A69B118D4B646FA4391CBC966FD7166708D25C13C500EFB07F6F: typed-stack/control-flow verification passed (1458 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-failure-flow1007-final/Flow.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/source-flow/Failure.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Functions.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailure.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-flow-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-failure-flow1007-final/source-flow/Failure.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46: typed-stack/control-flow verification passed (1458 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-failure-flow1007-final/source-flow/Failure.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 42,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/ownership.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/Absent.dll",
+        "/private/tmp/source-failure-flow1007-final/absent.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-failure-flow1007-final/Absent.dll",
+        "--system",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--module",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--module",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "Fault: missing value [code=UserFault] at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465:1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265.M_5465726D696E617465(String) owner=Named(\"NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.T_53797374656D2E52756E74696D652E436F6D70696C65725365727669636573_52756E74696D654661696C757265\") [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:2] IL instruction 1\n  at NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46.F_3C4E656F46756E6374696F6E3E3533373937333734363536445F3436363136393643(String) [NeoMetadata_416490E644DDC9A9BB044D9AA6329FEA71AB5847F69113ECF44FDA0F63033B46#1.0.0.0:0] IL instruction 1\n  at NeoMetadata_A251E09D9744386F92253C6608958F9EFED26ABDC14452E6981EA441C3B4CC66.F_4D61696E() [NeoMetadata_A251E09D9744386F92253C6608958F9EFED26ABDC14452E6981EA441C3B4CC66#1.0.0.0:0] IL instruction 14\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/failure-contract-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/source-failure-flow1007-final/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/preview12-bootstrap/System.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/source-failure-flow1007-final/wrong-owner.json",
+        "--reference",
+        "/private/tmp/native-poc-libraries1005/Numbers.dll",
+        "--reference",
+        "/private/tmp/source-failure-flow1007-final/Failure.dll",
+        "-o",
+        "/private/tmp/source-failure-flow1007-final/Rejected.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-consumer.rvn"
+      ],
+      "cwd": "/private/tmp/source-failure-flow1007-final",
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "error RAVT003: Target core configuration cannot be used: the failure contract requires one public namespace function with the configured owner and string-to-unit signature.\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/src/System/Functions.rvn": "fe9a0920f8d2108025f69871a904e212b42cec709fe29053001a628ed55d620d",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailure.rvn": "f37e08a8d4be0b74bde89bfacde5fcf080e98cac5cdbfab2106584338eff24f5",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/RuntimeFailureCalls.rvn": "bc1adc397bc118a45a1c4edc78f91b12e3dc06496b2cfea4be91f55da379759a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_failure.py": "bed21d2b88a5dbbbf4e982b86bba8099da28b667ee4b182e3b57ba1660c7e1ee",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-consumer.rvn": "482b87247adeff2ba9bb3367c7b49140919624d57365bdba87cf0241f48cfa9a",
+    "/private/tmp/native-poc-libraries1005/Numbers.dll": "3b41a75d3e16ac1f0750e22eb1f3ff7297691e9de8d5e6a47815596031afc1dd",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/runtime/raven/native/poc-ownership.json": "911b34ac5e995a9688626365fd2c15e95a043de3a0b579c7f8c61ac970241d3a",
+    "/private/tmp/source-failure-flow1007-final/ownership.json": "1ee10c3c26c985b331ee5ddcc0c4dd6d5253b05a9ab1dcfe34f3099677b3d92e",
+    "/private/tmp/source-failure-flow1007-final/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/private/tmp/preview12-bootstrap/System.neox": "2175d583a36e6de17086d25adc31376d9c3aea4a0c287f81043d3649dfc5c1dc",
+    "/private/tmp/source-failure-flow1007-final/Failure.dll": "51c39c21de84e8b515ffc488279ffcca89562e381592a81b43e168e7f2e231fb",
+    "/private/tmp/source-failure-flow1007-final/Consumer.dll": "a86437cc75aec179bf00656b081fcfc2faf25b3065aa6f245bf053f28d9c23ae",
+    "/private/tmp/failure-contract-compiler1007/rvnc.dll": "961d58919e5ae17946206c5bc03a87b13fe861b0e8c19b7931a5dcd32b216a0a",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/bin/Debug/net11.0/Probe.dll": "bc67f1182cba38216274d155981469568573b499d9271d4501938e2d616c98d1",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "8b17193473094c71b97c282b7009ad57d52d00403dae3539e8cab577c415ec31",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/bootstrap/failure-flow-consumer.rvn": "4faf35f62bf51485a6f9e9ace4c133823fe3bfb1be848e8b80c17da0587540f8",
+    "/private/tmp/source-failure-flow1007-final/Flow.dll": "b139f9d2fa1028e7c971fa1c46e4c71fedb8a4df3031d102dedd582b06dc9976",
+    "/private/tmp/source-failure-flow1007-final/source-flow/Failure.dll": "03461abd2529cb92970b771cb578976c808ac892cafd1c5aa6e75c8d14ab84e5",
+    "/private/tmp/source-failure-flow1007-final/absent.rvn": "22a3959c06ff43c8533e58c2eb50765ecdf1315f65a9cd08c9a2144951343b20",
+    "/private/tmp/source-failure-flow1007-final/Absent.dll": "47d14b019bfd8bd5fdae9dd2fc9a500a2c14d65994a920b24e4247470bf7bd99",
+    "/private/tmp/source-failure-flow1007-final/wrong-owner.json": "024f963d08a7b38c85883c62a126c0cf9e77d48fb3bfebcd3b3af1e59806a011",
+    "/private/tmp/failure-contract-compiler1007/Raven.CodeAnalysis.dll": "ce5d8e4757082337710b907b62e92d8793ad8007514f5d27bb05c72515778ee9",
+    "/private/tmp/failure-contract-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "c0c9212185897c38401ef010e7fff228b934f4b19aa03aed77549e6a156832b7",
+    "/private/tmp/failure-contract-compiler1007/NeoCLR.Metadata.Experimental.dll": "22a65fba99f1664151ed5cf8acc3d5624d2d2bd5426355ce417e2dd46159d46f",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/src/native.rs": "eee1afaf5fa01af4e476b8b146ff76c9b48e37e177e1295bf8c9d7e62c792785",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/tests/fault_codes.rs": "75fb0119b049241338b5b1fe32c05f3e6518dab765489841433478d26d59a5a4",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/CoreDeclarations.cs": "ff5f7bf550325d68294f93dd5036f050113ea96d668ec22ce847b46607909a03",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/Program.cs": "c4963733ac18e842a9a5428769ee6ccae2fb0d007e014b27fa4246d475485081"
+  }
+}

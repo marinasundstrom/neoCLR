@@ -6203,3 +6203,23 @@ Raven a6ee91610 remains unchanged: the native runtime path works, but its legacy
 terminal-flow test still excludes source/native Fail ownership. Replacing that check
 with an explicit target contract is the next compiler slice, not a new language rule.
 [Commands, hashes and scope](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
+
+### Native terminal-flow ownership (2026-10-07)
+
+The optional bootstrap `failure` object selects `{ "assemblyName": "Failure",
+"namespaceName": "System", "functionName": "Fail" }`. Use the source System library's
+actual assembly name in a full bootstrap (the audit uses Numbers). The catalog must
+contain that owner. Raven validates one public static non-generic namespace function
+with a by-value string parameter and unit/void result. This is a runtime behavior
+assertion supplied by the host, not a name-based inference. Invalid selection fails
+before output publication.
+
+Source/native symbols provide this fact to existing binding and lowering. Local and
+imported let-else both compile; a Some path returns 42 and a None path produces UserFault.
+The existing CLI bootstrap remains available, but no native consumer falls back to it.
+Raven's ordinary .NET path is unchanged. No new metadata encoding is needed for this
+bounded contract. [Evidence and remaining work](experiments/extended-cli-metadata/source-failure-flow-2026-10-07.md).
+
+The matching compiler contract is Raven `296ca0f36`; 18 focused compiler tests and the
+source/imported executable gate pass. The runtime remains `b933c32b`.

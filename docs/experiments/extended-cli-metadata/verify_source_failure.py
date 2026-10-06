@@ -24,6 +24,7 @@ def main():
     manifest['libraries'].append(dict(assemblyName='Failure',
         sources=[str(path.relative_to(ROOT)) for path in sources],
         types=['System.Runtime.CompilerServices.RuntimeFailure']))
+    manifest['failure'] = dict(assemblyName='Failure', namespaceName='System', functionName='Fail')
     selected = output / 'ownership.json'
     selected.write_text(json.dumps(manifest, indent=2) + '\n')
     core, failure, consumer = [output / name for name in ('Core.dll', 'Failure.dll', 'Consumer.dll')]
@@ -50,8 +51,40 @@ def main():
     result = run([runtime, 'run', consumer] + dependencies, expected_exit=1)
     if result.stdout or not result.stderr.startswith('Fault: source failure [code=UserFault]'):
         raise RuntimeError('Expected the source Fail diagnostic and no consumer output')
+    flow_sample = Path(__file__).resolve().parent / 'bootstrap/failure-flow-consumer.rvn'
+    flow_app = output / 'Flow.dll'
+    run(common + ['--reference', failure, '-o', flow_app, flow_sample])
+    run([runtime, 'verify', flow_app] + dependencies)
+    flow = run([runtime, 'run', flow_app] + dependencies, expected_exit=42)
+    if flow.stdout or flow.stderr:
+        raise RuntimeError('Successful let-else must produce no output')
+    source_directory = output / 'source-flow'
+    source_directory.mkdir()
+    source_app = source_directory / 'Failure.dll'
+    run(common + ['-o', source_app] + sources + [flow_sample])
+    source_dependencies = ['--system', seed, '--module', library]
+    run([runtime, 'verify', source_app] + source_dependencies)
+    source_flow = run([runtime, 'run', source_app] + source_dependencies, expected_exit=42)
+    if source_flow.stdout or source_flow.stderr:
+        raise RuntimeError('Source-owner let-else must produce no output')
+    absent_sample = output / 'absent.rvn'
+    absent_sample.write_text(flow_sample.read_text().replace('Some(42)', 'None()'))
+    absent_app = output / 'Absent.dll'
+    run(common + ['--reference', failure, '-o', absent_app, absent_sample])
+    absent = run([runtime, 'run', absent_app] + dependencies, expected_exit=1)
+    if absent.stdout or not absent.stderr.startswith('Fault: missing value [code=UserFault]'):
+        raise RuntimeError('Absent let-else must execute the terminal function')
+    wrong_manifest = json.loads(selected.read_text())
+    wrong_manifest['failure']['assemblyName'] = 'Numbers'
+    wrong = output / 'wrong-owner.json'
+    wrong.write_text(json.dumps(wrong_manifest, indent=2) + '\n')
+    wrong_common = [wrong if part == selected else part for part in common]
+    rejected = output / 'Rejected.dll'
+    invalid = run(wrong_common + ['--reference', failure, '-o', rejected, sample], expected_exit=1)
+    if rejected.exists() or 'failure contract' not in invalid.stderr:
+        raise RuntimeError('Wrong terminal owner must reject before publication')
     inputs = sources + [Path(__file__), sample, library, ownership, selected, core, seed,
-                        failure, consumer, compiler, probe, runtime]
+                        failure, consumer, compiler, probe, runtime, flow_sample, flow_app, source_app, absent_sample, absent_app, wrong]
     inputs += [compiler.parent / name for name in
                ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
     inputs += [ROOT / path for path in ('src/native.rs', 'tests/fault_codes.rs',

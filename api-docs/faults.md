@@ -127,3 +127,10 @@ metadata, temporary input Strings or total process memory. Setting the entry quo
 to zero prevents all insertions. Limits are terminal runtime budgets, not recoverable
 Storage errors or guest-selected Fault codes. Hosts constructing Limits exhaustively
 must supply the two new fields; using `..Limits::default()` picks up the defaults.
+
+
+Development update (2026-10-07): the source-owned terminal-flow limitation described
+above is resolved with Raven's explicit RuntimeFailureContract. The selected native
+owner now works in let-else, including separate compilation. Ordinary .NET methods
+remain unchanged; missing or incompatible owners reject before output. This changes
+compiler configuration, not the public Fail signature or runtime fault behavior.

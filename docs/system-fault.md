@@ -120,3 +120,10 @@ empty stdout and the supplied fault message. Raven still recognizes terminal flo
 for the legacy core declaration: source/imported native Fail in let-else needs the next
 compiler contract slice. The runtime guarantee already holds, but do not treat that as
 proof of source-library flow analysis. [Evidence](experiments/extended-cli-metadata/source-failure-2026-10-06.md).
+
+
+Development update (2026-10-07): the source-owned terminal-flow limitation described
+above is resolved with Raven's explicit RuntimeFailureContract. The selected native
+owner now works in let-else, including separate compilation. Ordinary .NET methods
+remain unchanged; missing or incompatible owners reject before output. This changes
+compiler configuration, not the public Fail signature or runtime fault behavior.

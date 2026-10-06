@@ -1,0 +1,10 @@
+import System.*
+import System.Option.*
+
+func Main() -> int {
+    let candidate: Option<int> = Some(42)
+    let Some(value) = candidate else {
+        System.Fail("missing value")
+    }
+    return value
+}

@@ -8,7 +8,17 @@ now follows the sample-driven POC priority below.
 Working samples, including Tasks and `await` through the native compiler path, are
 also required; runtime suspension and green threads are explicitly deferred.
 
-## Source-built System bootstrap frontier (2026-10-06)
+## Source-built System bootstrap frontier (2026-10-07)
+
+Explicit source/native terminal-function ownership now clears the six let-else and two
+HTTP Task return errors. The audit has **four binding errors across 192 inputs**, all
+NativeAllocation imports/member uses. Local and separately compiled Fail control-flow
+consumers execute both branches correctly; invalid owners publish no output. Next resolve
+NativeAllocation at its owning native instruction/service layer, then re-run the full
+compile to expose any encoding/linking frontier. Full System still emits no assembly.
+[Terminal-flow evidence](experiments/extended-cli-metadata/source-failure-flow-2026-10-07.md).
+
+### Earlier frontier — 2026-10-06
 
 The source System.Fail helper now compiles and its native consumer reports the expected
 UserFault without returning. Full-owned-handle binding is down to **12 diagnostics across
