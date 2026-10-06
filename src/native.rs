@@ -66,6 +66,9 @@ pub(crate) enum Binding {
     Int32ToString,
     IntegerToString,
     NativeIntegerTo64,
+    NativeAllocate,
+    NativeFree,
+    NativeMultiplyChecked,
     WriteLine,
     Fault,
     CharCategory,
@@ -209,6 +212,7 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
                 | "neoCLR.Runtime.GCKeepAlive"
                 | "neoCLR.Runtime.WriteLine"
                 | "neoCLR.Runtime.Fail"
+                | "neoCLR.Runtime.NativeFree"
         )
     {
         return Err(Fault::new(
@@ -501,6 +505,17 @@ pub(crate) fn bind(function: &Function) -> Result<Binding, Fault> {
         ("neoCLR.Runtime.Int64ToString", [Type::Int64])
         | ("neoCLR.Runtime.UInt64ToString", [Type::UInt64]) => {
             (Binding::IntegerToString, Type::String)
+        }
+        ("neoCLR.Runtime.NativeAllocate", [Type::UIntPtr]) => {
+            (Binding::NativeAllocate, Type::Ptr(Box::new(Type::Void)))
+        }
+        ("neoCLR.Runtime.NativeFree", [Type::Ptr(element)])
+            if **element == Type::Void && function.no_result =>
+        {
+            (Binding::NativeFree, Type::Void)
+        }
+        ("neoCLR.Runtime.NativeMultiplyChecked", [Type::UIntPtr, Type::UIntPtr]) => {
+            (Binding::NativeMultiplyChecked, Type::UIntPtr)
         }
         ("neoCLR.Runtime.Fault", [Type::String]) => (Binding::Fault, Type::Void),
         ("neoCLR.Runtime.Fail", [Type::String]) if function.no_result => {
@@ -1170,6 +1185,14 @@ impl Binding {
             (Self::StringCasing(uppercase), [Value::String(text)]) => Ok(Value::String(
                 crate::string_casing::convert(text, *uppercase).into(),
             )),
+            (Self::NativeMultiplyChecked, [Value::UIntPtr(left), Value::UIntPtr(right)]) => {
+                left.checked_mul(*right).map(Value::UIntPtr).ok_or_else(|| {
+                    Fault::coded(
+                        crate::FaultCode::ArithmeticOverflow,
+                        "native allocation size overflow",
+                    )
+                })
+            }
             (Self::NativeIntegerTo64, [Value::IntPtr(number)]) => Ok(Value::Int64(*number as i64)),
             (Self::NativeIntegerTo64, [Value::UIntPtr(number)]) => {
                 Ok(Value::UInt64(*number as u64))

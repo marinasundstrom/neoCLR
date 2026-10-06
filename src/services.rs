@@ -91,7 +91,21 @@ pub(crate) fn uses(module: &crate::Module, function: &Function) -> Result<Vec<Se
             | crate::native::Binding::ObjectEquals
             | crate::native::Binding::ObjectReferenceEquals
             | crate::native::Binding::ObjectIdentityHash => RuntimeService::ManagedHeap,
-            crate::native::Binding::Fault => return Ok(vec![]),
+            crate::native::Binding::NativeAllocate | crate::native::Binding::NativeFree => {
+                return Ok([
+                    RuntimeService::NativeAllocation,
+                    RuntimeService::PointerMemory,
+                ]
+                .into_iter()
+                .map(|service| ServiceUse {
+                    service,
+                    instruction: None,
+                })
+                .collect());
+            }
+            crate::native::Binding::NativeMultiplyChecked | crate::native::Binding::Fault => {
+                return Ok(vec![]);
+            }
             crate::native::Binding::EnvironmentArguments
             | crate::native::Binding::EnvironmentCurrentDirectory
             | crate::native::Binding::EnvironmentVariable

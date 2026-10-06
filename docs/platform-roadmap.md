@@ -10,6 +10,13 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+NativeAllocation runtime prerequisites now execute through native containers: exact
+allocation/free/checked-size services share the established pointer heap and limits.
+Five focused service tests and 17 pointer regressions pass. Next add unmanaged pointer
+signature authoring, reading/introspection and Raven mapping, then connect the unchanged
+NativeMemory sources. The four source binding errors remain; no full-System progress
+is claimed from runtime-only support. [Runtime contract](heap-and-pointers.md#source-nativeallocation-services-2026-10-07).
+
 Explicit source/native terminal-function ownership now clears the six let-else and two
 HTTP Task return errors. The audit has **four binding errors across 192 inputs**, all
 NativeAllocation imports/member uses. Local and separately compiled Fail control-flow

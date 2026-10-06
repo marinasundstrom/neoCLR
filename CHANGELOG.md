@@ -8,6 +8,13 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add exact native allocation InternalCalls for the pending source NativeAllocation
+  adapter: UIntPtr byte allocation, checked size multiplication and no-result void-pointer
+  release. They share the existing pointer heap, initialization tracking and limits;
+  legacy heap instructions remain unchanged. Five native-container service tests and
+  17 pointer regressions pass. C# pointer metadata/Raven authoring remains to be connected;
+  this slice does not reduce the four remaining full-System binding errors.
+
 - Select source/native System.Fail ownership through Raven's explicit failure contract.
   Local and separately imported let-else calls now compile and execute on both present
   and absent paths; wrong owners reject without publishing an assembly. The full-System

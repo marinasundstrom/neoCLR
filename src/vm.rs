@@ -3702,6 +3702,33 @@ fn interpret_instructions_with_dispatch(
                             )?);
                             return Ok(None);
                         }
+                        if matches!(binding, crate::native::Binding::NativeAllocate) {
+                            let [Value::UIntPtr(count)] = args.as_slice() else {
+                                return Err(Fault::new("native allocation requires a byte count"));
+                            };
+                            let layout = crate::memory::layout(module, &Type::Byte)?;
+                            let mut pointer = memory.allocate(
+                                Type::Byte,
+                                &layout,
+                                *count,
+                                limits.pointer_bytes,
+                                limits.pointer_allocations,
+                            )?;
+                            pointer.target = Type::Void;
+                            frames
+                                .last_mut()
+                                .unwrap()
+                                .stack
+                                .push(Value::Pointer(pointer));
+                            return Ok(None);
+                        }
+                        if matches!(binding, crate::native::Binding::NativeFree) {
+                            let [Value::Pointer(pointer)] = args.as_slice() else {
+                                return Err(Fault::new("native release requires a pointer"));
+                            };
+                            memory.free(pointer)?;
+                            return Ok(None);
+                        }
                         if matches!(binding, crate::native::Binding::GcCollect) {
                             // The private service consumes no arguments; all roots remain in frames.
                             let roots = execution_roots(

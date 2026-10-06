@@ -6223,3 +6223,18 @@ bounded contract. [Evidence and remaining work](experiments/extended-cli-metadat
 
 The matching compiler contract is Raven `296ca0f36`; 18 focused compiler tests and the
 source/imported executable gate pass. The runtime remains `b933c32b`.
+
+
+### NativeAllocation runtime prerequisites (2026-10-07)
+
+NativeAllocate(UIntPtr)->Void*, NativeMultiplyChecked(UIntPtr,UIntPtr)->UIntPtr and
+NativeFree(Void*)->noresult now execute as exact neoCLR.Runtime InternalCalls. They
+reuse the existing pointer heap and checked native-width operations; the previous bridge
+mapping to heap.alloc Byte / ptr.cast Void, mul.ovf.un and heap.free remains valid.
+The service path is the intended replacement for the source NativeAllocation helper.
+No source helper or bridge fallback is introduced in this runtime-only slice.
+
+The native container regression and 17 pointer controls pass. C# SignatureType pointer
+support, CLI PTR encoding/decoding, native Ptr mapping, introspection and Raven semantic
+operands are the remaining boundary. No compiler behavior changes yet; the full-System
+binding count remains four. [Exact service contract](heap-and-pointers.md#source-nativeallocation-services-2026-10-07).
