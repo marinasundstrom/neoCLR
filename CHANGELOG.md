@@ -93,7 +93,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
   projection; preserve original identities in selection reports and reject cross-module
   access violations. Compile a separate Raven Counter library/application into one ARM64
   executable with no input DLLs at execution time. Add PE/NEOX, interpreter parity and
-  invalid dependency/access tests. No public ABI or runtime APIs change.
+  invalid dependency/access tests. Extend the verified load-set path with one closed
+  generic value instantiation per type definition, preserving library identities in
+  specialization reports. Compile a separate Pair<int, byte> library consumer with
+  copied values, accessors and default initialization; validate both native containers
+  and reject additional shapes, reference payloads and cross-module generic access.
+  No public ABI or runtime APIs change.
   General unions, reference fields and general library dependency compilation remain
   unsupported. Loop budgets/cancellation,
   managed allocation and HTTP remain future work. Runtime

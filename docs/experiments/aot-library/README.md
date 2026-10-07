@@ -46,9 +46,10 @@ neoclr-aot-poc --inspect App.pe @entry --closed-world --module Values.pe
 - Each input is limited to 16 MiB; the combined inventory is limited to 4,096 functions
   and 1,024 types. Selected code keeps the existing 128-function/32-type/inline-layout
   limits. Source modules and source assemblies must be distinct. No dependency discovery,
-  dynamic loading, custom System/Object root, generic declarations or interface dispatch
-  is supported by this first library profile. Single-module generic specialization is
-  unchanged. Unknown external calls are rejected, never replaced with name-based intrinsics.
+  dynamic loading, custom System/Object root, generic methods or interface dispatch
+  is supported. The follow-up generic profile admits one closed instantiation per value
+  definition, as described below; constraints and reference payloads remain unsupported.
+  Single-module generic specialization is unchanged. Unknown external calls are rejected, never replaced with name-based intrinsics.
 - Before relocation, the ordinary runtime loader and verifier check the **entire original
   load set**, using bundled System. This enforces reference lists/revisions, identities,
   signatures, initialization, borrows and private/internal/type/field accessibility in
@@ -80,10 +81,43 @@ native publish, required library code is compiled at build time. The experiment 
 existing neoCLR runtime binder/verifier before projection instead of inventing parallel
 access rules or concatenating unchecked declarations. The benefit is reuse of executable
 identity/access semantics; the cost is whole-load-set verification, a bundled-System
-restriction and a deliberately small nongeneric profile. This does not claim general
+restriction and a deliberately small value profile. This does not claim general
 .NET-style library compatibility, performance gains or general trimming.
 
-Next: specialize generic values across this same verified boundary, then address the
-actual System.Result propagation-interface contract. The [library Result probe](../aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
+The subsequent slice below now specializes generic values across this verified boundary.
+The actual System.Result runtime load-set and propagation-interface contracts remain next. The [library Result probe](../aot-values/README.md#real-library-result-dependency-boundary-2026-10-07)
 still needs generic runtime-library and interface support. UTF-8 console input/lifetimes,
 multiple generic instantiations and the HTTP driver remain later work.
+
+
+## Generic library values (2026-10-07)
+
+The [generic library](generic-library.rvn) declares `Pair<T, U>` with private storage,
+a constructor and expression-bodied accessors. Its [consumer](generic-app.rvn) constructs
+`Pair<int, byte>`, copies it across an application call, reads both library accessors and
+checks zero initialization. Add `--generic` to the reproduction command and use a fresh
+output directory. [Generic evidence](generic-validation.json) records interpreter parity,
+inspection/emission agreement, no object imports and isolated native execution with only
+libSystem linkage. [GenericApp.pe](GenericApp.pe) and [GenericValues.pe](GenericValues.pe)
+are tested in PE/#Neo and NEOX forms.
+
+Original-scope whole-load-set verification still precedes projection and specialization.
+The existing type-parameter substitution and value admission rules then apply to the
+combined, verified inventory. The specialization report maps chosen arguments back to
+the original **library** module/revision/definition, not the temporary application rows.
+This preserves nominal distinctions and the original dependency/access proof while
+keeping the same private native layout and C entry ABI.
+
+One closed shape per type definition is permitted across the entire explicit load set.
+Multiple shapes, reference arguments and generic methods remain rejected; selected types
+with constraints or interface dependencies need later profiles. Negative tests cover a
+second instantiation, a reference payload, an internal generic accessor called from the
+application, and direct access to the library's private generic field. All fail before
+object emission. Source and native metadata formats are unchanged.
+
+This reuses the [type-specialization comparison](../aot-values/README.md#generic-result-and-pattern-bindings-2026-10-07):
+.NET Native AOT supports more generic instantiations with a code-size cost. The current
+single-shape restriction avoids inventing multi-instantiation metadata/symbol identities;
+it is an experimental bound, not a permanent platform rule. The next Result step must
+handle the explicit runtime-owned System/Object load context and propagation-interface
+metadata; this sample does not claim that the real System.Runtime Result already compiles.

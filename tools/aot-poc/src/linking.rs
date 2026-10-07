@@ -23,15 +23,12 @@ pub fn prepare(
     }
     for input in &inputs {
         super::selection::validate_source(input, true)?;
-        if input.types.iter().any(|t| !t.generic_parameters.is_empty())
-            || input
-                .functions
-                .iter()
-                .any(|f| !f.generic_parameters.is_empty())
+        if input
+            .functions
+            .iter()
+            .any(|f| !f.generic_parameters.is_empty())
         {
-            return Err(
-                "explicit library profile currently requires nongeneric declarations".into(),
-            );
+            return Err("explicit library profile does not support generic methods".into());
         }
     }
     // This checks reference lists/revisions, source access, signatures, field access,
@@ -113,7 +110,23 @@ pub fn prepare(
             ty.declaring_type = Some(type_id(i));
         }
     }
-    let (selected, mut report) = super::selection::select_inventory(&joined, root, false)?;
+    let specialized = if joined
+        .types
+        .iter()
+        .any(|t| !t.generic_parameters.is_empty())
+    {
+        Some(super::specialization::expand(&joined, root)?)
+    } else {
+        None
+    };
+    let input = specialized.as_ref().map_or(&joined, |(module, _)| module);
+    let (selected, mut report) = super::selection::select_inventory(input, root, false)?;
+    if let Some((_, mut specialization)) = specialized {
+        for row in specialization["types"].as_array_mut().unwrap() {
+            row["definition"] = json!(types[row["sourceIndex"].as_u64().unwrap() as usize]);
+        }
+        report["specialization"] = specialization;
+    }
     for key in ["functions", "excludedFunctions"] {
         for row in report[key].as_array_mut().unwrap() {
             row["definition"] = json!(methods[row["sourceIndex"].as_u64().unwrap() as usize]);
@@ -126,6 +139,6 @@ pub fn prepare(
     }
     report["loadSet"] = json!({"modules": inputs.iter().map(|m| json!({"name": m.name, "revision": m.revision})).collect::<Vec<_>>(),
         "validation": "all original bodies verified with runtime binder before private canonical projection",
-        "limits": "nongeneric declarations; one to eight explicit dependencies; bundled System; no dynamic loading"});
+        "limits": "one closed instantiation per local value definition; no generic methods; one to eight explicit dependencies; bundled System; no dynamic loading"});
     Ok((selected, report))
 }

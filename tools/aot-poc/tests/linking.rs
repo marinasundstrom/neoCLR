@@ -201,3 +201,123 @@ fn raven_library_and_application_compile_from_both_native_containers() {
         native(&dir, 0);
     }
 }
+
+#[test]
+fn generic_library_specialization_preserves_library_identity_and_value_copies() {
+    let app = include_bytes!("../../../docs/experiments/aot-library/GenericApp.pe");
+    let lib = include_bytes!("../../../docs/experiments/aot-library/GenericValues.pe");
+    let library = neoclr::metadata_container::decode(lib).unwrap();
+    for envelope in [false, true] {
+        let app = if envelope {
+            encode(&neoclr::metadata_container::decode(app).unwrap())
+        } else {
+            app.to_vec()
+        };
+        let lib = if envelope {
+            encode(&library)
+        } else {
+            lib.to_vec()
+        };
+        let dir = Temp::new();
+        let inspect = invoke(&dir, &app, &[lib.clone()], "@entry", true);
+        assert!(inspect.status.success());
+        assert!(!dir.0.join("app.o").exists());
+        let inspected: serde_json::Value = serde_json::from_slice(&inspect.stdout).unwrap();
+        assert_eq!(inspected["admission"]["accepted"], true, "{inspected}");
+        let result = invoke(&dir, &app, &[lib], "@entry", false);
+        assert!(
+            result.status.success(),
+            "{}",
+            String::from_utf8_lossy(&result.stderr)
+        );
+        let report: serde_json::Value = serde_json::from_slice(&result.stdout).unwrap();
+        assert_eq!(report, inspected["selection"]);
+        let shapes = report["specialization"]["types"].as_array().unwrap();
+        assert_eq!(shapes.len(), 1);
+        assert_eq!(shapes[0]["arguments"], serde_json::json!(["Int32", "Byte"]));
+        assert_eq!(shapes[0]["definition"]["module"], library.name);
+        assert_eq!(
+            shapes[0]["definition"]["revision"],
+            library.revision.as_deref().unwrap()
+        );
+        #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+        native(&dir, 0);
+    }
+}
+
+#[test]
+fn generic_library_rejects_multiple_shapes_references_and_cross_module_access() {
+    use neoclr::metadata::Type;
+    for case in 0..4 {
+        let mut app = neoclr::metadata_container::decode(include_bytes!(
+            "../../../docs/experiments/aot-library/GenericApp.pe"
+        ))
+        .unwrap();
+        let mut library = neoclr::metadata_container::decode(include_bytes!(
+            "../../../docs/experiments/aot-library/GenericValues.pe"
+        ))
+        .unwrap();
+        match case {
+            0 | 1 => {
+                let root = app
+                    .functions
+                    .iter_mut()
+                    .find(|f| f.name == app.entry)
+                    .unwrap();
+                let mut shape = root
+                    .locals
+                    .iter()
+                    .find(|t| matches!(t, Type::Constructed { .. }))
+                    .unwrap()
+                    .clone();
+                if let Type::Constructed { arguments, .. } = &mut shape {
+                    arguments[0] = if case == 0 {
+                        Type::Boolean
+                    } else {
+                        Type::String
+                    };
+                }
+                root.locals.push(shape);
+            }
+            2 => {
+                let getter = library
+                    .functions
+                    .iter_mut()
+                    .find(|f| f.returns == Type::TypeParameter(0) && f.parameters.is_empty())
+                    .unwrap();
+                getter.visibility = Visibility::Internal;
+            }
+            _ => {
+                let root = app
+                    .functions
+                    .iter_mut()
+                    .find(|f| f.name == app.entry)
+                    .unwrap();
+                let getter_name = &library
+                    .functions
+                    .iter()
+                    .find(|f| f.returns == Type::TypeParameter(0) && f.parameters.is_empty())
+                    .unwrap()
+                    .name;
+                let call = root
+                    .body
+                    .iter_mut()
+                    .find(|op| matches!(op, Op::Call(target) if &target.name == getter_name))
+                    .unwrap();
+                *call = Op::Field(0);
+            }
+        }
+        let dir = Temp::new();
+        let result = invoke(&dir, &encode(&app), &[encode(&library)], "@entry", false);
+        let error = String::from_utf8_lossy(&result.stderr);
+        assert!(!result.status.success(), "case {case} accepted");
+        assert!(!error.contains("panicked"));
+        assert!(!dir.0.join("app.o").exists());
+        if case == 0 {
+            assert!(error.contains("multiple closed instantiations"), "{error}");
+        }
+        if case >= 2 {
+            assert!(error.contains("access denied"), "{error}");
+        }
+    }
+}

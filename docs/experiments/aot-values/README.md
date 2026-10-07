@@ -68,7 +68,9 @@ Explicit `out` parameters may borrow Int32, Byte, Boolean or local-record storag
 Readonly receivers, conditional `out(true)` parameters, general `ref` parameters,
 virtual dispatch and external
 library/service calls remain unsupported here, including console calls in value-bearing
-modules. The original scalar/literal-console profile remains available for Hello World.
+modules. Explicit [value-library load sets](../aot-library/README.md) now extend direct
+calls to supplied, verified dependencies. The original scalar/literal-console profile
+remains available for Hello World.
 
 The native layout is private to this experiment:
 
@@ -441,6 +443,6 @@ trimming, multiple generic instantiations and input/lifetime services remain lat
 
 
 The [subsequent explicit value-library slice](../aot-library/README.md) now implements
-nongeneric application-plus-library compilation with original-scope verification and
-standalone Raven evidence. Generic runtime-library/interface support remains open;
+application-plus-library compilation with original-scope verification and standalone
+Raven evidence, including a follow-up with one closed generic value shape per definition. Generic runtime-library/interface support remains open;
 this does not change the recorded rejection of the System.Result probe.

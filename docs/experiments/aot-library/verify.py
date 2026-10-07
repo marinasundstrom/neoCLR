@@ -18,6 +18,7 @@ def main():
     for name in ('compiler', 'core', 'runtime', 'aot', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--compiler-revision', required=True)
+    parser.add_argument('--generic', action='store_true')
     args = parser.parse_args()
     if platform.system() != 'Darwin' or platform.machine() != 'arm64':
         parser.error('Native execution requires macOS ARM64')
@@ -27,7 +28,7 @@ def main():
             parser.error('Missing built tool: ' + str(path))
     output.mkdir(parents=True, exist_ok=False)
     sha = lambda p: hashlib.sha256(p.read_bytes()).hexdigest()
-    report = dict(profile='raven-value-library-v1', declaredCompilerRevision=args.compiler_revision,
+    report = dict(profile='raven-generic-value-library-v1' if args.generic else 'raven-value-library-v1', declaredCompilerRevision=args.compiler_revision,
                   neoClrBaseRevision=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
                   host=platform.platform(), SDKROOT=os.environ.get('SDKROOT'), commands=[], samples={})
 
@@ -44,7 +45,7 @@ def main():
 
     inputs = [compiler, runtime, aot, ROOT / 'docs/experiments/aot-hello/main.c']
     inputs += [compiler.parent / n for n in ('Raven.CodeAnalysis.dll', 'Raven.CodeAnalysis.NeoClr.dll', 'NeoCLR.Metadata.Experimental.dll')]
-    sources = [ROOT / 'docs/experiments/aot-library' / name for name in ('library.rvn', 'app.rvn')]
+    sources = [ROOT / 'docs/experiments/aot-library' / name for name in (('generic-library.rvn', 'generic-app.rvn') if args.generic else ('library.rvn', 'app.rvn'))]
     inputs += [core] + sources
     library, assembly, obj, binary = (output / name for name in ('Values.dll', 'App.dll', 'app.o', 'app'))
     run(['dotnet', compiler, 'neoclr', '--library', '-o', library, sources[0]])

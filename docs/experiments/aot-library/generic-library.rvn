@@ -1,0 +1,14 @@
+namespace Values
+
+public struct Pair<T, U> {
+    private var storedFirst: T
+    private var storedSecond: U
+
+    init(first: T, second: U) {
+        storedFirst = first
+        storedSecond = second
+    }
+
+    val First: T => storedFirst
+    val Second: U => storedSecond
+}

@@ -233,7 +233,9 @@ multiple generic instantiations and native input/lifetimes are still pending. A 
 library Result consumer now passes the interpreter; read-only closed-world inspection
 reports its external-call AOT boundary. A subsequent nongeneric value-library slice now compiles separate Raven library and
 application artifacts into one executable, checking original access scopes before
-selection. Generic runtime-library Result and interface support remain open.
+selection. Generic value-library specialization now also passes a Pair<int, byte>
+consumer with copied values and default initialization, limited to one closed shape per
+type definition. Runtime-library Result and interface support remain open.
 General AOT applications, the web demo, JIT and hot reload remain future work.
 Metadata alongside native images and stable calling conventions are a future
 interop exploration; the current compiler inspection report is build tooling only.

@@ -63,8 +63,10 @@ now passes Raven/interpreter execution and records AOT's external-call rejection
 Closed-world inspection shares emission preparation and exposes this boundary.
 An [explicit nongeneric value-library load set](experiments/aot-library/README.md) now
 compiles separate Raven library/application artifacts into one standalone executable,
-verifying original access scopes before projection. Generic library values are next,
-before the library Result propagation-interface contract. Multiple instantiations
+verifying original access scopes before projection. A follow-up now specializes one
+closed generic value shape across that boundary, validated by Pair<int, byte>. The next
+Result step needs the explicit runtime-owned System/Object load context and propagation-
+interface contract. Multiple instantiations
 and input/lifetimes remain open. The author adds a console-input sample after unions, exercising input and
 parse outcomes; strings, native input services and their lifetime contracts are later
 requirements, not implied by primitive value support.

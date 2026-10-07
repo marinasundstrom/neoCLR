@@ -1,0 +1,249 @@
+{
+  "profile": "raven-generic-value-library-v1",
+  "declaredCompilerRevision": "70aea9a7e9e424159a48b0227869245a95bf2ec2",
+  "neoClrBaseRevision": "bf7f97172d3f8dc9e9171eb16a86f9214186b9fd",
+  "host": "macOS-27.0-arm64-arm-64bit",
+  "SDKROOT": "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--library",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/Values.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/generic-library.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/Users/robert/Projects/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll",
+        "--reference",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/Values.dll",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/App.dll",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-library/generic-app.rvn"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/private/tmp/neoclr-clean1007/target/release/neoclr",
+        "run",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/App.dll",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--inspect",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/App.dll",
+        "@entry",
+        "--closed-world",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"admission\": {\n    \"accepted\": true\n  },\n  \"admissionMode\": \"closed-world\",\n  \"assemblies\": [\n    {\n      \"full_name\": \"[\\\"App\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\",\n      \"modules\": [\n        \"App.dll\"\n      ],\n      \"name\": \"App\",\n      \"references\": [\n        \"[\\\"Values\\\",\\\"1.0.0.0\\\",\\\"\\\",\\\"\\\",\\\"0\\\"]\"\n      ],\n      \"value_type_references\": [\n        \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n      ]\n    }\n  ],\n  \"capabilities\": {\n    \"console\": false\n  },\n  \"functions\": [\n    {\n      \"calls\": [],\n      \"definition\": null,\n      \"index\": 0,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [\n        {\n          \"Constructed\": {\n            \"arguments\": [\n              \"Int32\",\n              \"Byte\"\n            ],\n            \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n          }\n        }\n      ],\n      \"returns\": {\n        \"Constructed\": {\n          \"arguments\": [\n            \"Int32\",\n            \"Byte\"\n          ],\n          \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n        }\n      },\n      \"virtual\": false\n    },\n    {\n      \"calls\": [\n        {\n          \"instruction\": 3,\n          \"operation\": \"newobj.ctor\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032..ctor\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": [\n              \"Int32\",\n              \"Byte\"\n            ]\n          }\n        },\n        {\n          \"instruction\": 6,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": false,\n            \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079\",\n            \"owner\": null,\n            \"parameters\": [\n              {\n                \"Constructed\": {\n                  \"arguments\": [\n                    \"Int32\",\n                    \"Byte\"\n                  ],\n                  \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n                }\n              }\n            ]\n          }\n        },\n        {\n          \"instruction\": 9,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 16,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 23,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 37,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": []\n          }\n        },\n        {\n          \"instruction\": 44,\n          \"operation\": \"call\",\n          \"target\": {\n            \"instance\": true,\n            \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64\",\n            \"owner\": {\n              \"Constructed\": {\n                \"arguments\": [\n                  \"Int32\",\n                  \"Byte\"\n                ],\n                \"definition\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\"\n              }\n            },\n            \"parameters\": []\n          }\n        }\n      ],\n      \"definition\": null,\n      \"index\": 1,\n      \"instance\": false,\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n      \"noResult\": false,\n      \"outParameters\": [],\n      \"owner\": null,\n      \"parameters\": [],\n      \"returns\": \"Int32\",\n      \"virtual\": false\n    }\n  ],\n  \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n  \"notice\": \"Build diagnostics only. Not a deployable metadata sidecar, stable ABI or export manifest.\",\n  \"opcodes\": {\n    \"brfalse\": 2,\n    \"brtrue\": 3,\n    \"call\": 6,\n    \"ceq\": 10,\n    \"conv.i4\": 2,\n    \"conv.u1\": 1,\n    \"initobj\": 1,\n    \"ldarg\": 1,\n    \"ldc.bool\": 5,\n    \"ldc.i4\": 10,\n    \"ldloc\": 2,\n    \"ldloca\": 6,\n    \"newobj.ctor\": 1,\n    \"ret\": 4,\n    \"stloc\": 3\n  },\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n  \"schema\": \"neoclr-aot-inspection-v1\",\n  \"scope\": \"inventory includes all declarations; admission uses admissionMode\",\n  \"selection\": {\n    \"excludedFunctions\": [],\n    \"excludedTypes\": [],\n    \"functions\": [\n      {\n        \"compiledIndex\": 0,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079\",\n        \"sourceIndex\": 0\n      },\n      {\n        \"compiledIndex\": 1,\n        \"definition\": {\n          \"index\": 1,\n          \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n        \"sourceIndex\": 1\n      },\n      {\n        \"compiledIndex\": 2,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032..ctor\",\n        \"sourceIndex\": 2\n      },\n      {\n        \"compiledIndex\": 3,\n        \"definition\": {\n          \"index\": 1,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374\",\n        \"sourceIndex\": 3\n      },\n      {\n        \"compiledIndex\": 4,\n        \"definition\": {\n          \"index\": 2,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64\",\n        \"sourceIndex\": 4\n      }\n    ],\n    \"loadSet\": {\n      \"limits\": \"one closed instantiation per local value definition; no generic methods; one to eight explicit dependencies; bundled System; no dynamic loading\",\n      \"modules\": [\n        {\n          \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        {\n          \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        }\n      ],\n      \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n    },\n    \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n    \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n    \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n    \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n    \"schema\": \"neoclr-aot-selection-v1\",\n    \"specialization\": {\n      \"policy\": \"one closed instantiation per local type definition; no generic methods or constraints\",\n      \"types\": [\n        {\n          \"arguments\": [\n            \"Int32\",\n            \"Byte\"\n          ],\n          \"definition\": {\n            \"index\": 0,\n            \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n            \"revision\": \"1.0.0.0\"\n          },\n          \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\",\n          \"sourceIndex\": 0\n        }\n      ]\n    },\n    \"types\": [\n      {\n        \"compiledIndex\": 0,\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\",\n        \"sourceIndex\": 0\n      }\n    ]\n  },\n  \"types\": []\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc",
+        "--closed-world",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/App.dll",
+        "@entry",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app.o",
+        "--module",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/Values.dll"
+      ],
+      "exit": 0,
+      "stdout": "{\n  \"excludedFunctions\": [],\n  \"excludedTypes\": [],\n  \"functions\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079\",\n      \"sourceIndex\": 0\n    },\n    {\n      \"compiledIndex\": 1,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n      \"sourceIndex\": 1\n    },\n    {\n      \"compiledIndex\": 2,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032..ctor\",\n      \"sourceIndex\": 2\n    },\n    {\n      \"compiledIndex\": 3,\n      \"definition\": {\n        \"index\": 1,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374\",\n      \"sourceIndex\": 3\n    },\n    {\n      \"compiledIndex\": 4,\n      \"definition\": {\n        \"index\": 2,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64\",\n      \"sourceIndex\": 4\n    }\n  ],\n  \"loadSet\": {\n    \"limits\": \"one closed instantiation per local value definition; no generic methods; one to eight explicit dependencies; bundled System; no dynamic loading\",\n    \"modules\": [\n      {\n        \"name\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      {\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      }\n    ],\n    \"validation\": \"all original bodies verified with runtime binder before private canonical projection\"\n  },\n  \"metadataPolicy\": \"original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted\",\n  \"module\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5\",\n  \"policy\": \"explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch\",\n  \"root\": \"NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E\",\n  \"schema\": \"neoclr-aot-selection-v1\",\n  \"specialization\": {\n    \"policy\": \"one closed instantiation per local type definition; no generic methods or constraints\",\n    \"types\": [\n      {\n        \"arguments\": [\n          \"Int32\",\n          \"Byte\"\n        ],\n        \"definition\": {\n          \"index\": 0,\n          \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n          \"revision\": \"1.0.0.0\"\n        },\n        \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\",\n        \"sourceIndex\": 0\n      }\n    ]\n  },\n  \"types\": [\n    {\n      \"compiledIndex\": 0,\n      \"definition\": {\n        \"index\": 0,\n        \"module\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5\",\n        \"revision\": \"1.0.0.0\"\n      },\n      \"name\": \"NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032\",\n      \"sourceIndex\": 0\n    }\n  ]\n}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "clang",
+        "-arch",
+        "arm64",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app.o",
+        "-o",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "nm",
+        "-u",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app.o"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "otool",
+        "-L",
+        "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app"
+      ],
+      "exit": 0,
+      "stdout": "/Users/robert/Projects/neoclr/target/aot-generic-library-check2/app:\n\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1356.0.0)\n",
+      "stderr": ""
+    }
+  ],
+  "samples": {},
+  "selection": {
+    "excludedFunctions": [],
+    "excludedTypes": [],
+    "functions": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_436F7079",
+        "sourceIndex": 0
+      },
+      {
+        "compiledIndex": 1,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E",
+        "sourceIndex": 1
+      },
+      {
+        "compiledIndex": 2,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032..ctor",
+        "sourceIndex": 2
+      },
+      {
+        "compiledIndex": 3,
+        "definition": {
+          "index": 1,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F4669727374",
+        "sourceIndex": 3
+      },
+      {
+        "compiledIndex": 4,
+        "definition": {
+          "index": 2,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032.M_6765745F5365636F6E64",
+        "sourceIndex": 4
+      }
+    ],
+    "loadSet": {
+      "limits": "one closed instantiation per local value definition; no generic methods; one to eight explicit dependencies; bundled System; no dynamic loading",
+      "modules": [
+        {
+          "name": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+          "revision": "1.0.0.0"
+        },
+        {
+          "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        }
+      ],
+      "validation": "all original bodies verified with runtime binder before private canonical projection"
+    },
+    "metadataPolicy": "original artifact unchanged; private verification projection omits attributes/property descriptors, relocates definition rows; source origins retain access and readonly facts; external assembly bindings omitted",
+    "module": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5",
+    "policy": "explicit direct-call closed world; every opcode of selected bodies retained; no reflection or dynamic/virtual dispatch",
+    "root": "NeoMetadata_5154FB160D7108AB5DC6F9F3613BE6ACF54CF0AB8A14FFDA15DA0D1B86634AA5.F_4D61696E",
+    "schema": "neoclr-aot-selection-v1",
+    "specialization": {
+      "policy": "one closed instantiation per local type definition; no generic methods or constraints",
+      "types": [
+        {
+          "arguments": [
+            "Int32",
+            "Byte"
+          ],
+          "definition": {
+            "index": 0,
+            "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+            "revision": "1.0.0.0"
+          },
+          "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032",
+          "sourceIndex": 0
+        }
+      ]
+    },
+    "types": [
+      {
+        "compiledIndex": 0,
+        "definition": {
+          "index": 0,
+          "module": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5",
+          "revision": "1.0.0.0"
+        },
+        "name": "NeoMetadata_BA8CD12537671673EAD3C639F1273A505234890E034EC3320A09899F7E96B1C5.T_56616C756573_506169726032",
+        "sourceIndex": 0
+      }
+    ]
+  },
+  "native": {
+    "artifacts": {
+      "Values.dll": "f8eb07f45c8156a8890ba36bd15c18b2796bd3c320ab5d578875b49e520f4e4a",
+      "App.dll": "534ed668db5c6928c79966e28ed88c585248d84ef932d98cafbf968bfc817039",
+      "app.o": "8ed329fd50e0550ff97ee788ebaf17a4c6ec8e0d4e03656b752fd4eb5e8651ad",
+      "app": "81d72c3b4f4e5dd4266b7fdcfc97aa8e952a9606e2777b55d8b360fe83146713"
+    },
+    "exit": 0,
+    "emptyEnvironment": true,
+    "executableOnlyDirectory": true,
+    "dynamicDependencies": [
+      "/usr/lib/libSystem.B.dylib"
+    ]
+  },
+  "inputs": {
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/rvnc.dll": "6babb9602dd0a4f3f15d39b86fd2906653c74623f7c83b9f44ad166e6ae496c5",
+    "/private/tmp/neoclr-clean1007/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+    "/Users/robert/Projects/neoclr/tools/aot-poc/target/debug/neoclr-aot-poc": "25df944875422b6b465fb7367a41501ec899a561bd3c4ceffb56fad0ecbc9f34",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-hello/main.c": "93b05150980bf531da0a5cf56cac622e3c5fba49d08706d2d643404bda593fca",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.dll": "2258aa654dccb34c454445fdffcc3f619caa4a353a0a5192874e6017349928fb",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/Raven.CodeAnalysis.NeoClr.dll": "51723a2494693e8c670f53e6139c1f8500ddb0c7e2b370df6ba74492765601c3",
+    "/private/tmp/clean release extracted1007/neoclr-native-poc/sdk/tools/rvnc/NeoCLR.Metadata.Experimental.dll": "d924d50cb7287f40efd2e87e372612e3f77f9cc01b98283b8abb135311a9d14d",
+    "/Users/robert/Projects/neoclr/api-docs/reference/NeoCLR.CoreProbe.dll": "ceed4f239901f850a2a0194dec64e44ebc540c6d37c14c1db854b7e2a1d6f6a5",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/generic-library.rvn": "04f3b77b7db81006c7421d68ce8e62e300e9cb4bd6fbf8fc36c281f78580719a",
+    "/Users/robert/Projects/neoclr/docs/experiments/aot-library/generic-app.rvn": "5fb3d8ab964946028d08f2a8e5083e6a8c8d1f99f3289dfd884de79ba436ba1d"
+  }
+}

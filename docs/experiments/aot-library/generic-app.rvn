@@ -1,0 +1,18 @@
+import Values.*
+
+func Copy(item: Pair<int, byte>) -> Pair<int, byte> {
+    return item
+}
+
+func Main() -> int {
+    let pair = Pair<int, byte>(42, (byte)7)
+    let copy = Copy(pair)
+    if pair.First != 42 || copy.First != 42 || copy.Second != 7 {
+        return 1
+    }
+    let cleared = default(Pair<int, byte>)
+    if cleared.First != 0 || cleared.Second != 0 {
+        return 2
+    }
+    return 0
+}
