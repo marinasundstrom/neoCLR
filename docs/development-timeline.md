@@ -11343,3 +11343,23 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   slice; raw runtime-service integers are not promoted to public APIs by this audit.
 - [Reference direction](../api-docs/README.md#one-class-library-reference-across-assemblies),
   [Web boundary evidence](experiments/extended-cli-metadata/web-boundary-2026-10-07.md).
+
+## 2026-10-07: Project artifacts, documentation bundles and precise source links
+
+- **Author:** Directed that Networking and other libraries be their own projects,
+  referencing Runtime and Platform integration projects, with their outputs shipped.
+  Clarified that RavenDoc should define a bundle of assemblies shown as one structure.
+  Asked for universal GitHub source links to the specific type/member file and location,
+  comparable to .NET support; described the present solution as incomplete.
+- **Assistant proposal:** Preserve declaration origins independently of documentation
+  grouping, target representation and where inherited/extension members are displayed.
+  Use repository revision, source path and declaration span, not namespace guesses.
+- **Action:** Recorded the project gate and bundle/source-link requirements, compared
+  Source Link and Portable PDB inputs, and proposed investigating a declaration map
+  where standard debug information lacks exact declaration spans.
+- **Outcome/open:** Requirements documented; no project graph, bundle implementation,
+  new metadata encoding or complete source-link support is claimed. The ongoing Web
+  deadline slice remains unverified: separate Web compilation succeeded after an import
+  correction, but the new async consumer currently rejects its Task<()> entry signature.
+- [API requirements](../api-docs/README.md#planned-bundles-and-declaration-source-links),
+  [project direction](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07).

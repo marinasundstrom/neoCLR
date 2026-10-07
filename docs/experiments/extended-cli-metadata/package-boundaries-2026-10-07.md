@@ -47,6 +47,22 @@ APIs ship separately. Further native packages need evidence of an independent de
 ABI and deployment benefit. Likewise, splitting Runtime's remaining IO/reflection/tasks
 surfaces needs dependency evidence; their presence does not make them a minimal core.
 
+## Real project graph (author direction, 2026-10-07)
+
+System.Networking, Data, Web and other selected libraries must become actual projects
+with explicit project references to System.Runtime and required Platform integration
+projects. Source lists in audit scripts are validation scaffolding, not the final build
+model. Ship the outputs of the project graph together with matching runtime assets,
+documentation and provenance. Runtime stays below optional APIs in dependency order.
+
+After separate Web execution, inspect native Raven SDK project-reference support and
+introduce the graph incrementally. Platform integration must expose an intentional
+cross-assembly contract; moving internal service declarations to a new project alone
+will not work. Exact integration project names and service membership remain open.
+Validate clean builds, dependency ordering, source-free consumption, editor catalogs
+and execution from the collected artifacts. Existing legacy bridge build targets do
+not establish this native project gate.
+
 ## Unified documentation (author direction, 2026-10-07)
 
 Keep one class-library API reference across the assembly/package split. Namespace/type

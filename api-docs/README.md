@@ -79,6 +79,59 @@ correct on type, ordinary member, inherited member and extension-member pages; d
 identities reject rather than silently overwrite; existing URLs remain stable where
 possible. This is a presentation direction, not a requirement to merge runtime binaries.
 
+## Planned bundles and declaration source links
+
+Author clarification (2026-10-07): RavenDoc needs an explicit **assembly bundle**:
+a list of assemblies presented as one API structure. This is a documentation grouping,
+not a merged assembly. Resolve symbols using assembly-qualified identities before
+combining navigation, search and cross-references. Retain each input's documentation
+and source provenance, including inputs from different repositories or revisions.
+Configuration syntax and implementation remain future RavenDoc work.
+
+Source links must identify the actual file and declaration location for a type or
+member on GitHub, for both .NET and NeoCLR inputs. Repository links or namespace-based
+file guesses do not satisfy this requirement. Proposed shared declaration facts are:
+
+- Declaring assembly/artifact identity and unambiguous declaration identity, including
+  overloads, generic arity and module-level functions.
+- Repository URL, immutable commit, repository-relative document path and source checksum.
+- Declaration start/end line and column, with multiple locations retained for partial
+  declarations and an explicit generated-source origin when applicable.
+
+The renderer consumes these facts independently of the metadata target; a repository
+provider converts them to a browser URL (GitHub file and line anchors first). Inherited
+and extension-member entries link to their original declaration, even when displayed
+under another type or assembly. Documentation text and source location are separate:
+external Markdown can document an API without becoming its declaration source.
+
+Comparison: [.NET Source Link](https://learn.microsoft.com/dotnet/standard/library-guidance/sourcelink)
+provides repository provenance alongside symbols. The
+[Portable PDB specification](https://github.com/dotnet/runtime/blob/main/docs/design/specs/PortablePdb-Metadata.md)
+defines documents/checksums, method sequence points, Source Link mappings and
+TypeDefinitionDocument information. These are useful inputs, but method sequence points
+are not a universal declaration-span index for types, fields, properties and abstract
+members. Reuse available standard information; investigate a compiler-produced declaration
+map for missing locations rather than infer a declaration from its first executable line.
+The map's encoding, distribution and compatibility remain open decisions, not a new
+NeoCLR metadata extension approved by this note.
+
+Implementation order: audit both target readers and RavenDoc source lookup; define one
+origin contract; populate it from compiler source declarations and matching artifact
+symbols/maps; render links; then integrate bundle inputs. Carry matching provenance
+artifacts through project builds and packaging. Validate artifact/symbol identity and
+checksums before accepting locations. Missing provenance should omit the precise link
+with an actionable diagnostic; stale/conflicting provenance must not silently link to
+another version. Local uncommitted sources must not be represented as published commits.
+
+Acceptance includes exact links for types, constructors, overloads, properties, fields,
+interface members and module functions; cross-assembly inherited/extension members;
+partial and generated declarations; path escaping; multiple repositories; missing and
+mismatched symbols. Run equivalent .NET/NeoCLR fixtures. Neither source availability nor
+network access should be required to load native metadata or execute an assembly.
+The benefit is accurate, portable navigation; the cost is producing and shipping reliable
+declaration provenance beyond execution metadata. No new source-link support is claimed
+as implemented here.
+
 ## Build and refresh
 
 Author direction (2026-09-27): run only validation needed for the change; do not

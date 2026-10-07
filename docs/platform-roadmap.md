@@ -52,6 +52,14 @@ The API site remains one namespace/type reference across assemblies; declaring-a
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that
 shape, as recorded in [API maintenance](../api-docs/README.md#one-class-library-reference-across-assemblies).
 
+Author clarification (2026-10-07): follow the executable split with real library and
+Platform integration projects whose outputs form the shipped artifacts, rather than
+leaving the graph in audit source lists. Future RavenDoc work needs an explicit assembly
+bundle and target-independent, commit-pinned declaration source links, including exact
+GitHub file/line locations. See [project gate](experiments/extended-cli-metadata/package-boundaries-2026-10-07.md#real-project-graph-author-direction-2026-10-07)
+and [documentation acceptance](../api-docs/README.md#planned-bundles-and-declaration-source-links).
+These are recorded requirements; project/bundle/source-link implementation remains open.
+
 Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
 fundamentals; higher-level packages depend on it, never the reverse. Exact Runtime
 membership remains subject to dependency review. .NET is a comparison point, not a

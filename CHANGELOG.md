@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Record planned real library/Platform project outputs and RavenDoc assembly bundles.
+  Specify shared declaration provenance and exact revision-pinned source links for
+  .NET/NeoCLR API documentation, with Source Link/PDB comparison and validation gates.
+  These are requirements, not implemented project or documentation capabilities.
+
 - Extend optional-library auditing with a separate Web build against emitted Runtime,
   Data and Networking references. Record private deadline API failures and absence of
   output. Document the author-directed unified RavenDoc class-library reference with
