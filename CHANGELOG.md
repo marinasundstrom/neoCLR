@@ -8,6 +8,10 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Refresh RavenDoc with integrated multi-library website support and floating
+  copy controls that do not push signature or sample text downward. Keep neoCLR
+  namespace navigation flat and preserve the existing single-API configuration.
+
 - Update the pinned RavenDoc publisher and enable site-wide icon search and code
   copying. Include generated and manual API articles in search, list ordinary
   nested types separately from union cases, and add authored namespace guidance.

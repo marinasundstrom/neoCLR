@@ -112,7 +112,8 @@ The site enables RavenDoc's `search` and `copyCode` configuration options. The
 navbar search icon opens a field covering guides and API articles, including
 manual API pages. A nonempty query keeps the panel open; Escape closes it without
 clearing the query. Results are served locally from a generated index. Copy
-buttons preserve displayed code and report clipboard failures accessibly.
+buttons preserve displayed code and report clipboard failures accessibly. They
+float over samples and signatures without adding top padding or pushing text down.
 
 Public nested types appear under Nested types; union cases remain under Cases.
 Namespace `N:` comments are supported in source and Markdown/XML sidecars.
@@ -122,7 +123,7 @@ These are shared RavenDoc/compiler documentation changes: no Runtime Contract,
 native metadata, CLI bridge encoding or runtime execution behavior changes.
 
 Validation for this update: pinned Raven revision
-`2f5fe343bdf8626cab99ccbc00e724b6894bccdd`, 1,803 generated pages with local
+`29db57d676bb1389729f8451f833666b443d8888`, 1,803 generated pages with local
 links/anchors/HTML checked, and all 18 Python website tests passing. Browser
 checks passed at 390px and 1280px in light/dark themes on the homepage, API
 landing, System namespace and ArrayList pages, including search retention and

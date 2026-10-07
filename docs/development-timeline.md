@@ -11124,3 +11124,8 @@ a query. The assistant implemented the shared changes on Raven main and applied
 the publisher/configuration changes to neoCLR main. The author requested local
 site review when complete; publication was not requested. Validation results are
 recorded in the integration notes and changelog.
+
+During site review, the author clarified that library APIs must share Raven's main
+website shell and namespaces should be listed flat, as on neoCLR. They accepted
+copy buttons on signatures but required them to float without adding top spacing.
+The updated shared publisher carries that layout correction to neoCLR as well.
