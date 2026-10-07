@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Qualify native project import/run against separate source-built libraries using Raven
+  0f85f53b8's explicit Object-owner selection. Add a reproducible unchanged HTTP project
+  consumer and invalid-owner output-preservation check. Native ProjectReference build
+  orchestration remains the next slice; no release or VS Code gate is claimed complete.
+
 - Record Raven e141006f3's canonical bootstrap Void binding correction: two deterministic
   lookup regressions, six fresh Web compilations and five source-free executable consumers
   pass without metadata fallbacks. Preserve commands, artifact hashes and prior failures.

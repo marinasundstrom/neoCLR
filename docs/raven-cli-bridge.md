@@ -6594,3 +6594,13 @@ unchanged. Two forced-lookup regressions, 29 focused tests and six fresh separat
 compilations pass. See [evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
 General async unit-return corrections are owned by the Raven release task following the
 author's handoff instruction, and remain separate from this target-specific fix.
+
+## Native project Object owner (2026-10-07)
+
+Raven 0f85f53b8 supports RavenNeoClrObjectLibrary=System.Runtime in projects consuming
+the source-built runtime. Semantic loading and --run select the same registered native
+artifact; the project provider exposes ObjectRootPath and rejects missing/ambiguous
+names. Reference artifacts remain watched by the editor metadata loader. This adds no
+CLI projection or importer/emitter coupling. [Executable project gate](experiments/extended-cli-metadata/native-project-root-2026-10-07.md)
+passes against separate libraries. ProjectReference build orchestration remains next;
+this change does not claim full VS Code or packaged-release acceptance.

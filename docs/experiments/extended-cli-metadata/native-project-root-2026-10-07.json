@@ -1,0 +1,55 @@
+{
+  "compilerCommit": "0f85f53b8",
+  "baseline": "warning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\nerror NEOMETA001: Native emission does not support native type requires a supported symbol-only emission contract: System.Collections.ArrayList`1.\n",
+  "contractChecks": "PASS native XML type/member documentation and malformed optional sidecar\nPASS reference catalog snapshot reuse, replacement, native semantic import/emission, invalid inputs and seed ownership\nPASS evaluated native project references, semantic binding, missing-adapter rejection and transactional failure\n/tmp/native-project-contract2-1007/project/App.rvnproj\n",
+  "acceptance": {
+    "compilerRevision": "af47cb0a5+native-project-root",
+    "sourceRevision": "cb2f91d6b022bdbef5bd7fe03c67375bf5e25539",
+    "commands": [
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/native-project-compiler1007/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/native-project-acceptance1007/Headers.rvnproj",
+          "--run",
+          "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr"
+        ],
+        "exitCode": 0,
+        "stdout": "Native build output: /private/tmp/native-project-acceptance1007/bin/neoclr/Headers.dll\nHTTP header lookup checks passed\n",
+        "stderr": "warning RAV0162: Unreachable code\nwarning RAV0162: Unreachable code\n"
+      },
+      {
+        "command": [
+          "dotnet",
+          "/private/tmp/native-project-compiler1007/rvnc.dll",
+          "neoclr",
+          "--project",
+          "/private/tmp/native-project-acceptance1007/Headers.rvnproj"
+        ],
+        "exitCode": 1,
+        "stdout": "",
+        "stderr": "neoCLR project: Object library must select exactly one registered native reference: Missing.Owner\n"
+      }
+    ],
+    "hashes": {
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/scripts/verify-native-library-project.py": "f2cc1726012ce8016d2425b5934e9a4c48f5da39504d73234a20756c809d7342",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/http-headers/Main.rvn": "6a6bc829818dc4c9e091112e71f5e71a4be268ea4bb564631f4ec2467f1590f8",
+      "/private/tmp/native-project-acceptance1007/Headers.rvnproj": "804db384e3d6d876075f7707c53d5081c33f39e56fccd894a34b8541cb4f98f2",
+      "/private/tmp/native-project-acceptance1007/bin/neoclr/Headers.dll": "c3dec2e564c701962f1a21f31f4a73d76f1278fd7940e3f8b189ed7270146cc3",
+      "/private/tmp/native-project-compiler1007/rvnc.dll": "9c9772aa24c510a4d9cd7cafd809ac883b359f05b4e4643464c038601f747c52",
+      "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+      "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/release/neoclr": "888fe3115a3edd686c1880bf97057dc8f67a7360013871237cde85a64715698e",
+      "/private/tmp/array-runtime1007/runtime-owned/System.runtime.neox": "1dcf6f94ac3be45f832757cc9bba76783e01a1d02f9ad038beda2dba5a1887d4",
+      "/private/tmp/array-runtime1007/runtime-owned/ownership.json": "268459c1f90fa19f15ae1ad534a3954e9e3210ada5d0d365b4a2ef6e7ecb45da",
+      "/private/tmp/array-runtime1007/runtime-owned/System.Runtime.dll": "37f23ef91178c91d42164f8018adbec6206076dbe037daf0be25ed1b5da758b8",
+      "/private/tmp/web-build1007final/System.Data.dll": "206a8ab2f771d2dce12f10b18437968df1478e771e7c3dbbb93ab0a5b8d39311",
+      "/private/tmp/web-build1007final/System.Networking.dll": "4df43a877a11f3d1e31f3a7b15d153c341dbfe5a3d3c20ab84f758cac95ba89b",
+      "/private/tmp/void-fixed-web1007-0/System.Web.dll": "d166af8ce26e227a381f536a42b36bad591eb383dbf9fac7c884ab4807edcdd4",
+      "/private/tmp/native-project-compiler1007/Raven.CodeAnalysis.dll": "61ab44f4fc6efe34505451ea7fb2b88353b4dfe812e25a819d6c446b043ef658",
+      "/private/tmp/native-project-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "33f953c13134995799364ef16b9013e51032cb4f105401db8091893aa40eea9a",
+      "/private/tmp/native-project-compiler1007/NeoCLR.Metadata.Experimental.dll": "40e26a6d8dd51471f86d3c8fd84e2ee2f89f2469123be07c3dffd172c443d40a"
+    }
+  }
+}

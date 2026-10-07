@@ -56,7 +56,11 @@ Raven e141006f3 fixes the intermittent `System.Void` encoding failure at type bi
 exact bootstrap Void lookup now honors the selected native unit owner. Two deterministic
 regressions and six fresh builds pass. [Evidence](experiments/extended-cli-metadata/unit-bootstrap-2026-10-07.md).
 The general async unit-return correction is handed to the author-designated Raven release
-task; consume its qualified revision for native validation. Next: native project-reference/build and LSP catalogs, Platform service ownership and
+task; its integrated compiler revision is af47cb0a5, with native async qualification still
+separate. Native project import/run now carries the exact source-built Object root via
+RavenNeoClrObjectLibrary (Raven 0f85f53b8); the unchanged HTTP headers project executes
+and invalid ownership preserves the prior output. [Evidence](experiments/extended-cli-metadata/native-project-root-2026-10-07.md).
+Next: native project-reference/build and LSP catalogs, Platform service ownership and
 collected shipping artifacts. Existing native workspace tests explicitly reject project
 references; accepting a real project graph needs implementation and validation.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
@@ -72,7 +76,7 @@ and [documentation acceptance](../api-docs/README.md#planned-bundles-and-declara
 These are recorded requirements; project/bundle/source-link implementation remains open.
 Author merge direction (2026-10-07): once bootstrap is ready, merge
 `codex/native-system-bootstrap` into neoCLR `main` and continue development there.
-Current intermittent build failures and unqualified project/editor artifacts keep this
+Unqualified project-graph/editor/shipping artifacts keep this
 merge gate open; the instruction authorizes merging when qualified, not prematurely.
 
 Author-directed foundation rule (2026-10-07): System.Runtime owns well-defined
