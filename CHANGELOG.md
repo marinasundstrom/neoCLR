@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Establish the native source-owned orders gate: all 197 aggregate library inputs
+  emit, and unchanged application-order-collections imports that artifact, compiles,
+  verifies and executes with exact output/exit 0. Raven explicitly selects the imported
+  Object owner; primitive bootstrap and finalized retained seed remain required.
+  Add reproducible acceptance tooling and update the development website status.
+
 - Integrate Raven's native erased Value import fix: preserve nominal semantic identity
   instead of parsing a nonexistent CLR special type. The unchanged orders consumer
   now reaches ArrayList emission validation; reconcile imported source-root ownership

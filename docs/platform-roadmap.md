@@ -10,6 +10,21 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+**The native source-owned orders gate passes.** The 197-input aggregate library is
+compiled separately; unchanged application-order-collections imports its native metadata,
+emits and executes with exact checked-in output and exit 0. Explicit imported Object
+selection unifies semantic roots without weakening inheritance checks. The runtime uses
+the finalized retained seed and explicit source-root artifact. This meets the broad
+native application gate under the permitted bootstrap dependencies, not complete API
+coverage or a bootstrap-free/production-packaged release.
+
+Next: establish the proposed core/Data/Networking/Web assembly boundaries with
+separate-library consumers, then carry their owner/dependency catalog into project/LSP
+configuration. Keep the existing POC sample/editor gates as ownership moves.
+[Commands and evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
+
+### Earlier imported source-root frontier
+
 Native System.Value now imports with its declared semantic identity. The unchanged
 orders consumer gets through binding and reaches **System.Collections.ArrayList<T>
 emission validation**. Investigate imported source Object ownership for generic classes

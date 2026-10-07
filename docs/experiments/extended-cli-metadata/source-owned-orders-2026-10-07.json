@@ -1,0 +1,129 @@
+{
+  "sourceRevision": "75d97fe85a2aeba7b3e457f912e587a798ef1268",
+  "compilerRevision": "801f131ba+imported-root",
+  "commands": [
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/imported-root-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/failure1006b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json",
+        "--reference",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+        "--object-library",
+        "Numbers",
+        "-o",
+        "/private/tmp/source-owned-orders-recorded1007/Orders.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+      ],
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "verify",
+        "/private/tmp/source-owned-orders-recorded1007/Orders.dll",
+        "--system",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+        "--module",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+        "--object-root",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "NeoMetadata_7A1164BAA763529DA6AD75325214873528CF8556AA56783AE62D3FCCB0BEBB53: typed-stack/control-flow verification passed (2431 IL functions; maximum stack 7; runtime value checks remain)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr",
+        "run",
+        "/private/tmp/source-owned-orders-recorded1007/Orders.dll",
+        "--system",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+        "--module",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+        "--object-root",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll"
+      ],
+      "exitCode": 0,
+      "stdout": "Duplicate order rejected\n3\n3\nUnknown order\nOrder already shipped\nMultiple\n2\nFiltered orders share identity\n2\n303\n303\n0\nEmpty\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/imported-root-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/failure1006b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json",
+        "--reference",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+        "--object-library",
+        "Missing",
+        "-o",
+        "/private/tmp/source-owned-orders-recorded1007/missing.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: Object library is not a registered native reference: Missing\n"
+    },
+    {
+      "command": [
+        "dotnet",
+        "/private/tmp/imported-root-compiler1007/rvnc.dll",
+        "neoclr",
+        "--core-reference",
+        "/private/tmp/failure1006b/Core.dll",
+        "--runtime-seed",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox",
+        "--bootstrap-ownership",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json",
+        "--reference",
+        "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll",
+        "--object-library",
+        "Numbers",
+        "--source-object-root",
+        "--library",
+        "-o",
+        "/private/tmp/source-owned-orders-recorded1007/conflicting.dll",
+        "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn"
+      ],
+      "exitCode": 1,
+      "stdout": "",
+      "stderr": "neoCLR: --object-library requires --core-reference and cannot be combined with source or legacy Object ownership.\n"
+    }
+  ],
+  "hashes": {
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/extended-cli-metadata/verify_source_owned_orders.py": "8bf718c26be1b3c00466073317070144dd66883cd030ee90f7f6555f2bbabfb3",
+    "/private/tmp/retained-catalog-audit1007/audit.json": "02f581988f58bded1cb9319b6dd8494ef606dca3bba856229e4ec709bc7ee1f6",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/System.runtime.neox": "689c667a5872bf58fea50ef6773f131d035ad8856c505b19d74e1400eaf7d15f",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/Numbers.dll": "edd069bc424c27196549fd98061184cef87d41be6192466c2b70e7dce4abe37f",
+    "/private/tmp/retained-catalog-audit1007/full-owned-handle/ownership.json": "2afe2e6fcb77171c597b2beb79064882e8e4c63bfe9cb8d3ba4d054d973d9cc6",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.rvn": "d775c2c648591482cf53a0a735603ca51aea48c2f2bb33633c95830e57b6550b",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/docs/experiments/raven-target/samples/application-order-collections.expected.txt": "a3ad3c2feba43048173845f14ad098cd7301b07a283e661a8f0d6a889c1a03bb",
+    "/private/tmp/source-owned-orders-recorded1007/Orders.dll": "b56f19e0c6267dc205f0499584f0df2c4bf55fb8e9df8b540ed14c88f29384d6",
+    "/private/tmp/failure1006b/Core.dll": "7e5cee8e255704bbf44595173609c1c4834b7e7b512dba8704987fd05420dd88",
+    "/Users/robert/.codex/worktrees/extended-cli-metadata/neoclr/target/debug/neoclr": "180608db04f98d2834e0d520f7997adc54d9e86623fbd4ebcf2a62940599b750",
+    "/private/tmp/imported-root-compiler1007/rvnc.dll": "b9547d15eb19c0720f9690d5240727b8bc9ff9129ad017a46c4cb8fd6cfbf42d",
+    "/private/tmp/imported-root-compiler1007/Raven.CodeAnalysis.dll": "c61d8dc3012cc20e08357e885906c75243e7d62412d22d35630f2cd8f0cc6a99",
+    "/private/tmp/imported-root-compiler1007/Raven.CodeAnalysis.NeoClr.dll": "7cb5bea940a095aaebc30eea9ae5ab32a87e5de2c9ce9a2d23f597519c435fc6",
+    "/private/tmp/imported-root-compiler1007/NeoCLR.Metadata.Experimental.dll": "963d6844051fab3cee2e963a7a4e23c9e92ce07235372aeff62dfa7f0fbf5432"
+  },
+  "compilerChangeCommit": "3e5406d8f",
+  "compilerSnapshotNote": "Recorded snapshot label is 801f131ba+imported-root; binary hashes identify the tested compiler. Unrelated async work was committed concurrently on the integration branch.",
+  "semanticProbe": "PASS explicit imported Object semantic root, generic bases and selection rejection\n",
+  "regressions": "/usr/local/share/dotnet/sdk/11.0.100-rc.1.26425.128/Sdks/Microsoft.NET.Sdk/targets/Microsoft.NET.RuntimeIdentifierInference.targets(385,5): message NETSDK1057: You are using a preview version of .NET. See: https://aka.ms/dotnet-support-policy [/Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/Raven.CodeAnalysis.Tests.csproj]\n  Raven.CodeAnalysis.Tests -> /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll\n  Tool 'dotnet-ilverify' (version '9.0.9') was restored. Available commands: ilverify\n  Tool 'ilspycmd' (version '9.1.0.7988') was restored. Available commands: ilspycmd\n  \n  Restore was successful.\nTest run for /Users/robert/.codex/worktrees/raven-metadata-consumer/Raven/test/Raven.CodeAnalysis.Tests/bin/Debug/net11.0/Raven.CodeAnalysis.Tests.dll (.NETCoreApp,Version=v11.0)\nA total of 1 test files matched the specified pattern.\n\nPassed!  - Failed:     0, Passed:    47, Skipped:     0, Total:    47, Duration: 12 s - Raven.CodeAnalysis.Tests.dll (net11.0)\n"
+}

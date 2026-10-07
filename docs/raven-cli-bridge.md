@@ -6477,3 +6477,24 @@ The diagnostic now names the rejected type. The imported generic class uses the 
 source Object root; reconcile consumer root selection next, without weakening checks.
 No consumer artifact was published and broad execution is not claimed.
 [Evidence](experiments/extended-cli-metadata/value-import-2026-10-07.md).
+
+## Source-owned orders acceptance (2026-10-07)
+
+Raven 3e5406d8f adds an explicit imported Object contract and --object-library selection.
+It validates a native public abstract fieldless baseless root, uses it for object lookup,
+source/imported generic bases and primitive-bootstrap base facts, and retains the explicit
+CLI primitive core for other bootstrap declarations. Missing, wrong, non-native, conflicting
+and .NET selections reject; ordinary .NET defaults are unchanged. Emission consumes
+semantic facts and host artifact identities, without reopening importer objects.
+
+The unchanged orders sample compiles through ordinary driver commands using only the
+full 197-input native library artifact, ownership manifest, primitive bootstrap and
+finalized retained seed. It verifies and runs with exact expected stdout, no stderr,
+and exit 0. Mutations, callbacks, query operations and shared identity are observable in
+the checked-in sample output. The source library is reused from the recorded aggregate
+audit; no source/consumer rewriting or CLI projection fallback participates.
+
+47 focused compiler regressions and native root semantic checks pass. Root catalog
+propagation to project/LSP configuration and separate production assembly packaging are
+next; this is not execution of every class-library API or removal of bootstrap inputs.
+[Acceptance and hashes](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).

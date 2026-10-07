@@ -141,6 +141,14 @@ Unicode String/Char, encoding, text streams and JSON work. The text model distin
 grapheme clusters, Unicode scalars and bytes; native UTF-8 storage does not change the
 ordinary .NET target's Char semantics. Support and limitations remain target-specific.
 
+**Development beyond Preview 12:** the full 197-input class-library audit now emits a
+source-owned native assembly. The unchanged orders application imports that assembly
+with library sources absent, then compiles and runs with its expected collection,
+callback, query and shared-identity behavior. Explicit Object-root ownership, primitive
+bootstrap and a retained runtime seed are still required. This is a development acceptance
+gate; production library packaging and editor configuration for this layout remain work
+in progress, and not every class-library API has execution coverage.
+
 Native nongeneric async functions and class methods use the existing heap state-machine
 lowering. `Task<unit>` and `Task<int>` entries drain registered work before obtaining their
 result; cancellation and unresolved tasks fail explicitly. Generic async methods and

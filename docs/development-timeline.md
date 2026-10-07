@@ -11270,3 +11270,22 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
 - **Open:** Full-System admission reaches retained-seed dependency ownership. This is
   not full bootstrap or a completed optional-library split.
 - [Evidence](experiments/extended-cli-metadata/canonical-unit-2026-10-07.md).
+
+## 2026-10-07 — Source-owned broad application acceptance
+
+- **Author's earlier objective:** Compile the runtime-library sources, consume their
+  emitted metadata without including those sources in the application, and execute
+  unchanged application-order-collections. Keep bootstrap dependencies explicit and
+  preserve ordinary .NET behavior. Later suggested separating optional Data,
+  Networking and Web libraries from core.
+- **Assistant implementation follow-up:** Added an explicitly selected imported Object
+  owner to Raven's semantic import contract and compiler driver. This resolved the
+  competing bootstrap/source Object identities without relaxing inheritance checks.
+- **Observed outcome:** The native consumer compiles, verifies and runs with exact
+  expected stdout, no stderr and exit 0 against the separately emitted 197-input
+  aggregate. The C# root probe and 47 focused compiler regressions pass. Reproducible
+  commands and hashes are checked in; the website labels this as development work.
+- **Still open:** Production assembly boundaries, project/editor ownership catalogs,
+  wider API execution coverage and removal of permitted bootstrap inputs. This outcome
+  does not establish a new release or imply every API has been executed.
+- [Acceptance evidence](experiments/extended-cli-metadata/source-owned-orders-2026-10-07.md).
