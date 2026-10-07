@@ -90,13 +90,45 @@ def main():
             if seed_text.count(value_declaration) != 1:
                 raise ValueError('Expected exactly one retained Value declaration')
             seed_source.write_text(seed_text.replace(declaration, '').replace(void_declaration, '').replace(value_declaration, ''))
-            seed = directory / 'System.neox'
-            assembled = subprocess.run([str(args.runtime.resolve()), 'assemble', str(seed_source), str(seed), '--format', 'neox'],
+            # Assemble the seed with its bootstrap root to resolve source signatures,
+            # then remove that root from the retained metadata before selecting the
+            # source-owned root. The final seed is intentionally not standalone.
+            bootstrap_json = directory / 'System.bootstrap.json'
+            assembled = subprocess.run([str(args.runtime.resolve()), 'assemble', str(seed_source), str(bootstrap_json), '--format', 'json'],
                                        cwd=ROOT, capture_output=True, text=True, timeout=60)
             if assembled.returncode:
                 raise RuntimeError(assembled.stdout + assembled.stderr)
+            model = json.loads(bootstrap_json.read_text())
+            roots = [t for t in model['types'] if t['name'] == 'System.Object']
+            if len(roots) != 1:
+                raise ValueError('Expected exactly one bootstrap Object declaration')
+            model['types'] = [t for t in model['types'] if t['name'] != 'System.Object']
+            model['functions'] = [f for f in model['functions'] if f.get('owner') != {'Named': 'System.Object'}]
+            # Reindex the retained name-bound declarations on loading. Do not leave
+            # old dense definition IDs referring to entries removed above.
+            def clear_definition_ids(value):
+                if isinstance(value, dict):
+                    if isinstance(value.get('definition'), dict) and {'module', 'index'} <= set(value['definition']) <= {'module', 'revision', 'index'}:
+                        del value['definition']
+                    for child in value.values():
+                        clear_definition_ids(child)
+                elif isinstance(value, list):
+                    for child in value:
+                        clear_definition_ids(child)
+            clear_definition_ids(model)
+            retained_json = directory / 'System.retained.json'
+            retained_json.write_text(json.dumps(model, separators=(',', ':')))
+            seed = directory / 'System.neox'
+            encoded = subprocess.run(['dotnet', 'run', '--project', 'tools/metadata/NeoCLR.Metadata.Translate', '--', str(retained_json), str(seed)],
+                                     cwd=ROOT, capture_output=True, text=True, timeout=60)
+            if encoded.returncode:
+                raise RuntimeError(encoded.stdout + encoded.stderr)
             report['handleSeedAssembly'] = dict(command=assembled.args, exitCode=assembled.returncode,
                                                stdout=assembled.stdout, stderr=assembled.stderr)
+            report['retainedSeedEncoding'] = dict(command=encoded.args, exitCode=encoded.returncode,
+                                                 stdout=encoded.stdout, stderr=encoded.stderr)
+            for path in (bootstrap_json, retained_json):
+                report['hashes'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
             for path in (seed_source, seed):
                 report['hashes'][str(path)] = hashlib.sha256(path.read_bytes()).hexdigest()
         ownership = directory / 'ownership.json'

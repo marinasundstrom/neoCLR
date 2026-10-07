@@ -6409,3 +6409,16 @@ changes. Native metadata remains authoritative; CLI reference projection semanti
 and ordinary .NET codegen are unchanged. The aggregate owner Numbers is diagnostic,
 not production packaging. Runtime admission now reaches the source Array backing
 contract. [Evidence and candidate assembly split](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+## Retained root ownership and candidate assembly split (2026-10-07)
+
+The aggregate audit now removes seed Object before native linking to the selected
+source root, retaining explicit bootstrap/encoding inputs and hashes. Compiler
+emission still passes; runtime next rejects retained/source WriteLine contracts
+(Void value versus no-result). No compiler or .NET behavior is changed. Diagnostic
+metadata import during emission remains native; host seed preparation may use JSON
+before encoding NEOX and is not a runtime input fallback.
+
+The author-suggested Runtime/Data/Networking/Web split has an emitted local-dependency
+inventory and ordered separate-compilation gates, not final assembly ownership.
+[Details and remaining ABI work](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).

@@ -584,9 +584,17 @@ pub(crate) fn validate_linked(module: &Module) -> Result<(), Fault> {
             {
                 continue;
             }
-            return Err(Fault::new(
-                "duplicate function signature differing only by reference access",
-            ));
+            return Err(Fault::new(format!(
+                "conflicting function signature: {} ({:?}) [{:?} versus {:?}]; returns {:?}/{:?}, no-result {}/{}",
+                function.name,
+                function.parameters,
+                previous.definition,
+                function.definition,
+                previous.returns,
+                function.returns,
+                previous.no_result,
+                function.no_result
+            )));
         }
         if function.name.is_empty()
             || (function.owner.is_some()

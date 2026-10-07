@@ -11241,3 +11241,14 @@ still rejects with 48 diagnostics. See [gate](experiments/extended-cli-metadata/
   ownership; separate-library execution is not yet established. The proposal does
   not imply a final assembly naming/ownership decision.
 - [Implementation evidence and tradeoffs](experiments/extended-cli-metadata/expanded-library-2026-10-07.md).
+
+### Follow-up evidence for the 2026-10-07 packaging discussion
+
+- **Assistant investigation:** Counted emitted local references with nested union
+  cases assigned to their declaring owners. Observed Data → Runtime, Networking →
+  Runtime, and Web → Runtime/Data/Networking; no local reverse edge from the Runtime
+  remainder. Seed dependencies and native adapter ownership still need review.
+- **Performed action:** Removed the duplicate retained Object in the diagnostic
+  audit; the full-source artifact still emits. Runtime admission now identifies a
+  retained/source WriteLine result-contract mismatch. No assembly split is implemented.
+- [Inventory and ordered proposed gates](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).

@@ -8,6 +8,12 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Remove the competing bootstrap Object from the full-source audit's retained native
+  seed. All 197 inputs still emit; admission advances to the retained/source WriteLine
+  result-contract conflict, now identified with declaration and return details.
+  Add a read-only emitted-dependency inventory and staged Data/Networking/Web split
+  plan; no production assembly split is claimed.
+
 - Add required native library schema 4 with a 16 MiB envelope; smaller libraries
   retain schema 3 and its 8 MiB limit. JSON/node/depth and total PE bounds stay
   unchanged. All 197 System inputs now emit; runtime admission next rejects the

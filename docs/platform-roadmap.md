@@ -10,6 +10,15 @@ also required; runtime suspension and green threads are explicitly deferred.
 
 ## Source-built System bootstrap frontier (2026-10-07)
 
+The full-source audit now removes the competing seed Object; all 197 inputs emit.
+Runtime admission advances past Array backing to **retained/source WriteLine result
+ABI** (Void value versus no-result). Reconcile service ownership/contracts next.
+The candidate Runtime/Data/Networking/Web inventory has no local core-to-optional
+edges; build and consume those assemblies in dependency order after core admission.
+[Prioritized gates and evidence](experiments/extended-cli-metadata/library-boundaries-2026-10-07.md).
+
+### Earlier aggregate-emission frontier
+
 All 197 diagnostic System inputs now emit a native PE. Required schema 4 admits
 larger library envelopes while retaining earlier-profile bounds. Full-artifact runtime
 admission next rejects **nominal array backing storage**; resolve that actual source
