@@ -63,7 +63,10 @@ and invalid ownership preserves the prior output. [Evidence](experiments/extende
 Native project-reference builds and prebuilt workspace imports now pass a four-project
 execution diamond, including generic object mutation and failure preservation.
 [Graph evidence](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
-Next: checked-in class-library project layouts, live LSP qualification, Platform service
+The checked-in native System.Runtime project now builds the 175-source foundation;
+unchanged orders executes against its output after explicit retained-seed finalization.
+[Runtime project evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).
+Next: higher-level class-library projects, live LSP qualification, Platform service
 ownership and collected shipping artifacts.
 The API site remains one namespace/type reference across assemblies; declaring-assembly
 provenance belongs on pages. Native multi-input RavenDoc migration must preserve that

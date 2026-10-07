@@ -6620,3 +6620,20 @@ The executable diamond and C# loader contracts are recorded in the
 [project graph gate](experiments/extended-cli-metadata/native-project-graph-2026-10-07.md).
 Ordinary .NET project behavior is unchanged. This does not yet define Platform projects,
 a shipping layout or live VS Code acceptance; API/website rendering is unchanged.
+
+
+## Source-owned Runtime project (2026-10-07)
+
+Raven `eb5744ba4` adds `RavenNeoClrSourceObjectRoot=true`, the project equivalent of the native command's
+`--source-object-root`. It requires library output, excludes imported Object selection,
+and retains primitive/async ownership. Introspection follows the ownership manifest;
+there is no implicit seed introspection facade for a source-root bootstrap. Invalid
+boolean values, executable selection and conflicting imported roots reject.
+
+The [native Runtime project](../runtime/raven/projects/README.md) now builds the
+175 audited sources and executes unchanged orders through a separate native consumer.
+The primitive Core and compile-time retained seed are explicit inputs. Runtime execution
+requires a retained seed finalized against the new artifact. These are native semantic
+and emission contracts; no new CLI bridge representation is introduced. The legacy
+bridge project remains distinct. Public runtime APIs and website reference rendering
+are unchanged; see [evidence](experiments/extended-cli-metadata/native-runtime-project-2026-10-07.md).

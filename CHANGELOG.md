@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Add the checked-in native System.Runtime project and its explicit ownership manifest
+  for the 175-source Runtime foundation. Qualify project compilation, retained-seed
+  finalization and unchanged source-free orders execution. Higher-level project layouts
+  and Platform extraction remain open; the legacy bridge project is retained separately.
+
 - Qualify Raven 3892b113a dependency-first native ProjectReference builds with a four-project diamond,
   transitive native imports, generic object mutation/identity, exact execution output,
   cycle rejection and failed-output preservation. Record the prebuilt workspace boundary

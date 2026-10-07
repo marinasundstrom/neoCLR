@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>System.Runtime</AssemblyName>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RavenTargetPlatform>NeoCLR</RavenTargetPlatform>
+    <RavenMetadataFormat>NeoCLR</RavenMetadataFormat>
+    <!-- RavenNeoClrCoreReference and RavenNeoClrRuntimeSeed are explicit host inputs. -->
+    <RavenNeoClrBootstrapOwnership>ownership.json</RavenNeoClrBootstrapOwnership>
+    <RavenNeoClrSourceObjectRoot>true</RavenNeoClrSourceObjectRoot>
+    <RavenNeoClrBootstrapIntrinsics>true</RavenNeoClrBootstrapIntrinsics>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../src/System/**/*.rvn"
+             Exclude="../../src/System/Data/**/*.rvn;../../src/System/Networking/**/*.rvn;../../src/System/Web/**/*.rvn" />
+    <Compile Include="../../native/*.rvn"
+             Exclude="../../native/ObjectIntrospection.rvn;../../native/RuntimeNetworkCalls.rvn;../../native/RuntimeNetworkServices.rvn" />
+  </ItemGroup>
+</Project>
