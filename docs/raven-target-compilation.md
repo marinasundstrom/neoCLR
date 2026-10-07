@@ -249,3 +249,18 @@ Static Object reachability cannot infer arbitrary generic overrides and rejects
 that analysis explicitly. Arbitrary generic application unions and payload-bearing
 explicit layouts remain outside the validated subset. The separate Neo bootstrap
 profile retains its frozen legacy carrier/propagation ABI.
+
+## Shared heap-async release-gate fix (2026-10-07)
+
+Raven main commit `4d162731e` fixes a field-assignment regression found during
+0.1.14 release validation. Pending heap-state async methods could resume past
+an emitter-local copy of their stable `self` receiver, leaving the returned task
+incomplete. The emitter now reloads self/base after the value expression and
+retains single evaluation of side-effecting receivers. The fix is carried to
+`codex/source-object-metadata-resolution` as `ad7ef2ca9`.
+
+Seventeen focused modern .NET tests pass for Debug/Release heap and value-state
+methods, delayed task completion, GC and reference-field early returns. This
+is general compiler emission behavior, with no new Runtime Contract option,
+native metadata convention or temporary CLI encoding. Native neoCLR execution
+was not rerun for this fix; Raven's full release gates are still in progress.

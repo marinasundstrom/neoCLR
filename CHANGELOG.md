@@ -8,6 +8,11 @@ Published sections are frozen. See the [maintenance workflow](docs/changelog.md)
 
 ### 2026-10-07
 
+- Record the shared Raven heap-async resumption fix on main and the source-object
+  metadata integration branch. Seventeen focused .NET tests pass; native runtime
+  behavior and Runtime Contract configuration are unchanged. See the target
+  compilation guide for the release-gate evidence and validation limits.
+
 - Refresh RavenDoc so wide tables scroll inside mobile articles without widening
   the page. Rebuild the site and validate all 18 website tests.
 
